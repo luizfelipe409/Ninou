@@ -1335,3 +1335,11 @@ updateAmountField(selectedType());
 timerInterval = window.setInterval(renderTimer, 1000);
 initializeFirebase();
 render();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch((error) => {
+      console.warn("Service worker não registrado.", error);
+    });
+  });
+}

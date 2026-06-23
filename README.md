@@ -1,6 +1,6 @@
-# Projeto Baby
+# Ninou
 
-App estático para registrar rotina do bebê: sono, despertares, amamentação, mamadeira e fraldas.
+PWA estático para registrar rotina do bebê: sono, despertares, amamentação, mamadeira e fraldas.
 
 ## Rodar localmente
 
@@ -10,9 +10,25 @@ python3 -m http.server 8000
 
 Depois abra `http://127.0.0.1:8000`.
 
+## Instalar no celular
+
+Depois de publicado na Vercel, abra a URL no celular.
+
+No iPhone:
+
+1. Abra no Safari.
+2. Toque em compartilhar.
+3. Toque em `Adicionar à Tela de Início`.
+
+No Android:
+
+1. Abra no Chrome.
+2. Toque no menu.
+3. Toque em `Adicionar à tela inicial` ou `Instalar app`.
+
 ## Publicar na Vercel
 
-Este projeto é estático: `index.html`, `styles.css` e `app.js`.
+Este projeto é estático: `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `sw.js` e `icons/`.
 
 Opção pela interface:
 
@@ -57,3 +73,13 @@ Estrutura usada:
 users/{uid}/profile/main
 users/{uid}/activities/{activityId}
 ```
+
+## Ícones
+
+O ícone ativo usa `icons/app-icon-source.png`, gerado também como:
+
+- `icons/icon-192.png`
+- `icons/icon-512.png`
+- `icons/apple-touch-icon.png`
+
+Outras opções estão na pasta `icons/`.
