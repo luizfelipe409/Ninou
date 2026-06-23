@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Projeto Baby</title>
+    <link rel="stylesheet" href="./styles.css?v=21" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div class="hero-visual" aria-hidden="true">
+          <div class="moon"></div>
+          <div class="mobile">
+            <div class="mobile-bar"></div>
+            <div class="mini-row blue"></div>
+            <div class="mini-row green"></div>
+            <div class="mini-row coral"></div>
+          </div>
+          <div class="star star-one"></div>
+          <div class="star star-two"></div>
+          <div class="star star-three"></div>
+        </div>
+        <div class="hero-copy">
+          <div class="hero-identity">
+            <div id="profileAvatar" class="profile-avatar" aria-hidden="true">
+              <span id="profileAvatarInitial">B</span>
+              <img id="profileAvatarImage" alt="" hidden />
+            </div>
+            <p class="eyebrow" id="diaryLabel">Diário do bebê</p>
+          </div>
+          <h1>Projeto Baby</h1>
+          <p class="hero-text">
+            Registre a rotina, acompanhe padrões e veja uma sugestão simples para
+            a próxima soneca com base na janela de despertar do seu bebê.
+          </p>
+        </div>
+      </section>
+
+      <section class="auth-panel" aria-label="Sincronização">
+        <div>
+          <span id="syncStatus">Modo local</span>
+          <strong id="authTitle">Sincronizar com a família</strong>
+          <p id="authMessage">Entre com o mesmo e-mail nos celulares para manter os registros sincronizados.</p>
+        </div>
+        <form id="authForm" class="auth-form">
+          <input id="authEmail" type="email" autocomplete="email" placeholder="e-mail" />
+          <input id="authPassword" type="password" autocomplete="current-password" placeholder="senha" minlength="6" />
+          <button id="signInButton" class="small-button" type="submit">Entrar</button>
+          <button id="signUpButton" class="small-button ghost" type="button">Criar acesso</button>
+        </form>
+        <button id="signOutButton" class="small-button ghost" type="button" hidden>Sair</button>
+      </section>
+
+      <section class="workspace" aria-label="Registro de atividades">
+        <aside class="panel entry-panel">
+          <div class="panel-heading entry-heading">
+            <h2>Novo registro</h2>
+            <span id="todayLabel"></span>
+          </div>
+
+          <form id="activityForm">
+            <fieldset class="type-grid" aria-label="Tipo de atividade">
+              <label class="type-option sleep">
+                <input type="radio" name="type" value="sono" checked />
+                <span class="type-icon">☾</span>
+                <span>Soneca</span>
+              </label>
+              <label class="type-option wake">
+                <input type="radio" name="type" value="despertar" />
+                <span class="type-icon">↟</span>
+                <span>Acordou</span>
+              </label>
+              <label class="type-option bedtime">
+                <input type="radio" name="type" value="dormir" />
+                <span class="type-icon">◐</span>
+                <span>Noite</span>
+              </label>
+              <label class="type-option nursing">
+                <input type="radio" name="type" value="amamentacao" />
+                <span class="type-icon">◒</span>
+                <span>Amamentação</span>
+              </label>
+              <label class="type-option bottle">
+                <input type="radio" name="type" value="mamadeira" />
+                <span class="type-icon">⌁</span>
+                <span>Mamadeira</span>
+              </label>
+              <label class="type-option diaper">
+                <input type="radio" name="type" value="fralda" />
+                <span class="type-icon">▣</span>
+                <span>Fralda</span>
+              </label>
+            </fieldset>
+
+            <div class="timer-panel" aria-label="Rotina ao vivo">
+              <div class="panel-heading">
+                <h2>Rotina ao vivo</h2>
+                <span id="timerStatus">Nenhum timer ativo</span>
+              </div>
+              <div class="wake-card" id="wakeCard">
+                <span id="stateLabel">Acordado há</span>
+                <strong id="awakeElapsed">--:--</strong>
+                <p id="awakeSinceLabel">Finalize uma soneca ou registre que acordou.</p>
+              </div>
+              <div class="timer-actions">
+                <button id="sleepTimerButton" class="timer-button" type="button" data-timer-type="sono">
+                  <span id="sleepTimerIcon">☾</span>
+                  <strong id="sleepTimerLabel">Iniciar soneca</strong>
+                </button>
+                <button class="timer-button" type="button" data-timer-type="amamentacao">
+                  <span>◒</span>
+                  <strong>Amamentação</strong>
+                </button>
+              </div>
+              <button id="cancelSleepButton" class="sleep-cancel-button" type="button" hidden>Cancelar sono iniciado</button>
+              <div id="activeTimer" class="active-timer" hidden>
+                <div>
+                  <span id="activeTimerLabel">Timer ativo</span>
+                  <strong id="activeTimerElapsed">00:00:00</strong>
+                </div>
+                <div class="timer-controls">
+                  <button id="finishTimerButton" class="small-button" type="button">Finalizar</button>
+                  <button id="cancelTimerButton" class="small-button ghost" type="button">Cancelar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <label>
+                Horário
+                <input id="timeInput" name="time" type="datetime-local" required />
+              </label>
+              <label>
+                Duração
+                <input id="durationInput" name="duration" type="number" min="0" step="5" placeholder="min" />
+              </label>
+            </div>
+
+            <div class="field-row">
+              <label id="amountField">
+                Quantidade
+                <input id="amountInput" name="amount" type="number" min="0" step="5" placeholder="ml" />
+              </label>
+              <label id="detailField">
+                <span id="detailLabel">Lado / Tipo</span>
+                <select id="detailInput" name="detail">
+                  <option value="">Não se aplica</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Observações
+              <textarea id="notesInput" name="notes" rows="3" placeholder="Ex.: acordou tranquilo, mamou bem"></textarea>
+            </label>
+
+            <button id="submitButton" class="primary-button" type="submit">
+              <span id="submitButtonIcon">＋</span>
+              <span id="submitButtonLabel">Registrar</span>
+            </button>
+            <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="profile-panel" aria-label="Perfil do bebê">
+            <div class="panel-heading">
+              <h2>Perfil</h2>
+              <span id="wakeWindowHint">Janela sugerida</span>
+            </div>
+            <div class="field-row">
+              <label>
+                Nome
+                <input id="babyNameInput" type="text" placeholder="Bebê" />
+              </label>
+              <label>
+                Nascimento
+                <input id="babyBirthInput" type="date" />
+              </label>
+            </div>
+            <label class="photo-field">
+              Foto pequena
+              <input id="babyPhotoInput" type="file" accept="image/*" />
+            </label>
+            <div class="age-card">
+              <span>Dias de vida</span>
+              <strong id="babyDaysOld">--</strong>
+              <p id="babyAgeSummary">Preencha a data de nascimento.</p>
+            </div>
+            <div class="wake-window-control">
+              <div class="wake-window-topline">
+                <span>Janela de despertar</span>
+                <strong id="wakeWindowProfileValue">-- min</strong>
+              </div>
+              <p id="wakeWindowProfileNote">Preencha o nascimento para calcular uma sugestão.</p>
+              <div class="wake-window-actions">
+                <button class="adjust-button" type="button" data-window-adjust="-10">-10</button>
+                <button id="useSuggestionButton" class="adjust-button use-suggestion" type="button">Usar sugestão</button>
+                <button class="adjust-button" type="button" data-window-adjust="10">+10</button>
+              </div>
+              <label>
+                Ajuste fino
+                <input id="wakeWindowInput" type="number" min="30" max="360" step="5" placeholder="minutos" />
+              </label>
+            </div>
+          </div>
+        </aside>
+
+        <section class="dashboard">
+          <div class="toolbar">
+            <label class="date-filter">
+              Data
+              <input id="dateFilter" type="date" />
+            </label>
+            <div class="toolbar-actions">
+              <button id="exportButton" class="text-button" type="button" title="Exportar dados" aria-label="Exportar dados">
+                <span>⇩</span>
+                Exportar
+              </button>
+              <button id="clearButton" class="icon-button danger" type="button" title="Limpar registros do dia" aria-label="Limpar registros do dia">×</button>
+            </div>
+          </div>
+
+          <section class="plan-band" aria-label="Plano de sono">
+            <article class="plan-card">
+              <span>Próxima soneca</span>
+              <strong id="nextNapTime">--:--</strong>
+              <p id="nextNapStatus">Registre que acordou ou finalize uma soneca para calcular.</p>
+            </article>
+            <article class="plan-card awake-plan-card">
+              <span>Tempo acordado hoje</span>
+              <strong id="awakeToday">0h 00</strong>
+              <p id="awakeTodayNote">Comece registrando que acordou.</p>
+            </article>
+            <article class="plan-card">
+              <span>Janela atual</span>
+              <strong id="wakeWindowValue">-- min</strong>
+              <p id="wakeWindowNote">Ajuste no perfil conforme o ritmo do bebê.</p>
+            </article>
+            <article class="plan-card">
+              <span>Plano do dia</span>
+              <strong id="dayPlan">Sem dados</strong>
+              <p id="dayPlanNote">A rotina aparece conforme os registros entram.</p>
+            </article>
+          </section>
+
+          <div class="stats-grid" aria-label="Estatísticas do dia">
+            <article class="stat sleep-stat">
+              <span>Sono total</span>
+              <strong id="sleepTotal">0h 00</strong>
+            </article>
+            <article class="stat">
+              <span>Mamadas</span>
+              <strong id="feedingCount">0</strong>
+            </article>
+            <article class="stat">
+              <span>Mamadeiras</span>
+              <strong id="bottleTotal">0 ml</strong>
+            </article>
+            <article class="stat">
+              <span>Fraldas</span>
+              <strong id="diaperCount">0</strong>
+            </article>
+          </div>
+
+          <div class="panel trends-panel">
+            <div class="panel-heading">
+              <h2>Tendências</h2>
+              <span>Últimos 7 dias</span>
+            </div>
+            <div class="trend-summary">
+              <div>
+                <span>Média/dia</span>
+                <strong id="averageSleep">0h 00</strong>
+              </div>
+              <div>
+                <span>Sonecas/dia</span>
+                <strong id="averageNaps">0</strong>
+              </div>
+            </div>
+            <div id="trendBars" class="trend-bars" aria-label="Sono dos últimos 7 dias"></div>
+          </div>
+
+          <div class="panel timeline-panel">
+            <div class="panel-heading">
+              <h2>Linha do tempo</h2>
+              <span id="eventCount">0 registros</span>
+            </div>
+            <ol id="timeline" class="timeline"></ol>
+            <p id="emptyState" class="empty-state">Nenhum registro nesta data.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <template id="eventTemplate">
+      <li class="timeline-item">
+        <div class="event-mark"></div>
+        <div class="event-body">
+          <div class="event-topline">
+            <strong class="event-title"></strong>
+            <time class="event-time"></time>
+          </div>
+          <p class="event-meta"></p>
+          <p class="event-notes"></p>
+        </div>
+        <button class="delete-button" type="button" title="Excluir registro" aria-label="Excluir registro">×</button>
+      </li>
+    </template>
+
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+    <script src="./app.js?v=21"></script>
+  </body>
+</html>
