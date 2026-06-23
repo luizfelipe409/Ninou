@@ -253,6 +253,38 @@ function authErrorMessage(error) {
   return messages[error.code] || "Não consegui autenticar agora.";
 }
 
+function loadImageFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+    image.addEventListener("load", () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    });
+    image.addEventListener("error", () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Não consegui carregar esta imagem."));
+    });
+    image.src = url;
+  });
+}
+
+async function compressProfilePhoto(file) {
+  const image = await loadImageFromFile(file);
+  const maxSize = 320;
+  const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  canvas.width = width;
+  canvas.height = height;
+  context.drawImage(image, 0, 0, width, height);
+
+  return canvas.toDataURL("image/jpeg", 0.78);
+}
+
 function setSyncMessage(message) {
   authMessage.textContent = message;
 }
@@ -1235,20 +1267,23 @@ babyBirthInput.addEventListener("input", () => {
   renderPlan();
 });
 
-babyPhotoInput.addEventListener("change", () => {
+babyPhotoInput.addEventListener("change", async () => {
   const file = babyPhotoInput.files?.[0];
   if (!file) {
     return;
   }
 
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    profile.photo = reader.result;
+  try {
+    profile.photo = await compressProfilePhoto(file);
     saveProfile();
     renderProfile();
+    formStatus.textContent = "Foto do perfil atualizada.";
+  } catch (error) {
+    console.error(error);
+    formStatus.textContent = "Não consegui carregar esta foto. Tente uma imagem JPG ou PNG.";
+  } finally {
     babyPhotoInput.value = "";
-  });
-  reader.readAsDataURL(file);
+  }
 });
 
 wakeWindowInput.addEventListener("input", () => {
