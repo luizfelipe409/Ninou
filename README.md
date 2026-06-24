@@ -49,30 +49,60 @@ vercel --prod
 
 ## Observação importante
 
-Esta versão de teste funciona em modo local. A tela de conta já exige e-mail e senha e indica o estado `Off-line`/`Online`, mas a sincronização real entre celulares ainda precisa ser ligada ao Firebase.
+A sincronização usa Firebase Authentication e Firestore. Para dois celulares compartilharem os dados, entre com uma conta e use o mesmo `Código familiar` nos aparelhos. Isso também permite que e-mails diferentes participem da mesma rotina familiar.
 
 ## Firebase
 
-A próxima etapa para sincronizar entre aparelhos é conectar Firebase Authentication com `Email/Password` e Firestore. Regras sugeridas:
+No Firebase Console:
+
+1. Em Authentication, ative o provedor `Email/Password`.
+2. Em Firestore Database, use a edição Standard/Spark e publique regras compatíveis com famílias.
+
+Regras sugeridas para esta versão:
 
 ```js
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isFamilyMember(familyId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid));
+    }
+
     match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /families/{familyId}/members/{userId} {
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /families/{familyId}/profile/{document} {
+      allow read, write: if isFamilyMember(familyId);
+    }
+
+    match /families/{familyId}/days/{document} {
+      allow read, write: if isFamilyMember(familyId);
     }
   }
 }
 ```
 
-Estrutura usada:
+Estrutura usada no Firestore:
 
 ```text
-users/{uid}/profile/main
-users/{uid}/activities/{activityId}
+users/{uid}/settings/main
+families/{codigoFamiliar}/members/{uid}
+families/{codigoFamiliar}/profile/main
+families/{codigoFamiliar}/days/{YYYY-MM-DD}
 ```
+
+A foto de perfil é reduzida no navegador e salva no documento `profile/main`, então não é necessário configurar Firebase Storage nesta versão.
 
 ## Ícones
 
