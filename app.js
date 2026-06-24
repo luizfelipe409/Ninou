@@ -62,7 +62,20 @@ const storageKeys = {
   email: "ninou.demo.email",
   wakeWindow: "ninou.demo.wakeWindow",
   profile: "ninou.demo.profile",
+  dayState: "ninou.demo.dayState",
 };
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAlGGx3z6kDWk4vsgBjSH2BDkDQwPoZlAM",
+  authDomain: "ninou-3c936.firebaseapp.com",
+  projectId: "ninou-3c936",
+  storageBucket: "ninou-3c936.firebasestorage.app",
+  messagingSenderId: "18333404018",
+  appId: "1:18333404018:web:6faefb89f2e79e737c6beb",
+  measurementId: "G-WPEYS3SH60",
+};
+
+const firebaseSdkVersion = "10.12.4";
 
 const typeConfig = {
   sono: {
@@ -117,11 +130,22 @@ const typeConfig = {
 
 const hour = 60 * 60 * 1000;
 const day = 24 * hour;
+
 let currentSheetType = "sono";
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
+let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
+let firebaseServices = null;
+let firebaseServicesPromise = null;
+let cloudUser = null;
+let profileUnsubscribe = null;
+let dayUnsubscribe = null;
+let profileCloudSaveTimer = null;
+let dayCloudSaveTimer = null;
+let applyingCloudState = false;
+let state = loadLocalDayState();
 
 function createEmptyDayState() {
   return {
@@ -130,8 +154,6 @@ function createEmptyDayState() {
     events: [],
   };
 }
-
-let state = createEmptyDayState();
 
 function makeEvent(type, start, end = start, detail = "", notes = "") {
   return {
@@ -142,6 +164,52 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
     detail,
     notes,
   };
+}
+
+function normalizeEvent(event = {}) {
+  const type = typeof event.type === "string" && typeConfig[event.type] ? event.type : "sono";
+  const start = Number(event.start);
+  const end = Number(event.end);
+
+  if (!Number.isFinite(start)) return null;
+
+  return {
+    id: typeof event.id === "string" ? event.id : `${type}-${Math.round(start)}-${Math.random().toString(36).slice(2, 8)}`,
+    type,
+    start,
+    end: Number.isFinite(end) ? end : start,
+    detail: typeof event.detail === "string" ? event.detail : "",
+    notes: typeof event.notes === "string" ? event.notes : "",
+  };
+}
+
+function normalizeDayState(dayState = {}) {
+  const validModes = ["idle", "awake", "sleeping"];
+  const mode = validModes.includes(dayState.mode) ? dayState.mode : "idle";
+  const activeStartedAt = Number(dayState.activeStartedAt);
+
+  return {
+    mode,
+    activeStartedAt: mode === "idle" || !Number.isFinite(activeStartedAt) ? null : activeStartedAt,
+    events: Array.isArray(dayState.events) ? dayState.events.map(normalizeEvent).filter(Boolean) : [],
+  };
+}
+
+function loadLocalDayState() {
+  try {
+    return normalizeDayState(JSON.parse(localStorage.getItem(storageKeys.dayState) || "{}"));
+  } catch {
+    return createEmptyDayState();
+  }
+}
+
+function saveLocalDayState() {
+  localStorage.setItem(storageKeys.dayState, JSON.stringify(normalizeDayState(state)));
+}
+
+function saveDayState() {
+  saveLocalDayState();
+  scheduleDayCloudSave();
 }
 
 function formatDuration(ms) {
@@ -207,24 +275,27 @@ function getDefaultBabyProfile() {
   };
 }
 
+function normalizeBabyProfile(profile = {}) {
+  return {
+    name: typeof profile.name === "string" ? profile.name : "",
+    article: profile.article === "da" ? "da" : "do",
+    birthDate: typeof profile.birthDate === "string" ? profile.birthDate : "",
+  };
+}
+
 function loadBabyProfile() {
   try {
-    const savedProfile = {
+    return normalizeBabyProfile({
       ...getDefaultBabyProfile(),
       ...JSON.parse(localStorage.getItem(storageKeys.profile) || "{}"),
-    };
-    return {
-      name: typeof savedProfile.name === "string" ? savedProfile.name : "",
-      article: savedProfile.article === "da" ? "da" : "do",
-      birthDate: typeof savedProfile.birthDate === "string" ? savedProfile.birthDate : "",
-    };
+    });
   } catch {
     return getDefaultBabyProfile();
   }
 }
 
 function saveBabyProfile() {
-  localStorage.setItem(storageKeys.profile, JSON.stringify(babyProfile));
+  localStorage.setItem(storageKeys.profile, JSON.stringify(normalizeBabyProfile(babyProfile)));
 }
 
 function getBabyName() {
@@ -295,13 +366,297 @@ function syncBabyProfileForm() {
 }
 
 function updateBabyProfile(patch) {
-  babyProfile = {
+  babyProfile = normalizeBabyProfile({
     ...babyProfile,
     ...patch,
-  };
+  });
   saveBabyProfile();
   renderBabyIdentity();
   renderCurrentState();
+  scheduleProfileCloudSave();
+}
+
+async function getFirebaseServices() {
+  if (firebaseServices) return firebaseServices;
+
+  if (!firebaseServicesPromise) {
+    firebaseServicesPromise = Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`),
+      import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`),
+    ])
+      .then(([appModule, authModule, firestoreModule]) => {
+        const app = appModule.initializeApp(firebaseConfig);
+
+        firebaseServices = {
+          auth: authModule.getAuth(app),
+          createUserWithEmailAndPassword: authModule.createUserWithEmailAndPassword,
+          signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
+          signOut: authModule.signOut,
+          onAuthStateChanged: authModule.onAuthStateChanged,
+          db: firestoreModule.getFirestore(app),
+          doc: firestoreModule.doc,
+          getDoc: firestoreModule.getDoc,
+          setDoc: firestoreModule.setDoc,
+          onSnapshot: firestoreModule.onSnapshot,
+          serverTimestamp: firestoreModule.serverTimestamp,
+        };
+
+        return firebaseServices;
+      })
+      .catch((error) => {
+        firebaseServicesPromise = null;
+        console.error("Erro ao carregar Firebase:", error);
+        throw error;
+      });
+  }
+
+  return firebaseServicesPromise;
+}
+
+function getCurrentDayId() {
+  return toDateInputValue(getDayStart());
+}
+
+function getCloudProfileRef() {
+  if (!firebaseServices || !cloudUser) return null;
+  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "profile", "main");
+}
+
+function getCloudDayRef(dayId = getCurrentDayId()) {
+  if (!firebaseServices || !cloudUser) return null;
+  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "days", dayId);
+}
+
+function getProfilePayload() {
+  return {
+    ...normalizeBabyProfile(babyProfile),
+    photo: currentProfilePhoto || "",
+    wakeWindowMinutes,
+    updatedAt: firebaseServices.serverTimestamp(),
+  };
+}
+
+function applyCloudProfile(data = {}) {
+  applyingCloudState = true;
+
+  babyProfile = normalizeBabyProfile(data);
+  currentProfilePhoto = typeof data.photo === "string" ? data.photo : currentProfilePhoto;
+
+  if (Number.isFinite(Number(data.wakeWindowMinutes))) {
+    wakeWindowMinutes = Math.min(240, Math.max(20, Number(data.wakeWindowMinutes)));
+    localStorage.setItem(storageKeys.wakeWindow, String(wakeWindowMinutes));
+  }
+
+  saveBabyProfile();
+
+  if (currentProfilePhoto) {
+    try {
+      localStorage.setItem(storageKeys.photo, currentProfilePhoto);
+    } catch {
+      // A foto continua visível mesmo se o navegador não permitir salvar localmente.
+    }
+    updateProfilePhoto(currentProfilePhoto);
+  }
+
+  syncBabyProfileForm();
+  wakeWindowInput.value = String(wakeWindowMinutes);
+  wakeWindowValue.textContent = String(wakeWindowMinutes);
+  renderAll();
+
+  applyingCloudState = false;
+}
+
+function applyCloudDay(data = {}) {
+  applyingCloudState = true;
+  state = normalizeDayState(data);
+  saveLocalDayState();
+  renderAll();
+  applyingCloudState = false;
+}
+
+function scheduleProfileCloudSave() {
+  if (applyingCloudState || !cloudUser || !firebaseServices) return;
+
+  window.clearTimeout(profileCloudSaveTimer);
+  profileCloudSaveTimer = window.setTimeout(saveProfileToCloud, 600);
+}
+
+async function saveProfileToCloud() {
+  const profileRef = getCloudProfileRef();
+  if (!profileRef) return;
+
+  try {
+    await firebaseServices.setDoc(profileRef, getProfilePayload(), { merge: true });
+    setSyncStatus("online", cloudUser.email);
+  } catch (error) {
+    console.error("Erro ao salvar perfil:", error);
+    setSyncStatus("error", cloudUser.email);
+    loginHelper.textContent = getFirebaseErrorMessage(error);
+  }
+}
+
+function scheduleDayCloudSave() {
+  if (applyingCloudState || !cloudUser || !firebaseServices) return;
+
+  window.clearTimeout(dayCloudSaveTimer);
+  dayCloudSaveTimer = window.setTimeout(saveDayToCloud, 500);
+}
+
+async function saveDayToCloud() {
+  const dayRef = getCloudDayRef();
+  if (!dayRef || applyingCloudState) return;
+
+  try {
+    await firebaseServices.setDoc(
+      dayRef,
+      {
+        ...normalizeDayState(state),
+        updatedAt: firebaseServices.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    setSyncStatus("online", cloudUser.email);
+  } catch (error) {
+    console.error("Erro ao salvar rotina:", error);
+    setSyncStatus("error", cloudUser.email);
+    loginHelper.textContent = getFirebaseErrorMessage(error);
+  }
+}
+
+async function subscribeToCloudProfile() {
+  const profileRef = getCloudProfileRef();
+  if (!profileRef) return;
+
+  if (profileUnsubscribe) profileUnsubscribe();
+
+  profileUnsubscribe = firebaseServices.onSnapshot(profileRef, (snapshot) => {
+    if (!snapshot.exists()) {
+      saveProfileToCloud();
+      return;
+    }
+
+    applyCloudProfile(snapshot.data());
+  }, (error) => {
+    console.error("Erro ao ler perfil:", error);
+    setSyncStatus("error", cloudUser?.email || "");
+  });
+}
+
+async function subscribeToCloudDay() {
+  const dayRef = getCloudDayRef();
+  if (!dayRef) return;
+
+  if (dayUnsubscribe) dayUnsubscribe();
+
+  dayUnsubscribe = firebaseServices.onSnapshot(dayRef, (snapshot) => {
+    if (!snapshot.exists()) {
+      saveDayToCloud();
+      return;
+    }
+
+    applyCloudDay(snapshot.data());
+  }, (error) => {
+    console.error("Erro ao ler rotina:", error);
+    setSyncStatus("error", cloudUser?.email || "");
+  });
+}
+
+async function initFirebaseAuthState() {
+  const services = await getFirebaseServices();
+
+  services.onAuthStateChanged(services.auth, async (user) => {
+    cloudUser = user;
+
+    if (!user) {
+      if (profileUnsubscribe) profileUnsubscribe();
+      if (dayUnsubscribe) dayUnsubscribe();
+      profileUnsubscribe = null;
+      dayUnsubscribe = null;
+      setSyncStatus("offline");
+      loginButton.textContent = "Entrar";
+      createAccountButton.textContent = "Criar conta nova";
+      loginHelper.textContent = "Entre com e-mail e senha para sincronizar entre aparelhos.";
+      return;
+    }
+
+    localStorage.setItem(storageKeys.email, user.email || "");
+    loginEmail.value = user.email || "";
+
+    setSyncStatus("online", user.email || "");
+    loginButton.textContent = "Conectado";
+    createAccountButton.textContent = "Conta ativa";
+    loginHelper.textContent = "Conta conectada e sincronizando.";
+
+    await subscribeToCloudProfile();
+    await subscribeToCloudDay();
+  });
+}
+
+function getFirebaseErrorMessage(error) {
+  const code = error?.code || "";
+
+  const messages = {
+    "auth/email-already-in-use": "Este e-mail já tem uma conta. Toque em Entrar.",
+    "auth/invalid-email": "Digite um e-mail válido.",
+    "auth/user-not-found": "Conta não encontrada. Crie uma conta nova.",
+    "auth/wrong-password": "Senha incorreta.",
+    "auth/invalid-credential": "E-mail ou senha incorretos.",
+    "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
+    "auth/network-request-failed": "Falha de conexão. Verifique a internet.",
+    "permission-denied": "Sem permissão no banco. Verifique as regras do Firestore.",
+  };
+
+  return messages[code] || "Não foi possível concluir a operação. Tente novamente.";
+}
+
+async function signInFamilyAccount() {
+  const credentials = getLoginCredentials("entrar");
+  if (!credentials) return;
+
+  try {
+    const services = await getFirebaseServices();
+
+    loginHelper.textContent = "Entrando...";
+    loginButton.disabled = true;
+    createAccountButton.disabled = true;
+
+    await services.signInWithEmailAndPassword(services.auth, credentials.email, credentials.password);
+    localStorage.setItem(storageKeys.email, credentials.email);
+  } catch (error) {
+    console.error("Erro ao entrar:", error);
+    loginHelper.textContent = getFirebaseErrorMessage(error);
+  } finally {
+    loginButton.disabled = false;
+    createAccountButton.disabled = false;
+  }
+}
+
+async function createFamilyAccount() {
+  const credentials = getLoginCredentials("criar a conta");
+  if (!credentials) return;
+
+  if (credentials.password.length < 6) {
+    loginHelper.textContent = "A senha precisa ter pelo menos 6 caracteres.";
+    return;
+  }
+
+  try {
+    const services = await getFirebaseServices();
+
+    loginHelper.textContent = "Criando conta...";
+    loginButton.disabled = true;
+    createAccountButton.disabled = true;
+
+    await services.createUserWithEmailAndPassword(services.auth, credentials.email, credentials.password);
+    localStorage.setItem(storageKeys.email, credentials.email);
+  } catch (error) {
+    console.error("Erro ao criar conta:", error);
+    loginHelper.textContent = getFirebaseErrorMessage(error);
+  } finally {
+    loginButton.disabled = false;
+    createAccountButton.disabled = false;
+  }
 }
 
 function getEventConfig(type) {
@@ -620,16 +975,19 @@ function finishSleep() {
   state.events.push(makeEvent("sono", state.activeStartedAt, finishedAt, "Timer"));
   state.mode = "awake";
   state.activeStartedAt = finishedAt;
+  saveDayState();
 }
 
 function startSleep() {
   state.mode = "sleeping";
   state.activeStartedAt = Date.now();
+  saveDayState();
 }
 
 function startRoutine(mode) {
   state.mode = mode === "sleeping" ? "sleeping" : "awake";
   state.activeStartedAt = Date.now();
+  saveDayState();
   renderAll();
 }
 
@@ -672,6 +1030,7 @@ function resetDayData() {
   });
   closeSheet();
   showScreen("today");
+  saveDayState();
   renderAll();
 }
 
@@ -682,17 +1041,30 @@ function updateWakeWindow(value) {
   wakeWindowValue.textContent = String(nextValue);
   localStorage.setItem(storageKeys.wakeWindow, String(nextValue));
   renderSummary();
+  scheduleProfileCloudSave();
 }
 
-function setSyncStatus(email = "") {
-  const connected = Boolean(email);
-  syncPill.textContent = connected ? "Online" : "Off-line";
-  syncPill.classList.toggle("online", connected);
-  syncPill.classList.toggle("offline", !connected);
-  syncStatusTitle.textContent = connected ? "Conta conectada" : "Off-line";
-  syncStatusText.textContent = connected
-    ? `${email} sincronizará a rotina familiar quando o Firebase estiver ativo.`
-    : "Entre com e-mail e senha para sincronizar entre aparelhos.";
+function setSyncStatus(status = "offline", email = "") {
+  if (status.includes?.("@") && !email) {
+    email = status;
+    status = "online";
+  }
+
+  const online = status === "online";
+  const loading = status === "loading";
+  const error = status === "error";
+
+  syncPill.textContent = online ? "Online" : loading ? "Conectando" : error ? "Erro" : "Off-line";
+  syncPill.classList.toggle("online", online);
+  syncPill.classList.toggle("offline", !online);
+  syncStatusTitle.textContent = online ? "Conta conectada" : loading ? "Conectando" : error ? "Erro na sincronização" : "Off-line";
+  syncStatusText.textContent = online
+    ? `${email} está sincronizando a rotina familiar.`
+    : loading
+      ? "Conectando ao Firebase..."
+      : error
+        ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
+        : "Entre com e-mail e senha para sincronizar entre aparelhos.";
 }
 
 function getLoginCredentials(actionText) {
@@ -749,6 +1121,7 @@ function saveManualEvent() {
   sheetAmountInput.value = "";
   sheetNotesInput.value = "";
   closeSheet();
+  saveDayState();
   renderAll();
 }
 
@@ -825,6 +1198,7 @@ closeSheetButton.addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 saveButton.addEventListener("click", saveManualEvent);
 resetDataButton.addEventListener("click", resetDayData);
+
 wakeWindowInput.addEventListener("input", () => {
   const nextValue = Number(wakeWindowInput.value);
   if (nextValue >= 20 && nextValue <= 240) {
@@ -851,46 +1225,27 @@ profilePhotoInput.addEventListener("change", async () => {
   const file = profilePhotoInput.files?.[0];
   if (!file) return;
   const dataUrl = await resizeImage(file);
+  currentProfilePhoto = dataUrl;
   updateProfilePhoto(dataUrl);
   try {
     localStorage.setItem(storageKeys.photo, dataUrl);
   } catch {
     // A foto continua visível mesmo se o navegador não permitir salvar localmente.
   }
+  scheduleProfileCloudSave();
 });
 
-loginButton.addEventListener("click", () => {
-  const credentials = getLoginCredentials("entrar");
-  if (!credentials) return;
-  const { email } = credentials;
-  localStorage.setItem(storageKeys.email, email);
-  setSyncStatus(email);
-  loginButton.textContent = "Conectado";
-  loginHelper.textContent = "Conta conectada neste aparelho.";
-});
+loginButton.addEventListener("click", signInFamilyAccount);
+createAccountButton.addEventListener("click", createFamilyAccount);
 
-createAccountButton.addEventListener("click", () => {
-  const credentials = getLoginCredentials("criar a conta");
-  if (!credentials) return;
-  const { email } = credentials;
-  localStorage.setItem(storageKeys.email, email);
-  setSyncStatus(email);
-  loginButton.textContent = "Conectado";
-  createAccountButton.textContent = "Conta criada";
-  loginHelper.textContent = "Conta familiar criada. Use este mesmo e-mail nos outros celulares.";
-});
-
-const savedPhoto = localStorage.getItem(storageKeys.photo);
-if (savedPhoto) updateProfilePhoto(savedPhoto);
+if (currentProfilePhoto) updateProfilePhoto(currentProfilePhoto);
 
 const savedEmail = localStorage.getItem(storageKeys.email);
 if (savedEmail) {
   loginEmail.value = savedEmail;
-  setSyncStatus(savedEmail);
-  loginButton.textContent = "Conectado";
-  loginHelper.textContent = "Conta conectada neste aparelho.";
+  setSyncStatus("loading", savedEmail);
 } else {
-  setSyncStatus();
+  setSyncStatus("offline");
 }
 
 initDiaryDatePicker();
@@ -898,3 +1253,17 @@ syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes);
 renderAll();
 setInterval(renderAll, 500);
+
+initFirebaseAuthState().catch((error) => {
+  console.error("Firebase não iniciou:", error);
+  setSyncStatus("error");
+  loginHelper.textContent = "Não foi possível iniciar a sincronização.";
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch((error) => {
+      console.warn("Service worker não registrado:", error);
+    });
+  });
+}
