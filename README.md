@@ -49,11 +49,11 @@ vercel --prod
 
 ## Observação importante
 
-O app funciona em modo local sem login. Para sincronizar entre celulares, entre com o mesmo e-mail e senha nos aparelhos.
+Esta versão de teste funciona em modo local. A tela de conta já exige e-mail e senha e indica o estado `Off-line`/`Online`, mas a sincronização real entre celulares ainda precisa ser ligada ao Firebase.
 
 ## Firebase
 
-Ative Authentication com `Email/Password` e use estas regras no Firestore:
+A próxima etapa para sincronizar entre aparelhos é conectar Firebase Authentication com `Email/Password` e Firestore. Regras sugeridas:
 
 ```js
 rules_version = '2';

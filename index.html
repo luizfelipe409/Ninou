@@ -5,319 +5,314 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ninou</title>
     <meta name="theme-color" content="#101029" />
-    <meta name="description" content="Diário sincronizado de sono, mamadas, fraldas e rotina do bebê." />
+    <meta name="description" content="Diário de sono, mamadas, fraldas e rotina do bebê." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=23" />
+    <link rel="stylesheet" href="./styles.css?v=30" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="hero">
-        <div class="hero-visual" aria-hidden="true">
-          <div class="moon"></div>
-          <div class="mobile">
-            <div class="mobile-bar"></div>
-            <div class="mini-row blue"></div>
-            <div class="mini-row green"></div>
-            <div class="mini-row coral"></div>
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="ux-bottle" viewBox="0 0 24 24">
+        <path d="M10 2h4v3l2.2 2.2c.5.5.8 1.2.8 1.9V19a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9.1c0-.7.3-1.4.8-1.9L10 5V2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M10 5h4M9 12h3M9 15h3M9 18h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M10 2h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="ux-diaper" viewBox="0 0 24 24">
+        <path d="M4 7c2.3 1.2 4.9 1.9 8 1.9S17.7 8.2 20 7v7.2c0 3.5-2.8 6.3-6.3 6.3h-3.4A6.3 6.3 0 0 1 4 14.2V7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M4 10.2h4.4M15.6 10.2H20M9 15.5c1.8 1.1 4.2 1.1 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="ux-sunrise" viewBox="0 0 24 24">
+        <path d="M4 18h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M7 18a5 5 0 0 1 10 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 5v3M5.8 8.8l2.1 2.1M18.2 8.8l-2.1 2.1M3 14h3M18 14h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="ux-moon" viewBox="0 0 24 24">
+        <path d="M18.4 15.6A7.6 7.6 0 0 1 8.4 5.6a8 8 0 1 0 10 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="ux-night" viewBox="0 0 24 24">
+        <path d="M4 18h16M7 18a5 5 0 0 1 10 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M17.8 6.8A5.8 5.8 0 0 1 10.2 3a6.1 6.1 0 0 0 6.8 8.4 5.7 5.7 0 0 0 .8-4.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="ux-feed" viewBox="0 0 24 24">
+        <path d="M12 5c-3 2.2-5 5-5 8a5 5 0 0 0 10 0c0-3-2-5.8-5-8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M9.2 14.2c1.6.9 4 .9 5.6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="ux-wake" viewBox="0 0 24 24">
+        <path d="M5 17h14M8 17a4 4 0 0 1 8 0M12 7v3M6.8 9.8l1.8 1.8M17.2 9.8l-1.8 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+    </svg>
+    <main class="phone-shell" aria-label="Protótipo completo Ninou">
+      <header class="app-header">
+        <div class="identity">
+          <img src="./icons/icon-192.png" alt="" />
+          <div>
+            <span>Ninou</span>
+            <strong>Diário de Francisco</strong>
           </div>
-          <div class="star star-one"></div>
-          <div class="star star-two"></div>
-          <div class="star star-three"></div>
         </div>
-        <div class="hero-copy">
-          <div class="hero-identity">
-            <div id="profileAvatar" class="profile-avatar" aria-hidden="true">
-              <span id="profileAvatarInitial">B</span>
-              <img id="profileAvatarImage" alt="" hidden />
-            </div>
-            <p class="eyebrow" id="diaryLabel">Diário do bebê</p>
-          </div>
-          <h1>Ninou</h1>
-          <p class="hero-text">
-            Registre a rotina, acompanhe padrões e veja uma sugestão simples para
-            a próxima soneca com base na janela de despertar do seu bebê.
-          </p>
+        <button class="sync-pill offline" type="button" aria-label="Status da sincronização">Off-line</button>
+      </header>
+
+      <section class="screen active" data-screen="today" aria-label="Hoje">
+        <div class="today-topline">
+          <span>17 dias • 2 semanas</span>
+          <button class="ghost-link" type="button" data-target-shortcut="profile">Perfil</button>
         </div>
-      </section>
 
-      <section class="auth-panel" aria-label="Sincronização">
-        <div>
-          <span id="syncStatus">Modo local</span>
-          <strong id="authTitle">Sincronizar com a família</strong>
-          <p id="authMessage">Entre com o mesmo e-mail nos celulares para manter os registros sincronizados.</p>
-        </div>
-        <form id="authForm" class="auth-form">
-          <input id="authEmail" type="email" autocomplete="email" placeholder="e-mail" />
-          <input id="authPassword" type="password" autocomplete="current-password" placeholder="senha" minlength="6" />
-          <button id="signInButton" class="small-button" type="submit">Entrar</button>
-          <button id="signUpButton" class="small-button ghost" type="button">Criar acesso</button>
-        </form>
-        <button id="signOutButton" class="small-button ghost" type="button" hidden>Sair</button>
-      </section>
+        <section class="state-orbit">
+          <div class="orbit-ring" aria-hidden="true"></div>
+          <div id="orbitEvents" class="orbit-events" aria-label="Atividades das últimas 24 horas"></div>
+          <span id="stateLabel">Rotina zerada</span>
+          <strong id="stateClock">00:00:00</strong>
+          <p id="stateHint">Escolha como começar o dia.</p>
+        </section>
 
-      <section class="workspace" aria-label="Registro de atividades">
-        <aside class="panel entry-panel">
-          <div class="panel-heading entry-heading">
-            <h2>Novo registro</h2>
-            <span id="todayLabel"></span>
-          </div>
-
-          <form id="activityForm">
-            <fieldset class="type-grid" aria-label="Tipo de atividade">
-              <label class="type-option sleep">
-                <input type="radio" name="type" value="sono" checked />
-                <span class="type-icon">☾</span>
-                <span>Soneca</span>
-              </label>
-              <label class="type-option wake">
-                <input type="radio" name="type" value="despertar" />
-                <span class="type-icon">↟</span>
-                <span>Acordou</span>
-              </label>
-              <label class="type-option bedtime">
-                <input type="radio" name="type" value="dormir" />
-                <span class="type-icon">◐</span>
-                <span>Noite</span>
-              </label>
-              <label class="type-option nursing">
-                <input type="radio" name="type" value="amamentacao" />
-                <span class="type-icon">◒</span>
-                <span>Amamentação</span>
-              </label>
-              <label class="type-option bottle">
-                <input type="radio" name="type" value="mamadeira" />
-                <span class="type-icon">⌁</span>
-                <span>Mamadeira</span>
-              </label>
-              <label class="type-option diaper">
-                <input type="radio" name="type" value="fralda" />
-                <span class="type-icon">▣</span>
-                <span>Fralda</span>
-              </label>
-            </fieldset>
-
-            <div class="timer-panel" aria-label="Rotina ao vivo">
-              <div class="panel-heading">
-                <h2>Rotina ao vivo</h2>
-                <span id="timerStatus">Nenhum timer ativo</span>
-              </div>
-              <div class="wake-card" id="wakeCard">
-                <span id="stateLabel">Acordado há</span>
-                <strong id="awakeElapsed">--:--</strong>
-                <p id="awakeSinceLabel">Finalize uma soneca ou registre que acordou.</p>
-              </div>
-              <div class="timer-actions">
-                <button id="sleepTimerButton" class="timer-button" type="button" data-timer-type="sono">
-                  <span id="sleepTimerIcon">☾</span>
-                  <strong id="sleepTimerLabel">Iniciar soneca</strong>
-                </button>
-                <button class="timer-button" type="button" data-timer-type="amamentacao">
-                  <span>◒</span>
-                  <strong>Amamentação</strong>
-                </button>
-              </div>
-              <button id="cancelSleepButton" class="sleep-cancel-button" type="button" hidden>Cancelar sono iniciado</button>
-              <div id="activeTimer" class="active-timer" hidden>
-                <div>
-                  <span id="activeTimerLabel">Timer ativo</span>
-                  <strong id="activeTimerElapsed">00:00:00</strong>
-                </div>
-                <div class="timer-controls">
-                  <button id="finishTimerButton" class="small-button" type="button">Finalizar</button>
-                  <button id="cancelTimerButton" class="small-button ghost" type="button">Cancelar</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="field-row">
-              <label>
-                Horário
-                <input id="timeInput" name="time" type="datetime-local" required />
-              </label>
-              <label>
-                Duração
-                <input id="durationInput" name="duration" type="number" min="0" step="5" placeholder="min" />
-              </label>
-            </div>
-
-            <div class="field-row">
-              <label id="amountField">
-                Quantidade
-                <input id="amountInput" name="amount" type="number" min="0" step="5" placeholder="ml" />
-              </label>
-              <label id="detailField">
-                <span id="detailLabel">Lado / Tipo</span>
-                <select id="detailInput" name="detail">
-                  <option value="">Não se aplica</option>
-                </select>
-              </label>
-            </div>
-
-            <label>
-              Observações
-              <textarea id="notesInput" name="notes" rows="3" placeholder="Ex.: acordou tranquilo, mamou bem"></textarea>
-            </label>
-
-            <button id="submitButton" class="primary-button" type="submit">
-              <span id="submitButtonIcon">＋</span>
-              <span id="submitButtonLabel">Registrar</span>
+        <section class="main-action-area" aria-label="Ação principal">
+          <button id="wakeAction" class="primary-action" type="button" hidden>
+            <span class="action-icon"><svg><use href="#ux-sunrise"></use></svg></span>
+            <span id="wakeActionLabel">Acordou</span>
+          </button>
+          <div id="startChoice" class="start-choice">
+            <button type="button" data-start-mode="awake">
+              <span class="action-icon"><svg><use href="#ux-sunrise"></use></svg></span>
+              <span>Acordou</span>
             </button>
-            <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
-          </form>
-
-          <div class="profile-panel" aria-label="Perfil do bebê">
-            <div class="panel-heading">
-              <h2>Perfil</h2>
-              <span id="wakeWindowHint">Janela sugerida</span>
-            </div>
-            <div class="field-row">
-              <label>
-                Nome
-                <input id="babyNameInput" type="text" placeholder="Bebê" />
-              </label>
-              <label>
-                Nascimento
-                <input id="babyBirthInput" type="date" />
-              </label>
-            </div>
-            <label class="photo-field">
-              Foto pequena
-              <input id="babyPhotoInput" type="file" accept="image/*" />
-            </label>
-            <div class="age-card">
-              <span>Dias de vida</span>
-              <strong id="babyDaysOld">--</strong>
-              <p id="babyAgeSummary">Preencha a data de nascimento.</p>
-            </div>
-            <div class="wake-window-control">
-              <div class="wake-window-topline">
-                <span>Janela de despertar</span>
-                <strong id="wakeWindowProfileValue">-- min</strong>
-              </div>
-              <p id="wakeWindowProfileNote">Preencha o nascimento para calcular uma sugestão.</p>
-              <div class="wake-window-actions">
-                <button class="adjust-button" type="button" data-window-adjust="-10">-10</button>
-                <button id="useSuggestionButton" class="adjust-button use-suggestion" type="button">Usar sugestão</button>
-                <button class="adjust-button" type="button" data-window-adjust="10">+10</button>
-              </div>
-              <label>
-                Ajuste fino
-                <input id="wakeWindowInput" type="number" min="30" max="360" step="5" placeholder="minutos" />
-              </label>
-            </div>
-          </div>
-        </aside>
-
-        <section class="dashboard">
-          <div class="toolbar">
-            <label class="date-filter">
-              Data
-              <input id="dateFilter" type="date" />
-            </label>
-            <div class="toolbar-actions">
-              <button id="exportButton" class="text-button" type="button" title="Exportar dados" aria-label="Exportar dados">
-                <span>⇩</span>
-                Exportar
-              </button>
-              <button id="clearButton" class="icon-button danger" type="button" title="Limpar registros do dia" aria-label="Limpar registros do dia">×</button>
-            </div>
-          </div>
-
-          <section class="plan-band" aria-label="Plano de sono">
-            <article class="plan-card">
-              <span>Próxima soneca</span>
-              <strong id="nextNapTime">--:--</strong>
-              <p id="nextNapStatus">Registre que acordou ou finalize uma soneca para calcular.</p>
-            </article>
-            <article class="plan-card awake-plan-card">
-              <span>Tempo acordado hoje</span>
-              <strong id="awakeToday">0h 00</strong>
-              <p id="awakeTodayNote">Comece registrando que acordou.</p>
-            </article>
-            <article class="plan-card">
-              <span>Janela atual</span>
-              <strong id="wakeWindowValue">-- min</strong>
-              <p id="wakeWindowNote">Ajuste no perfil conforme o ritmo do bebê.</p>
-            </article>
-            <article class="plan-card">
-              <span>Plano do dia</span>
-              <strong id="dayPlan">Sem dados</strong>
-              <p id="dayPlanNote">A rotina aparece conforme os registros entram.</p>
-            </article>
-          </section>
-
-          <div class="stats-grid" aria-label="Estatísticas do dia">
-            <article class="stat sleep-stat">
-              <span>Sono total</span>
-              <strong id="sleepTotal">0h 00</strong>
-            </article>
-            <article class="stat">
-              <span>Mamadas</span>
-              <strong id="feedingCount">0</strong>
-            </article>
-            <article class="stat">
-              <span>Mamadeiras</span>
-              <strong id="bottleTotal">0 ml</strong>
-            </article>
-            <article class="stat">
-              <span>Fraldas</span>
-              <strong id="diaperCount">0</strong>
-            </article>
-          </div>
-
-          <div class="panel trends-panel">
-            <div class="panel-heading">
-              <h2>Tendências</h2>
-              <span>Últimos 7 dias</span>
-            </div>
-            <div class="trend-summary">
-              <div>
-                <span>Média/dia</span>
-                <strong id="averageSleep">0h 00</strong>
-              </div>
-              <div>
-                <span>Sonecas/dia</span>
-                <strong id="averageNaps">0</strong>
-              </div>
-            </div>
-            <div id="trendBars" class="trend-bars" aria-label="Sono dos últimos 7 dias"></div>
-          </div>
-
-          <div class="panel timeline-panel">
-            <div class="panel-heading">
-              <h2>Linha do tempo</h2>
-              <span id="eventCount">0 registros</span>
-            </div>
-            <ol id="timeline" class="timeline"></ol>
-            <p id="emptyState" class="empty-state">Nenhum registro nesta data.</p>
+            <button type="button" data-start-mode="sleeping">
+              <span class="action-icon"><svg><use href="#ux-moon"></use></svg></span>
+              <span>Iniciar soneca</span>
+            </button>
           </div>
         </section>
+
+        <section class="quick-actions" aria-label="Ações rápidas">
+          <button type="button" data-open-sheet="amamentacao">
+            <span class="action-icon"><svg><use href="#ux-feed"></use></svg></span>
+            <span>Amamentação</span>
+          </button>
+          <button type="button" data-open-sheet="fralda">
+            <span class="action-icon"><svg><use href="#ux-diaper"></use></svg></span>
+            <span>Fralda</span>
+          </button>
+          <button type="button" data-open-sheet="mamadeira">
+            <span class="action-icon"><svg><use href="#ux-bottle"></use></svg></span>
+            <span>Mamadeira</span>
+          </button>
+          <button type="button" data-open-sheet="sono">
+            <span class="action-icon">☾</span>
+            <span>Soneca</span>
+          </button>
+        </section>
+
+        <section class="next-card" aria-label="Próxima soneca">
+          <div>
+            <span>Próxima soneca</span>
+            <strong>Aguardando</strong>
+            <p>Escolha como começar a rotina diária.</p>
+          </div>
+          <div class="mini-ring">70</div>
+        </section>
+
+        <section class="summary-grid" aria-label="Resumo de hoje">
+          <article>
+            <span>Sono</span>
+            <strong>0 min</strong>
+          </article>
+          <article>
+            <span>Acordado</span>
+            <strong>0 min</strong>
+          </article>
+          <article>
+            <span>Mamadas</span>
+            <strong>0</strong>
+          </article>
+          <article>
+            <span>Fraldas</span>
+            <strong>0</strong>
+          </article>
+        </section>
+
+        <section class="last-card">
+          <div class="section-title compact">
+            <span>Último registro</span>
+            <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
+          </div>
+          <article class="event-card">
+            <i class="mark"></i>
+            <div>
+              <strong>Nenhum registro</strong>
+              <span>O dia ainda está zerado.</span>
+            </div>
+          </article>
+        </section>
       </section>
+
+      <section class="screen" data-screen="diary" aria-label="Diário">
+        <div class="section-title">
+          <div>
+            <span id="diaryDateHint">Hoje</span>
+            <strong id="diaryDateTitle">Diário</strong>
+          </div>
+        </div>
+        <label class="date-filter">
+          Data do diário
+          <input id="diaryDateInput" type="date" />
+        </label>
+        <div class="chips" aria-label="Filtros">
+          <button class="active" type="button" data-diary-filter="all">Todos</button>
+          <button type="button" data-diary-filter="sleep">Sono</button>
+          <button type="button" data-diary-filter="feeding">Alimentação</button>
+          <button type="button" data-diary-filter="diaper">Fralda</button>
+        </div>
+        <ol class="timeline">
+          <li class="event-card">
+            <i class="mark"></i>
+            <div>
+              <strong>Nenhum registro</strong>
+              <span>Escolha uma data ou crie um novo registro.</span>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="screen" data-screen="trends" aria-label="Relatório do sono">
+        <div class="section-title">
+          <div>
+            <span>Últimos 7 dias</span>
+            <strong>Relatório do sono</strong>
+          </div>
+        </div>
+        <section class="trend-summary">
+          <article>
+            <span>Média/dia</span>
+            <strong id="sleepAverage">0 min</strong>
+            <p id="sleepAverageHint">Sono registrado por dia.</p>
+          </article>
+          <article>
+            <span>Sonecas/dia</span>
+            <strong id="napAverage">0</strong>
+            <p id="napAverageHint">Média de sonecas e noites.</p>
+          </article>
+        </section>
+        <div id="sleepBars" class="bars" aria-label="Sono por dia"></div>
+        <section class="insights">
+          <article>
+            <span>Melhor janela</span>
+            <strong id="bestWindow">Sem dados</strong>
+            <p id="bestWindowHint">Registre mais sonecas para calcular a janela mais comum.</p>
+          </article>
+          <article>
+            <span>Rotina</span>
+            <strong id="routineStatus">Aprendendo</strong>
+            <p id="routineHint">A rotina será calculada com base nos horários das sonecas.</p>
+          </article>
+        </section>
+      </section>
+
+      <section class="screen" data-screen="profile" aria-label="Perfil">
+        <div class="profile-card">
+          <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
+          <span>Francisco</span>
+          <strong>17 dias • 2 semanas</strong>
+          <label class="photo-button">
+            Trocar foto
+            <input id="profilePhotoInput" type="file" accept="image/*" />
+          </label>
+        </div>
+        <section class="settings-list">
+          <article class="login-card">
+            <span>Login familiar</span>
+            <strong>Entrar ou criar conta</strong>
+            <p id="loginHelper">Use o mesmo e-mail nos celulares para compartilhar a rotina.</p>
+            <div class="login-fields">
+              <input id="loginEmail" type="email" placeholder="email@familia.com" />
+              <input id="loginPassword" type="password" placeholder="Senha" autocomplete="current-password" />
+            </div>
+            <div class="login-actions">
+              <button id="loginButton" type="button">Entrar</button>
+              <button id="createAccountButton" class="secondary-login" type="button">Criar conta nova</button>
+            </div>
+          </article>
+          <article>
+            <span>Nascimento</span>
+            <strong>06/06/2026</strong>
+          </article>
+          <article class="wake-window-card">
+            <span>Janela de despertar</span>
+            <strong><span id="wakeWindowValue">70</span> min</strong>
+            <label>
+              Minutos acordado
+              <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
+            </label>
+          </article>
+          <article>
+            <span>Sincronização</span>
+            <strong id="syncStatusTitle">Off-line</strong>
+            <p id="syncStatusText">Entre com e-mail e senha para sincronizar entre aparelhos.</p>
+          </article>
+          <article class="danger-card">
+            <span>Rotina diária</span>
+            <strong>Zerar o dia</strong>
+            <p>Limpa os registros de hoje e reinicia os contadores da rotina.</p>
+            <button id="resetDataButton" type="button">Zerar dia</button>
+          </article>
+        </section>
+      </section>
+
+      <button class="fab" type="button" data-open-sheet="sono" aria-label="Novo registro">＋</button>
+
+      <nav class="bottom-nav" aria-label="Menu principal">
+        <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
+        <button type="button" data-target="diary">≡<span>Diário</span></button>
+        <button type="button" data-target="trends">▥<span>Sono</span></button>
+        <button type="button" data-target="profile">○<span>Perfil</span></button>
+      </nav>
     </main>
 
-    <template id="eventTemplate">
-      <li class="timeline-item">
-        <div class="event-mark"></div>
-        <div class="event-body">
-          <div class="event-topline">
-            <strong class="event-title"></strong>
-            <time class="event-time"></time>
-          </div>
-          <p class="event-meta"></p>
-          <p class="event-notes"></p>
+    <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+    <section id="recordSheet" class="record-sheet" aria-label="Novo registro" hidden>
+      <div class="sheet-handle"></div>
+      <div class="section-title">
+        <div>
+          <span>Novo registro</span>
+          <strong id="sheetTitle">Soneca</strong>
         </div>
-        <button class="delete-button" type="button" title="Excluir registro" aria-label="Excluir registro">×</button>
-      </li>
-    </template>
+        <button id="closeSheet" class="round-action" type="button">×</button>
+      </div>
+      <div class="record-types">
+        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon">☾</span><span>Soneca</span></button>
+        <button type="button" data-sheet-type="dormir"><span class="type-icon">◐</span><span>Noite</span></button>
+        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon">↟</span><span>Despertar noturno</span></button>
+        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><svg><use href="#ux-feed"></use></svg></span><span>Amamentação</span></button>
+        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><svg><use href="#ux-bottle"></use></svg></span><span>Mamadeira</span></button>
+        <button type="button" data-sheet-type="fralda"><span class="type-icon"><svg><use href="#ux-diaper"></use></svg></span><span>Fralda</span></button>
+      </div>
+      <form class="record-form">
+        <label>
+          Horário
+          <input type="datetime-local" />
+        </label>
+        <label>
+          <span id="sheetDetailLabel">Detalhe</span>
+          <select id="sheetDetail">
+            <option>Não se aplica</option>
+          </select>
+        </label>
+        <label id="sheetAmountField" hidden>
+          Quantidade
+          <input type="number" placeholder="ml" />
+        </label>
+        <label>
+          Observações
+          <textarea rows="3" placeholder="Ex.: mamou bem, acordou tranquilo"></textarea>
+        </label>
+        <button class="save-button" type="button">Registrar</button>
+      </form>
+    </section>
 
-    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
-    <script src="./app.js?v=23"></script>
+    <script src="./app.js?v=30"></script>
   </body>
 </html>
