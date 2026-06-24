@@ -38,7 +38,6 @@ const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const loginEmail = document.querySelector("#loginEmail");
 const loginPassword = document.querySelector("#loginPassword");
-const familyCodeInput = document.querySelector("#familyCodeInput");
 const loginButton = document.querySelector("#loginButton");
 const createAccountButton = document.querySelector("#createAccountButton");
 const loginHelper = document.querySelector("#loginHelper");
@@ -64,7 +63,6 @@ const storageKeys = {
   wakeWindow: "ninou.demo.wakeWindow",
   profile: "ninou.demo.profile",
   dayState: "ninou.demo.dayState",
-  familyCode: "ninou.demo.familyCode",
 };
 
 const firebaseConfig = {
@@ -139,7 +137,6 @@ let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
 let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
-let familyCode = normalizeFamilyCode(localStorage.getItem(storageKeys.familyCode) || "");
 let firebaseServices = null;
 let firebaseServicesPromise = null;
 let cloudUser = null;
@@ -268,33 +265,6 @@ function toDateInputValue(timestamp = Date.now()) {
   const date = new Date(timestamp);
   const timezoneOffset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 10);
-}
-
-function normalizeFamilyCode(value = "") {
-  return String(value)
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9_-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-}
-
-function createFamilyCode() {
-  const randomValue = window.crypto?.getRandomValues
-    ? Array.from(window.crypto.getRandomValues(new Uint8Array(4)), (value) => value.toString(36)).join("")
-    : Math.random().toString(36).slice(2, 10);
-  return `ninou-${randomValue.slice(0, 8)}`;
-}
-
-function setFamilyCode(nextCode) {
-  familyCode = normalizeFamilyCode(nextCode);
-  familyCodeInput.value = familyCode;
-  if (familyCode) {
-    localStorage.setItem(storageKeys.familyCode, familyCode);
-  }
-  return familyCode;
 }
 
 function getDefaultBabyProfile() {
@@ -426,7 +396,6 @@ async function getFirebaseServices() {
           onAuthStateChanged: authModule.onAuthStateChanged,
           db: firestoreModule.getFirestore(app),
           doc: firestoreModule.doc,
-          getDoc: firestoreModule.getDoc,
           setDoc: firestoreModule.setDoc,
           onSnapshot: firestoreModule.onSnapshot,
           serverTimestamp: firestoreModule.serverTimestamp,
@@ -448,61 +417,14 @@ function getCurrentDayId() {
   return toDateInputValue(getDayStart());
 }
 
-function getUserSettingsRef() {
-  if (!firebaseServices || !cloudUser) return null;
-  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "settings", "main");
-}
-
-function getFamilyMemberRef() {
-  if (!firebaseServices || !cloudUser || !familyCode) return null;
-  return firebaseServices.doc(firebaseServices.db, "families", familyCode, "members", cloudUser.uid);
-}
-
 function getCloudProfileRef() {
-  if (!firebaseServices || !cloudUser || !familyCode) return null;
-  return firebaseServices.doc(firebaseServices.db, "families", familyCode, "profile", "main");
+  if (!firebaseServices || !cloudUser) return null;
+  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "profile", "main");
 }
 
 function getCloudDayRef(dayId = getCurrentDayId()) {
-  if (!firebaseServices || !cloudUser || !familyCode) return null;
-  return firebaseServices.doc(firebaseServices.db, "families", familyCode, "days", dayId);
-}
-
-async function resolveFamilyCode() {
-  const typedCode = normalizeFamilyCode(familyCodeInput.value);
-  const savedCode = normalizeFamilyCode(localStorage.getItem(storageKeys.familyCode) || familyCode);
-  const userSettingsRef = getUserSettingsRef();
-
-  if (typedCode) {
-    setFamilyCode(typedCode);
-  } else if (savedCode) {
-    setFamilyCode(savedCode);
-  } else if (userSettingsRef) {
-    const snapshot = await firebaseServices.getDoc(userSettingsRef);
-    const cloudCode = normalizeFamilyCode(snapshot.exists() ? snapshot.data()?.familyCode : "");
-    setFamilyCode(cloudCode || createFamilyCode());
-  } else {
-    setFamilyCode(createFamilyCode());
-  }
-
-  if (userSettingsRef) {
-    await firebaseServices.setDoc(userSettingsRef, {
-      familyCode,
-      updatedAt: firebaseServices.serverTimestamp(),
-    }, { merge: true });
-  }
-
-  return familyCode;
-}
-
-async function joinCurrentFamily() {
-  const memberRef = getFamilyMemberRef();
-  if (!memberRef) return;
-
-  await firebaseServices.setDoc(memberRef, {
-    email: cloudUser.email || "",
-    joinedAt: firebaseServices.serverTimestamp(),
-  }, { merge: true });
+  if (!firebaseServices || !cloudUser) return null;
+  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "days", dayId);
 }
 
 function unsubscribeCloudListeners() {
@@ -512,9 +434,7 @@ function unsubscribeCloudListeners() {
   dayUnsubscribe = null;
 }
 
-async function connectCurrentFamily() {
-  await resolveFamilyCode();
-  await joinCurrentFamily();
+async function connectCurrentAccount() {
   await subscribeToCloudProfile();
   await subscribeToCloudDay();
 }
@@ -672,7 +592,7 @@ async function initFirebaseAuthState() {
       setSyncStatus("offline");
       loginButton.textContent = "Entrar";
       createAccountButton.textContent = "Criar conta nova";
-      loginHelper.textContent = "Entre com e-mail, senha e código familiar para sincronizar entre aparelhos.";
+      loginHelper.textContent = "Entre com e-mail e senha para sincronizar entre aparelhos.";
       return;
     }
 
@@ -682,12 +602,12 @@ async function initFirebaseAuthState() {
     setSyncStatus("loading", user.email || "");
     loginButton.textContent = "Conectado";
     createAccountButton.textContent = "Conta ativa";
-    loginHelper.textContent = "Conectando à conta familiar...";
+    loginHelper.textContent = "Conectando à conta...";
 
     try {
-      await connectCurrentFamily();
+      await connectCurrentAccount();
       setSyncStatus("online", user.email || "");
-      loginHelper.textContent = `Conta familiar conectada. Código: ${familyCode}.`;
+      loginHelper.textContent = "Conta conectada e sincronizando.";
     } catch (error) {
       console.error("Erro ao conectar família:", error);
       setSyncStatus("error", user.email || "");
@@ -708,13 +628,13 @@ function getFirebaseErrorMessage(error) {
     "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",
     "auth/network-request-failed": "Falha de conexão. Verifique a internet.",
-    "permission-denied": "Sem permissão no banco. Verifique as regras do Firestore para families.",
+    "permission-denied": "Sem permissão no banco. Verifique as regras do Firestore para users.",
   };
 
   return messages[code] || "Não foi possível concluir a operação. Tente novamente.";
 }
 
-async function signInFamilyAccount() {
+async function signInAccount() {
   const credentials = getLoginCredentials("entrar");
   if (!credentials) return;
 
@@ -736,7 +656,7 @@ async function signInFamilyAccount() {
   }
 }
 
-async function createFamilyAccount() {
+async function createAccount() {
   const credentials = getLoginCredentials("criar a conta");
   if (!credentials) return;
 
@@ -1163,12 +1083,12 @@ function setSyncStatus(status = "offline", email = "") {
   syncPill.classList.toggle("offline", !online);
   syncStatusTitle.textContent = online ? "Sincronização ativa" : loading ? "Conectando" : error ? "Erro na sincronização" : "Sincronização off-line";
   syncStatusText.textContent = online
-    ? `${email} está sincronizando a rotina familiar${familyCode ? ` pelo código ${familyCode}` : ""}.`
+    ? `${email} está sincronizando a rotina familiar em tempo real.`
     : loading
       ? "Conectando ao Firebase..."
       : error
         ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
-        : "Entre com sua conta familiar para ativar a sincronização entre aparelhos.";
+        : "Entre com e-mail e senha para ativar a sincronização entre aparelhos.";
 }
 
 function getLoginCredentials(actionText) {
@@ -1325,35 +1245,6 @@ babyBirthInput.addEventListener("change", () => {
   updateBabyProfile({ birthDate: babyBirthInput.value });
 });
 
-familyCodeInput.addEventListener("change", async () => {
-  const nextCode = normalizeFamilyCode(familyCodeInput.value);
-  if (!nextCode) {
-    familyCodeInput.value = familyCode;
-    loginHelper.textContent = "Digite um código familiar para trocar a sincronização.";
-    return;
-  }
-
-  setFamilyCode(nextCode);
-
-  if (!cloudUser || !firebaseServices) {
-    loginHelper.textContent = "Código familiar salvo neste aparelho.";
-    return;
-  }
-
-  try {
-    unsubscribeCloudListeners();
-    setSyncStatus("loading", cloudUser.email || "");
-    loginHelper.textContent = "Conectando ao código familiar...";
-    await connectCurrentFamily();
-    setSyncStatus("online", cloudUser.email || "");
-    loginHelper.textContent = `Conta familiar conectada. Código: ${familyCode}.`;
-  } catch (error) {
-    console.error("Erro ao trocar família:", error);
-    setSyncStatus("error", cloudUser.email || "");
-    loginHelper.textContent = getFirebaseErrorMessage(error);
-  }
-});
-
 profilePhotoInput.addEventListener("change", async () => {
   const file = profilePhotoInput.files?.[0];
   if (!file) return;
@@ -1368,11 +1259,10 @@ profilePhotoInput.addEventListener("change", async () => {
   scheduleProfileCloudSave();
 });
 
-loginButton.addEventListener("click", signInFamilyAccount);
-createAccountButton.addEventListener("click", createFamilyAccount);
+loginButton.addEventListener("click", signInAccount);
+createAccountButton.addEventListener("click", createAccount);
 
 if (currentProfilePhoto) updateProfilePhoto(currentProfilePhoto);
-familyCodeInput.value = familyCode;
 
 const savedEmail = localStorage.getItem(storageKeys.email);
 if (savedEmail) {

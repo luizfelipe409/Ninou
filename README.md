@@ -49,14 +49,14 @@ vercel --prod
 
 ## Observação importante
 
-A sincronização usa Firebase Authentication e Firestore. Para dois celulares compartilharem os dados, entre com uma conta e use o mesmo `Código familiar` nos aparelhos. Isso também permite que e-mails diferentes participem da mesma rotina familiar.
+A sincronização usa Firebase Authentication e Firestore. Para dois celulares compartilharem os dados, entre com o mesmo e-mail e senha nos aparelhos.
 
 ## Firebase
 
 No Firebase Console:
 
 1. Em Authentication, ative o provedor `Email/Password`.
-2. Em Firestore Database, use a edição Standard/Spark e publique regras compatíveis com famílias.
+2. Em Firestore Database, use a edição Standard/Spark e publique regras compatíveis com usuários autenticados.
 
 Regras sugeridas para esta versão:
 
@@ -65,29 +65,8 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-
-    function isFamilyMember(familyId) {
-      return signedIn()
-        && exists(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid));
-    }
-
     match /users/{userId}/{document=**} {
-      allow read, write: if signedIn() && request.auth.uid == userId;
-    }
-
-    match /families/{familyId}/members/{userId} {
-      allow read, write: if signedIn() && request.auth.uid == userId;
-    }
-
-    match /families/{familyId}/profile/{document} {
-      allow read, write: if isFamilyMember(familyId);
-    }
-
-    match /families/{familyId}/days/{document} {
-      allow read, write: if isFamilyMember(familyId);
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
@@ -96,10 +75,8 @@ service cloud.firestore {
 Estrutura usada no Firestore:
 
 ```text
-users/{uid}/settings/main
-families/{codigoFamiliar}/members/{uid}
-families/{codigoFamiliar}/profile/main
-families/{codigoFamiliar}/days/{YYYY-MM-DD}
+users/{uid}/profile/main
+users/{uid}/days/{YYYY-MM-DD}
 ```
 
 A foto de perfil é reduzida no navegador e salva no documento `profile/main`, então não é necessário configurar Firebase Storage nesta versão.
