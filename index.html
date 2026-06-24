@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=30" />
+    <link rel="stylesheet" href="./styles.css?v=31" />
   </head>
   <body>
     <svg class="icon-sprite" aria-hidden="true">
@@ -51,7 +51,7 @@
           <img src="./icons/icon-192.png" alt="" />
           <div>
             <span>Ninou</span>
-            <strong>Diário de Francisco</strong>
+            <strong id="diaryTitle">Diário do bebê</strong>
           </div>
         </div>
         <button class="sync-pill offline" type="button" aria-label="Status da sincronização">Off-line</button>
@@ -59,7 +59,7 @@
 
       <section class="screen active" data-screen="today" aria-label="Hoje">
         <div class="today-topline">
-          <span>17 dias • 2 semanas</span>
+          <span id="babyAgeLine">Nascimento não preenchido</span>
           <button class="ghost-link" type="button" data-target-shortcut="profile">Perfil</button>
         </div>
 
@@ -215,14 +215,33 @@
       <section class="screen" data-screen="profile" aria-label="Perfil">
         <div class="profile-card">
           <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
-          <span>Francisco</span>
-          <strong>17 dias • 2 semanas</strong>
+          <span id="profileBabyName">Bebê</span>
+          <strong id="profileBabyAge">Preencha o nascimento</strong>
           <label class="photo-button">
             Trocar foto
             <input id="profilePhotoInput" type="file" accept="image/*" />
           </label>
         </div>
         <section class="settings-list">
+          <article class="baby-profile-card">
+            <span>Perfil do bebê</span>
+            <strong>Dados principais</strong>
+            <label>
+              Nome do bebê
+              <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
+            </label>
+            <label>
+              Como mostrar no diário
+              <select id="babyArticleInput">
+                <option value="do">Diário do</option>
+                <option value="da">Diário da</option>
+              </select>
+            </label>
+            <label>
+              Dia de nascimento
+              <input id="babyBirthInput" type="date" />
+            </label>
+          </article>
           <article class="login-card">
             <span>Login familiar</span>
             <strong>Entrar ou criar conta</strong>
@@ -235,10 +254,6 @@
               <button id="loginButton" type="button">Entrar</button>
               <button id="createAccountButton" class="secondary-login" type="button">Criar conta nova</button>
             </div>
-          </article>
-          <article>
-            <span>Nascimento</span>
-            <strong>06/06/2026</strong>
           </article>
           <article class="wake-window-card">
             <span>Janela de despertar</span>
@@ -313,6 +328,6 @@
       </form>
     </section>
 
-    <script src="./app.js?v=30"></script>
+    <script src="./app.js?v=31"></script>
   </body>
 </html>

@@ -27,6 +27,13 @@ const diaryDateInput = document.querySelector("#diaryDateInput");
 const diaryDateTitle = document.querySelector("#diaryDateTitle");
 const diaryDateHint = document.querySelector("#diaryDateHint");
 const saveButton = document.querySelector(".save-button");
+const diaryTitle = document.querySelector("#diaryTitle");
+const babyAgeLine = document.querySelector("#babyAgeLine");
+const profileBabyName = document.querySelector("#profileBabyName");
+const profileBabyAge = document.querySelector("#profileBabyAge");
+const babyNameInput = document.querySelector("#babyNameInput");
+const babyArticleInput = document.querySelector("#babyArticleInput");
+const babyBirthInput = document.querySelector("#babyBirthInput");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const loginEmail = document.querySelector("#loginEmail");
@@ -54,6 +61,7 @@ const storageKeys = {
   photo: "ninou.demo.profilePhoto",
   email: "ninou.demo.email",
   wakeWindow: "ninou.demo.wakeWindow",
+  profile: "ninou.demo.profile",
 };
 
 const typeConfig = {
@@ -113,6 +121,7 @@ let currentSheetType = "sono";
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
+let babyProfile = loadBabyProfile();
 
 function createEmptyDayState() {
   return {
@@ -190,6 +199,111 @@ function toDateInputValue(timestamp = Date.now()) {
   return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 10);
 }
 
+function getDefaultBabyProfile() {
+  return {
+    name: "",
+    article: "do",
+    birthDate: "",
+  };
+}
+
+function loadBabyProfile() {
+  try {
+    const savedProfile = {
+      ...getDefaultBabyProfile(),
+      ...JSON.parse(localStorage.getItem(storageKeys.profile) || "{}"),
+    };
+    return {
+      name: typeof savedProfile.name === "string" ? savedProfile.name : "",
+      article: savedProfile.article === "da" ? "da" : "do",
+      birthDate: typeof savedProfile.birthDate === "string" ? savedProfile.birthDate : "",
+    };
+  } catch {
+    return getDefaultBabyProfile();
+  }
+}
+
+function saveBabyProfile() {
+  localStorage.setItem(storageKeys.profile, JSON.stringify(babyProfile));
+}
+
+function getBabyName() {
+  return babyProfile.name.trim();
+}
+
+function getBabyReference() {
+  return getBabyName() || "o bebê";
+}
+
+function getDiaryTitle() {
+  const name = getBabyName();
+  return name ? `Diário ${babyProfile.article} ${name}` : "Diário do bebê";
+}
+
+function parseLocalDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [year, month, date] = value.split("-").map(Number);
+  return new Date(year, month - 1, date, 12, 0, 0, 0);
+}
+
+function pluralize(value, singular, plural) {
+  return value === 1 ? singular : plural;
+}
+
+function getBabyAgeText() {
+  const birthDate = parseLocalDate(babyProfile.birthDate);
+  if (!birthDate) {
+    return {
+      short: "Nascimento não preenchido",
+      profile: "Preencha o nascimento",
+    };
+  }
+
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  if (birthDate.getTime() > today.getTime()) {
+    return {
+      short: "Revise o nascimento",
+      profile: "Data futura",
+    };
+  }
+
+  const daysAlive = Math.floor((today.getTime() - birthDate.getTime()) / day);
+  const weeksAlive = Math.floor(daysAlive / 7);
+  const daysText = `${daysAlive} ${pluralize(daysAlive, "dia", "dias")} de vida`;
+  const weeksText = `${weeksAlive} ${pluralize(weeksAlive, "semana", "semanas")}`;
+  return {
+    short: `${daysText} • ${weeksText}`,
+    profile: `${daysText} • ${weeksText}`,
+  };
+}
+
+function renderBabyIdentity() {
+  const name = getBabyName();
+  const ageText = getBabyAgeText();
+  diaryTitle.textContent = getDiaryTitle();
+  babyAgeLine.textContent = ageText.short;
+  profileBabyName.textContent = name || "Bebê";
+  profileBabyAge.textContent = ageText.profile;
+}
+
+function syncBabyProfileForm() {
+  babyNameInput.value = babyProfile.name;
+  babyArticleInput.value = babyProfile.article;
+  babyBirthInput.value = babyProfile.birthDate;
+  babyBirthInput.max = toDateInputValue();
+}
+
+function updateBabyProfile(patch) {
+  babyProfile = {
+    ...babyProfile,
+    ...patch,
+  };
+  saveBabyProfile();
+  renderBabyIdentity();
+  renderCurrentState();
+}
+
 function getEventConfig(type) {
   return typeConfig[type] || typeConfig.sono;
 }
@@ -242,7 +356,7 @@ function renderCurrentState() {
     startChoice.hidden = false;
     stateLabel.textContent = "Rotina zerada";
     stateClock.textContent = "00:00:00";
-    stateHint.textContent = "Escolha se Francisco acordou ou iniciou uma soneca.";
+    stateHint.textContent = `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`;
     return;
   }
 
@@ -493,6 +607,7 @@ function updateTheme() {
 
 function renderAll() {
   updateTheme();
+  renderBabyIdentity();
   renderCurrentState();
   renderOrbit();
   renderTimeline();
@@ -720,6 +835,18 @@ wakeWindowInput.addEventListener("input", () => {
 });
 wakeWindowInput.addEventListener("change", () => updateWakeWindow(wakeWindowInput.value));
 
+babyNameInput.addEventListener("input", () => {
+  updateBabyProfile({ name: babyNameInput.value.trim() });
+});
+
+babyArticleInput.addEventListener("change", () => {
+  updateBabyProfile({ article: babyArticleInput.value === "da" ? "da" : "do" });
+});
+
+babyBirthInput.addEventListener("change", () => {
+  updateBabyProfile({ birthDate: babyBirthInput.value });
+});
+
 profilePhotoInput.addEventListener("change", async () => {
   const file = profilePhotoInput.files?.[0];
   if (!file) return;
@@ -767,6 +894,7 @@ if (savedEmail) {
 }
 
 initDiaryDatePicker();
+syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes);
 renderAll();
 setInterval(renderAll, 500);

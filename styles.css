@@ -797,6 +797,25 @@ body.day-theme .phone-shell {
   gap: 10px;
 }
 
+.baby-profile-card {
+  display: grid;
+  gap: 10px;
+}
+
+.baby-profile-card label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.baby-profile-card input,
+.baby-profile-card select {
+  min-height: 48px;
+}
+
 .wake-window-card {
   display: grid;
   gap: 10px;
