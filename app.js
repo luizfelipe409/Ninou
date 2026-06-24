@@ -458,6 +458,31 @@ function unsubscribeCloudListeners() {
   dayUnsubscribe = null;
 }
 
+function renderAuthControls() {
+  const connected = isLoggedIn();
+  loginButton.textContent = connected ? "Conectado" : "Entrar";
+  loginButton.disabled = connected;
+  createAccountButton.textContent = connected ? "Sair" : "Criar conta nova";
+  createAccountButton.classList.toggle("logout-button", connected);
+  loginEmail.disabled = connected;
+  loginPassword.disabled = connected;
+}
+
+function clearLocalAccountData() {
+  [storageKeys.photo, storageKeys.email, storageKeys.wakeWindow, storageKeys.profile, storageKeys.dayState].forEach((key) => {
+    localStorage.removeItem(key);
+  });
+
+  state = createEmptyDayState();
+  babyProfile = getDefaultBabyProfile();
+  currentProfilePhoto = "";
+  wakeWindowMinutes = 70;
+  updateProfilePhoto("./icons/icon-192.png");
+  syncBabyProfileForm();
+  updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
+  renderAll();
+}
+
 async function connectCurrentAccount() {
   await subscribeToCloudProfile();
   await subscribeToCloudDay();
@@ -613,9 +638,11 @@ async function initFirebaseAuthState() {
 
     if (!user) {
       unsubscribeCloudListeners();
+      clearLocalAccountData();
       setSyncStatus("offline");
-      loginButton.textContent = "Entrar";
-      createAccountButton.textContent = "Criar conta nova";
+      loginEmail.value = "";
+      loginPassword.value = "";
+      renderAuthControls();
       loginHelper.textContent = "Entre com e-mail e senha para sincronizar entre aparelhos.";
       return;
     }
@@ -624,8 +651,7 @@ async function initFirebaseAuthState() {
     loginEmail.value = user.email || "";
 
     setSyncStatus("loading", user.email || "");
-    loginButton.textContent = "Conectado";
-    createAccountButton.textContent = "Conta ativa";
+    renderAuthControls();
     loginHelper.textContent = "Conectando à conta...";
 
     try {
@@ -675,12 +701,17 @@ async function signInAccount() {
     console.error("Erro ao entrar:", error);
     loginHelper.textContent = getFirebaseErrorMessage(error);
   } finally {
-    loginButton.disabled = false;
+    renderAuthControls();
     createAccountButton.disabled = false;
   }
 }
 
 async function createAccount() {
+  if (isLoggedIn()) {
+    await signOutAccount();
+    return;
+  }
+
   const credentials = getLoginCredentials("criar a conta");
   if (!credentials) return;
 
@@ -702,7 +733,31 @@ async function createAccount() {
     console.error("Erro ao criar conta:", error);
     loginHelper.textContent = getFirebaseErrorMessage(error);
   } finally {
-    loginButton.disabled = false;
+    renderAuthControls();
+    createAccountButton.disabled = false;
+  }
+}
+
+async function signOutAccount() {
+  try {
+    const services = await getFirebaseServices();
+    loginHelper.textContent = "Saindo...";
+    createAccountButton.disabled = true;
+    await services.signOut(services.auth);
+    cloudUser = null;
+    unsubscribeCloudListeners();
+    clearLocalAccountData();
+    setSyncStatus("offline");
+    loginEmail.value = "";
+    loginPassword.value = "";
+    loginEmail.disabled = false;
+    loginPassword.disabled = false;
+    renderAuthControls();
+    loginHelper.textContent = "Conta desconectada neste aparelho.";
+  } catch (error) {
+    console.error("Erro ao sair:", error);
+    loginHelper.textContent = "Não foi possível sair. Tente novamente.";
+  } finally {
     createAccountButton.disabled = false;
   }
 }
