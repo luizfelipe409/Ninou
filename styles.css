@@ -79,11 +79,56 @@ select,
 textarea {
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 16px;
+  appearance: none;
+  -webkit-appearance: none;
   background: rgba(255, 255, 255, 0.08);
   color: var(--ink);
+  font-size: 16px;
+  line-height: 1.25;
   padding: 12px;
+}
+
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"] {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-height: 48px;
+  color-scheme: dark;
+  text-align: left;
+}
+
+body.day-theme input[type="date"],
+body.day-theme input[type="datetime-local"],
+body.day-theme input[type="time"] {
+  color-scheme: light;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  width: 100%;
+  min-height: 1.25em;
+  margin: 0;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  padding: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-left: 6px;
+  opacity: 0.75;
 }
 
 select option {
@@ -967,6 +1012,9 @@ body.day-theme .bottom-nav button.active {
   bottom: 0;
   z-index: 21;
   width: min(100%, 430px);
+  max-height: calc(100vh - 18px - env(safe-area-inset-top));
+  max-height: calc(100dvh - 18px - env(safe-area-inset-top));
+  overflow-y: auto;
   display: grid;
   gap: 14px;
   transform: translateX(-50%);
@@ -974,7 +1022,8 @@ body.day-theme .bottom-nav button.active {
   border-radius: 28px 28px 0 0;
   background: linear-gradient(180deg, #211c4d, #13112e);
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.42);
-  padding: 10px 16px 18px;
+  padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling: touch;
 }
 
 .sheet-handle {
