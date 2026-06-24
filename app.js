@@ -23,6 +23,7 @@ const sheetAmountInput = sheetAmountField.querySelector("input");
 const sheetNotesInput = document.querySelector(".record-form textarea");
 const shortcutButtons = document.querySelectorAll("[data-target-shortcut]");
 const diaryFilterButtons = document.querySelectorAll("[data-diary-filter]");
+const timeline = document.querySelector(".timeline");
 const diaryDateInput = document.querySelector("#diaryDateInput");
 const diaryDateTitle = document.querySelector("#diaryDateTitle");
 const diaryDateHint = document.querySelector("#diaryDateHint");
@@ -42,6 +43,8 @@ const loginButton = document.querySelector("#loginButton");
 const createAccountButton = document.querySelector("#createAccountButton");
 const loginHelper = document.querySelector("#loginHelper");
 const resetDataButton = document.querySelector("#resetDataButton");
+const exportJsonButton = document.querySelector("#exportJsonButton");
+const exportCsvButton = document.querySelector("#exportCsvButton");
 const syncPill = document.querySelector(".sync-pill");
 const syncStatusTitle = document.querySelector("#syncStatusTitle");
 const syncStatusText = document.querySelector("#syncStatusText");
@@ -132,6 +135,7 @@ const hour = 60 * 60 * 1000;
 const day = 24 * hour;
 
 let currentSheetType = "sono";
+let currentEditingEventId = null;
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
@@ -207,7 +211,21 @@ function saveLocalDayState() {
   localStorage.setItem(storageKeys.dayState, JSON.stringify(normalizeDayState(state)));
 }
 
+function isLoggedIn() {
+  return Boolean(cloudUser);
+}
+
+function requireLogin(actionText = "salvar dados") {
+  if (isLoggedIn()) return true;
+  closeSheet();
+  showScreen("profile");
+  setSyncStatus("offline");
+  loginHelper.textContent = `Entre com e-mail e senha para ${actionText}.`;
+  return false;
+}
+
 function saveDayState() {
+  if (!isLoggedIn() && !applyingCloudState) return;
   saveLocalDayState();
   scheduleDayCloudSave();
 }
@@ -295,6 +313,7 @@ function loadBabyProfile() {
 }
 
 function saveBabyProfile() {
+  if (!isLoggedIn() && !applyingCloudState) return;
   localStorage.setItem(storageKeys.profile, JSON.stringify(normalizeBabyProfile(babyProfile)));
 }
 
@@ -366,6 +385,11 @@ function syncBabyProfileForm() {
 }
 
 function updateBabyProfile(patch) {
+  if (!requireLogin("salvar o perfil")) {
+    syncBabyProfileForm();
+    return;
+  }
+
   babyProfile = normalizeBabyProfile({
     ...babyProfile,
     ...patch,
@@ -794,7 +818,6 @@ function renderOrbit() {
 }
 
 function renderTimeline() {
-  const timeline = document.querySelector(".timeline");
   const lastCard = document.querySelector(".last-card .event-card");
   if (!timeline || !lastCard) return;
 
@@ -830,6 +853,10 @@ function renderTimeline() {
         <strong>${escapeHtml(config.title)}</strong>
         <span>${escapeHtml(formatEventMeta(event))}</span>
         ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
+        <div class="event-actions">
+          <button type="button" data-event-edit="${escapeHtml(event.id)}">Editar</button>
+          <button type="button" data-event-delete="${escapeHtml(event.id)}">Excluir</button>
+        </div>
       </div>
     `;
     timeline.append(item);
@@ -995,6 +1022,7 @@ function renderAll() {
 }
 
 function finishSleep() {
+  if (!requireLogin("salvar a rotina")) return;
   const finishedAt = Date.now();
   state.events.push(makeEvent("sono", state.activeStartedAt, finishedAt, "Timer"));
   state.mode = "awake";
@@ -1003,12 +1031,14 @@ function finishSleep() {
 }
 
 function startSleep() {
+  if (!requireLogin("salvar a rotina")) return;
   state.mode = "sleeping";
   state.activeStartedAt = Date.now();
   saveDayState();
 }
 
 function startRoutine(mode) {
+  if (!requireLogin("salvar a rotina")) return;
   state.mode = mode === "sleeping" ? "sleeping" : "awake";
   state.activeStartedAt = Date.now();
   saveDayState();
@@ -1045,6 +1075,7 @@ function initDiaryDatePicker() {
 }
 
 function resetDayData() {
+  if (!requireLogin("zerar a rotina")) return;
   state = createEmptyDayState();
   currentDiaryFilter = "all";
   selectedDiaryDay = getDayStart();
@@ -1058,14 +1089,23 @@ function resetDayData() {
   renderAll();
 }
 
-function updateWakeWindow(value) {
+function updateWakeWindow(value, options = {}) {
+  if (!options.skipLogin && !requireLogin("salvar a janela de despertar")) {
+    wakeWindowInput.value = String(wakeWindowMinutes);
+    return;
+  }
+
   const nextValue = Math.min(240, Math.max(20, Number(value) || 70));
   wakeWindowMinutes = nextValue;
   wakeWindowInput.value = String(nextValue);
   wakeWindowValue.textContent = String(nextValue);
-  localStorage.setItem(storageKeys.wakeWindow, String(nextValue));
+  if (!options.skipPersist) {
+    localStorage.setItem(storageKeys.wakeWindow, String(nextValue));
+  }
   renderSummary();
-  scheduleProfileCloudSave();
+  if (!options.skipPersist) {
+    scheduleProfileCloudSave();
+  }
 }
 
 function setSyncStatus(status = "offline", email = "") {
@@ -1107,10 +1147,14 @@ function getLoginCredentials(actionText) {
   return { email, password };
 }
 
+function getEventById(eventId) {
+  return state.events.find((event) => event.id === eventId);
+}
+
 function setSheetType(type) {
   currentSheetType = type;
   const config = getEventConfig(type);
-  sheetTitle.textContent = config.title;
+  sheetTitle.textContent = currentEditingEventId ? `Editar ${config.title}` : config.title;
   sheetDetailLabel.textContent = config.label;
   sheetAmountField.hidden = !config.amount;
   sheetDetail.innerHTML = "";
@@ -1124,9 +1168,45 @@ function setSheetType(type) {
   });
 }
 
-function openSheet(type = "sono") {
-  setSheetType(type);
+function resetSheetState() {
+  currentEditingEventId = null;
+  saveButton.textContent = "Registrar";
+  sheetAmountInput.value = "";
+  sheetNotesInput.value = "";
+}
+
+function hydrateSheetFromEvent(event) {
+  const config = getEventConfig(event.type);
+  sheetDateInput.value = toDateTimeInputValue(event.start);
+  sheetNotesInput.value = event.notes || "";
+  sheetAmountInput.value = "";
+
+  if (config.amount) {
+    const amountMatch = String(event.detail || "").match(/[\d,.]+/);
+    sheetAmountInput.value = amountMatch ? amountMatch[0].replace(",", ".") : "";
+    return;
+  }
+
+  if ([...sheetDetail.options].some((option) => option.value === event.detail || option.textContent === event.detail)) {
+    sheetDetail.value = event.detail;
+  }
+}
+
+function openSheet(type = "sono", eventId = null) {
+  const editingEvent = eventId ? getEventById(eventId) : null;
+  if (!requireLogin(editingEvent ? "editar registros" : "criar registros")) return;
+
+  currentEditingEventId = editingEvent?.id || null;
+  setSheetType(editingEvent?.type || type);
+  saveButton.textContent = editingEvent ? "Salvar alterações" : "Registrar";
   sheetDateInput.value = toDateTimeInputValue();
+  sheetAmountInput.value = "";
+  sheetNotesInput.value = "";
+
+  if (editingEvent) {
+    hydrateSheetFromEvent(editingEvent);
+  }
+
   sheet.hidden = false;
   sheetBackdrop.hidden = false;
 }
@@ -1134,19 +1214,122 @@ function openSheet(type = "sono") {
 function closeSheet() {
   sheet.hidden = true;
   sheetBackdrop.hidden = true;
+  resetSheetState();
 }
 
 function saveManualEvent() {
+  if (!requireLogin("salvar registros")) return;
   const start = sheetDateInput.value ? new Date(sheetDateInput.value).getTime() : Date.now();
   const detail = typeConfig[currentSheetType].amount && sheetAmountInput.value
     ? `${sheetAmountInput.value} ml`
     : sheetDetail.value;
-  state.events.push(makeEvent(currentSheetType, start, start, detail, sheetNotesInput.value.trim()));
+  const existingEvent = currentEditingEventId ? getEventById(currentEditingEventId) : null;
+
+  if (existingEvent) {
+    const duration = Math.max(0, existingEvent.end - existingEvent.start);
+    Object.assign(existingEvent, {
+      type: currentSheetType,
+      start,
+      end: duration ? start + duration : start,
+      detail,
+      notes: sheetNotesInput.value.trim(),
+    });
+  } else {
+    state.events.push(makeEvent(currentSheetType, start, start, detail, sheetNotesInput.value.trim()));
+  }
+
   sheetAmountInput.value = "";
   sheetNotesInput.value = "";
   closeSheet();
   saveDayState();
   renderAll();
+}
+
+function editEvent(eventId) {
+  const event = getEventById(eventId);
+  if (!event) return;
+  openSheet(event.type, event.id);
+}
+
+function deleteEvent(eventId) {
+  if (!requireLogin("excluir registros")) return;
+  const event = getEventById(eventId);
+  if (!event) return;
+  if (!window.confirm(`Excluir ${getEventConfig(event.type).title.toLowerCase()} das ${formatTime(event.start)}?`)) return;
+
+  state.events = state.events.filter((item) => item.id !== eventId);
+  saveDayState();
+  renderAll();
+}
+
+function getExportEvents() {
+  return [...state.events]
+    .sort((a, b) => a.start - b.start)
+    .map((event) => ({
+      id: event.id,
+      type: event.type,
+      title: getEventConfig(event.type).title,
+      start: new Date(event.start).toISOString(),
+      end: new Date(event.end).toISOString(),
+      durationMinutes: Math.round(Math.max(0, event.end - event.start) / 60000),
+      detail: event.detail || "",
+      notes: event.notes || "",
+    }));
+}
+
+function getExportPayload() {
+  return {
+    app: "Ninou",
+    exportedAt: new Date().toISOString(),
+    exportedBy: cloudUser?.email || "",
+    day: getCurrentDayId(),
+    profile: normalizeBabyProfile(babyProfile),
+    wakeWindowMinutes,
+    state: normalizeDayState(state),
+    events: getExportEvents(),
+  };
+}
+
+function downloadFile(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function escapeCsv(value) {
+  const text = String(value ?? "");
+  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function exportRoutine(format) {
+  if (!requireLogin("exportar a rotina")) return;
+  const payload = getExportPayload();
+  const filenameBase = `ninou-${payload.day}`;
+
+  if (format === "csv") {
+    const header = ["id", "tipo", "titulo", "inicio", "fim", "duracao_min", "detalhe", "observacoes"];
+    const rows = payload.events.map((event) => [
+      event.id,
+      event.type,
+      event.title,
+      event.start,
+      event.end,
+      event.durationMinutes,
+      event.detail,
+      event.notes,
+    ]);
+    const csv = [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
+    downloadFile(`${filenameBase}.csv`, csv, "text/csv;charset=utf-8");
+    return;
+  }
+
+  downloadFile(`${filenameBase}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
 }
 
 function updateProfilePhoto(dataUrl) {
@@ -1196,6 +1379,19 @@ diaryFilterButtons.forEach((button) => {
 
 diaryDateInput.addEventListener("change", () => setDiaryDate(diaryDateInput.value));
 
+timeline.addEventListener("click", (event) => {
+  const editButton = event.target.closest("[data-event-edit]");
+  const deleteButton = event.target.closest("[data-event-delete]");
+
+  if (editButton) {
+    editEvent(editButton.dataset.eventEdit);
+  }
+
+  if (deleteButton) {
+    deleteEvent(deleteButton.dataset.eventDelete);
+  }
+});
+
 startModeButtons.forEach((button) => {
   button.addEventListener("click", () => startRoutine(button.dataset.startMode));
 });
@@ -1222,8 +1418,11 @@ closeSheetButton.addEventListener("click", closeSheet);
 sheetBackdrop.addEventListener("click", closeSheet);
 saveButton.addEventListener("click", saveManualEvent);
 resetDataButton.addEventListener("click", resetDayData);
+exportJsonButton.addEventListener("click", () => exportRoutine("json"));
+exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
 
 wakeWindowInput.addEventListener("input", () => {
+  if (!isLoggedIn()) return;
   const nextValue = Number(wakeWindowInput.value);
   if (nextValue >= 20 && nextValue <= 240) {
     wakeWindowMinutes = nextValue;
@@ -1246,6 +1445,11 @@ babyBirthInput.addEventListener("change", () => {
 });
 
 profilePhotoInput.addEventListener("change", async () => {
+  if (!requireLogin("salvar a foto")) {
+    profilePhotoInput.value = "";
+    return;
+  }
+
   const file = profilePhotoInput.files?.[0];
   if (!file) return;
   const dataUrl = await resizeImage(file);
@@ -1274,7 +1478,7 @@ if (savedEmail) {
 
 initDiaryDatePicker();
 syncBabyProfileForm();
-updateWakeWindow(wakeWindowMinutes);
+updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 renderAll();
 setInterval(renderAll, 500);
 

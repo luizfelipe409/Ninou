@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=34" />
+    <link rel="stylesheet" href="./styles.css?v=35" />
   </head>
   <body>
     <svg class="icon-sprite" aria-hidden="true">
@@ -268,6 +268,15 @@
             <strong id="syncStatusTitle">Sincronização off-line</strong>
             <p id="syncStatusText">Entre com e-mail e senha para ativar a sincronização entre aparelhos.</p>
           </article>
+          <article class="export-card">
+            <span>Backup</span>
+            <strong>Exportar rotina</strong>
+            <p>Baixe os dados do dia atual para guardar uma cópia de segurança.</p>
+            <div class="export-actions">
+              <button id="exportJsonButton" type="button">JSON</button>
+              <button id="exportCsvButton" type="button">CSV</button>
+            </div>
+          </article>
           <article class="danger-card">
             <span>Rotina diária</span>
             <strong>Zerar o dia</strong>
@@ -328,6 +337,6 @@
       </form>
     </section>
 
-    <script src="./app.js?v=34"></script>
+    <script src="./app.js?v=35"></script>
   </body>
 </html>

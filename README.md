@@ -51,6 +51,8 @@ vercel --prod
 
 A sincronização usa Firebase Authentication e Firestore. Para dois celulares compartilharem os dados, entre com o mesmo e-mail e senha nos aparelhos.
 
+Para segurança, criar, editar, excluir, zerar, exportar rotina e alterar perfil/foto exigem login ativo.
+
 ## Firebase
 
 No Firebase Console:
