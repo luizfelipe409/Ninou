@@ -340,6 +340,24 @@ function getCloudProfileVersion(data = {}) {
   return Number.isFinite(version) ? version : 0;
 }
 
+function hasProfileContent(profile = babyProfile, photo = currentProfilePhoto, windowMinutes = wakeWindowMinutes) {
+  const normalizedProfile = normalizeBabyProfile(profile);
+  return Boolean(
+    normalizedProfile.name.trim() ||
+      normalizedProfile.birthDate ||
+      photo ||
+      normalizedProfile.article === "da" ||
+      windowMinutes !== 70,
+  );
+}
+
+function hasCloudProfileContent(data = {}) {
+  const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
+  const photoValue = data.photo || data.photoDataUrl || "";
+  const cloudWakeWindow = Number.isFinite(Number(data.wakeWindowMinutes)) ? Number(data.wakeWindowMinutes) : 70;
+  return hasProfileContent(profileSource, photoValue, cloudWakeWindow);
+}
+
 function getBabyName() {
   return babyProfile.name.trim();
 }
@@ -538,7 +556,15 @@ function getProfilePayload(options = {}) {
 
 function applyCloudProfile(data = {}) {
   const cloudProfileVersion = getCloudProfileVersion(data);
-  if (profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt) {
+  const cloudHasContent = hasCloudProfileContent(data);
+  const localHasContent = hasProfileContent();
+
+  if (!cloudHasContent && localHasContent) {
+    saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+    return;
+  }
+
+  if (localHasContent && profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt) {
     return;
   }
 
@@ -657,7 +683,9 @@ async function subscribeToCloudProfile() {
 
   profileUnsubscribe = firebaseServices.onSnapshot(profileRef, (snapshot) => {
     if (!snapshot.exists()) {
-      saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+      if (hasProfileContent()) {
+        saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+      }
       return;
     }
 
@@ -735,7 +763,7 @@ function getFirebaseErrorMessage(error) {
     "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",
     "auth/network-request-failed": "Falha de conexão. Verifique a internet.",
-    "permission-denied": "Sem permissão no banco. Verifique as regras do Firestore para users.",
+    "permission-denied": "Sem permissão no banco. Libere users/{uid}/profile/main e users/{uid}/days nas regras do Firestore.",
     "resource-exhausted": "Não foi possível salvar. A foto ou os dados ficaram grandes demais para o Firestore.",
     "invalid-argument": "Não foi possível salvar. Revise a foto ou os dados do perfil.",
     "unavailable": "Firebase indisponível no momento. Tente novamente em alguns segundos.",
