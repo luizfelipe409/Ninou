@@ -65,6 +65,7 @@ const storageKeys = {
   email: "ninou.demo.email",
   wakeWindow: "ninou.demo.wakeWindow",
   profile: "ninou.demo.profile",
+  profileVersion: "ninou.demo.profileVersion",
   dayState: "ninou.demo.dayState",
 };
 
@@ -141,6 +142,7 @@ let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
 let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
+let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
 let firebaseServices = null;
 let firebaseServicesPromise = null;
 let cloudUser = null;
@@ -315,6 +317,26 @@ function loadBabyProfile() {
 function saveBabyProfile() {
   if (!isLoggedIn() && !applyingCloudState) return;
   localStorage.setItem(storageKeys.profile, JSON.stringify(normalizeBabyProfile(babyProfile)));
+  if (profileClientUpdatedAt) {
+    localStorage.setItem(storageKeys.profileVersion, String(profileClientUpdatedAt));
+  }
+}
+
+function markProfileLocallyChanged() {
+  profileClientUpdatedAt = Math.max(Date.now(), profileClientUpdatedAt + 1);
+  localStorage.setItem(storageKeys.profileVersion, String(profileClientUpdatedAt));
+}
+
+function ensureProfileVersion() {
+  if (!profileClientUpdatedAt) {
+    markProfileLocallyChanged();
+  }
+  return profileClientUpdatedAt;
+}
+
+function getCloudProfileVersion(data = {}) {
+  const version = Number(data.clientUpdatedAt);
+  return Number.isFinite(version) ? version : 0;
 }
 
 function getBabyName() {
@@ -394,6 +416,7 @@ function updateBabyProfile(patch) {
     ...babyProfile,
     ...patch,
   });
+  markProfileLocallyChanged();
   saveBabyProfile();
   renderBabyIdentity();
   renderCurrentState();
@@ -469,13 +492,21 @@ function renderAuthControls() {
 }
 
 function clearLocalAccountData() {
-  [storageKeys.photo, storageKeys.email, storageKeys.wakeWindow, storageKeys.profile, storageKeys.dayState].forEach((key) => {
+  [
+    storageKeys.photo,
+    storageKeys.email,
+    storageKeys.wakeWindow,
+    storageKeys.profile,
+    storageKeys.profileVersion,
+    storageKeys.dayState,
+  ].forEach((key) => {
     localStorage.removeItem(key);
   });
 
   state = createEmptyDayState();
   babyProfile = getDefaultBabyProfile();
   currentProfilePhoto = "";
+  profileClientUpdatedAt = 0;
   wakeWindowMinutes = 70;
   updateProfilePhoto("./icons/icon-192.png");
   syncBabyProfileForm();
@@ -493,45 +524,54 @@ function getProfilePayload() {
     ...normalizeBabyProfile(babyProfile),
     photo: currentProfilePhoto || "",
     wakeWindowMinutes,
+    clientUpdatedAt: ensureProfileVersion(),
     updatedAt: firebaseServices.serverTimestamp(),
   };
 }
 
 function applyCloudProfile(data = {}) {
+  const cloudProfileVersion = getCloudProfileVersion(data);
+  if (profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt) {
+    return;
+  }
+
   applyingCloudState = true;
+  try {
+    profileClientUpdatedAt = cloudProfileVersion;
 
-  const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
-  babyProfile = normalizeBabyProfile(profileSource);
-  if (Object.prototype.hasOwnProperty.call(data, "photo") || Object.prototype.hasOwnProperty.call(data, "photoDataUrl")) {
-    const photoValue = data.photo || data.photoDataUrl;
-    currentProfilePhoto = typeof photoValue === "string" ? photoValue : "";
-  }
-
-  if (Number.isFinite(Number(data.wakeWindowMinutes))) {
-    wakeWindowMinutes = Math.min(240, Math.max(20, Number(data.wakeWindowMinutes)));
-    localStorage.setItem(storageKeys.wakeWindow, String(wakeWindowMinutes));
-  }
-
-  saveBabyProfile();
-
-  if (currentProfilePhoto) {
-    try {
-      localStorage.setItem(storageKeys.photo, currentProfilePhoto);
-    } catch {
-      // A foto continua visível mesmo se o navegador não permitir salvar localmente.
+    const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
+    babyProfile = normalizeBabyProfile(profileSource);
+    if (Object.prototype.hasOwnProperty.call(data, "photo") || Object.prototype.hasOwnProperty.call(data, "photoDataUrl")) {
+      const photoValue = data.photo || data.photoDataUrl;
+      currentProfilePhoto = typeof photoValue === "string" ? photoValue : "";
     }
-    updateProfilePhoto(currentProfilePhoto);
-  } else {
-    localStorage.removeItem(storageKeys.photo);
-    updateProfilePhoto("./icons/icon-192.png");
+
+    if (Number.isFinite(Number(data.wakeWindowMinutes))) {
+      wakeWindowMinutes = Math.min(240, Math.max(20, Number(data.wakeWindowMinutes)));
+      localStorage.setItem(storageKeys.wakeWindow, String(wakeWindowMinutes));
+    }
+
+    saveBabyProfile();
+
+    if (currentProfilePhoto) {
+      try {
+        localStorage.setItem(storageKeys.photo, currentProfilePhoto);
+      } catch {
+        // A foto continua visível mesmo se o navegador não permitir salvar localmente.
+      }
+      updateProfilePhoto(currentProfilePhoto);
+    } else {
+      localStorage.removeItem(storageKeys.photo);
+      updateProfilePhoto("./icons/icon-192.png");
+    }
+
+    syncBabyProfileForm();
+    wakeWindowInput.value = String(wakeWindowMinutes);
+    wakeWindowValue.textContent = String(wakeWindowMinutes);
+    renderAll();
+  } finally {
+    applyingCloudState = false;
   }
-
-  syncBabyProfileForm();
-  wakeWindowInput.value = String(wakeWindowMinutes);
-  wakeWindowValue.textContent = String(wakeWindowMinutes);
-  renderAll();
-
-  applyingCloudState = false;
 }
 
 function applyCloudDay(data = {}) {
@@ -1155,6 +1195,7 @@ function updateWakeWindow(value, options = {}) {
   wakeWindowInput.value = String(nextValue);
   wakeWindowValue.textContent = String(nextValue);
   if (!options.skipPersist) {
+    markProfileLocallyChanged();
     localStorage.setItem(storageKeys.wakeWindow, String(nextValue));
   }
   renderSummary();
@@ -1509,6 +1550,7 @@ profilePhotoInput.addEventListener("change", async () => {
   if (!file) return;
   const dataUrl = await resizeImage(file);
   currentProfilePhoto = dataUrl;
+  markProfileLocallyChanged();
   updateProfilePhoto(dataUrl);
   try {
     localStorage.setItem(storageKeys.photo, dataUrl);
