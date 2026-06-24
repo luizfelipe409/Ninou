@@ -151,6 +151,7 @@ let dayUnsubscribe = null;
 let profileCloudSaveTimer = null;
 let dayCloudSaveTimer = null;
 let applyingCloudState = false;
+let pendingProfilePhotoSave = false;
 let state = loadLocalDayState();
 
 function createEmptyDayState() {
@@ -507,6 +508,7 @@ function clearLocalAccountData() {
   babyProfile = getDefaultBabyProfile();
   currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
+  pendingProfilePhotoSave = false;
   wakeWindowMinutes = 70;
   updateProfilePhoto("./icons/icon-192.png");
   syncBabyProfileForm();
@@ -519,14 +521,19 @@ async function connectCurrentAccount() {
   await subscribeToCloudDay();
 }
 
-function getProfilePayload() {
-  return {
+function getProfilePayload(options = {}) {
+  const payload = {
     ...normalizeBabyProfile(babyProfile),
-    photo: currentProfilePhoto || "",
     wakeWindowMinutes,
     clientUpdatedAt: ensureProfileVersion(),
     updatedAt: firebaseServices.serverTimestamp(),
   };
+
+  if (options.includePhoto) {
+    payload.photo = currentProfilePhoto || "";
+  }
+
+  return payload;
 }
 
 function applyCloudProfile(data = {}) {
@@ -583,24 +590,34 @@ function applyCloudDay(data = {}) {
   applyingCloudState = false;
 }
 
-function scheduleProfileCloudSave() {
+function scheduleProfileCloudSave(options = {}) {
   if (applyingCloudState || !cloudUser || !firebaseServices) return;
+  if (options.includePhoto) pendingProfilePhotoSave = true;
 
   window.clearTimeout(profileCloudSaveTimer);
-  profileCloudSaveTimer = window.setTimeout(saveProfileToCloud, 600);
+  profileCloudSaveTimer = window.setTimeout(saveProfileToCloud, options.includePhoto ? 120 : 600);
 }
 
-async function saveProfileToCloud() {
+async function saveProfileToCloud(options = {}) {
   const profileRef = getCloudProfileRef();
   if (!profileRef) return;
 
+  const includePhoto = Boolean(options.includePhoto || pendingProfilePhotoSave);
+  const payload = getProfilePayload({ includePhoto });
+  const savedProfileVersion = payload.clientUpdatedAt;
+
   try {
-    await firebaseServices.setDoc(profileRef, getProfilePayload(), { merge: true });
-    setSyncStatus("online", cloudUser.email);
+    await firebaseServices.setDoc(profileRef, payload, { merge: true });
+    if (includePhoto) pendingProfilePhotoSave = false;
+    if (savedProfileVersion === profileClientUpdatedAt) {
+      setSyncStatus("online", cloudUser.email);
+    }
   } catch (error) {
     console.error("Erro ao salvar perfil:", error);
-    setSyncStatus("error", cloudUser.email);
-    loginHelper.textContent = getFirebaseErrorMessage(error);
+    if (savedProfileVersion === profileClientUpdatedAt) {
+      setSyncStatus("error", cloudUser.email);
+      loginHelper.textContent = getFirebaseErrorMessage(error);
+    }
   }
 }
 
@@ -640,7 +657,7 @@ async function subscribeToCloudProfile() {
 
   profileUnsubscribe = firebaseServices.onSnapshot(profileRef, (snapshot) => {
     if (!snapshot.exists()) {
-      saveProfileToCloud();
+      saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
       return;
     }
 
@@ -719,6 +736,9 @@ function getFirebaseErrorMessage(error) {
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",
     "auth/network-request-failed": "Falha de conexão. Verifique a internet.",
     "permission-denied": "Sem permissão no banco. Verifique as regras do Firestore para users.",
+    "resource-exhausted": "Não foi possível salvar. A foto ou os dados ficaram grandes demais para o Firestore.",
+    "invalid-argument": "Não foi possível salvar. Revise a foto ou os dados do perfil.",
+    "unavailable": "Firebase indisponível no momento. Tente novamente em alguns segundos.",
   };
 
   return messages[code] || "Não foi possível concluir a operação. Tente novamente.";
@@ -1557,7 +1577,7 @@ profilePhotoInput.addEventListener("change", async () => {
   } catch {
     // A foto continua visível mesmo se o navegador não permitir salvar localmente.
   }
-  scheduleProfileCloudSave();
+  scheduleProfileCloudSave({ includePhoto: true });
 });
 
 loginButton.addEventListener("click", signInAccount);
