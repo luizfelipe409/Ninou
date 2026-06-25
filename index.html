@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=54" />
+    <link rel="stylesheet" href="./styles.css?v=56" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -78,6 +78,10 @@
             <span class="action-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span>Mamadeira</span>
           </button>
+          <button type="button" data-open-sheet="medicamento">
+            <span class="action-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span>
+            <span>Medicamento</span>
+          </button>
           <button type="button" data-open-sheet="sono">
             <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span>Soneca</span>
@@ -110,6 +114,10 @@
             <span>Fraldas</span>
             <strong>0</strong>
           </article>
+          <article>
+            <span>Medicamentos</span>
+            <strong>0</strong>
+          </article>
         </section>
 
         <section class="last-card">
@@ -124,6 +132,38 @@
               <span>O dia ainda está zerado.</span>
             </div>
           </article>
+        </section>
+
+        <section id="dailyDrawer" class="daily-drawer" aria-label="Resumo diário recolhível">
+          <button id="dailyDrawerHandle" class="daily-drawer-handle" type="button" aria-expanded="false">
+            <span class="drawer-grip" aria-hidden="true"></span>
+            <span class="drawer-title">Resumo diário</span>
+            <strong id="drawerQuickStatus">Hoje zerado</strong>
+            <span class="drawer-arrow" aria-hidden="true">⌃</span>
+          </button>
+          <div class="daily-drawer-content">
+            <div id="drawerSummaryGrid" class="drawer-summary-grid">
+              <article><span>Sono</span><strong>0 min</strong></article>
+              <article><span>Acordado</span><strong>0 min</strong></article>
+              <article><span>Mamadas</span><strong>0</strong></article>
+              <article><span>Fraldas</span><strong>0</strong></article>
+              <article><span>Medicação</span><strong>0</strong></article>
+            </div>
+            <div class="drawer-section-title">
+              <span>Últimos registros</span>
+              <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
+            </div>
+            <div id="drawerLastEvents" class="drawer-last-events">
+              <article class="mini-event empty">Nenhum registro ainda.</article>
+            </div>
+            <article class="drawer-chart-card">
+              <div>
+                <span>Últimos 5 dias</span>
+                <strong>Resumo rápido</strong>
+              </div>
+              <div id="drawerMiniChart" class="mini-chart" aria-label="Resumo dos últimos 5 dias"></div>
+            </article>
+          </div>
         </section>
       </section>
 
@@ -143,6 +183,7 @@
           <button type="button" data-diary-filter="sleep">Sono</button>
           <button type="button" data-diary-filter="feeding">Alimentação</button>
           <button type="button" data-diary-filter="diaper">Fralda</button>
+          <button type="button" data-diary-filter="medicine">Medicamento</button>
         </div>
         <ol class="timeline">
           <li class="event-card">
@@ -155,16 +196,16 @@
         </ol>
       </section>
 
-      <section class="screen" data-screen="trends" aria-label="Relatório do sono">
+      <section class="screen" data-screen="trends" aria-label="Relatórios da rotina">
         <div class="section-title">
           <div>
-            <span>Últimos 7 dias</span>
-            <strong>Relatório do sono</strong>
+            <span>Últimos 5 dias</span>
+            <strong>Relatórios</strong>
           </div>
         </div>
         <section class="trend-summary">
           <article>
-            <span>Média/dia</span>
+            <span>Média de sono</span>
             <strong id="sleepAverage">0 min</strong>
             <p id="sleepAverageHint">Sono registrado por dia.</p>
           </article>
@@ -174,7 +215,28 @@
             <p id="napAverageHint">Média de sonecas e noites.</p>
           </article>
         </section>
-        <div id="sleepBars" class="bars" aria-label="Sono por dia"></div>
+        <section class="report-stack" aria-label="Gráficos dos últimos 5 dias">
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 5 dias</span><strong>Sono</strong></div>
+            <div id="sleepBars" class="bars" aria-label="Sono por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 5 dias</span><strong>Amamentação</strong></div>
+            <div id="breastfeedingBars" class="bars compact-bars" aria-label="Amamentações por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 5 dias</span><strong>Mamadeira</strong></div>
+            <div id="bottleBars" class="bars compact-bars" aria-label="Volume de mamadeira por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 5 dias</span><strong>Fraldas</strong></div>
+            <div id="diaperBars" class="bars compact-bars" aria-label="Fraldas por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 5 dias</span><strong>Medicamentos</strong></div>
+            <div id="medicationBars" class="bars compact-bars" aria-label="Medicamentos por dia"></div>
+          </article>
+        </section>
         <section class="insights">
           <article>
             <span>Melhor janela</span>
@@ -292,7 +354,7 @@
       <nav class="bottom-nav" aria-label="Menu principal">
         <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
         <button type="button" data-target="diary">≡<span>Diário</span></button>
-        <button type="button" data-target="trends">▥<span>Sono</span></button>
+        <button type="button" data-target="trends">▥<span>Dados</span></button>
         <button type="button" data-target="profile">○<span>Perfil</span></button>
       </nav>
     </main>
@@ -314,21 +376,49 @@
         <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Amamentação</span></button>
         <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamadeira</span></button>
         <button type="button" data-sheet-type="fralda"><span class="type-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Fralda</span></button>
+        <button type="button" data-sheet-type="medicamento"><span class="type-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><span>Medicamento</span></button>
       </div>
       <form class="record-form">
         <label>
           Horário
           <input type="datetime-local" />
         </label>
-        <label>
+        <label class="select-label">
           <span id="sheetDetailLabel">Detalhe</span>
           <select id="sheetDetail">
             <option>Não se aplica</option>
           </select>
         </label>
-        <label id="sheetAmountField" hidden>
-          Quantidade
-          <input type="number" placeholder="ml" />
+        <section id="breastTimerPanel" class="breast-timer-panel" hidden aria-label="Timer da amamentação">
+          <div class="breast-timer-head">
+            <div>
+              <span>Timer da mamada</span>
+              <strong id="breastTimerTotal">00:00</strong>
+            </div>
+            <button id="resetBreastTimerButton" type="button">Zerar</button>
+          </div>
+          <div class="breast-side-grid">
+            <button type="button" data-breast-side="left">
+              <span>E</span>
+              <strong id="leftBreastTimer">00:00</strong>
+              <small>Esquerdo</small>
+            </button>
+            <button type="button" data-breast-side="right">
+              <span>D</span>
+              <strong id="rightBreastTimer">00:00</strong>
+              <small>Direito</small>
+            </button>
+          </div>
+          <p>Toque em E ou D para iniciar/pausar o tempo de cada peito.</p>
+        </section>
+        <label id="sheetAmountField" class="amount-field" hidden>
+          <span>Quantidade</span>
+          <input id="sheetAmountInput" class="amount-hidden-input" type="number" min="0" max="350" step="5" placeholder="ml" inputmode="numeric" />
+          <div class="milk-slider-card">
+            <strong id="bottleAmountDisplay">105 ml</strong>
+            <input id="bottleAmountRange" class="milk-range" type="range" min="0" max="350" step="5" value="105" />
+            <div class="range-scale"><span>0</span><span>350 ml</span></div>
+          </div>
         </label>
         <label>
           Observações
@@ -350,6 +440,6 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=54"></script>
+    <script src="./app.js?v=56"></script>
   </body>
 </html>
