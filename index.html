@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=48" />
+    <link rel="stylesheet" href="./styles.css?v=53" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -50,16 +50,16 @@
 
         <section class="main-action-area" aria-label="Ação principal">
           <button id="wakeAction" class="primary-action" type="button" hidden>
-            <span class="action-icon"><span class="icon-art icon-art-acordou" aria-hidden="true"></span></span>
+            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span id="wakeActionLabel">Acordou</span>
           </button>
           <div id="startChoice" class="start-choice">
             <button type="button" data-start-mode="awake">
-              <span class="action-icon"><span class="icon-art icon-art-acordou" aria-hidden="true"></span></span>
+              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
               <span>Acordou</span>
             </button>
             <button type="button" data-start-mode="sleeping">
-              <span class="action-icon"><span class="icon-art icon-art-sono" aria-hidden="true"></span></span>
+              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
               <span>Iniciar soneca</span>
             </button>
           </div>
@@ -67,19 +67,19 @@
 
         <section class="quick-actions" aria-label="Ações rápidas">
           <button type="button" data-open-sheet="amamentacao">
-            <span class="action-icon"><span class="icon-art icon-art-amamentacao" aria-hidden="true"></span></span>
+            <span class="action-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span>Amamentação</span>
           </button>
           <button type="button" data-open-sheet="fralda">
-            <span class="action-icon"><span class="icon-art icon-art-fralda" aria-hidden="true"></span></span>
+            <span class="action-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span>Fralda</span>
           </button>
           <button type="button" data-open-sheet="mamadeira">
-            <span class="action-icon"><span class="icon-art icon-art-mamadeira" aria-hidden="true"></span></span>
+            <span class="action-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span>Mamadeira</span>
           </button>
           <button type="button" data-open-sheet="sono">
-            <span class="action-icon"><span class="icon-art icon-art-sono" aria-hidden="true"></span></span>
+            <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span>Soneca</span>
           </button>
         </section>
@@ -218,6 +218,30 @@
               Dia de nascimento
               <input id="babyBirthInput" type="date" />
             </label>
+            <div class="weight-profile-block">
+              <div class="weight-profile-header">
+                <span>Peso do bebê</span>
+                <strong id="lastWeightValue">Nenhum peso cadastrado</strong>
+                <p id="lastWeightHint">Cadastre o peso mais recente para acompanhar a evolução.</p>
+              </div>
+              <div class="weight-input-row">
+                <label>
+                  Data da pesagem
+                  <input id="babyWeightDateInput" type="date" />
+                </label>
+                <label>
+                  Peso em kg
+                  <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
+                </label>
+              </div>
+              <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Salvar peso</button>
+              <div class="weight-history-card">
+                <span>3 últimos pesos</span>
+                <ol id="weightHistoryList" class="weight-history-list">
+                  <li>Nenhum peso cadastrado.</li>
+                </ol>
+              </div>
+            </div>
           </article>
           <article class="login-card">
             <span>Login familiar</span>
@@ -284,12 +308,12 @@
         <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
       </div>
       <div class="record-types">
-        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><span class="icon-art icon-art-sono" aria-hidden="true"></span></span><span>Soneca</span></button>
-        <button type="button" data-sheet-type="dormir"><span class="type-icon"><span class="icon-art icon-art-dormir" aria-hidden="true"></span></span><span>Noite</span></button>
-        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><span class="icon-art icon-art-despertar-noturno" aria-hidden="true"></span></span><span>Despertar noturno</span></button>
-        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><span class="icon-art icon-art-amamentacao" aria-hidden="true"></span></span><span>Amamentação</span></button>
-        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><span class="icon-art icon-art-mamadeira" aria-hidden="true"></span></span><span>Mamadeira</span></button>
-        <button type="button" data-sheet-type="fralda"><span class="type-icon"><span class="icon-art icon-art-fralda" aria-hidden="true"></span></span><span>Fralda</span></button>
+        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Soneca</span></button>
+        <button type="button" data-sheet-type="dormir"><span class="type-icon"><img class="icon-art icon-art-dormir" src="./icons/actions/dormir.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Noite</span></button>
+        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img class="icon-art icon-art-despertar-noturno" src="./icons/actions/despertar-noturno.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Despertar noturno</span></button>
+        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Amamentação</span></button>
+        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamadeira</span></button>
+        <button type="button" data-sheet-type="fralda"><span class="type-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Fralda</span></button>
       </div>
       <form class="record-form">
         <label>
@@ -308,7 +332,7 @@
         </label>
         <label>
           Observações
-          <textarea rows="3" placeholder="Ex.: mamou bem, acordou tranquilo"></textarea>
+          <textarea rows="3" placeholder="Observações sobre este registro"></textarea>
         </label>
         <button class="save-button" type="button">Registrar</button>
       </form>
@@ -326,6 +350,6 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=48"></script>
+    <script src="./app.js?v=53"></script>
   </body>
 </html>
