@@ -1,9 +1,9 @@
-const CACHE_NAME = "ninou-v48";
+const CACHE_NAME = "ninou-v50";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=48",
-  "/app.js?v=48",
+  "/styles.css?v=50",
+  "/app.js?v=50",
   "/manifest.webmanifest",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
@@ -32,13 +32,33 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") {
+  if (event.request.method !== "GET") return;
+
+  const request = event.request;
+  const url = new URL(request.url);
+  const isAppFile = request.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith(".css") || url.pathname.endsWith(".js");
+
+  if (isAppFile) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("/index.html"))),
+    );
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then((cached) =>
-      cached || fetch(event.request).catch(() => caches.match("/index.html")),
-    ),
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        return response;
+      }).catch(() => caches.match("/index.html"));
+    }),
   );
 });

@@ -227,7 +227,6 @@ body.day-theme .phone-shell {
 
 .screen {
   display: none;
-  animation: appear 180ms ease;
 }
 
 .screen.active {
@@ -386,16 +385,28 @@ body.day-theme .phone-shell {
   height: 100%;
   display: block;
   border-radius: 50%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  contain: paint;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  transition: none;
-  will-change: auto;
+  object-fit: cover;
+  background: none !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  contain: initial !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.orbit-event i,
+.action-icon,
+.type-icon,
+.mark,
+.cluster-icon {
+  transform: none !important;
+  -webkit-transform: none !important;
+  contain: initial !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
 }
 
 .icon-art-acordou {
@@ -1415,5 +1426,29 @@ body.day-theme .record-sheet textarea::placeholder {
     border: 1px solid var(--line);
     border-radius: 36px;
     box-shadow: 0 24px 90px rgba(0, 0, 0, 0.38);
+  }
+}
+
+
+/* CorreÃ§Ã£o iOS/WebKit: evita piscadas/repaint dos Ã­cones durante scroll e atualizaÃ§Ã£o do relÃ³gio. */
+@supports (-webkit-touch-callout: none) {
+  .icon-art,
+  .orbit-event i,
+  .action-icon,
+  .type-icon,
+  .mark,
+  .cluster-icon {
+    transform: none !important;
+    -webkit-transform: none !important;
+    contain: initial !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+  }
+
+  .bottom-nav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(29, 25, 66, 0.96);
   }
 }

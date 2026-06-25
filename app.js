@@ -96,13 +96,14 @@ const actionIcons = {
 };
 
 function iconMarkup(iconKey) {
-  return `<span class="icon-art icon-art-${iconKey}" aria-hidden="true"></span>`;
+  const src = actionIcons[iconKey] || actionIcons.sono;
+  return `<img class="icon-art" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
 }
 
 function preloadActionIcons() {
   Object.values(actionIcons).forEach((src) => {
     const image = new Image();
-    image.decoding = "async";
+    image.decoding = "sync";
     image.src = src;
   });
 }
@@ -1998,7 +1999,9 @@ initFirebaseAuthState().catch((error) => {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch((error) => {
+    navigator.serviceWorker.register("/sw.js").then((registration) => {
+      registration.update().catch(() => {});
+    }).catch((error) => {
       console.warn("Service worker não registrado:", error);
     });
   });
