@@ -23,15 +23,7 @@ const sheetDetailLabel = document.querySelector("#sheetDetailLabel");
 const sheetDetail = document.querySelector("#sheetDetail");
 const sheetAmountField = document.querySelector("#sheetAmountField");
 const sheetDateInput = document.querySelector('.record-form input[type="datetime-local"]');
-const sheetAmountInput = document.querySelector("#sheetAmountInput");
-const bottleAmountRange = document.querySelector("#bottleAmountRange");
-const bottleAmountDisplay = document.querySelector("#bottleAmountDisplay");
-const breastTimerPanel = document.querySelector("#breastTimerPanel");
-const breastTimerTotal = document.querySelector("#breastTimerTotal");
-const leftBreastTimer = document.querySelector("#leftBreastTimer");
-const rightBreastTimer = document.querySelector("#rightBreastTimer");
-const resetBreastTimerButton = document.querySelector("#resetBreastTimerButton");
-const breastSideButtons = document.querySelectorAll("[data-breast-side]");
+const sheetAmountInput = sheetAmountField.querySelector("input");
 const sheetNotesInput = document.querySelector(".record-form textarea");
 const shortcutButtons = document.querySelectorAll("[data-target-shortcut]");
 const diaryFilterButtons = document.querySelectorAll("[data-diary-filter]");
@@ -47,6 +39,7 @@ const profileBabyAge = document.querySelector("#profileBabyAge");
 const babyNameInput = document.querySelector("#babyNameInput");
 const babyArticleInput = document.querySelector("#babyArticleInput");
 const babyBirthInput = document.querySelector("#babyBirthInput");
+const themeModeInput = document.querySelector("#themeModeInput");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const loginEmail = document.querySelector("#loginEmail");
@@ -71,22 +64,6 @@ const bestWindow = document.querySelector("#bestWindow");
 const bestWindowHint = document.querySelector("#bestWindowHint");
 const routineStatus = document.querySelector("#routineStatus");
 const routineHint = document.querySelector("#routineHint");
-const breastfeedingBars = document.querySelector("#breastfeedingBars");
-const bottleBars = document.querySelector("#bottleBars");
-const diaperBars = document.querySelector("#diaperBars");
-const medicationBars = document.querySelector("#medicationBars");
-const dailyDrawer = document.querySelector("#dailyDrawer");
-const dailyDrawerHandle = document.querySelector("#dailyDrawerHandle");
-const drawerQuickStatus = document.querySelector("#drawerQuickStatus");
-const drawerSummaryGrid = document.querySelector("#drawerSummaryGrid");
-const drawerLastEvents = document.querySelector("#drawerLastEvents");
-const drawerMiniChart = document.querySelector("#drawerMiniChart");
-const babyWeightDateInput = document.querySelector("#babyWeightDateInput");
-const babyWeightInput = document.querySelector("#babyWeightInput");
-const saveBabyWeightButton = document.querySelector("#saveBabyWeightButton");
-const lastWeightValue = document.querySelector("#lastWeightValue");
-const lastWeightHint = document.querySelector("#lastWeightHint");
-const weightHistoryList = document.querySelector("#weightHistoryList");
 
 const storageKeys = {
   photo: "ninou.demo.profilePhoto",
@@ -95,6 +72,7 @@ const storageKeys = {
   profile: "ninou.demo.profile",
   profileVersion: "ninou.demo.profileVersion",
   dayState: "ninou.demo.dayState",
+  themeMode: "ninou.demo.themeMode",
 };
 
 const firebaseConfig = {
@@ -119,10 +97,7 @@ const actionIcons = {
   fralda: "./icons/actions/fralda.png",
 };
 
-const medicineSvgIcon = `<svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg>`;
-
 function iconMarkup(iconKey) {
-  if (iconKey === "medicamento") return medicineSvgIcon;
   const src = actionIcons[iconKey] || actionIcons.sono;
   return `<img class="icon-art" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
 }
@@ -143,7 +118,6 @@ const typeConfig = {
     amount: false,
     arcType: "sleep",
     icon: iconMarkup("sono"),
-    notesPlaceholder: "Ex.: dormiu no berço, precisou de colo, acordou tranquilo",
   },
   dormir: {
     title: "Noite",
@@ -152,7 +126,6 @@ const typeConfig = {
     amount: false,
     arcType: "dormir",
     icon: iconMarkup("dormir"),
-    notesPlaceholder: "Ex.: rotina da noite, banho, luz baixa, ruído branco",
   },
   "despertar-noturno": {
     title: "Despertar noturno",
@@ -161,7 +134,6 @@ const typeConfig = {
     amount: false,
     arcType: "despertar-noturno",
     icon: iconMarkup("despertar-noturno"),
-    notesPlaceholder: "Ex.: chorou pouco, mamou e voltou a dormir",
   },
   amamentacao: {
     title: "Amamentação",
@@ -170,7 +142,6 @@ const typeConfig = {
     amount: false,
     arcType: "amamentacao",
     icon: iconMarkup("amamentacao"),
-    notesPlaceholder: "Ex.: pega boa, alternou os lados, mamou com calma",
   },
   mamadeira: {
     title: "Mamadeira",
@@ -179,7 +150,6 @@ const typeConfig = {
     amount: true,
     arcType: "mamadeira",
     icon: iconMarkup("mamadeira"),
-    notesPlaceholder: "Ex.: aceitou bem, pausas para arrotar, restou pouco leite",
   },
   fralda: {
     title: "Fralda",
@@ -188,16 +158,6 @@ const typeConfig = {
     amount: false,
     arcType: "fralda",
     icon: iconMarkup("fralda"),
-    notesPlaceholder: "Ex.: quantidade, cor, textura ou possível assadura",
-  },
-  medicamento: {
-    title: "Medicamento",
-    label: "Tipo de medicamento",
-    options: ["Gotas", "Xarope", "Comprimido", "Pomada", "Spray", "Vitamina", "Outro"],
-    amount: false,
-    arcType: "medicamento",
-    icon: iconMarkup("medicamento"),
-    notesPlaceholder: "Ex.: Vitamina D 2 gotas, Tylenol 2,5 ml, horário da próxima dose",
   },
 };
 
@@ -209,6 +169,7 @@ let currentEditingEventId = null;
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
+let themeMode = normalizeThemeMode(localStorage.getItem(storageKeys.themeMode) || "auto");
 let babyProfile = loadBabyProfile();
 let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
 let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
@@ -224,10 +185,6 @@ let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
 let liveTickMinute = -1;
-let currentEditingWeightId = null;
-let breastTimer = createEmptyBreastTimer();
-let breastTimerInterval = null;
-let drawerDragStartY = null;
 let state = loadLocalDayState();
 
 function createEmptyDayState() {
@@ -237,7 +194,6 @@ function createEmptyDayState() {
     activeType: "sono",
     activeDetail: "",
     activeNotes: "",
-    routineStartedAt: null,
     events: [],
   };
 }
@@ -276,14 +232,12 @@ function normalizeDayState(dayState = {}) {
   const activeStartedAt = Number(dayState.activeStartedAt);
   const activeType = isSleepType(dayState.activeType) ? dayState.activeType : "sono";
 
-  const routineStartedAt = Number(dayState.routineStartedAt);
   return {
     mode,
     activeStartedAt: mode === "idle" || !Number.isFinite(activeStartedAt) ? null : activeStartedAt,
     activeType: mode === "sleeping" ? activeType : "sono",
     activeDetail: mode === "sleeping" && typeof dayState.activeDetail === "string" ? dayState.activeDetail : "",
     activeNotes: mode === "sleeping" && typeof dayState.activeNotes === "string" ? dayState.activeNotes : "",
-    routineStartedAt: Number.isFinite(routineStartedAt) ? routineStartedAt : null,
     events: Array.isArray(dayState.events) ? dayState.events.map(normalizeEvent).filter(Boolean) : [],
   };
 }
@@ -382,95 +336,6 @@ function toDateTimeInputValue(timestamp = Date.now()) {
   return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16);
 }
 
-function createEmptyBreastTimer() {
-  return {
-    leftMs: 0,
-    rightMs: 0,
-    activeSide: null,
-    startedAt: null,
-  };
-}
-
-function getBreastTimerSnapshot() {
-  const snapshot = { ...breastTimer };
-  if (snapshot.activeSide && Number.isFinite(snapshot.startedAt)) {
-    const elapsed = Math.max(0, Date.now() - snapshot.startedAt);
-    if (snapshot.activeSide === "left") snapshot.leftMs += elapsed;
-    if (snapshot.activeSide === "right") snapshot.rightMs += elapsed;
-  }
-  snapshot.startedAt = snapshot.activeSide ? Date.now() : null;
-  return snapshot;
-}
-
-function commitBreastTimer() {
-  breastTimer = getBreastTimerSnapshot();
-}
-
-function formatTimerMinute(ms) {
-  const totalSeconds = Math.floor(Math.max(0, ms) / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function formatTimerDetail(ms) {
-  const totalSeconds = Math.floor(Math.max(0, ms) / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${String(seconds).padStart(2, "0")}`;
-}
-
-function renderBreastTimer() {
-  if (!breastTimerPanel) return;
-  const snapshot = getBreastTimerSnapshot();
-  const total = snapshot.leftMs + snapshot.rightMs;
-  if (leftBreastTimer) leftBreastTimer.textContent = formatTimerMinute(snapshot.leftMs);
-  if (rightBreastTimer) rightBreastTimer.textContent = formatTimerMinute(snapshot.rightMs);
-  if (breastTimerTotal) breastTimerTotal.textContent = formatTimerMinute(total);
-  breastSideButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.breastSide === snapshot.activeSide);
-  });
-}
-
-function toggleBreastTimer(side) {
-  commitBreastTimer();
-  breastTimer.activeSide = breastTimer.activeSide === side ? null : side;
-  breastTimer.startedAt = breastTimer.activeSide ? Date.now() : null;
-  renderBreastTimer();
-}
-
-function resetBreastTimer() {
-  breastTimer = createEmptyBreastTimer();
-  renderBreastTimer();
-}
-
-function getBreastTimerTotalMs() {
-  const snapshot = getBreastTimerSnapshot();
-  return snapshot.leftMs + snapshot.rightMs;
-}
-
-function getBreastTimerDetail() {
-  const snapshot = getBreastTimerSnapshot();
-  const parts = [];
-  if (snapshot.leftMs > 0) parts.push(`E ${formatTimerDetail(snapshot.leftMs)}`);
-  if (snapshot.rightMs > 0) parts.push(`D ${formatTimerDetail(snapshot.rightMs)}`);
-  return parts.join(" • ");
-}
-
-function updateBottleAmount(value) {
-  const amount = Math.min(350, Math.max(0, Number(value) || 0));
-  if (sheetAmountInput) sheetAmountInput.value = String(amount);
-  if (bottleAmountRange) bottleAmountRange.value = String(amount);
-  if (bottleAmountDisplay) bottleAmountDisplay.textContent = `${amount} ml`;
-}
-
-function getAmountMlFromDetail(detail = "") {
-  const match = String(detail).match(/[\d,.]+/);
-  if (!match) return 0;
-  const value = Number(match[0].replace(",", "."));
-  return Number.isFinite(value) ? value : 0;
-}
-
 function toDateInputValue(timestamp = Date.now()) {
   const date = new Date(timestamp);
   const timezoneOffset = date.getTimezoneOffset() * 60000;
@@ -482,38 +347,14 @@ function getDefaultBabyProfile() {
     name: "",
     article: "do",
     birthDate: "",
-    weights: [],
-  };
-}
-
-function normalizeBabyWeight(item = {}) {
-  const weight = Number(String(item.weight ?? item.value ?? "").replace(",", "."));
-  const date = typeof item.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.date) ? item.date : toDateInputValue();
-  const createdAt = Number(item.createdAt);
-  const id = typeof item.id === "string" ? item.id : `weight-${date}-${Math.random().toString(36).slice(2, 8)}`;
-
-  if (!Number.isFinite(weight) || weight <= 0) return null;
-
-  return {
-    id,
-    date,
-    weight: Math.round(weight * 1000) / 1000,
-    createdAt: Number.isFinite(createdAt) ? createdAt : Date.now(),
   };
 }
 
 function normalizeBabyProfile(profile = {}) {
-  const weights = Array.isArray(profile.weights)
-    ? profile.weights.map(normalizeBabyWeight).filter(Boolean)
-    : [];
-
   return {
     name: typeof profile.name === "string" ? profile.name : "",
     article: profile.article === "da" ? "da" : "do",
     birthDate: typeof profile.birthDate === "string" ? profile.birthDate : "",
-    weights: weights
-      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt)
-      .slice(0, 24),
   };
 }
 
@@ -560,7 +401,6 @@ function hasProfileContent(profile = babyProfile, photo = currentProfilePhoto, w
       normalizedProfile.birthDate ||
       photo ||
       normalizedProfile.article === "da" ||
-      normalizedProfile.weights.length > 0 ||
       windowMinutes !== 70,
   );
 }
@@ -637,7 +477,6 @@ function syncBabyProfileForm() {
   babyArticleInput.value = babyProfile.article;
   babyBirthInput.value = babyProfile.birthDate;
   babyBirthInput.max = toDateInputValue();
-  if (babyWeightDateInput) babyWeightDateInput.max = toDateInputValue();
 }
 
 function updateBabyProfile(patch) {
@@ -653,112 +492,7 @@ function updateBabyProfile(patch) {
   markProfileLocallyChanged();
   saveBabyProfile();
   renderBabyIdentity();
-  renderWeightHistory();
   renderCurrentState();
-  scheduleProfileCloudSave();
-}
-
-function formatWeight(weight) {
-  return `${Number(weight).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg`;
-}
-
-function formatWeightDate(dateValue) {
-  const parsed = parseLocalDate(dateValue);
-  if (!parsed) return "Data não informada";
-  return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(parsed);
-}
-
-function resetWeightForm() {
-  currentEditingWeightId = null;
-  if (babyWeightDateInput) babyWeightDateInput.value = toDateInputValue();
-  if (babyWeightInput) babyWeightInput.value = "";
-  if (saveBabyWeightButton) saveBabyWeightButton.textContent = "Salvar peso";
-}
-
-function renderWeightHistory() {
-  if (!lastWeightValue || !weightHistoryList) return;
-  const weights = [...(babyProfile.weights || [])].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
-  const latest = weights[0];
-
-  if (!latest) {
-    lastWeightValue.textContent = "Nenhum peso cadastrado";
-    lastWeightHint.textContent = "Cadastre o peso mais recente para acompanhar a evolução.";
-    weightHistoryList.innerHTML = "<li>Nenhum peso cadastrado.</li>";
-    return;
-  }
-
-  lastWeightValue.textContent = formatWeight(latest.weight);
-  lastWeightHint.textContent = `Registrado em ${formatWeightDate(latest.date)}.`;
-  weightHistoryList.innerHTML = weights.slice(0, 3).map((item) => `
-    <li>
-      <div>
-        <strong>${escapeHtml(formatWeight(item.weight))}</strong>
-        <span>${escapeHtml(formatWeightDate(item.date))}</span>
-      </div>
-      <div class="weight-actions">
-        <button type="button" data-weight-edit="${escapeHtml(item.id)}" aria-label="Editar peso">✎</button>
-        <button type="button" data-weight-delete="${escapeHtml(item.id)}" aria-label="Excluir peso">×</button>
-      </div>
-    </li>
-  `).join("");
-}
-
-function saveBabyWeight() {
-  if (!requireLogin("salvar o peso")) return;
-  const weight = Number(String(babyWeightInput.value || "").replace(",", "."));
-  const date = babyWeightDateInput.value || toDateInputValue();
-
-  if (!Number.isFinite(weight) || weight <= 0) {
-    babyWeightInput.focus();
-    return;
-  }
-
-  const nextItem = normalizeBabyWeight({
-    id: currentEditingWeightId || `weight-${date}-${Math.random().toString(36).slice(2, 8)}`,
-    date,
-    weight,
-    createdAt: currentEditingWeightId
-      ? babyProfile.weights.find((item) => item.id === currentEditingWeightId)?.createdAt || Date.now()
-      : Date.now(),
-  });
-
-  if (!nextItem) return;
-
-  const remaining = (babyProfile.weights || []).filter((item) => item.id !== nextItem.id);
-  babyProfile = normalizeBabyProfile({
-    ...babyProfile,
-    weights: [nextItem, ...remaining],
-  });
-  markProfileLocallyChanged();
-  saveBabyProfile();
-  resetWeightForm();
-  renderWeightHistory();
-  scheduleProfileCloudSave();
-}
-
-function editBabyWeight(weightId) {
-  const item = (babyProfile.weights || []).find((weight) => weight.id === weightId);
-  if (!item) return;
-  currentEditingWeightId = item.id;
-  babyWeightDateInput.value = item.date;
-  babyWeightInput.value = String(item.weight).replace(".", ",");
-  saveBabyWeightButton.textContent = "Salvar alteração";
-  babyWeightInput.focus();
-}
-
-function deleteBabyWeight(weightId) {
-  if (!requireLogin("excluir o peso")) return;
-  const item = (babyProfile.weights || []).find((weight) => weight.id === weightId);
-  if (!item) return;
-  if (!window.confirm(`Excluir peso ${formatWeight(item.weight)} de ${formatWeightDate(item.date)}?`)) return;
-  babyProfile = normalizeBabyProfile({
-    ...babyProfile,
-    weights: babyProfile.weights.filter((weight) => weight.id !== weightId),
-  });
-  markProfileLocallyChanged();
-  saveBabyProfile();
-  resetWeightForm();
-  renderWeightHistory();
   scheduleProfileCloudSave();
 }
 
@@ -1206,7 +940,6 @@ function matchesDiaryFilter(event) {
   if (currentDiaryFilter === "sleep") return isSleepEvent(event) || event.type === "despertar-noturno";
   if (currentDiaryFilter === "feeding") return event.type === "mamadeira" || event.type === "amamentacao";
   if (currentDiaryFilter === "diaper") return event.type === "fralda";
-  if (currentDiaryFilter === "medicine") return event.type === "medicamento";
   return true;
 }
 
@@ -1535,115 +1268,30 @@ function closeOrbitCluster() {
   }
 }
 
-function getRoutineStartForToday(todayStart = getDayStart()) {
-  const todayEvents = state.events.filter((event) => event.start >= todayStart);
-  const candidates = [];
-  if (Number.isFinite(state.routineStartedAt) && state.routineStartedAt >= todayStart) candidates.push(state.routineStartedAt);
-  if (Number.isFinite(state.activeStartedAt) && state.activeStartedAt >= todayStart) candidates.push(state.activeStartedAt);
-  todayEvents.forEach((event) => candidates.push(event.start));
-  if (!candidates.length) return null;
-  return Math.max(todayStart, Math.min(...candidates));
-}
-
-function getTodayMetrics() {
-  const now = Date.now();
+function renderSummary() {
   const todayStart = getDayStart();
   const todaysEvents = state.events.filter((event) => event.start >= todayStart);
   const sleepMs = todaysEvents
     .filter(isSleepEvent)
     .reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
-  const activeSleepMs = state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)
-    ? Math.max(0, now - state.activeStartedAt)
-    : 0;
-  const routineStart = getRoutineStartForToday(todayStart);
-  const awakeBase = routineStart ? Math.max(0, now - routineStart - sleepMs - activeSleepMs) : 0;
   const feedingCount = todaysEvents.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
   const diaperCount = todaysEvents.filter((event) => event.type === "fralda").length;
-  const medicationCount = todaysEvents.filter((event) => event.type === "medicamento").length;
-  const bottleMl = todaysEvents
-    .filter((event) => event.type === "mamadeira")
-    .reduce((total, event) => total + getAmountMlFromDetail(event.detail), 0);
-
-  return {
-    sleepMs: sleepMs + activeSleepMs,
-    awakeMs: state.mode === "idle" ? 0 : awakeBase,
-    feedingCount,
-    diaperCount,
-    medicationCount,
-    bottleMl,
-    todaysEvents,
-  };
-}
-
-function renderDailyDrawer(metrics = getTodayMetrics()) {
-  if (!dailyDrawer) return;
-  const summaryValues = drawerSummaryGrid?.querySelectorAll("strong") || [];
-  if (summaryValues.length >= 4) {
-    setText(summaryValues[0], formatShortDuration(metrics.sleepMs));
-    setText(summaryValues[1], formatShortDuration(metrics.awakeMs));
-    setText(summaryValues[2], metrics.feedingCount);
-    setText(summaryValues[3], metrics.diaperCount);
-    if (summaryValues[4]) setText(summaryValues[4], metrics.medicationCount || 0);
-  }
-
-  if (drawerQuickStatus) {
-    const pieces = [];
-    if (metrics.sleepMs > 0) pieces.push(formatShortDuration(metrics.sleepMs));
-    if (metrics.feedingCount > 0) pieces.push(`${metrics.feedingCount} mamada${metrics.feedingCount === 1 ? "" : "s"}`);
-    if (metrics.diaperCount > 0) pieces.push(`${metrics.diaperCount} fralda${metrics.diaperCount === 1 ? "" : "s"}`);
-    if ((metrics.medicationCount || 0) > 0) pieces.push(`${metrics.medicationCount} medicação${metrics.medicationCount === 1 ? "" : "ões"}`);
-    setText(drawerQuickStatus, pieces.length ? pieces.join(" • ") : "Hoje zerado");
-  }
-
-  if (drawerLastEvents) {
-    const latestEvents = [...metrics.todaysEvents].sort((a, b) => b.start - a.start).slice(0, 3);
-    drawerLastEvents.innerHTML = latestEvents.length
-      ? latestEvents.map((event) => {
-          const config = getEventConfig(event.type);
-          return `
-            <article class="mini-event">
-              <i class="mark ${config.arcType}">${config.icon}</i>
-              <div>
-                <strong>${escapeHtml(config.title)}</strong>
-                <span>${escapeHtml(formatEventMeta(event))}</span>
-              </div>
-            </article>
-          `;
-        }).join("")
-      : `<article class="mini-event empty">Nenhum registro ainda.</article>`;
-  }
-
-  if (drawerMiniChart) {
-    const days = getReportDays(5);
-    const maxValue = Math.max(...days.map((item) => item.events.length), 1);
-    drawerMiniChart.innerHTML = days.map((item) => {
-      const count = item.events.length;
-      const height = Math.max(8, Math.round((count / maxValue) * 100));
-      return `<span style="--h:${height}%"><b>${count}</b><i>${item.label}</i></span>`;
-    }).join("");
-  }
-}
-
-function renderSummary() {
-  const metrics = getTodayMetrics();
+  const awakeMs = state.mode === "awake" ? Date.now() - state.activeStartedAt : 0;
   const summaryValues = document.querySelectorAll(".summary-grid strong");
   const nextCard = document.querySelector(".next-card strong");
   const nextHint = document.querySelector(".next-card p");
   const miniRing = document.querySelector(".mini-ring");
 
   if (summaryValues.length >= 4) {
-    setText(summaryValues[0], formatShortDuration(metrics.sleepMs));
-    setText(summaryValues[1], formatShortDuration(metrics.awakeMs));
-    setText(summaryValues[2], metrics.feedingCount);
-    setText(summaryValues[3], metrics.diaperCount);
-    if (summaryValues[4]) setText(summaryValues[4], metrics.medicationCount || 0);
+    setText(summaryValues[0], formatShortDuration(sleepMs));
+    setText(summaryValues[1], formatShortDuration(awakeMs));
+    setText(summaryValues[2], feedingCount);
+    setText(summaryValues[3], diaperCount);
   }
 
   if (miniRing) {
     setText(miniRing, wakeWindowMinutes);
   }
-
-  renderDailyDrawer(metrics);
 
   if (nextCard && nextHint) {
     if (state.mode === "idle") {
@@ -1660,61 +1308,31 @@ function renderSummary() {
   }
 }
 
-function getReportDays(length = 5) {
+function getSleepReportDays() {
   const todayStart = getDayStart();
-  return Array.from({ length }, (_, index) => {
-    const start = todayStart - (length - 1 - index) * day;
+  return Array.from({ length: 7 }, (_, index) => {
+    const start = todayStart - (6 - index) * day;
     const end = start + day;
-    const events = state.events.filter((event) => event.start >= start && event.start < end);
-    const sleepEvents = events.filter(isSleepEvent);
-    const sleepMs = sleepEvents.reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
-    const breastfeedingEvents = events.filter((event) => event.type === "amamentacao");
-    const bottleEvents = events.filter((event) => event.type === "mamadeira");
-    const diaperEvents = events.filter((event) => event.type === "fralda");
-    const medicationEvents = events.filter((event) => event.type === "medicamento");
-    const breastfeedingMs = breastfeedingEvents.reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
-    const bottleMl = bottleEvents.reduce((total, event) => total + getAmountMlFromDetail(event.detail), 0);
-
+    const events = state.events.filter((event) => isSleepEvent(event) && event.start >= start && event.start < end);
+    const sleepMs = events.reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
     return {
       start,
       label: getDayLabel(start),
       events,
-      sleepEvents,
       sleepMs,
-      breastfeedingEvents,
-      breastfeedingMs,
-      bottleEvents,
-      bottleMl,
-      diaperEvents,
-      medicationEvents,
     };
-  });
-}
-
-function renderBars(container, days, getValue, formatValue, options = {}) {
-  if (!container) return;
-  const minForNonZero = options.minForNonZero ?? 7;
-  const maxValue = Math.max(...days.map(getValue), options.minMax ?? 1);
-  container.innerHTML = "";
-  days.forEach((item) => {
-    const value = getValue(item);
-    const height = value > 0 ? Math.max(minForNonZero, Math.round((value / maxValue) * 100)) : 0;
-    const bar = document.createElement("span");
-    bar.style.setProperty("--h", `${height}%`);
-    bar.classList.toggle("is-empty", value <= 0);
-    bar.innerHTML = `<b>${formatValue(value, item)}</b><i>${item.label}</i>`;
-    container.append(bar);
   });
 }
 
 function renderSleepReport() {
   if (!sleepBars) return;
-  const days = getReportDays(5);
+  const days = getSleepReportDays();
   const totalSleep = days.reduce((total, item) => total + item.sleepMs, 0);
-  const totalNaps = days.reduce((total, item) => total + item.sleepEvents.length, 0);
-  const daysWithDataCount = days.filter((item) => item.sleepEvents.length > 0).length;
+  const totalNaps = days.reduce((total, item) => total + item.events.length, 0);
+  const daysWithDataCount = days.filter((item) => item.events.length > 0).length;
   const daysWithData = daysWithDataCount || 1;
-  const sleepEvents = days.flatMap((item) => item.sleepEvents);
+  const maxSleep = Math.max(...days.map((item) => item.sleepMs), 60 * 60000);
+  const sleepEvents = days.flatMap((item) => item.events);
   const routineEvents = sleepEvents.filter((event) => {
     const duration = event.end - event.start;
     return duration >= 10 * 60000;
@@ -1726,25 +1344,23 @@ function renderSleepReport() {
     : "Nenhum sono registrado no período.";
   napAverage.textContent = totalNaps ? (totalNaps / daysWithData).toFixed(1).replace(".", ",") : "0";
   napAverageHint.textContent = totalNaps
-    ? `${totalNaps} registros de sono nos últimos 5 dias.`
-    : "Nenhuma soneca registrada nos últimos 5 dias.";
+    ? `${totalNaps} registros de sono nos últimos 7 dias.`
+    : "Nenhuma soneca registrada nos últimos 7 dias.";
 
-  renderBars(sleepBars, days, (item) => item.sleepMs, (value) => value ? formatShortDuration(value) : "0", { minMax: 60 * 60000 });
-  renderBars(
-    breastfeedingBars,
-    days,
-    (item) => item.breastfeedingMs || item.breastfeedingEvents.length,
-    (value, item) => item.breastfeedingMs ? formatShortDuration(item.breastfeedingMs) : String(value),
-  );
-  renderBars(bottleBars, days, (item) => item.bottleMl || item.bottleEvents.length, (value) => value ? `${Math.round(value)} ml` : "0");
-  renderBars(diaperBars, days, (item) => item.diaperEvents.length, (value) => String(value));
-  renderBars(medicationBars, days, (item) => item.medicationEvents.length, (value) => String(value));
+  sleepBars.innerHTML = "";
+  days.forEach((item) => {
+    const bar = document.createElement("span");
+    const height = Math.max(6, Math.round((item.sleepMs / maxSleep) * 100));
+    bar.style.setProperty("--h", `${height}%`);
+    bar.innerHTML = `<b>${item.sleepMs ? formatShortDuration(item.sleepMs) : "0"}</b><i>${item.label}</i>`;
+    sleepBars.append(bar);
+  });
 
   if (!routineEvents.length) {
     bestWindow.textContent = "Sem dados";
     bestWindowHint.textContent = "Registre sonecas para calcular a melhor janela.";
     routineStatus.textContent = "Aprendendo";
-    routineHint.textContent = "O relatório será atualizado automaticamente com os últimos 5 dias.";
+    routineHint.textContent = "O relatório será atualizado automaticamente.";
     return;
   }
 
@@ -1773,18 +1389,37 @@ function renderSleepReport() {
   }
 }
 
+function normalizeThemeMode(value) {
+  return ["auto", "light", "dark"].includes(value) ? value : "auto";
+}
+
+function getThemeModeLabel(value = themeMode) {
+  if (value === "light") return "Claro";
+  if (value === "dark") return "Escuro";
+  return "Automático";
+}
+
+function syncThemeModeInput() {
+  if (themeModeInput) {
+    themeModeInput.value = normalizeThemeMode(themeMode);
+  }
+}
+
 function updateTheme() {
+  themeMode = normalizeThemeMode(themeMode);
   const hourValue = new Date().getHours();
-  const dayTheme = hourValue >= 6 && hourValue < 18;
-  if (document.body.classList.contains("day-theme") !== dayTheme) {
-    document.body.classList.toggle("day-theme", dayTheme);
+  const dayTheme = themeMode === "light" || (themeMode === "auto" && hourValue >= 6 && hourValue < 18);
+  document.body.classList.toggle("day-theme", dayTheme);
+  document.body.dataset.themeMode = themeMode;
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) {
+    themeMeta.setAttribute("content", dayTheme ? "#f7f4ff" : "#101029");
   }
 }
 
 function renderAll() {
   updateTheme();
   renderBabyIdentity();
-  renderWeightHistory();
   renderCurrentState();
   renderOrbit();
   renderTimeline();
@@ -1810,7 +1445,6 @@ function renderLiveTick() {
 function finishSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const finishedAt = Date.now();
-  if (!Number.isFinite(state.routineStartedAt)) state.routineStartedAt = state.activeStartedAt;
   state.events.push(makeEvent(state.activeType || "sono", state.activeStartedAt, finishedAt, state.activeDetail || "Timer", state.activeNotes || ""));
   state.mode = "awake";
   state.activeStartedAt = finishedAt;
@@ -1823,7 +1457,6 @@ function finishSleep() {
 function startSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const startedAt = Date.now();
-  if (!Number.isFinite(state.routineStartedAt)) state.routineStartedAt = state.activeStartedAt || startedAt;
   const nightWakeActive = getActiveNightWakeEvent();
   closeActiveNightWake(startedAt);
   state.mode = "sleeping";
@@ -1838,7 +1471,6 @@ function startRoutine(mode) {
   if (!requireLogin("salvar a rotina")) return;
   state.mode = mode === "sleeping" ? "sleeping" : "awake";
   state.activeStartedAt = Date.now();
-  state.routineStartedAt = state.activeStartedAt;
   state.activeType = "sono";
   state.activeDetail = state.mode === "sleeping" ? "Timer" : "";
   state.activeNotes = "";
@@ -1851,33 +1483,7 @@ function showScreen(target) {
   screens.forEach((screen) => {
     screen.classList.toggle("active", screen.dataset.screen === target);
   });
-  if (dailyDrawer) {
-    dailyDrawer.classList.toggle("is-hidden", target !== "today");
-    if (target !== "today") collapseDailyDrawer();
-  }
 }
-
-function expandDailyDrawer() {
-  if (!dailyDrawer || !dailyDrawerHandle) return;
-  dailyDrawer.classList.add("expanded");
-  dailyDrawerHandle.setAttribute("aria-expanded", "true");
-}
-
-function collapseDailyDrawer() {
-  if (!dailyDrawer || !dailyDrawerHandle) return;
-  dailyDrawer.classList.remove("expanded");
-  dailyDrawerHandle.setAttribute("aria-expanded", "false");
-}
-
-function toggleDailyDrawer() {
-  if (!dailyDrawer) return;
-  if (dailyDrawer.classList.contains("expanded")) {
-    collapseDailyDrawer();
-  } else {
-    expandDailyDrawer();
-  }
-}
-
 
 function setDiaryFilter(filter) {
   currentDiaryFilter = filter;
@@ -1985,8 +1591,6 @@ function setSheetType(type) {
   sheetTitle.textContent = currentEditingEventId ? `Editar ${config.title}` : config.title;
   sheetDetailLabel.textContent = config.label;
   sheetAmountField.hidden = !config.amount;
-  if (breastTimerPanel) breastTimerPanel.hidden = type !== "amamentacao";
-  if (sheetNotesInput) sheetNotesInput.placeholder = config.notesPlaceholder || "Observações sobre este registro";
   sheetDetail.innerHTML = "";
   config.options.forEach((optionText) => {
     const option = document.createElement("option");
@@ -1996,31 +1600,24 @@ function setSheetType(type) {
   sheetTypeButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.sheetType === type);
   });
-  if (config.amount && !currentEditingEventId && !sheetAmountInput.value) {
-    updateBottleAmount(105);
-  }
-  if (type === "amamentacao") {
-    renderBreastTimer();
-  }
 }
 
 function resetSheetState() {
   currentEditingEventId = null;
   saveButton.textContent = "Registrar";
-  updateBottleAmount(105);
+  sheetAmountInput.value = "";
   sheetNotesInput.value = "";
-  resetBreastTimer();
 }
 
 function hydrateSheetFromEvent(event) {
   const config = getEventConfig(event.type);
   sheetDateInput.value = toDateTimeInputValue(event.start);
   sheetNotesInput.value = event.notes || "";
-  updateBottleAmount(105);
-  resetBreastTimer();
+  sheetAmountInput.value = "";
 
   if (config.amount) {
-    updateBottleAmount(getAmountMlFromDetail(event.detail) || 105);
+    const amountMatch = String(event.detail || "").match(/[\d,.]+/);
+    sheetAmountInput.value = amountMatch ? amountMatch[0].replace(",", ".") : "";
     return;
   }
 
@@ -2038,9 +1635,8 @@ function openSheet(type = "sono", eventId = null) {
   setSheetType(editingEvent?.type || type);
   saveButton.textContent = editingEvent ? "Salvar alterações" : "Registrar";
   sheetDateInput.value = toDateTimeInputValue();
-  updateBottleAmount(105);
+  sheetAmountInput.value = "";
   sheetNotesInput.value = "";
-  resetBreastTimer();
 
   if (editingEvent) {
     hydrateSheetFromEvent(editingEvent);
@@ -2126,7 +1722,6 @@ function startLiveAwakeFromManualNightWake(start, detail, notes) {
   state.events.push(makeEvent("despertar-noturno", start, start, detail, notes));
   state.mode = "awake";
   state.activeStartedAt = start;
-  if (!Number.isFinite(state.routineStartedAt)) state.routineStartedAt = start;
   state.activeType = "sono";
   state.activeDetail = "";
   state.activeNotes = "";
@@ -2136,7 +1731,6 @@ function startLiveSleepFromManualEvent(type, start, detail, notes) {
   closeActiveNightWake(start);
   state.mode = "sleeping";
   state.activeStartedAt = start;
-  if (!Number.isFinite(state.routineStartedAt)) state.routineStartedAt = start;
   state.activeType = isSleepType(type) ? type : "sono";
   state.activeDetail = detail || "Timer";
   state.activeNotes = notes || "";
@@ -2146,18 +1740,15 @@ function saveManualEvent() {
   if (!requireLogin("salvar registros")) return;
   const start = sheetDateInput.value ? new Date(sheetDateInput.value).getTime() : Date.now();
   const notes = sheetNotesInput.value.trim();
-  commitBreastTimer();
-  const breastTotalMs = currentSheetType === "amamentacao" ? getBreastTimerTotalMs() : 0;
-  const breastDetail = currentSheetType === "amamentacao" ? getBreastTimerDetail() : "";
   const detail = typeConfig[currentSheetType].amount && sheetAmountInput.value
     ? `${sheetAmountInput.value} ml`
-    : breastDetail || sheetDetail.value;
+    : sheetDetail.value;
   const existingEvent = currentEditingEventId ? getEventById(currentEditingEventId) : null;
   const startsLiveSleep = shouldStartLiveSleepFromManualEvent(currentSheetType, start, existingEvent);
   const startsLiveAwake = shouldStartLiveAwakeFromManualNightWake(currentSheetType, start, existingEvent);
 
   if (existingEvent) {
-    const duration = breastTotalMs || Math.max(0, existingEvent.end - existingEvent.start);
+    const duration = Math.max(0, existingEvent.end - existingEvent.start);
     Object.assign(existingEvent, {
       type: currentSheetType,
       start,
@@ -2170,12 +1761,11 @@ function saveManualEvent() {
   } else if (startsLiveSleep) {
     startLiveSleepFromManualEvent(currentSheetType, start, detail, notes);
   } else {
-    state.events.push(makeEvent(currentSheetType, start, breastTotalMs ? start + breastTotalMs : start, detail, notes));
+    state.events.push(makeEvent(currentSheetType, start, start, detail, notes));
   }
 
-  updateBottleAmount(105);
+  sheetAmountInput.value = "";
   sheetNotesInput.value = "";
-  resetBreastTimer();
   closeSheet();
   saveDayState();
   renderAll();
@@ -2299,20 +1889,6 @@ function resizeImage(file) {
   });
 }
 
-if (dailyDrawerHandle) {
-  dailyDrawerHandle.addEventListener("click", toggleDailyDrawer);
-  dailyDrawerHandle.addEventListener("pointerdown", (event) => {
-    drawerDragStartY = event.clientY;
-  });
-  dailyDrawerHandle.addEventListener("pointerup", (event) => {
-    if (drawerDragStartY === null) return;
-    const delta = event.clientY - drawerDragStartY;
-    drawerDragStartY = null;
-    if (delta < -24) expandDailyDrawer();
-    if (delta > 24) collapseDailyDrawer();
-  });
-}
-
 navButtons.forEach((button) => {
   button.addEventListener("click", () => showScreen(button.dataset.target));
 });
@@ -2364,26 +1940,6 @@ sheetTypeButtons.forEach((button) => {
   button.addEventListener("click", () => setSheetType(button.dataset.sheetType));
 });
 
-if (bottleAmountRange) {
-  bottleAmountRange.addEventListener("input", () => updateBottleAmount(bottleAmountRange.value));
-}
-
-if (sheetAmountInput) {
-  sheetAmountInput.addEventListener("input", () => updateBottleAmount(sheetAmountInput.value));
-}
-
-breastSideButtons.forEach((button) => {
-  button.addEventListener("click", () => toggleBreastTimer(button.dataset.breastSide));
-});
-
-if (resetBreastTimerButton) {
-  resetBreastTimerButton.addEventListener("click", resetBreastTimer);
-}
-
-breastTimerInterval = window.setInterval(() => {
-  if (!sheet.hidden && currentSheetType === "amamentacao") renderBreastTimer();
-}, 1000);
-
 closeSheetButton.addEventListener("click", closeSheet);
 closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);
 sheetBackdrop.addEventListener("click", () => {
@@ -2418,16 +1974,11 @@ babyBirthInput.addEventListener("change", () => {
   updateBabyProfile({ birthDate: babyBirthInput.value });
 });
 
-if (saveBabyWeightButton) {
-  saveBabyWeightButton.addEventListener("click", saveBabyWeight);
-}
-
-if (weightHistoryList) {
-  weightHistoryList.addEventListener("click", (event) => {
-    const editButton = event.target.closest("[data-weight-edit]");
-    const deleteButton = event.target.closest("[data-weight-delete]");
-    if (editButton) editBabyWeight(editButton.dataset.weightEdit);
-    if (deleteButton) deleteBabyWeight(deleteButton.dataset.weightDelete);
+if (themeModeInput) {
+  themeModeInput.addEventListener("change", () => {
+    themeMode = normalizeThemeMode(themeModeInput.value);
+    localStorage.setItem(storageKeys.themeMode, themeMode);
+    updateTheme();
   });
 }
 
@@ -2466,8 +2017,7 @@ if (savedEmail) {
 
 initDiaryDatePicker();
 syncBabyProfileForm();
-resetWeightForm();
-renderWeightHistory();
+syncThemeModeInput();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
 renderAll();

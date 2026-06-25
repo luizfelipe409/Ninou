@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=56" />
+    <link rel="stylesheet" href="./styles.css?v=59" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -119,52 +119,27 @@
             <strong>0</strong>
           </article>
         </section>
-
-        <section class="last-card">
-          <div class="section-title compact">
-            <span>Último registro</span>
+        <section class="last-card today-last-card" aria-label="Últimos registros de hoje">
+          <div class="drawer-section-title">
+            <span>Últimos registros</span>
             <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
           </div>
-          <article class="event-card">
-            <i class="mark"></i>
-            <div>
-              <strong>Nenhum registro</strong>
-              <span>O dia ainda está zerado.</span>
-            </div>
-          </article>
-        </section>
-
-        <section id="dailyDrawer" class="daily-drawer" aria-label="Resumo diário recolhível">
-          <button id="dailyDrawerHandle" class="daily-drawer-handle" type="button" aria-expanded="false">
-            <span class="drawer-grip" aria-hidden="true"></span>
-            <span class="drawer-title">Resumo diário</span>
-            <strong id="drawerQuickStatus">Hoje zerado</strong>
-            <span class="drawer-arrow" aria-hidden="true">⌃</span>
-          </button>
-          <div class="daily-drawer-content">
-            <div id="drawerSummaryGrid" class="drawer-summary-grid">
-              <article><span>Sono</span><strong>0 min</strong></article>
-              <article><span>Acordado</span><strong>0 min</strong></article>
-              <article><span>Mamadas</span><strong>0</strong></article>
-              <article><span>Fraldas</span><strong>0</strong></article>
-              <article><span>Medicação</span><strong>0</strong></article>
-            </div>
-            <div class="drawer-section-title">
-              <span>Últimos registros</span>
-              <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
-            </div>
-            <div id="drawerLastEvents" class="drawer-last-events">
-              <article class="mini-event empty">Nenhum registro ainda.</article>
-            </div>
-            <article class="drawer-chart-card">
-              <div>
-                <span>Últimos 5 dias</span>
-                <strong>Resumo rápido</strong>
-              </div>
-              <div id="drawerMiniChart" class="mini-chart" aria-label="Resumo dos últimos 5 dias"></div>
-            </article>
+          <div id="todayLastEvents" class="drawer-last-events today-last-events">
+            <article class="mini-event empty">Nenhum registro ainda.</article>
           </div>
         </section>
+
+        <section class="last-card five-day-actions-card" aria-label="Resumo rápido dos últimos 5 dias">
+          <div class="chart-title">
+            <div>
+              <span>Últimos 5 dias</span>
+              <strong>Quantidade de ações</strong>
+            </div>
+          </div>
+          <p class="chart-helper">Total de registros feitos por dia, somando sono, mamadas, fraldas, mamadeiras e medicamentos.</p>
+          <div id="todayMiniChart" class="mini-chart actions-mini-chart" aria-label="Quantidade de ações registradas nos últimos 5 dias"></div>
+        </section>
+
       </section>
 
       <section class="screen" data-screen="diary" aria-label="Diário">
@@ -280,6 +255,19 @@
               Dia de nascimento
               <input id="babyBirthInput" type="date" />
             </label>
+            <div class="appearance-profile-block">
+              <span>Aparência</span>
+              <strong>Tema do app</strong>
+              <p>Escolha se o Ninou muda sozinho conforme o horário ou se fica sempre claro/escuro.</p>
+              <label>
+                Modo de visual
+                <select id="themeModeInput">
+                  <option value="auto">Automático — dia/noite</option>
+                  <option value="light">Claro</option>
+                  <option value="dark">Escuro</option>
+                </select>
+              </label>
+            </div>
             <div class="weight-profile-block">
               <div class="weight-profile-header">
                 <span>Peso do bebê</span>
@@ -440,6 +428,6 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=56"></script>
+    <script src="./app.js?v=59"></script>
   </body>
 </html>
