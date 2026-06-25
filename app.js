@@ -922,7 +922,11 @@ function getWakeWindowText() {
 }
 
 function setWakeActionIcon() {
-  wakeActionIcon.innerHTML = state.mode === "sleeping" ? iconMarkup("acordou") : iconMarkup("sono");
+  const iconKey = state.mode === "sleeping" ? "acordou" : "sono";
+  if (wakeActionIcon.dataset.iconKey === iconKey) return;
+
+  wakeActionIcon.dataset.iconKey = iconKey;
+  wakeActionIcon.innerHTML = iconMarkup(iconKey);
 }
 
 function renderCurrentState() {
@@ -1312,6 +1316,12 @@ function renderAll() {
   renderTimeline();
   renderSummary();
   renderSleepReport();
+}
+
+function renderLiveTick() {
+  updateTheme();
+  renderCurrentState();
+  renderSummary();
 }
 
 function finishSleep() {
@@ -1818,7 +1828,7 @@ initDiaryDatePicker();
 syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 renderAll();
-setInterval(renderAll, 500);
+setInterval(renderLiveTick, 500);
 
 initFirebaseAuthState().catch((error) => {
   console.error("Firebase não iniciou:", error);
