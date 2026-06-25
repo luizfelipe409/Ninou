@@ -268,6 +268,22 @@ body.day-theme .phone-shell {
   border-radius: 16px;
 }
 
+.screen[data-screen="diary"] .date-filter {
+  margin-bottom: 6px;
+}
+
+.screen[data-screen="diary"] .chips {
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 2px 1px 8px;
+}
+
+.screen[data-screen="diary"] .chips button {
+  min-width: 78px;
+  justify-content: center;
+  padding: 0 15px;
+}
+
 .state-orbit {
   min-height: 348px;
   position: relative;
@@ -730,23 +746,37 @@ body.day-theme .phone-shell {
 .event-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 7px;
+  margin-top: 11px;
 }
 
-.event-actions button {
-  min-height: 34px;
-  border: 1px solid var(--line);
+.event-action-button {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(143, 124, 255, 0.22);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(143, 124, 255, 0.1);
   color: var(--ink);
-  padding: 0 12px;
-  font-size: 0.76rem;
+  padding: 0 10px;
+  font-size: 0.72rem;
   font-weight: 900;
 }
 
-.event-actions button[data-event-delete] {
-  border-color: rgba(255, 154, 118, 0.34);
+.event-action-button span {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  line-height: 1;
+}
+
+.event-action-button.delete {
+  border-color: rgba(255, 154, 118, 0.26);
+  background: rgba(255, 154, 118, 0.08);
   color: var(--coral);
 }
 
@@ -1178,19 +1208,6 @@ body.day-theme .bottom-nav button.active {
   font-size: 0.94rem;
   font-weight: 900;
   white-space: nowrap;
-}
-
-.cluster-card button {
-  grid-column: 2 / -1;
-  justify-self: start;
-  min-height: 32px;
-  border: 1px solid rgba(143, 124, 255, 0.35);
-  border-radius: 999px;
-  background: rgba(143, 124, 255, 0.14);
-  color: var(--ink);
-  padding: 0 12px;
-  font-size: 0.74rem;
-  font-weight: 900;
 }
 
 .sheet-handle {

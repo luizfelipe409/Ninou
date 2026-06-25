@@ -1108,8 +1108,14 @@ function renderTimeline() {
         <span>${escapeHtml(formatEventMeta(event))}</span>
         ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
         <div class="event-actions">
-          <button type="button" data-event-edit="${escapeHtml(event.id)}">Editar</button>
-          <button type="button" data-event-delete="${escapeHtml(event.id)}">Excluir</button>
+          <button class="event-action-button edit" type="button" data-event-edit="${escapeHtml(event.id)}" aria-label="Editar ${escapeHtml(config.title)}">
+            <span>✎</span>
+            Editar
+          </button>
+          <button class="event-action-button delete" type="button" data-event-delete="${escapeHtml(event.id)}" aria-label="Excluir ${escapeHtml(config.title)}">
+            <span>×</span>
+            Excluir
+          </button>
         </div>
       </div>
     `;
@@ -1144,7 +1150,6 @@ function openOrbitCluster(events) {
   orbitClusterList.innerHTML = orderedEvents.map((event) => {
     const config = getEventConfig(event.type);
     const notes = event.notes ? `<p>${escapeHtml(event.notes)}</p>` : "";
-    const editButton = event.isActive ? "" : `<button type="button" data-cluster-edit="${escapeHtml(event.id)}">Editar</button>`;
 
     return `
       <article class="cluster-card">
@@ -1155,7 +1160,6 @@ function openOrbitCluster(events) {
           ${notes}
         </div>
         <time>${escapeHtml(getOrbitEventRange(event))}</time>
-        ${editButton}
       </article>
     `;
   }).join("");
@@ -1719,15 +1723,6 @@ timeline.addEventListener("click", (event) => {
   if (deleteButton) {
     deleteEvent(deleteButton.dataset.eventDelete);
   }
-});
-
-orbitClusterList.addEventListener("click", (event) => {
-  const editButton = event.target.closest("[data-cluster-edit]");
-  if (!editButton) return;
-
-  const eventId = editButton.dataset.clusterEdit;
-  closeOrbitCluster();
-  editEvent(eventId);
 });
 
 startModeButtons.forEach((button) => {
