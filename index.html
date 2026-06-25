@@ -12,39 +12,16 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=45" />
+    <link rel="preload" as="image" href="./icons/actions/acordou.png" />
+    <link rel="preload" as="image" href="./icons/actions/soneca.png" />
+    <link rel="preload" as="image" href="./icons/actions/dormir.png" />
+    <link rel="preload" as="image" href="./icons/actions/despertar-noturno.png" />
+    <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
+    <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
+    <link rel="preload" as="image" href="./icons/actions/fralda.png" />
+    <link rel="stylesheet" href="./styles.css?v=47" />
   </head>
   <body>
-    <svg class="icon-sprite" aria-hidden="true">
-      <symbol id="ux-bottle" viewBox="0 0 24 24">
-        <path d="M10 2h4v3l2.2 2.2c.5.5.8 1.2.8 1.9V19a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9.1c0-.7.3-1.4.8-1.9L10 5V2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M10 5h4M9 12h3M9 15h3M9 18h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M10 2h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </symbol>
-      <symbol id="ux-diaper" viewBox="0 0 24 24">
-        <path d="M4 7c2.3 1.2 4.9 1.9 8 1.9S17.7 8.2 20 7v7.2c0 3.5-2.8 6.3-6.3 6.3h-3.4A6.3 6.3 0 0 1 4 14.2V7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M4 10.2h4.4M15.6 10.2H20M9 15.5c1.8 1.1 4.2 1.1 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </symbol>
-      <symbol id="ux-sunrise" viewBox="0 0 24 24">
-        <path d="M4 18h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M7 18a5 5 0 0 1 10 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M12 5v3M5.8 8.8l2.1 2.1M18.2 8.8l-2.1 2.1M3 14h3M18 14h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </symbol>
-      <symbol id="ux-moon" viewBox="0 0 24 24">
-        <path d="M18.4 15.6A7.6 7.6 0 0 1 8.4 5.6a8 8 0 1 0 10 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-      </symbol>
-      <symbol id="ux-night" viewBox="0 0 24 24">
-        <path d="M4 18h16M7 18a5 5 0 0 1 10 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M17.8 6.8A5.8 5.8 0 0 1 10.2 3a6.1 6.1 0 0 0 6.8 8.4 5.7 5.7 0 0 0 .8-4.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-      </symbol>
-      <symbol id="ux-feed" viewBox="0 0 24 24">
-        <path d="M12 5c-3 2.2-5 5-5 8a5 5 0 0 0 10 0c0-3-2-5.8-5-8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M9.2 14.2c1.6.9 4 .9 5.6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </symbol>
-      <symbol id="ux-wake" viewBox="0 0 24 24">
-        <path d="M5 17h14M8 17a4 4 0 0 1 8 0M12 7v3M6.8 9.8l1.8 1.8M17.2 9.8l-1.8 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </symbol>
-    </svg>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
       <header class="app-header">
         <div class="identity">
@@ -73,16 +50,16 @@
 
         <section class="main-action-area" aria-label="Ação principal">
           <button id="wakeAction" class="primary-action" type="button" hidden>
-            <span class="action-icon"><img src="./icons/actions/acordou.png" alt="" loading="lazy" decoding="async" /></span>
+            <span class="action-icon"><span class="icon-art icon-art-acordou" aria-hidden="true"></span></span>
             <span id="wakeActionLabel">Acordou</span>
           </button>
           <div id="startChoice" class="start-choice">
             <button type="button" data-start-mode="awake">
-              <span class="action-icon"><img src="./icons/actions/acordou.png" alt="" loading="lazy" decoding="async" /></span>
+              <span class="action-icon"><span class="icon-art icon-art-acordou" aria-hidden="true"></span></span>
               <span>Acordou</span>
             </button>
             <button type="button" data-start-mode="sleeping">
-              <span class="action-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span>
+              <span class="action-icon"><span class="icon-art icon-art-sono" aria-hidden="true"></span></span>
               <span>Iniciar soneca</span>
             </button>
           </div>
@@ -90,19 +67,19 @@
 
         <section class="quick-actions" aria-label="Ações rápidas">
           <button type="button" data-open-sheet="amamentacao">
-            <span class="action-icon"><img src="./icons/actions/amamentacao.png" alt="" loading="lazy" decoding="async" /></span>
+            <span class="action-icon"><span class="icon-art icon-art-amamentacao" aria-hidden="true"></span></span>
             <span>Amamentação</span>
           </button>
           <button type="button" data-open-sheet="fralda">
-            <span class="action-icon"><img src="./icons/actions/fralda.png" alt="" loading="lazy" decoding="async" /></span>
+            <span class="action-icon"><span class="icon-art icon-art-fralda" aria-hidden="true"></span></span>
             <span>Fralda</span>
           </button>
           <button type="button" data-open-sheet="mamadeira">
-            <span class="action-icon"><img src="./icons/actions/mamadeira.png" alt="" loading="lazy" decoding="async" /></span>
+            <span class="action-icon"><span class="icon-art icon-art-mamadeira" aria-hidden="true"></span></span>
             <span>Mamadeira</span>
           </button>
           <button type="button" data-open-sheet="sono">
-            <span class="action-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span>
+            <span class="action-icon"><span class="icon-art icon-art-sono" aria-hidden="true"></span></span>
             <span>Soneca</span>
           </button>
         </section>
@@ -307,12 +284,12 @@
         <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
       </div>
       <div class="record-types">
-        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span><span>Soneca</span></button>
-        <button type="button" data-sheet-type="dormir"><span class="type-icon"><img src="./icons/actions/dormir.png" alt="" loading="lazy" decoding="async" /></span><span>Noite</span></button>
-        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img src="./icons/actions/despertar-noturno.png" alt="" loading="lazy" decoding="async" /></span><span>Despertar noturno</span></button>
-        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><img src="./icons/actions/amamentacao.png" alt="" loading="lazy" decoding="async" /></span><span>Amamentação</span></button>
-        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img src="./icons/actions/mamadeira.png" alt="" loading="lazy" decoding="async" /></span><span>Mamadeira</span></button>
-        <button type="button" data-sheet-type="fralda"><span class="type-icon"><img src="./icons/actions/fralda.png" alt="" loading="lazy" decoding="async" /></span><span>Fralda</span></button>
+        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><span class="icon-art icon-art-sono" aria-hidden="true"></span></span><span>Soneca</span></button>
+        <button type="button" data-sheet-type="dormir"><span class="type-icon"><span class="icon-art icon-art-dormir" aria-hidden="true"></span></span><span>Noite</span></button>
+        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><span class="icon-art icon-art-despertar-noturno" aria-hidden="true"></span></span><span>Despertar noturno</span></button>
+        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><span class="icon-art icon-art-amamentacao" aria-hidden="true"></span></span><span>Amamentação</span></button>
+        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><span class="icon-art icon-art-mamadeira" aria-hidden="true"></span></span><span>Mamadeira</span></button>
+        <button type="button" data-sheet-type="fralda"><span class="type-icon"><span class="icon-art icon-art-fralda" aria-hidden="true"></span></span><span>Fralda</span></button>
       </div>
       <form class="record-form">
         <label>
@@ -349,6 +326,6 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=45"></script>
+    <script src="./app.js?v=47"></script>
   </body>
 </html>

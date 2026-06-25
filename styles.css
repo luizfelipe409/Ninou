@@ -36,13 +36,6 @@ body.day-theme {
   display: none !important;
 }
 
-.icon-sprite {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-
 body {
   min-height: 100vh;
   margin: 0;
@@ -368,6 +361,9 @@ body.day-theme .phone-shell {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
   font-size: 0.82rem;
   font-style: normal;
+  backface-visibility: hidden;
+  contain: paint;
+  transform: translateZ(0);
 }
 
 .orbit-event b {
@@ -382,22 +378,45 @@ body.day-theme .phone-shell {
   opacity: 0.82;
 }
 
-.orbit-event i svg {
-  width: 14px;
-  height: 14px;
-  display: block;
-}
-
-.orbit-event i img,
-.action-icon img,
-.type-icon img,
-.mark img,
-.cluster-icon img {
+.icon-art {
   width: 100%;
   height: 100%;
   display: block;
   border-radius: 50%;
-  object-fit: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  backface-visibility: hidden;
+  contain: paint;
+  transform: translateZ(0);
+}
+
+.icon-art-acordou {
+  background-image: url("./icons/actions/acordou.png");
+}
+
+.icon-art-sono {
+  background-image: url("./icons/actions/soneca.png");
+}
+
+.icon-art-dormir {
+  background-image: url("./icons/actions/dormir.png");
+}
+
+.icon-art-despertar-noturno {
+  background-image: url("./icons/actions/despertar-noturno.png");
+}
+
+.icon-art-amamentacao {
+  background-image: url("./icons/actions/amamentacao.png");
+}
+
+.icon-art-mamadeira {
+  background-image: url("./icons/actions/mamadeira.png");
+}
+
+.icon-art-fralda {
+  background-image: url("./icons/actions/fralda.png");
 }
 
 .orbit-cluster i {
@@ -554,13 +573,9 @@ body.day-theme .phone-shell {
   color: var(--plum-soft);
   font-size: 1.08rem;
   line-height: 1;
-}
-
-.action-icon svg,
-.type-icon svg {
-  width: 20px;
-  height: 20px;
-  display: block;
+  backface-visibility: hidden;
+  contain: paint;
+  transform: translateZ(0);
 }
 
 .quick-actions button[data-open-sheet="amamentacao"] .action-icon,
@@ -797,6 +812,9 @@ body.day-theme .phone-shell {
   overflow: hidden;
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+  backface-visibility: hidden;
+  contain: paint;
+  transform: translateZ(0);
 }
 
 .mark:empty {
@@ -1300,6 +1318,9 @@ body.day-theme .record-sheet textarea::placeholder {
   overflow: hidden;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
+  backface-visibility: hidden;
+  contain: paint;
+  transform: translateZ(0);
 }
 
 .cluster-card strong,

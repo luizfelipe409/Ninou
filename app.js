@@ -96,7 +96,15 @@ const actionIcons = {
 };
 
 function iconMarkup(iconKey) {
-  return `<img src="${actionIcons[iconKey]}" alt="" loading="lazy" decoding="async" />`;
+  return `<span class="icon-art icon-art-${iconKey}" aria-hidden="true"></span>`;
+}
+
+function preloadActionIcons() {
+  Object.values(actionIcons).forEach((src) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = src;
+  });
 }
 
 const typeConfig = {
@@ -254,6 +262,19 @@ function requireLogin(actionText = "salvar dados") {
   return false;
 }
 
+function setText(element, value) {
+  const nextValue = String(value);
+  if (element.textContent !== nextValue) {
+    element.textContent = nextValue;
+  }
+}
+
+function setHidden(element, hidden) {
+  if (element.hidden !== hidden) {
+    element.hidden = hidden;
+  }
+}
+
 function saveDayState() {
   if (!isLoggedIn() && !applyingCloudState) return;
   saveLocalDayState();
@@ -288,7 +309,8 @@ function formatTime(timestamp) {
 
 function formatEventMeta(event) {
   const duration = event.end > event.start ? formatShortDuration(event.end - event.start) : "";
-  const timeText = isSleepEvent(event) && event.end > event.start
+  const showRange = (isSleepEvent(event) || event.type === "despertar-noturno") && event.end > event.start;
+  const timeText = showRange
     ? `${formatTime(event.start)}-${formatTime(event.end)}`
     : formatTime(event.start);
   return [timeText, duration, event.detail].filter(Boolean).join(" • ");
@@ -918,13 +940,18 @@ function matchesDiaryFilter(event) {
 
 function getWakeWindowText() {
   const elapsed = Date.now() - state.activeStartedAt;
+  if (getActiveNightWakeEvent()) {
+    return `Despertar iniciado às ${formatTime(state.activeStartedAt)}.`;
+  }
+
   return state.mode === "sleeping"
     ? `Ficou acordado ${formatShortDuration(elapsed)} antes de dormir.`
     : `Acordado desde ${formatTime(state.activeStartedAt)}.`;
 }
 
 function setWakeActionIcon() {
-  const iconKey = state.mode === "sleeping" ? "acordou" : "sono";
+  const nightWakeActive = state.mode !== "sleeping" && getActiveNightWakeEvent();
+  const iconKey = state.mode === "sleeping" ? "acordou" : nightWakeActive ? "dormir" : "sono";
   if (wakeActionIcon.dataset.iconKey === iconKey) return;
 
   wakeActionIcon.dataset.iconKey = iconKey;
@@ -933,22 +960,23 @@ function setWakeActionIcon() {
 
 function renderCurrentState() {
   if (state.mode === "idle") {
-    wakeAction.hidden = true;
-    startChoice.hidden = false;
-    stateLabel.textContent = "Rotina zerada";
-    stateClock.textContent = "00:00:00";
-    stateHint.textContent = `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`;
+    setHidden(wakeAction, true);
+    setHidden(startChoice, false);
+    setText(stateLabel, "Rotina zerada");
+    setText(stateClock, "00:00:00");
+    setText(stateHint, `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`);
     return;
   }
 
-  wakeAction.hidden = false;
-  startChoice.hidden = true;
+  setHidden(wakeAction, false);
+  setHidden(startChoice, true);
   const elapsed = Date.now() - state.activeStartedAt;
   const sleeping = state.mode === "sleeping";
-  wakeActionLabel.textContent = sleeping ? "Acordou" : "Iniciar soneca";
-  stateLabel.textContent = sleeping ? "Dormindo há" : "Acordado há";
-  stateClock.textContent = formatDuration(elapsed);
-  stateHint.textContent = getWakeWindowText();
+  const nightWakeActive = getActiveNightWakeEvent();
+  setText(wakeActionLabel, sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca");
+  setText(stateLabel, sleeping ? "Dormindo há" : nightWakeActive ? "Despertar noturno há" : "Acordado há");
+  setText(stateClock, formatDuration(elapsed));
+  setText(stateHint, getWakeWindowText());
   setWakeActionIcon();
 }
 
@@ -1250,28 +1278,28 @@ function renderSummary() {
   const miniRing = document.querySelector(".mini-ring");
 
   if (summaryValues.length >= 4) {
-    summaryValues[0].textContent = formatShortDuration(sleepMs);
-    summaryValues[1].textContent = formatShortDuration(awakeMs);
-    summaryValues[2].textContent = String(feedingCount);
-    summaryValues[3].textContent = String(diaperCount);
+    setText(summaryValues[0], formatShortDuration(sleepMs));
+    setText(summaryValues[1], formatShortDuration(awakeMs));
+    setText(summaryValues[2], feedingCount);
+    setText(summaryValues[3], diaperCount);
   }
 
   if (miniRing) {
-    miniRing.textContent = String(wakeWindowMinutes);
+    setText(miniRing, wakeWindowMinutes);
   }
 
   if (nextCard && nextHint) {
     if (state.mode === "idle") {
-      nextCard.textContent = "Aguardando";
-      nextHint.textContent = "Escolha como começar a rotina diária.";
+      setText(nextCard, "Aguardando");
+      setText(nextHint, "Escolha como começar a rotina diária.");
       return;
     }
 
     const target = state.mode === "awake" ? state.activeStartedAt + wakeWindowMinutes * 60000 : Date.now() + wakeWindowMinutes * 60000;
-    nextCard.textContent = formatTime(target);
-    nextHint.textContent = state.mode === "awake"
+    setText(nextCard, formatTime(target));
+    setText(nextHint, state.mode === "awake"
       ? `Hora de preparar a soneca em ${formatShortDuration(target - Date.now())}.`
-      : "Próxima janela calculada após acordar.";
+      : "Próxima janela calculada após acordar.");
   }
 }
 
@@ -1359,7 +1387,9 @@ function renderSleepReport() {
 function updateTheme() {
   const hourValue = new Date().getHours();
   const dayTheme = hourValue >= 6 && hourValue < 18;
-  document.body.classList.toggle("day-theme", dayTheme);
+  if (document.body.classList.contains("day-theme") !== dayTheme) {
+    document.body.classList.toggle("day-theme", dayTheme);
+  }
 }
 
 function renderAll() {
@@ -1392,10 +1422,13 @@ function finishSleep() {
 
 function startSleep() {
   if (!requireLogin("salvar a rotina")) return;
+  const startedAt = Date.now();
+  const nightWakeActive = getActiveNightWakeEvent();
+  closeActiveNightWake(startedAt);
   state.mode = "sleeping";
-  state.activeStartedAt = Date.now();
-  state.activeType = "sono";
-  state.activeDetail = "Timer";
+  state.activeStartedAt = startedAt;
+  state.activeType = nightWakeActive ? "dormir" : "sono";
+  state.activeDetail = nightWakeActive ? "Após despertar noturno" : "Timer";
   state.activeNotes = "";
   saveDayState();
 }
@@ -1602,7 +1635,66 @@ function shouldStartLiveSleepFromManualEvent(type, start, existingEvent) {
   return state.mode === "idle";
 }
 
+function canUseManualTimeForLiveState(start) {
+  const now = Date.now();
+  const sameDay = getDayStart(start) === getDayStart(now);
+  const notFuture = start <= now + 2 * 60000;
+  return sameDay && notFuture;
+}
+
+function shouldStartLiveAwakeFromManualNightWake(type, start, existingEvent) {
+  if (existingEvent || type !== "despertar-noturno") return false;
+  if (!canUseManualTimeForLiveState(start)) return false;
+
+  if (state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)) {
+    return start >= state.activeStartedAt - 5 * 60000;
+  }
+
+  if (state.mode === "awake" && Number.isFinite(state.activeStartedAt)) {
+    return start >= state.activeStartedAt - 5 * 60000;
+  }
+
+  return state.mode === "idle";
+}
+
+function getActiveNightWakeEvent() {
+  if (state.mode !== "awake" || !Number.isFinite(state.activeStartedAt)) return null;
+
+  return [...state.events]
+    .reverse()
+    .find((event) => (
+      event.type === "despertar-noturno" &&
+      Math.abs(event.start - state.activeStartedAt) < 60000 &&
+      event.end <= event.start
+    )) || null;
+}
+
+function closeActiveNightWake(end = Date.now()) {
+  const activeNightWake = getActiveNightWakeEvent();
+  if (!activeNightWake || end < activeNightWake.start) return;
+
+  activeNightWake.end = end;
+}
+
+function startLiveAwakeFromManualNightWake(start, detail, notes) {
+  if (state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)) {
+    const sleepStart = state.activeStartedAt;
+    const sleepEnd = Math.max(start, sleepStart);
+    if (sleepEnd > sleepStart) {
+      state.events.push(makeEvent(state.activeType || "sono", sleepStart, sleepEnd, state.activeDetail || "Timer", state.activeNotes || ""));
+    }
+  }
+
+  state.events.push(makeEvent("despertar-noturno", start, start, detail, notes));
+  state.mode = "awake";
+  state.activeStartedAt = start;
+  state.activeType = "sono";
+  state.activeDetail = "";
+  state.activeNotes = "";
+}
+
 function startLiveSleepFromManualEvent(type, start, detail, notes) {
+  closeActiveNightWake(start);
   state.mode = "sleeping";
   state.activeStartedAt = start;
   state.activeType = isSleepType(type) ? type : "sono";
@@ -1619,6 +1711,7 @@ function saveManualEvent() {
     : sheetDetail.value;
   const existingEvent = currentEditingEventId ? getEventById(currentEditingEventId) : null;
   const startsLiveSleep = shouldStartLiveSleepFromManualEvent(currentSheetType, start, existingEvent);
+  const startsLiveAwake = shouldStartLiveAwakeFromManualNightWake(currentSheetType, start, existingEvent);
 
   if (existingEvent) {
     const duration = Math.max(0, existingEvent.end - existingEvent.start);
@@ -1629,6 +1722,8 @@ function saveManualEvent() {
       detail,
       notes,
     });
+  } else if (startsLiveAwake) {
+    startLiveAwakeFromManualNightWake(start, detail, notes);
   } else if (startsLiveSleep) {
     startLiveSleepFromManualEvent(currentSheetType, start, detail, notes);
   } else {
@@ -1881,8 +1976,9 @@ if (savedEmail) {
 initDiaryDatePicker();
 syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
+preloadActionIcons();
 renderAll();
-setInterval(renderLiveTick, 500);
+setInterval(renderLiveTick, 1000);
 
 initFirebaseAuthState().catch((error) => {
   console.error("Firebase não iniciou:", error);
