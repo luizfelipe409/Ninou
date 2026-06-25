@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=63" />
+    <link rel="stylesheet" href="./styles.css?v=65" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -148,13 +148,17 @@
         <label class="date-filter">
           Data do diário
           <input id="diaryDateInput" type="date" />
+          <span class="field-chevron date-chevron" aria-hidden="true"></span>
         </label>
-        <div class="chips" aria-label="Filtros">
-          <button class="active" type="button" data-diary-filter="all">Todos</button>
-          <button type="button" data-diary-filter="sleep">Sono</button>
-          <button type="button" data-diary-filter="feeding">Alimentação</button>
-          <button type="button" data-diary-filter="diaper">Fralda</button>
-          <button type="button" data-diary-filter="medicine">Medicamento</button>
+        <div class="chips-shell">
+          <div class="chips" aria-label="Filtros">
+            <button class="active" type="button" data-diary-filter="all">Todos</button>
+            <button type="button" data-diary-filter="sleep">Sono</button>
+            <button type="button" data-diary-filter="feeding">Alimentação</button>
+            <button type="button" data-diary-filter="diaper">Fralda</button>
+            <button type="button" data-diary-filter="medicine">Medicamento</button>
+          </div>
+          <span class="chips-more-hint" aria-hidden="true"></span>
         </div>
         <ol class="timeline">
           <li class="event-card">
@@ -372,6 +376,7 @@
           <select id="sheetDetail">
             <option>Não se aplica</option>
           </select>
+          <span class="field-chevron select-chevron" aria-hidden="true"></span>
         </label>
         <section id="breastTimerPanel" class="breast-timer-panel" hidden aria-label="Timer da amamentação">
           <div class="breast-timer-head">
@@ -424,6 +429,6 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=63"></script>
+    <script src="./app.js?v=65"></script>
   </body>
 </html>

@@ -1285,10 +1285,12 @@ function renderTimeline() {
     item.className = "event-card";
     item.innerHTML = `
       <i class="mark ${config.arcType}">${config.icon}</i>
-      <div>
-        <strong>${escapeHtml(config.title)}</strong>
-        <span>${escapeHtml(formatEventMeta(event))}</span>
-        ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
+      <div class="event-main">
+        <div class="event-text">
+          <strong>${escapeHtml(config.title)}</strong>
+          <span>${escapeHtml(formatEventMeta(event))}</span>
+          ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
+        </div>
         <div class="event-actions">
           <button class="event-action-button edit" type="button" data-event-edit="${escapeHtml(event.id)}" aria-label="Editar ${escapeHtml(config.title)}">
             <span>✎</span>

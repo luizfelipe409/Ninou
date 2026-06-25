@@ -247,6 +247,7 @@ body.day-theme .phone-shell {
 }
 
 .date-filter {
+  position: relative;
   display: grid;
   gap: 6px;
   color: var(--muted);
@@ -255,25 +256,72 @@ body.day-theme .phone-shell {
   text-transform: uppercase;
 }
 
+.date-filter::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  bottom: 17px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
 .date-filter input {
   min-height: 44px;
   border-radius: 16px;
+  padding-right: 42px;
 }
 
 .screen[data-screen="diary"] .date-filter {
   margin-bottom: 6px;
 }
 
+.screen[data-screen="diary"] .chips-shell {
+  position: relative;
+  margin-bottom: 4px;
+}
+
 .screen[data-screen="diary"] .chips {
   gap: 10px;
-  margin-bottom: 4px;
-  padding: 2px 1px 8px;
+  padding: 2px 30px 8px 1px;
+  scroll-padding-right: 36px;
 }
 
 .screen[data-screen="diary"] .chips button {
   min-width: 78px;
   justify-content: center;
   padding: 0 15px;
+}
+
+.chips-more-hint {
+  position: absolute;
+  right: 0;
+  top: 2px;
+  width: 36px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--bg) 54%, var(--bg));
+}
+
+.chips-more-hint::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  opacity: 0.78;
+}
+
+body.day-theme .chips-more-hint {
+  background: linear-gradient(90deg, transparent, rgba(255, 242, 224, 0.94) 54%, rgba(255, 242, 224, 0.98));
 }
 
 .state-orbit {
@@ -931,11 +979,25 @@ body.day-theme .state-orbit strong {
   color: var(--muted);
 }
 
+.event-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.event-text {
+  min-width: 0;
+}
+
 .event-actions {
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 7px;
-  margin-top: 11px;
+  margin-top: 0;
 }
 
 .event-action-button {
@@ -966,6 +1028,18 @@ body.day-theme .state-orbit strong {
   border-color: rgba(255, 154, 118, 0.26);
   background: rgba(255, 154, 118, 0.08);
   color: var(--coral);
+}
+
+
+@media (max-width: 390px) {
+  .event-main {
+    display: block;
+  }
+
+  .event-actions {
+    justify-content: flex-start;
+    margin-top: 11px;
+  }
 }
 
 .mark {
@@ -1790,17 +1864,21 @@ body.day-theme .record-types button.active {
 }
 
 .select-label::after {
-  content: "âŒ„";
+  content: "";
   position: absolute;
-  right: 14px;
-  bottom: 12px;
-  color: var(--muted);
-  font-size: 1.1rem;
+  right: 18px;
+  bottom: 20px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  opacity: 0.72;
   pointer-events: none;
 }
 
 .select-label select {
-  padding-right: 40px;
+  padding-right: 44px;
 }
 
 .breast-timer-panel {
@@ -2048,4 +2126,152 @@ body.day-theme .fab {
 .mini-chart i {
   order: 3;
   font-style: normal;
+}
+
+.date-filter input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+
+/* v65: ajustes de UX no diÃ¡rio e setas de campos */
+.date-filter::after,
+.select-label::after {
+  display: none !important;
+}
+
+.field-chevron {
+  position: absolute;
+  right: 18px;
+  width: 9px;
+  height: 9px;
+  border-right: 2.2px solid currentColor;
+  border-bottom: 2.2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.68;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.date-filter .field-chevron {
+  bottom: 18px;
+  color: var(--muted);
+}
+
+.select-label .field-chevron {
+  bottom: 20px;
+  color: var(--muted);
+}
+
+.date-filter input,
+.select-label select {
+  padding-right: 48px !important;
+}
+
+.screen[data-screen="diary"] .chips-shell {
+  overflow: hidden;
+  padding-right: 0;
+}
+
+.screen[data-screen="diary"] .chips {
+  padding-right: 48px !important;
+}
+
+.chips-more-hint {
+  z-index: 4;
+  right: -1px;
+  top: 0;
+  width: 48px;
+  height: 46px;
+  grid-template-columns: auto auto;
+  column-gap: 7px;
+  background: linear-gradient(90deg, transparent, rgba(16, 16, 41, 0.58) 42%, var(--bg) 90%);
+}
+
+.chips-more-hint::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.48;
+  box-shadow: 7px 0 0 var(--muted);
+}
+
+.chips-more-hint::after {
+  width: 7px;
+  height: 7px;
+  border-width: 2px;
+  opacity: 0.75;
+}
+
+body.day-theme .chips-more-hint {
+  background: linear-gradient(90deg, transparent, rgba(255, 246, 235, 0.82) 42%, rgba(255, 241, 225, 0.98) 90%);
+}
+
+.timeline .event-card {
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.timeline .event-card .mark {
+  width: 44px;
+  height: 44px;
+}
+
+.timeline .event-main {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 14px;
+  width: 100%;
+}
+
+.timeline .event-text {
+  min-width: 0;
+}
+
+.timeline .event-text strong,
+.timeline .event-text span,
+.timeline .event-text p {
+  overflow-wrap: anywhere;
+}
+
+.timeline .event-actions {
+  justify-content: flex-end;
+  align-self: center;
+  flex-wrap: nowrap;
+  margin-top: 0 !important;
+}
+
+.timeline .event-action-button {
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .timeline .event-card {
+    align-items: start;
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .timeline .event-card .mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .timeline .event-main {
+    display: block !important;
+  }
+
+  .timeline .event-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 11px !important;
+  }
 }
