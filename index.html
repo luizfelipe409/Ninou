@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=65" />
+    <link rel="stylesheet" href="./styles.css?v=66" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -158,7 +158,7 @@
             <button type="button" data-diary-filter="diaper">Fralda</button>
             <button type="button" data-diary-filter="medicine">Medicamento</button>
           </div>
-          <span class="chips-more-hint" aria-hidden="true"></span>
+          <button id="diaryChipsMoreButton" class="chips-more-button" type="button" aria-label="Mostrar mais filtros" title="Mostrar mais filtros"><span aria-hidden="true"></span></button>
         </div>
         <ol class="timeline">
           <li class="event-card">
@@ -429,6 +429,6 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=65"></script>
+    <script src="./app.js?v=66"></script>
   </body>
 </html>

@@ -2275,3 +2275,64 @@ body.day-theme .chips-more-hint {
     margin-top: 11px !important;
   }
 }
+
+/* v66: botÃ£o funcional para revelar os filtros do diÃ¡rio */
+.chips-more-hint {
+  display: none !important;
+}
+
+.chips-more-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 6;
+  width: 44px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(201, 192, 255, 0.18);
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(16, 16, 41, 0.08), rgba(16, 16, 41, 0.82)),
+    rgba(34, 29, 76, 0.8);
+  color: var(--plum-soft);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  padding: 0;
+}
+
+.chips-more-button[hidden] {
+  display: none !important;
+}
+
+.chips-more-button span {
+  width: 10px;
+  height: 10px;
+  border-right: 2.2px solid currentColor;
+  border-bottom: 2.2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 180ms ease;
+}
+
+.chips-more-button.is-back span {
+  transform: rotate(135deg);
+}
+
+body.day-theme .chips-more-button {
+  border-color: rgba(140, 113, 92, 0.18);
+  background:
+    linear-gradient(90deg, rgba(255, 246, 235, 0.1), rgba(255, 246, 235, 0.92)),
+    rgba(255, 239, 220, 0.92);
+  color: #7a5a44;
+  box-shadow: 0 8px 20px rgba(156, 115, 82, 0.12);
+}
+
+.screen[data-screen="diary"] .chips-shell {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.screen[data-screen="diary"] .chips {
+  padding-right: 52px !important;
+  scroll-behavior: smooth;
+}

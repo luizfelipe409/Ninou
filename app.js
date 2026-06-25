@@ -27,6 +27,8 @@ const sheetAmountInput = sheetAmountField.querySelector("input");
 const sheetNotesInput = document.querySelector(".record-form textarea");
 const shortcutButtons = document.querySelectorAll("[data-target-shortcut]");
 const diaryFilterButtons = document.querySelectorAll("[data-diary-filter]");
+const diaryChips = document.querySelector('.screen[data-screen="diary"] .chips');
+const diaryChipsMoreButton = document.querySelector("#diaryChipsMoreButton");
 const timeline = document.querySelector(".timeline");
 const diaryDateInput = document.querySelector("#diaryDateInput");
 const diaryDateTitle = document.querySelector("#diaryDateTitle");
@@ -1364,16 +1366,65 @@ function closeOrbitCluster() {
   }
 }
 
+function getOverlapDuration(start, end, windowStart, windowEnd) {
+  const safeStart = Number(start);
+  const safeEnd = Number(end);
+  if (!Number.isFinite(safeStart)) return 0;
+  const boundedStart = Math.max(safeStart, windowStart);
+  const boundedEnd = Math.min(Number.isFinite(safeEnd) ? safeEnd : safeStart, windowEnd);
+  return Math.max(0, boundedEnd - boundedStart);
+}
+
+function getSleepMsForRange(windowStart, windowEnd) {
+  const completedSleepMs = state.events
+    .filter(isSleepEvent)
+    .reduce((total, event) => total + getOverlapDuration(event.start, event.end, windowStart, windowEnd), 0);
+
+  if (state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)) {
+    return completedSleepMs + getOverlapDuration(state.activeStartedAt, Date.now(), windowStart, windowEnd);
+  }
+
+  return completedSleepMs;
+}
+
+function getRoutineStartForRange(windowStart, windowEnd) {
+  const candidates = [];
+
+  state.events.forEach((event) => {
+    const eventEnd = Math.max(Number(event.end) || event.start, event.start);
+    if (eventEnd >= windowStart && event.start < windowEnd) {
+      candidates.push(Math.max(event.start, windowStart));
+    }
+  });
+
+  if (state.mode !== "idle" && Number.isFinite(state.activeStartedAt)) {
+    if (state.activeStartedAt < windowEnd) {
+      candidates.push(Math.max(state.activeStartedAt, windowStart));
+    }
+  }
+
+  if (!candidates.length) return null;
+  return Math.min(...candidates);
+}
+
+function getAwakeMsForRange(windowStart, windowEnd) {
+  const routineStart = getRoutineStartForRange(windowStart, windowEnd);
+  if (routineStart === null) return 0;
+
+  const sleepMs = getSleepMsForRange(windowStart, windowEnd);
+  return Math.max(0, windowEnd - routineStart - sleepMs);
+}
+
 function renderSummary() {
   const todayStart = getDayStart();
-  const todaysEvents = state.events.filter((event) => event.start >= todayStart);
-  const sleepMs = todaysEvents
-    .filter(isSleepEvent)
-    .reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
+  const now = Date.now();
+  const todayEnd = Math.min(todayStart + day, now);
+  const todaysEvents = state.events.filter((event) => event.start >= todayStart && event.start < todayStart + day);
+  const sleepMs = getSleepMsForRange(todayStart, todayEnd);
   const feedingCount = todaysEvents.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
   const diaperCount = todaysEvents.filter((event) => event.type === "fralda").length;
   const medicationCount = todaysEvents.filter((event) => event.type === "medicamento").length;
-  const awakeMs = state.mode === "awake" ? Date.now() - state.activeStartedAt : 0;
+  const awakeMs = getAwakeMsForRange(todayStart, todayEnd);
   const summaryValues = document.querySelectorAll(".summary-grid strong");
   const nextCard = document.querySelector(".next-card strong");
   const nextHint = document.querySelector(".next-card p");
@@ -1817,6 +1868,34 @@ function startRoutine(mode) {
   renderAll();
 }
 
+function updateDiaryChipsMoreButton() {
+  if (!diaryChips || !diaryChipsMoreButton) return;
+
+  const maxScroll = Math.max(0, diaryChips.scrollWidth - diaryChips.clientWidth);
+  if (maxScroll <= 4) {
+    diaryChipsMoreButton.hidden = true;
+    return;
+  }
+
+  diaryChipsMoreButton.hidden = false;
+  const atEnd = diaryChips.scrollLeft >= maxScroll - 6;
+  diaryChipsMoreButton.classList.toggle("is-back", atEnd);
+  diaryChipsMoreButton.setAttribute("aria-label", atEnd ? "Voltar filtros" : "Mostrar mais filtros");
+  diaryChipsMoreButton.title = atEnd ? "Voltar filtros" : "Mostrar mais filtros";
+}
+
+function scrollDiaryFilters() {
+  if (!diaryChips) return;
+
+  const maxScroll = Math.max(0, diaryChips.scrollWidth - diaryChips.clientWidth);
+  const atEnd = diaryChips.scrollLeft >= maxScroll - 6;
+  diaryChips.scrollTo({
+    left: atEnd ? 0 : maxScroll,
+    behavior: "smooth",
+  });
+  window.setTimeout(updateDiaryChipsMoreButton, 280);
+}
+
 function showScreen(target) {
   navButtons.forEach((item) => item.classList.toggle("active", item.dataset.target === target));
   screens.forEach((screen) => {
@@ -1827,8 +1906,13 @@ function showScreen(target) {
 function setDiaryFilter(filter) {
   currentDiaryFilter = filter;
   diaryFilterButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.diaryFilter === filter);
+    const active = button.dataset.diaryFilter === filter;
+    button.classList.toggle("active", active);
+    if (active) {
+      button.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+    }
   });
+  window.setTimeout(updateDiaryChipsMoreButton, 220);
   renderTimeline();
 }
 
@@ -2249,6 +2333,15 @@ diaryFilterButtons.forEach((button) => {
   button.addEventListener("click", () => setDiaryFilter(button.dataset.diaryFilter));
 });
 
+if (diaryChipsMoreButton) {
+  diaryChipsMoreButton.addEventListener("click", scrollDiaryFilters);
+}
+
+if (diaryChips) {
+  diaryChips.addEventListener("scroll", updateDiaryChipsMoreButton, { passive: true });
+  window.addEventListener("resize", updateDiaryChipsMoreButton);
+}
+
 diaryDateInput.addEventListener("change", () => setDiaryDate(diaryDateInput.value));
 
 timeline.addEventListener("click", (event) => {
@@ -2387,6 +2480,7 @@ syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
 renderAll();
+updateDiaryChipsMoreButton();
 setInterval(renderLiveTick, 1000);
 
 initFirebaseAuthState().catch((error) => {
