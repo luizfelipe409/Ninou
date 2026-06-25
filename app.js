@@ -97,7 +97,8 @@ const actionIcons = {
 
 function iconMarkup(iconKey) {
   const src = actionIcons[iconKey] || actionIcons.sono;
-  return `<img class="icon-art" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
+  const fallbackClass = `icon-art-${iconKey}`;
+  return `<img class="icon-art ${fallbackClass}" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
 }
 
 function preloadActionIcons() {

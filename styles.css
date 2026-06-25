@@ -385,8 +385,9 @@ body.day-theme .phone-shell {
   height: 100%;
   display: block;
   border-radius: 50%;
-  object-fit: cover;
-  background: none !important;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   transform: none !important;
   -webkit-transform: none !important;
   backface-visibility: visible !important;
@@ -394,6 +395,13 @@ body.day-theme .phone-shell {
   contain: initial !important;
   transition: none !important;
   will-change: auto !important;
+}
+
+img.icon-art {
+  object-fit: cover;
+  background: transparent !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .orbit-event i,
@@ -598,6 +606,19 @@ body.day-theme .phone-shell {
   -webkit-transform: translateZ(0);
   transition: none;
   will-change: auto;
+}
+
+.action-icon > .icon-art,
+.type-icon > .icon-art,
+.mark > .icon-art,
+.cluster-icon > .icon-art,
+.orbit-event i > .icon-art {
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  display: block;
+  flex: 0 0 auto;
 }
 
 .quick-actions button[data-open-sheet="amamentacao"] .action-icon,
@@ -809,13 +830,25 @@ body.day-theme .phone-shell {
 }
 
 .event-action-button span {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   display: inline-grid;
   place-items: center;
+  flex: 0 0 24px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
+  color: currentColor;
   line-height: 1;
+  font-size: 1.12rem;
+  font-weight: 950;
+}
+
+.event-action-button.edit span {
+  font-size: 1.06rem;
+}
+
+.event-action-button.delete span {
+  font-size: 1.26rem;
 }
 
 .event-action-button.delete {
