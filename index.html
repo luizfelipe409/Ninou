@@ -19,10 +19,10 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="preload" as="audio" href="./audio/ruido-branco.mp3" />
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
-    <link rel="preload" as="audio" href="./audio/classica-suave.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=68" />
+    <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
+    <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
+    <link rel="stylesheet" href="./styles.css?v=69" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -263,41 +263,42 @@
             <strong id="soundTimer">01:00:00</strong>
           </div>
           <div class="sound-current">
-            <i id="soundCurrentIcon">🌊</i>
+            <i id="soundCurrentIcon">💗</i>
             <div>
-              <strong id="soundCurrentTitle">Ruído branco</strong>
-              <p id="soundCurrentDesc">Abafa ruídos repentinos e cria uma base constante.</p>
+              <strong id="soundCurrentTitle">Som do útero</strong>
+              <p id="soundCurrentDesc">Som acolhedor inspirado no ambiente intrauterino.</p>
             </div>
           </div>
           <div class="sound-progress" aria-hidden="true"><i id="soundProgress"></i></div>
           <div class="sound-controls">
             <button id="soundPlayPause" class="sound-main-button" type="button">▶ Tocar por 1h</button>
             <button id="soundStop" class="sound-stop-button" type="button">Parar</button>
+            <a id="soundSourceLink" class="sound-source-link" href="https://www.youtube.com/watch?v=Hmck-0EYGk0&t=9312s" target="_blank" rel="noopener noreferrer">Fonte</a>
           </div>
         </section>
 
         <section class="sound-list" aria-label="Escolha um som">
-          <button class="sound-option active" type="button" data-sound-key="white">
-            <span class="sound-option-icon">🌊</span>
-            <span>
-              <strong>Ruído branco</strong>
-              <em>Som contínuo para abafar ruídos do ambiente.</em>
-            </span>
-            <i>▶</i>
-          </button>
-          <button class="sound-option" type="button" data-sound-key="womb">
+          <button class="sound-option active" type="button" data-sound-key="womb">
             <span class="sound-option-icon">💗</span>
             <span>
               <strong>Som do útero</strong>
-              <em>Batidas suaves e grave acolhedor para acalmar.</em>
+              <em>Referência enviada: som profundo e acolhedor para acalmar.</em>
             </span>
             <i>▶</i>
           </button>
-          <button class="sound-option" type="button" data-sound-key="classical">
-            <span class="sound-option-icon">🎼</span>
+          <button class="sound-option" type="button" data-sound-key="relax">
+            <span class="sound-option-icon">🌙</span>
             <span>
-              <strong>Música clássica suave</strong>
-              <em>Melodia instrumental leve para a rotina de sono.</em>
+              <strong>Som para relaxar</strong>
+              <em>Som contínuo e tranquilo para preparar o sono.</em>
+            </span>
+            <i>▶</i>
+          </button>
+          <button class="sound-option" type="button" data-sound-key="rhythm">
+            <span class="sound-option-icon">🧸</span>
+            <span>
+              <strong>Ritmo suave bebê</strong>
+              <em>Ritmo leve para manter uma rotina calma.</em>
             </span>
             <i>▶</i>
           </button>
@@ -305,7 +306,7 @@
 
         <section class="sound-note">
           <strong>Observação</strong>
-          <p>O som começa apenas após tocar em play. Em iPhone, o áudio costuma continuar com a tela apagada quando iniciado por toque, mas o navegador pode interromper se o sistema economizar bateria.</p>
+          <p>O som começa apenas após tocar em play. Para usar exatamente os áudios dos links do YouTube, substitua os arquivos MP3 da pasta audio por versões autorizadas com os mesmos nomes. Em iPhone, o navegador costuma manter áudio iniciado por toque, mas o sistema ainda pode interromper conforme economia de bateria.</p>
         </section>
       </section>
 
@@ -514,6 +515,6 @@
     </section>
 
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
-    <script src="./app.js?v=68"></script>
+    <script src="./app.js?v=69"></script>
   </body>
 </html>

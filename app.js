@@ -8,14 +8,6 @@ const startModeButtons = document.querySelectorAll("[data-start-mode]");
 const stateLabel = document.querySelector("#stateLabel");
 const stateClock = document.querySelector("#stateClock");
 const stateHint = document.querySelector("#stateHint");
-const activeTimerCard = document.querySelector("#activeTimerCard");
-const activeTimerIcon = document.querySelector("#activeTimerIcon");
-const activeTimerKicker = document.querySelector("#activeTimerKicker");
-const activeTimerTitle = document.querySelector("#activeTimerTitle");
-const activeTimerElapsed = document.querySelector("#activeTimerElapsed");
-const activeTimerProgress = document.querySelector("#activeTimerProgress");
-const activeTimerMeta = document.querySelector("#activeTimerMeta");
-const activeTimerAction = document.querySelector("#activeTimerAction");
 const orbitEvents = document.querySelector("#orbitEvents");
 const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
@@ -35,8 +27,6 @@ const sheetAmountInput = sheetAmountField.querySelector("input");
 const sheetNotesInput = document.querySelector(".record-form textarea");
 const shortcutButtons = document.querySelectorAll("[data-target-shortcut]");
 const diaryFilterButtons = document.querySelectorAll("[data-diary-filter]");
-const diaryChips = document.querySelector('.screen[data-screen="diary"] .chips');
-const diaryChipsMoreButton = document.querySelector("#diaryChipsMoreButton");
 const timeline = document.querySelector(".timeline");
 const diaryDateInput = document.querySelector("#diaryDateInput");
 const diaryDateTitle = document.querySelector("#diaryDateTitle");
@@ -73,37 +63,18 @@ const bestWindow = document.querySelector("#bestWindow");
 const bestWindowHint = document.querySelector("#bestWindowHint");
 const routineStatus = document.querySelector("#routineStatus");
 const routineHint = document.querySelector("#routineHint");
-const breastfeedingBars = document.querySelector("#breastfeedingBars");
-const bottleBars = document.querySelector("#bottleBars");
-const diaperBars = document.querySelector("#diaperBars");
-const medicationBars = document.querySelector("#medicationBars");
-const todayLastEvents = document.querySelector("#todayLastEvents");
-const todayMiniChart = document.querySelector("#todayMiniChart");
-const bottleAmountRange = document.querySelector("#bottleAmountRange");
-const bottleAmountDisplay = document.querySelector("#bottleAmountDisplay");
-const breastTimerPanel = document.querySelector("#breastTimerPanel");
-const breastTimerTotal = document.querySelector("#breastTimerTotal");
-const leftBreastTimer = document.querySelector("#leftBreastTimer");
-const rightBreastTimer = document.querySelector("#rightBreastTimer");
-const resetBreastTimerButton = document.querySelector("#resetBreastTimerButton");
-const breastSideButtons = document.querySelectorAll("[data-breast-side]");
-const themeModeInput = document.querySelector("#themeModeInput");
-const babyWeightDateInput = document.querySelector("#babyWeightDateInput");
-const babyWeightInput = document.querySelector("#babyWeightInput");
-const saveBabyWeightButton = document.querySelector("#saveBabyWeightButton");
-const lastWeightValue = document.querySelector("#lastWeightValue");
-const lastWeightHint = document.querySelector("#lastWeightHint");
-const weightHistoryList = document.querySelector("#weightHistoryList");
+
 const sleepSoundAudio = document.querySelector("#sleepSoundAudio");
-const soundOptionButtons = document.querySelectorAll("[data-sound-key]");
+const soundOptions = document.querySelectorAll("[data-sound-key]");
 const soundStatus = document.querySelector("#soundStatus");
 const soundTimer = document.querySelector("#soundTimer");
 const soundCurrentIcon = document.querySelector("#soundCurrentIcon");
 const soundCurrentTitle = document.querySelector("#soundCurrentTitle");
 const soundCurrentDesc = document.querySelector("#soundCurrentDesc");
 const soundProgress = document.querySelector("#soundProgress");
-const soundPlayPauseButton = document.querySelector("#soundPlayPause");
-const soundStopButton = document.querySelector("#soundStop");
+const soundPlayPause = document.querySelector("#soundPlayPause");
+const soundStop = document.querySelector("#soundStop");
+const soundSourceLink = document.querySelector("#soundSourceLink");
 
 const storageKeys = {
   photo: "ninou.demo.profilePhoto",
@@ -112,9 +83,7 @@ const storageKeys = {
   profile: "ninou.demo.profile",
   profileVersion: "ninou.demo.profileVersion",
   dayState: "ninou.demo.dayState",
-  themeMode: "ninou.demo.themeMode",
-  weights: "ninou.demo.weights",
-  sleepSound: "ninou.demo.sleepSound",
+  soundKey: "ninou.demo.soundKey",
 };
 
 const firebaseConfig = {
@@ -139,12 +108,7 @@ const actionIcons = {
   fralda: "./icons/actions/fralda.png",
 };
 
-function medicineIconMarkup() {
-  return `<svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg>`;
-}
-
 function iconMarkup(iconKey) {
-  if (iconKey === "medicamento") return medicineIconMarkup();
   const src = actionIcons[iconKey] || actionIcons.sono;
   return `<img class="icon-art" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
 }
@@ -206,40 +170,44 @@ const typeConfig = {
     arcType: "fralda",
     icon: iconMarkup("fralda"),
   },
-  medicamento: {
-    title: "Medicamento",
-    label: "Tipo de registro",
-    options: ["Dose", "Gotas", "Xarope", "Vitamina", "Outro"],
-    amount: false,
-    arcType: "medicamento",
-    icon: iconMarkup("medicamento"),
+};
+
+
+const sleepSoundTracks = {
+  womb: {
+    title: "Som do útero",
+    desc: "Som acolhedor inspirado no ambiente intrauterino.",
+    icon: "💗",
+    src: "./audio/som-utero.mp3",
+    youtube: "https://www.youtube.com/watch?v=Hmck-0EYGk0&t=9312s",
+  },
+  relax: {
+    title: "Som para relaxar",
+    desc: "Som contínuo e tranquilo para preparar o sono.",
+    icon: "🌙",
+    src: "./audio/som-relaxar.mp3",
+    youtube: "https://www.youtube.com/watch?v=4owTdwvbyNA&list=RD4owTdwvbyNA&start_radio=1",
+  },
+  rhythm: {
+    title: "Ritmo suave bebê",
+    desc: "Ritmo leve para manter uma rotina calma.",
+    icon: "🧸",
+    src: "./audio/ritmo-suave-bebe.mp3",
+    youtube: "https://www.youtube.com/watch?v=Dr5V86pzuRc&list=RDDr5V86pzuRc&start_radio=1",
   },
 };
+
+const sleepSoundDurationMs = 60 * 60 * 1000;
+let selectedSoundKey = sleepSoundTracks[localStorage.getItem(storageKeys.soundKey)]
+  ? localStorage.getItem(storageKeys.soundKey)
+  : "womb";
+let soundInterval = null;
+let soundEndsAt = 0;
+let soundRemainingMs = sleepSoundDurationMs;
+let soundIsRunning = false;
 
 const hour = 60 * 60 * 1000;
 const day = 24 * hour;
-
-const sleepSoundDurationMs = 60 * 60 * 1000;
-const sleepSounds = {
-  white: {
-    title: "Ruído branco",
-    description: "Abafa ruídos repentinos e cria uma base constante.",
-    icon: "🌊",
-    src: "./audio/ruido-branco.mp3",
-  },
-  womb: {
-    title: "Som do útero",
-    description: "Batidas suaves e grave acolhedor para acalmar.",
-    icon: "💗",
-    src: "./audio/som-utero.mp3",
-  },
-  classical: {
-    title: "Música clássica suave",
-    description: "Melodia instrumental leve para a rotina de sono.",
-    icon: "🎼",
-    src: "./audio/classica-suave.mp3",
-  },
-};
 
 let currentSheetType = "sono";
 let currentEditingEventId = null;
@@ -261,20 +229,6 @@ let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
 let liveTickMinute = -1;
-let breastTimerState = {
-  leftMs: 0,
-  rightMs: 0,
-  activeSide: null,
-  lastStartedAt: 0,
-  intervalId: null,
-};
-let sleepSoundState = {
-  selectedKey: sleepSounds[localStorage.getItem(storageKeys.sleepSound)] ? localStorage.getItem(storageKeys.sleepSound) : "white",
-  playing: false,
-  startedAt: 0,
-  remainingMs: sleepSoundDurationMs,
-  timeoutId: null,
-};
 let state = loadLocalDayState();
 
 function createEmptyDayState() {
@@ -300,18 +254,7 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
 }
 
 function normalizeEvent(event = {}) {
-  const typeAliases = {
-    medicine: "medicamento",
-    medication: "medicamento",
-    remedio: "medicamento",
-    diaper: "fralda",
-    feed: "amamentacao",
-    bottle: "mamadeira",
-    sleep: "sono",
-  };
-  const rawType = typeof event.type === "string" ? event.type : "sono";
-  const mappedType = typeAliases[rawType] || rawType;
-  const type = typeConfig[mappedType] ? mappedType : "sono";
+  const type = typeof event.type === "string" && typeConfig[event.type] ? event.type : "sono";
   const start = Number(event.start);
   const end = Number(event.end);
 
@@ -443,50 +386,19 @@ function toDateInputValue(timestamp = Date.now()) {
   return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 10);
 }
 
-function normalizeWeights(weights = []) {
-  if (!Array.isArray(weights)) return [];
-  return weights
-    .map((item) => {
-      const value = Number(String(item.value ?? item.weight ?? "").replace(",", "."));
-      const date = typeof item.date === "string" ? item.date : "";
-      const id = typeof item.id === "string" ? item.id : `peso-${date}-${Math.random().toString(36).slice(2, 8)}`;
-      if (!date || !Number.isFinite(value) || value <= 0) return null;
-      return { id, date, value };
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
-}
-
-function loadLocalWeights() {
-  try {
-    return normalizeWeights(JSON.parse(localStorage.getItem(storageKeys.weights) || "[]"));
-  } catch {
-    return [];
-  }
-}
-
-function persistLocalWeights(weights) {
-  localStorage.setItem(storageKeys.weights, JSON.stringify(normalizeWeights(weights)));
-}
-
 function getDefaultBabyProfile() {
   return {
     name: "",
     article: "do",
     birthDate: "",
-    themeMode: localStorage.getItem(storageKeys.themeMode) || "auto",
-    weights: loadLocalWeights(),
   };
 }
 
 function normalizeBabyProfile(profile = {}) {
-  const themeMode = ["auto", "light", "dark"].includes(profile.themeMode) ? profile.themeMode : (localStorage.getItem(storageKeys.themeMode) || "auto");
   return {
     name: typeof profile.name === "string" ? profile.name : "",
     article: profile.article === "da" ? "da" : "do",
     birthDate: typeof profile.birthDate === "string" ? profile.birthDate : "",
-    themeMode,
-    weights: normalizeWeights(profile.weights || loadLocalWeights()),
   };
 }
 
@@ -502,10 +414,8 @@ function loadBabyProfile() {
 }
 
 function saveBabyProfile() {
-  const normalized = normalizeBabyProfile(babyProfile);
-  localStorage.setItem(storageKeys.profile, JSON.stringify(normalized));
-  localStorage.setItem(storageKeys.themeMode, normalized.themeMode);
-  persistLocalWeights(normalized.weights);
+  if (!isLoggedIn() && !applyingCloudState) return;
+  localStorage.setItem(storageKeys.profile, JSON.stringify(normalizeBabyProfile(babyProfile)));
   if (profileClientUpdatedAt) {
     localStorage.setItem(storageKeys.profileVersion, String(profileClientUpdatedAt));
   }
@@ -535,8 +445,6 @@ function hasProfileContent(profile = babyProfile, photo = currentProfilePhoto, w
       normalizedProfile.birthDate ||
       photo ||
       normalizedProfile.article === "da" ||
-      normalizedProfile.themeMode !== "auto" ||
-      normalizedProfile.weights.length > 0 ||
       windowMinutes !== 70,
   );
 }
@@ -613,8 +521,6 @@ function syncBabyProfileForm() {
   babyArticleInput.value = babyProfile.article;
   babyBirthInput.value = babyProfile.birthDate;
   babyBirthInput.max = toDateInputValue();
-  if (themeModeInput) themeModeInput.value = babyProfile.themeMode || "auto";
-  renderWeightProfile();
 }
 
 function updateBabyProfile(patch) {
@@ -710,7 +616,6 @@ function clearLocalAccountData() {
     storageKeys.profile,
     storageKeys.profileVersion,
     storageKeys.dayState,
-    storageKeys.weights,
   ].forEach((key) => {
     localStorage.removeItem(key);
   });
@@ -1079,7 +984,6 @@ function matchesDiaryFilter(event) {
   if (currentDiaryFilter === "sleep") return isSleepEvent(event) || event.type === "despertar-noturno";
   if (currentDiaryFilter === "feeding") return event.type === "mamadeira" || event.type === "amamentacao";
   if (currentDiaryFilter === "diaper") return event.type === "fralda";
-  if (currentDiaryFilter === "medicine") return event.type === "medicamento";
   return true;
 }
 
@@ -1103,74 +1007,6 @@ function setWakeActionIcon() {
   wakeActionIcon.innerHTML = iconMarkup(iconKey);
 }
 
-function getActiveTimerDetails() {
-  if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return null;
-
-  const nightWakeActive = getActiveNightWakeEvent();
-  const sleeping = state.mode === "sleeping";
-  const elapsed = Date.now() - state.activeStartedAt;
-  const activeType = sleeping ? state.activeType || "sono" : nightWakeActive ? "despertar-noturno" : "acordou";
-  const config = typeConfig[activeType] || null;
-  const title = sleeping
-    ? (config?.title || "Sono")
-    : nightWakeActive
-      ? "Despertar noturno"
-      : "Tempo acordado";
-  const iconKey = sleeping ? state.activeType || "sono" : nightWakeActive ? "despertar-noturno" : "acordou";
-  const actionLabel = sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca";
-  const kicker = sleeping ? "Timer de sono" : nightWakeActive ? "Timer noturno" : "Timer acordado";
-  const meta = sleeping
-    ? `${config?.title || "Sono"} iniciado às ${formatTime(state.activeStartedAt)}`
-    : nightWakeActive
-      ? `Despertar iniciado às ${formatTime(state.activeStartedAt)}`
-      : `Acordado desde ${formatTime(state.activeStartedAt)}`;
-  const targetMs = sleeping
-    ? (state.activeType === "dormir" ? 8 * hour : 2 * hour)
-    : Math.max(20 * 60000, wakeWindowMinutes * 60000);
-
-  return {
-    title,
-    iconKey,
-    actionLabel,
-    kicker,
-    meta,
-    elapsed,
-    progress: Math.max(3, Math.min(100, Math.round((elapsed / targetMs) * 100))),
-  };
-}
-
-function renderActiveTimerCard() {
-  if (!activeTimerCard) return;
-
-  const details = getActiveTimerDetails();
-  if (!details) {
-    setHidden(activeTimerCard, true);
-    return;
-  }
-
-  setHidden(activeTimerCard, false);
-  if (activeTimerIcon && activeTimerIcon.dataset.iconKey !== details.iconKey) {
-    activeTimerIcon.dataset.iconKey = details.iconKey;
-    activeTimerIcon.innerHTML = iconMarkup(details.iconKey);
-  }
-  setText(activeTimerKicker, details.kicker);
-  setText(activeTimerTitle, details.title);
-  setText(activeTimerElapsed, formatDuration(details.elapsed));
-  setText(activeTimerMeta, details.meta);
-  setText(activeTimerAction, details.actionLabel);
-  if (activeTimerProgress) activeTimerProgress.style.width = `${details.progress}%`;
-}
-
-function runActiveTimerAction() {
-  if (state.mode === "idle") return;
-  if (state.mode === "sleeping") {
-    finishSleep();
-  } else {
-    startSleep();
-  }
-  renderAll();
-}
-
 function renderCurrentState() {
   if (state.mode === "idle") {
     setHidden(wakeAction, true);
@@ -1178,7 +1014,6 @@ function renderCurrentState() {
     setText(stateLabel, "Rotina zerada");
     setText(stateClock, "00:00:00");
     setText(stateHint, `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`);
-    renderActiveTimerCard();
     return;
   }
 
@@ -1192,7 +1027,6 @@ function renderCurrentState() {
   setText(stateClock, formatDuration(elapsed));
   setText(stateHint, getWakeWindowText());
   setWakeActionIcon();
-  renderActiveTimerCard();
 }
 
 function eventPosition(timestamp) {
@@ -1370,7 +1204,7 @@ function renderOrbit() {
 
 function renderTimeline() {
   const lastCard = document.querySelector(".last-card .event-card");
-  if (!timeline) return;
+  if (!timeline || !lastCard) return;
 
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const selectedEnd = selectedStart + day;
@@ -1405,12 +1239,10 @@ function renderTimeline() {
     item.className = "event-card";
     item.innerHTML = `
       <i class="mark ${config.arcType}">${config.icon}</i>
-      <div class="event-main">
-        <div class="event-text">
-          <strong>${escapeHtml(config.title)}</strong>
-          <span>${escapeHtml(formatEventMeta(event))}</span>
-          ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
-        </div>
+      <div>
+        <strong>${escapeHtml(config.title)}</strong>
+        <span>${escapeHtml(formatEventMeta(event))}</span>
+        ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
         <div class="event-actions">
           <button class="event-action-button edit" type="button" data-event-edit="${escapeHtml(event.id)}" aria-label="Editar ${escapeHtml(config.title)}">
             <span>✎</span>
@@ -1427,28 +1259,24 @@ function renderTimeline() {
   });
 
   if (!latest) {
-    if (lastCard) {
-      lastCard.innerHTML = `
-        <i class="mark"></i>
-        <div>
-          <strong>Nenhum registro</strong>
-          <span>O dia ainda está zerado.</span>
-        </div>
-      `;
-    }
-    return;
-  }
-  if (lastCard) {
-    const latestConfig = getEventConfig(latest.type);
     lastCard.innerHTML = `
-      <i class="mark ${latestConfig.arcType}">${latestConfig.icon}</i>
+      <i class="mark"></i>
       <div>
-        <strong>${escapeHtml(latestConfig.title)}</strong>
-        <span>${escapeHtml(formatEventMeta(latest))}</span>
-        ${latest.notes ? `<p>${escapeHtml(latest.notes)}</p>` : ""}
+        <strong>Nenhum registro</strong>
+        <span>O dia ainda está zerado.</span>
       </div>
     `;
+    return;
   }
+  const latestConfig = getEventConfig(latest.type);
+  lastCard.innerHTML = `
+    <i class="mark ${latestConfig.arcType}">${latestConfig.icon}</i>
+    <div>
+      <strong>${escapeHtml(latestConfig.title)}</strong>
+      <span>${escapeHtml(formatEventMeta(latest))}</span>
+      ${latest.notes ? `<p>${escapeHtml(latest.notes)}</p>` : ""}
+    </div>
+  `;
 }
 
 function openOrbitCluster(events) {
@@ -1484,65 +1312,15 @@ function closeOrbitCluster() {
   }
 }
 
-function getOverlapDuration(start, end, windowStart, windowEnd) {
-  const safeStart = Number(start);
-  const safeEnd = Number(end);
-  if (!Number.isFinite(safeStart)) return 0;
-  const boundedStart = Math.max(safeStart, windowStart);
-  const boundedEnd = Math.min(Number.isFinite(safeEnd) ? safeEnd : safeStart, windowEnd);
-  return Math.max(0, boundedEnd - boundedStart);
-}
-
-function getSleepMsForRange(windowStart, windowEnd) {
-  const completedSleepMs = state.events
-    .filter(isSleepEvent)
-    .reduce((total, event) => total + getOverlapDuration(event.start, event.end, windowStart, windowEnd), 0);
-
-  if (state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)) {
-    return completedSleepMs + getOverlapDuration(state.activeStartedAt, Date.now(), windowStart, windowEnd);
-  }
-
-  return completedSleepMs;
-}
-
-function getRoutineStartForRange(windowStart, windowEnd) {
-  const candidates = [];
-
-  state.events.forEach((event) => {
-    const eventEnd = Math.max(Number(event.end) || event.start, event.start);
-    if (eventEnd >= windowStart && event.start < windowEnd) {
-      candidates.push(Math.max(event.start, windowStart));
-    }
-  });
-
-  if (state.mode !== "idle" && Number.isFinite(state.activeStartedAt)) {
-    if (state.activeStartedAt < windowEnd) {
-      candidates.push(Math.max(state.activeStartedAt, windowStart));
-    }
-  }
-
-  if (!candidates.length) return null;
-  return Math.min(...candidates);
-}
-
-function getAwakeMsForRange(windowStart, windowEnd) {
-  const routineStart = getRoutineStartForRange(windowStart, windowEnd);
-  if (routineStart === null) return 0;
-
-  const sleepMs = getSleepMsForRange(windowStart, windowEnd);
-  return Math.max(0, windowEnd - routineStart - sleepMs);
-}
-
 function renderSummary() {
   const todayStart = getDayStart();
-  const now = Date.now();
-  const todayEnd = Math.min(todayStart + day, now);
-  const todaysEvents = state.events.filter((event) => event.start >= todayStart && event.start < todayStart + day);
-  const sleepMs = getSleepMsForRange(todayStart, todayEnd);
+  const todaysEvents = state.events.filter((event) => event.start >= todayStart);
+  const sleepMs = todaysEvents
+    .filter(isSleepEvent)
+    .reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
   const feedingCount = todaysEvents.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
   const diaperCount = todaysEvents.filter((event) => event.type === "fralda").length;
-  const medicationCount = todaysEvents.filter((event) => event.type === "medicamento").length;
-  const awakeMs = getAwakeMsForRange(todayStart, todayEnd);
+  const awakeMs = state.mode === "awake" ? Date.now() - state.activeStartedAt : 0;
   const summaryValues = document.querySelectorAll(".summary-grid strong");
   const nextCard = document.querySelector(".next-card strong");
   const nextHint = document.querySelector(".next-card p");
@@ -1553,7 +1331,6 @@ function renderSummary() {
     setText(summaryValues[1], formatShortDuration(awakeMs));
     setText(summaryValues[2], feedingCount);
     setText(summaryValues[3], diaperCount);
-    if (summaryValues[4]) setText(summaryValues[4], medicationCount);
   }
 
   if (miniRing) {
@@ -1656,419 +1433,9 @@ function renderSleepReport() {
   }
 }
 
-function getReportDays(count = 7) {
-  const todayStart = getDayStart();
-  return Array.from({ length: count }, (_, index) => {
-    const start = todayStart - (count - 1 - index) * day;
-    const end = start + day;
-    const events = state.events.filter((event) => event.start >= start && event.start < end);
-    return { start, end, label: getDayLabel(start), events };
-  });
-}
-
-function parseAmountMl(detail = "") {
-  const match = String(detail).replace(",", ".").match(/(\d+(?:\.\d+)?)/);
-  return match ? Number(match[1]) : 0;
-}
-
-function formatNumber(value) {
-  return Number(value || 0).toLocaleString("pt-BR", { maximumFractionDigits: 0 });
-}
-
-function renderBarChart(container, days, getValue, formatValue = formatNumber) {
-  if (!container) return;
-  const values = days.map((item) => Number(getValue(item)) || 0);
-  const maxValue = Math.max(...values, 1);
-  container.innerHTML = "";
-
-  days.forEach((item, index) => {
-    const value = values[index];
-    const bar = document.createElement("span");
-    const height = value > 0 ? Math.max(8, Math.round((value / maxValue) * 100)) : 6;
-    bar.style.setProperty("--h", `${height}%`);
-    bar.classList.toggle("is-empty", value <= 0);
-    bar.innerHTML = `<b>${escapeHtml(formatValue(value))}</b><i>${escapeHtml(item.label)}</i>`;
-    container.append(bar);
-  });
-}
-
-function renderSupplementalReports() {
-  const reportDays = getReportDays(7);
-
-  renderBarChart(
-    breastfeedingBars,
-    reportDays,
-    (item) => item.events.filter((event) => event.type === "amamentacao").length,
-  );
-
-  renderBarChart(
-    bottleBars,
-    reportDays,
-    (item) => item.events.filter((event) => event.type === "mamadeira").reduce((total, event) => total + parseAmountMl(event.detail), 0),
-    (value) => value ? `${formatNumber(value)} ml` : "0",
-  );
-
-  renderBarChart(
-    diaperBars,
-    reportDays,
-    (item) => item.events.filter((event) => event.type === "fralda").length,
-  );
-
-  renderBarChart(
-    medicationBars,
-    reportDays,
-    (item) => item.events.filter((event) => event.type === "medicamento").length,
-  );
-}
-
-function renderTodayLastEvents() {
-  if (!todayLastEvents) return;
-  const todayStart = getDayStart();
-  const events = [...state.events]
-    .filter((event) => event.start >= todayStart)
-    .sort((a, b) => b.start - a.start)
-    .slice(0, 5);
-
-  if (!events.length) {
-    todayLastEvents.innerHTML = `<article class="mini-event empty">Nenhum registro ainda.</article>`;
-    return;
-  }
-
-  todayLastEvents.innerHTML = events.map((event) => {
-    const config = getEventConfig(event.type);
-    return `
-      <article class="mini-event">
-        <i class="mark ${config.arcType}">${config.icon}</i>
-        <div>
-          <strong>${escapeHtml(config.title)}</strong>
-          <span>${escapeHtml(formatEventMeta(event))}</span>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-function renderTodayMiniChart() {
-  const days = getReportDays(5);
-  renderBarChart(
-    todayMiniChart,
-    days,
-    (item) => item.events.filter((event) => ["sono", "dormir", "despertar-noturno", "amamentacao", "mamadeira", "fralda", "medicamento"].includes(event.type)).length,
-  );
-}
-
-function renderTodayHomeSections() {
-  renderTodayLastEvents();
-  renderTodayMiniChart();
-}
-
-function formatBreastTimer(ms) {
-  const safeMs = Math.max(0, Math.floor(ms || 0));
-  const totalSeconds = Math.floor(safeMs / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function getBreastTimerSnapshot() {
-  const now = Date.now();
-  const leftExtra = breastTimerState.activeSide === "left" ? now - breastTimerState.lastStartedAt : 0;
-  const rightExtra = breastTimerState.activeSide === "right" ? now - breastTimerState.lastStartedAt : 0;
-  return {
-    leftMs: breastTimerState.leftMs + Math.max(0, leftExtra),
-    rightMs: breastTimerState.rightMs + Math.max(0, rightExtra),
-  };
-}
-
-function renderBreastTimer() {
-  const snapshot = getBreastTimerSnapshot();
-  if (leftBreastTimer) leftBreastTimer.textContent = formatBreastTimer(snapshot.leftMs);
-  if (rightBreastTimer) rightBreastTimer.textContent = formatBreastTimer(snapshot.rightMs);
-  if (breastTimerTotal) breastTimerTotal.textContent = formatBreastTimer(snapshot.leftMs + snapshot.rightMs);
-  breastSideButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.breastSide === breastTimerState.activeSide);
-  });
-}
-
-function stopBreastTimer() {
-  if (!breastTimerState.activeSide) return;
-  const elapsed = Math.max(0, Date.now() - breastTimerState.lastStartedAt);
-  if (breastTimerState.activeSide === "left") breastTimerState.leftMs += elapsed;
-  if (breastTimerState.activeSide === "right") breastTimerState.rightMs += elapsed;
-  breastTimerState.activeSide = null;
-  breastTimerState.lastStartedAt = 0;
-  if (breastTimerState.intervalId) window.clearInterval(breastTimerState.intervalId);
-  breastTimerState.intervalId = null;
-  renderBreastTimer();
-}
-
-function resetBreastTimer() {
-  if (breastTimerState.intervalId) window.clearInterval(breastTimerState.intervalId);
-  breastTimerState = { leftMs: 0, rightMs: 0, activeSide: null, lastStartedAt: 0, intervalId: null };
-  renderBreastTimer();
-}
-
-function toggleBreastTimer(side) {
-  if (!breastTimerPanel || breastTimerPanel.hidden) return;
-  if (breastTimerState.activeSide === side) {
-    stopBreastTimer();
-    return;
-  }
-  stopBreastTimer();
-  breastTimerState.activeSide = side;
-  breastTimerState.lastStartedAt = Date.now();
-  breastTimerState.intervalId = window.setInterval(renderBreastTimer, 500);
-  renderBreastTimer();
-}
-
-function getBreastTimerDetail(fallbackDetail) {
-  stopBreastTimer();
-  const leftMs = breastTimerState.leftMs;
-  const rightMs = breastTimerState.rightMs;
-  if (leftMs + rightMs <= 0) return fallbackDetail;
-  return `${fallbackDetail} • E ${formatBreastTimer(leftMs)} • D ${formatBreastTimer(rightMs)}`;
-}
-
-function syncBottleAmount(value) {
-  const nextValue = Math.min(350, Math.max(0, Math.round((Number(value) || 0) / 5) * 5));
-  if (sheetAmountInput) sheetAmountInput.value = String(nextValue);
-  if (bottleAmountRange) bottleAmountRange.value = String(nextValue);
-  if (bottleAmountDisplay) bottleAmountDisplay.textContent = `${nextValue} ml`;
-}
-
-function getSheetDetailValue() {
-  if (currentSheetType === "mamadeira") {
-    const value = Number(sheetAmountInput.value || bottleAmountRange?.value || 0);
-    const ml = Math.min(350, Math.max(0, Math.round(value / 5) * 5));
-    return ml ? `${ml} ml` : sheetDetail.value;
-  }
-  if (currentSheetType === "amamentacao") {
-    return getBreastTimerDetail(sheetDetail.value);
-  }
-  return sheetDetail.value;
-}
-
-function renderWeightProfile() {
-  const weights = normalizeWeights(babyProfile.weights || loadLocalWeights());
-  if (babyWeightDateInput) babyWeightDateInput.value = toDateInputValue();
-  if (!lastWeightValue || !lastWeightHint || !weightHistoryList) return;
-
-  if (!weights.length) {
-    lastWeightValue.textContent = "Nenhum peso cadastrado";
-    lastWeightHint.textContent = "Cadastre o peso mais recente para acompanhar a evolução.";
-    weightHistoryList.innerHTML = "<li>Nenhum peso cadastrado.</li>";
-    return;
-  }
-
-  const latest = weights[0];
-  lastWeightValue.textContent = `${latest.value.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg`;
-  lastWeightHint.textContent = `Última pesagem em ${formatDiaryDate(parseLocalDate(latest.date)?.getTime() || Date.now())}.`;
-  weightHistoryList.innerHTML = weights.slice(0, 3).map((item) => `
-    <li>
-      <div>
-        <strong>${item.value.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</strong>
-        <span>${escapeHtml(formatDiaryDate(parseLocalDate(item.date)?.getTime() || Date.now()))}</span>
-      </div>
-      <button type="button" data-weight-edit="${escapeHtml(item.id)}">Editar</button>
-      <button type="button" data-weight-delete="${escapeHtml(item.id)}">Excluir</button>
-    </li>
-  `).join("");
-}
-
-function saveBabyWeight() {
-  const value = Number(String(babyWeightInput?.value || "").replace(",", "."));
-  const date = babyWeightDateInput?.value || toDateInputValue();
-  if (!Number.isFinite(value) || value <= 0 || !date) {
-    if (babyWeightInput) babyWeightInput.focus();
-    return;
-  }
-  const weights = normalizeWeights(babyProfile.weights || loadLocalWeights());
-  const existingIndex = weights.findIndex((item) => item.date === date);
-  const nextItem = { id: existingIndex >= 0 ? weights[existingIndex].id : `peso-${date}-${Date.now()}`, date, value };
-  if (existingIndex >= 0) weights[existingIndex] = nextItem;
-  else weights.push(nextItem);
-  babyProfile = normalizeBabyProfile({ ...babyProfile, weights });
-  saveBabyProfile();
-  markProfileLocallyChanged();
-  scheduleProfileCloudSave();
-  if (babyWeightInput) babyWeightInput.value = "";
-  renderWeightProfile();
-}
-
-function editBabyWeight(id) {
-  const item = normalizeWeights(babyProfile.weights || loadLocalWeights()).find((weight) => weight.id === id);
-  if (!item) return;
-  if (babyWeightDateInput) babyWeightDateInput.value = item.date;
-  if (babyWeightInput) {
-    babyWeightInput.value = String(item.value).replace(".", ",");
-    babyWeightInput.focus();
-  }
-}
-
-function deleteBabyWeight(id) {
-  const weights = normalizeWeights(babyProfile.weights || loadLocalWeights()).filter((weight) => weight.id !== id);
-  babyProfile = normalizeBabyProfile({ ...babyProfile, weights });
-  saveBabyProfile();
-  markProfileLocallyChanged();
-  scheduleProfileCloudSave();
-  renderWeightProfile();
-}
-
-
-function formatSoundTimer(ms) {
-  const safeMs = Math.max(0, ms);
-  const totalSeconds = Math.ceil(safeMs / 1000);
-  const hoursValue = Math.floor(totalSeconds / 3600);
-  const minutesValue = Math.floor((totalSeconds % 3600) / 60);
-  const secondsValue = totalSeconds % 60;
-  const pad = (value) => String(value).padStart(2, "0");
-  return `${pad(hoursValue)}:${pad(minutesValue)}:${pad(secondsValue)}`;
-}
-
-function getSelectedSleepSound() {
-  return sleepSounds[sleepSoundState.selectedKey] || sleepSounds.white;
-}
-
-function getSleepSoundRemainingMs() {
-  if (!sleepSoundState.playing) return sleepSoundState.remainingMs;
-  return Math.max(0, sleepSoundState.remainingMs - (Date.now() - sleepSoundState.startedAt));
-}
-
-function updateMediaSession(sound) {
-  if (!("mediaSession" in navigator)) return;
-  try {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: sound.title,
-      artist: "Ninou",
-      album: "Sons para dormir",
-    });
-    navigator.mediaSession.setActionHandler("play", () => playSleepSound());
-    navigator.mediaSession.setActionHandler("pause", () => pauseSleepSound());
-    navigator.mediaSession.setActionHandler("stop", () => stopSleepSound());
-  } catch {
-    // Media Session não está disponível em todos os navegadores.
-  }
-}
-
-function renderSleepSoundUI() {
-  if (!sleepSoundAudio || !soundTimer) return;
-  const sound = getSelectedSleepSound();
-  const remainingMs = getSleepSoundRemainingMs();
-  const progress = 1 - remainingMs / sleepSoundDurationMs;
-
-  soundOptionButtons.forEach((button) => {
-    const active = button.dataset.soundKey === sleepSoundState.selectedKey;
-    button.classList.toggle("active", active);
-    const playIcon = button.querySelector("i");
-    if (playIcon) playIcon.textContent = active && sleepSoundState.playing ? "Ⅱ" : "▶";
-  });
-
-  setText(soundCurrentIcon, sound.icon);
-  setText(soundCurrentTitle, sound.title);
-  setText(soundCurrentDesc, sound.description);
-  setText(soundTimer, formatSoundTimer(remainingMs));
-  setText(soundStatus, sleepSoundState.playing ? "Tocando agora" : remainingMs < sleepSoundDurationMs ? "Pausado" : "Pronto para tocar");
-  if (soundProgress) soundProgress.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
-  if (soundPlayPauseButton) soundPlayPauseButton.textContent = sleepSoundState.playing ? "Pausar" : remainingMs < sleepSoundDurationMs ? "▶ Continuar" : "▶ Tocar por 1h";
-
-  if (sleepSoundState.playing && remainingMs <= 0) {
-    stopSleepSound();
-  }
-}
-
-function setSleepSound(key, options = {}) {
-  if (!sleepSounds[key]) return;
-  const wasPlaying = sleepSoundState.playing;
-  if (wasPlaying) pauseSleepSound({ keepPosition: false });
-  sleepSoundState.selectedKey = key;
-  sleepSoundState.remainingMs = sleepSoundDurationMs;
-  localStorage.setItem(storageKeys.sleepSound, key);
-  const sound = getSelectedSleepSound();
-  if (sleepSoundAudio) {
-    sleepSoundAudio.src = sound.src;
-    sleepSoundAudio.loop = true;
-    sleepSoundAudio.preload = "auto";
-  }
-  updateMediaSession(sound);
-  renderSleepSoundUI();
-  if (options.play || wasPlaying) playSleepSound();
-}
-
-async function playSleepSound() {
-  if (!sleepSoundAudio) return;
-  const sound = getSelectedSleepSound();
-  if (!sleepSoundAudio.src || !sleepSoundAudio.src.includes(sound.src.replace("./", ""))) {
-    sleepSoundAudio.src = sound.src;
-  }
-  sleepSoundAudio.loop = true;
-  updateMediaSession(sound);
-  try {
-    await sleepSoundAudio.play();
-    sleepSoundState.playing = true;
-    sleepSoundState.startedAt = Date.now();
-    clearTimeout(sleepSoundState.timeoutId);
-    sleepSoundState.timeoutId = window.setTimeout(stopSleepSound, getSleepSoundRemainingMs());
-  } catch {
-    setText(soundStatus, "Toque novamente para liberar o áudio");
-  }
-  renderSleepSoundUI();
-}
-
-function pauseSleepSound(options = {}) {
-  if (!sleepSoundAudio) return;
-  const keepPosition = options.keepPosition !== false;
-  if (sleepSoundState.playing) {
-    sleepSoundState.remainingMs = getSleepSoundRemainingMs();
-  }
-  sleepSoundState.playing = false;
-  clearTimeout(sleepSoundState.timeoutId);
-  sleepSoundAudio.pause();
-  if (!keepPosition) sleepSoundAudio.currentTime = 0;
-  renderSleepSoundUI();
-}
-
-function stopSleepSound() {
-  if (!sleepSoundAudio) return;
-  sleepSoundState.playing = false;
-  sleepSoundState.remainingMs = sleepSoundDurationMs;
-  clearTimeout(sleepSoundState.timeoutId);
-  sleepSoundAudio.pause();
-  sleepSoundAudio.currentTime = 0;
-  renderSleepSoundUI();
-}
-
-function toggleSleepSound() {
-  if (sleepSoundState.playing) {
-    pauseSleepSound();
-    return;
-  }
-  playSleepSound();
-}
-
-function initSleepSoundPlayer() {
-  if (!sleepSoundAudio) return;
-  setSleepSound(sleepSoundState.selectedKey);
-  sleepSoundAudio.addEventListener("play", () => {
-    if (!sleepSoundState.playing) {
-      sleepSoundState.playing = true;
-      sleepSoundState.startedAt = Date.now();
-    }
-    renderSleepSoundUI();
-  });
-  sleepSoundAudio.addEventListener("pause", () => {
-    if (!sleepSoundAudio.ended && sleepSoundState.playing) {
-      sleepSoundState.remainingMs = getSleepSoundRemainingMs();
-      sleepSoundState.playing = false;
-      clearTimeout(sleepSoundState.timeoutId);
-    }
-    renderSleepSoundUI();
-  });
-}
-
 function updateTheme() {
-  const storedMode = themeModeInput?.value || babyProfile.themeMode || localStorage.getItem(storageKeys.themeMode) || "auto";
   const hourValue = new Date().getHours();
-  const dayTheme = storedMode === "light" || (storedMode === "auto" && hourValue >= 6 && hourValue < 18);
+  const dayTheme = hourValue >= 6 && hourValue < 18;
   if (document.body.classList.contains("day-theme") !== dayTheme) {
     document.body.classList.toggle("day-theme", dayTheme);
   }
@@ -2082,19 +1449,14 @@ function renderAll() {
   renderTimeline();
   renderSummary();
   renderSleepReport();
-  renderSupplementalReports();
-  renderTodayHomeSections();
-  renderSleepSoundUI();
 }
 
 function renderLiveTick() {
   updateTheme();
-  renderSleepSoundUI();
 
   if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return;
 
   setText(stateClock, formatDuration(Date.now() - state.activeStartedAt));
-  renderActiveTimerCard();
 
   const currentMinute = Math.floor(Date.now() / 60000);
   if (currentMinute === liveTickMinute) return;
@@ -2140,34 +1502,6 @@ function startRoutine(mode) {
   renderAll();
 }
 
-function updateDiaryChipsMoreButton() {
-  if (!diaryChips || !diaryChipsMoreButton) return;
-
-  const maxScroll = Math.max(0, diaryChips.scrollWidth - diaryChips.clientWidth);
-  if (maxScroll <= 4) {
-    diaryChipsMoreButton.hidden = true;
-    return;
-  }
-
-  diaryChipsMoreButton.hidden = false;
-  const atEnd = diaryChips.scrollLeft >= maxScroll - 6;
-  diaryChipsMoreButton.classList.toggle("is-back", atEnd);
-  diaryChipsMoreButton.setAttribute("aria-label", atEnd ? "Voltar filtros" : "Mostrar mais filtros");
-  diaryChipsMoreButton.title = atEnd ? "Voltar filtros" : "Mostrar mais filtros";
-}
-
-function scrollDiaryFilters() {
-  if (!diaryChips) return;
-
-  const maxScroll = Math.max(0, diaryChips.scrollWidth - diaryChips.clientWidth);
-  const atEnd = diaryChips.scrollLeft >= maxScroll - 6;
-  diaryChips.scrollTo({
-    left: atEnd ? 0 : maxScroll,
-    behavior: "smooth",
-  });
-  window.setTimeout(updateDiaryChipsMoreButton, 280);
-}
-
 function showScreen(target) {
   navButtons.forEach((item) => item.classList.toggle("active", item.dataset.target === target));
   screens.forEach((screen) => {
@@ -2178,13 +1512,8 @@ function showScreen(target) {
 function setDiaryFilter(filter) {
   currentDiaryFilter = filter;
   diaryFilterButtons.forEach((button) => {
-    const active = button.dataset.diaryFilter === filter;
-    button.classList.toggle("active", active);
-    if (active) {
-      button.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
-    }
+    button.classList.toggle("active", button.dataset.diaryFilter === filter);
   });
-  window.setTimeout(updateDiaryChipsMoreButton, 220);
   renderTimeline();
 }
 
@@ -2286,9 +1615,6 @@ function setSheetType(type) {
   sheetTitle.textContent = currentEditingEventId ? `Editar ${config.title}` : config.title;
   sheetDetailLabel.textContent = config.label;
   sheetAmountField.hidden = !config.amount;
-  if (breastTimerPanel) breastTimerPanel.hidden = type !== "amamentacao";
-  if (type !== "amamentacao") stopBreastTimer();
-  if (type === "mamadeira" && !sheetAmountInput.value) syncBottleAmount(bottleAmountRange?.value || 105);
   sheetDetail.innerHTML = "";
   config.options.forEach((optionText) => {
     const option = document.createElement("option");
@@ -2305,8 +1631,6 @@ function resetSheetState() {
   saveButton.textContent = "Registrar";
   sheetAmountInput.value = "";
   sheetNotesInput.value = "";
-  resetBreastTimer();
-  syncBottleAmount(105);
 }
 
 function hydrateSheetFromEvent(event) {
@@ -2317,7 +1641,7 @@ function hydrateSheetFromEvent(event) {
 
   if (config.amount) {
     const amountMatch = String(event.detail || "").match(/[\d,.]+/);
-    syncBottleAmount(amountMatch ? amountMatch[0].replace(",", ".") : 105);
+    sheetAmountInput.value = amountMatch ? amountMatch[0].replace(",", ".") : "";
     return;
   }
 
@@ -2337,8 +1661,6 @@ function openSheet(type = "sono", eventId = null) {
   sheetDateInput.value = toDateTimeInputValue();
   sheetAmountInput.value = "";
   sheetNotesInput.value = "";
-  resetBreastTimer();
-  syncBottleAmount(105);
 
   if (editingEvent) {
     hydrateSheetFromEvent(editingEvent);
@@ -2442,7 +1764,9 @@ function saveManualEvent() {
   if (!requireLogin("salvar registros")) return;
   const start = sheetDateInput.value ? new Date(sheetDateInput.value).getTime() : Date.now();
   const notes = sheetNotesInput.value.trim();
-  const detail = getSheetDetailValue();
+  const detail = typeConfig[currentSheetType].amount && sheetAmountInput.value
+    ? `${sheetAmountInput.value} ml`
+    : sheetDetail.value;
   const existingEvent = currentEditingEventId ? getEventById(currentEditingEventId) : null;
   const startsLiveSleep = shouldStartLiveSleepFromManualEvent(currentSheetType, start, existingEvent);
   const startsLiveAwake = shouldStartLiveAwakeFromManualNightWake(currentSheetType, start, existingEvent);
@@ -2466,8 +1790,6 @@ function saveManualEvent() {
 
   sheetAmountInput.value = "";
   sheetNotesInput.value = "";
-  resetBreastTimer();
-  syncBottleAmount(105);
   closeSheet();
   saveDayState();
   renderAll();
@@ -2560,6 +1882,120 @@ function exportRoutine(format) {
   downloadFile(`${filenameBase}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
 }
 
+
+function formatClockFromMs(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function getSelectedSoundTrack() {
+  return sleepSoundTracks[selectedSoundKey] || sleepSoundTracks.womb;
+}
+
+function setSleepSoundSource(track) {
+  if (!sleepSoundAudio || sleepSoundAudio.dataset.src === track.src) return;
+  sleepSoundAudio.dataset.src = track.src;
+  sleepSoundAudio.src = track.src;
+  sleepSoundAudio.load();
+}
+
+function updateSoundPlayerUI() {
+  if (!sleepSoundAudio || !soundCurrentTitle) return;
+  const track = getSelectedSoundTrack();
+  soundOptions.forEach((button) => {
+    button.classList.toggle("active", button.dataset.soundKey === selectedSoundKey);
+  });
+  setText(soundCurrentIcon, track.icon);
+  setText(soundCurrentTitle, track.title);
+  setText(soundCurrentDesc, track.desc);
+  if (soundSourceLink) soundSourceLink.href = track.youtube;
+  setText(soundTimer, formatClockFromMs(soundRemainingMs));
+  if (soundProgress) {
+    const progress = Math.max(0, Math.min(100, ((sleepSoundDurationMs - soundRemainingMs) / sleepSoundDurationMs) * 100));
+    soundProgress.style.width = `${progress}%`;
+  }
+  setText(soundStatus, soundIsRunning ? "Tocando agora" : soundRemainingMs < sleepSoundDurationMs ? "Pausado" : "Pronto para tocar");
+  setText(soundPlayPause, soundIsRunning ? "⏸ Pausar" : soundRemainingMs < sleepSoundDurationMs ? "▶ Continuar" : "▶ Tocar por 1h");
+}
+
+function tickSoundTimer() {
+  if (!soundIsRunning) return;
+  soundRemainingMs = Math.max(0, soundEndsAt - Date.now());
+  if (soundRemainingMs <= 0) {
+    stopSleepSound();
+    return;
+  }
+  updateSoundPlayerUI();
+}
+
+function selectSleepSound(key, playNow = false) {
+  if (!sleepSoundTracks[key]) return;
+  const changed = selectedSoundKey !== key;
+  selectedSoundKey = key;
+  localStorage.setItem(storageKeys.soundKey, selectedSoundKey);
+  const track = getSelectedSoundTrack();
+  setSleepSoundSource(track);
+  if (changed && soundIsRunning) {
+    sleepSoundAudio.play().catch(() => {
+      setText(soundStatus, "Toque em play para iniciar o áudio.");
+    });
+  }
+  updateSoundPlayerUI();
+  if (playNow) startSleepSound();
+}
+
+function startSleepSound() {
+  if (!sleepSoundAudio) return;
+  const track = getSelectedSoundTrack();
+  setSleepSoundSource(track);
+  if (soundRemainingMs <= 0 || soundRemainingMs >= sleepSoundDurationMs) {
+    soundRemainingMs = sleepSoundDurationMs;
+  }
+  soundEndsAt = Date.now() + soundRemainingMs;
+  sleepSoundAudio.loop = true;
+  sleepSoundAudio.play().then(() => {
+    soundIsRunning = true;
+    clearInterval(soundInterval);
+    soundInterval = setInterval(tickSoundTimer, 1000);
+    tickSoundTimer();
+  }).catch(() => {
+    soundIsRunning = false;
+    setText(soundStatus, "Toque novamente para liberar o áudio.");
+    updateSoundPlayerUI();
+  });
+}
+
+function pauseSleepSound() {
+  if (!sleepSoundAudio) return;
+  soundRemainingMs = Math.max(0, soundEndsAt - Date.now()) || soundRemainingMs;
+  soundIsRunning = false;
+  sleepSoundAudio.pause();
+  clearInterval(soundInterval);
+  updateSoundPlayerUI();
+}
+
+function stopSleepSound() {
+  if (!sleepSoundAudio) return;
+  soundIsRunning = false;
+  soundRemainingMs = sleepSoundDurationMs;
+  soundEndsAt = 0;
+  clearInterval(soundInterval);
+  sleepSoundAudio.pause();
+  sleepSoundAudio.currentTime = 0;
+  updateSoundPlayerUI();
+}
+
+function toggleSleepSound() {
+  if (soundIsRunning) {
+    pauseSleepSound();
+    return;
+  }
+  startSleepSound();
+}
+
 function updateProfilePhoto(dataUrl) {
   profileImages.forEach((image) => {
     image.src = dataUrl;
@@ -2591,6 +2027,17 @@ function resizeImage(file) {
   });
 }
 
+
+soundOptions.forEach((button) => {
+  button.addEventListener("click", () => selectSleepSound(button.dataset.soundKey, true));
+});
+
+soundPlayPause?.addEventListener("click", toggleSleepSound);
+soundStop?.addEventListener("click", stopSleepSound);
+sleepSoundAudio?.addEventListener("error", () => {
+  setText(soundStatus, "Arquivo de áudio não encontrado. Verifique a pasta audio.");
+});
+
 navButtons.forEach((button) => {
   button.addEventListener("click", () => showScreen(button.dataset.target));
 });
@@ -2604,15 +2051,6 @@ shortcutButtons.forEach((button) => {
 diaryFilterButtons.forEach((button) => {
   button.addEventListener("click", () => setDiaryFilter(button.dataset.diaryFilter));
 });
-
-if (diaryChipsMoreButton) {
-  diaryChipsMoreButton.addEventListener("click", scrollDiaryFilters);
-}
-
-if (diaryChips) {
-  diaryChips.addEventListener("scroll", updateDiaryChipsMoreButton, { passive: true });
-  window.addEventListener("resize", updateDiaryChipsMoreButton);
-}
 
 diaryDateInput.addEventListener("change", () => setDiaryDate(diaryDateInput.value));
 
@@ -2633,8 +2071,15 @@ startModeButtons.forEach((button) => {
   button.addEventListener("click", () => startRoutine(button.dataset.startMode));
 });
 
-wakeAction.addEventListener("click", runActiveTimerAction);
-if (activeTimerAction) activeTimerAction.addEventListener("click", runActiveTimerAction);
+wakeAction.addEventListener("click", () => {
+  if (state.mode === "idle") return;
+  if (state.mode === "sleeping") {
+    finishSleep();
+  } else {
+    startSleep();
+  }
+  renderAll();
+});
 
 openSheetButtons.forEach((button) => {
   button.addEventListener("click", () => openSheet(button.dataset.openSheet));
@@ -2678,41 +2123,6 @@ babyBirthInput.addEventListener("change", () => {
   updateBabyProfile({ birthDate: babyBirthInput.value });
 });
 
-if (themeModeInput) {
-  themeModeInput.addEventListener("change", () => {
-    const nextMode = ["auto", "light", "dark"].includes(themeModeInput.value) ? themeModeInput.value : "auto";
-    babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: nextMode });
-    saveBabyProfile();
-    if (isLoggedIn()) {
-      markProfileLocallyChanged();
-      scheduleProfileCloudSave();
-    }
-    updateTheme();
-  });
-}
-
-if (bottleAmountRange) bottleAmountRange.addEventListener("input", () => syncBottleAmount(bottleAmountRange.value));
-if (sheetAmountInput) sheetAmountInput.addEventListener("input", () => syncBottleAmount(sheetAmountInput.value));
-breastSideButtons.forEach((button) => {
-  button.addEventListener("click", () => toggleBreastTimer(button.dataset.breastSide));
-});
-if (resetBreastTimerButton) resetBreastTimerButton.addEventListener("click", resetBreastTimer);
-if (saveBabyWeightButton) saveBabyWeightButton.addEventListener("click", saveBabyWeight);
-if (weightHistoryList) {
-  weightHistoryList.addEventListener("click", (event) => {
-    const editButton = event.target.closest("[data-weight-edit]");
-    const deleteButton = event.target.closest("[data-weight-delete]");
-    if (editButton) editBabyWeight(editButton.dataset.weightEdit);
-    if (deleteButton) deleteBabyWeight(deleteButton.dataset.weightDelete);
-  });
-}
-
-if (soundPlayPauseButton) soundPlayPauseButton.addEventListener("click", toggleSleepSound);
-if (soundStopButton) soundStopButton.addEventListener("click", stopSleepSound);
-soundOptionButtons.forEach((button) => {
-  button.addEventListener("click", () => setSleepSound(button.dataset.soundKey, { play: true }));
-});
-
 profilePhotoInput.addEventListener("change", async () => {
   if (!requireLogin("salvar a foto")) {
     profilePhotoInput.value = "";
@@ -2750,9 +2160,8 @@ initDiaryDatePicker();
 syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
-initSleepSoundPlayer();
+selectSleepSound(selectedSoundKey);
 renderAll();
-updateDiaryChipsMoreButton();
 setInterval(renderLiveTick, 1000);
 
 initFirebaseAuthState().catch((error) => {

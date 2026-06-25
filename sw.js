@@ -1,9 +1,9 @@
-const CACHE_NAME = "ninou-v68";
+const CACHE_NAME = "ninou-v69";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=68",
-  "/app.js?v=68",
+  "/styles.css?v=69",
+  "/app.js?v=69",
   "/manifest.webmanifest",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
@@ -15,9 +15,9 @@ const APP_SHELL = [
   "/icons/actions/fralda.png",
   "/icons/actions/mamadeira.png",
   "/icons/actions/soneca.png",
-  "/audio/ruido-branco.mp3",
   "/audio/som-utero.mp3",
-  "/audio/classica-suave.mp3"
+  "/audio/som-relaxar.mp3",
+  "/audio/ritmo-suave-bebe.mp3"
 ];
 
 self.addEventListener("install", (event) => {
