@@ -1075,13 +1075,52 @@ body.day-theme .phone-shell {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  min-height: 34px;
+  min-height: 38px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
   padding: 7px 10px;
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 850;
+}
+
+.weight-history-empty {
+  justify-content: flex-start !important;
+}
+
+.weight-history-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.weight-history-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.weight-history-actions button {
+  width: 31px;
+  height: 31px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(143, 124, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(143, 124, 255, 0.1);
+  color: var(--ink);
+  padding: 0;
+  font-size: 1.05rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.weight-history-actions button[data-weight-delete] {
+  border-color: rgba(255, 154, 118, 0.28);
+  background: rgba(255, 154, 118, 0.1);
+  color: var(--coral);
+  font-size: 1.28rem;
 }
 
 .weight-history-list strong {

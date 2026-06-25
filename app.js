@@ -176,6 +176,7 @@ const day = 24 * hour;
 
 let currentSheetType = "sono";
 let currentEditingEventId = null;
+let currentEditingWeightId = null;
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
@@ -199,6 +200,7 @@ let state = loadLocalDayState();
 function createEmptyDayState() {
   return {
     mode: "idle",
+    routineStartedAt: null,
     activeStartedAt: null,
     activeType: "sono",
     activeDetail: "",
@@ -239,10 +241,12 @@ function normalizeDayState(dayState = {}) {
   const validModes = ["idle", "awake", "sleeping"];
   const mode = validModes.includes(dayState.mode) ? dayState.mode : "idle";
   const activeStartedAt = Number(dayState.activeStartedAt);
+  const routineStartedAt = Number(dayState.routineStartedAt);
   const activeType = isSleepType(dayState.activeType) ? dayState.activeType : "sono";
 
   return {
     mode,
+    routineStartedAt: mode === "idle" || !Number.isFinite(routineStartedAt) ? null : routineStartedAt,
     activeStartedAt: mode === "idle" || !Number.isFinite(activeStartedAt) ? null : activeStartedAt,
     activeType: mode === "sleeping" ? activeType : "sono",
     activeDetail: mode === "sleeping" && typeof dayState.activeDetail === "string" ? dayState.activeDetail : "",
@@ -568,6 +572,7 @@ function renderWeightHistory() {
     lastWeightValue.textContent = "Nenhum peso cadastrado";
     lastWeightHint.textContent = "Cadastre o peso mais recente para acompanhar a evolução.";
     const emptyItem = document.createElement("li");
+    emptyItem.className = "weight-history-empty";
     emptyItem.textContent = "Nenhum peso cadastrado.";
     weightHistoryList.append(emptyItem);
     return;
@@ -579,9 +584,26 @@ function renderWeightHistory() {
 
   weights.slice(0, 3).forEach((record) => {
     const item = document.createElement("li");
-    item.innerHTML = `<strong>${escapeHtml(formatWeightValue(record.value))}</strong><span>${escapeHtml(formatWeightDate(record.date))}</span>`;
+    item.dataset.weightId = record.id;
+    item.innerHTML = `
+      <div class="weight-history-info">
+        <strong>${escapeHtml(formatWeightValue(record.value))}</strong>
+        <span>${escapeHtml(formatWeightDate(record.date))}</span>
+      </div>
+      <div class="weight-history-actions" aria-label="Ações do peso">
+        <button type="button" data-weight-edit="${escapeHtml(record.id)}" aria-label="Editar peso">✎</button>
+        <button type="button" data-weight-delete="${escapeHtml(record.id)}" aria-label="Excluir peso">×</button>
+      </div>
+    `;
     weightHistoryList.append(item);
   });
+}
+
+function resetWeightForm() {
+  currentEditingWeightId = null;
+  if (babyWeightInput) babyWeightInput.value = "";
+  if (babyWeightDateInput) babyWeightDateInput.value = toDateInputValue();
+  if (saveBabyWeightButton) saveBabyWeightButton.textContent = "Salvar peso";
 }
 
 function saveBabyWeight() {
@@ -597,21 +619,56 @@ function saveBabyWeight() {
   }
 
   const nextRecord = normalizeWeightRecord({
-    id: `peso-${date}-${Date.now()}`,
+    id: currentEditingWeightId || `peso-${date}-${Date.now()}`,
     date,
     value,
   });
 
   if (!nextRecord) return;
 
+  const previousWeights = babyProfile.weights || [];
+  const nextWeights = currentEditingWeightId
+    ? previousWeights.map((record) => record.id === currentEditingWeightId ? nextRecord : record)
+    : [nextRecord, ...previousWeights];
+
   babyProfile = normalizeBabyProfile({
     ...babyProfile,
-    weights: [nextRecord, ...(babyProfile.weights || [])],
+    weights: nextWeights,
   });
   markProfileLocallyChanged();
   saveBabyProfile();
-  babyWeightInput.value = "";
-  babyWeightDateInput.value = toDateInputValue();
+  resetWeightForm();
+  renderWeightHistory();
+  scheduleProfileCloudSave();
+}
+
+function editBabyWeight(weightId) {
+  if (!requireLogin("editar o peso")) return;
+
+  const record = normalizeWeightRecords(babyProfile.weights).find((item) => item.id === weightId);
+  if (!record) return;
+
+  currentEditingWeightId = record.id;
+  babyWeightDateInput.value = record.date;
+  babyWeightInput.value = String(record.value).replace(".", ",");
+  saveBabyWeightButton.textContent = "Salvar alteração";
+  babyWeightInput.focus();
+}
+
+function deleteBabyWeight(weightId) {
+  if (!requireLogin("excluir o peso")) return;
+
+  const record = normalizeWeightRecords(babyProfile.weights).find((item) => item.id === weightId);
+  if (!record) return;
+  if (!window.confirm(`Excluir o peso ${formatWeightValue(record.value)} de ${formatWeightDate(record.date)}?`)) return;
+
+  babyProfile = normalizeBabyProfile({
+    ...babyProfile,
+    weights: (babyProfile.weights || []).filter((item) => item.id !== weightId),
+  });
+  markProfileLocallyChanged();
+  saveBabyProfile();
+  if (currentEditingWeightId === weightId) resetWeightForm();
   renderWeightHistory();
   scheduleProfileCloudSave();
 }
@@ -1388,15 +1445,59 @@ function closeOrbitCluster() {
   }
 }
 
+function getClampedDuration(start, end, min, max) {
+  const safeStart = Math.max(start, min);
+  const safeEnd = Math.min(end, max);
+  return Math.max(0, safeEnd - safeStart);
+}
+
+function getRoutineStartForToday(todayStart, now = Date.now()) {
+  const routineStartedAt = Number(state.routineStartedAt);
+  if (Number.isFinite(routineStartedAt) && routineStartedAt >= todayStart && routineStartedAt <= now) {
+    return routineStartedAt;
+  }
+
+  const activeStartedAt = Number(state.activeStartedAt);
+  if (state.mode !== "idle" && Number.isFinite(activeStartedAt) && activeStartedAt >= todayStart && activeStartedAt <= now) {
+    return activeStartedAt;
+  }
+
+  const firstEvent = state.events
+    .filter((event) => event.start >= todayStart && event.start <= now)
+    .sort((a, b) => a.start - b.start)[0];
+
+  return firstEvent ? firstEvent.start : null;
+}
+
+function getAwakeMsToday(todaysEvents, todayStart, now = Date.now()) {
+  const routineStart = getRoutineStartForToday(todayStart, now);
+  if (!Number.isFinite(routineStart)) return 0;
+
+  const totalTrackedMs = getClampedDuration(routineStart, now, todayStart, now);
+  const finishedSleepMs = todaysEvents
+    .filter(isSleepEvent)
+    .reduce((total, event) => total + getClampedDuration(event.start, event.end, routineStart, now), 0);
+
+  const activeSleepMs = state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)
+    ? getClampedDuration(state.activeStartedAt, now, routineStart, now)
+    : 0;
+
+  return Math.max(0, totalTrackedMs - finishedSleepMs - activeSleepMs);
+}
+
 function renderSummary() {
   const todayStart = getDayStart();
   const todaysEvents = state.events.filter((event) => event.start >= todayStart);
+  const now = Date.now();
   const sleepMs = todaysEvents
     .filter(isSleepEvent)
-    .reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
+    .reduce((total, event) => total + getClampedDuration(event.start, event.end, todayStart, now), 0)
+    + (state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)
+      ? getClampedDuration(state.activeStartedAt, now, todayStart, now)
+      : 0);
   const feedingCount = todaysEvents.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
   const diaperCount = todaysEvents.filter((event) => event.type === "fralda").length;
-  const awakeMs = state.mode === "awake" ? Date.now() - state.activeStartedAt : 0;
+  const awakeMs = getAwakeMsToday(todaysEvents, todayStart, now);
   const summaryValues = document.querySelectorAll(".summary-grid strong");
   const nextCard = document.querySelector(".next-card strong");
   const nextHint = document.querySelector(".next-card p");
@@ -1546,6 +1647,9 @@ function renderLiveTick() {
 function finishSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const finishedAt = Date.now();
+  if (!Number.isFinite(state.routineStartedAt)) {
+    state.routineStartedAt = state.activeStartedAt;
+  }
   state.events.push(makeEvent(state.activeType || "sono", state.activeStartedAt, finishedAt, state.activeDetail || "Timer", state.activeNotes || ""));
   state.mode = "awake";
   state.activeStartedAt = finishedAt;
@@ -1558,6 +1662,9 @@ function finishSleep() {
 function startSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const startedAt = Date.now();
+  if (!Number.isFinite(state.routineStartedAt)) {
+    state.routineStartedAt = Number.isFinite(state.activeStartedAt) ? state.activeStartedAt : startedAt;
+  }
   const nightWakeActive = getActiveNightWakeEvent();
   closeActiveNightWake(startedAt);
   state.mode = "sleeping";
@@ -1570,8 +1677,10 @@ function startSleep() {
 
 function startRoutine(mode) {
   if (!requireLogin("salvar a rotina")) return;
+  const startedAt = Date.now();
   state.mode = mode === "sleeping" ? "sleeping" : "awake";
-  state.activeStartedAt = Date.now();
+  state.routineStartedAt = startedAt;
+  state.activeStartedAt = startedAt;
   state.activeType = "sono";
   state.activeDetail = state.mode === "sleeping" ? "Timer" : "";
   state.activeNotes = "";
@@ -1813,6 +1922,10 @@ function closeActiveNightWake(end = Date.now()) {
 }
 
 function startLiveAwakeFromManualNightWake(start, detail, notes) {
+  if (!Number.isFinite(state.routineStartedAt)) {
+    state.routineStartedAt = Number.isFinite(state.activeStartedAt) ? Math.min(state.activeStartedAt, start) : start;
+  }
+
   if (state.mode === "sleeping" && Number.isFinite(state.activeStartedAt)) {
     const sleepStart = state.activeStartedAt;
     const sleepEnd = Math.max(start, sleepStart);
@@ -1830,6 +1943,9 @@ function startLiveAwakeFromManualNightWake(start, detail, notes) {
 }
 
 function startLiveSleepFromManualEvent(type, start, detail, notes) {
+  if (!Number.isFinite(state.routineStartedAt)) {
+    state.routineStartedAt = Number.isFinite(state.activeStartedAt) ? Math.min(state.activeStartedAt, start) : start;
+  }
   closeActiveNightWake(start);
   state.mode = "sleeping";
   state.activeStartedAt = start;
@@ -2077,6 +2193,21 @@ babyBirthInput.addEventListener("change", () => {
 });
 
 saveBabyWeightButton.addEventListener("click", saveBabyWeight);
+
+if (weightHistoryList) {
+  weightHistoryList.addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-weight-edit]");
+    const deleteButton = event.target.closest("[data-weight-delete]");
+
+    if (editButton) {
+      editBabyWeight(editButton.dataset.weightEdit);
+    }
+
+    if (deleteButton) {
+      deleteBabyWeight(deleteButton.dataset.weightDelete);
+    }
+  });
+}
 
 profilePhotoInput.addEventListener("change", async () => {
   if (!requireLogin("salvar a foto")) {
