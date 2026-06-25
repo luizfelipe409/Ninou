@@ -332,6 +332,12 @@ body.day-theme .phone-shell {
   line-height: 1;
   text-align: center;
   transform: translate(-50%, -50%);
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
 }
 
 .orbit-event i {
@@ -364,6 +370,32 @@ body.day-theme .phone-shell {
   width: 14px;
   height: 14px;
   display: block;
+}
+
+.orbit-event i img,
+.action-icon img,
+.type-icon img,
+.mark img,
+.cluster-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.orbit-cluster i {
+  border-color: rgba(255, 154, 118, 0.82);
+  background: radial-gradient(circle, rgba(255, 154, 118, 0.32), rgba(35, 30, 80, 0.92));
+  box-shadow:
+    0 0 0 2px rgba(255, 154, 118, 0.16),
+    0 0 18px rgba(255, 154, 118, 0.44);
+}
+
+.orbit-cluster i span {
+  color: #fff;
+  font-size: 1rem;
+  transform: translateY(-2px);
 }
 
 .orbit-event.sleep,
@@ -499,6 +531,7 @@ body.day-theme .phone-shell {
   display: grid;
   place-items: center;
   border-radius: 50%;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   color: var(--plum-soft);
   font-size: 1.08rem;
@@ -676,8 +709,9 @@ body.day-theme .phone-shell {
 
 .event-card {
   display: grid;
-  grid-template-columns: 12px 1fr;
+  grid-template-columns: 42px 1fr;
   gap: 12px;
+  align-items: start;
   border: 1px solid var(--line);
   border-radius: 22px;
   background: var(--panel);
@@ -717,10 +751,22 @@ body.day-theme .phone-shell {
 }
 
 .mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  margin-top: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+}
+
+.mark:empty {
   width: 12px;
   height: 12px;
   margin-top: 5px;
-  border-radius: 50%;
+  box-shadow: none;
 }
 
 .mark.sleep {
@@ -1051,7 +1097,8 @@ body.day-theme .bottom-nav button.active {
   background: rgba(0, 0, 0, 0.48);
 }
 
-.record-sheet {
+.record-sheet,
+.orbit-cluster-sheet {
   position: fixed;
   left: 50%;
   bottom: 0;
@@ -1069,6 +1116,81 @@ body.day-theme .bottom-nav button.active {
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.42);
   padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
   -webkit-overflow-scrolling: touch;
+}
+
+.orbit-cluster-sheet {
+  gap: 12px;
+}
+
+.cluster-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(58vh, 460px);
+  overflow-y: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cluster-card {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(143, 124, 255, 0.18);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 12px;
+}
+
+.cluster-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cluster-card strong,
+.cluster-card span,
+.cluster-card p {
+  display: block;
+}
+
+.cluster-card strong {
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.cluster-card span,
+.cluster-card p {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.cluster-card p {
+  margin-top: 3px;
+}
+
+.cluster-card time {
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.cluster-card button {
+  grid-column: 2 / -1;
+  justify-self: start;
+  min-height: 32px;
+  border: 1px solid rgba(143, 124, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(143, 124, 255, 0.14);
+  color: var(--ink);
+  padding: 0 12px;
+  font-size: 0.74rem;
+  font-weight: 900;
 }
 
 .sheet-handle {

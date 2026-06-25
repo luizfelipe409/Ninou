@@ -11,6 +11,10 @@ const stateHint = document.querySelector("#stateHint");
 const orbitEvents = document.querySelector("#orbitEvents");
 const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
+const orbitClusterSheet = document.querySelector("#orbitClusterSheet");
+const orbitClusterTitle = document.querySelector("#orbitClusterTitle");
+const orbitClusterList = document.querySelector("#orbitClusterList");
+const closeOrbitClusterButton = document.querySelector("#closeOrbitCluster");
 const closeSheetButton = document.querySelector("#closeSheet");
 const openSheetButtons = document.querySelectorAll("[data-open-sheet]");
 const sheetTypeButtons = document.querySelectorAll("[data-sheet-type]");
@@ -81,6 +85,20 @@ const firebaseConfig = {
 
 const firebaseSdkVersion = "10.12.4";
 
+const actionIcons = {
+  acordou: "./icons/actions/acordou.png",
+  sono: "./icons/actions/soneca.png",
+  dormir: "./icons/actions/dormir.png",
+  "despertar-noturno": "./icons/actions/despertar-noturno.png",
+  amamentacao: "./icons/actions/amamentacao.png",
+  mamadeira: "./icons/actions/mamadeira.png",
+  fralda: "./icons/actions/fralda.png",
+};
+
+function iconMarkup(iconKey) {
+  return `<img src="${actionIcons[iconKey]}" alt="" loading="lazy" decoding="async" />`;
+}
+
 const typeConfig = {
   sono: {
     title: "Soneca",
@@ -88,7 +106,7 @@ const typeConfig = {
     options: ["No berço", "Amamentação", "Colo", "Carrinho de bebê", "Mamadeira", "Cama"],
     amount: false,
     arcType: "sleep",
-    icon: '<svg><use href="#ux-moon"></use></svg>',
+    icon: iconMarkup("sono"),
   },
   dormir: {
     title: "Noite",
@@ -96,7 +114,7 @@ const typeConfig = {
     options: ["Não se aplica"],
     amount: false,
     arcType: "dormir",
-    icon: '<svg><use href="#ux-night"></use></svg>',
+    icon: iconMarkup("dormir"),
   },
   "despertar-noturno": {
     title: "Despertar noturno",
@@ -104,7 +122,7 @@ const typeConfig = {
     options: ["Mau humor", "Neutro(a)", "Bom humor"],
     amount: false,
     arcType: "despertar-noturno",
-    icon: '<svg><use href="#ux-wake"></use></svg>',
+    icon: iconMarkup("despertar-noturno"),
   },
   amamentacao: {
     title: "Amamentação",
@@ -112,7 +130,7 @@ const typeConfig = {
     options: ["Esquerdo", "Direito", "Ambos"],
     amount: false,
     arcType: "amamentacao",
-    icon: '<svg><use href="#ux-feed"></use></svg>',
+    icon: iconMarkup("amamentacao"),
   },
   mamadeira: {
     title: "Mamadeira",
@@ -120,7 +138,7 @@ const typeConfig = {
     options: ["Leite materno", "Fórmula", "Misto"],
     amount: true,
     arcType: "mamadeira",
-    icon: '<svg><use href="#ux-bottle"></use></svg>',
+    icon: iconMarkup("mamadeira"),
   },
   fralda: {
     title: "Fralda",
@@ -128,7 +146,7 @@ const typeConfig = {
     options: ["Xixi", "Cocô", "Mista"],
     amount: false,
     arcType: "fralda",
-    icon: '<svg><use href="#ux-diaper"></use></svg>',
+    icon: iconMarkup("fralda"),
   },
 };
 
@@ -893,7 +911,7 @@ function getWakeWindowText() {
 }
 
 function setWakeActionIcon() {
-  wakeActionIcon.innerHTML = state.mode === "sleeping" ? '<svg><use href="#ux-sunrise"></use></svg>' : "☾";
+  wakeActionIcon.innerHTML = state.mode === "sleeping" ? iconMarkup("acordou") : iconMarkup("sono");
 }
 
 function renderCurrentState() {
@@ -931,9 +949,49 @@ function eventPosition(timestamp) {
   };
 }
 
-function createOrbitEvent(event, active = false) {
+function getOrbitEventEnd(event) {
+  if (event.isActive) return Date.now();
+  return event.end;
+}
+
+function getOrbitEventRange(event) {
+  const end = getOrbitEventEnd(event);
+  return end > event.start ? `${formatTime(event.start)} - ${formatTime(end)}` : formatTime(event.start);
+}
+
+function getOrbitEventSubline(event) {
+  if (event.isActive) return "Em andamento";
+  const duration = event.end > event.start ? formatShortDuration(event.end - event.start) : "";
+  return [duration, event.detail].filter(Boolean).join(" • ") || "Registro rápido";
+}
+
+function getDistance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function getOrbitGroups(items) {
+  const groups = [];
+  const overlapDistance = 30;
+
+  items.forEach((item) => {
+    const group = groups.find((candidate) => candidate.items.some((member) => getDistance(member.position, item.position) <= overlapDistance));
+    if (group) {
+      group.items.push(item);
+      group.position = {
+        x: Math.round(group.items.reduce((total, member) => total + member.position.x, 0) / group.items.length),
+        y: Math.round(group.items.reduce((total, member) => total + member.position.y, 0) / group.items.length),
+      };
+      return;
+    }
+
+    groups.push({ items: [item], position: item.position });
+  });
+
+  return groups;
+}
+
+function createOrbitEvent(event, active = false, position = eventPosition(event.start)) {
   const config = getEventConfig(event.type);
-  const position = eventPosition(event.start);
   const item = document.createElement("div");
   item.className = `orbit-event ${config.arcType}${active ? " active" : ""}`;
   item.style.setProperty("--x", `${position.x}px`);
@@ -949,15 +1007,57 @@ function createOrbitEvent(event, active = false) {
   return item;
 }
 
+function createOrbitCluster(group) {
+  const eventList = group.items.map((item) => item.event).sort((a, b) => a.start - b.start);
+  const config = getEventConfig(eventList[0].type);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `orbit-event orbit-cluster ${config.arcType}`;
+  button.style.setProperty("--x", `${group.position.x}px`);
+  button.style.setProperty("--y", `${group.position.y}px`);
+  button.title = `${eventList.length} registros próximos`;
+  button.setAttribute("aria-label", `${eventList.length} registros próximos no arco`);
+  button.innerHTML = `
+    <i><span>...</span></i>
+    <b>${eventList.length}</b>
+  `;
+  button.addEventListener("click", () => openOrbitCluster(eventList));
+  return button;
+}
+
 function renderOrbit() {
   orbitEvents.innerHTML = "";
   const dayAgo = Date.now() - 24 * hour;
-  const events = state.events.filter((event) => event.start >= dayAgo).slice(-14);
-  events.forEach((event) => orbitEvents.append(createOrbitEvent(event)));
+  const items = state.events
+    .filter((event) => event.start >= dayAgo)
+    .slice(-14)
+    .map((event) => ({
+      event,
+      active: false,
+      position: eventPosition(event.start),
+    }));
 
   if (state.mode === "sleeping") {
-    orbitEvents.append(createOrbitEvent(makeEvent("sono", state.activeStartedAt), true));
+    const activeEvent = {
+      ...makeEvent("sono", state.activeStartedAt, Date.now(), "Timer"),
+      isActive: true,
+    };
+    items.push({
+      event: activeEvent,
+      active: true,
+      position: eventPosition(activeEvent.start),
+    });
   }
+
+  getOrbitGroups(items).forEach((group) => {
+    if (group.items.length > 1) {
+      orbitEvents.append(createOrbitCluster(group));
+      return;
+    }
+
+    const [item] = group.items;
+    orbitEvents.append(createOrbitEvent(item.event, item.active, item.position));
+  });
 }
 
 function renderTimeline() {
@@ -991,7 +1091,7 @@ function renderTimeline() {
     const item = document.createElement("li");
     item.className = "event-card";
     item.innerHTML = `
-      <i class="mark ${config.arcType}"></i>
+      <i class="mark ${config.arcType}">${config.icon}</i>
       <div>
         <strong>${escapeHtml(config.title)}</strong>
         <span>${escapeHtml(formatEventMeta(event))}</span>
@@ -1018,13 +1118,48 @@ function renderTimeline() {
   }
   const latestConfig = getEventConfig(latest.type);
   lastCard.innerHTML = `
-    <i class="mark ${latestConfig.arcType}"></i>
+    <i class="mark ${latestConfig.arcType}">${latestConfig.icon}</i>
     <div>
       <strong>${escapeHtml(latestConfig.title)}</strong>
       <span>${escapeHtml(formatEventMeta(latest))}</span>
       ${latest.notes ? `<p>${escapeHtml(latest.notes)}</p>` : ""}
     </div>
   `;
+}
+
+function openOrbitCluster(events) {
+  const orderedEvents = [...events].sort((a, b) => a.start - b.start);
+  orbitClusterTitle.textContent = `${orderedEvents.length} registros próximos`;
+  orbitClusterList.innerHTML = orderedEvents.map((event) => {
+    const config = getEventConfig(event.type);
+    const notes = event.notes ? `<p>${escapeHtml(event.notes)}</p>` : "";
+    const editButton = event.isActive ? "" : `<button type="button" data-cluster-edit="${escapeHtml(event.id)}">Editar</button>`;
+
+    return `
+      <article class="cluster-card">
+        <i class="cluster-icon ${config.arcType}">${config.icon}</i>
+        <div>
+          <strong>${escapeHtml(config.title)}</strong>
+          <span>${escapeHtml(getOrbitEventSubline(event))}</span>
+          ${notes}
+        </div>
+        <time>${escapeHtml(getOrbitEventRange(event))}</time>
+        ${editButton}
+      </article>
+    `;
+  }).join("");
+
+  closeSheet();
+  orbitClusterSheet.hidden = false;
+  sheetBackdrop.hidden = false;
+}
+
+function closeOrbitCluster() {
+  orbitClusterSheet.hidden = true;
+  orbitClusterList.innerHTML = "";
+  if (sheet.hidden) {
+    sheetBackdrop.hidden = true;
+  }
 }
 
 function renderSummary() {
@@ -1340,6 +1475,7 @@ function openSheet(type = "sono", eventId = null) {
   const editingEvent = eventId ? getEventById(eventId) : null;
   if (!requireLogin(editingEvent ? "editar registros" : "criar registros")) return;
 
+  closeOrbitCluster();
   currentEditingEventId = editingEvent?.id || null;
   setSheetType(editingEvent?.type || type);
   saveButton.textContent = editingEvent ? "Salvar alterações" : "Registrar";
@@ -1357,7 +1493,9 @@ function openSheet(type = "sono", eventId = null) {
 
 function closeSheet() {
   sheet.hidden = true;
-  sheetBackdrop.hidden = true;
+  if (orbitClusterSheet.hidden) {
+    sheetBackdrop.hidden = true;
+  }
   resetSheetState();
 }
 
@@ -1536,6 +1674,15 @@ timeline.addEventListener("click", (event) => {
   }
 });
 
+orbitClusterList.addEventListener("click", (event) => {
+  const editButton = event.target.closest("[data-cluster-edit]");
+  if (!editButton) return;
+
+  const eventId = editButton.dataset.clusterEdit;
+  closeOrbitCluster();
+  editEvent(eventId);
+});
+
 startModeButtons.forEach((button) => {
   button.addEventListener("click", () => startRoutine(button.dataset.startMode));
 });
@@ -1559,7 +1706,11 @@ sheetTypeButtons.forEach((button) => {
 });
 
 closeSheetButton.addEventListener("click", closeSheet);
-sheetBackdrop.addEventListener("click", closeSheet);
+closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);
+sheetBackdrop.addEventListener("click", () => {
+  closeSheet();
+  closeOrbitCluster();
+});
 saveButton.addEventListener("click", saveManualEvent);
 resetDataButton.addEventListener("click", resetDayData);
 exportJsonButton.addEventListener("click", () => exportRoutine("json"));

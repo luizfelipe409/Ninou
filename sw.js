@@ -1,13 +1,20 @@
-const CACHE_NAME = "ninou-v39";
+const CACHE_NAME = "ninou-v40";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=39",
-  "/app.js?v=39",
+  "/styles.css?v=40",
+  "/app.js?v=40",
   "/manifest.webmanifest",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
-  "/icons/apple-touch-icon.png"
+  "/icons/apple-touch-icon.png",
+  "/icons/actions/acordou.png",
+  "/icons/actions/amamentacao.png",
+  "/icons/actions/despertar-noturno.png",
+  "/icons/actions/dormir.png",
+  "/icons/actions/fralda.png",
+  "/icons/actions/mamadeira.png",
+  "/icons/actions/soneca.png"
 ];
 
 self.addEventListener("install", (event) => {

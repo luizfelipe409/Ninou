@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=39" />
+    <link rel="stylesheet" href="./styles.css?v=40" />
   </head>
   <body>
     <svg class="icon-sprite" aria-hidden="true">
@@ -73,16 +73,16 @@
 
         <section class="main-action-area" aria-label="Ação principal">
           <button id="wakeAction" class="primary-action" type="button" hidden>
-            <span class="action-icon"><svg><use href="#ux-sunrise"></use></svg></span>
+            <span class="action-icon"><img src="./icons/actions/acordou.png" alt="" loading="lazy" decoding="async" /></span>
             <span id="wakeActionLabel">Acordou</span>
           </button>
           <div id="startChoice" class="start-choice">
             <button type="button" data-start-mode="awake">
-              <span class="action-icon"><svg><use href="#ux-sunrise"></use></svg></span>
+              <span class="action-icon"><img src="./icons/actions/acordou.png" alt="" loading="lazy" decoding="async" /></span>
               <span>Acordou</span>
             </button>
             <button type="button" data-start-mode="sleeping">
-              <span class="action-icon"><svg><use href="#ux-moon"></use></svg></span>
+              <span class="action-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span>
               <span>Iniciar soneca</span>
             </button>
           </div>
@@ -90,19 +90,19 @@
 
         <section class="quick-actions" aria-label="Ações rápidas">
           <button type="button" data-open-sheet="amamentacao">
-            <span class="action-icon"><svg><use href="#ux-feed"></use></svg></span>
+            <span class="action-icon"><img src="./icons/actions/amamentacao.png" alt="" loading="lazy" decoding="async" /></span>
             <span>Amamentação</span>
           </button>
           <button type="button" data-open-sheet="fralda">
-            <span class="action-icon"><svg><use href="#ux-diaper"></use></svg></span>
+            <span class="action-icon"><img src="./icons/actions/fralda.png" alt="" loading="lazy" decoding="async" /></span>
             <span>Fralda</span>
           </button>
           <button type="button" data-open-sheet="mamadeira">
-            <span class="action-icon"><svg><use href="#ux-bottle"></use></svg></span>
+            <span class="action-icon"><img src="./icons/actions/mamadeira.png" alt="" loading="lazy" decoding="async" /></span>
             <span>Mamadeira</span>
           </button>
           <button type="button" data-open-sheet="sono">
-            <span class="action-icon">☾</span>
+            <span class="action-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span>
             <span>Soneca</span>
           </button>
         </section>
@@ -307,12 +307,12 @@
         <button id="closeSheet" class="round-action" type="button">×</button>
       </div>
       <div class="record-types">
-        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon">☾</span><span>Soneca</span></button>
-        <button type="button" data-sheet-type="dormir"><span class="type-icon">◐</span><span>Noite</span></button>
-        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon">↟</span><span>Despertar noturno</span></button>
-        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><svg><use href="#ux-feed"></use></svg></span><span>Amamentação</span></button>
-        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><svg><use href="#ux-bottle"></use></svg></span><span>Mamadeira</span></button>
-        <button type="button" data-sheet-type="fralda"><span class="type-icon"><svg><use href="#ux-diaper"></use></svg></span><span>Fralda</span></button>
+        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span><span>Soneca</span></button>
+        <button type="button" data-sheet-type="dormir"><span class="type-icon"><img src="./icons/actions/dormir.png" alt="" loading="lazy" decoding="async" /></span><span>Noite</span></button>
+        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img src="./icons/actions/despertar-noturno.png" alt="" loading="lazy" decoding="async" /></span><span>Despertar noturno</span></button>
+        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><img src="./icons/actions/amamentacao.png" alt="" loading="lazy" decoding="async" /></span><span>Amamentação</span></button>
+        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img src="./icons/actions/mamadeira.png" alt="" loading="lazy" decoding="async" /></span><span>Mamadeira</span></button>
+        <button type="button" data-sheet-type="fralda"><span class="type-icon"><img src="./icons/actions/fralda.png" alt="" loading="lazy" decoding="async" /></span><span>Fralda</span></button>
       </div>
       <form class="record-form">
         <label>
@@ -337,6 +337,18 @@
       </form>
     </section>
 
-    <script src="./app.js?v=39"></script>
+    <section id="orbitClusterSheet" class="orbit-cluster-sheet" aria-label="Registros próximos" hidden>
+      <div class="sheet-handle"></div>
+      <div class="section-title">
+        <div>
+          <span>Registros próximos</span>
+          <strong id="orbitClusterTitle">Atividades no mesmo horário</strong>
+        </div>
+        <button id="closeOrbitCluster" class="round-action" type="button">×</button>
+      </div>
+      <div id="orbitClusterList" class="cluster-list"></div>
+    </section>
+
+    <script src="./app.js?v=40"></script>
   </body>
 </html>
