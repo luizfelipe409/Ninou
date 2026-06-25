@@ -306,7 +306,7 @@ body.day-theme .phone-shell {
   border: 28px solid rgba(143, 124, 255, 0.12);
   border-bottom-color: transparent;
   transform: rotate(17deg);
-  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.12));
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
 }
 
 .orbit-ring::before {
@@ -362,8 +362,11 @@ body.day-theme .phone-shell {
   font-size: 0.82rem;
   font-style: normal;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   contain: paint;
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: auto;
 }
 
 .orbit-event b {
@@ -387,8 +390,12 @@ body.day-theme .phone-shell {
   background-repeat: no-repeat;
   background-size: cover;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   contain: paint;
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: none;
+  will-change: auto;
 }
 
 .icon-art-acordou {
@@ -574,8 +581,12 @@ body.day-theme .phone-shell {
   font-size: 1.08rem;
   line-height: 1;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   contain: paint;
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: none;
+  will-change: auto;
 }
 
 .quick-actions button[data-open-sheet="amamentacao"] .action-icon,
@@ -813,8 +824,12 @@ body.day-theme .phone-shell {
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   contain: paint;
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: none;
+  will-change: auto;
 }
 
 .mark:empty {

@@ -180,6 +180,7 @@ let applyingCloudState = false;
 let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
+let liveTickMinute = -1;
 let state = loadLocalDayState();
 
 function createEmptyDayState() {
@@ -1404,7 +1405,16 @@ function renderAll() {
 
 function renderLiveTick() {
   updateTheme();
-  renderCurrentState();
+
+  if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return;
+
+  setText(stateClock, formatDuration(Date.now() - state.activeStartedAt));
+
+  const currentMinute = Math.floor(Date.now() / 60000);
+  if (currentMinute === liveTickMinute) return;
+
+  liveTickMinute = currentMinute;
+  setText(stateHint, getWakeWindowText());
   renderSummary();
 }
 
