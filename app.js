@@ -8,6 +8,14 @@ const startModeButtons = document.querySelectorAll("[data-start-mode]");
 const stateLabel = document.querySelector("#stateLabel");
 const stateClock = document.querySelector("#stateClock");
 const stateHint = document.querySelector("#stateHint");
+const activeTimerCard = document.querySelector("#activeTimerCard");
+const activeTimerIcon = document.querySelector("#activeTimerIcon");
+const activeTimerKicker = document.querySelector("#activeTimerKicker");
+const activeTimerTitle = document.querySelector("#activeTimerTitle");
+const activeTimerElapsed = document.querySelector("#activeTimerElapsed");
+const activeTimerProgress = document.querySelector("#activeTimerProgress");
+const activeTimerMeta = document.querySelector("#activeTimerMeta");
+const activeTimerAction = document.querySelector("#activeTimerAction");
 const orbitEvents = document.querySelector("#orbitEvents");
 const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
@@ -86,6 +94,16 @@ const saveBabyWeightButton = document.querySelector("#saveBabyWeightButton");
 const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
+const sleepSoundAudio = document.querySelector("#sleepSoundAudio");
+const soundOptionButtons = document.querySelectorAll("[data-sound-key]");
+const soundStatus = document.querySelector("#soundStatus");
+const soundTimer = document.querySelector("#soundTimer");
+const soundCurrentIcon = document.querySelector("#soundCurrentIcon");
+const soundCurrentTitle = document.querySelector("#soundCurrentTitle");
+const soundCurrentDesc = document.querySelector("#soundCurrentDesc");
+const soundProgress = document.querySelector("#soundProgress");
+const soundPlayPauseButton = document.querySelector("#soundPlayPause");
+const soundStopButton = document.querySelector("#soundStop");
 
 const storageKeys = {
   photo: "ninou.demo.profilePhoto",
@@ -96,6 +114,7 @@ const storageKeys = {
   dayState: "ninou.demo.dayState",
   themeMode: "ninou.demo.themeMode",
   weights: "ninou.demo.weights",
+  sleepSound: "ninou.demo.sleepSound",
 };
 
 const firebaseConfig = {
@@ -200,6 +219,28 @@ const typeConfig = {
 const hour = 60 * 60 * 1000;
 const day = 24 * hour;
 
+const sleepSoundDurationMs = 60 * 60 * 1000;
+const sleepSounds = {
+  white: {
+    title: "Ruído branco",
+    description: "Abafa ruídos repentinos e cria uma base constante.",
+    icon: "🌊",
+    src: "./audio/ruido-branco.mp3",
+  },
+  womb: {
+    title: "Som do útero",
+    description: "Batidas suaves e grave acolhedor para acalmar.",
+    icon: "💗",
+    src: "./audio/som-utero.mp3",
+  },
+  classical: {
+    title: "Música clássica suave",
+    description: "Melodia instrumental leve para a rotina de sono.",
+    icon: "🎼",
+    src: "./audio/classica-suave.mp3",
+  },
+};
+
 let currentSheetType = "sono";
 let currentEditingEventId = null;
 let currentDiaryFilter = "all";
@@ -226,6 +267,13 @@ let breastTimerState = {
   activeSide: null,
   lastStartedAt: 0,
   intervalId: null,
+};
+let sleepSoundState = {
+  selectedKey: sleepSounds[localStorage.getItem(storageKeys.sleepSound)] ? localStorage.getItem(storageKeys.sleepSound) : "white",
+  playing: false,
+  startedAt: 0,
+  remainingMs: sleepSoundDurationMs,
+  timeoutId: null,
 };
 let state = loadLocalDayState();
 
@@ -1055,6 +1103,74 @@ function setWakeActionIcon() {
   wakeActionIcon.innerHTML = iconMarkup(iconKey);
 }
 
+function getActiveTimerDetails() {
+  if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return null;
+
+  const nightWakeActive = getActiveNightWakeEvent();
+  const sleeping = state.mode === "sleeping";
+  const elapsed = Date.now() - state.activeStartedAt;
+  const activeType = sleeping ? state.activeType || "sono" : nightWakeActive ? "despertar-noturno" : "acordou";
+  const config = typeConfig[activeType] || null;
+  const title = sleeping
+    ? (config?.title || "Sono")
+    : nightWakeActive
+      ? "Despertar noturno"
+      : "Tempo acordado";
+  const iconKey = sleeping ? state.activeType || "sono" : nightWakeActive ? "despertar-noturno" : "acordou";
+  const actionLabel = sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca";
+  const kicker = sleeping ? "Timer de sono" : nightWakeActive ? "Timer noturno" : "Timer acordado";
+  const meta = sleeping
+    ? `${config?.title || "Sono"} iniciado às ${formatTime(state.activeStartedAt)}`
+    : nightWakeActive
+      ? `Despertar iniciado às ${formatTime(state.activeStartedAt)}`
+      : `Acordado desde ${formatTime(state.activeStartedAt)}`;
+  const targetMs = sleeping
+    ? (state.activeType === "dormir" ? 8 * hour : 2 * hour)
+    : Math.max(20 * 60000, wakeWindowMinutes * 60000);
+
+  return {
+    title,
+    iconKey,
+    actionLabel,
+    kicker,
+    meta,
+    elapsed,
+    progress: Math.max(3, Math.min(100, Math.round((elapsed / targetMs) * 100))),
+  };
+}
+
+function renderActiveTimerCard() {
+  if (!activeTimerCard) return;
+
+  const details = getActiveTimerDetails();
+  if (!details) {
+    setHidden(activeTimerCard, true);
+    return;
+  }
+
+  setHidden(activeTimerCard, false);
+  if (activeTimerIcon && activeTimerIcon.dataset.iconKey !== details.iconKey) {
+    activeTimerIcon.dataset.iconKey = details.iconKey;
+    activeTimerIcon.innerHTML = iconMarkup(details.iconKey);
+  }
+  setText(activeTimerKicker, details.kicker);
+  setText(activeTimerTitle, details.title);
+  setText(activeTimerElapsed, formatDuration(details.elapsed));
+  setText(activeTimerMeta, details.meta);
+  setText(activeTimerAction, details.actionLabel);
+  if (activeTimerProgress) activeTimerProgress.style.width = `${details.progress}%`;
+}
+
+function runActiveTimerAction() {
+  if (state.mode === "idle") return;
+  if (state.mode === "sleeping") {
+    finishSleep();
+  } else {
+    startSleep();
+  }
+  renderAll();
+}
+
 function renderCurrentState() {
   if (state.mode === "idle") {
     setHidden(wakeAction, true);
@@ -1062,6 +1178,7 @@ function renderCurrentState() {
     setText(stateLabel, "Rotina zerada");
     setText(stateClock, "00:00:00");
     setText(stateHint, `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`);
+    renderActiveTimerCard();
     return;
   }
 
@@ -1075,6 +1192,7 @@ function renderCurrentState() {
   setText(stateClock, formatDuration(elapsed));
   setText(stateHint, getWakeWindowText());
   setWakeActionIcon();
+  renderActiveTimerCard();
 }
 
 function eventPosition(timestamp) {
@@ -1796,6 +1914,157 @@ function deleteBabyWeight(id) {
   renderWeightProfile();
 }
 
+
+function formatSoundTimer(ms) {
+  const safeMs = Math.max(0, ms);
+  const totalSeconds = Math.ceil(safeMs / 1000);
+  const hoursValue = Math.floor(totalSeconds / 3600);
+  const minutesValue = Math.floor((totalSeconds % 3600) / 60);
+  const secondsValue = totalSeconds % 60;
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${pad(hoursValue)}:${pad(minutesValue)}:${pad(secondsValue)}`;
+}
+
+function getSelectedSleepSound() {
+  return sleepSounds[sleepSoundState.selectedKey] || sleepSounds.white;
+}
+
+function getSleepSoundRemainingMs() {
+  if (!sleepSoundState.playing) return sleepSoundState.remainingMs;
+  return Math.max(0, sleepSoundState.remainingMs - (Date.now() - sleepSoundState.startedAt));
+}
+
+function updateMediaSession(sound) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: sound.title,
+      artist: "Ninou",
+      album: "Sons para dormir",
+    });
+    navigator.mediaSession.setActionHandler("play", () => playSleepSound());
+    navigator.mediaSession.setActionHandler("pause", () => pauseSleepSound());
+    navigator.mediaSession.setActionHandler("stop", () => stopSleepSound());
+  } catch {
+    // Media Session não está disponível em todos os navegadores.
+  }
+}
+
+function renderSleepSoundUI() {
+  if (!sleepSoundAudio || !soundTimer) return;
+  const sound = getSelectedSleepSound();
+  const remainingMs = getSleepSoundRemainingMs();
+  const progress = 1 - remainingMs / sleepSoundDurationMs;
+
+  soundOptionButtons.forEach((button) => {
+    const active = button.dataset.soundKey === sleepSoundState.selectedKey;
+    button.classList.toggle("active", active);
+    const playIcon = button.querySelector("i");
+    if (playIcon) playIcon.textContent = active && sleepSoundState.playing ? "Ⅱ" : "▶";
+  });
+
+  setText(soundCurrentIcon, sound.icon);
+  setText(soundCurrentTitle, sound.title);
+  setText(soundCurrentDesc, sound.description);
+  setText(soundTimer, formatSoundTimer(remainingMs));
+  setText(soundStatus, sleepSoundState.playing ? "Tocando agora" : remainingMs < sleepSoundDurationMs ? "Pausado" : "Pronto para tocar");
+  if (soundProgress) soundProgress.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
+  if (soundPlayPauseButton) soundPlayPauseButton.textContent = sleepSoundState.playing ? "Pausar" : remainingMs < sleepSoundDurationMs ? "▶ Continuar" : "▶ Tocar por 1h";
+
+  if (sleepSoundState.playing && remainingMs <= 0) {
+    stopSleepSound();
+  }
+}
+
+function setSleepSound(key, options = {}) {
+  if (!sleepSounds[key]) return;
+  const wasPlaying = sleepSoundState.playing;
+  if (wasPlaying) pauseSleepSound({ keepPosition: false });
+  sleepSoundState.selectedKey = key;
+  sleepSoundState.remainingMs = sleepSoundDurationMs;
+  localStorage.setItem(storageKeys.sleepSound, key);
+  const sound = getSelectedSleepSound();
+  if (sleepSoundAudio) {
+    sleepSoundAudio.src = sound.src;
+    sleepSoundAudio.loop = true;
+    sleepSoundAudio.preload = "auto";
+  }
+  updateMediaSession(sound);
+  renderSleepSoundUI();
+  if (options.play || wasPlaying) playSleepSound();
+}
+
+async function playSleepSound() {
+  if (!sleepSoundAudio) return;
+  const sound = getSelectedSleepSound();
+  if (!sleepSoundAudio.src || !sleepSoundAudio.src.includes(sound.src.replace("./", ""))) {
+    sleepSoundAudio.src = sound.src;
+  }
+  sleepSoundAudio.loop = true;
+  updateMediaSession(sound);
+  try {
+    await sleepSoundAudio.play();
+    sleepSoundState.playing = true;
+    sleepSoundState.startedAt = Date.now();
+    clearTimeout(sleepSoundState.timeoutId);
+    sleepSoundState.timeoutId = window.setTimeout(stopSleepSound, getSleepSoundRemainingMs());
+  } catch {
+    setText(soundStatus, "Toque novamente para liberar o áudio");
+  }
+  renderSleepSoundUI();
+}
+
+function pauseSleepSound(options = {}) {
+  if (!sleepSoundAudio) return;
+  const keepPosition = options.keepPosition !== false;
+  if (sleepSoundState.playing) {
+    sleepSoundState.remainingMs = getSleepSoundRemainingMs();
+  }
+  sleepSoundState.playing = false;
+  clearTimeout(sleepSoundState.timeoutId);
+  sleepSoundAudio.pause();
+  if (!keepPosition) sleepSoundAudio.currentTime = 0;
+  renderSleepSoundUI();
+}
+
+function stopSleepSound() {
+  if (!sleepSoundAudio) return;
+  sleepSoundState.playing = false;
+  sleepSoundState.remainingMs = sleepSoundDurationMs;
+  clearTimeout(sleepSoundState.timeoutId);
+  sleepSoundAudio.pause();
+  sleepSoundAudio.currentTime = 0;
+  renderSleepSoundUI();
+}
+
+function toggleSleepSound() {
+  if (sleepSoundState.playing) {
+    pauseSleepSound();
+    return;
+  }
+  playSleepSound();
+}
+
+function initSleepSoundPlayer() {
+  if (!sleepSoundAudio) return;
+  setSleepSound(sleepSoundState.selectedKey);
+  sleepSoundAudio.addEventListener("play", () => {
+    if (!sleepSoundState.playing) {
+      sleepSoundState.playing = true;
+      sleepSoundState.startedAt = Date.now();
+    }
+    renderSleepSoundUI();
+  });
+  sleepSoundAudio.addEventListener("pause", () => {
+    if (!sleepSoundAudio.ended && sleepSoundState.playing) {
+      sleepSoundState.remainingMs = getSleepSoundRemainingMs();
+      sleepSoundState.playing = false;
+      clearTimeout(sleepSoundState.timeoutId);
+    }
+    renderSleepSoundUI();
+  });
+}
+
 function updateTheme() {
   const storedMode = themeModeInput?.value || babyProfile.themeMode || localStorage.getItem(storageKeys.themeMode) || "auto";
   const hourValue = new Date().getHours();
@@ -1815,14 +2084,17 @@ function renderAll() {
   renderSleepReport();
   renderSupplementalReports();
   renderTodayHomeSections();
+  renderSleepSoundUI();
 }
 
 function renderLiveTick() {
   updateTheme();
+  renderSleepSoundUI();
 
   if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return;
 
   setText(stateClock, formatDuration(Date.now() - state.activeStartedAt));
+  renderActiveTimerCard();
 
   const currentMinute = Math.floor(Date.now() / 60000);
   if (currentMinute === liveTickMinute) return;
@@ -2361,15 +2633,8 @@ startModeButtons.forEach((button) => {
   button.addEventListener("click", () => startRoutine(button.dataset.startMode));
 });
 
-wakeAction.addEventListener("click", () => {
-  if (state.mode === "idle") return;
-  if (state.mode === "sleeping") {
-    finishSleep();
-  } else {
-    startSleep();
-  }
-  renderAll();
-});
+wakeAction.addEventListener("click", runActiveTimerAction);
+if (activeTimerAction) activeTimerAction.addEventListener("click", runActiveTimerAction);
 
 openSheetButtons.forEach((button) => {
   button.addEventListener("click", () => openSheet(button.dataset.openSheet));
@@ -2442,6 +2707,12 @@ if (weightHistoryList) {
   });
 }
 
+if (soundPlayPauseButton) soundPlayPauseButton.addEventListener("click", toggleSleepSound);
+if (soundStopButton) soundStopButton.addEventListener("click", stopSleepSound);
+soundOptionButtons.forEach((button) => {
+  button.addEventListener("click", () => setSleepSound(button.dataset.soundKey, { play: true }));
+});
+
 profilePhotoInput.addEventListener("change", async () => {
   if (!requireLogin("salvar a foto")) {
     profilePhotoInput.value = "";
@@ -2479,6 +2750,7 @@ initDiaryDatePicker();
 syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
+initSleepSoundPlayer();
 renderAll();
 updateDiaryChipsMoreButton();
 setInterval(renderLiveTick, 1000);

@@ -19,7 +19,10 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=66" />
+    <link rel="preload" as="audio" href="./audio/ruido-branco.mp3" />
+    <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
+    <link rel="preload" as="audio" href="./audio/classica-suave.mp3" />
+    <link rel="stylesheet" href="./styles.css?v=68" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -46,6 +49,24 @@
           <span id="stateLabel">Rotina zerada</span>
           <strong id="stateClock">00:00:00</strong>
           <p id="stateHint">Escolha como começar o dia.</p>
+        </section>
+
+        <section id="activeTimerCard" class="active-timer-card" aria-live="polite" hidden>
+          <div class="active-timer-head">
+            <span id="activeTimerIcon" class="active-timer-icon" aria-hidden="true"></span>
+            <div class="active-timer-copy">
+              <span id="activeTimerKicker">Timer ativo</span>
+              <strong id="activeTimerTitle">Rotina em andamento</strong>
+            </div>
+            <strong id="activeTimerElapsed" class="active-timer-elapsed">00:00</strong>
+          </div>
+          <div class="active-timer-bar" aria-hidden="true">
+            <span id="activeTimerProgress"></span>
+          </div>
+          <div class="active-timer-foot">
+            <span id="activeTimerMeta">Iniciado agora</span>
+            <button id="activeTimerAction" type="button">Atualizar</button>
+          </div>
         </section>
 
         <section class="main-action-area" aria-label="Ação principal">
@@ -226,6 +247,68 @@
         </section>
       </section>
 
+      <section class="screen" data-screen="sounds" aria-label="Sons para dormir">
+        <section class="sounds-hero">
+          <div class="sounds-hero-icon">♪</div>
+          <div>
+            <span>Sons para dormir</span>
+            <strong>Escolha um som relaxante</strong>
+            <p>Toque por 1 hora, com repetição automática até o timer terminar.</p>
+          </div>
+        </section>
+
+        <section id="soundPlayerCard" class="sound-player-card" aria-label="Player de som para dormir">
+          <div class="sound-player-topline">
+            <span id="soundStatus">Pronto para tocar</span>
+            <strong id="soundTimer">01:00:00</strong>
+          </div>
+          <div class="sound-current">
+            <i id="soundCurrentIcon">🌊</i>
+            <div>
+              <strong id="soundCurrentTitle">Ruído branco</strong>
+              <p id="soundCurrentDesc">Abafa ruídos repentinos e cria uma base constante.</p>
+            </div>
+          </div>
+          <div class="sound-progress" aria-hidden="true"><i id="soundProgress"></i></div>
+          <div class="sound-controls">
+            <button id="soundPlayPause" class="sound-main-button" type="button">▶ Tocar por 1h</button>
+            <button id="soundStop" class="sound-stop-button" type="button">Parar</button>
+          </div>
+        </section>
+
+        <section class="sound-list" aria-label="Escolha um som">
+          <button class="sound-option active" type="button" data-sound-key="white">
+            <span class="sound-option-icon">🌊</span>
+            <span>
+              <strong>Ruído branco</strong>
+              <em>Som contínuo para abafar ruídos do ambiente.</em>
+            </span>
+            <i>▶</i>
+          </button>
+          <button class="sound-option" type="button" data-sound-key="womb">
+            <span class="sound-option-icon">💗</span>
+            <span>
+              <strong>Som do útero</strong>
+              <em>Batidas suaves e grave acolhedor para acalmar.</em>
+            </span>
+            <i>▶</i>
+          </button>
+          <button class="sound-option" type="button" data-sound-key="classical">
+            <span class="sound-option-icon">🎼</span>
+            <span>
+              <strong>Música clássica suave</strong>
+              <em>Melodia instrumental leve para a rotina de sono.</em>
+            </span>
+            <i>▶</i>
+          </button>
+        </section>
+
+        <section class="sound-note">
+          <strong>Observação</strong>
+          <p>O som começa apenas após tocar em play. Em iPhone, o áudio costuma continuar com a tela apagada quando iniciado por toque, mas o navegador pode interromper se o sistema economizar bateria.</p>
+        </section>
+      </section>
+
       <section class="screen" data-screen="profile" aria-label="Perfil">
         <div class="profile-card">
           <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
@@ -343,6 +426,7 @@
         <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
         <button type="button" data-target="diary">≡<span>Diário</span></button>
         <button type="button" data-target="trends">▥<span>Dados</span></button>
+        <button type="button" data-target="sounds">♪<span>Sons</span></button>
         <button type="button" data-target="profile">○<span>Perfil</span></button>
       </nav>
     </main>
@@ -429,6 +513,7 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=66"></script>
+    <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
+    <script src="./app.js?v=68"></script>
   </body>
 </html>

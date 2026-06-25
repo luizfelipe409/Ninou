@@ -1622,6 +1622,175 @@ body.day-theme .record-sheet textarea::placeholder {
   font-weight: 950;
 }
 
+
+.active-timer-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(201, 192, 255, 0.18);
+  border-radius: 26px;
+  background:
+    linear-gradient(135deg, rgba(18, 16, 45, 0.86), rgba(33, 25, 64, 0.78)),
+    radial-gradient(circle at 12% 20%, rgba(143, 124, 255, 0.26), transparent 30%);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  padding: 14px;
+}
+
+.active-timer-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 26%, rgba(255, 255, 255, 0.16), transparent 18%),
+    radial-gradient(circle at 78% 30%, rgba(124, 229, 194, 0.12), transparent 20%);
+  pointer-events: none;
+}
+
+body.day-theme .active-timer-card {
+  border-color: rgba(219, 165, 104, 0.26);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 234, 0.94), rgba(255, 237, 213, 0.82)),
+    radial-gradient(circle at 14% 18%, rgba(255, 207, 133, 0.42), transparent 32%);
+  box-shadow:
+    0 18px 38px rgba(177, 126, 76, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.active-timer-head,
+.active-timer-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.active-timer-head {
+  justify-content: space-between;
+}
+
+.active-timer-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+}
+
+.active-timer-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.active-timer-copy span,
+.active-timer-meta {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.active-timer-copy strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 1.02rem;
+  line-height: 1.15;
+}
+
+.active-timer-elapsed {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 1.16rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.active-timer-bar {
+  position: relative;
+  z-index: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(201, 192, 255, 0.18);
+}
+
+.active-timer-bar span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--plum), var(--sage));
+  transition: width 260ms ease;
+}
+
+.active-timer-foot {
+  justify-content: space-between;
+}
+
+.active-timer-foot > span {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.active-timer-foot button {
+  min-height: 36px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(124, 229, 194, 0.28);
+  border-radius: 999px;
+  background: rgba(124, 229, 194, 0.12);
+  color: var(--sage);
+  padding: 0 13px;
+  font-size: 0.8rem;
+  font-weight: 950;
+}
+
+body.day-theme .active-timer-foot button {
+  border-color: rgba(219, 139, 91, 0.26);
+  background: rgba(232, 154, 94, 0.14);
+  color: #9b5f38;
+}
+
+@media (max-width: 380px) {
+  .active-timer-card {
+    padding: 12px;
+  }
+
+  .active-timer-head {
+    gap: 9px;
+  }
+
+  .active-timer-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .active-timer-elapsed {
+    font-size: 1rem;
+  }
+
+  .active-timer-foot {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .active-timer-foot button {
+    width: 100%;
+  }
+}
+
 @keyframes appear {
   from {
     opacity: 0;
@@ -2335,4 +2504,239 @@ body.day-theme .chips-more-button {
 .screen[data-screen="diary"] .chips {
   padding-right: 52px !important;
   scroll-behavior: smooth;
+}
+
+/* Sons para dormir */
+.sounds-hero,
+.sound-player-card,
+.sound-option,
+.sound-note {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 24px;
+}
+
+.sounds-hero {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+}
+
+.sounds-hero-icon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(143, 124, 255, 0.16);
+  color: var(--plum-soft);
+  font-size: 2rem;
+  box-shadow: inset 0 0 0 1px rgba(201, 192, 255, 0.14);
+}
+
+.sounds-hero span,
+.sound-player-topline span,
+.sound-note strong {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sounds-hero strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 1.4rem;
+}
+
+.sounds-hero p,
+.sound-current p,
+.sound-note p,
+.sound-option em {
+  margin: 4px 0 0;
+  color: var(--muted);
+  line-height: 1.35;
+  font-style: normal;
+}
+
+.sound-player-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 16% 16%, rgba(143, 124, 255, 0.18), transparent 24%),
+    var(--panel);
+}
+
+.sound-player-topline,
+.sound-current,
+.sound-controls {
+  display: flex;
+  align-items: center;
+}
+
+.sound-player-topline {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sound-player-topline strong {
+  font-size: 1.45rem;
+  letter-spacing: 0.02em;
+}
+
+.sound-current {
+  gap: 12px;
+}
+
+.sound-current i,
+.sound-option-icon {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 1.55rem;
+  font-style: normal;
+  box-shadow: inset 0 0 0 1px rgba(201, 192, 255, 0.12);
+}
+
+.sound-current strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.sound-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(201, 192, 255, 0.14);
+}
+
+.sound-progress i {
+  width: 0%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--plum), var(--sage));
+  transition: width 220ms ease;
+}
+
+.sound-controls {
+  gap: 10px;
+}
+
+.sound-main-button,
+.sound-stop-button {
+  min-height: 48px;
+  border-radius: 18px;
+  font-weight: 950;
+}
+
+.sound-main-button {
+  flex: 1;
+  border: 0;
+  background: linear-gradient(135deg, var(--plum), #b09cff);
+  color: #fff;
+}
+
+.sound-stop-button {
+  width: 90px;
+  border: 1px solid rgba(255, 154, 118, 0.3);
+  background: rgba(255, 154, 118, 0.1);
+  color: var(--coral);
+}
+
+.sound-list {
+  display: grid;
+  gap: 10px;
+}
+
+.sound-option {
+  width: 100%;
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: 58px 1fr 34px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  color: var(--ink);
+  text-align: left;
+}
+
+.sound-option strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.sound-option i {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(143, 124, 255, 0.14);
+  color: var(--plum-soft);
+  font-style: normal;
+  font-weight: 950;
+}
+
+.sound-option.active {
+  border-color: rgba(143, 124, 255, 0.58);
+  box-shadow: 0 16px 34px rgba(143, 124, 255, 0.12);
+}
+
+.sound-option.active .sound-option-icon,
+.sound-option.active i {
+  background: rgba(143, 124, 255, 0.22);
+}
+
+.sound-note {
+  padding: 14px 16px;
+}
+
+body.day-theme .sounds-hero,
+body.day-theme .sound-player-card,
+body.day-theme .sound-option,
+body.day-theme .sound-note {
+  background: rgba(255, 246, 235, 0.72);
+  border-color: rgba(122, 88, 146, 0.16);
+}
+
+body.day-theme .sound-main-button {
+  background: linear-gradient(135deg, #e59b64, #ffc795);
+  color: #2b2552;
+}
+
+body.day-theme .sound-progress i {
+  background: linear-gradient(90deg, #e59b64, #35a889);
+}
+
+@media (max-width: 380px) {
+  .sounds-hero {
+    grid-template-columns: 52px 1fr;
+    padding: 15px;
+  }
+
+  .sounds-hero-icon,
+  .sound-current i,
+  .sound-option-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .sound-option {
+    grid-template-columns: 52px 1fr 30px;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .bottom-nav button {
+    min-width: 52px;
+    padding-inline: 6px;
+  }
 }
