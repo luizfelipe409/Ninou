@@ -1311,6 +1311,26 @@ function getEventsForDayRange(start, end) {
   return state.events.filter((event) => event.start >= start && event.start < end);
 }
 
+function eventTypeIn(event, types = []) {
+  return types.includes(event?.type);
+}
+
+function isBreastfeedingRecord(event) {
+  return eventTypeIn(event, ["amamentacao", "amamentação", "breastfeeding", "feed"]);
+}
+
+function isBottleRecord(event) {
+  return eventTypeIn(event, ["mamadeira", "bottle"]);
+}
+
+function isDiaperRecord(event) {
+  return eventTypeIn(event, ["fralda", "diaper"]);
+}
+
+function isMedicationRecord(event) {
+  return eventTypeIn(event, ["medicamento", "medicine", "medication", "remedio", "remédio"]);
+}
+
 function renderTodayLastEvents() {
   if (!todayLastEvents) return;
   const todayStart = getDayStart();
@@ -1381,26 +1401,26 @@ function renderRoutineCharts(days) {
   renderCompactBars(
     breastfeedingBars,
     enrichedDays,
-    (item) => item.events.filter((event) => event.type === "amamentacao").length,
+    (item) => item.events.filter(isBreastfeedingRecord).length,
   );
 
   renderCompactBars(
     bottleBars,
     enrichedDays,
-    (item) => item.events.filter((event) => event.type === "mamadeira").reduce((total, event) => total + parseMl(event.detail), 0),
+    (item) => item.events.filter(isBottleRecord).reduce((total, event) => total + parseMl(event.detail), 0),
     (value) => (value ? `${Math.round(value)} ml` : "0"),
   );
 
   renderCompactBars(
     diaperBars,
     enrichedDays,
-    (item) => item.events.filter((event) => event.type === "fralda").length,
+    (item) => item.events.filter(isDiaperRecord).length,
   );
 
   renderCompactBars(
     medicationBars,
     enrichedDays,
-    (item) => item.events.filter((event) => event.type === "medicamento").length,
+    (item) => item.events.filter(isMedicationRecord).length,
   );
 }
 
@@ -1543,10 +1563,10 @@ function renderSummary() {
   }
 }
 
-function getSleepReportDays() {
+function getSleepReportDays(count = 7) {
   const todayStart = getDayStart();
-  return Array.from({ length: 5 }, (_, index) => {
-    const start = todayStart - (4 - index) * day;
+  return Array.from({ length: count }, (_, index) => {
+    const start = todayStart - (count - 1 - index) * day;
     const end = start + day;
     const events = state.events.filter((event) => isSleepEvent(event) && event.start >= start && event.start < end);
     const sleepMs = events.reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
@@ -1561,7 +1581,7 @@ function getSleepReportDays() {
 
 function renderSleepReport() {
   if (!sleepBars) return;
-  const days = getSleepReportDays();
+  const days = getSleepReportDays(7);
   const totalSleep = days.reduce((total, item) => total + item.sleepMs, 0);
   const totalNaps = days.reduce((total, item) => total + item.events.length, 0);
   const daysWithDataCount = days.filter((item) => item.events.length > 0).length;
@@ -1579,8 +1599,8 @@ function renderSleepReport() {
     : "Nenhum sono registrado no período.";
   napAverage.textContent = totalNaps ? (totalNaps / daysWithData).toFixed(1).replace(".", ",") : "0";
   napAverageHint.textContent = totalNaps
-    ? `${totalNaps} registros de sono nos últimos 5 dias.`
-    : "Nenhuma soneca registrada nos últimos 5 dias.";
+    ? `${totalNaps} registros de sono nos últimos 7 dias.`
+    : "Nenhuma soneca registrada nos últimos 7 dias.";
 
   sleepBars.innerHTML = "";
   days.forEach((item) => {

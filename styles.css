@@ -15,17 +15,17 @@
 
 body.day-theme {
   color-scheme: light;
-  --bg: #e9e4ff;
-  --panel: rgba(236, 230, 255, 0.84);
-  --line: rgba(85, 72, 148, 0.22);
-  --ink: #332b63;
-  --muted: #6d6598;
-  --plum: #7467e8;
-  --plum-soft: #8d83ff;
-  --coral: #e77f66;
-  --sage: #2e9a83;
-  --butter: #c9852d;
-  --rose: #c95f98;
+  --bg: #dcd6f7;
+  --panel: rgba(224, 217, 249, 0.9);
+  --line: rgba(83, 70, 145, 0.3);
+  --ink: #30285c;
+  --muted: #645c8d;
+  --plum: #6d5fe0;
+  --plum-soft: #887df4;
+  --coral: #df765d;
+  --sage: #2c927e;
+  --butter: #be7c28;
+  --rose: #bf5a90;
 }
 
 * {
@@ -51,9 +51,9 @@ body {
 
 body.day-theme {
   background:
-    radial-gradient(circle at 20% 8%, rgba(255, 211, 122, 0.26), transparent 26%),
-    radial-gradient(circle at 86% 70%, rgba(124, 229, 194, 0.16), transparent 25%),
-    linear-gradient(180deg, #ece7ff, #e8e2ff 54%, #e4ecff);
+    radial-gradient(circle at 20% 8%, rgba(255, 211, 122, 0.18), transparent 26%),
+    radial-gradient(circle at 86% 70%, rgba(124, 229, 194, 0.12), transparent 25%),
+    linear-gradient(180deg, #ddd6f7, #d8d1f3 54%, #d6e0f7);
 }
 
 button,
@@ -1691,7 +1691,7 @@ body.day-theme .chart-card {
 }
 
 .report-stack .chart-title span::after {
-  content: " â€¢";
+  content: " -";
 }
 
 .five-day-actions-card .chart-title strong {
@@ -1809,18 +1809,28 @@ body.day-theme .chart-card {
 }
 
 .screen[data-screen="diary"] .chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
+  padding: 2px 0 8px;
 }
 
 .screen[data-screen="diary"] .chips button {
-  min-width: max-content;
-  flex: 0 0 auto;
-  padding: 0 15px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
+  padding: 0 8px;
   white-space: nowrap;
-  font-size: 0.76rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.72rem;
   line-height: 1;
+}
+
+.screen[data-screen="diary"] .chips button[data-diary-filter="all"] {
+  grid-column: span 1;
 }
 
 .record-types button {
@@ -1846,12 +1856,12 @@ body.day-theme .chart-card {
 
 .weight-profile-block {
   display: grid;
-  gap: 14px;
-  margin-top: 4px;
+  gap: 18px;
+  margin-top: 8px;
   border: 1px solid rgba(143, 124, 255, 0.18);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.05);
-  padding: 14px;
+  padding: 16px;
 }
 
 .weight-profile-header {
@@ -1873,8 +1883,8 @@ body.day-theme .chart-card {
 
 .weight-input-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .weight-input-row label {
@@ -1887,11 +1897,11 @@ body.day-theme .chart-card {
 
 .weight-history-card {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid rgba(201, 192, 255, 0.14);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.04);
-  padding: 12px;
+  padding: 14px;
 }
 
 .weight-history-list {
@@ -1964,4 +1974,75 @@ body.day-theme .weight-history-item {
   .weight-input-row {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* DiÃ¡rio: cards mais equilibrados em telas pequenas */
+.screen[data-screen="diary"] .timeline {
+  gap: 14px;
+}
+
+.screen[data-screen="diary"] .event-card {
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+
+.screen[data-screen="diary"] .event-card > div {
+  min-width: 0;
+}
+
+.screen[data-screen="diary"] .event-card .mark {
+  width: 46px;
+  height: 46px;
+  align-self: start;
+}
+
+.screen[data-screen="diary"] .event-card strong {
+  font-size: 1.03rem;
+  line-height: 1.16;
+}
+
+.screen[data-screen="diary"] .event-card span,
+.screen[data-screen="diary"] .event-card p {
+  line-height: 1.25;
+}
+
+.screen[data-screen="diary"] .event-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.screen[data-screen="diary"] .event-action-button {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+@media (max-width: 370px) {
+  .screen[data-screen="diary"] .event-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .screen[data-screen="diary"] .event-action-button {
+    justify-content: center;
+  }
+}
+
+
+.report-stack .chart-title span {
+  letter-spacing: 0.02em;
+}
+
+.report-stack .chart-title strong {
+  font-size: 1.02rem;
+}
+
+body.day-theme .chart-card,
+body.day-theme .last-card,
+body.day-theme .summary-grid article,
+body.day-theme .next-card {
+  background: rgba(224, 217, 249, 0.86);
 }
