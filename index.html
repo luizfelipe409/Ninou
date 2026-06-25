@@ -12,7 +12,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=44" />
+    <link rel="stylesheet" href="./styles.css?v=45" />
   </head>
   <body>
     <svg class="icon-sprite" aria-hidden="true">
@@ -286,7 +286,7 @@
         </section>
       </section>
 
-      <button class="fab" type="button" data-open-sheet="sono" aria-label="Novo registro">＋</button>
+      <button class="fab icon-button-add" type="button" data-open-sheet="sono" aria-label="Novo registro"></button>
 
       <nav class="bottom-nav" aria-label="Menu principal">
         <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
@@ -304,7 +304,7 @@
           <span>Novo registro</span>
           <strong id="sheetTitle">Soneca</strong>
         </div>
-        <button id="closeSheet" class="round-action" type="button">×</button>
+        <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
       </div>
       <div class="record-types">
         <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><img src="./icons/actions/soneca.png" alt="" loading="lazy" decoding="async" /></span><span>Soneca</span></button>
@@ -344,11 +344,11 @@
           <span>Registros próximos</span>
           <strong id="orbitClusterTitle">Atividades no mesmo horário</strong>
         </div>
-        <button id="closeOrbitCluster" class="round-action" type="button">×</button>
+        <button id="closeOrbitCluster" class="round-action icon-button-close" type="button" aria-label="Fechar registros próximos"></button>
       </div>
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
-    <script src="./app.js?v=44"></script>
+    <script src="./app.js?v=45"></script>
   </body>
 </html>

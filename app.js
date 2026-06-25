@@ -170,6 +170,8 @@ let profileCloudSaveTimer = null;
 let dayCloudSaveTimer = null;
 let applyingCloudState = false;
 let pendingProfilePhotoSave = false;
+let orbitRenderSignature = "";
+let timelineRenderSignature = "";
 let state = loadLocalDayState();
 
 function createEmptyDayState() {
@@ -1040,9 +1042,45 @@ function createOrbitCluster(group) {
   return button;
 }
 
+function getEventRenderSignature(event, options = {}) {
+  const eventKey = options.active ? `active-${event.type}-${Math.round(event.start)}` : event.id;
+  const endKey = options.active ? "live" : Math.round(event.end || event.start);
+  return [
+    eventKey,
+    event.type,
+    Math.round(event.start),
+    endKey,
+    event.detail,
+    event.notes,
+  ].join("|");
+}
+
+function getOrbitItemSignature(item) {
+  return [
+    getEventRenderSignature(item.event, { active: item.active }),
+    item.active ? "active" : "done",
+    item.position.x,
+    item.position.y,
+  ].join("|");
+}
+
+function getOrbitRenderSignature(items) {
+  return items.map(getOrbitItemSignature).join("||");
+}
+
+function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, latest) {
+  return [
+    selectedStart,
+    selectedEnd,
+    currentDiaryFilter,
+    visibleEvents.map((event) => getEventRenderSignature(event)).join("||"),
+    latest ? getEventRenderSignature(latest) : "empty-latest",
+  ].join("::");
+}
+
 function renderOrbit() {
-  orbitEvents.innerHTML = "";
-  const dayAgo = Date.now() - 24 * hour;
+  const now = Date.now();
+  const dayAgo = now - 24 * hour;
   const items = state.events
     .filter((event) => event.start >= dayAgo)
     .slice(-14)
@@ -1053,8 +1091,14 @@ function renderOrbit() {
     }));
 
   if (state.mode === "sleeping") {
+    const activeStartedAt = Number(state.activeStartedAt) || now;
     const activeEvent = {
-      ...makeEvent(state.activeType || "sono", state.activeStartedAt, Date.now(), state.activeDetail || "Timer", state.activeNotes || ""),
+      id: `active-${state.activeType || "sono"}-${Math.round(activeStartedAt)}`,
+      type: state.activeType || "sono",
+      start: activeStartedAt,
+      end: now,
+      detail: state.activeDetail || "Timer",
+      notes: state.activeNotes || "",
       isActive: true,
     };
     items.push({
@@ -1063,6 +1107,12 @@ function renderOrbit() {
       position: eventPosition(activeEvent.start),
     });
   }
+
+  const nextSignature = getOrbitRenderSignature(items);
+  if (nextSignature === orbitRenderSignature) return;
+
+  orbitRenderSignature = nextSignature;
+  orbitEvents.replaceChildren();
 
   getOrbitGroups(items).forEach((group) => {
     if (group.items.length > 1) {
@@ -1084,6 +1134,11 @@ function renderTimeline() {
   const orderedEvents = [...state.events].sort((a, b) => b.start - a.start);
   const dayEvents = orderedEvents.filter((event) => event.start >= selectedStart && event.start < selectedEnd);
   const visibleEvents = dayEvents.filter(matchesDiaryFilter);
+  const latest = orderedEvents[0];
+  const nextSignature = getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, latest);
+  if (nextSignature === timelineRenderSignature) return;
+
+  timelineRenderSignature = nextSignature;
   timeline.innerHTML = "";
   diaryDateTitle.textContent = formatDiaryDate(selectedStart);
   diaryDateHint.textContent = selectedStart === getDayStart() ? "Hoje" : "Data selecionada";
@@ -1126,7 +1181,6 @@ function renderTimeline() {
     timeline.append(item);
   });
 
-  const latest = orderedEvents[0];
   if (!latest) {
     lastCard.innerHTML = `
       <i class="mark"></i>

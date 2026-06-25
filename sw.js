@@ -1,9 +1,9 @@
-const CACHE_NAME = "ninou-v44";
+const CACHE_NAME = "ninou-v45";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=44",
-  "/app.js?v=44",
+  "/styles.css?v=45",
+  "/app.js?v=45",
   "/manifest.webmanifest",
   "/icons/icon-192.png",
   "/icons/icon-512.png",

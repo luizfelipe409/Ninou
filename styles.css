@@ -673,11 +673,16 @@ body.day-theme .phone-shell {
 .round-action {
   width: 40px;
   height: 40px;
+  position: relative;
+  display: grid;
+  place-items: center;
   border: 1px solid var(--line);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   color: var(--ink);
   font-weight: 900;
+  line-height: 1;
+  padding: 0;
 }
 
 .chips,
@@ -1115,13 +1120,55 @@ body.day-theme .bottom-nav button.active {
   height: 58px;
   z-index: 6;
   transform: translateX(130px);
+  display: grid;
+  place-items: center;
   border: 0;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--plum), #b09cff);
   color: #fff;
   font-size: 1.55rem;
   font-weight: 900;
+  line-height: 1;
+  padding: 0;
   box-shadow: 0 16px 38px rgba(143, 124, 255, 0.38);
+}
+
+.icon-button-add::before,
+.icon-button-add::after,
+.icon-button-close::before,
+.icon-button-close::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.icon-button-add::before {
+  width: 22px;
+  height: 2.5px;
+}
+
+.icon-button-add::after {
+  width: 2.5px;
+  height: 22px;
+}
+
+.icon-button-close::before,
+.icon-button-close::after {
+  width: 17px;
+  height: 2px;
+}
+
+.icon-button-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.icon-button-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .sheet-backdrop {
