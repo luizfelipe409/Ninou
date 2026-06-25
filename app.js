@@ -176,6 +176,9 @@ function createEmptyDayState() {
   return {
     mode: "idle",
     activeStartedAt: null,
+    activeType: "sono",
+    activeDetail: "",
+    activeNotes: "",
     events: [],
   };
 }
@@ -212,10 +215,14 @@ function normalizeDayState(dayState = {}) {
   const validModes = ["idle", "awake", "sleeping"];
   const mode = validModes.includes(dayState.mode) ? dayState.mode : "idle";
   const activeStartedAt = Number(dayState.activeStartedAt);
+  const activeType = isSleepType(dayState.activeType) ? dayState.activeType : "sono";
 
   return {
     mode,
     activeStartedAt: mode === "idle" || !Number.isFinite(activeStartedAt) ? null : activeStartedAt,
+    activeType: mode === "sleeping" ? activeType : "sono",
+    activeDetail: mode === "sleeping" && typeof dayState.activeDetail === "string" ? dayState.activeDetail : "",
+    activeNotes: mode === "sleeping" && typeof dayState.activeNotes === "string" ? dayState.activeNotes : "",
     events: Array.isArray(dayState.events) ? dayState.events.map(normalizeEvent).filter(Boolean) : [],
   };
 }
@@ -872,8 +879,12 @@ function getEventConfig(type) {
   return typeConfig[type] || typeConfig.sono;
 }
 
+function isSleepType(type) {
+  return type === "sono" || type === "dormir";
+}
+
 function isSleepEvent(event) {
-  return event.type === "sono" || event.type === "dormir";
+  return isSleepType(event.type);
 }
 
 function getDayStart(timestamp = Date.now()) {
@@ -1039,7 +1050,7 @@ function renderOrbit() {
 
   if (state.mode === "sleeping") {
     const activeEvent = {
-      ...makeEvent("sono", state.activeStartedAt, Date.now(), "Timer"),
+      ...makeEvent(state.activeType || "sono", state.activeStartedAt, Date.now(), state.activeDetail || "Timer", state.activeNotes || ""),
       isActive: true,
     };
     items.push({
@@ -1302,9 +1313,12 @@ function renderAll() {
 function finishSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const finishedAt = Date.now();
-  state.events.push(makeEvent("sono", state.activeStartedAt, finishedAt, "Timer"));
+  state.events.push(makeEvent(state.activeType || "sono", state.activeStartedAt, finishedAt, state.activeDetail || "Timer", state.activeNotes || ""));
   state.mode = "awake";
   state.activeStartedAt = finishedAt;
+  state.activeType = "sono";
+  state.activeDetail = "";
+  state.activeNotes = "";
   saveDayState();
 }
 
@@ -1312,6 +1326,9 @@ function startSleep() {
   if (!requireLogin("salvar a rotina")) return;
   state.mode = "sleeping";
   state.activeStartedAt = Date.now();
+  state.activeType = "sono";
+  state.activeDetail = "Timer";
+  state.activeNotes = "";
   saveDayState();
 }
 
@@ -1319,6 +1336,9 @@ function startRoutine(mode) {
   if (!requireLogin("salvar a rotina")) return;
   state.mode = mode === "sleeping" ? "sleeping" : "awake";
   state.activeStartedAt = Date.now();
+  state.activeType = "sono";
+  state.activeDetail = state.mode === "sleeping" ? "Timer" : "";
+  state.activeNotes = "";
   saveDayState();
   renderAll();
 }
@@ -1499,13 +1519,38 @@ function closeSheet() {
   resetSheetState();
 }
 
+function shouldStartLiveSleepFromManualEvent(type, start, existingEvent) {
+  if (existingEvent || !isSleepType(type) || state.mode === "sleeping") return false;
+
+  const now = Date.now();
+  const sameDay = getDayStart(start) === getDayStart(now);
+  const notFuture = start <= now + 2 * 60000;
+  if (!sameDay || !notFuture) return false;
+
+  if (state.mode === "awake" && Number.isFinite(state.activeStartedAt)) {
+    return start >= state.activeStartedAt - 5 * 60000;
+  }
+
+  return state.mode === "idle";
+}
+
+function startLiveSleepFromManualEvent(type, start, detail, notes) {
+  state.mode = "sleeping";
+  state.activeStartedAt = start;
+  state.activeType = isSleepType(type) ? type : "sono";
+  state.activeDetail = detail || "Timer";
+  state.activeNotes = notes || "";
+}
+
 function saveManualEvent() {
   if (!requireLogin("salvar registros")) return;
   const start = sheetDateInput.value ? new Date(sheetDateInput.value).getTime() : Date.now();
+  const notes = sheetNotesInput.value.trim();
   const detail = typeConfig[currentSheetType].amount && sheetAmountInput.value
     ? `${sheetAmountInput.value} ml`
     : sheetDetail.value;
   const existingEvent = currentEditingEventId ? getEventById(currentEditingEventId) : null;
+  const startsLiveSleep = shouldStartLiveSleepFromManualEvent(currentSheetType, start, existingEvent);
 
   if (existingEvent) {
     const duration = Math.max(0, existingEvent.end - existingEvent.start);
@@ -1514,10 +1559,12 @@ function saveManualEvent() {
       start,
       end: duration ? start + duration : start,
       detail,
-      notes: sheetNotesInput.value.trim(),
+      notes,
     });
+  } else if (startsLiveSleep) {
+    startLiveSleepFromManualEvent(currentSheetType, start, detail, notes);
   } else {
-    state.events.push(makeEvent(currentSheetType, start, start, detail, sheetNotesInput.value.trim()));
+    state.events.push(makeEvent(currentSheetType, start, start, detail, notes));
   }
 
   sheetAmountInput.value = "";
