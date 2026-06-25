@@ -124,6 +124,18 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: 0.75;
 }
 
+select {
+  padding-right: 42px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) 52%,
+    calc(100% - 15px) 52%;
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+}
+
 select option {
   background: #1d1a45;
   color: var(--ink);
@@ -385,9 +397,8 @@ body.day-theme .phone-shell {
   height: 100%;
   display: block;
   border-radius: 50%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  object-fit: cover;
+  background: none !important;
   transform: none !important;
   -webkit-transform: none !important;
   backface-visibility: visible !important;
@@ -395,13 +406,6 @@ body.day-theme .phone-shell {
   contain: initial !important;
   transition: none !important;
   will-change: auto !important;
-}
-
-img.icon-art {
-  object-fit: cover;
-  background: transparent !important;
-  opacity: 1 !important;
-  visibility: visible !important;
 }
 
 .orbit-event i,
@@ -606,19 +610,6 @@ img.icon-art {
   -webkit-transform: translateZ(0);
   transition: none;
   will-change: auto;
-}
-
-.action-icon > .icon-art,
-.type-icon > .icon-art,
-.mark > .icon-art,
-.cluster-icon > .icon-art,
-.orbit-event i > .icon-art {
-  width: 100%;
-  height: 100%;
-  min-width: 100%;
-  min-height: 100%;
-  display: block;
-  flex: 0 0 auto;
 }
 
 .quick-actions button[data-open-sheet="amamentacao"] .action-icon,
@@ -834,21 +825,10 @@ img.icon-art {
   height: 24px;
   display: inline-grid;
   place-items: center;
-  flex: 0 0 24px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
-  color: currentColor;
+  font-size: 1.08rem;
   line-height: 1;
-  font-size: 1.12rem;
-  font-weight: 950;
-}
-
-.event-action-button.edit span {
-  font-size: 1.06rem;
-}
-
-.event-action-button.delete span {
-  font-size: 1.26rem;
 }
 
 .event-action-button.delete {
@@ -1042,6 +1022,83 @@ img.icon-art {
 .baby-profile-card input,
 .baby-profile-card select {
   min-height: 48px;
+}
+
+.weight-profile-block {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(143, 124, 255, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+}
+
+.weight-profile-header strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.35rem;
+}
+
+.weight-profile-header p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.weight-input-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.weight-save-button {
+  width: 100%;
+}
+
+.weight-history-card {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.weight-history-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weight-history-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 7px 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.weight-history-list strong {
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.weight-history-list span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-transform: none;
+}
+
+@media (max-width: 360px) {
+  .weight-input-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .wake-window-card {
@@ -1314,6 +1371,12 @@ body.day-theme .record-types button span {
 body.day-theme .record-types .type-icon {
   background: rgba(255, 255, 255, 0.82);
   box-shadow: inset 0 0 0 1px rgba(98, 86, 156, 0.1);
+}
+
+body.day-theme .weight-profile-block,
+body.day-theme .weight-history-list li {
+  border-color: rgba(98, 86, 156, 0.16);
+  background: rgba(255, 255, 255, 0.62);
 }
 
 body.day-theme .round-action {

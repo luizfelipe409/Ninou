@@ -39,6 +39,12 @@ const profileBabyAge = document.querySelector("#profileBabyAge");
 const babyNameInput = document.querySelector("#babyNameInput");
 const babyArticleInput = document.querySelector("#babyArticleInput");
 const babyBirthInput = document.querySelector("#babyBirthInput");
+const babyWeightDateInput = document.querySelector("#babyWeightDateInput");
+const babyWeightInput = document.querySelector("#babyWeightInput");
+const saveBabyWeightButton = document.querySelector("#saveBabyWeightButton");
+const lastWeightValue = document.querySelector("#lastWeightValue");
+const lastWeightHint = document.querySelector("#lastWeightHint");
+const weightHistoryList = document.querySelector("#weightHistoryList");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const loginEmail = document.querySelector("#loginEmail");
@@ -97,8 +103,7 @@ const actionIcons = {
 
 function iconMarkup(iconKey) {
   const src = actionIcons[iconKey] || actionIcons.sono;
-  const fallbackClass = `icon-art-${iconKey}`;
-  return `<img class="icon-art ${fallbackClass}" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
+  return `<img class="icon-art" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
 }
 
 function preloadActionIcons() {
@@ -114,6 +119,7 @@ const typeConfig = {
     title: "Soneca",
     label: "Detalhes da soneca",
     options: ["No berço", "Amamentação", "Colo", "Carrinho de bebê", "Mamadeira", "Cama"],
+    notesPlaceholder: "Ex.: dormiu no colo, acordou tranquilo(a)",
     amount: false,
     arcType: "sleep",
     icon: iconMarkup("sono"),
@@ -122,6 +128,7 @@ const typeConfig = {
     title: "Noite",
     label: "Detalhes do sono",
     options: ["Não se aplica"],
+    notesPlaceholder: "Ex.: começou a noite calmo(a), precisou de colo",
     amount: false,
     arcType: "dormir",
     icon: iconMarkup("dormir"),
@@ -130,6 +137,7 @@ const typeConfig = {
     title: "Despertar noturno",
     label: "Humor ao acordar",
     options: ["Mau humor", "Neutro(a)", "Bom humor"],
+    notesPlaceholder: "Ex.: acordou chorando, voltou a dormir rápido",
     amount: false,
     arcType: "despertar-noturno",
     icon: iconMarkup("despertar-noturno"),
@@ -138,6 +146,7 @@ const typeConfig = {
     title: "Amamentação",
     label: "Lado",
     options: ["Esquerdo", "Direito", "Ambos"],
+    notesPlaceholder: "Ex.: pegou bem, mamou dos dois lados",
     amount: false,
     arcType: "amamentacao",
     icon: iconMarkup("amamentacao"),
@@ -146,6 +155,7 @@ const typeConfig = {
     title: "Mamadeira",
     label: "Tipo de leite",
     options: ["Leite materno", "Fórmula", "Misto"],
+    notesPlaceholder: "Ex.: aceitou bem, arrotou depois",
     amount: true,
     arcType: "mamadeira",
     icon: iconMarkup("mamadeira"),
@@ -154,6 +164,7 @@ const typeConfig = {
     title: "Fralda",
     label: "Tipo de fralda",
     options: ["Xixi", "Cocô", "Mista"],
+    notesPlaceholder: "Ex.: pele sem assaduras, troca tranquila",
     amount: false,
     arcType: "fralda",
     icon: iconMarkup("fralda"),
@@ -345,7 +356,38 @@ function getDefaultBabyProfile() {
     name: "",
     article: "do",
     birthDate: "",
+    weights: [],
   };
+}
+
+function normalizeWeightRecord(record = {}) {
+  const value = Number(String(record.value ?? "").replace(",", "."));
+  const date = typeof record.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(record.date)
+    ? record.date
+    : toDateInputValue();
+
+  if (!Number.isFinite(value) || value <= 0) return null;
+
+  return {
+    id: typeof record.id === "string" ? record.id : `peso-${date}-${Math.random().toString(36).slice(2, 8)}`,
+    date,
+    value: Math.round(value * 1000) / 1000,
+  };
+}
+
+function normalizeWeightRecords(weights = []) {
+  if (!Array.isArray(weights)) return [];
+
+  const unique = new Map();
+  weights
+    .map(normalizeWeightRecord)
+    .filter(Boolean)
+    .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id))
+    .forEach((record) => {
+      unique.set(record.id, record);
+    });
+
+  return [...unique.values()].slice(0, 12);
 }
 
 function normalizeBabyProfile(profile = {}) {
@@ -353,6 +395,7 @@ function normalizeBabyProfile(profile = {}) {
     name: typeof profile.name === "string" ? profile.name : "",
     article: profile.article === "da" ? "da" : "do",
     birthDate: typeof profile.birthDate === "string" ? profile.birthDate : "",
+    weights: normalizeWeightRecords(profile.weights),
   };
 }
 
@@ -397,6 +440,7 @@ function hasProfileContent(profile = babyProfile, photo = currentProfilePhoto, w
   return Boolean(
     normalizedProfile.name.trim() ||
       normalizedProfile.birthDate ||
+      normalizedProfile.weights.length > 0 ||
       photo ||
       normalizedProfile.article === "da" ||
       windowMinutes !== 70,
@@ -475,6 +519,10 @@ function syncBabyProfileForm() {
   babyArticleInput.value = babyProfile.article;
   babyBirthInput.value = babyProfile.birthDate;
   babyBirthInput.max = toDateInputValue();
+  if (babyWeightDateInput) {
+    babyWeightDateInput.value = toDateInputValue();
+    babyWeightDateInput.max = toDateInputValue();
+  }
 }
 
 function updateBabyProfile(patch) {
@@ -490,7 +538,81 @@ function updateBabyProfile(patch) {
   markProfileLocallyChanged();
   saveBabyProfile();
   renderBabyIdentity();
+  renderWeightHistory();
   renderCurrentState();
+  scheduleProfileCloudSave();
+}
+
+function formatWeightValue(value) {
+  return `${Number(value).toLocaleString("pt-BR", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  })} kg`;
+}
+
+function formatWeightDate(dateValue) {
+  const parsed = parseLocalDate(dateValue);
+  return parsed
+    ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(parsed)
+    : "Data não informada";
+}
+
+function renderWeightHistory() {
+  if (!lastWeightValue || !weightHistoryList) return;
+
+  const weights = normalizeWeightRecords(babyProfile.weights);
+  babyProfile.weights = weights;
+  weightHistoryList.innerHTML = "";
+
+  if (!weights.length) {
+    lastWeightValue.textContent = "Nenhum peso cadastrado";
+    lastWeightHint.textContent = "Cadastre o peso mais recente para acompanhar a evolução.";
+    const emptyItem = document.createElement("li");
+    emptyItem.textContent = "Nenhum peso cadastrado.";
+    weightHistoryList.append(emptyItem);
+    return;
+  }
+
+  const [latest] = weights;
+  lastWeightValue.textContent = formatWeightValue(latest.value);
+  lastWeightHint.textContent = `Última pesagem em ${formatWeightDate(latest.date)}.`;
+
+  weights.slice(0, 3).forEach((record) => {
+    const item = document.createElement("li");
+    item.innerHTML = `<strong>${escapeHtml(formatWeightValue(record.value))}</strong><span>${escapeHtml(formatWeightDate(record.date))}</span>`;
+    weightHistoryList.append(item);
+  });
+}
+
+function saveBabyWeight() {
+  if (!requireLogin("salvar o peso")) return;
+
+  const value = Number(String(babyWeightInput.value || "").replace(",", "."));
+  const date = babyWeightDateInput.value || toDateInputValue();
+
+  if (!Number.isFinite(value) || value <= 0) {
+    babyWeightInput.focus();
+    loginHelper.textContent = "Digite um peso válido em kg. Ex.: 3,250.";
+    return;
+  }
+
+  const nextRecord = normalizeWeightRecord({
+    id: `peso-${date}-${Date.now()}`,
+    date,
+    value,
+  });
+
+  if (!nextRecord) return;
+
+  babyProfile = normalizeBabyProfile({
+    ...babyProfile,
+    weights: [nextRecord, ...(babyProfile.weights || [])],
+  });
+  markProfileLocallyChanged();
+  saveBabyProfile();
+  babyWeightInput.value = "";
+  babyWeightDateInput.value = toDateInputValue();
+  renderWeightHistory();
   scheduleProfileCloudSave();
 }
 
@@ -1398,6 +1520,7 @@ function updateTheme() {
 function renderAll() {
   updateTheme();
   renderBabyIdentity();
+  renderWeightHistory();
   renderCurrentState();
   renderOrbit();
   renderTimeline();
@@ -1569,6 +1692,7 @@ function setSheetType(type) {
   sheetTitle.textContent = currentEditingEventId ? `Editar ${config.title}` : config.title;
   sheetDetailLabel.textContent = config.label;
   sheetAmountField.hidden = !config.amount;
+  sheetNotesInput.placeholder = config.notesPlaceholder || "Observações sobre este registro";
   sheetDetail.innerHTML = "";
   config.options.forEach((optionText) => {
     const option = document.createElement("option");
@@ -1951,6 +2075,8 @@ babyArticleInput.addEventListener("change", () => {
 babyBirthInput.addEventListener("change", () => {
   updateBabyProfile({ birthDate: babyBirthInput.value });
 });
+
+saveBabyWeightButton.addEventListener("click", saveBabyWeight);
 
 profilePhotoInput.addEventListener("change", async () => {
   if (!requireLogin("salvar a foto")) {
