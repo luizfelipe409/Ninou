@@ -64,6 +64,18 @@ const bestWindow = document.querySelector("#bestWindow");
 const bestWindowHint = document.querySelector("#bestWindowHint");
 const routineStatus = document.querySelector("#routineStatus");
 const routineHint = document.querySelector("#routineHint");
+const todayLastEvents = document.querySelector("#todayLastEvents");
+const todayMiniChart = document.querySelector("#todayMiniChart");
+const breastfeedingBars = document.querySelector("#breastfeedingBars");
+const bottleBars = document.querySelector("#bottleBars");
+const diaperBars = document.querySelector("#diaperBars");
+const medicationBars = document.querySelector("#medicationBars");
+const babyWeightDateInput = document.querySelector("#babyWeightDateInput");
+const babyWeightInput = document.querySelector("#babyWeightInput");
+const saveBabyWeightButton = document.querySelector("#saveBabyWeightButton");
+const weightHistoryList = document.querySelector("#weightHistoryList");
+const lastWeightValue = document.querySelector("#lastWeightValue");
+const lastWeightHint = document.querySelector("#lastWeightHint");
 
 const storageKeys = {
   photo: "ninou.demo.profilePhoto",
@@ -100,6 +112,10 @@ const actionIcons = {
 function iconMarkup(iconKey) {
   const src = actionIcons[iconKey] || actionIcons.sono;
   return `<img class="icon-art" src="${src}" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" />`;
+}
+
+function medicineIconMarkup() {
+  return `<svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg>`;
 }
 
 function preloadActionIcons() {
@@ -159,6 +175,14 @@ const typeConfig = {
     arcType: "fralda",
     icon: iconMarkup("fralda"),
   },
+  medicamento: {
+    title: "Medicamento",
+    label: "Tipo de medicamento",
+    options: ["Dose", "Vitamina", "Antitérmico", "Gotas", "Outro"],
+    amount: false,
+    arcType: "medicamento",
+    icon: medicineIconMarkup(),
+  },
 };
 
 const hour = 60 * 60 * 1000;
@@ -168,6 +192,7 @@ let currentSheetType = "sono";
 let currentEditingEventId = null;
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
+let currentEditingWeightId = null;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let themeMode = normalizeThemeMode(localStorage.getItem(storageKeys.themeMode) || "auto");
 let babyProfile = loadBabyProfile();
@@ -347,14 +372,31 @@ function getDefaultBabyProfile() {
     name: "",
     article: "do",
     birthDate: "",
+    weights: [],
+  };
+}
+
+function normalizeWeightEntry(entry = {}) {
+  const value = Number(String(entry.value ?? entry.weight ?? "").replace(",", "."));
+  const date = typeof entry.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(entry.date) ? entry.date : "";
+  if (!date || !Number.isFinite(value) || value <= 0) return null;
+  return {
+    id: typeof entry.id === "string" ? entry.id : `peso-${date}-${Math.random().toString(36).slice(2, 8)}`,
+    date,
+    value,
   };
 }
 
 function normalizeBabyProfile(profile = {}) {
+  const weights = Array.isArray(profile.weights)
+    ? profile.weights.map(normalizeWeightEntry).filter(Boolean).sort((a, b) => b.date.localeCompare(a.date))
+    : [];
+
   return {
     name: typeof profile.name === "string" ? profile.name : "",
     article: profile.article === "da" ? "da" : "do",
     birthDate: typeof profile.birthDate === "string" ? profile.birthDate : "",
+    weights,
   };
 }
 
@@ -400,6 +442,7 @@ function hasProfileContent(profile = babyProfile, photo = currentProfilePhoto, w
     normalizedProfile.name.trim() ||
       normalizedProfile.birthDate ||
       photo ||
+      normalizedProfile.weights.length > 0 ||
       normalizedProfile.article === "da" ||
       windowMinutes !== 70,
   );
@@ -477,6 +520,7 @@ function syncBabyProfileForm() {
   babyArticleInput.value = babyProfile.article;
   babyBirthInput.value = babyProfile.birthDate;
   babyBirthInput.max = toDateInputValue();
+  renderWeightProfile();
 }
 
 function updateBabyProfile(patch) {
@@ -940,6 +984,7 @@ function matchesDiaryFilter(event) {
   if (currentDiaryFilter === "sleep") return isSleepEvent(event) || event.type === "despertar-noturno";
   if (currentDiaryFilter === "feeding") return event.type === "mamadeira" || event.type === "amamentacao";
   if (currentDiaryFilter === "diaper") return event.type === "fralda";
+  if (currentDiaryFilter === "medicine") return event.type === "medicamento";
   return true;
 }
 
@@ -1159,8 +1204,7 @@ function renderOrbit() {
 }
 
 function renderTimeline() {
-  const lastCard = document.querySelector(".last-card .event-card");
-  if (!timeline || !lastCard) return;
+  if (!timeline) return;
 
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const selectedEnd = selectedStart + day;
@@ -1214,25 +1258,6 @@ function renderTimeline() {
     timeline.append(item);
   });
 
-  if (!latest) {
-    lastCard.innerHTML = `
-      <i class="mark"></i>
-      <div>
-        <strong>Nenhum registro</strong>
-        <span>O dia ainda está zerado.</span>
-      </div>
-    `;
-    return;
-  }
-  const latestConfig = getEventConfig(latest.type);
-  lastCard.innerHTML = `
-    <i class="mark ${latestConfig.arcType}">${latestConfig.icon}</i>
-    <div>
-      <strong>${escapeHtml(latestConfig.title)}</strong>
-      <span>${escapeHtml(formatEventMeta(latest))}</span>
-      ${latest.notes ? `<p>${escapeHtml(latest.notes)}</p>` : ""}
-    </div>
-  `;
 }
 
 function openOrbitCluster(events) {
@@ -1268,6 +1293,214 @@ function closeOrbitCluster() {
   }
 }
 
+
+function getRecentDays(count = 5) {
+  const todayStart = getDayStart();
+  return Array.from({ length: count }, (_, index) => {
+    const start = todayStart - (count - 1 - index) * day;
+    return {
+      start,
+      end: start + day,
+      label: getDayLabel(start),
+      dateLabel: new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(new Date(start)),
+    };
+  });
+}
+
+function getEventsForDayRange(start, end) {
+  return state.events.filter((event) => event.start >= start && event.start < end);
+}
+
+function renderTodayLastEvents() {
+  if (!todayLastEvents) return;
+  const todayStart = getDayStart();
+  const events = state.events
+    .filter((event) => event.start >= todayStart && event.start < todayStart + day)
+    .sort((a, b) => b.start - a.start)
+    .slice(0, 5);
+
+  if (!events.length) {
+    todayLastEvents.innerHTML = `<article class="mini-event empty">Nenhum registro ainda.</article>`;
+    return;
+  }
+
+  todayLastEvents.innerHTML = events.map((event) => {
+    const config = getEventConfig(event.type);
+    return `
+      <article class="mini-event">
+        <i class="mark ${config.arcType}">${config.icon}</i>
+        <div>
+          <strong>${escapeHtml(config.title)}</strong>
+          <span>${escapeHtml(formatEventMeta(event))}</span>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderTodayMiniChart() {
+  if (!todayMiniChart) return;
+  const days = getRecentDays(5).map((item) => {
+    const events = getEventsForDayRange(item.start, item.end);
+    return { ...item, count: events.length };
+  });
+  const maxCount = Math.max(...days.map((item) => item.count), 1);
+  todayMiniChart.innerHTML = days.map((item) => {
+    const height = Math.max(8, Math.round((item.count / maxCount) * 100));
+    return `
+      <span class="mini-bar" style="--h:${height}%">
+        <b>${item.count}</b>
+        <i>${item.label}</i>
+      </span>
+    `;
+  }).join("");
+}
+
+function parseMl(detail = "") {
+  const match = String(detail).replace(",", ".").match(/[\d.]+/);
+  return match ? Number(match[0]) || 0 : 0;
+}
+
+function renderCompactBars(container, days, valueGetter, valueFormatter = (value) => String(value)) {
+  if (!container) return;
+  const values = days.map((item) => valueGetter(item));
+  const maxValue = Math.max(...values, 1);
+  container.innerHTML = days.map((item, index) => {
+    const value = values[index];
+    const height = Math.max(6, Math.round((value / maxValue) * 100));
+    return `<span style="--h:${height}%"><b>${escapeHtml(valueFormatter(value))}</b><i>${escapeHtml(item.label)}</i></span>`;
+  }).join("");
+}
+
+function renderRoutineCharts(days) {
+  const enrichedDays = days.map((item) => ({
+    ...item,
+    events: getEventsForDayRange(item.start, item.end),
+  }));
+
+  renderCompactBars(
+    breastfeedingBars,
+    enrichedDays,
+    (item) => item.events.filter((event) => event.type === "amamentacao").length,
+  );
+
+  renderCompactBars(
+    bottleBars,
+    enrichedDays,
+    (item) => item.events.filter((event) => event.type === "mamadeira").reduce((total, event) => total + parseMl(event.detail), 0),
+    (value) => (value ? `${Math.round(value)} ml` : "0"),
+  );
+
+  renderCompactBars(
+    diaperBars,
+    enrichedDays,
+    (item) => item.events.filter((event) => event.type === "fralda").length,
+  );
+
+  renderCompactBars(
+    medicationBars,
+    enrichedDays,
+    (item) => item.events.filter((event) => event.type === "medicamento").length,
+  );
+}
+
+function formatWeightValue(value) {
+  return `${Number(value).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg`;
+}
+
+function formatWeightDate(value) {
+  const date = parseLocalDate(value);
+  return date ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(date) : value;
+}
+
+function renderWeightProfile() {
+  if (!babyWeightDateInput || !babyWeightInput || !weightHistoryList) return;
+  const weights = [...(babyProfile.weights || [])].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  babyWeightDateInput.max = toDateInputValue();
+  if (!babyWeightDateInput.value) babyWeightDateInput.value = toDateInputValue();
+
+  const latest = weights[0];
+  if (latest) {
+    lastWeightValue.textContent = formatWeightValue(latest.value);
+    lastWeightHint.textContent = `Última pesagem em ${formatWeightDate(latest.date)}.`;
+  } else {
+    lastWeightValue.textContent = "Nenhum peso cadastrado";
+    lastWeightHint.textContent = "Cadastre o peso mais recente para acompanhar a evolução.";
+  }
+
+  if (!weights.length) {
+    weightHistoryList.innerHTML = `<li>Nenhum peso cadastrado.</li>`;
+    return;
+  }
+
+  weightHistoryList.innerHTML = weights.map((entry) => `
+    <li class="weight-history-item">
+      <div>
+        <strong>${escapeHtml(formatWeightValue(entry.value))}</strong>
+        <span>${escapeHtml(formatWeightDate(entry.date))}</span>
+      </div>
+      <div class="weight-history-actions">
+        <button type="button" data-weight-edit="${escapeHtml(entry.id)}">Editar</button>
+        <button type="button" data-weight-delete="${escapeHtml(entry.id)}">Excluir</button>
+      </div>
+    </li>
+  `).join("");
+}
+
+function saveBabyWeight() {
+  if (!requireLogin("salvar o peso")) return;
+  const date = babyWeightDateInput?.value || toDateInputValue();
+  const value = Number(String(babyWeightInput?.value || "").replace(",", "."));
+
+  if (!date || !Number.isFinite(value) || value <= 0) {
+    if (babyWeightInput) babyWeightInput.focus();
+    return;
+  }
+
+  const nextEntry = {
+    id: currentEditingWeightId || `peso-${date}-${Math.random().toString(36).slice(2, 8)}`,
+    date,
+    value,
+  };
+  const entries = [...(babyProfile.weights || [])].filter((entry) => entry.id !== nextEntry.id);
+  entries.push(nextEntry);
+  babyProfile = normalizeBabyProfile({ ...babyProfile, weights: entries });
+  currentEditingWeightId = null;
+  babyWeightInput.value = "";
+  babyWeightDateInput.value = toDateInputValue();
+  saveBabyWeightButton.textContent = "Salvar peso";
+  markProfileLocallyChanged();
+  saveBabyProfile();
+  renderWeightProfile();
+  scheduleProfileCloudSave();
+}
+
+function editBabyWeight(id) {
+  const entry = (babyProfile.weights || []).find((item) => item.id === id);
+  if (!entry) return;
+  currentEditingWeightId = id;
+  babyWeightDateInput.value = entry.date;
+  babyWeightInput.value = String(entry.value).replace(".", ",");
+  saveBabyWeightButton.textContent = "Salvar alteração";
+  babyWeightInput.focus();
+}
+
+function deleteBabyWeight(id) {
+  if (!requireLogin("excluir o peso")) return;
+  babyProfile = normalizeBabyProfile({
+    ...babyProfile,
+    weights: (babyProfile.weights || []).filter((entry) => entry.id !== id),
+  });
+  if (currentEditingWeightId === id) {
+    currentEditingWeightId = null;
+    saveBabyWeightButton.textContent = "Salvar peso";
+  }
+  markProfileLocallyChanged();
+  saveBabyProfile();
+  renderWeightProfile();
+  scheduleProfileCloudSave();
+}
+
 function renderSummary() {
   const todayStart = getDayStart();
   const todaysEvents = state.events.filter((event) => event.start >= todayStart);
@@ -1276,6 +1509,7 @@ function renderSummary() {
     .reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
   const feedingCount = todaysEvents.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
   const diaperCount = todaysEvents.filter((event) => event.type === "fralda").length;
+  const medicationCount = todaysEvents.filter((event) => event.type === "medicamento").length;
   const awakeMs = state.mode === "awake" ? Date.now() - state.activeStartedAt : 0;
   const summaryValues = document.querySelectorAll(".summary-grid strong");
   const nextCard = document.querySelector(".next-card strong");
@@ -1287,6 +1521,7 @@ function renderSummary() {
     setText(summaryValues[1], formatShortDuration(awakeMs));
     setText(summaryValues[2], feedingCount);
     setText(summaryValues[3], diaperCount);
+    if (summaryValues[4]) setText(summaryValues[4], medicationCount);
   }
 
   if (miniRing) {
@@ -1310,8 +1545,8 @@ function renderSummary() {
 
 function getSleepReportDays() {
   const todayStart = getDayStart();
-  return Array.from({ length: 7 }, (_, index) => {
-    const start = todayStart - (6 - index) * day;
+  return Array.from({ length: 5 }, (_, index) => {
+    const start = todayStart - (4 - index) * day;
     const end = start + day;
     const events = state.events.filter((event) => isSleepEvent(event) && event.start >= start && event.start < end);
     const sleepMs = events.reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
@@ -1344,8 +1579,8 @@ function renderSleepReport() {
     : "Nenhum sono registrado no período.";
   napAverage.textContent = totalNaps ? (totalNaps / daysWithData).toFixed(1).replace(".", ",") : "0";
   napAverageHint.textContent = totalNaps
-    ? `${totalNaps} registros de sono nos últimos 7 dias.`
-    : "Nenhuma soneca registrada nos últimos 7 dias.";
+    ? `${totalNaps} registros de sono nos últimos 5 dias.`
+    : "Nenhuma soneca registrada nos últimos 5 dias.";
 
   sleepBars.innerHTML = "";
   days.forEach((item) => {
@@ -1355,6 +1590,8 @@ function renderSleepReport() {
     bar.innerHTML = `<b>${item.sleepMs ? formatShortDuration(item.sleepMs) : "0"}</b><i>${item.label}</i>`;
     sleepBars.append(bar);
   });
+
+  renderRoutineCharts(days);
 
   if (!routineEvents.length) {
     bestWindow.textContent = "Sem dados";
@@ -1413,7 +1650,7 @@ function updateTheme() {
   document.body.dataset.themeMode = themeMode;
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   if (themeMeta) {
-    themeMeta.setAttribute("content", dayTheme ? "#f7f4ff" : "#101029");
+    themeMeta.setAttribute("content", dayTheme ? "#e9e4ff" : "#101029");
   }
 }
 
@@ -1424,7 +1661,10 @@ function renderAll() {
   renderOrbit();
   renderTimeline();
   renderSummary();
+  renderTodayLastEvents();
+  renderTodayMiniChart();
   renderSleepReport();
+  renderWeightProfile();
 }
 
 function renderLiveTick() {
@@ -1597,6 +1837,16 @@ function setSheetType(type) {
     option.textContent = optionText;
     sheetDetail.append(option);
   });
+  const placeholders = {
+    sono: "Ex.: dormiu no berço, precisou de colo, acordou tranquilo.",
+    dormir: "Ex.: início do sono da noite, ambiente escuro, ruído branco.",
+    "despertar-noturno": "Ex.: acordou chorando, mamou, arrotou ou voltou rápido.",
+    amamentacao: "Ex.: tempo em cada peito, pega, pausa ou comportamento.",
+    mamadeira: "Ex.: aceitou bem, fórmula, leite materno ou sobrou quantidade.",
+    fralda: "Ex.: quantidade, cor, textura ou alguma observação importante.",
+    medicamento: "Ex.: nome, dose, orientação médica ou reação observada.",
+  };
+  sheetNotesInput.placeholder = placeholders[type] || "Observações do registro.";
   sheetTypeButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.sheetType === type);
   });
@@ -1979,6 +2229,19 @@ if (themeModeInput) {
     themeMode = normalizeThemeMode(themeModeInput.value);
     localStorage.setItem(storageKeys.themeMode, themeMode);
     updateTheme();
+  });
+}
+
+if (saveBabyWeightButton) {
+  saveBabyWeightButton.addEventListener("click", saveBabyWeight);
+}
+
+if (weightHistoryList) {
+  weightHistoryList.addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-weight-edit]");
+    const deleteButton = event.target.closest("[data-weight-delete]");
+    if (editButton) editBabyWeight(editButton.dataset.weightEdit);
+    if (deleteButton) deleteBabyWeight(deleteButton.dataset.weightDelete);
   });
 }
 
