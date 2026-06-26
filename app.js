@@ -64,18 +64,6 @@ const bestWindowHint = document.querySelector("#bestWindowHint");
 const routineStatus = document.querySelector("#routineStatus");
 const routineHint = document.querySelector("#routineHint");
 
-const sleepSoundAudio = document.querySelector("#sleepSoundAudio");
-const soundOptions = document.querySelectorAll("[data-sound-key]");
-const soundStatus = document.querySelector("#soundStatus");
-const soundTimer = document.querySelector("#soundTimer");
-const soundCurrentIcon = document.querySelector("#soundCurrentIcon");
-const soundCurrentTitle = document.querySelector("#soundCurrentTitle");
-const soundCurrentDesc = document.querySelector("#soundCurrentDesc");
-const soundProgress = document.querySelector("#soundProgress");
-const soundPlayPause = document.querySelector("#soundPlayPause");
-const soundStop = document.querySelector("#soundStop");
-const soundSourceLink = document.querySelector("#soundSourceLink");
-
 const storageKeys = {
   photo: "ninou.demo.profilePhoto",
   email: "ninou.demo.email",
@@ -83,7 +71,6 @@ const storageKeys = {
   profile: "ninou.demo.profile",
   profileVersion: "ninou.demo.profileVersion",
   dayState: "ninou.demo.dayState",
-  soundKey: "ninou.demo.soundKey",
 };
 
 const firebaseConfig = {
@@ -171,40 +158,6 @@ const typeConfig = {
     icon: iconMarkup("fralda"),
   },
 };
-
-
-const sleepSoundTracks = {
-  womb: {
-    title: "Som do útero",
-    desc: "Som acolhedor inspirado no ambiente intrauterino.",
-    icon: "💗",
-    src: "./audio/som-utero.mp3",
-    youtube: "https://www.youtube.com/watch?v=Hmck-0EYGk0&t=9312s",
-  },
-  relax: {
-    title: "Som para relaxar",
-    desc: "Som contínuo e tranquilo para preparar o sono.",
-    icon: "🌙",
-    src: "./audio/som-relaxar.mp3",
-    youtube: "https://www.youtube.com/watch?v=4owTdwvbyNA&list=RD4owTdwvbyNA&start_radio=1",
-  },
-  rhythm: {
-    title: "Ritmo suave bebê",
-    desc: "Ritmo leve para manter uma rotina calma.",
-    icon: "🧸",
-    src: "./audio/ritmo-suave-bebe.mp3",
-    youtube: "https://www.youtube.com/watch?v=Dr5V86pzuRc&list=RDDr5V86pzuRc&start_radio=1",
-  },
-};
-
-const sleepSoundDurationMs = 60 * 60 * 1000;
-let selectedSoundKey = sleepSoundTracks[localStorage.getItem(storageKeys.soundKey)]
-  ? localStorage.getItem(storageKeys.soundKey)
-  : "womb";
-let soundInterval = null;
-let soundEndsAt = 0;
-let soundRemainingMs = sleepSoundDurationMs;
-let soundIsRunning = false;
 
 const hour = 60 * 60 * 1000;
 const day = 24 * hour;
@@ -1882,120 +1835,6 @@ function exportRoutine(format) {
   downloadFile(`${filenameBase}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
 }
 
-
-function formatClockFromMs(ms) {
-  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function getSelectedSoundTrack() {
-  return sleepSoundTracks[selectedSoundKey] || sleepSoundTracks.womb;
-}
-
-function setSleepSoundSource(track) {
-  if (!sleepSoundAudio || sleepSoundAudio.dataset.src === track.src) return;
-  sleepSoundAudio.dataset.src = track.src;
-  sleepSoundAudio.src = track.src;
-  sleepSoundAudio.load();
-}
-
-function updateSoundPlayerUI() {
-  if (!sleepSoundAudio || !soundCurrentTitle) return;
-  const track = getSelectedSoundTrack();
-  soundOptions.forEach((button) => {
-    button.classList.toggle("active", button.dataset.soundKey === selectedSoundKey);
-  });
-  setText(soundCurrentIcon, track.icon);
-  setText(soundCurrentTitle, track.title);
-  setText(soundCurrentDesc, track.desc);
-  if (soundSourceLink) soundSourceLink.href = track.youtube;
-  setText(soundTimer, formatClockFromMs(soundRemainingMs));
-  if (soundProgress) {
-    const progress = Math.max(0, Math.min(100, ((sleepSoundDurationMs - soundRemainingMs) / sleepSoundDurationMs) * 100));
-    soundProgress.style.width = `${progress}%`;
-  }
-  setText(soundStatus, soundIsRunning ? "Tocando agora" : soundRemainingMs < sleepSoundDurationMs ? "Pausado" : "Pronto para tocar");
-  setText(soundPlayPause, soundIsRunning ? "⏸ Pausar" : soundRemainingMs < sleepSoundDurationMs ? "▶ Continuar" : "▶ Tocar por 1h");
-}
-
-function tickSoundTimer() {
-  if (!soundIsRunning) return;
-  soundRemainingMs = Math.max(0, soundEndsAt - Date.now());
-  if (soundRemainingMs <= 0) {
-    stopSleepSound();
-    return;
-  }
-  updateSoundPlayerUI();
-}
-
-function selectSleepSound(key, playNow = false) {
-  if (!sleepSoundTracks[key]) return;
-  const changed = selectedSoundKey !== key;
-  selectedSoundKey = key;
-  localStorage.setItem(storageKeys.soundKey, selectedSoundKey);
-  const track = getSelectedSoundTrack();
-  setSleepSoundSource(track);
-  if (changed && soundIsRunning) {
-    sleepSoundAudio.play().catch(() => {
-      setText(soundStatus, "Toque em play para iniciar o áudio.");
-    });
-  }
-  updateSoundPlayerUI();
-  if (playNow) startSleepSound();
-}
-
-function startSleepSound() {
-  if (!sleepSoundAudio) return;
-  const track = getSelectedSoundTrack();
-  setSleepSoundSource(track);
-  if (soundRemainingMs <= 0 || soundRemainingMs >= sleepSoundDurationMs) {
-    soundRemainingMs = sleepSoundDurationMs;
-  }
-  soundEndsAt = Date.now() + soundRemainingMs;
-  sleepSoundAudio.loop = true;
-  sleepSoundAudio.play().then(() => {
-    soundIsRunning = true;
-    clearInterval(soundInterval);
-    soundInterval = setInterval(tickSoundTimer, 1000);
-    tickSoundTimer();
-  }).catch(() => {
-    soundIsRunning = false;
-    setText(soundStatus, "Toque novamente para liberar o áudio.");
-    updateSoundPlayerUI();
-  });
-}
-
-function pauseSleepSound() {
-  if (!sleepSoundAudio) return;
-  soundRemainingMs = Math.max(0, soundEndsAt - Date.now()) || soundRemainingMs;
-  soundIsRunning = false;
-  sleepSoundAudio.pause();
-  clearInterval(soundInterval);
-  updateSoundPlayerUI();
-}
-
-function stopSleepSound() {
-  if (!sleepSoundAudio) return;
-  soundIsRunning = false;
-  soundRemainingMs = sleepSoundDurationMs;
-  soundEndsAt = 0;
-  clearInterval(soundInterval);
-  sleepSoundAudio.pause();
-  sleepSoundAudio.currentTime = 0;
-  updateSoundPlayerUI();
-}
-
-function toggleSleepSound() {
-  if (soundIsRunning) {
-    pauseSleepSound();
-    return;
-  }
-  startSleepSound();
-}
-
 function updateProfilePhoto(dataUrl) {
   profileImages.forEach((image) => {
     image.src = dataUrl;
@@ -2026,17 +1865,6 @@ function resizeImage(file) {
     reader.readAsDataURL(file);
   });
 }
-
-
-soundOptions.forEach((button) => {
-  button.addEventListener("click", () => selectSleepSound(button.dataset.soundKey, true));
-});
-
-soundPlayPause?.addEventListener("click", toggleSleepSound);
-soundStop?.addEventListener("click", stopSleepSound);
-sleepSoundAudio?.addEventListener("error", () => {
-  setText(soundStatus, "Arquivo de áudio não encontrado. Verifique a pasta audio.");
-});
 
 navButtons.forEach((button) => {
   button.addEventListener("click", () => showScreen(button.dataset.target));
@@ -2146,6 +1974,183 @@ profilePhotoInput.addEventListener("change", async () => {
 loginButton.addEventListener("click", signInAccount);
 createAccountButton.addEventListener("click", createAccount);
 
+
+function initSleepSounds() {
+  const audio = document.querySelector("#sleepSoundAudio");
+  const playPauseButton = document.querySelector("#soundPlayPause");
+  const stopButton = document.querySelector("#soundStop");
+  const timerLabel = document.querySelector("#soundTimer");
+  const statusLabel = document.querySelector("#soundStatus");
+  const progressBar = document.querySelector("#soundProgress");
+  const currentIcon = document.querySelector("#soundCurrentIcon");
+  const currentTitle = document.querySelector("#soundCurrentTitle");
+  const currentDesc = document.querySelector("#soundCurrentDesc");
+  const optionButtons = document.querySelectorAll(".sound-option");
+
+  if (!audio || !playPauseButton || !stopButton || !optionButtons.length) return;
+
+  const durationMs = 60 * 60 * 1000;
+  const soundOptions = {
+    womb: {
+      title: "Som do útero",
+      desc: "Áudio enviado com batimento e ambiência intrauterina.",
+      icon: "💗",
+      src: "./audio/som-utero.mp3",
+    },
+    relax: {
+      title: "Som para relaxar",
+      desc: "Áudio relaxante enviado para acalmar e embalar o sono.",
+      icon: "🌙",
+      src: "./audio/som-relaxar.mp3",
+    },
+    rhythm: {
+      title: "Ritmo suave bebê",
+      desc: "Ritmo suave enviado para uma rotina tranquila.",
+      icon: "🧸",
+      src: "./audio/ritmo-suave-bebe.mp3",
+    },
+  };
+
+  let selectedKey = "womb";
+  let timerStartedAt = null;
+  let pausedRemainingMs = durationMs;
+  let timerInterval = null;
+  let isPlaying = false;
+
+  function formatSoundTime(ms) {
+    const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+    const hoursValue = Math.floor(totalSeconds / 3600);
+    const minutesValue = Math.floor((totalSeconds % 3600) / 60);
+    const secondsValue = totalSeconds % 60;
+    return `${String(hoursValue).padStart(2, "0")}:${String(minutesValue).padStart(2, "0")}:${String(secondsValue).padStart(2, "0")}`;
+  }
+
+  function getRemainingMs() {
+    if (!timerStartedAt || !isPlaying) return pausedRemainingMs;
+    return pausedRemainingMs - (Date.now() - timerStartedAt);
+  }
+
+  function renderSoundState() {
+    const remaining = Math.max(0, getRemainingMs());
+    const elapsed = durationMs - remaining;
+    const progress = Math.min(100, Math.max(0, (elapsed / durationMs) * 100));
+
+    setText(timerLabel, formatSoundTime(remaining));
+    if (progressBar) progressBar.style.width = `${progress}%`;
+
+    if (remaining <= 0) {
+      stopSound({ completed: true });
+      return;
+    }
+
+    if (isPlaying) {
+      setText(statusLabel, "Tocando agora");
+      setText(playPauseButton, "⏸ Pausar");
+    } else if (pausedRemainingMs < durationMs) {
+      setText(statusLabel, "Pausado");
+      setText(playPauseButton, "▶ Continuar");
+    } else {
+      setText(statusLabel, "Pronto para tocar");
+      setText(playPauseButton, "▶ Tocar por 1h");
+    }
+  }
+
+  function setSelectedSound(key, options = {}) {
+    selectedKey = soundOptions[key] ? key : "womb";
+    const selected = soundOptions[selectedKey];
+
+    optionButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.soundKey === selectedKey);
+    });
+
+    setText(currentIcon, selected.icon);
+    setText(currentTitle, selected.title);
+    setText(currentDesc, selected.desc);
+
+    const shouldContinuePlaying = Boolean(options.continuePlaying && isPlaying);
+    if (!audio.src.endsWith(selected.src.replace("./", ""))) {
+      audio.src = selected.src;
+      audio.load();
+    }
+
+    if (shouldContinuePlaying) {
+      audio.play().catch(() => {
+        isPlaying = false;
+        renderSoundState();
+      });
+    }
+  }
+
+  async function playSound() {
+    const selected = soundOptions[selectedKey];
+    if (!audio.src.endsWith(selected.src.replace("./", ""))) {
+      audio.src = selected.src;
+      audio.load();
+    }
+
+    audio.loop = true;
+    try {
+      await audio.play();
+      isPlaying = true;
+      timerStartedAt = Date.now();
+      if (!timerInterval) timerInterval = setInterval(renderSoundState, 1000);
+      renderSoundState();
+    } catch {
+      isPlaying = false;
+      setText(statusLabel, "Toque novamente para liberar o áudio");
+      setText(playPauseButton, "▶ Tocar por 1h");
+    }
+  }
+
+  function pauseSound() {
+    pausedRemainingMs = Math.max(0, getRemainingMs());
+    isPlaying = false;
+    timerStartedAt = null;
+    audio.pause();
+    renderSoundState();
+  }
+
+  function stopSound(options = {}) {
+    isPlaying = false;
+    timerStartedAt = null;
+    pausedRemainingMs = durationMs;
+    audio.pause();
+    audio.currentTime = 0;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    setText(statusLabel, options.completed ? "Timer finalizado" : "Pronto para tocar");
+    renderSoundState();
+  }
+
+  playPauseButton.addEventListener("click", () => {
+    if (isPlaying) {
+      pauseSound();
+      return;
+    }
+    playSound();
+  });
+
+  stopButton.addEventListener("click", () => stopSound());
+
+  optionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setSelectedSound(button.dataset.soundKey, { continuePlaying: true });
+    });
+  });
+
+  audio.addEventListener("ended", () => {
+    if (isPlaying) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+  });
+
+  setSelectedSound(selectedKey);
+  renderSoundState();
+}
+
 if (currentProfilePhoto) updateProfilePhoto(currentProfilePhoto);
 
 const savedEmail = localStorage.getItem(storageKeys.email);
@@ -2159,8 +2164,8 @@ if (savedEmail) {
 initDiaryDatePicker();
 syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
+initSleepSounds();
 preloadActionIcons();
-selectSleepSound(selectedSoundKey);
 renderAll();
 setInterval(renderLiveTick, 1000);
 

@@ -1454,13 +1454,17 @@ body.day-theme .record-sheet textarea::placeholder {
 }
 
 
+/* Sons para dormir */
+.screen[data-screen="sounds"] {
+  gap: 14px;
+}
+
 .sounds-hero,
 .sound-player-card,
+.sound-option,
 .sound-note {
   border: 1px solid var(--line);
-  border-radius: 24px;
   background: var(--panel);
-  padding: 16px;
 }
 
 .sounds-hero {
@@ -1468,6 +1472,8 @@ body.day-theme .record-sheet textarea::placeholder {
   grid-template-columns: 58px 1fr;
   align-items: center;
   gap: 14px;
+  border-radius: 26px;
+  padding: 18px;
 }
 
 .sounds-hero-icon {
@@ -1475,39 +1481,44 @@ body.day-theme .record-sheet textarea::placeholder {
   height: 58px;
   display: grid;
   place-items: center;
-  border-radius: 20px;
+  border-radius: 50%;
   background: rgba(143, 124, 255, 0.16);
-  color: var(--plum-soft);
-  font-size: 1.8rem;
+  border: 1px solid rgba(143, 124, 255, 0.22);
+  font-size: 1.6rem;
 }
 
 .sounds-hero span,
 .sound-player-topline span,
-.sound-note strong {
+.sound-option em,
+.sound-note p {
   color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 850;
+}
+
+.sounds-hero span,
+.sound-player-topline span {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 900;
   text-transform: uppercase;
 }
 
-.sounds-hero strong,
-.sound-current strong {
+.sounds-hero strong {
   display: block;
-  font-size: 1.18rem;
+  font-size: 1.28rem;
 }
 
 .sounds-hero p,
 .sound-current p,
-.sound-note p,
-.sound-option em {
-  margin: 3px 0 0;
-  color: var(--muted);
+.sound-note p {
+  margin: 4px 0 0;
   line-height: 1.35;
 }
 
 .sound-player-card {
   display: grid;
   gap: 14px;
+  border-radius: 26px;
+  padding: 16px;
 }
 
 .sound-player-topline {
@@ -1518,34 +1529,32 @@ body.day-theme .record-sheet textarea::placeholder {
 }
 
 .sound-player-topline strong {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
 }
 
-.sound-current,
-.sound-option {
+.sound-current {
   display: grid;
-  grid-template-columns: 52px 1fr auto;
+  grid-template-columns: 48px 1fr;
   align-items: center;
   gap: 12px;
 }
 
-.sound-current i,
-.sound-option-icon {
-  width: 52px;
-  height: 52px;
+.sound-current i {
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(143, 124, 255, 0.14);
+  background: rgba(124, 229, 194, 0.12);
   font-style: normal;
-  font-size: 1.45rem;
+  font-size: 1.35rem;
 }
 
 .sound-progress {
-  height: 8px;
+  height: 10px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .sound-progress i {
@@ -1553,26 +1562,20 @@ body.day-theme .record-sheet textarea::placeholder {
   height: 100%;
   display: block;
   border-radius: inherit;
-  background: linear-gradient(135deg, var(--plum), var(--sage));
-  transition: width 180ms ease;
+  background: linear-gradient(90deg, var(--plum), var(--sage));
+  transition: width 200ms ease;
 }
 
 .sound-controls {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
 }
 
-.sound-main-button,
-.sound-stop-button,
-.sound-source-link {
-  min-height: 44px;
-  display: inline-grid;
-  place-items: center;
+.sound-controls button {
+  min-height: 46px;
   border-radius: 16px;
   font-weight: 950;
-  text-decoration: none;
 }
 
 .sound-main-button {
@@ -1581,12 +1584,10 @@ body.day-theme .record-sheet textarea::placeholder {
   color: #211f38;
 }
 
-.sound-stop-button,
-.sound-source-link {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--ink);
-  padding: 0 12px;
+.sound-stop-button {
+  border: 1px solid rgba(255, 154, 118, 0.32);
+  background: rgba(255, 154, 118, 0.1);
+  color: var(--coral);
 }
 
 .sound-list {
@@ -1595,48 +1596,55 @@ body.day-theme .record-sheet textarea::placeholder {
 }
 
 .sound-option {
-  width: 100%;
   min-height: 82px;
-  border: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  align-items: center;
+  gap: 12px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--ink);
   padding: 12px;
+  color: var(--ink);
   text-align: left;
 }
 
 .sound-option.active {
-  border-color: rgba(143, 124, 255, 0.55);
-  background: rgba(143, 124, 255, 0.16);
+  border-color: rgba(143, 124, 255, 0.62);
+  background: rgba(143, 124, 255, 0.18);
 }
 
-.sound-option strong {
-  display: block;
-  font-size: 1rem;
-}
-
-.sound-option em {
-  display: block;
-  font-style: normal;
-}
-
-.sound-option > i {
-  width: 34px;
-  height: 34px;
+.sound-option-icon {
+  width: 50px;
+  height: 50px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(143, 124, 255, 0.16);
-  color: var(--plum-soft);
-  font-style: normal;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 1.35rem;
 }
 
-@media (max-width: 360px) {
-  .sound-controls {
-    grid-template-columns: 1fr 1fr;
-  }
+.sound-option strong,
+.sound-option em {
+  display: block;
+}
 
-  .sound-source-link {
-    grid-column: 1 / -1;
+.sound-option em {
+  margin-top: 3px;
+  font-style: normal;
+  line-height: 1.25;
+}
+
+.sound-option > i {
+  font-style: normal;
+  color: var(--plum-soft);
+}
+
+.sound-note {
+  border-radius: 22px;
+  padding: 14px;
+}
+
+@media (max-width: 390px) {
+  .sound-controls {
+    grid-template-columns: 1fr;
   }
 }

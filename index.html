@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=69" />
+    <link rel="stylesheet" href="./styles.css?v=72" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -273,7 +273,6 @@
           <div class="sound-controls">
             <button id="soundPlayPause" class="sound-main-button" type="button">▶ Tocar por 1h</button>
             <button id="soundStop" class="sound-stop-button" type="button">Parar</button>
-            <a id="soundSourceLink" class="sound-source-link" href="https://www.youtube.com/watch?v=Hmck-0EYGk0&t=9312s" target="_blank" rel="noopener noreferrer">Fonte</a>
           </div>
         </section>
 
@@ -306,7 +305,7 @@
 
         <section class="sound-note">
           <strong>Observação</strong>
-          <p>O som começa apenas após tocar em play. Para usar exatamente os áudios dos links do YouTube, substitua os arquivos MP3 da pasta audio por versões autorizadas com os mesmos nomes. Em iPhone, o navegador costuma manter áudio iniciado por toque, mas o sistema ainda pode interromper conforme economia de bateria.</p>
+          <p>O som começa após tocar em play e fica em repetição até completar 1 hora. No iPhone, mantenha o modo silencioso desligado e o volume ativo para melhor reprodução.</p>
         </section>
       </section>
 
@@ -515,6 +514,6 @@
     </section>
 
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
-    <script src="./app.js?v=69"></script>
+    <script src="./app.js?v=72"></script>
   </body>
 </html>
