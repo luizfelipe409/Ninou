@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=72" />
+    <link rel="stylesheet" href="./styles.css?v=73" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -281,7 +281,7 @@
             <span class="sound-option-icon">💗</span>
             <span>
               <strong>Som do útero</strong>
-              <em>Referência enviada: som profundo e acolhedor para acalmar.</em>
+              <em>Som profundo e acolhedor para acalmar.</em>
             </span>
             <i>▶</i>
           </button>
@@ -338,42 +338,42 @@
               Dia de nascimento
               <input id="babyBirthInput" type="date" />
             </label>
-            <div class="appearance-profile-block">
-              <span>Aparência</span>
-              <strong>Tema do app</strong>
-              <p>Escolha se o Ninou muda sozinho conforme o horário ou se fica sempre claro/escuro.</p>
+          </article>
+          <article class="appearance-profile-block">
+            <span>Aparência</span>
+            <strong>Tema do app</strong>
+            <p>Escolha se o Ninou muda sozinho conforme o horário ou se fica sempre claro/escuro.</p>
+            <label>
+              Modo de visual
+              <select id="themeModeInput">
+                <option value="auto">Automático — dia/noite</option>
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+              </select>
+            </label>
+          </article>
+          <article class="weight-profile-block">
+            <div class="weight-profile-header">
+              <span>Peso do bebê</span>
+              <strong id="lastWeightValue">Nenhum peso cadastrado</strong>
+              <p id="lastWeightHint">Cadastre o peso mais recente para acompanhar a evolução.</p>
+            </div>
+            <div class="weight-input-row">
               <label>
-                Modo de visual
-                <select id="themeModeInput">
-                  <option value="auto">Automático — dia/noite</option>
-                  <option value="light">Claro</option>
-                  <option value="dark">Escuro</option>
-                </select>
+                Data da pesagem
+                <input id="babyWeightDateInput" type="date" />
+              </label>
+              <label>
+                Peso em kg
+                <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
               </label>
             </div>
-            <div class="weight-profile-block">
-              <div class="weight-profile-header">
-                <span>Peso do bebê</span>
-                <strong id="lastWeightValue">Nenhum peso cadastrado</strong>
-                <p id="lastWeightHint">Cadastre o peso mais recente para acompanhar a evolução.</p>
-              </div>
-              <div class="weight-input-row">
-                <label>
-                  Data da pesagem
-                  <input id="babyWeightDateInput" type="date" />
-                </label>
-                <label>
-                  Peso em kg
-                  <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
-                </label>
-              </div>
-              <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Salvar peso</button>
-              <div class="weight-history-card">
-                <span>3 últimos pesos</span>
-                <ol id="weightHistoryList" class="weight-history-list">
-                  <li>Nenhum peso cadastrado.</li>
-                </ol>
-              </div>
+            <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Salvar peso</button>
+            <div class="weight-history-card">
+              <span>3 últimos pesos</span>
+              <ol id="weightHistoryList" class="weight-history-list">
+                <li>Nenhum peso cadastrado.</li>
+              </ol>
             </div>
           </article>
           <article class="login-card">
@@ -514,6 +514,6 @@
     </section>
 
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
-    <script src="./app.js?v=72"></script>
+    <script src="./app.js?v=73"></script>
   </body>
 </html>
