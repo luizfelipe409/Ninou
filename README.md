@@ -14,3 +14,8 @@ Versão funcional da refatoração v74.
 ## Deploy
 
 Envie todos os arquivos para o projeto no Vercel e limpe o cache do navegador/PWA após atualizar.
+
+
+## v74.15
+
+Correção de carregamento: remove duplicidade `async async` no módulo principal e atualiza cache do Service Worker.

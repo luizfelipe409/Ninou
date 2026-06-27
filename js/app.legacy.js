@@ -392,7 +392,7 @@ function updateBabyProfile(patch) {
   scheduleProfileCloudSave();
 }
 
-async async function getFirebaseServices() {
+async function getFirebaseServices() {
   firebaseServices = await loadFirebaseServices();
   return firebaseServices;
 }

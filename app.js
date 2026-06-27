@@ -1,6 +1,6 @@
-// Ninou v74.14 - aplicação consolidada e melhorias funcionais
-// Etapa funcional: registro Acordou, janela acordado correta e opções de sono revisadas.
-const NINOU_APP_VERSION = "74.14";
+// Ninou v74.15 - aplicação consolidada e melhorias funcionais
+// Correção de carregamento: remove erro de sintaxe do módulo principal e força cache novo.
+const NINOU_APP_VERSION = "74.15";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
