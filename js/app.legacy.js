@@ -430,27 +430,12 @@ function renderAuthControls() {
 }
 
 function clearLocalAccountData() {
-  [
-    storageKeys.photo,
-    storageKeys.email,
-    storageKeys.wakeWindow,
-    storageKeys.profile,
-    storageKeys.profileVersion,
-    storageKeys.dayState,
-    storageKeys.weights,
-  ].forEach((key) => {
-    localStorage.removeItem(key);
-  });
-
-  state = createEmptyDayState();
-  babyProfile = getDefaultBabyProfile();
-  currentProfilePhoto = "";
-  profileClientUpdatedAt = 0;
+  // Local-first: desconectar ou abrir o app sem login não pode apagar rotina, perfil, foto ou pesos.
+  // A limpeza completa do dia continua disponível apenas no botão "Zerar dia".
+  localStorage.removeItem(storageKeys.email);
+  cloudUser = null;
   pendingProfilePhotoSave = false;
-  wakeWindowMinutes = 70;
-  updateProfilePhoto("./icons/icon-192.png");
-  syncBabyProfileForm();
-  updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
+  if (loginPassword) loginPassword.value = "";
   renderAll();
 }
 
@@ -1918,7 +1903,6 @@ exportJsonButton.addEventListener("click", () => exportRoutine("json"));
 exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
 
 wakeWindowInput.addEventListener("input", () => {
-  if (!isLoggedIn()) return;
   const nextValue = Number(wakeWindowInput.value);
   if (nextValue >= 20 && nextValue <= 240) {
     wakeWindowMinutes = nextValue;
@@ -1944,11 +1928,9 @@ if (themeModeInput) {
   themeModeInput.addEventListener("change", () => {
     const nextMode = readThemeModeInput(themeModeInput);
     babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: nextMode });
+    markProfileLocallyChanged();
     saveBabyProfile();
-    if (isLoggedIn()) {
-      markProfileLocallyChanged();
-      scheduleProfileCloudSave();
-    }
+    scheduleProfileCloudSave();
     updateTheme();
   });
 }

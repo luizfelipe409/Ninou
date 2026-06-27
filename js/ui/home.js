@@ -33,15 +33,33 @@ export function getNextNapInfo({ state, wakeWindowMinutes, now, formatTime, form
     return {
       title: "Aguardando",
       hint: "Escolha como começar a rotina diária.",
+      status: "waiting",
     };
   }
 
-  const target = state.mode === "awake" ? state.activeStartedAt + wakeWindowMinutes * 60000 : now + wakeWindowMinutes * 60000;
+  if (state.mode === "sleeping") {
+    return {
+      title: "Após acordar",
+      hint: "A próxima janela será recalculada quando o sono terminar.",
+      status: "sleeping",
+    };
+  }
+
+  const target = Number(state.activeStartedAt) + wakeWindowMinutes * 60000;
+  const diff = target - now;
+
+  if (diff < 0) {
+    return {
+      title: "Atrasada",
+      hint: `Passou há ${formatShortDuration(Math.abs(diff))}.`,
+      status: "overdue",
+    };
+  }
+
   return {
     title: formatTime(target),
-    hint: state.mode === "awake"
-      ? `Hora de preparar a soneca em ${formatShortDuration(target - now)}.`
-      : "Próxima janela calculada após acordar.",
+    hint: `Em ${formatShortDuration(diff)}.`,
+    status: "ready",
   };
 }
 
@@ -87,6 +105,9 @@ export function renderHomeSummary({
 
   if (nextCard && nextHint) {
     const nextNap = getNextNapInfo({ state, wakeWindowMinutes, now, formatTime, formatShortDuration });
+    const card = nextCard.closest?.(".next-card");
+    card?.classList.toggle("is-overdue", nextNap.status === "overdue");
+    card?.classList.toggle("is-sleeping", nextNap.status === "sleeping");
     setText(nextCard, nextNap.title);
     setText(nextHint, nextNap.hint);
   }

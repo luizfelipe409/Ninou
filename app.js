@@ -1,6 +1,6 @@
-// Ninou v74.15 - aplicação consolidada e melhorias funcionais
-// Correção de carregamento: remove erro de sintaxe do módulo principal e força cache novo.
-const NINOU_APP_VERSION = "74.15";
+// Ninou v74.16 - revisão final do roadmap estável
+// Loader modular com cache renovado e fallback de carregamento.
+const NINOU_APP_VERSION = "74.16";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

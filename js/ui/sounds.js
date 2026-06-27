@@ -123,8 +123,8 @@ export function initSleepSounds({ root = document } = {}) {
       clearInterval(timerInterval);
       timerInterval = null;
     }
-    setText(statusLabel, options.completed ? "Timer finalizado" : "Pronto para tocar");
     renderSoundState();
+    setText(statusLabel, options.completed ? "Timer finalizado" : "Pronto para tocar");
   }
 
   playPauseButton.addEventListener("click", () => {

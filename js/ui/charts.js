@@ -54,7 +54,7 @@ export function renderTodayMiniChart({
   todayStart,
   dayMs,
   getDayLabel,
-  trackedTypes = ["sono", "dormir", "despertar-noturno", "amamentacao", "mamadeira", "fralda", "medicamento"],
+  trackedTypes = ["acordou", "sono", "dormir", "despertar-noturno", "amamentacao", "mamadeira", "fralda", "medicamento"],
 }) {
   const days = getReportDays(state.events, { count: 5, todayStart, dayMs, getDayLabel });
   renderBarChart(

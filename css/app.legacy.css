@@ -876,6 +876,28 @@ body.day-theme .state-orbit strong {
   line-height: 1.35;
 }
 
+
+.next-card.is-overdue {
+  border-color: rgba(255, 154, 118, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 154, 118, 0.14), rgba(255, 211, 122, 0.08)),
+    var(--panel);
+}
+
+.next-card.is-overdue strong {
+  color: var(--coral);
+}
+
+.next-card.is-overdue .mini-ring {
+  border-color: rgba(255, 154, 118, 0.42);
+  border-right-color: var(--coral);
+}
+
+.next-card.is-sleeping .mini-ring {
+  border-color: rgba(124, 229, 194, 0.22);
+  border-right-color: var(--sage);
+}
+
 .mini-ring {
   width: 62px;
   height: 62px;

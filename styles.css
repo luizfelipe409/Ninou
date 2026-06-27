@@ -1,4 +1,3 @@
-/* Ninou v74.15 - CSS loader
-   A base visual permanece preservada em css/app.legacy.css.
-   A refatoração desta etapa foi focada em JavaScript: navegação, estados vazios e utilitários de renderização. */
-@import url("./css/app.legacy.css?v=74.15");
+/* Ninou v74.16 - CSS loader
+   Revisão final do roadmap estável: mantém a base visual e aplica acabamentos de QA. */
+@import url("./css/app.legacy.css?v=74.16");
