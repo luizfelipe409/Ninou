@@ -1,94 +1,16 @@
-# Ninou
+# Ninou v74.14 — sono manual e local-first
 
-PWA estático para registrar rotina do bebê: sono, despertares, amamentação, mamadeira e fraldas.
+Versão funcional da refatoração v74.
 
-## Rodar localmente
+## Principais melhorias
 
-```bash
-python3 -m http.server 8000
-```
+- Soneca, sono noturno e despertar noturno agora podem ter **início e fim** no modal.
+- Ao editar um registro de sono, é possível corrigir início e fim sem apagar o histórico.
+- O modal mostra a **duração calculada** antes de salvar.
+- A janela acordado é recalculada e salva no próprio registro de sono quando existe despertar anterior válido.
+- O Diário mostra “Acordado X antes” nos registros de sono.
+- O app passa a salvar dados localmente mesmo sem login; Firebase fica como sincronização familiar.
 
-Depois abra `http://127.0.0.1:8000`.
+## Deploy
 
-## Instalar no celular
-
-Depois de publicado na Vercel, abra a URL no celular.
-
-No iPhone:
-
-1. Abra no Safari.
-2. Toque em compartilhar.
-3. Toque em `Adicionar à Tela de Início`.
-
-No Android:
-
-1. Abra no Chrome.
-2. Toque no menu.
-3. Toque em `Adicionar à tela inicial` ou `Instalar app`.
-
-## Publicar na Vercel
-
-Este projeto é estático: `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `sw.js` e `icons/`.
-
-Opção pela interface:
-
-1. Suba estes arquivos para um repositório no GitHub.
-2. Na Vercel, clique em `Add New...` e depois `Project`.
-3. Importe o repositório.
-4. Use framework `Other`.
-5. Deixe `Build Command` vazio.
-6. Deixe `Output Directory` vazio ou como `.`.
-7. Clique em `Deploy`.
-
-Opção pelo terminal:
-
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-## Observação importante
-
-A sincronização usa Firebase Authentication e Firestore. Para dois celulares compartilharem os dados, entre com o mesmo e-mail e senha nos aparelhos.
-
-Para segurança, criar, editar, excluir, zerar, exportar rotina e alterar perfil/foto exigem login ativo.
-
-## Firebase
-
-No Firebase Console:
-
-1. Em Authentication, ative o provedor `Email/Password`.
-2. Em Firestore Database, use a edição Standard/Spark e publique regras compatíveis com usuários autenticados.
-
-Regras sugeridas para esta versão:
-
-```js
-rules_version = '2';
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
-
-Estrutura usada no Firestore:
-
-```text
-users/{uid}/profile/main
-users/{uid}/days/{YYYY-MM-DD}
-```
-
-A foto de perfil é reduzida no navegador e salva no documento `profile/main`, então não é necessário configurar Firebase Storage nesta versão.
-
-## Ícones
-
-O ícone ativo usa `icons/app-icon-source.png`, gerado também como:
-
-- `icons/icon-192.png`
-- `icons/icon-512.png`
-- `icons/apple-touch-icon.png`
-
-Outras opções estão na pasta `icons/`.
+Envie todos os arquivos para o projeto no Vercel e limpe o cache do navegador/PWA após atualizar.

@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=73" />
+    <link rel="stylesheet" href="./styles.css?v=74.14" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -442,6 +442,7 @@
         <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
       </div>
       <div class="record-types">
+        <button type="button" data-sheet-type="acordou"><span class="type-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
         <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Soneca</span></button>
         <button type="button" data-sheet-type="dormir"><span class="type-icon"><img class="icon-art icon-art-dormir" src="./icons/actions/dormir.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Noite</span></button>
         <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img class="icon-art icon-art-despertar-noturno" src="./icons/actions/despertar-noturno.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Despertar noturno</span></button>
@@ -452,9 +453,14 @@
       </div>
       <form class="record-form">
         <label>
-          Horário
-          <input type="datetime-local" />
+          <span id="sheetStartLabel">Horário</span>
+          <input id="sheetStartTimeInput" type="datetime-local" />
         </label>
+        <label id="sheetEndTimeField" class="sheet-end-time-field" hidden>
+          <span id="sheetEndLabel">Fim</span>
+          <input id="sheetEndTimeInput" type="datetime-local" />
+        </label>
+        <div id="sleepDurationPreview" class="sleep-duration-preview" hidden aria-live="polite"></div>
         <label class="select-label">
           <span id="sheetDetailLabel">Detalhe</span>
           <select id="sheetDetail">
@@ -514,6 +520,6 @@
     </section>
 
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
-    <script src="./app.js?v=73"></script>
+    <script src="./app.js?v=74.14"></script>
   </body>
 </html>
