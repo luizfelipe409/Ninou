@@ -103,6 +103,7 @@ const familyAccessBadge = document.querySelector("#familyAccessBadge");
 const createFamilyButton = document.querySelector("#createFamilyButton");
 const inviteCodeInput = document.querySelector("#inviteCodeInput");
 const acceptInviteButton = document.querySelector("#acceptInviteButton");
+const inviteAcceptBox = document.querySelector(".invite-accept-box");
 const adminInvitePanel = document.querySelector("#adminInvitePanel");
 const adminInviteEmail = document.querySelector("#adminInviteEmail");
 const adminInviteRole = document.querySelector("#adminInviteRole");
@@ -439,10 +440,29 @@ function isFamilyAdmin() {
   return hasFamilyAccess() && isGlobalAppAdmin();
 }
 
+function buildGlobalAdminAccess(user = cloudUser) {
+  if (!user || !isGlobalAppAdmin(user)) return null;
+  return {
+    familyId: APP_ADMIN_FAMILY_ID,
+    role: "admin",
+    email: user.email || GLOBAL_APP_ADMIN_EMAIL,
+    ownerUid: user.uid,
+    acceptedAt: new Date().toISOString(),
+  };
+}
+
+function ensureGlobalAdminAccess(user = cloudUser) {
+  const access = buildGlobalAdminAccess(user);
+  if (!access) return null;
+  return saveFamilyAccess(access);
+}
+
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  const shouldShow = !isGlobalAppAdmin() && !hasFamilyAccess();
+  // O botão de WhatsApp é um contato público para visitantes ainda deslogados.
+  // Depois que há uma conta conectada, o fluxo correto passa a ser login/convite no Perfil.
+  const shouldShow = !isLoggedIn();
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = !shouldShow;
   document.body.classList.toggle("guest-whatsapp-visible", shouldShow);
@@ -545,30 +565,33 @@ function renderFamilyAccessPanel() {
     familyAccessTitle.textContent = authorized
       ? (appAdmin ? "Admin do app conectado" : "Família conectada")
       : connected
-        ? (appAdmin ? "Admin pronto para ativar" : "Conta sem convite")
+        ? "Conta aguardando convite"
         : "Convites e permissões";
   }
 
   if (familyAccessText) {
     familyAccessText.textContent = authorized
       ? (appAdmin
-        ? `${email} é o administrador do Ninou. Somente esta conta pode acessar o painel de convites.`
+        ? `${email} é o administrador do Ninou. O painel de convites aparece somente para esta conta.`
         : `${email} está conectado como ${getRoleLabel(effectiveRole)}. Os registros são sincronizados no ambiente da família.`)
       : connected
-        ? (appAdmin
-          ? "Ative a família principal para começar a convidar usuários por e-mail."
-          : "Esta conta ainda não possui convite. Peça um convite ao administrador do app.")
-        : "Entre com sua conta para aceitar convite. O painel Admin aparece somente para o e-mail administrador do app.";
+        ? "Esta conta ainda não possui convite. Peça um convite ao administrador do app ou entre com o e-mail convidado."
+        : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou solicite acesso pelo WhatsApp.";
   }
 
   if (familyAccessBadge) {
-    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin do app" : getRoleLabel(effectiveRole)) : connected ? "Aguardando convite" : "Sem login";
+    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin do app" : getRoleLabel(effectiveRole)) : connected ? "Sem convite" : "Visitante";
     familyAccessBadge.dataset.role = authorized ? effectiveRole : "offline";
   }
 
   if (createFamilyButton) {
-    createFamilyButton.hidden = !connected || authorized || !appAdmin;
-    createFamilyButton.textContent = "Ativar família principal";
+    // A conta admin é ativada automaticamente. O botão fica como plano B caso o Firestore precise ser regravado.
+    createFamilyButton.hidden = !connected || !appAdmin;
+    createFamilyButton.textContent = authorized ? "Reativar sincronização admin" : "Ativar família principal";
+  }
+
+  if (inviteAcceptBox) {
+    inviteAcceptBox.hidden = appAdmin;
   }
 
   if (adminInvitePanel) {
@@ -643,27 +666,34 @@ async function activatePersonalFamily() {
     return null;
   }
 
-  const access = {
-    familyId: APP_ADMIN_FAMILY_ID,
-    role: "admin",
-    email: cloudUser.email || "",
-    ownerUid: cloudUser.uid,
-    createdAt: new Date().toISOString(),
-  };
-
-  const services = await getFirebaseServices();
-  await services.setDoc(services.doc(services.db, "families", access.familyId), {
-    ownerUid: cloudUser.uid,
-    ownerEmail: cloudUser.email || "",
-    createdAt: services.serverTimestamp(),
-    updatedAt: services.serverTimestamp(),
-  }, { merge: true });
-  await saveAccountAccessToCloud(access);
-  await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
-  await saveDayToCloud();
-  if (loginHelper) loginHelper.textContent = "Família principal ativada. Você é o admin do app e já pode gerar convites.";
+  const access = buildGlobalAdminAccess(cloudUser);
+  saveFamilyAccess(access);
   renderAuthControls();
-  refreshAdminStats({ silent: true });
+
+  try {
+    const services = await getFirebaseServices();
+    await services.setDoc(services.doc(services.db, "families", access.familyId), {
+      ownerUid: cloudUser.uid,
+      ownerEmail: cloudUser.email || "",
+      createdAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await saveAccountAccessToCloud(access);
+    await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+    await saveDayToCloud();
+    setSyncStatus("online", cloudUser.email || "");
+    if (loginHelper) loginHelper.textContent = "Admin do app conectado. Você já pode gerar convites no Perfil.";
+    refreshAdminStats({ silent: true });
+  } catch (error) {
+    console.error("Erro ao ativar família principal no Firebase:", error);
+    setSyncStatus("offline", cloudUser.email || "");
+    if (loginHelper) {
+      loginHelper.textContent = "Admin liberado neste aparelho. Para gerar convites e sincronizar, revise as regras do Firestore.";
+    }
+    setAdminStatsPlaceholder("Admin liberado. A contagem depende das regras do Firestore.");
+  }
+
+  renderAuthControls();
   return familyAccess;
 }
 
@@ -988,12 +1018,14 @@ function renderAuthControls() {
   createAccountButton.classList.toggle("logout-button", connected);
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
-  document.body.classList.toggle("access-locked", !authorized);
+  document.body.classList.toggle("access-locked", false);
+  openSheetButtons.forEach((button) => {
+    const shouldHide = !authorized;
+    button.hidden = shouldHide;
+    button.setAttribute("aria-hidden", shouldHide ? "true" : "false");
+  });
   updateGuestWhatsappButton();
   renderFamilyAccessPanel();
-  if (!authorized) {
-    updateScreenVisibility({ target: "profile", navButtons, screens });
-  }
 }
 
 function clearLocalAccountData() {
@@ -1115,8 +1147,8 @@ async function saveProfileToCloud(options = {}) {
   } catch (error) {
     console.error("Erro ao salvar perfil:", error);
     if (savedProfileVersion === profileClientUpdatedAt) {
-      setSyncStatus("error", cloudUser.email);
-      loginHelper.textContent = getFirebaseErrorMessage(error);
+      setSyncStatus("offline", cloudUser.email);
+      loginHelper.textContent = "Dados preservados neste aparelho. A sincronização será retomada após ajustar conexão ou regras do Firestore.";
     }
   }
 }
@@ -1144,8 +1176,8 @@ async function saveDayToCloud() {
     setSyncStatus("online", cloudUser.email);
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
-    setSyncStatus("error", cloudUser.email);
-    loginHelper.textContent = getFirebaseErrorMessage(error);
+    setSyncStatus("offline", cloudUser.email);
+    loginHelper.textContent = "Dados preservados neste aparelho. A sincronização será retomada após ajustar conexão ou regras do Firestore.";
   }
 }
 
@@ -1166,7 +1198,7 @@ async function subscribeToCloudProfile() {
     applyCloudProfile(snapshot.data());
   }, (error) => {
     console.error("Erro ao ler perfil:", error);
-    setSyncStatus("error", cloudUser?.email || "");
+    setSyncStatus("offline", cloudUser?.email || "");
   });
 }
 
@@ -1185,7 +1217,7 @@ async function subscribeToCloudDay() {
     applyCloudDay(snapshot.data());
   }, (error) => {
     console.error("Erro ao ler rotina:", error);
-    setSyncStatus("error", cloudUser?.email || "");
+    setSyncStatus("offline", cloudUser?.email || "");
   });
 }
 
@@ -1214,21 +1246,33 @@ async function initFirebaseAuthState() {
     loginHelper.textContent = "Verificando acesso familiar...";
 
     try {
-      const restoredAccess = await readAccountAccessFromCloud(user);
-      if (!restoredAccess) saveFamilyAccess(null);
-
-      if (!hasFamilyAccess() && isGlobalAppAdmin(user)) {
-        loginHelper.textContent = "Conta admin conectada. Ativando família principal...";
+      if (isGlobalAppAdmin(user)) {
+        ensureGlobalAdminAccess(user);
+        renderAuthControls();
+        loginHelper.textContent = "Admin do app conectado. Preparando sincronização...";
         await activatePersonalFamily();
+        await connectCurrentAccount();
+        loginHelper.textContent = "Admin do app conectado. Você pode gerar convites no Perfil.";
+        renderAuthControls();
+        return;
       }
 
-      if (pendingInviteCode && !isGlobalAppAdmin(user)) {
+      let restoredAccess = null;
+      try {
+        restoredAccess = await readAccountAccessFromCloud(user);
+      } catch (error) {
+        console.error("Erro ao ler acesso familiar:", error);
+        restoredAccess = null;
+      }
+      if (!restoredAccess) saveFamilyAccess(null);
+
+      if (pendingInviteCode) {
         await acceptFamilyInvite(pendingInviteCode, { silent: true });
       }
 
       if (!hasFamilyAccess()) {
-        loginHelper.textContent = isGlobalAppAdmin(user) ? "Conta admin conectada. Ative a família principal para gerar convites." : "Conta conectada. Aceite um convite do administrador do app.";
-        setSyncStatus("loading", user.email || "");
+        loginHelper.textContent = "Conta conectada. Aceite um convite do administrador do app.";
+        setSyncStatus("offline", user.email || "");
         renderAuthControls();
         showScreen("profile");
         return;
@@ -1236,12 +1280,12 @@ async function initFirebaseAuthState() {
 
       await connectCurrentAccount();
       setSyncStatus("online", user.email || "");
-      loginHelper.textContent = isGlobalAppAdmin(user) ? "Admin do app conectado. Você pode gerar convites no Perfil." : `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
+      loginHelper.textContent = `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
       renderAuthControls();
     } catch (error) {
       console.error("Erro ao conectar família:", error);
-      setSyncStatus("error", user.email || "");
-      loginHelper.textContent = getFirebaseErrorMessage(error);
+      setSyncStatus("offline", user.email || "");
+      loginHelper.textContent = "Conta conectada, mas a sincronização ainda precisa das regras corretas do Firestore.";
       renderAuthControls();
     }
   });
@@ -2151,11 +2195,9 @@ function scrollDiaryFilters() {
 }
 
 function showScreen(target) {
-  const nextTarget = target !== "profile" && !canUsePrivateFeatures() ? "profile" : target;
-  if (nextTarget === "profile" && target !== "profile" && loginHelper) {
-    loginHelper.textContent = "Entre com uma conta autorizada para acessar as funções do Ninou.";
-  }
-  updateScreenVisibility({ target: nextTarget, navButtons, screens });
+  // Visitantes podem navegar pelas telas para conhecer o Ninou.
+  // O bloqueio acontece apenas nas ações que gravam/alteram dados via requireLogin().
+  updateScreenVisibility({ target, navButtons, screens });
 }
 
 function setDiaryFilter(filter) {
@@ -2735,8 +2777,8 @@ setInterval(renderLiveTick, 1000);
 
 initFirebaseAuthState().catch((error) => {
   console.error("Firebase não iniciou:", error);
-  setSyncStatus("error");
-  loginHelper.textContent = "Não foi possível iniciar a sincronização.";
+  setSyncStatus("offline");
+  loginHelper.textContent = "O app abriu em modo local. Verifique Firebase quando quiser sincronizar.";
 });
 
 if ("serviceWorker" in navigator) {

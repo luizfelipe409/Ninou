@@ -25,6 +25,15 @@ Para segurança real em produção, aplique as regras sugeridas em:
 
 O frontend esconde o painel, mas quem realmente protege os dados é o Firestore.
 
+## v75.7 — Acesso público controlado e Admin estável
+
+- Visitantes podem navegar pelas telas sem login.
+- Ações de gravação continuam exigindo conta autorizada.
+- Botão de adicionar fica oculto sem acesso.
+- WhatsApp aparece apenas para visitantes deslogados.
+- Admin global `luizfelipe.dasilva@gmail.com` não precisa de convite e é liberado automaticamente.
+- Cache atualizado para `ninou-v75-7-acesso-admin-estavel`.
+
 ## v75.6 — Admin, WhatsApp e contagem de usuários
 
 - Botão pequeno de WhatsApp para visitantes sem acesso.

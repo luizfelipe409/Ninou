@@ -3719,3 +3719,13 @@ body.day-theme .guest-whatsapp-button {
     font-size: 1.7rem;
   }
 }
+
+/* v75.7 - acesso público controlado */
+.fab[hidden],
+.invite-accept-box[hidden] {
+  display: none !important;
+}
+
+body:not(.access-locked) .bottom-nav button {
+  opacity: 1;
+}
