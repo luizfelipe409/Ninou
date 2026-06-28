@@ -203,6 +203,7 @@ let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
 let autoSelectedLatestFamilyDay = false;
 let familyDayIdsCache = [];
+let familyDayStatesCache = {};
 let familyDayIdsCacheAt = 0;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
@@ -669,7 +670,70 @@ function setSelectedDiaryDayById(dayId = getCurrentDayId()) {
 
 function resetFamilyDayCache() {
   familyDayIdsCache = [];
+  familyDayStatesCache = {};
   familyDayIdsCacheAt = 0;
+}
+
+
+function getDayIdFromStart(startValue = getDayStart()) {
+  return toDateInputValue(getDayStart(Number(startValue) || Date.now()));
+}
+
+function syncSelectedDayIntoFamilyCache() {
+  const dayId = getSelectedDayId();
+  if (!isDateId(dayId)) return;
+  familyDayStatesCache = {
+    ...familyDayStatesCache,
+    [dayId]: normalizeDayState(state),
+  };
+  if (hasRoutineDayContent(state) && !familyDayIdsCache.includes(dayId)) {
+    familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
+  }
+}
+
+function getFamilyDayState(dayId) {
+  if (dayId === getSelectedDayId()) return normalizeDayState(state);
+  return normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
+}
+
+function getFamilyEventsForWindow(windowStart, windowEnd) {
+  syncSelectedDayIntoFamilyCache();
+  const events = [];
+  const startDay = getDayStart(windowStart);
+  const endDay = getDayStart(Math.max(windowStart, windowEnd - 1));
+  for (let dayStart = startDay; dayStart <= endDay; dayStart += day) {
+    const dayId = toDateInputValue(dayStart);
+    const dayState = getFamilyDayState(dayId);
+    (dayState.events || []).forEach((event) => {
+      if (event.start >= windowStart && event.start < windowEnd) events.push(event);
+    });
+  }
+  return events.sort((a, b) => Number(a.start) - Number(b.start));
+}
+
+function buildFamilyReportDays(count = 7, anchorStart = getDayStart()) {
+  syncSelectedDayIntoFamilyCache();
+  return Array.from({ length: count }, (_, index) => {
+    const start = anchorStart - (count - 1 - index) * day;
+    const end = start + day;
+    const dayId = toDateInputValue(start);
+    const dayState = getFamilyDayState(dayId);
+    return {
+      start,
+      end,
+      label: getDayLabel(start),
+      events: (dayState.events || []).filter((event) => event.start >= start && event.start < end),
+    };
+  });
+}
+
+function buildFamilyStateForRecentWindow(count = 7, anchorStart = getDayStart()) {
+  const start = anchorStart - (count - 1) * day;
+  const end = anchorStart + day;
+  return {
+    ...normalizeDayState(state),
+    events: getFamilyEventsForWindow(start, end),
+  };
 }
 
 function isFamilyAdmin() {
@@ -1039,13 +1103,86 @@ function getLegacyWakeWindow(...sources) {
   return 70;
 }
 
-function getLegacyWeights(...sources) {
-  for (const source of sources) {
-    if (!source || typeof source !== "object") continue;
-    const value = firstDefined(source.weights, source.weightHistory, source.pesos, source.babyWeights);
-    if (Array.isArray(value) && value.length) return normalizeWeights(value);
+function normalizeLegacyWeightDate(value, fallback = "") {
+  if (typeof value === "string" && isDateId(value.slice(0, 10))) return value.slice(0, 10);
+  const ms = toMilliseconds(value);
+  if (Number.isFinite(ms)) return toDateInputValue(getDayStart(ms));
+  if (typeof fallback === "string" && isDateId(fallback.slice(0, 10))) return fallback.slice(0, 10);
+  return "";
+}
+
+function normalizeLegacyWeightItem(item = {}, fallbackId = "") {
+  if (!item || typeof item !== "object") return null;
+  const rawValue = firstDefined(
+    item.value,
+    item.weight,
+    item.kg,
+    item.peso,
+    item.pesoKg,
+    item.weightKg,
+    item.valueKg,
+    item.amount,
+    item.grams,
+    item.g,
+  );
+  const rawValueText = String(rawValue ?? "").replace(",", ".");
+  const rawValueMatch = rawValueText.match(/\d+(?:\.\d+)?/);
+  let value = Number(rawValueMatch ? rawValueMatch[0] : rawValueText);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  if ((item.grams || item.g) && value > 50) value = value / 1000;
+
+  const date = normalizeLegacyWeightDate(
+    firstDefined(item.date, item.day, item.dayId, item.data, item.recordedAt, item.createdAt, item.updatedAt, item.timestamp, item.weighedAt),
+    fallbackId,
+  );
+  if (!date) return null;
+  return {
+    id: typeof item.id === "string" ? item.id : `peso-${date}-${String(fallbackId || Date.now()).replace(/[^a-z0-9-]+/gi, "-")}`,
+    date,
+    value,
+  };
+}
+
+function normalizeLegacyWeightsCandidate(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return normalizeWeights(value.map((item, index) => normalizeLegacyWeightItem(item, String(index))).filter(Boolean));
+  if (typeof value === "object") {
+    return normalizeWeights(Object.entries(value)
+      .map(([key, item]) => normalizeLegacyWeightItem(typeof item === "object" ? item : { value: item, date: key }, key))
+      .filter(Boolean));
   }
   return [];
+}
+
+function getLegacyWeights(...sources) {
+  const collected = [];
+  for (const source of sources) {
+    if (!source || typeof source !== "object") continue;
+    const nestedProfile = source.profile && typeof source.profile === "object" ? source.profile : null;
+    const nestedBaby = source.babyProfile && typeof source.babyProfile === "object" ? source.babyProfile : null;
+    const candidates = [
+      source.weights,
+      source.weightHistory,
+      source.pesos,
+      source.babyWeights,
+      source.weightEntries,
+      source.growth,
+      source.growthWeights,
+      nestedProfile?.weights,
+      nestedProfile?.weightHistory,
+      nestedBaby?.weights,
+      nestedBaby?.weightHistory,
+    ];
+    candidates.forEach((candidate) => {
+      const normalized = normalizeLegacyWeightsCandidate(candidate);
+      if (normalized.length) collected.push(...normalized);
+    });
+  }
+  const byDate = new Map();
+  normalizeWeights(collected).forEach((item) => {
+    if (!byDate.has(item.date)) byDate.set(item.date, item);
+  });
+  return normalizeWeights(Array.from(byDate.values()));
 }
 
 async function readMaybeDoc(services, ...pathParts) {
@@ -1095,7 +1232,7 @@ async function readMaybeCollectionGroup(services, groupName) {
 }
 
 async function collectLegacyUidsByCollectionGroups(services) {
-  const groups = ["activities", "days", "profile", "access"];
+  const groups = ["activities", "days", "profile", "access", "weights", "pesos"];
   const uids = new Set();
   const counts = {};
 
@@ -1181,6 +1318,8 @@ async function buildLegacyCloudContextFromUser(services, userDoc) {
   const profileData = profileMain || profileDocs.find((item) => item.id !== "main")?.data || null;
   const dayDocs = await readMaybeCollection(services, "users", uid, "days");
   const activityDocs = await readMaybeCollection(services, "users", uid, "activities");
+  const weightDocs = await readMaybeCollection(services, "users", uid, "weights");
+  const pesoDocs = await readMaybeCollection(services, "users", uid, "pesos");
 
   const email = normalizeEmail(accessData?.email || rootData.email || profileData?.email || rootData.ownerEmail || uid);
   const dayStates = {};
@@ -1200,7 +1339,12 @@ async function buildLegacyCloudContextFromUser(services, userDoc) {
   const profile = normalizeLegacyProfileData(rootData, profileData, accessData, { email });
   const photo = getLegacyPhoto(profileData, rootData);
   const wakeWindow = getLegacyWakeWindow(profileData, rootData);
-  const weights = getLegacyWeights(profileData, rootData);
+  const weights = getLegacyWeights(
+    profileData,
+    rootData,
+    { weights: weightDocs.map(({ id, data }) => ({ id, ...data })) },
+    { pesos: pesoDocs.map(({ id, data }) => ({ id, ...data })) },
+  );
   const eventsCount = Object.values(dayStates).reduce((total, item) => total + (Array.isArray(item.events) ? item.events.length : 0), 0);
   const hasProfile = hasProfileContent(profile, photo, wakeWindow);
   const hasDay = eventsCount > 0 || Object.values(dayStates).some(hasRoutineDayContent);
@@ -1522,12 +1666,14 @@ function renderFamilyMigrationPanel(options = {}) {
 function applyMigrationContextToCurrentView(context) {
   if (!context) return false;
 
-  localStorage.setItem(storageKeys.profile, JSON.stringify(context.profile || createDefaultBabyProfile()));
+  const migratedWeights = normalizeWeights(context.weights || context.profile?.weights || []);
+  const migratedProfile = normalizeBabyProfile({ ...(context.profile || createDefaultBabyProfile()), weights: migratedWeights });
+  localStorage.setItem(storageKeys.profile, JSON.stringify(migratedProfile));
   if (context.photo) localStorage.setItem(storageKeys.photo, context.photo);
   else localStorage.removeItem(storageKeys.photo);
   localStorage.setItem(storageKeys.wakeWindow, String(context.wakeWindow || 70));
   localStorage.setItem(storageKeys.profileVersion, String(Date.now()));
-  if (Array.isArray(context.weights)) localStorage.setItem(storageKeys.weights, JSON.stringify(context.weights));
+  localStorage.setItem(storageKeys.weights, JSON.stringify(migratedWeights));
 
   const todayId = getCurrentDayId();
   const dayIds = Object.keys(context.dayStates || {}).filter(isDateId).sort();
@@ -1535,6 +1681,10 @@ function applyMigrationContextToCurrentView(context) {
   const visibleDayId = (context.dayStates || {})[todayId] ? todayId : latestDayId;
   const currentDayState = (context.dayStates || {})[visibleDayId] || createEmptyDayState();
   localStorage.setItem(storageKeys.dayState, JSON.stringify(currentDayState));
+  familyDayStatesCache = {
+    ...familyDayStatesCache,
+    ...Object.fromEntries(Object.entries(context.dayStates || {}).filter(([dayId]) => isDateId(dayId)).map(([dayId, dayState]) => [dayId, normalizeDayState(dayState)])),
+  };
   if (visibleDayId) {
     setSelectedDiaryDayById(visibleDayId);
     familyDayIdsCache = Array.from(new Set([...familyDayIdsCache, ...dayIds])).filter(isDateId).sort();
@@ -2494,14 +2644,18 @@ async function loadFamilyDayIds(options = {}) {
     const familyId = getActiveFamilyId();
     const snap = await firebaseServices.getDocs(firebaseServices.collection(firebaseServices.db, "families", familyId, "days"));
     const ids = [];
+    const states = {};
     snap.forEach((docSnap) => {
       const id = docSnap.id;
       if (!isDateId(id)) return;
       const data = docSnap.data() || {};
-      if (hasRoutineDayContent(normalizeDayState(data.state && typeof data.state === "object" ? data.state : data))) ids.push(id);
+      const normalized = normalizeDayState(data.state && typeof data.state === "object" ? data.state : data);
+      states[id] = normalized;
+      if (hasRoutineDayContent(normalized)) ids.push(id);
     });
     ids.sort();
     familyDayIdsCache = ids;
+    familyDayStatesCache = states;
     familyDayIdsCacheAt = now;
     updateDiaryDateRangeFromFamilyDays(ids);
     return ids;
@@ -2600,22 +2754,26 @@ function applyCloudProfile(data = {}) {
   const cloudProfileVersion = getCloudProfileVersion(data);
   const cloudHasContent = hasCloudProfileContent(data);
   const localHasContent = hasProfileContent();
+  const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
+  const cloudWeights = normalizeWeights(data.weights || profileSource.weights || []);
+  const localWeights = normalizeWeights(babyProfile.weights || loadLocalWeights());
+  const shouldAcceptCloudWeights = cloudWeights.length > 0 && localWeights.length === 0;
+  const shouldAcceptCloudPhoto = Boolean((data.photo || data.photoDataUrl) && !currentProfilePhoto);
 
   if (!cloudHasContent && localHasContent) {
     saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
     return;
   }
 
-  if (localHasContent && profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt) {
+  if (localHasContent && profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt && !shouldAcceptCloudWeights && !shouldAcceptCloudPhoto) {
     return;
   }
 
   applyingCloudState = true;
   try {
-    profileClientUpdatedAt = cloudProfileVersion;
+    profileClientUpdatedAt = Math.max(cloudProfileVersion, profileClientUpdatedAt);
 
-    const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
-    babyProfile = normalizeBabyProfile(profileSource);
+    babyProfile = normalizeBabyProfile({ ...profileSource, weights: cloudWeights.length ? cloudWeights : profileSource.weights });
     if (Object.prototype.hasOwnProperty.call(data, "photo") || Object.prototype.hasOwnProperty.call(data, "photoDataUrl")) {
       const photoValue = data.photo || data.photoDataUrl;
       currentProfilePhoto = typeof photoValue === "string" ? photoValue : "";
@@ -2650,10 +2808,17 @@ function applyCloudProfile(data = {}) {
   }
 }
 
-function applyCloudDay(data = {}) {
+function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
   applyingCloudState = true;
   const daySource = data.state && typeof data.state === "object" ? data.state : data;
   state = normalizeDayState(daySource);
+  if (isDateId(dayId)) {
+    familyDayStatesCache = { ...familyDayStatesCache, [dayId]: normalizeDayState(state) };
+    if (hasRoutineDayContent(state) && !familyDayIdsCache.includes(dayId)) {
+      familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
+      updateDiaryDateRangeFromFamilyDays();
+    }
+  }
   saveLocalDayState();
   renderAll();
   applyingCloudState = false;
@@ -2713,6 +2878,7 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
       },
       { merge: true },
     );
+    familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(state) };
     if (!familyDayIdsCache.includes(safeDayId)) familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
     updateDiaryDateRangeFromFamilyDays();
     setSyncStatus("online", cloudUser.email);
@@ -2770,7 +2936,7 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
       return;
     }
 
-    applyCloudDay(snapshot.data());
+    applyCloudDay(snapshot.data(), safeDayId);
   }, (error) => {
     console.error("Erro ao ler rotina:", error);
     setSyncStatus("offline", cloudUser?.email || "");
@@ -3251,15 +3417,20 @@ function getOverlapDuration(start, end, windowStart, windowEnd) {
 }
 
 function getSleepMsForRange(windowStart, windowEnd) {
-  return calculateSleepMsForRange(state.events, state, windowStart, windowEnd, isSleepEvent);
+  const events = getFamilyEventsForWindow(windowStart, windowEnd);
+  const rangeState = getDayIdFromStart(windowStart) === getSelectedDayId() ? state : { ...createEmptyDayState(), events };
+  return calculateSleepMsForRange(events, rangeState, windowStart, windowEnd, isSleepEvent);
 }
 
 function getRoutineStartForRange(windowStart, windowEnd) {
-  return calculateRoutineStartForRange(state.events, state, windowStart, windowEnd);
+  const events = getFamilyEventsForWindow(windowStart, windowEnd);
+  return calculateRoutineStartForRange(events, { ...createEmptyDayState(), events }, windowStart, windowEnd);
 }
 
 function getAwakeMsForRange(windowStart, windowEnd) {
-  return calculateAwakeMsForRange(state.events, state, windowStart, windowEnd, isSleepEvent);
+  const events = getFamilyEventsForWindow(windowStart, windowEnd);
+  const rangeState = getDayIdFromStart(windowStart) === getSelectedDayId() ? state : { ...createEmptyDayState(), events };
+  return calculateAwakeMsForRange(events, rangeState, windowStart, windowEnd, isSleepEvent);
 }
 
 function renderSummary() {
@@ -3291,12 +3462,10 @@ function renderSummary() {
 }
 
 function getSleepReportDays() {
-  return buildSleepReportDays(state.events, {
-    count: 7,
-    todayStart: getDayStart(),
-    dayMs: day,
-    getDayLabel,
-    isSleepEvent,
+  return buildFamilyReportDays(7).map((item) => {
+    const sleepEvents = item.events.filter((event) => isSleepEvent(event));
+    const sleepMs = sleepEvents.reduce((total, event) => total + Math.max(0, Math.min(event.end, item.end) - Math.max(event.start, item.start)), 0);
+    return { ...item, events: sleepEvents, sleepMs };
   });
 }
 
@@ -3366,12 +3535,7 @@ function renderSleepReport() {
 }
 
 function getReportDays(count = 7) {
-  return buildReportDays(state.events, {
-    count,
-    todayStart: getDayStart(),
-    dayMs: day,
-    getDayLabel,
-  });
+  return buildFamilyReportDays(count);
 }
 
 
@@ -3387,7 +3551,7 @@ function renderSupplementalReports() {
   const reportDays = getReportDays(7);
   renderTrendKpis({
     container: trendKpis,
-    state,
+    state: buildFamilyStateForRecentWindow(7),
     todayStart: getDayStart(),
     now: Date.now(),
     dayMs: day,
@@ -3438,7 +3602,7 @@ function renderTodayLastEvents() {
 function renderTodayMiniChart() {
   renderTodayMiniChartPanel({
     container: todayMiniChart,
-    state,
+    state: buildFamilyStateForRecentWindow(5),
     todayStart: getDayStart(),
     dayMs: day,
     getDayLabel,
@@ -3448,9 +3612,10 @@ function renderTodayMiniChart() {
 function renderIntelligentHomeSections() {
   const todayStart = getDayStart();
   const now = Date.now();
+  const recentFamilyState = buildFamilyStateForRecentWindow(7, todayStart);
   renderSmartInsight({
     container: smartInsightCard,
-    state,
+    state: recentFamilyState,
     now,
     todayStart,
     dayMs: day,
@@ -3475,7 +3640,7 @@ function renderIntelligentHomeSections() {
   renderDailyRhythm({
     container: dailyRhythm,
     statusElement: routineProgressStatus,
-    state,
+    state: recentFamilyState,
     todayStart,
     now,
     dayMs: day,
@@ -3495,7 +3660,7 @@ function renderIntelligentHomeSections() {
   });
   renderWeeklyOverview({
     container: weeklyOverview,
-    state,
+    state: recentFamilyState,
     todayStart,
     dayMs: day,
     getSleepMsForRange,
