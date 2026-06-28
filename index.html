@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.12" />
+    <link rel="stylesheet" href="./styles.css?v=75.13" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -494,13 +494,13 @@
               <section class="admin-clean-section admin-migration-card">
                 <div class="admin-invite-header">
                   <strong>Dados da família</strong>
-                  <em>Use apenas se o perfil/foto/rotina do Francisco não aparecerem após conectar a família.</em>
+                  <em>Busca dados antigos no Firebase e neste aparelho para migrar à família principal.</em>
                 </div>
-                <p id="adminMigrationStatus" class="admin-migration-status">Verificando dados salvos neste aparelho...</p>
+                <p id="adminMigrationStatus" class="admin-migration-status">Buscando dados antigos no Firebase e neste aparelho...</p>
                 <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
-                  <li>Nenhum dado antigo encontrado neste aparelho.</li>
+                  <li>A busca ainda não começou.</li>
                 </ul>
-                <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Importar dados encontrados</button>
+                <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
               </section>
 
               <section class="admin-clean-section admin-create-invite-card">
@@ -688,6 +688,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.12"></script>
+    <script type="module" src="./app.js?v=75.13"></script>
   </body>
 </html>

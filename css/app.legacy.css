@@ -4228,3 +4228,55 @@ body.day-theme .admin-access-item {
     flex: 1 1 128px;
   }
 }
+
+
+/* v75.13 - Admin focado e migração inteligente */
+body.global-admin-mode .screen:not([data-screen="profile"]) {
+  display: none !important;
+}
+
+body.global-admin-mode .bottom-nav button:not([data-target="profile"]),
+body.global-admin-mode .fab,
+body.global-admin-mode .profile-card,
+body.global-admin-mode .baby-profile-card,
+body.global-admin-mode .appearance-profile-block,
+body.global-admin-mode .weight-profile-block,
+body.global-admin-mode .wake-window-card,
+body.global-admin-mode .export-card,
+body.global-admin-mode .danger-card {
+  display: none !important;
+}
+
+body.global-admin-mode .bottom-nav {
+  grid-template-columns: 1fr !important;
+}
+
+body.global-admin-mode .bottom-nav button[data-target="profile"] {
+  display: grid !important;
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+body.global-admin-mode .settings-list {
+  padding-top: 8px;
+}
+
+body.global-admin-mode .login-card {
+  order: -2;
+}
+
+body.global-admin-mode .admin-access-card {
+  order: -1;
+}
+
+.admin-migration-source small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: rgba(122, 236, 190, 0.13);
+  color: #8df3c9;
+  font-weight: 900;
+}

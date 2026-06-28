@@ -208,6 +208,9 @@ let familyAccess = loadFamilyAccess();
 let pendingInviteCode = getInitialInviteCode();
 let recentInvites = [];
 let adminStatsRequestId = 0;
+let legacyCloudContexts = [];
+let legacyCloudScanState = "idle";
+let legacyCloudScanError = "";
 let profileUnsubscribe = null;
 let dayUnsubscribe = null;
 let profileCloudSaveTimer = null;
@@ -747,77 +750,454 @@ function getBestRestorableContext() {
   return getRestorableContexts().find((context) => context.email !== currentEmail) || null;
 }
 
+
+function getContextEventsCount(context = {}) {
+  if (Number.isFinite(Number(context.eventsCount))) return Number(context.eventsCount);
+  if (context.dayStates && typeof context.dayStates === "object") {
+    return Object.values(context.dayStates).reduce((total, dayState) => total + (Array.isArray(dayState?.events) ? dayState.events.length : 0), 0);
+  }
+  return 0;
+}
+
+function getContextDaysCount(context = {}) {
+  if (context.dayStates && typeof context.dayStates === "object") return Object.keys(context.dayStates).length;
+  return context.hasDay ? 1 : 0;
+}
+
 function getContextBabyLabel(context) {
   if (!context) return "dados locais";
   const name = getBabyNameFromProfile(context.profile || {});
   const parts = [];
   if (name && name !== "Bebê") parts.push(name);
-  if (context.eventsCount) parts.push(`${context.eventsCount} registros de hoje`);
+  const eventsCount = getContextEventsCount(context);
+  const daysCount = getContextDaysCount(context);
+  if (eventsCount) parts.push(`${eventsCount} registros${daysCount > 1 ? ` em ${daysCount} dias` : ""}`);
   if (context.photo) parts.push("foto salva");
   if (context.weights?.length) parts.push(`${context.weights.length} pesos`);
-  return parts.length ? parts.join(" • ") : "perfil salvo neste aparelho";
+  if (context.source === "cloud") parts.push("Firebase");
+  return parts.length ? parts.join(" • ") : (context.source === "cloud" ? "dados encontrados no Firebase" : "perfil salvo neste aparelho");
 }
 
-function renderFamilyMigrationPanel() {
+function toMilliseconds(value) {
+  if (value === null || typeof value === "undefined" || value === "") return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value > 100000000000) return value;
+    if (value > 1000000000) return value * 1000;
+    return value;
+  }
+  if (value instanceof Date) return value.getTime();
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value === "object" && Number.isFinite(Number(value.seconds))) {
+    return Number(value.seconds) * 1000 + Math.floor(Number(value.nanoseconds || 0) / 1000000);
+  }
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function firstDefined(...values) {
+  return values.find((value) => value !== null && typeof value !== "undefined" && value !== "");
+}
+
+function findTimestampFromObject(source = {}, keys = []) {
+  for (const key of keys) {
+    const value = source?.[key];
+    const ms = toMilliseconds(value);
+    if (Number.isFinite(ms)) return ms;
+  }
+  return null;
+}
+
+function normalizeLegacyType(source = {}) {
+  const text = [
+    source.type,
+    source.kind,
+    source.category,
+    source.action,
+    source.activityType,
+    source.eventType,
+    source.name,
+    source.title,
+    source.label,
+    source.detail,
+  ].filter(Boolean).join(" ").toLowerCase();
+
+  if (/acord|wake|awake/.test(text)) return "acordou";
+  if (/despert|noturn|night.?wake/.test(text)) return "despertar-noturno";
+  if (/dorm|sono noturno|noite|sleep night|bedtime/.test(text)) return "dormir";
+  if (/soneca|sono|sleep|nap/.test(text)) return "sono";
+  if (/amament|peito|mama|breast|nursing/.test(text)) return "amamentacao";
+  if (/mamadeira|bottle|formula|fórmula|leite/.test(text)) return "mamadeira";
+  if (/fralda|diaper|xixi|coc[oô]|mista/.test(text)) return "fralda";
+  if (/medic|rem[eé]dio|dose|xarope|gota|vitamina/.test(text)) return "medicamento";
+  return normalizeEvent({ type: source.type || "sono", start: Date.now() })?.type || "sono";
+}
+
+function normalizeLegacyDetail(source = {}, type = "sono") {
+  const amount = firstDefined(source.amountMl, source.ml, source.volumeMl, source.quantityMl, source.amount, source.volume, source.quantity);
+  const side = firstDefined(source.side, source.breastSide, source.lado);
+  const detail = firstDefined(source.detail, source.details, source.label, source.subtype, source.categoryLabel, source.option, source.reason, source.local, source.place, source.location, source.name, source.title);
+  const pieces = [];
+  if (typeof detail === "string" && detail.trim()) pieces.push(detail.trim());
+  if (typeof side === "string" && side.trim() && !pieces.join(" ").toLowerCase().includes(side.trim().toLowerCase())) pieces.push(side.trim());
+  if (amount !== null && typeof amount !== "undefined" && amount !== "" && type === "mamadeira") pieces.push(`${amount} ml`);
+
+  if (type === "amamentacao") {
+    const left = Number(firstDefined(source.leftMs, source.leftDurationMs, source.esquerdoMs, source.leftMinutes, source.esquerdoMin, source.left));
+    const right = Number(firstDefined(source.rightMs, source.rightDurationMs, source.direitoMs, source.rightMinutes, source.direitoMin, source.right));
+    if (left > 0 && right > 0 && !pieces.some((item) => /mista/i.test(item))) pieces.unshift("Mista");
+  }
+
+  return pieces.length ? pieces.join(" • ") : "";
+}
+
+function normalizeLegacyNotes(source = {}) {
+  const notes = firstDefined(source.notes, source.note, source.observacao, source.observações, source.observation, source.description, source.comment, source.comentario);
+  if (typeof notes === "string") return notes;
+  return "";
+}
+
+function getLegacyDurationMs(source = {}) {
+  const raw = firstDefined(source.durationMs, source.elapsedMs, source.totalMs, source.duration, source.elapsed, source.totalDuration);
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  if (value > 1000 * 60 * 60 * 24) return value;
+  if (value > 1000) return value;
+  return value * 60000;
+}
+
+function normalizeLegacyActivityDocument(source = {}, id = "") {
+  const nestedState = source.state && typeof source.state === "object" ? source.state : source.dayState;
+  if (nestedState && Array.isArray(nestedState.events)) {
+    return { kind: "day", dayState: normalizeDayState(nestedState), dayId: source.dayId || source.date || id };
+  }
+  if (Array.isArray(source.events)) {
+    return { kind: "day", dayState: normalizeDayState(source), dayId: source.dayId || source.date || id };
+  }
+
+  const start = findTimestampFromObject(source, [
+    "start",
+    "startedAt",
+    "startAt",
+    "startTime",
+    "time",
+    "timestamp",
+    "createdAt",
+    "date",
+    "datetime",
+    "registeredAt",
+    "updatedAt",
+  ]);
+  if (!Number.isFinite(start)) return null;
+
+  let end = findTimestampFromObject(source, ["end", "endedAt", "finishedAt", "finishAt", "endTime", "completedAt", "stoppedAt"]);
+  const durationMs = getLegacyDurationMs(source);
+  if (!Number.isFinite(end) && durationMs > 0) end = start + durationMs;
+  if (!Number.isFinite(end)) end = start;
+  if (end < start) end = start;
+
+  const type = normalizeLegacyType(source);
+  const event = normalizeEvent({
+    id: typeof id === "string" && id ? `legacy-${id}` : undefined,
+    type,
+    start,
+    end,
+    detail: normalizeLegacyDetail(source, type),
+    notes: normalizeLegacyNotes(source),
+    wakeWindowStartedAt: toMilliseconds(source.wakeWindowStartedAt),
+    wakeWindowMs: Number(source.wakeWindowMs || source.wakeWindowMilliseconds || 0),
+  });
+
+  return event ? { kind: "event", event } : null;
+}
+
+function dayIdFromAny(value) {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const ms = toMilliseconds(value);
+  if (Number.isFinite(ms)) return toDateInputValue(ms);
+  if (typeof value === "string") {
+    const match = value.match(/\d{4}-\d{2}-\d{2}/);
+    if (match) return match[0];
+  }
+  return null;
+}
+
+function addEventToDayMap(dayStates, event) {
+  if (!event || !Number.isFinite(Number(event.start))) return;
+  const dayId = toDateInputValue(event.start);
+  const dayState = dayStates[dayId] || createEmptyDayState();
+  const key = `${event.type}|${Math.round(event.start)}|${Math.round(event.end)}|${event.detail || ""}|${event.notes || ""}`;
+  const exists = (dayState.events || []).some((item) => `${item.type}|${Math.round(item.start)}|${Math.round(item.end)}|${item.detail || ""}|${item.notes || ""}` === key);
+  if (!exists) dayState.events.push(event);
+  dayState.events.sort((a, b) => a.start - b.start);
+  dayStates[dayId] = normalizeDayState(dayState);
+}
+
+function addDayStateToMap(dayStates, dayIdValue, dayStateValue) {
+  const normalized = normalizeDayState(dayStateValue);
+  const explicitDayId = dayIdFromAny(dayIdValue);
+  const inferredDayId = normalized.events?.[0] ? toDateInputValue(normalized.events[0].start) : explicitDayId;
+  const dayId = explicitDayId || inferredDayId;
+  if (!dayId) return;
+  const target = dayStates[dayId] || createEmptyDayState();
+  (normalized.events || []).forEach((event) => addEventToDayMap(dayStates, event));
+  const merged = dayStates[dayId] || target;
+  if (normalized.mode !== "idle" && Number.isFinite(Number(normalized.activeStartedAt))) {
+    merged.mode = normalized.mode;
+    merged.activeStartedAt = normalized.activeStartedAt;
+    merged.activeType = normalized.activeType || merged.activeType;
+    merged.activeDetail = normalized.activeDetail || merged.activeDetail;
+    merged.activeNotes = normalized.activeNotes || merged.activeNotes;
+    dayStates[dayId] = normalizeDayState(merged);
+  }
+}
+
+function normalizeLegacyProfileData(...sources) {
+  const merged = Object.assign({}, ...sources.filter((item) => item && typeof item === "object"));
+  const rawProfile = merged.babyProfile && typeof merged.babyProfile === "object" ? merged.babyProfile : merged.profile && typeof merged.profile === "object" ? merged.profile : merged;
+  const name = firstDefined(rawProfile.name, rawProfile.babyName, rawProfile.nome, rawProfile.childName, rawProfile.displayName, merged.name, merged.babyName, merged.nome, "");
+  const article = firstDefined(rawProfile.article, rawProfile.artigo, merged.article, "do");
+  const birthDate = firstDefined(rawProfile.birthDate, rawProfile.birth, rawProfile.birthday, rawProfile.nascimento, rawProfile.diaNascimento, merged.birthDate, "");
+  const profile = normalizeBabyProfile({ name, article, birthDate });
+  if (!profile.name || profile.name === "Bebê") {
+    const email = normalizeEmail(merged.email || "");
+    if (email.includes("francisco")) profile.name = "Francisco";
+  }
+  return profile;
+}
+
+function getLegacyPhoto(...sources) {
+  for (const source of sources) {
+    if (!source || typeof source !== "object") continue;
+    const raw = firstDefined(source.photo, source.photoDataUrl, source.profilePhoto, source.profilePhotoUrl, source.babyPhoto, source.avatar, source.image, source.imageUrl, source.picture);
+    if (typeof raw === "string" && raw.length > 20) return raw;
+  }
+  return "";
+}
+
+function getLegacyWakeWindow(...sources) {
+  for (const source of sources) {
+    if (!source || typeof source !== "object") continue;
+    const value = Number(firstDefined(source.wakeWindowMinutes, source.wakeWindow, source.awakeWindowMinutes, source.janelaDespertar));
+    if (Number.isFinite(value) && value >= 20 && value <= 240) return value;
+  }
+  return 70;
+}
+
+function getLegacyWeights(...sources) {
+  for (const source of sources) {
+    if (!source || typeof source !== "object") continue;
+    const value = firstDefined(source.weights, source.weightHistory, source.pesos, source.babyWeights);
+    if (Array.isArray(value) && value.length) return normalizeWeights(value);
+  }
+  return [];
+}
+
+async function readMaybeDoc(services, ...pathParts) {
+  try {
+    const ref = services.doc(services.db, ...pathParts);
+    const snap = await services.getDoc(ref);
+    return snap.exists() ? (snap.data() || {}) : null;
+  } catch (error) {
+    console.warn("Não foi possível ler documento legado:", pathParts.join("/"), error);
+    return null;
+  }
+}
+
+async function readMaybeCollection(services, ...pathParts) {
+  try {
+    const snap = await services.getDocs(services.collection(services.db, ...pathParts));
+    const docs = [];
+    snap.forEach((docSnap) => docs.push({ id: docSnap.id, data: docSnap.data() || {} }));
+    return docs;
+  } catch (error) {
+    console.warn("Não foi possível ler coleção legada:", pathParts.join("/"), error);
+    return [];
+  }
+}
+
+async function buildLegacyCloudContextFromUser(services, userDoc) {
+  const uid = userDoc.id;
+  const rootData = userDoc.data() || {};
+  const accessData = await readMaybeDoc(services, "users", uid, "access", "ninou");
+  const profileMain = await readMaybeDoc(services, "users", uid, "profile", "main");
+  const profileDocs = await readMaybeCollection(services, "users", uid, "profile");
+  const profileData = profileMain || profileDocs.find((item) => item.id !== "main")?.data || null;
+  const dayDocs = await readMaybeCollection(services, "users", uid, "days");
+  const activityDocs = await readMaybeCollection(services, "users", uid, "activities");
+
+  const email = normalizeEmail(accessData?.email || rootData.email || profileData?.email || rootData.ownerEmail || uid);
+  const dayStates = {};
+
+  dayDocs.forEach(({ id, data }) => {
+    const source = data.state && typeof data.state === "object" ? data.state : data;
+    addDayStateToMap(dayStates, id, source);
+  });
+
+  activityDocs.forEach(({ id, data }) => {
+    const converted = normalizeLegacyActivityDocument(data, id);
+    if (!converted) return;
+    if (converted.kind === "day") addDayStateToMap(dayStates, converted.dayId || id, converted.dayState);
+    if (converted.kind === "event") addEventToDayMap(dayStates, converted.event);
+  });
+
+  const profile = normalizeLegacyProfileData(rootData, profileData, accessData, { email });
+  const photo = getLegacyPhoto(profileData, rootData);
+  const wakeWindow = getLegacyWakeWindow(profileData, rootData);
+  const weights = getLegacyWeights(profileData, rootData);
+  const eventsCount = Object.values(dayStates).reduce((total, item) => total + (Array.isArray(item.events) ? item.events.length : 0), 0);
+  const hasProfile = hasProfileContent(profile, photo, wakeWindow);
+  const hasDay = eventsCount > 0 || Object.values(dayStates).some(hasRoutineDayContent);
+  const hasWeights = weights.length > 0;
+
+  if (!hasProfile && !hasDay && !hasWeights) return null;
+
+  const score = (hasProfile ? 100 : 0)
+    + (photo ? 50 : 0)
+    + Math.min(eventsCount, 80)
+    + Math.min(Object.keys(dayStates).length * 8, 40)
+    + Math.min(weights.length * 5, 25);
+
+  return {
+    source: "cloud",
+    uid,
+    email,
+    profile,
+    photo,
+    wakeWindow,
+    weights,
+    dayStates,
+    eventsCount,
+    hasProfile,
+    hasDay,
+    hasWeights,
+    score,
+  };
+}
+
+async function scanLegacyCloudSources(options = {}) {
+  if (!isFamilyAdmin()) return [];
+  if (legacyCloudScanState === "loading") return legacyCloudContexts;
+
+  legacyCloudScanState = "loading";
+  legacyCloudScanError = "";
+  renderFamilyMigrationPanel({ skipScan: true });
+
+  try {
+    const services = await getFirebaseServices();
+    const usersSnapshot = await services.getDocs(services.collection(services.db, "users"));
+    const contexts = [];
+    for (const userDoc of usersSnapshot.docs || []) {
+      const context = await buildLegacyCloudContextFromUser(services, userDoc);
+      if (context) contexts.push(context);
+    }
+    legacyCloudContexts = contexts
+      .filter((context) => normalizeEmail(context.email) !== normalizeEmail(cloudUser?.email || ""))
+      .sort((a, b) => b.score - a.score || String(a.email).localeCompare(String(b.email)));
+    legacyCloudScanState = "done";
+    renderFamilyMigrationPanel({ skipScan: true });
+    return legacyCloudContexts;
+  } catch (error) {
+    console.error("Erro ao buscar dados antigos no Firebase:", error);
+    legacyCloudScanState = "error";
+    legacyCloudScanError = getFirebaseErrorMessage(error);
+    renderFamilyMigrationPanel({ skipScan: true });
+    return [];
+  }
+}
+
+function getCombinedRestorableContexts() {
+  const currentEmail = normalizeEmail(cloudUser?.email || "");
+  const localContexts = getRestorableContexts()
+    .filter((context) => context.email !== currentEmail)
+    .map((context) => ({ ...context, source: "local", dayStates: { [getCurrentDayId()]: context.dayState }, eventsCount: context.eventsCount || 0 }));
+  const byKey = new Map();
+  [...legacyCloudContexts, ...localContexts].forEach((context) => {
+    const key = `${context.source}:${context.uid || context.email}`;
+    if (!byKey.has(key)) byKey.set(key, context);
+  });
+  return Array.from(byKey.values()).sort((a, b) => b.score - a.score || String(a.email).localeCompare(String(b.email)));
+}
+
+function getBestRestorableSource() {
+  return getCombinedRestorableContexts()[0] || null;
+}
+
+function renderFamilyMigrationPanel(options = {}) {
   if (!adminMigrationStatus || !adminMigrationSources || !restoreFamilyDataButton) return;
 
-  const contexts = isFamilyAdmin() ? getRestorableContexts().filter((context) => context.email !== normalizeEmail(cloudUser?.email || "")) : [];
-  const best = contexts[0] || null;
-
   if (!isFamilyAdmin()) {
-    adminMigrationStatus.textContent = "Entre como admin para revisar dados salvos neste aparelho.";
+    adminMigrationStatus.textContent = "Entre como admin para revisar e migrar dados antigos.";
     adminMigrationSources.innerHTML = "<li>Nenhuma conta em análise.</li>";
     restoreFamilyDataButton.hidden = true;
     return;
   }
 
-  if (!best) {
-    adminMigrationStatus.textContent = "Nenhum dado antigo encontrado neste aparelho. Se a família já tiver dados no Firebase, eles aparecem automaticamente após sincronizar.";
-    adminMigrationSources.innerHTML = "<li>Nenhum cache antigo encontrado neste aparelho.</li>";
+  if (!options.skipScan && legacyCloudScanState === "idle") {
+    scanLegacyCloudSources({ silent: true });
+  }
+
+  const contexts = getCombinedRestorableContexts();
+  const best = contexts[0] || null;
+
+  if (legacyCloudScanState === "loading") {
+    adminMigrationStatus.textContent = "Buscando dados antigos no Firebase e neste aparelho...";
+    adminMigrationSources.innerHTML = contexts.length
+      ? contexts.slice(0, 4).map((context, index) => `
+        <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
+          <div><strong>${escapeHtml(context.email || context.uid || "Conta encontrada")}</strong><span>${escapeHtml(getContextBabyLabel(context))}</span></div>
+          ${index === 0 ? "<small>Melhor opção até agora</small>" : ""}
+        </li>`).join("")
+      : "<li>Procurando em users, profile, days e activities...</li>";
     restoreFamilyDataButton.hidden = true;
     return;
   }
 
-  adminMigrationStatus.textContent = `Encontramos dados salvos de ${best.email}. Você pode importar esse perfil para a família principal se os dados do Francisco ainda não aparecerem.`;
-  adminMigrationSources.innerHTML = contexts.slice(0, 3).map((context, index) => `
+  if (legacyCloudScanState === "error" && !best) {
+    adminMigrationStatus.textContent = legacyCloudScanError || "Não foi possível buscar dados antigos no Firebase. Revise as regras do Firestore.";
+    adminMigrationSources.innerHTML = "<li>Falha ao acessar dados legados. Publique as regras de migração e tente novamente.</li>";
+    restoreFamilyDataButton.hidden = true;
+    return;
+  }
+
+  if (!best) {
+    adminMigrationStatus.textContent = "Nenhum dado antigo encontrado no Firebase nem neste aparelho. Confira se a conta antiga possui registros em users/{uid}/activities ou users/{uid}/days.";
+    adminMigrationSources.innerHTML = "<li>Nenhuma origem recuperável encontrada.</li>";
+    restoreFamilyDataButton.hidden = true;
+    return;
+  }
+
+  adminMigrationStatus.textContent = `Encontramos dados de ${best.email || best.uid}. Importe para preencher a família principal e liberar a rotina do Francisco para todos os membros autorizados.`;
+  adminMigrationSources.innerHTML = contexts.slice(0, 5).map((context, index) => `
     <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
       <div>
-        <strong>${escapeHtml(context.email)}</strong>
+        <strong>${escapeHtml(context.email || context.uid || "Conta encontrada")}</strong>
         <span>${escapeHtml(getContextBabyLabel(context))}</span>
       </div>
-      ${index === 0 ? "<small>Melhor opção</small>" : ""}
+      ${index === 0 ? "<small>Melhor opção</small>" : `<small>${context.source === "cloud" ? "Firebase" : "Aparelho"}</small>`}
     </li>
   `).join("");
   restoreFamilyDataButton.hidden = false;
   restoreFamilyDataButton.disabled = false;
+  restoreFamilyDataButton.textContent = best.source === "cloud" ? "Migrar dados do Firebase" : "Importar dados encontrados";
 }
 
-function applyCachedContextToCurrentView(context) {
+function applyMigrationContextToCurrentView(context) {
   if (!context) return false;
 
-  if (context.profileRaw !== null && typeof context.profileRaw !== "undefined") {
-    localStorage.setItem(storageKeys.profile, context.profileRaw);
-  } else {
-    localStorage.setItem(storageKeys.profile, JSON.stringify(context.profile || createDefaultBabyProfile()));
-  }
-
+  localStorage.setItem(storageKeys.profile, JSON.stringify(context.profile || createDefaultBabyProfile()));
   if (context.photo) localStorage.setItem(storageKeys.photo, context.photo);
   else localStorage.removeItem(storageKeys.photo);
-
   localStorage.setItem(storageKeys.wakeWindow, String(context.wakeWindow || 70));
-  localStorage.setItem(storageKeys.profileVersion, String(Math.max(Date.now(), Number(context.profileVersion) || 0)));
+  localStorage.setItem(storageKeys.profileVersion, String(Date.now()));
+  if (Array.isArray(context.weights)) localStorage.setItem(storageKeys.weights, JSON.stringify(context.weights));
 
-  if (context.dayStateRaw !== null && typeof context.dayStateRaw !== "undefined") {
-    localStorage.setItem(storageKeys.dayState, context.dayStateRaw);
-  } else {
-    localStorage.setItem(storageKeys.dayState, JSON.stringify(context.dayState || createEmptyDayState()));
-  }
-
-  if (context.weightsRaw !== null && typeof context.weightsRaw !== "undefined") {
-    localStorage.setItem(storageKeys.weights, context.weightsRaw);
-  } else if (Array.isArray(context.weights)) {
-    localStorage.setItem(storageKeys.weights, JSON.stringify(context.weights));
-  }
+  const todayId = getCurrentDayId();
+  const latestDayId = Object.keys(context.dayStates || {}).sort().at(-1);
+  const currentDayState = (context.dayStates || {})[todayId] || (context.dayStates || {})[latestDayId] || createEmptyDayState();
+  localStorage.setItem(storageKeys.dayState, JSON.stringify(currentDayState));
 
   wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
   babyProfile = loadBabyProfile();
@@ -861,67 +1241,112 @@ async function familyCloudHasContent() {
   return { profile, day: dayContent };
 }
 
+async function uploadMigrationContextToFamily(context) {
+  const services = await getFirebaseServices();
+  const familyId = familyAccess?.familyId || APP_ADMIN_FAMILY_ID;
+  const sourceLabel = context.source === "cloud" ? `users/${context.uid || context.email}` : `cache/${context.email}`;
+  const migrationId = `${Date.now()}-${String(context.uid || context.email || "origem").replace(/[^a-z0-9]+/gi, "-").slice(0, 32)}`;
+
+  await services.setDoc(services.doc(services.db, "families", familyId), {
+    ownerUid: cloudUser.uid,
+    ownerEmail: cloudUser.email || "",
+    title: "Família do Francisco",
+    updatedAt: services.serverTimestamp(),
+  }, { merge: true });
+
+  if (context.profile || context.photo) {
+    await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
+      ...(normalizeBabyProfile(context.profile || createDefaultBabyProfile())),
+      wakeWindowMinutes: Number(context.wakeWindow) || 70,
+      clientUpdatedAt: Date.now(),
+      ...(context.photo ? { photo: context.photo } : {}),
+      migratedFrom: sourceLabel,
+      migratedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+  }
+
+  const dayEntries = Object.entries(context.dayStates || {}).filter(([, dayState]) => hasRoutineDayContent(dayState));
+  for (const [dayId, dayState] of dayEntries) {
+    await services.setDoc(services.doc(services.db, "families", familyId, "days", dayId), {
+      ...normalizeDayState(dayState),
+      migratedFrom: sourceLabel,
+      migratedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+  }
+
+  await services.setDoc(services.doc(services.db, "families", familyId, "migrations", migrationId), {
+    source: context.source || "unknown",
+    sourceUid: context.uid || "",
+    sourceEmail: context.email || "",
+    daysMigrated: dayEntries.length,
+    eventsMigrated: getContextEventsCount(context),
+    profileMigrated: Boolean(context.profile || context.photo),
+    createdBy: cloudUser.uid,
+    createdByEmail: cloudUser.email || "",
+    createdAt: services.serverTimestamp(),
+  }, { merge: true });
+}
+
 async function uploadCurrentContextToFamily() {
   await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
   await saveDayToCloud();
 }
 
-async function restoreFamilyDataFromBestCache(options = {}) {
+async function restoreFamilyDataFromBestSource(options = {}) {
   if (!isFamilyAdmin()) return false;
-  const context = getBestRestorableContext();
+  if (legacyCloudScanState === "idle") await scanLegacyCloudSources({ silent: true });
+  const context = getBestRestorableSource();
   if (!context) {
-    if (!options.silent && adminMigrationStatus) adminMigrationStatus.textContent = "Nenhum dado antigo encontrado neste aparelho para importar.";
-    renderFamilyMigrationPanel();
+    if (!options.silent && adminMigrationStatus) adminMigrationStatus.textContent = "Nenhum dado antigo encontrado no Firebase ou neste aparelho para migrar.";
+    renderFamilyMigrationPanel({ skipScan: true });
     return false;
   }
 
   if (!options.silent) {
-    const ok = window.confirm(`Importar os dados salvos de ${context.email} para a família principal do Ninou? Isso substituirá a visualização familiar neste aparelho e sincronizará o perfil/rotina atuais.`);
+    const ok = window.confirm(`Migrar os dados de ${context.email || context.uid} para a família principal do Ninou? A rotina ficará disponível para os membros autorizados.`);
     if (!ok) return false;
   }
 
   if (restoreFamilyDataButton) {
     restoreFamilyDataButton.disabled = true;
-    restoreFamilyDataButton.textContent = "Importando...";
+    restoreFamilyDataButton.textContent = "Migrando...";
   }
-  if (adminMigrationStatus) adminMigrationStatus.textContent = `Importando dados de ${context.email}...`;
+  if (adminMigrationStatus) adminMigrationStatus.textContent = `Migrando dados de ${context.email || context.uid}...`;
 
   try {
-    applyCachedContextToCurrentView(context);
-    await uploadCurrentContextToFamily();
+    await uploadMigrationContextToFamily(context);
+    applyMigrationContextToCurrentView(context);
     setSyncStatus("online", cloudUser?.email || "");
-    if (loginHelper) loginHelper.textContent = "Dados do Francisco importados para a família principal.";
-    if (adminMigrationStatus) adminMigrationStatus.textContent = `Dados importados de ${context.email}. Os membros autorizados já devem enxergar o perfil e a rotina familiar.`;
-    renderFamilyMigrationPanel();
+    if (loginHelper) loginHelper.textContent = "Dados do Francisco migrados para a família principal.";
+    if (adminMigrationStatus) adminMigrationStatus.textContent = `Migração concluída: ${getContextEventsCount(context)} registros em ${getContextDaysCount(context)} dia(s). Entre com a conta do Francisco para validar.`;
+    legacyCloudScanState = "idle";
+    legacyCloudContexts = [];
+    renderFamilyMigrationPanel({ skipScan: false });
     return true;
   } catch (error) {
-    console.error("Erro ao importar dados para a família:", error);
+    console.error("Erro ao migrar dados para a família:", error);
     if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
     setSyncStatus("offline", cloudUser?.email || "");
     return false;
   } finally {
     if (restoreFamilyDataButton) {
       restoreFamilyDataButton.disabled = false;
-      restoreFamilyDataButton.textContent = "Importar dados encontrados";
+      restoreFamilyDataButton.textContent = "Migrar dados encontrados";
     }
   }
 }
 
 async function autoSeedFamilyFromLocalCache() {
   if (!isFamilyAdmin()) return false;
-  const context = getBestRestorableContext();
-  if (!context) {
-    renderFamilyMigrationPanel();
-    return false;
-  }
-
   const cloudContent = await familyCloudHasContent();
   if (cloudContent.profile || cloudContent.day) {
     renderFamilyMigrationPanel();
     return false;
   }
-
-  return restoreFamilyDataFromBestCache({ silent: true });
+  await scanLegacyCloudSources({ silent: true });
+  return restoreFamilyDataFromBestSource({ silent: true });
 }
 
 function renderAdminAccessLists(stats = null) {
@@ -1670,6 +2095,7 @@ function renderAuthControls() {
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
   document.body.classList.toggle("access-locked", false);
+  document.body.classList.toggle("global-admin-mode", Boolean(isGlobalAppAdmin() && hasFamilyAccess()));
   openSheetButtons.forEach((button) => {
     const shouldHide = !authorized;
     button.hidden = shouldHide;
@@ -1908,8 +2334,9 @@ async function initFirebaseAuthState() {
         loginHelper.textContent = "Admin do app conectado. Preparando sincronização...";
         await activatePersonalFamily();
         await connectCurrentAccount();
-        loginHelper.textContent = "Admin do app conectado. Você pode gerar convites no Perfil.";
+        loginHelper.textContent = "Admin do app conectado. Painel administrativo ativo.";
         renderAuthControls();
+        showScreen("profile");
         return;
       }
 
@@ -3396,7 +3823,7 @@ if (refreshAdminStatsButton) {
 }
 if (restoreFamilyDataButton) {
   restoreFamilyDataButton.addEventListener("click", () => {
-    restoreFamilyDataFromBestCache().catch((error) => {
+    restoreFamilyDataFromBestSource().catch((error) => {
       console.error("Erro ao importar dados familiares:", error);
       if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
     });
