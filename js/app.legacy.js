@@ -201,6 +201,9 @@ let currentSheetType = "sono";
 let currentEditingEventId = null;
 let currentDiaryFilter = "all";
 let selectedDiaryDay = null;
+let autoSelectedLatestFamilyDay = false;
+let familyDayIdsCache = [];
+let familyDayIdsCacheAt = 0;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
 let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
@@ -470,7 +473,12 @@ function hasPermissionForAction(actionText = "") {
 }
 
 function requireLogin(actionText = "usar o Ninou") {
-  if (canUsePrivateFeatures() && hasPermissionForAction(actionText)) return true;
+  if (canUsePrivateFeatures() && hasPermissionForAction(actionText)) {
+    if (/(salvar a rotina|salvar registros|excluir registros|zerar a rotina)/i.test(actionText)) {
+      ensureTodaySelectedForRoutineWrite();
+    }
+    return true;
+  }
   if (canUsePrivateFeatures() && !hasPermissionForAction(actionText)) {
     if (loginHelper) loginHelper.textContent = `Seu perfil (${getRoleLabel(familyAccess.role)}) não permite ${actionText}.`;
     return false;
@@ -483,6 +491,22 @@ function requireLogin(actionText = "usar o Ninou") {
       : `Entre com uma conta autorizada para ${actionText}. Novos usuários entram por convite do administrador do app.`;
   }
   return false;
+}
+
+function ensureTodaySelectedForRoutineWrite() {
+  const todayStart = getDayStart();
+  if ((selectedDiaryDay ?? todayStart) === todayStart) return;
+
+  setSelectedDiaryDayById(getCurrentDayId());
+  timelineRenderSignature = "";
+
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    subscribeToCloudDay(getCurrentDayId(), { resetIfMissing: false });
+    return;
+  }
+
+  state = loadLocalDayState();
+  renderAll();
 }
 
 function normalizeEmail(value = "") {
@@ -623,6 +647,29 @@ async function cleanupDuplicatePendingInvites(services, email, familyId, keepCod
 
 function getActiveFamilyId() {
   return familyAccess?.familyId || (cloudUser ? cloudUser.uid : "");
+}
+
+function getSelectedDayId() {
+  return toDateInputValue(selectedDiaryDay ?? getDayStart());
+}
+
+function isDateId(value = "") {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
+}
+
+function setSelectedDiaryDayById(dayId = getCurrentDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  selectedDiaryDay = getDayStart(new Date(`${safeDayId}T12:00:00`).getTime());
+  if (diaryDateInput) {
+    diaryDateInput.value = safeDayId;
+    if (!diaryDateInput.max || diaryDateInput.max < safeDayId) diaryDateInput.max = safeDayId;
+    if (!diaryDateInput.min || diaryDateInput.min > safeDayId) diaryDateInput.min = safeDayId;
+  }
+}
+
+function resetFamilyDayCache() {
+  familyDayIdsCache = [];
+  familyDayIdsCacheAt = 0;
 }
 
 function isFamilyAdmin() {
@@ -1367,7 +1414,7 @@ function getMigrationContextPriority(context = {}) {
   const isEmailSearch = discoveries.includes("email") || Boolean(context.manualEmail);
   const isExactEmailSearch = context.manualEmail && normalizeEmail(context.manualEmail) === email;
 
-  // A v75.17 prioriza busca manual por e-mail/UID e fontes associadas ao Francisco.
+  // A v75.18 prioriza busca manual por e-mail/UID e fontes associadas ao Francisco.
   // Isso evita que dados de teste com foto/perfil tenham score maior e sejam migrados por engano.
   return (isExactEmailSearch ? 130000 : 0)
     + (isEmailSearch ? 120000 : 0)
@@ -1403,7 +1450,7 @@ function renderFamilyMigrationPanel(options = {}) {
 
   if (lastMigrationResult && !options.forceList) {
     const result = lastMigrationResult;
-    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família principal. Os dados antigos continuam preservados.`;
+    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família principal. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
     adminMigrationSources.innerHTML = `
       <li class="admin-migration-source is-best">
         <div>
@@ -1483,9 +1530,17 @@ function applyMigrationContextToCurrentView(context) {
   if (Array.isArray(context.weights)) localStorage.setItem(storageKeys.weights, JSON.stringify(context.weights));
 
   const todayId = getCurrentDayId();
-  const latestDayId = Object.keys(context.dayStates || {}).sort().at(-1);
-  const currentDayState = (context.dayStates || {})[todayId] || (context.dayStates || {})[latestDayId] || createEmptyDayState();
+  const dayIds = Object.keys(context.dayStates || {}).filter(isDateId).sort();
+  const latestDayId = dayIds.at(-1);
+  const visibleDayId = (context.dayStates || {})[todayId] ? todayId : latestDayId;
+  const currentDayState = (context.dayStates || {})[visibleDayId] || createEmptyDayState();
   localStorage.setItem(storageKeys.dayState, JSON.stringify(currentDayState));
+  if (visibleDayId) {
+    setSelectedDiaryDayById(visibleDayId);
+    familyDayIdsCache = Array.from(new Set([...familyDayIdsCache, ...dayIds])).filter(isDateId).sort();
+    familyDayIdsCacheAt = Date.now();
+    updateDiaryDateRangeFromFamilyDays();
+  }
 
   wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
   babyProfile = loadBabyProfile();
@@ -1529,6 +1584,34 @@ async function familyCloudHasContent() {
   return { profile, day: dayContent };
 }
 
+async function linkMigrationSourceAccountToFamily(context, familyId, sourceLabel) {
+  const sourceUid = String(context?.uid || "").trim();
+  const sourceEmail = normalizeEmail(context?.manualEmail || context?.email || "");
+  if (!sourceUid) return false;
+
+  const services = await getFirebaseServices();
+  const role = "responsavel";
+  const payload = {
+    familyId,
+    role,
+    email: sourceEmail,
+    ownerUid: cloudUser?.uid || familyId,
+    migratedFrom: sourceLabel,
+    migratedBy: cloudUser?.uid || "",
+    migratedByEmail: cloudUser?.email || "",
+    updatedAt: services.serverTimestamp(),
+  };
+
+  await services.setDoc(services.doc(services.db, "users", sourceUid, "access", "ninou"), payload, { merge: true });
+  await services.setDoc(services.doc(services.db, "families", familyId, "members", sourceUid), {
+    ...payload,
+    uid: sourceUid,
+    status: "active",
+    joinedAt: services.serverTimestamp(),
+  }, { merge: true });
+  return true;
+}
+
 async function uploadMigrationContextToFamily(context) {
   const services = await getFirebaseServices();
   const familyId = familyAccess?.familyId || APP_ADMIN_FAMILY_ID;
@@ -1544,8 +1627,12 @@ async function uploadMigrationContextToFamily(context) {
     ownerUid: cloudUser.uid,
     ownerEmail: cloudUser.email || "",
     title: "Família do Francisco",
+    latestMigratedDayId: Object.keys(context.dayStates || {}).filter(isDateId).sort().at(-1) || "",
+    migratedDayIds: Object.keys(context.dayStates || {}).filter(isDateId).sort(),
     updatedAt: services.serverTimestamp(),
   }, { merge: true });
+
+  const linkedSourceAccount = await linkMigrationSourceAccountToFamily(context, familyId, sourceLabel);
 
   if (context.profile || context.photo || normalizedWeights.length) {
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
@@ -1580,6 +1667,7 @@ async function uploadMigrationContextToFamily(context) {
     eventsMigrated,
     weightsMigrated: normalizedWeights.length,
     profileMigrated: Boolean(context.profile || context.photo || normalizedWeights.length),
+    linkedSourceAccount,
     createdBy: cloudUser.uid,
     createdByEmail: cloudUser.email || "",
     createdAt: services.serverTimestamp(),
@@ -1591,6 +1679,9 @@ async function uploadMigrationContextToFamily(context) {
     events: eventsMigrated,
     weights: normalizedWeights.length,
     source: sourceLabel,
+    linkedSourceAccount,
+    sourceEmail: normalizeEmail(context.manualEmail || context.email || ""),
+    sourceUid: context.uid || "",
   };
 }
 
@@ -1626,6 +1717,8 @@ Os dados antigos não serão apagados.`);
 
   try {
     const migrationResult = await uploadMigrationContextToFamily(context);
+    resetFamilyDayCache();
+    await loadFamilyDayIds({ force: true });
     applyMigrationContextToCurrentView(context);
     setSyncStatus("online", cloudUser?.email || "");
     if (loginHelper) loginHelper.textContent = "Dados do Francisco migrados para a família principal.";
@@ -2385,11 +2478,59 @@ function getCloudProfileRef() {
   return firebaseServices.doc(firebaseServices.db, "families", familyId, "profile", "main");
 }
 
-function getCloudDayRef(dayId = getCurrentDayId()) {
+function getCloudDayRef(dayId = getSelectedDayId()) {
   if (!firebaseServices || !cloudUser) return null;
   const familyId = getActiveFamilyId();
   if (!familyId) return null;
   return firebaseServices.doc(firebaseServices.db, "families", familyId, "days", dayId);
+}
+
+async function loadFamilyDayIds(options = {}) {
+  if (!firebaseServices || !cloudUser || !hasFamilyAccess()) return [];
+  const now = Date.now();
+  if (!options.force && familyDayIdsCache.length && now - familyDayIdsCacheAt < 30000) return familyDayIdsCache;
+
+  try {
+    const familyId = getActiveFamilyId();
+    const snap = await firebaseServices.getDocs(firebaseServices.collection(firebaseServices.db, "families", familyId, "days"));
+    const ids = [];
+    snap.forEach((docSnap) => {
+      const id = docSnap.id;
+      if (!isDateId(id)) return;
+      const data = docSnap.data() || {};
+      if (hasRoutineDayContent(normalizeDayState(data.state && typeof data.state === "object" ? data.state : data))) ids.push(id);
+    });
+    ids.sort();
+    familyDayIdsCache = ids;
+    familyDayIdsCacheAt = now;
+    updateDiaryDateRangeFromFamilyDays(ids);
+    return ids;
+  } catch (error) {
+    console.warn("Não foi possível listar dias da família:", error);
+    return familyDayIdsCache || [];
+  }
+}
+
+function updateDiaryDateRangeFromFamilyDays(dayIds = familyDayIdsCache) {
+  if (!diaryDateInput) return;
+  const todayId = getCurrentDayId();
+  const fallbackMin = toDateInputValue(getDayStart() - 30 * day);
+  const validIds = (dayIds || []).filter(isDateId).sort();
+  diaryDateInput.min = validIds[0] && validIds[0] < fallbackMin ? validIds[0] : fallbackMin;
+  diaryDateInput.max = todayId;
+}
+
+async function maybeOpenLatestFamilyDayAfterEmptyToday(dayId = getSelectedDayId()) {
+  if (autoSelectedLatestFamilyDay || dayId !== getCurrentDayId()) return false;
+  const ids = await loadFamilyDayIds({ force: true });
+  const latest = ids.at(-1);
+  if (!latest || latest === getCurrentDayId()) return false;
+
+  autoSelectedLatestFamilyDay = true;
+  setSelectedDiaryDayById(latest);
+  timelineRenderSignature = "";
+  await subscribeToCloudDay(latest, { allowAutoLatest: false });
+  return true;
 }
 
 function unsubscribeCloudListeners() {
@@ -2433,8 +2574,11 @@ function clearLocalAccountData() {
 }
 
 async function connectCurrentAccount() {
+  resetFamilyDayCache();
+  autoSelectedLatestFamilyDay = false;
   await subscribeToCloudProfile();
-  await subscribeToCloudDay();
+  await loadFamilyDayIds({ force: true });
+  await subscribeToCloudDay(getSelectedDayId());
 }
 
 function getProfilePayload(options = {}) {
@@ -2546,15 +2690,17 @@ async function saveProfileToCloud(options = {}) {
   }
 }
 
-function scheduleDayCloudSave() {
+function scheduleDayCloudSave(dayId = getSelectedDayId()) {
   if (applyingCloudState || !cloudUser || !firebaseServices) return;
 
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   window.clearTimeout(dayCloudSaveTimer);
-  dayCloudSaveTimer = window.setTimeout(saveDayToCloud, 500);
+  dayCloudSaveTimer = window.setTimeout(() => saveDayToCloud(safeDayId), 500);
 }
 
-async function saveDayToCloud() {
-  const dayRef = getCloudDayRef();
+async function saveDayToCloud(dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
   if (!hasRoutineDayContent()) return;
 
@@ -2567,6 +2713,8 @@ async function saveDayToCloud() {
       },
       { merge: true },
     );
+    if (!familyDayIdsCache.includes(safeDayId)) familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
+    updateDiaryDateRangeFromFamilyDays();
     setSyncStatus("online", cloudUser.email);
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
@@ -2596,16 +2744,29 @@ async function subscribeToCloudProfile() {
   });
 }
 
-async function subscribeToCloudDay() {
-  const dayRef = getCloudDayRef();
+async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef) return;
 
   if (dayUnsubscribe) dayUnsubscribe();
 
-  dayUnsubscribe = firebaseServices.onSnapshot(dayRef, (snapshot) => {
+  dayUnsubscribe = firebaseServices.onSnapshot(dayRef, async (snapshot) => {
     if (!snapshot.exists()) {
-      if (hasRoutineDayContent()) saveDayToCloud();
-      else renderAll();
+      if (safeDayId === getCurrentDayId() && hasRoutineDayContent()) {
+        saveDayToCloud(safeDayId);
+      } else if (options.allowAutoLatest !== false && safeDayId === getCurrentDayId()) {
+        const switched = await maybeOpenLatestFamilyDayAfterEmptyToday(safeDayId);
+        if (!switched) {
+          state = createEmptyDayState();
+          saveLocalDayState();
+          renderAll();
+        }
+      } else {
+        state = createEmptyDayState();
+        saveLocalDayState();
+        renderAll();
+      }
       return;
     }
 
@@ -3612,14 +3773,19 @@ function setDiaryFilter(filter) {
   renderTimeline();
 }
 
-function setDiaryDate(value) {
-  selectedDiaryDay = value ? getDayStart(new Date(`${value}T12:00:00`).getTime()) : getDayStart();
-  renderTimeline();
+async function setDiaryDate(value) {
+  setSelectedDiaryDayById(value || getCurrentDayId());
+  timelineRenderSignature = "";
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    await subscribeToCloudDay(getSelectedDayId(), { allowAutoLatest: false });
+  } else {
+    renderTimeline();
+  }
 }
 
 function initDiaryDatePicker() {
   const today = getDayStart();
-  const minDay = today - 4 * day;
+  const minDay = today - 30 * day;
   selectedDiaryDay = today;
   diaryDateInput.min = toDateInputValue(minDay);
   diaryDateInput.max = toDateInputValue(today);

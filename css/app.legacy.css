@@ -4422,3 +4422,138 @@ body.day-theme .admin-stats-grid article span,
 body.day-theme .admin-stats-grid article small {
   color: #5b4034 !important;
 }
+
+/* v75.19 - Admin responsivo: evita tela partida/zoomada por textos longos e cards fixos */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body.global-admin-mode {
+  place-items: stretch center;
+}
+
+body.global-admin-mode .phone-shell {
+  width: min(100%, 720px);
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body.global-admin-mode .screen[data-screen="profile"],
+body.global-admin-mode .settings-list,
+body.global-admin-mode .admin-access-card,
+body.global-admin-mode .admin-clean-panel,
+body.global-admin-mode .admin-clean-hero,
+body.global-admin-mode .admin-clean-section,
+body.global-admin-mode .admin-stats-grid,
+body.global-admin-mode .admin-access-list,
+body.global-admin-mode .admin-access-item,
+body.global-admin-mode .admin-manual-migration,
+body.global-admin-mode .invite-result {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+body.global-admin-mode .admin-access-card {
+  overflow: hidden;
+}
+
+body.global-admin-mode .admin-clean-panel {
+  overflow-x: hidden;
+}
+
+body.global-admin-mode .admin-clean-panel span,
+body.global-admin-mode .admin-clean-panel strong,
+body.global-admin-mode .admin-clean-panel em,
+body.global-admin-mode .admin-clean-panel p,
+body.global-admin-mode .admin-clean-panel small,
+body.global-admin-mode .admin-clean-panel li,
+body.global-admin-mode .admin-clean-panel input,
+body.global-admin-mode .admin-clean-panel select,
+body.global-admin-mode .admin-clean-panel button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+body.global-admin-mode .admin-clean-panel span,
+body.global-admin-mode .admin-clean-panel small,
+body.global-admin-mode .admin-clean-panel li {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+body.global-admin-mode .admin-clean-hero > div,
+body.global-admin-mode .admin-stats-header > div,
+body.global-admin-mode .admin-access-item > div,
+body.global-admin-mode .admin-migration-source > div,
+body.global-admin-mode .admin-manual-migration label {
+  min-width: 0;
+}
+
+body.global-admin-mode .admin-clean-hero > div > span,
+body.global-admin-mode .admin-stats-header span,
+body.global-admin-mode .admin-stats-grid span,
+body.global-admin-mode .admin-clean-section .admin-invite-header > span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+body.global-admin-mode .admin-migration-source span {
+  display: block;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+body.global-admin-mode .admin-manual-migration button,
+body.global-admin-mode #restoreFamilyDataButton,
+body.global-admin-mode #createInviteButton,
+body.global-admin-mode .admin-refresh-button {
+  width: 100%;
+  white-space: normal;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+@media (max-width: 520px) {
+  body {
+    display: block;
+  }
+
+  body.global-admin-mode .phone-shell {
+    width: 100vw;
+    min-height: 100dvh;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    border-radius: 0;
+  }
+
+  body.global-admin-mode .admin-access-card,
+  body.global-admin-mode .admin-clean-hero,
+  body.global-admin-mode .admin-clean-section {
+    border-radius: 22px;
+  }
+
+  body.global-admin-mode .admin-clean-hero strong {
+    font-size: clamp(1.35rem, 8vw, 1.9rem);
+  }
+
+  body.global-admin-mode .admin-clean-section {
+    padding: 14px;
+  }
+
+  body.global-admin-mode .admin-stats-grid,
+  body.global-admin-mode .admin-access-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.global-admin-mode .admin-access-actions {
+    display: grid;
+  }
+
+  body.global-admin-mode .admin-access-actions button {
+    width: 100%;
+  }
+}

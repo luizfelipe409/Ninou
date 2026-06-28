@@ -1,27 +1,22 @@
-# Ninou v75.17 — Migração por e-mail, pesos e status claro
+# Ninou v75.19 — Admin responsivo e sem tela partida
 
-Versão criada para resolver a confusão vista no fluxo de administração/migração.
+Esta versão mantém as correções da v75.18 e ajusta a tela administrativa para evitar aparência de zoom, corte lateral e quebra visual em celulares.
 
-## Ajustes principais
+## Mantido da v75.18
 
-- Adicionada busca manual por e-mail antigo, como `francisco@gmail.com`.
-- A busca por e-mail consulta `users`, `access` e `profile` para localizar o UID correto.
-- A migração agora grava também `weights` em `families/ninou-family-luizfelipe/profile/main`.
-- Após clicar em migrar, a tela mostra status de conclusão e não volta imediatamente para o loop de “dados encontrados”.
-- O alerta de confirmação ficou mais claro: mostra quantidade de registros, dias, destino e informa que os dados antigos não serão apagados.
-- No perfil conectado como admin, o topo passa a mostrar “Painel admin do Ninou” em vez de “Diário do Francisco”.
-- Cache atualizado para `ninou-v75-17-migracao-email-pesos`.
+- Migração por e-mail e UID.
+- Cópia de perfil, foto, pesos e rotina para `families/ninou-family-luizfelipe`.
+- Vinculação da conta migrada em `families/{familyId}/members/{uid}` e `users/{uid}/access/ninou`.
+- Leitura dos dias migrados pelo calendário/último dia com dados.
 
-## Caminhos finais esperados
+## Novo na v75.19
 
-- Perfil/foto/pesos: `families/ninou-family-luizfelipe/profile/main`
-- Rotina diária: `families/ninou-family-luizfelipe/days/AAAA-MM-DD`
-- Membros autorizados: `families/ninou-family-luizfelipe/members/{uid}`
+- Admin com largura fluida e limite maior em telas grandes.
+- Correção de overflow horizontal em textos longos, e-mails, UIDs e caminhos do Firestore.
+- Botões, inputs e listas do admin ocupando 100% da largura disponível no mobile.
+- Caminhos como `families/ninou-family-luizfelipe/profile/main` deixam de forçar zoom ou corte lateral.
+- Textos de status deixam de ficar em caixa alta por herança da tela de perfil.
 
-## Regras
+## Depois de publicar
 
-Publique as regras em:
-
-`docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_17.md`
-
-Depois faça hard refresh no navegador ou remova/reinstale o PWA no iPhone.
+Atualize o PWA ou remova/adicone novamente à tela inicial para garantir que o cache antigo saia.
