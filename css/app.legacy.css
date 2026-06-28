@@ -4280,3 +4280,145 @@ body.global-admin-mode .admin-access-card {
   color: #8df3c9;
   font-weight: 900;
 }
+
+
+/* v75.14 - Migração inteligente por collectionGroup/UID */
+.admin-manual-migration {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  margin: 10px 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.045);
+}
+.admin-manual-migration label {
+  display: grid;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.admin-manual-migration input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  padding: 0 12px;
+  font-size: 0.92rem;
+}
+.admin-manual-migration small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+.admin-migration-source.is-manual {
+  border-color: rgba(150, 220, 255, 0.36);
+}
+
+
+/* v75.15 - Contraste reforçado no Admin, especialmente no tema claro */
+body.day-theme .admin-clean-panel label,
+body.day-theme .admin-manual-migration label,
+body.day-theme .admin-create-invite-card label,
+body.day-theme .invite-accept-box label {
+  color: #5b4034 !important;
+  text-shadow: none !important;
+}
+
+body.day-theme .admin-clean-panel input,
+body.day-theme .admin-clean-panel select,
+body.day-theme .admin-manual-migration input,
+body.day-theme .invite-accept-box input,
+body.day-theme #adminInviteEmail,
+body.day-theme #adminInviteRole,
+body.day-theme #adminMigrationUidInput {
+  background: #fffaf2 !important;
+  color: #2f211b !important;
+  border-color: rgba(126, 82, 45, 0.34) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), 0 8px 20px rgba(154, 105, 56, 0.08) !important;
+  -webkit-text-fill-color: #2f211b !important;
+}
+
+body.day-theme .admin-clean-panel input::placeholder,
+body.day-theme .admin-manual-migration input::placeholder,
+body.day-theme .invite-accept-box input::placeholder {
+  color: rgba(72, 48, 38, 0.58) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: rgba(72, 48, 38, 0.58) !important;
+}
+
+body.day-theme .admin-clean-panel select,
+body.day-theme #adminInviteRole {
+  background-image:
+    linear-gradient(45deg, transparent 50%, #5b4034 50%),
+    linear-gradient(135deg, #5b4034 50%, transparent 50%) !important;
+  background-position: calc(100% - 22px) 23px, calc(100% - 15px) 23px !important;
+  background-size: 7px 7px, 7px 7px !important;
+  background-repeat: no-repeat !important;
+}
+
+body.day-theme .admin-migration-status,
+body.day-theme .admin-manual-migration small,
+body.day-theme .admin-stats-hint,
+body.day-theme .admin-clean-hero p,
+body.day-theme .admin-clean-section .admin-invite-header em,
+body.day-theme .admin-access-list > li:not(.admin-access-item),
+body.day-theme .admin-migration-list > li,
+body.day-theme .invite-result span {
+  color: #5b4034 !important;
+}
+
+body.day-theme .admin-access-list > li:not(.admin-access-item),
+body.day-theme .admin-migration-list > li {
+  background: rgba(255, 250, 242, 0.88) !important;
+  border-color: rgba(126, 82, 45, 0.22) !important;
+}
+
+body.day-theme .admin-manual-migration {
+  background: rgba(255, 250, 242, 0.72) !important;
+  border-color: rgba(126, 82, 45, 0.22) !important;
+}
+
+body.day-theme .admin-create-invite-card > button,
+body.day-theme .admin-refresh-button,
+body.day-theme .admin-access-actions button,
+body.day-theme #restoreFamilyDataButton,
+body.day-theme #scanLegacyUidButton,
+body.day-theme .secondary-login {
+  color: #245f4e !important;
+  background: rgba(79, 180, 139, 0.18) !important;
+  border-color: rgba(45, 130, 98, 0.34) !important;
+  box-shadow: 0 8px 18px rgba(83, 133, 101, 0.10) !important;
+}
+
+body.day-theme .admin-access-actions button[data-cancel-invite] {
+  color: #8b3a2f !important;
+  background: rgba(232, 137, 109, 0.16) !important;
+  border-color: rgba(176, 86, 66, 0.34) !important;
+}
+
+body.day-theme .invite-result,
+body.day-theme .admin-migration-source.is-best,
+body.day-theme .admin-migration-source.is-manual {
+  background: rgba(255, 250, 242, 0.9) !important;
+  border-color: rgba(45, 130, 98, 0.24) !important;
+  color: #2f211b !important;
+}
+
+body.day-theme .admin-migration-source small {
+  background: rgba(79, 180, 139, 0.18) !important;
+  color: #245f4e !important;
+}
+
+body.day-theme .admin-clean-section .admin-invite-header strong,
+body.day-theme .admin-clean-hero strong,
+body.day-theme .admin-stats-grid strong,
+body.day-theme .admin-access-item strong {
+  color: #2f211b !important;
+}
+
+body.day-theme .admin-stats-grid article span,
+body.day-theme .admin-stats-grid article small {
+  color: #5b4034 !important;
+}

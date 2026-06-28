@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.13" />
+    <link rel="stylesheet" href="./styles.css?v=75.15" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -500,6 +500,14 @@
                 <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
                   <li>A busca ainda não começou.</li>
                 </ul>
+                <div class="admin-manual-migration">
+                  <label>
+                    UID da conta antiga, se souber
+                    <input id="adminMigrationUidInput" type="text" placeholder="Cole o UID antigo do Firebase" autocomplete="off" />
+                  </label>
+                  <button id="scanLegacyUidButton" class="secondary-login" type="button">Buscar por UID</button>
+                  <small>Use quando os dados aparecem em users/{uid}/activities, mas a busca automática não encontra.</small>
+                </div>
                 <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
               </section>
 
@@ -688,6 +696,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.13"></script>
+    <script type="module" src="./app.js?v=75.15"></script>
   </body>
 </html>

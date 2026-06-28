@@ -120,6 +120,8 @@ const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton
 const adminMigrationStatus = document.querySelector("#adminMigrationStatus");
 const adminMigrationSources = document.querySelector("#adminMigrationSources");
 const restoreFamilyDataButton = document.querySelector("#restoreFamilyDataButton");
+const adminMigrationUidInput = document.querySelector("#adminMigrationUidInput");
+const scanLegacyUidButton = document.querySelector("#scanLegacyUidButton");
 const guestWhatsappButton = document.querySelector("#guestWhatsappButton");
 const resetDataButton = document.querySelector("#resetDataButton");
 const exportJsonButton = document.querySelector("#exportJsonButton");
@@ -1018,6 +1020,45 @@ async function readMaybeCollection(services, ...pathParts) {
   }
 }
 
+function getLegacyUidFromPath(path = "") {
+  const match = String(path || "").match(/^users\/([^/]+)\//);
+  return match ? match[1] : "";
+}
+
+async function readMaybeCollectionGroup(services, groupName) {
+  if (!services.collectionGroup) return [];
+  try {
+    const snap = await services.getDocs(services.collectionGroup(services.db, groupName));
+    const docs = [];
+    snap.forEach((docSnap) => docs.push({
+      id: docSnap.id,
+      path: docSnap.ref?.path || "",
+      uid: getLegacyUidFromPath(docSnap.ref?.path || ""),
+      data: docSnap.data() || {},
+    }));
+    return docs;
+  } catch (error) {
+    console.warn("Não foi possível consultar collectionGroup legado:", groupName, error);
+    return [];
+  }
+}
+
+async function collectLegacyUidsByCollectionGroups(services) {
+  const groups = ["activities", "days", "profile", "access"];
+  const uids = new Set();
+  const counts = {};
+
+  for (const group of groups) {
+    const docs = await readMaybeCollectionGroup(services, group);
+    counts[group] = docs.length;
+    docs.forEach((item) => {
+      if (item.uid) uids.add(item.uid);
+    });
+  }
+
+  return { uids: Array.from(uids), counts };
+}
+
 async function buildLegacyCloudContextFromUser(services, userDoc) {
   const uid = userDoc.id;
   const rootData = userDoc.data() || {};
@@ -1087,15 +1128,41 @@ async function scanLegacyCloudSources(options = {}) {
 
   try {
     const services = await getFirebaseServices();
-    const usersSnapshot = await services.getDocs(services.collection(services.db, "users"));
-    const contexts = [];
-    for (const userDoc of usersSnapshot.docs || []) {
-      const context = await buildLegacyCloudContextFromUser(services, userDoc);
-      if (context) contexts.push(context);
+    const uidMap = new Map();
+    const addUid = (uid, reason = "") => {
+      const clean = String(uid || "").trim();
+      if (!clean) return;
+      if (!uidMap.has(clean)) uidMap.set(clean, new Set());
+      if (reason) uidMap.get(clean).add(reason);
+    };
+
+    // 1) Tenta listar users/{uid}. Isso só encontra documentos raiz existentes.
+    try {
+      const usersSnapshot = await services.getDocs(services.collection(services.db, "users"));
+      (usersSnapshot.docs || []).forEach((docSnap) => addUid(docSnap.id, "users"));
+    } catch (error) {
+      console.warn("Não foi possível listar users. Tentando collectionGroup.", error);
     }
-    legacyCloudContexts = contexts
-      .filter((context) => normalizeEmail(context.email) !== normalizeEmail(cloudUser?.email || ""))
-      .sort((a, b) => b.score - a.score || String(a.email).localeCompare(String(b.email)));
+
+    // 2) Tenta collectionGroup. Isso ajuda quando users/{uid} é um documento fantasma
+    // com subcoleções, situação comum no Firestore Console.
+    const groupScan = await collectLegacyUidsByCollectionGroups(services);
+    groupScan.uids.forEach((uid) => addUid(uid, "collectionGroup"));
+
+    // 3) Inclui UID manual, quando o admin cola o UID antigo visível no Console.
+    const manualUid = normalizeMigrationUid(adminMigrationUidInput?.value || "");
+    if (manualUid) addUid(manualUid, "manual");
+
+    const contexts = [];
+    for (const uid of uidMap.keys()) {
+      const context = await buildLegacyCloudContextFromUser(services, { id: uid, data: () => ({}) });
+      if (context) {
+        context.discovery = Array.from(uidMap.get(uid) || []);
+        contexts.push(context);
+      }
+    }
+
+    legacyCloudContexts = contexts.sort(compareMigrationContexts);
     legacyCloudScanState = "done";
     renderFamilyMigrationPanel({ skipScan: true });
     return legacyCloudContexts;
@@ -1108,17 +1175,81 @@ async function scanLegacyCloudSources(options = {}) {
   }
 }
 
+function normalizeMigrationUid(value = "") {
+  return String(value || "")
+    .trim()
+    .replace(/^users\//, "")
+    .split("/")[0]
+    .trim();
+}
+
+async function scanLegacySourceByManualUid() {
+  if (!isFamilyAdmin()) return null;
+  const uid = normalizeMigrationUid(adminMigrationUidInput?.value || "");
+  if (!uid) {
+    if (adminMigrationStatus) adminMigrationStatus.textContent = "Cole o UID antigo do Firebase para buscar manualmente.";
+    return null;
+  }
+
+  if (scanLegacyUidButton) {
+    scanLegacyUidButton.disabled = true;
+    scanLegacyUidButton.textContent = "Buscando...";
+  }
+  if (adminMigrationStatus) adminMigrationStatus.textContent = `Buscando dados no UID ${uid}...`;
+
+  try {
+    const services = await getFirebaseServices();
+    const context = await buildLegacyCloudContextFromUser(services, { id: uid, data: () => ({}) });
+    if (!context) {
+      if (adminMigrationStatus) adminMigrationStatus.textContent = `Nenhum dado recuperável encontrado em users/${uid}. Abra users/${uid}/activities no Firebase e confira se há documentos.`;
+      return null;
+    }
+    context.discovery = Array.from(new Set([...(context.discovery || []), "manual"]));
+    const existing = legacyCloudContexts.filter((item) => item.uid !== uid);
+    legacyCloudContexts = [context, ...existing].sort(compareMigrationContexts);
+    legacyCloudScanState = "done";
+    renderFamilyMigrationPanel({ skipScan: true });
+    return context;
+  } catch (error) {
+    console.error("Erro ao buscar UID manual:", error);
+    if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
+    return null;
+  } finally {
+    if (scanLegacyUidButton) {
+      scanLegacyUidButton.disabled = false;
+      scanLegacyUidButton.textContent = "Buscar por UID";
+    }
+  }
+}
+
+function getMigrationContextPriority(context = {}) {
+  const email = normalizeEmail(context.email || "");
+  const name = normalizeEmail(context.profile?.name || "");
+  const isManual = Array.isArray(context.discovery) && context.discovery.includes("manual");
+
+  // A v75.16 prioriza o UID colado manualmente e fontes associadas ao Francisco.
+  // Isso evita que dados de teste com foto/perfil tenham score maior e sejam migrados por engano.
+  return (isManual ? 100000 : 0)
+    + (email.includes("francisco") ? 20000 : 0)
+    + (name.includes("francisco") ? 10000 : 0)
+    + (Number(context.score) || 0);
+}
+
+function compareMigrationContexts(a = {}, b = {}) {
+  return getMigrationContextPriority(b) - getMigrationContextPriority(a)
+    || (Number(b.score) || 0) - (Number(a.score) || 0)
+    || String(a.email || a.uid || "").localeCompare(String(b.email || b.uid || ""));
+}
+
 function getCombinedRestorableContexts() {
-  const currentEmail = normalizeEmail(cloudUser?.email || "");
   const localContexts = getRestorableContexts()
-    .filter((context) => context.email !== currentEmail)
     .map((context) => ({ ...context, source: "local", dayStates: { [getCurrentDayId()]: context.dayState }, eventsCount: context.eventsCount || 0 }));
   const byKey = new Map();
   [...legacyCloudContexts, ...localContexts].forEach((context) => {
     const key = `${context.source}:${context.uid || context.email}`;
     if (!byKey.has(key)) byKey.set(key, context);
   });
-  return Array.from(byKey.values()).sort((a, b) => b.score - a.score || String(a.email).localeCompare(String(b.email)));
+  return Array.from(byKey.values()).sort(compareMigrationContexts);
 }
 
 function getBestRestorableSource() {
@@ -1163,8 +1294,8 @@ function renderFamilyMigrationPanel(options = {}) {
   }
 
   if (!best) {
-    adminMigrationStatus.textContent = "Nenhum dado antigo encontrado no Firebase nem neste aparelho. Confira se a conta antiga possui registros em users/{uid}/activities ou users/{uid}/days.";
-    adminMigrationSources.innerHTML = "<li>Nenhuma origem recuperável encontrada.</li>";
+    adminMigrationStatus.textContent = "Nenhum dado antigo encontrado automaticamente. Se você vê activities no Firebase, cole o UID antigo acima e toque em Buscar por UID.";
+    adminMigrationSources.innerHTML = "<li>Nenhuma origem automática encontrada. Use a busca por UID se o documento users/{uid} só possuir subcoleções.</li>";
     restoreFamilyDataButton.hidden = true;
     return;
   }
@@ -1176,7 +1307,7 @@ function renderFamilyMigrationPanel(options = {}) {
         <strong>${escapeHtml(context.email || context.uid || "Conta encontrada")}</strong>
         <span>${escapeHtml(getContextBabyLabel(context))}</span>
       </div>
-      ${index === 0 ? "<small>Melhor opção</small>" : `<small>${context.source === "cloud" ? "Firebase" : "Aparelho"}</small>`}
+      ${context.discovery?.includes("manual") ? "<small>UID manual</small>" : (index === 0 ? "<small>Melhor opção</small>" : `<small>${context.source === "cloud" ? "Firebase" : "Aparelho"}</small>`) }
     </li>
   `).join("");
   restoreFamilyDataButton.hidden = false;
@@ -3825,6 +3956,14 @@ if (restoreFamilyDataButton) {
   restoreFamilyDataButton.addEventListener("click", () => {
     restoreFamilyDataFromBestSource().catch((error) => {
       console.error("Erro ao importar dados familiares:", error);
+      if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
+    });
+  });
+}
+if (scanLegacyUidButton) {
+  scanLegacyUidButton.addEventListener("click", () => {
+    scanLegacySourceByManualUid().catch((error) => {
+      console.error("Erro ao buscar UID legado:", error);
       if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
     });
   });

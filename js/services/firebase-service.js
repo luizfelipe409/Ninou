@@ -24,6 +24,7 @@ export async function getFirebaseServices() {
           db: firestoreModule.getFirestore(app),
           doc: firestoreModule.doc,
           collection: firestoreModule.collection,
+          collectionGroup: firestoreModule.collectionGroup,
           setDoc: firestoreModule.setDoc,
           getDoc: firestoreModule.getDoc,
           getDocs: firestoreModule.getDocs,
