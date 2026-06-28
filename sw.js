@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-9-admin-contexto";
+const CACHE_NAME = "ninou-v75-11-admin-limpo";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.9",
-  "/css/app.legacy.css?v=75.9",
-  "/app.js?v=75.9",
-  "/js/app.legacy.js?v=75.9",
+  "/styles.css?v=75.11",
+  "/css/app.legacy.css?v=75.11",
+  "/app.js?v=75.11",
+  "/js/app.legacy.js?v=75.11",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

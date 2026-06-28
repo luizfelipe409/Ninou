@@ -1,6 +1,6 @@
-// Ninou v75.9 - correção de regras Firestore e convites
+// Ninou v75.11 - Admin limpo e profissional
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.9";
+const NINOU_APP_VERSION = "75.11";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

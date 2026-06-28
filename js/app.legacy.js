@@ -110,6 +110,8 @@ const adminInviteRole = document.querySelector("#adminInviteRole");
 const createInviteButton = document.querySelector("#createInviteButton");
 const inviteResult = document.querySelector("#inviteResult");
 const inviteList = document.querySelector("#inviteList");
+const adminPendingInviteList = document.querySelector("#adminPendingInviteList");
+const adminMembersList = document.querySelector("#adminMembersList");
 const adminUsersCount = document.querySelector("#adminUsersCount");
 const adminPendingInvitesCount = document.querySelector("#adminPendingInvitesCount");
 const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesCount");
@@ -502,6 +504,7 @@ function loadFamilyAccess() {
       role: normalizeRole(data.role),
       email: normalizeEmail(data.email),
       ownerUid: data.ownerUid ? String(data.ownerUid) : "",
+      inviteCode: data.inviteCode ? normalizeInviteCode(data.inviteCode) : "",
       acceptedAt: data.acceptedAt || data.createdAt || "",
     };
   } catch {
@@ -516,6 +519,7 @@ function saveFamilyAccess(access) {
         role: getEffectiveRole(access.role, access.email || cloudUser?.email || ""),
         email: normalizeEmail(access.email || cloudUser?.email || ""),
         ownerUid: access.ownerUid ? String(access.ownerUid) : "",
+        inviteCode: access.inviteCode ? normalizeInviteCode(access.inviteCode) : "",
         acceptedAt: access.acceptedAt || access.createdAt || new Date().toISOString(),
       }
     : null;
@@ -552,12 +556,57 @@ function createInviteCode() {
   return `NINOU-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}`;
 }
 
+function stableInviteToken(input = "") {
+  const text = String(input || "").trim().toLowerCase();
+  let hashA = 0x811c9dc5;
+  let hashB = 0x45d9f3b;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const code = text.charCodeAt(index);
+    hashA ^= code;
+    hashA = Math.imul(hashA, 0x01000193) >>> 0;
+    hashB ^= code + index;
+    hashB = Math.imul(hashB, 0x27d4eb2d) >>> 0;
+  }
+
+  return `${hashA.toString(16).padStart(8, "0")}${hashB.toString(16).padStart(8, "0")}`.toUpperCase();
+}
+
+function createInviteCodeForEmail(email = "", familyId = APP_ADMIN_FAMILY_ID) {
+  const token = stableInviteToken(`${normalizeEmail(email)}|${familyId}|ninou`);
+  return `NINOU-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}`;
+}
+
 function buildInviteLink(code) {
   const url = new URL(window.location.href);
   url.search = "";
   url.hash = "";
   url.searchParams.set("convite", code);
   return url.toString();
+}
+
+async function cleanupDuplicatePendingInvites(services, email, familyId, keepCode) {
+  try {
+    const snapshot = await services.getDocs(services.collection(services.db, "invites"));
+    const updates = [];
+    snapshot.forEach((inviteDoc) => {
+      const data = inviteDoc.data() || {};
+      const sameEmail = normalizeEmail(data.email || "") === normalizeEmail(email);
+      const sameFamily = data.familyId === familyId;
+      const isDuplicate = inviteDoc.id !== keepCode;
+      const isPending = !data.status || data.status === "pending";
+      if (sameEmail && sameFamily && isDuplicate && isPending) {
+        updates.push(services.setDoc(
+          services.doc(services.db, "invites", inviteDoc.id),
+          { status: "cancelled", replacedBy: keepCode, cancelledAt: services.serverTimestamp() },
+          { merge: true },
+        ));
+      }
+    });
+    await Promise.allSettled(updates);
+  } catch (error) {
+    console.warn("Não foi possível limpar convites duplicados:", error);
+  }
 }
 
 function getActiveFamilyId() {
@@ -603,11 +652,56 @@ function setAdminStatsPlaceholder(message = "Entre como admin para visualizar os
   setText(adminStatsHint, message);
 }
 
+function renderAdminAccessLists(stats = null) {
+  if (adminPendingInviteList) {
+    const pending = Array.isArray(stats?.pendingInvites) ? stats.pendingInvites : [];
+    if (!pending.length) {
+      adminPendingInviteList.innerHTML = "<li>Nenhum convite pendente.</li>";
+    } else {
+      adminPendingInviteList.innerHTML = pending.slice(0, 8).map((invite) => {
+        const code = escapeHtml(invite.code || "");
+        const link = escapeHtml(buildInviteLink(invite.code || ""));
+        return `
+          <li class="admin-access-item">
+            <div>
+              <strong>${escapeHtml(invite.email || "Convite sem e-mail")}</strong>
+              <span>${escapeHtml(getRoleLabel(invite.role))} • ${code}</span>
+            </div>
+            <div class="admin-access-actions">
+              <button type="button" data-copy-invite="${code}">Copiar código</button>
+              <button type="button" data-copy-invite="${link}">Copiar link</button>
+              <button type="button" data-cancel-invite="${code}">Cancelar</button>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+  }
+
+  if (adminMembersList) {
+    const members = Array.isArray(stats?.members) ? stats.members : [];
+    if (!members.length) {
+      adminMembersList.innerHTML = "<li>Nenhum usuário autorizado ainda.</li>";
+    } else {
+      adminMembersList.innerHTML = members.slice(0, 10).map((member) => `
+        <li class="admin-access-item">
+          <div>
+            <strong>${escapeHtml(member.email || "Usuário sem e-mail")}</strong>
+            <span>${escapeHtml(getRoleLabel(member.role))}${member.isAdmin ? " • Admin do app" : ""}</span>
+          </div>
+          <small>${member.joinedAt ? "Entrou na família" : "Autorizado"}</small>
+        </li>
+      `).join("");
+    }
+  }
+}
+
 function renderAdminStats(stats = null) {
   if (!adminUsersCount || !adminPendingInvitesCount || !adminAcceptedInvitesCount) return;
 
   if (!stats) {
     setAdminStatsPlaceholder();
+    renderAdminAccessLists(null);
     return;
   }
 
@@ -616,8 +710,9 @@ function renderAdminStats(stats = null) {
   setText(adminAcceptedInvitesCount, String(stats.acceptedInvitesCount ?? 0));
   setText(
     adminStatsHint,
-    `${pluralize(stats.membersCount ?? 0, "usuário autorizado", "usuários autorizados")} na família principal. Contas criadas no Firebase sem convite não aparecem aqui até aceitarem acesso.`,
+    `${pluralize(stats.membersCount ?? 0, "usuário autorizado", "usuários autorizados")} na família principal. O admin vê somente convites e acessos.`,
   );
+  renderAdminAccessLists(stats);
 }
 
 async function refreshAdminStats(options = {}) {
@@ -633,26 +728,58 @@ async function refreshAdminStats(options = {}) {
   try {
     const services = await getFirebaseServices();
     const familyId = familyAccess.familyId;
-    const [membersSnapshot, invitesSnapshot] = await Promise.all([
+    const [membersSnapshot, globalInvitesSnapshot] = await Promise.all([
       services.getDocs(services.collection(services.db, "families", familyId, "members")),
-      services.getDocs(services.collection(services.db, "families", familyId, "invites")),
+      services.getDocs(services.collection(services.db, "invites")),
     ]);
 
-    let membersCount = 0;
+    const members = [];
     membersSnapshot.forEach((memberDoc) => {
       const data = memberDoc.data() || {};
-      if ((data.status || "active") !== "removed") membersCount += 1;
+      if ((data.status || "active") === "removed") return;
+      const email = normalizeEmail(data.email || "");
+      const role = getEffectiveRole(data.role || "visualizacao", email);
+      members.push({
+        uid: memberDoc.id,
+        email,
+        role,
+        isAdmin: isGlobalAdminEmail(email),
+        joinedAt: data.joinedAt || data.acceptedAt || data.updatedAt || null,
+      });
     });
+    members.sort((a, b) => Number(Boolean(b.isAdmin)) - Number(Boolean(a.isAdmin)) || String(a.email).localeCompare(String(b.email)));
 
-    let pendingInvitesCount = 0;
-    let acceptedInvitesCount = 0;
-    invitesSnapshot.forEach((inviteDoc) => {
+    const pendingMap = new Map();
+    const acceptedEmails = new Set();
+    globalInvitesSnapshot.forEach((inviteDoc) => {
       const data = inviteDoc.data() || {};
-      if (data.status === "active" || data.status === "accepted") acceptedInvitesCount += 1;
-      else if (!data.status || data.status === "pending") pendingInvitesCount += 1;
+      if (data.familyId !== familyId) return;
+      const emailKey = normalizeEmail(data.email || inviteDoc.id);
+      const status = data.status || "pending";
+      const invite = {
+        code: data.code || inviteDoc.id,
+        email: emailKey,
+        role: normalizeInviteRole(data.role || "responsavel"),
+        status,
+      };
+      if (status === "accepted" || status === "active") {
+        acceptedEmails.add(emailKey);
+        pendingMap.delete(emailKey);
+      } else if (status === "pending" && !pendingMap.has(emailKey)) {
+        pendingMap.set(emailKey, invite);
+      }
     });
 
-    const stats = { membersCount, pendingInvitesCount, acceptedInvitesCount };
+    acceptedEmails.forEach((email) => pendingMap.delete(email));
+    const pendingInvites = Array.from(pendingMap.values()).filter((invite) => invite.email);
+
+    const stats = {
+      members,
+      pendingInvites,
+      membersCount: members.length,
+      pendingInvitesCount: pendingInvites.length,
+      acceptedInvitesCount: acceptedEmails.size,
+    };
     if (requestId === adminStatsRequestId) renderAdminStats(stats);
     return stats;
   } catch (error) {
@@ -691,7 +818,7 @@ function renderFamilyAccessPanel() {
 
   if (familyAccessTitle) {
     familyAccessTitle.textContent = authorized
-      ? (appAdmin ? "Admin do app conectado" : "Família conectada")
+      ? (appAdmin ? "Administração do Ninou" : "Família conectada")
       : connected
         ? "Conta aguardando convite"
         : "Convites e permissões";
@@ -700,7 +827,7 @@ function renderFamilyAccessPanel() {
   if (familyAccessText) {
     familyAccessText.textContent = authorized
       ? (appAdmin
-        ? `${email} é o administrador do Ninou. O painel de convites aparece somente para esta conta.`
+        ? `Você está conectado como admin do app. Use este painel apenas para convites, usuários e permissões.`
         : `${email} está conectado como ${getRoleLabel(effectiveRole)}. Os registros são sincronizados no ambiente da família.`)
       : connected
         ? "Esta conta ainda não possui convite. Peça um convite ao administrador do app ou entre com o e-mail convidado."
@@ -713,13 +840,13 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // A conta admin é ativada automaticamente. O botão fica como plano B caso o Firestore precise ser regravado.
-    createFamilyButton.hidden = !connected || !appAdmin;
-    createFamilyButton.textContent = authorized ? "Reativar sincronização admin" : "Ativar família principal";
+    // Botão aparece somente quando o admin ainda precisa ativar a família pela primeira vez.
+    createFamilyButton.hidden = !connected || !appAdmin || authorized;
+    createFamilyButton.textContent = "Ativar família principal";
   }
 
   if (inviteAcceptBox) {
-    inviteAcceptBox.hidden = appAdmin;
+    inviteAcceptBox.hidden = appAdmin || authorized;
   }
 
   if (adminInvitePanel) {
@@ -757,6 +884,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     role: data.role,
     email: data.email || user.email || "",
     ownerUid: data.ownerUid || "",
+    inviteCode: data.inviteCode || "",
     acceptedAt: data.acceptedAt || data.createdAt || "",
   });
 }
@@ -833,6 +961,43 @@ async function activatePersonalFamily() {
   return familyAccess;
 }
 
+async function cancelFamilyInvite(codeValue = "") {
+  const code = normalizeInviteCode(codeValue);
+  if (!code || !isFamilyAdmin()) return false;
+  try {
+    const services = await getFirebaseServices();
+    await services.setDoc(services.doc(services.db, "invites", code), {
+      status: "cancelled",
+      cancelledBy: cloudUser.uid,
+      cancelledAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    try {
+      await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), {
+        status: "cancelled",
+        cancelledBy: cloudUser.uid,
+        cancelledAt: services.serverTimestamp(),
+        updatedAt: services.serverTimestamp(),
+      }, { merge: true });
+    } catch (mirrorError) {
+      console.warn("Convite cancelado na coleção principal, mas não no espelho:", mirrorError);
+    }
+    await refreshAdminStats();
+    if (inviteResult) {
+      inviteResult.hidden = false;
+      inviteResult.textContent = "Convite cancelado.";
+    }
+    return true;
+  } catch (error) {
+    console.error("Erro ao cancelar convite:", error);
+    if (inviteResult) {
+      inviteResult.hidden = false;
+      inviteResult.textContent = getFirebaseErrorMessage(error);
+    }
+    return false;
+  }
+}
+
 async function createFamilyInvite() {
   if (!cloudUser || !isFamilyAdmin()) {
     if (loginHelper) loginHelper.textContent = "Apenas o admin do app pode gerar convites.";
@@ -852,17 +1017,9 @@ async function createFamilyInvite() {
   }
 
   const services = await getFirebaseServices();
-  const code = createInviteCode();
-  const payload = {
-    code,
-    familyId: familyAccess.familyId,
-    email,
-    role,
-    status: "pending",
-    createdBy: cloudUser.uid,
-    createdByEmail: cloudUser.email || "",
-    createdAt: services.serverTimestamp(),
-  };
+  const code = createInviteCodeForEmail(email, familyAccess.familyId);
+  const inviteRef = services.doc(services.db, "invites", code);
+  const link = buildInviteLink(code);
 
   createInviteButton.disabled = true;
   if (inviteResult) {
@@ -871,7 +1028,42 @@ async function createFamilyInvite() {
   }
 
   try {
-    await services.setDoc(services.doc(services.db, "invites", code), payload, { merge: true });
+    const existingSnapshot = await services.getDoc(inviteRef);
+    if (existingSnapshot.exists()) {
+      const existing = existingSnapshot.data() || {};
+      const existingStatus = existing.status || "pending";
+      if (existingStatus === "accepted" || existingStatus === "active") {
+        if (inviteResult) {
+          inviteResult.innerHTML = `
+            <strong>Convite já aceito</strong>
+            <span>${escapeHtml(email)} já está autorizado na família.</span>
+            <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link novamente</button>
+          `;
+        }
+        recentInvites.unshift({ code, email, role: existing.role || role, link });
+        renderInviteList();
+        refreshAdminStats({ silent: true });
+        return;
+      }
+    }
+
+    const payload = {
+      code,
+      familyId: familyAccess.familyId,
+      email,
+      role,
+      status: "pending",
+      createdBy: cloudUser.uid,
+      createdByEmail: cloudUser.email || "",
+      updatedAt: services.serverTimestamp(),
+    };
+
+    if (!existingSnapshot.exists()) {
+      payload.createdAt = services.serverTimestamp();
+    }
+
+    await services.setDoc(inviteRef, payload, { merge: true });
+    await cleanupDuplicatePendingInvites(services, email, familyAccess.familyId, code);
 
     try {
       await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), payload, { merge: true });
@@ -879,14 +1071,14 @@ async function createFamilyInvite() {
       console.warn("Convite criado na coleção principal, mas não foi espelhado na família:", mirrorError);
     }
 
-    const link = buildInviteLink(code);
     recentInvites.unshift({ code, email, role, link });
     renderInviteList();
     refreshAdminStats({ silent: true });
     if (inviteResult) {
       inviteResult.innerHTML = `
-        <strong>Convite criado</strong>
+        <strong>Convite pronto</strong>
         <span>Código: ${escapeHtml(code)}</span>
+        <span>Envie para: ${escapeHtml(email)}</span>
         <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>
       `;
     }
@@ -895,7 +1087,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.8 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.11 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -905,6 +1097,14 @@ async function createFamilyInvite() {
 
 async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingInviteCode || "", options = {}) {
   const code = normalizeInviteCode(codeValue);
+  const previousLabel = acceptInviteButton?.textContent || "Aceitar convite";
+
+  const setAccepting = (isAccepting) => {
+    if (!acceptInviteButton) return;
+    acceptInviteButton.disabled = isAccepting;
+    acceptInviteButton.textContent = isAccepting ? "Aceitando convite..." : previousLabel;
+  };
+
   if (!code) {
     if (!options.silent && loginHelper) loginHelper.textContent = "Digite o código de convite.";
     inviteCodeInput?.focus();
@@ -924,71 +1124,92 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     return false;
   }
 
-  const services = await getFirebaseServices();
-  const inviteRef = services.doc(services.db, "invites", code);
-  const snapshot = await services.getDoc(inviteRef);
+  setAccepting(true);
 
-  if (!snapshot.exists()) {
-    if (!options.silent && loginHelper) loginHelper.textContent = "Convite não encontrado ou expirado.";
-    return false;
-  }
-
-  const invite = snapshot.data() || {};
-  const inviteEmail = normalizeEmail(invite.email || "");
-  const userEmail = normalizeEmail(cloudUser.email || "");
-
-  if (invite.status && invite.status !== "pending" && invite.status !== "active") {
-    if (!options.silent && loginHelper) loginHelper.textContent = "Este convite já foi usado ou cancelado.";
-    return false;
-  }
-
-  if (inviteEmail && inviteEmail !== userEmail) {
-    if (!options.silent && loginHelper) loginHelper.textContent = `Este convite foi criado para ${inviteEmail}. Entre com esse e-mail.`;
-    return false;
-  }
-
-  const access = {
-    familyId: String(invite.familyId || ""),
-    role: normalizeInviteRole(invite.role),
-    email: userEmail,
-    ownerUid: invite.createdBy || invite.ownerUid || "",
-    inviteCode: code,
-    acceptedAt: new Date().toISOString(),
-  };
-
-  if (!access.familyId) {
-    if (!options.silent && loginHelper) loginHelper.textContent = "Convite inválido: família não encontrada.";
-    return false;
-  }
-
-  await saveAccountAccessToCloud(access);
-  await services.setDoc(inviteRef, {
-    status: "active",
-    acceptedBy: cloudUser.uid,
-    acceptedByEmail: userEmail,
-    acceptedAt: services.serverTimestamp(),
-  }, { merge: true });
   try {
-    await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), {
-      ...invite,
-      ...access,
-      code,
-      status: "active",
+    const services = await getFirebaseServices();
+    const inviteRef = services.doc(services.db, "invites", code);
+    const snapshot = await services.getDoc(inviteRef);
+
+    if (!snapshot.exists()) {
+      if (!options.silent && loginHelper) loginHelper.textContent = "Convite não encontrado ou expirado.";
+      return false;
+    }
+
+    const invite = snapshot.data() || {};
+    const inviteEmail = normalizeEmail(invite.email || "");
+    const userEmail = normalizeEmail(cloudUser.email || "");
+
+    if (invite.status && invite.status !== "pending" && invite.status !== "active") {
+      if (!options.silent && loginHelper) loginHelper.textContent = "Este convite já foi usado ou cancelado.";
+      return false;
+    }
+
+    if (inviteEmail && inviteEmail !== userEmail) {
+      if (!options.silent && loginHelper) loginHelper.textContent = `Este convite foi criado para ${inviteEmail}. Entre com esse e-mail.`;
+      return false;
+    }
+
+    const access = {
+      familyId: String(invite.familyId || ""),
+      role: normalizeInviteRole(invite.role),
+      email: userEmail,
+      ownerUid: invite.createdBy || invite.ownerUid || "",
+      inviteCode: code,
+      acceptedAt: new Date().toISOString(),
+    };
+
+    if (!access.familyId) {
+      if (!options.silent && loginHelper) loginHelper.textContent = "Convite inválido: família não encontrada.";
+      return false;
+    }
+
+    await saveAccountAccessToCloud(access);
+    await services.setDoc(inviteRef, {
+      status: "accepted",
       acceptedBy: cloudUser.uid,
       acceptedByEmail: userEmail,
       acceptedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
     }, { merge: true });
-  } catch (mirrorError) {
-    console.warn("Convite aceito, mas o espelho da família não foi atualizado:", mirrorError);
-  }
 
-  pendingInviteCode = "";
-  localStorage.removeItem(storageKeys.pendingInvite);
-  if (inviteCodeInput) inviteCodeInput.value = "";
-  if (!options.silent && loginHelper) loginHelper.textContent = "Convite aceito. Rotina familiar conectada.";
-  await connectCurrentAccount();
-  renderAll();
-  return true;
+    try {
+      await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), {
+        ...invite,
+        ...access,
+        code,
+        status: "accepted",
+        acceptedBy: cloudUser.uid,
+        acceptedByEmail: userEmail,
+        acceptedAt: services.serverTimestamp(),
+        updatedAt: services.serverTimestamp(),
+      }, { merge: true });
+    } catch (mirrorError) {
+      console.warn("Convite aceito, mas o espelho da família não foi atualizado:", mirrorError);
+    }
+
+    pendingInviteCode = "";
+    localStorage.removeItem(storageKeys.pendingInvite);
+    if (inviteCodeInput) inviteCodeInput.value = "";
+    if (!options.silent && loginHelper) loginHelper.textContent = "Convite aceito. Rotina familiar conectada.";
+    renderAuthControls();
+    await connectCurrentAccount();
+    setSyncStatus("online", cloudUser.email || "");
+    showScreen("home");
+    renderAll();
+    return true;
+  } catch (error) {
+    console.error("Erro ao aceitar convite:", error);
+    if (!options.silent && loginHelper) {
+      loginHelper.textContent = error?.code === "permission-denied"
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.11 e confirme se o convite é para este e-mail."
+        : getFirebaseErrorMessage(error);
+    }
+    return false;
+  } finally {
+    setAccepting(false);
+    renderAuthControls();
+  }
 }
 
 function saveDayState() {
@@ -2894,6 +3115,29 @@ if (createInviteButton) {
 }
 if (refreshAdminStatsButton) {
   refreshAdminStatsButton.addEventListener("click", () => refreshAdminStats());
+}
+if (adminInvitePanel) {
+  adminInvitePanel.addEventListener("click", async (event) => {
+    const copyButton = event.target.closest("[data-copy-invite]");
+    if (copyButton) {
+      const text = copyButton.dataset.copyInvite || "";
+      try {
+        await navigator.clipboard.writeText(text);
+        copyButton.textContent = text.startsWith("http") ? "Link copiado" : "Código copiado";
+      } catch {
+        copyButton.textContent = "Copie manualmente";
+      }
+      return;
+    }
+
+    const cancelButton = event.target.closest("[data-cancel-invite]");
+    if (cancelButton) {
+      const code = cancelButton.dataset.cancelInvite || "";
+      cancelButton.disabled = true;
+      cancelButton.textContent = "Cancelando...";
+      await cancelFamilyInvite(code);
+    }
+  });
 }
 if (inviteResult) {
   inviteResult.addEventListener("click", async (event) => {
