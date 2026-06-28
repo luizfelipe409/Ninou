@@ -1,28 +1,27 @@
-# Ninou v75.15 — Contraste Admin + Migração inteligente
+# Ninou v75.17 — Migração por e-mail, pesos e status claro
 
-Versão focada em recuperar dados antigos que ficaram em caminhos legados do Firestore.
+Versão criada para resolver a confusão vista no fluxo de administração/migração.
 
-## Principais ajustes
+## Ajustes principais
 
-- Busca por `collectionGroup` em `activities`, `days`, `profile` e `access`.
-- Campo manual para buscar diretamente pelo UID antigo do Firebase.
-- Não ignora mais dados antigos salvos na própria conta admin.
-- Migração para a família principal `ninou-family-luizfelipe`.
-- Cache atualizado para `ninou-v75-15-contraste-admin`.
+- Adicionada busca manual por e-mail antigo, como `francisco@gmail.com`.
+- A busca por e-mail consulta `users`, `access` e `profile` para localizar o UID correto.
+- A migração agora grava também `weights` em `families/ninou-family-luizfelipe/profile/main`.
+- Após clicar em migrar, a tela mostra status de conclusão e não volta imediatamente para o loop de “dados encontrados”.
+- O alerta de confirmação ficou mais claro: mostra quantidade de registros, dias, destino e informa que os dados antigos não serão apagados.
+- No perfil conectado como admin, o topo passa a mostrar “Painel admin do Ninou” em vez de “Diário do Francisco”.
+- Cache atualizado para `ninou-v75-17-migracao-email-pesos`.
 
-## Obrigatório
+## Caminhos finais esperados
 
-Publique as regras:
+- Perfil/foto/pesos: `families/ninou-family-luizfelipe/profile/main`
+- Rotina diária: `families/ninou-family-luizfelipe/days/AAAA-MM-DD`
+- Membros autorizados: `families/ninou-family-luizfelipe/members/{uid}`
 
-`docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_15.md`
+## Regras
 
-Depois faça hard refresh ou reinstale o PWA no iPhone.
+Publique as regras em:
 
+`docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_17.md`
 
-## v75.15 — Correção visual do Admin
-
-- Corrigido contraste dos campos no tema claro.
-- Labels como “E-mail do convidado”, “Permissão” e “UID da conta antiga” ficaram mais escuros.
-- Mensagens de status e listas vazias da área Dados da família ficaram legíveis.
-- Inputs, selects e botões administrativos agora usam cores mais fortes no tema claro.
-
+Depois faça hard refresh no navegador ou remova/reinstale o PWA no iPhone.

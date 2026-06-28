@@ -1,6 +1,6 @@
-// Ninou v75.16 - Correção definitiva da migração por UID
+// Ninou v75.17 - Migração por e-mail, pesos e status claro
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.16";
+const NINOU_APP_VERSION = "75.17";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

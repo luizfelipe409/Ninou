@@ -122,6 +122,8 @@ const adminMigrationSources = document.querySelector("#adminMigrationSources");
 const restoreFamilyDataButton = document.querySelector("#restoreFamilyDataButton");
 const adminMigrationUidInput = document.querySelector("#adminMigrationUidInput");
 const scanLegacyUidButton = document.querySelector("#scanLegacyUidButton");
+const adminMigrationEmailInput = document.querySelector("#adminMigrationEmailInput");
+const scanLegacyEmailButton = document.querySelector("#scanLegacyEmailButton");
 const guestWhatsappButton = document.querySelector("#guestWhatsappButton");
 const resetDataButton = document.querySelector("#resetDataButton");
 const exportJsonButton = document.querySelector("#exportJsonButton");
@@ -210,6 +212,8 @@ let familyAccess = loadFamilyAccess();
 let pendingInviteCode = getInitialInviteCode();
 let recentInvites = [];
 let adminStatsRequestId = 0;
+let activeScreenName = "today";
+let lastMigrationResult = null;
 let legacyCloudContexts = [];
 let legacyCloudScanState = "idle";
 let legacyCloudScanError = "";
@@ -1021,7 +1025,7 @@ async function readMaybeCollection(services, ...pathParts) {
 }
 
 function getLegacyUidFromPath(path = "") {
-  const match = String(path || "").match(/^users\/([^/]+)\//);
+  const match = String(path || "").match(/^users\/([^/]+)(?:\/|$)/);
   return match ? match[1] : "";
 }
 
@@ -1057,6 +1061,68 @@ async function collectLegacyUidsByCollectionGroups(services) {
   }
 
   return { uids: Array.from(uids), counts };
+}
+
+async function addQueryResultsToUidMap(services, uidMap, queryRef, reason = "") {
+  try {
+    const snap = await services.getDocs(queryRef);
+    (snap.docs || []).forEach((docSnap) => {
+      const uid = getLegacyUidFromPath(docSnap.ref?.path || "") || docSnap.id;
+      if (!uid) return;
+      if (!uidMap.has(uid)) uidMap.set(uid, new Set());
+      if (reason) uidMap.get(uid).add(reason);
+    });
+  } catch (error) {
+    console.warn(`Não foi possível buscar candidatos por ${reason}:`, error);
+  }
+}
+
+async function collectLegacyUidsByEmail(services, email = "") {
+  const targetEmail = normalizeEmail(email);
+  const uidMap = new Map();
+  if (!targetEmail || !targetEmail.includes("@")) return uidMap;
+
+  const addUid = (uid, reason = "email") => {
+    const clean = String(uid || "").trim();
+    if (!clean) return;
+    if (!uidMap.has(clean)) uidMap.set(clean, new Set());
+    uidMap.get(clean).add(reason);
+  };
+
+  // 1) users/{uid} com e-mail no documento raiz.
+  for (const field of ["email", "ownerEmail", "userEmail"]) {
+    await addQueryResultsToUidMap(
+      services,
+      uidMap,
+      services.query(services.collection(services.db, "users"), services.where(field, "==", targetEmail)),
+      `email:${field}`,
+    );
+  }
+
+  // 2) users/{uid}/access/ninou costuma guardar o e-mail da conta autorizada.
+  if (services.collectionGroup) {
+    for (const field of ["email", "ownerEmail", "userEmail"]) {
+      await addQueryResultsToUidMap(
+        services,
+        uidMap,
+        services.query(services.collectionGroup(services.db, "access"), services.where(field, "==", targetEmail)),
+        `email:access.${field}`,
+      );
+      await addQueryResultsToUidMap(
+        services,
+        uidMap,
+        services.query(services.collectionGroup(services.db, "profile"), services.where(field, "==", targetEmail)),
+        `email:profile.${field}`,
+      );
+    }
+  }
+
+  // 3) Se a busca automática já achou essa conta, reaproveita o UID.
+  legacyCloudContexts.forEach((context) => {
+    if (normalizeEmail(context.email || "") === targetEmail && context.uid) addUid(context.uid, "email:cache");
+  });
+
+  return uidMap;
 }
 
 async function buildLegacyCloudContextFromUser(services, userDoc) {
@@ -1183,6 +1249,75 @@ function normalizeMigrationUid(value = "") {
     .trim();
 }
 
+function normalizeMigrationEmail(value = "") {
+  return normalizeEmail(value || "");
+}
+
+async function scanLegacySourceByManualEmail() {
+  if (!isFamilyAdmin()) return null;
+  const email = normalizeMigrationEmail(adminMigrationEmailInput?.value || "");
+  if (!email || !email.includes("@")) {
+    if (adminMigrationStatus) adminMigrationStatus.textContent = "Digite o e-mail antigo que aparece no Firebase, por exemplo francisco@gmail.com.";
+    return null;
+  }
+
+  lastMigrationResult = null;
+
+  if (scanLegacyEmailButton) {
+    scanLegacyEmailButton.disabled = true;
+    scanLegacyEmailButton.textContent = "Buscando...";
+  }
+  if (adminMigrationStatus) adminMigrationStatus.textContent = `Buscando dados ligados a ${email}...`;
+
+  try {
+    const services = await getFirebaseServices();
+    const uidMap = await collectLegacyUidsByEmail(services, email);
+
+    if (!uidMap.size) {
+      const localMatch = getRestorableContexts().find((context) => normalizeEmail(context.email || "") === email);
+      if (localMatch) {
+        legacyCloudScanState = "done";
+        renderFamilyMigrationPanel({ skipScan: true });
+        return localMatch;
+      }
+      if (adminMigrationStatus) adminMigrationStatus.textContent = `Não encontrei UID com o e-mail ${email}. Tente colar o UID antigo que aparece em users/{uid}.`;
+      return null;
+    }
+
+    const contexts = [];
+    for (const [uid, reasons] of uidMap.entries()) {
+      const context = await buildLegacyCloudContextFromUser(services, { id: uid, data: () => ({}) });
+      if (context) {
+        context.email = normalizeEmail(context.email || email) || email;
+        context.manualEmail = email;
+        context.discovery = Array.from(new Set([...(context.discovery || []), ...Array.from(reasons), "email"]));
+        contexts.push(context);
+      }
+    }
+
+    if (!contexts.length) {
+      if (adminMigrationStatus) adminMigrationStatus.textContent = `Achei o e-mail ${email}, mas não encontrei perfil, peso ou rotina recuperável nesse UID.`;
+      return null;
+    }
+
+    const foundUids = new Set(contexts.map((context) => context.uid));
+    const existing = legacyCloudContexts.filter((item) => !foundUids.has(item.uid));
+    legacyCloudContexts = [...contexts, ...existing].sort(compareMigrationContexts);
+    legacyCloudScanState = "done";
+    renderFamilyMigrationPanel({ skipScan: true });
+    return contexts[0] || null;
+  } catch (error) {
+    console.error("Erro ao buscar e-mail legado:", error);
+    if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
+    return null;
+  } finally {
+    if (scanLegacyEmailButton) {
+      scanLegacyEmailButton.disabled = false;
+      scanLegacyEmailButton.textContent = "Buscar por e-mail";
+    }
+  }
+}
+
 async function scanLegacySourceByManualUid() {
   if (!isFamilyAdmin()) return null;
   const uid = normalizeMigrationUid(adminMigrationUidInput?.value || "");
@@ -1190,6 +1325,8 @@ async function scanLegacySourceByManualUid() {
     if (adminMigrationStatus) adminMigrationStatus.textContent = "Cole o UID antigo do Firebase para buscar manualmente.";
     return null;
   }
+
+  lastMigrationResult = null;
 
   if (scanLegacyUidButton) {
     scanLegacyUidButton.disabled = true;
@@ -1225,11 +1362,16 @@ async function scanLegacySourceByManualUid() {
 function getMigrationContextPriority(context = {}) {
   const email = normalizeEmail(context.email || "");
   const name = normalizeEmail(context.profile?.name || "");
-  const isManual = Array.isArray(context.discovery) && context.discovery.includes("manual");
+  const discoveries = Array.isArray(context.discovery) ? context.discovery : [];
+  const isManual = discoveries.includes("manual");
+  const isEmailSearch = discoveries.includes("email") || Boolean(context.manualEmail);
+  const isExactEmailSearch = context.manualEmail && normalizeEmail(context.manualEmail) === email;
 
-  // A v75.16 prioriza o UID colado manualmente e fontes associadas ao Francisco.
+  // A v75.17 prioriza busca manual por e-mail/UID e fontes associadas ao Francisco.
   // Isso evita que dados de teste com foto/perfil tenham score maior e sejam migrados por engano.
-  return (isManual ? 100000 : 0)
+  return (isExactEmailSearch ? 130000 : 0)
+    + (isEmailSearch ? 120000 : 0)
+    + (isManual ? 100000 : 0)
     + (email.includes("francisco") ? 20000 : 0)
     + (name.includes("francisco") ? 10000 : 0)
     + (Number(context.score) || 0);
@@ -1258,6 +1400,21 @@ function getBestRestorableSource() {
 
 function renderFamilyMigrationPanel(options = {}) {
   if (!adminMigrationStatus || !adminMigrationSources || !restoreFamilyDataButton) return;
+
+  if (lastMigrationResult && !options.forceList) {
+    const result = lastMigrationResult;
+    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família principal. Os dados antigos continuam preservados.`;
+    adminMigrationSources.innerHTML = `
+      <li class="admin-migration-source is-best">
+        <div>
+          <strong>Destino atualizado</strong>
+          <span>families/${escapeHtml(result.familyId)}/profile/main e families/${escapeHtml(result.familyId)}/days</span>
+        </div>
+        <small>Concluído</small>
+      </li>`;
+    restoreFamilyDataButton.hidden = true;
+    return;
+  }
 
   if (!isFamilyAdmin()) {
     adminMigrationStatus.textContent = "Entre como admin para revisar e migrar dados antigos.";
@@ -1300,14 +1457,14 @@ function renderFamilyMigrationPanel(options = {}) {
     return;
   }
 
-  adminMigrationStatus.textContent = `Encontramos dados de ${best.email || best.uid}. Importe para preencher a família principal e liberar a rotina do Francisco para todos os membros autorizados.`;
+  adminMigrationStatus.textContent = `Encontramos ${getContextEventsCount(best)} registros em ${getContextDaysCount(best)} dia(s) de ${best.email || best.uid}. Escolha a busca por e-mail/UID se quiser forçar uma origem específica antes de migrar.`;
   adminMigrationSources.innerHTML = contexts.slice(0, 5).map((context, index) => `
     <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
       <div>
         <strong>${escapeHtml(context.email || context.uid || "Conta encontrada")}</strong>
         <span>${escapeHtml(getContextBabyLabel(context))}</span>
       </div>
-      ${context.discovery?.includes("manual") ? "<small>UID manual</small>" : (index === 0 ? "<small>Melhor opção</small>" : `<small>${context.source === "cloud" ? "Firebase" : "Aparelho"}</small>`) }
+      ${context.discovery?.includes("email") ? "<small>Busca por e-mail</small>" : context.discovery?.includes("manual") ? "<small>UID manual</small>" : (index === 0 ? "<small>Melhor opção</small>" : `<small>${context.source === "cloud" ? "Firebase" : "Aparelho"}</small>`) }
     </li>
   `).join("");
   restoreFamilyDataButton.hidden = false;
@@ -1377,6 +1534,11 @@ async function uploadMigrationContextToFamily(context) {
   const familyId = familyAccess?.familyId || APP_ADMIN_FAMILY_ID;
   const sourceLabel = context.source === "cloud" ? `users/${context.uid || context.email}` : `cache/${context.email}`;
   const migrationId = `${Date.now()}-${String(context.uid || context.email || "origem").replace(/[^a-z0-9]+/gi, "-").slice(0, 32)}`;
+  const normalizedWeights = normalizeWeights(context.weights || context.profile?.weights || []);
+  const normalizedProfile = normalizeBabyProfile({
+    ...(context.profile || createDefaultBabyProfile()),
+    weights: normalizedWeights,
+  });
 
   await services.setDoc(services.doc(services.db, "families", familyId), {
     ownerUid: cloudUser.uid,
@@ -1385,9 +1547,10 @@ async function uploadMigrationContextToFamily(context) {
     updatedAt: services.serverTimestamp(),
   }, { merge: true });
 
-  if (context.profile || context.photo) {
+  if (context.profile || context.photo || normalizedWeights.length) {
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
-      ...(normalizeBabyProfile(context.profile || createDefaultBabyProfile())),
+      ...normalizedProfile,
+      weights: normalizedWeights,
       wakeWindowMinutes: Number(context.wakeWindow) || 70,
       clientUpdatedAt: Date.now(),
       ...(context.photo ? { photo: context.photo } : {}),
@@ -1407,17 +1570,28 @@ async function uploadMigrationContextToFamily(context) {
     }, { merge: true });
   }
 
+  const eventsMigrated = getContextEventsCount(context);
   await services.setDoc(services.doc(services.db, "families", familyId, "migrations", migrationId), {
     source: context.source || "unknown",
     sourceUid: context.uid || "",
     sourceEmail: context.email || "",
+    manualEmail: context.manualEmail || "",
     daysMigrated: dayEntries.length,
-    eventsMigrated: getContextEventsCount(context),
-    profileMigrated: Boolean(context.profile || context.photo),
+    eventsMigrated,
+    weightsMigrated: normalizedWeights.length,
+    profileMigrated: Boolean(context.profile || context.photo || normalizedWeights.length),
     createdBy: cloudUser.uid,
     createdByEmail: cloudUser.email || "",
     createdAt: services.serverTimestamp(),
   }, { merge: true });
+
+  return {
+    familyId,
+    days: dayEntries.length,
+    events: eventsMigrated,
+    weights: normalizedWeights.length,
+    source: sourceLabel,
+  };
 }
 
 async function uploadCurrentContextToFamily() {
@@ -1436,7 +1610,11 @@ async function restoreFamilyDataFromBestSource(options = {}) {
   }
 
   if (!options.silent) {
-    const ok = window.confirm(`Migrar os dados de ${context.email || context.uid} para a família principal do Ninou? A rotina ficará disponível para os membros autorizados.`);
+    const ok = window.confirm(`Copiar ${getContextEventsCount(context)} registros em ${getContextDaysCount(context)} dia(s) de ${context.email || context.uid} para a família principal do Ninou?
+
+Destino: families/${familyAccess?.familyId || APP_ADMIN_FAMILY_ID}
+
+Os dados antigos não serão apagados.`);
     if (!ok) return false;
   }
 
@@ -1447,14 +1625,13 @@ async function restoreFamilyDataFromBestSource(options = {}) {
   if (adminMigrationStatus) adminMigrationStatus.textContent = `Migrando dados de ${context.email || context.uid}...`;
 
   try {
-    await uploadMigrationContextToFamily(context);
+    const migrationResult = await uploadMigrationContextToFamily(context);
     applyMigrationContextToCurrentView(context);
     setSyncStatus("online", cloudUser?.email || "");
     if (loginHelper) loginHelper.textContent = "Dados do Francisco migrados para a família principal.";
-    if (adminMigrationStatus) adminMigrationStatus.textContent = `Migração concluída: ${getContextEventsCount(context)} registros em ${getContextDaysCount(context)} dia(s). Entre com a conta do Francisco para validar.`;
-    legacyCloudScanState = "idle";
-    legacyCloudContexts = [];
-    renderFamilyMigrationPanel({ skipScan: false });
+    lastMigrationResult = migrationResult;
+    legacyCloudScanState = "done";
+    renderFamilyMigrationPanel({ skipScan: true });
     return true;
   } catch (error) {
     console.error("Erro ao migrar dados para a família:", error);
@@ -2129,7 +2306,8 @@ function hasCloudProfileContent(data = {}) {
   const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
   const photoValue = data.photo || data.photoDataUrl || "";
   const cloudWakeWindow = Number.isFinite(Number(data.wakeWindowMinutes)) ? Number(data.wakeWindowMinutes) : 70;
-  return hasProfileContent(profileSource, photoValue, cloudWakeWindow);
+  const weights = normalizeWeights(data.weights || profileSource.weights || []);
+  return hasProfileContent(profileSource, photoValue, cloudWakeWindow) || weights.length > 0;
 }
 
 function getBabyName() {
@@ -2155,6 +2333,11 @@ function renderBabyIdentity() {
     profileBabyName,
     profileBabyAge,
   });
+
+  if (isGlobalAppAdmin() && activeScreenName === "profile") {
+    if (diaryTitle) diaryTitle.textContent = "Painel admin do Ninou";
+    if (babyAgeLine) babyAgeLine.textContent = "Convites, membros e migração da família principal";
+  }
 }
 
 function syncBabyProfileForm() {
@@ -3411,7 +3594,9 @@ function scrollDiaryFilters() {
 function showScreen(target) {
   // Visitantes podem navegar pelas telas para conhecer o Ninou.
   // O bloqueio acontece apenas nas ações que gravam/alteram dados via requireLogin().
+  activeScreenName = target || activeScreenName;
   updateScreenVisibility({ target, navButtons, screens });
+  renderBabyIdentity();
 }
 
 function setDiaryFilter(filter) {
@@ -3964,6 +4149,14 @@ if (scanLegacyUidButton) {
   scanLegacyUidButton.addEventListener("click", () => {
     scanLegacySourceByManualUid().catch((error) => {
       console.error("Erro ao buscar UID legado:", error);
+      if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
+    });
+  });
+}
+if (scanLegacyEmailButton) {
+  scanLegacyEmailButton.addEventListener("click", () => {
+    scanLegacySourceByManualEmail().catch((error) => {
+      console.error("Erro ao buscar e-mail legado:", error);
       if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
     });
   });

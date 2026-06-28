@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.15" />
+    <link rel="stylesheet" href="./styles.css?v=75.17" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -502,11 +502,19 @@
                 </ul>
                 <div class="admin-manual-migration">
                   <label>
+                    E-mail da conta antiga
+                    <input id="adminMigrationEmailInput" type="email" placeholder="Ex.: francisco@gmail.com" autocomplete="off" />
+                  </label>
+                  <button id="scanLegacyEmailButton" class="secondary-login" type="button">Buscar por e-mail</button>
+                  <small>Use primeiro esta opção quando souber o e-mail antigo. Ela prioriza exatamente essa conta na migração.</small>
+                </div>
+                <div class="admin-manual-migration">
+                  <label>
                     UID da conta antiga, se souber
                     <input id="adminMigrationUidInput" type="text" placeholder="Cole o UID antigo do Firebase" autocomplete="off" />
                   </label>
                   <button id="scanLegacyUidButton" class="secondary-login" type="button">Buscar por UID</button>
-                  <small>Use quando os dados aparecem em users/{uid}/activities, mas a busca automática não encontra.</small>
+                  <small>Use quando os dados aparecem em users/{uid}/activities, mas a busca por e-mail não encontra.</small>
                 </div>
                 <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
               </section>
@@ -696,6 +704,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.15"></script>
+    <script type="module" src="./app.js?v=75.17"></script>
   </body>
 </html>
