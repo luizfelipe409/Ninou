@@ -1,6 +1,6 @@
-// Ninou v74.16 - revisão final do roadmap estável
+// Ninou v75.2 - sem timer duplicado
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "74.16";
+const NINOU_APP_VERSION = "75.2";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

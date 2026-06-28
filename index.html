@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=74.16" />
+    <link rel="stylesheet" href="./styles.css?v=75.2" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -51,23 +51,23 @@
           <p id="stateHint">Escolha como começar o dia.</p>
         </section>
 
-        <section id="activeTimerCard" class="active-timer-card" aria-live="polite" hidden>
-          <div class="active-timer-head">
-            <span id="activeTimerIcon" class="active-timer-icon" aria-hidden="true"></span>
-            <div class="active-timer-copy">
-              <span id="activeTimerKicker">Timer ativo</span>
-              <strong id="activeTimerTitle">Rotina em andamento</strong>
-            </div>
-            <strong id="activeTimerElapsed" class="active-timer-elapsed">00:00</strong>
-          </div>
-          <div class="active-timer-bar" aria-hidden="true">
-            <span id="activeTimerProgress"></span>
-          </div>
-          <div class="active-timer-foot">
-            <span id="activeTimerMeta">Iniciado agora</span>
-            <button id="activeTimerAction" type="button">Atualizar</button>
-          </div>
+        <section id="smartInsightCard" class="smart-insight-card" aria-live="polite">
+          <span>💡 Observação</span>
+          <strong>Começando a aprender a rotina</strong>
+          <p>Registre sono, mamadas e fraldas para o Ninou mostrar observações úteis.</p>
         </section>
+
+        <section id="liveAssistantCard" class="live-assistant-card" aria-live="polite" hidden>
+          <div>
+            <span id="liveAssistantKicker">Próxima ação</span>
+            <strong id="liveAssistantTitle">Rotina pronta para começar</strong>
+            <p id="liveAssistantText">O Ninou mostra a próxima ação conforme a rotina for registrada.</p>
+          </div>
+          <div id="liveAssistantBadge" class="live-assistant-badge">✨</div>
+        </section>
+
+        <!-- v75.2: card de timer secundário removido para evitar duplicidade.
+             O status principal fica no card central e a ação fica no botão principal. -->
 
         <section class="main-action-area" aria-label="Ação principal">
           <button id="wakeAction" class="primary-action" type="button" hidden>
@@ -135,6 +135,44 @@
             <span>Medicamentos</span>
             <strong>0</strong>
           </article>
+        </section>
+
+        <section class="routine-progress-card" aria-label="Rotina do dia">
+          <div class="drawer-section-title">
+            <span>Rotina do dia</span>
+            <strong id="routineProgressStatus">Média recente</strong>
+          </div>
+          <div id="dailyRhythm" class="daily-rhythm">
+            <article><span>Sono</span><b>0 min hoje</b><i style="--p: 0%"></i></article>
+            <article><span>Mamadas</span><b>0 hoje</b><i style="--p: 0%"></i></article>
+            <article><span>Fraldas</span><b>0 hoje</b><i style="--p: 0%"></i></article>
+          </div>
+        </section>
+
+        <section class="intelligent-timeline-card" aria-label="Linha do tempo inteligente de hoje">
+          <div class="drawer-section-title">
+            <span>Linha do tempo inteligente</span>
+            <button class="ghost-link" type="button" data-target-shortcut="diary">Abrir diário</button>
+          </div>
+          <div id="intelligentTimeline" class="intelligent-timeline">
+            <article class="timeline-empty">Ainda não há registros suficientes para montar a linha do tempo.</article>
+          </div>
+        </section>
+
+        <section class="weekly-overview-card" aria-label="Histórico semanal rápido">
+          <div class="drawer-section-title">
+            <span>Resumo</span>
+            <strong>Últimos 7 dias</strong>
+          </div>
+          <div id="weeklyOverview" class="weekly-overview"></div>
+        </section>
+
+        <section class="day-story-card" aria-label="Como foi o dia do bebê">
+          <div class="drawer-section-title">
+            <span>Como foi o dia?</span>
+            <button class="ghost-link" type="button" data-target-shortcut="trends">Ver dados</button>
+          </div>
+          <p id="dayStoryText">O resumo do dia aparecerá conforme você registrar a rotina.</p>
         </section>
         <section class="last-card today-last-card" aria-label="Últimos registros de hoje">
           <div class="drawer-section-title">
@@ -211,6 +249,12 @@
             <p id="napAverageHint">Média de sonecas e noites.</p>
           </article>
         </section>
+        <section id="trendKpis" class="trend-kpis" aria-label="Resumo rápido dos dados de hoje">
+          <article><span>Sono hoje</span><strong>0 min</strong><p>Total dormido desde meia-noite.</p></article>
+          <article><span>Mamadas</span><strong>0</strong><p>Amamentação e mamadeira.</p></article>
+          <article><span>Fraldas</span><strong>0</strong><p>Trocas registradas hoje.</p></article>
+          <article><span>Medicamentos</span><strong>0</strong><p>Doses registradas hoje.</p></article>
+        </section>
         <section class="report-stack" aria-label="Gráficos dos últimos 7 dias">
           <article class="chart-card">
             <div class="chart-title"><span>Últimos 7 dias -</span><strong>Sono</strong></div>
@@ -270,6 +314,11 @@
             </div>
           </div>
           <div class="sound-progress" aria-hidden="true"><i id="soundProgress"></i></div>
+          <div class="sound-player-meta">
+            <span id="soundElapsed">00:00</span>
+            <span>Repetir ativo • para em 1h</span>
+            <span id="soundRemainingShort">60:00</span>
+          </div>
           <div class="sound-controls">
             <button id="soundPlayPause" class="sound-main-button" type="button">▶ Tocar por 1h</button>
             <button id="soundStop" class="sound-stop-button" type="button">Parar</button>
@@ -520,6 +569,6 @@
     </section>
 
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
-    <script type="module" src="./app.js?v=74.16"></script>
+    <script type="module" src="./app.js?v=75.2"></script>
   </body>
 </html>

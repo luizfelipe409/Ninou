@@ -2,16 +2,103 @@ import { getEventConfig, isSleepEvent } from "../domain/record-types.js";
 import { escapeHtml } from "../utils/text.js";
 import { formatShortDuration, formatTime } from "../utils/time.js";
 
-export function formatEventMeta(event) {
+function isPlaceholderDetail(detail = "") {
+  const value = String(detail || "").trim();
+  return !value || value === "Timer" || value === "Não se aplica";
+}
+
+function parseBreastfeedingDetail(detail = "") {
+  const text = String(detail || "").trim();
+  const left = text.match(/\bE\s+(\d{2}:\d{2})/i)?.[1] || "";
+  const right = text.match(/\bD\s+(\d{2}:\d{2})/i)?.[1] || "";
+  const total = text.match(/\bTotal\s+(\d{2}:\d{2})/i)?.[1] || "";
+  const hasBoth = Boolean(left && right);
+  const explicitSide = text.split("•")[0]?.trim() || "";
+  const side = hasBoth ? "Mista" : explicitSide || (left ? "Esquerdo" : right ? "Direito" : "Amamentação");
+  return { side, left, right, total, hasBoth, hasTimer: Boolean(left || right || total) };
+}
+
+function formatBreastfeedingMeta(event) {
+  const time = formatTime(event.start);
+  const parsed = parseBreastfeedingDetail(event.detail);
+  if (!parsed.hasTimer) {
+    return {
+      primary: [time, parsed.side].filter(Boolean).join(" • "),
+      secondary: "",
+      compact: [time, parsed.side].filter(Boolean).join(" • "),
+    };
+  }
+
+  const totalText = parsed.total || "";
+  return {
+    primary: [time, parsed.side, totalText ? `Total ${totalText}` : ""].filter(Boolean).join(" • "),
+    secondary: [parsed.left ? `E ${parsed.left}` : "", parsed.right ? `D ${parsed.right}` : ""].filter(Boolean).join(" • "),
+    compact: [time, parsed.side, totalText || parsed.left || parsed.right].filter(Boolean).join(" • "),
+  };
+}
+
+function formatSleepMeta(event) {
+  const hasEnd = Number(event.end) > Number(event.start);
+  const duration = hasEnd ? formatShortDuration(event.end - event.start) : "em andamento";
+  const timeText = hasEnd ? `${formatTime(event.start)}–${formatTime(event.end)}` : formatTime(event.start);
+  const detail = isPlaceholderDetail(event.detail) ? "" : String(event.detail || "").trim();
+  const wakeWindow = Number(event.wakeWindowMs) > 0
+    ? `Acordado ${formatShortDuration(Number(event.wakeWindowMs))} antes`
+    : "";
+  return {
+    primary: [timeText, duration].filter(Boolean).join(" • "),
+    secondary: [detail, wakeWindow].filter(Boolean).join(" • "),
+    compact: [timeText, duration, detail].filter(Boolean).join(" • "),
+  };
+}
+
+function formatBottleMeta(event) {
+  const detail = String(event.detail || "").trim();
+  const ml = detail.match(/(\d+(?:[,.]\d+)?)\s*ml/i)?.[0] || "";
+  const type = ml ? detail.replace(ml, "").replace(/[•-]/g, " ").trim() : detail;
+  return {
+    primary: [ml || detail || "Mamadeira", formatTime(event.start)].filter(Boolean).join(" • "),
+    secondary: ml && type ? type : "",
+    compact: [formatTime(event.start), detail].filter(Boolean).join(" • "),
+  };
+}
+
+function formatMedicineMeta(event) {
+  const detail = isPlaceholderDetail(event.detail) ? "Dose" : String(event.detail || "").trim();
+  const notes = String(event.notes || "").trim();
+  return {
+    primary: [formatTime(event.start), detail].filter(Boolean).join(" • "),
+    secondary: notes ? notes : "",
+    compact: [formatTime(event.start), detail].filter(Boolean).join(" • "),
+  };
+}
+
+function formatGenericMeta(event) {
   const duration = event.end > event.start ? formatShortDuration(event.end - event.start) : "";
   const showRange = (isSleepEvent(event) || event.type === "despertar-noturno") && event.end > event.start;
   const timeText = showRange
-    ? `${formatTime(event.start)}-${formatTime(event.end)}`
+    ? `${formatTime(event.start)}–${formatTime(event.end)}`
     : formatTime(event.start);
-  const wakeWindow = isSleepEvent(event) && Number(event.wakeWindowMs) > 0
-    ? `Acordado ${formatShortDuration(Number(event.wakeWindowMs))} antes`
-    : "";
-  return [timeText, duration, event.detail, wakeWindow].filter(Boolean).join(" • ");
+  const detail = isPlaceholderDetail(event.detail) ? "" : String(event.detail || "").trim();
+  return {
+    primary: [timeText, detail].filter(Boolean).join(" • "),
+    secondary: duration && !isSleepEvent(event) ? duration : "",
+    compact: [timeText, duration, detail].filter(Boolean).join(" • "),
+  };
+}
+
+export function getEventDisplayParts(event) {
+  if (!event) return { primary: "", secondary: "", compact: "" };
+  if (event.type === "amamentacao") return formatBreastfeedingMeta(event);
+  if (isSleepEvent(event)) return formatSleepMeta(event);
+  if (event.type === "mamadeira") return formatBottleMeta(event);
+  if (event.type === "medicamento") return formatMedicineMeta(event);
+  return formatGenericMeta(event);
+}
+
+export function formatEventMeta(event) {
+  const parts = getEventDisplayParts(event);
+  return [parts.primary, parts.secondary].filter(Boolean).join(" • ");
 }
 
 export function getEventRenderSignature(event, options = {}) {
@@ -50,13 +137,16 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   }
 
   const config = getEventConfig(event.type);
+  const parts = getEventDisplayParts(event);
+  const notes = event.notes && event.type !== "medicamento" ? `<p>${escapeHtml(event.notes)}</p>` : "";
   return `
     <i class="mark ${config.arcType}">${config.icon}</i>
     <div class="event-main">
       <div class="event-text">
         <strong>${escapeHtml(config.title)}</strong>
-        <span>${escapeHtml(formatEventMeta(event))}</span>
-        ${event.notes ? `<p>${escapeHtml(event.notes)}</p>` : ""}
+        <span class="event-meta-primary">${escapeHtml(parts.primary)}</span>
+        ${parts.secondary ? `<span class="event-meta-extra">${escapeHtml(parts.secondary)}</span>` : ""}
+        ${notes}
       </div>
       <div class="event-actions">
         <button class="event-action-button edit" type="button" data-event-edit="${escapeHtml(event.id)}" aria-label="Editar ${escapeHtml(config.title)}">
@@ -74,12 +164,13 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
 
 export function getMiniEventMarkup(event) {
   const config = getEventConfig(event.type);
+  const parts = getEventDisplayParts(event);
   return `
     <article class="mini-event">
       <i class="mark ${config.arcType}">${config.icon}</i>
       <div>
         <strong>${escapeHtml(config.title)}</strong>
-        <span>${escapeHtml(formatEventMeta(event))}</span>
+        <span>${escapeHtml(parts.compact || parts.primary)}</span>
       </div>
     </article>
   `;

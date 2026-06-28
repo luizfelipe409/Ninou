@@ -2795,3 +2795,515 @@ body.day-theme .chips-more-button {
 .report-stack .chart-title {
   gap: 10px;
 }
+
+/* v75 - Assistente inteligente: produto, leitura rápida e mobile-first */
+.smart-insight-card,
+.live-assistant-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.trend-kpis article {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(143, 124, 255, 0.18), transparent 34%),
+    var(--panel);
+  padding: 16px;
+}
+
+.smart-insight-card {
+  display: grid;
+  gap: 4px;
+  border-color: rgba(255, 211, 122, 0.22);
+  background:
+    linear-gradient(135deg, rgba(255, 211, 122, 0.12), rgba(143, 124, 255, 0.12)),
+    var(--panel);
+}
+
+.smart-insight-card span,
+.live-assistant-card span,
+.routine-progress-card .drawer-section-title span,
+.intelligent-timeline-card .drawer-section-title span,
+.weekly-overview-card .drawer-section-title span,
+.day-story-card .drawer-section-title span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.smart-insight-card strong,
+.live-assistant-card strong,
+.day-story-card strong {
+  display: block;
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.smart-insight-card p,
+.live-assistant-card p,
+.day-story-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.38;
+  font-weight: 750;
+}
+
+.live-assistant-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58px;
+  align-items: center;
+  gap: 14px;
+}
+
+.live-assistant-card[data-status="sleeping"] {
+  border-color: rgba(124, 229, 194, 0.28);
+}
+
+.live-assistant-card[data-status="overdue"] {
+  border-color: rgba(255, 154, 118, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 154, 118, 0.14), rgba(255, 211, 122, 0.08)),
+    var(--panel);
+}
+
+.live-assistant-badge {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: rgba(143, 124, 255, 0.18);
+  border: 1px solid rgba(143, 124, 255, 0.22);
+  font-size: 1.65rem;
+}
+
+.daily-rhythm,
+.weekly-overview {
+  display: grid;
+  gap: 10px;
+}
+
+.daily-rhythm article,
+.weekly-overview article {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+}
+
+.daily-rhythm span,
+.weekly-overview span {
+  color: var(--muted);
+  font-weight: 950;
+}
+
+.daily-rhythm b,
+.weekly-overview b {
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.daily-rhythm i,
+.weekly-overview i {
+  position: relative;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  grid-column: 2 / 3;
+  grid-row: 1;
+}
+
+.daily-rhythm i::before,
+.weekly-overview i::before {
+  content: "";
+  display: block;
+  width: var(--p, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--plum), var(--sage));
+}
+
+.intelligent-timeline {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.intelligent-timeline::before {
+  content: "";
+  position: absolute;
+  left: 72px;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(143, 124, 255, 0.05), rgba(143, 124, 255, 0.48), rgba(124, 229, 194, 0.12));
+  border-radius: 999px;
+}
+
+.intelligent-timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 58px 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+}
+
+.intelligent-timeline-item time {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.intelligent-timeline-item .mark {
+  width: 34px;
+  height: 34px;
+  z-index: 1;
+}
+
+.intelligent-timeline-item strong,
+.intelligent-timeline-item span {
+  display: block;
+}
+
+.intelligent-timeline-item strong {
+  font-size: 0.95rem;
+}
+
+.intelligent-timeline-item span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.25;
+}
+
+.timeline-empty {
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.weekly-overview article {
+  grid-template-columns: 98px minmax(0, 1fr) 72px;
+}
+
+.day-story-card p {
+  font-size: 0.95rem;
+}
+
+.trend-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trend-kpis article strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 1.25rem;
+}
+
+.trend-kpis article p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+/* v75 - Diário mais legível no iPhone */
+.timeline .event-card {
+  grid-template-columns: 50px minmax(0, 1fr);
+  padding: 16px 14px;
+  border-radius: 24px;
+}
+
+.timeline .event-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.timeline .event-text strong {
+  font-size: 1.06rem;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.timeline .event-meta-primary,
+.timeline .event-meta-extra {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.25;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.timeline .event-meta-extra {
+  margin-top: 3px;
+  color: rgba(234, 229, 255, 0.78);
+}
+
+.event-action-button {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.74rem;
+}
+
+@media (max-width: 460px) {
+  .timeline .event-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .timeline .event-main {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .timeline .event-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    justify-content: stretch;
+    gap: 8px;
+    margin-top: 0 !important;
+  }
+  .timeline .event-action-button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* v75 - Filtros com respiro e seta sem sobreposição */
+.screen[data-screen="diary"] .chips-shell {
+  margin-bottom: 12px;
+}
+
+.screen[data-screen="diary"] .chips {
+  gap: 8px;
+  padding-right: 58px !important;
+}
+
+.screen[data-screen="diary"] .chips button {
+  min-height: 40px;
+  padding-inline: 18px;
+  font-size: 0.84rem;
+}
+
+.chips-more-button {
+  width: 42px;
+  height: 42px;
+  background:
+    linear-gradient(90deg, rgba(16, 16, 41, 0.0), rgba(16, 16, 41, 0.96) 42%),
+    rgba(34, 29, 76, 0.96);
+}
+
+/* v75 - Sons estilo player */
+.sound-player-card {
+  gap: 16px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(124, 229, 194, 0.12), transparent 36%),
+    var(--panel);
+}
+
+.sound-player-meta {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.sound-player-meta span:nth-child(2) {
+  text-align: center;
+}
+
+.sound-player-meta span:last-child {
+  text-align: right;
+}
+
+.sound-controls {
+  grid-template-columns: 1fr 94px;
+}
+
+.sound-main-button {
+  font-size: 1rem;
+}
+
+.sound-stop-button::before {
+  content: "⏹ ";
+}
+
+.sound-option.active > i {
+  color: var(--sage);
+}
+
+.sound-option.active > i::before {
+  content: "● ";
+}
+
+body.day-theme .smart-insight-card,
+body.day-theme .live-assistant-card,
+body.day-theme .routine-progress-card,
+body.day-theme .intelligent-timeline-card,
+body.day-theme .weekly-overview-card,
+body.day-theme .day-story-card,
+body.day-theme .trend-kpis article {
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 211, 122, 0.16), transparent 34%),
+    rgba(255, 249, 241, 0.92);
+}
+
+body.day-theme .timeline .event-meta-extra {
+  color: rgba(105, 83, 70, 0.82);
+}
+
+@media (max-width: 390px) {
+  .daily-rhythm article,
+  .weekly-overview article {
+    grid-template-columns: 80px minmax(0, 1fr) 58px;
+  }
+  .trend-kpis {
+    grid-template-columns: 1fr;
+  }
+  .sound-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* v75.1 - Tela inicial mais viva, sem exagero, e menos redundância */
+.state-orbit {
+  transition: box-shadow .35s ease, filter .35s ease, background .35s ease;
+}
+
+body[data-day-period="night"]:not(.day-theme) .state-orbit::before {
+  animation: orbitStarsSlow 28s ease-in-out infinite alternate;
+}
+
+body[data-routine-mode="sleeping"]:not(.day-theme) .state-orbit {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 58px rgba(10, 8, 45, 0.38),
+    0 0 0 1px rgba(143, 124, 255, 0.05);
+}
+
+body[data-routine-mode="sleeping"]:not(.day-theme) .orbit-ring {
+  border-color: rgba(159, 138, 255, 0.18);
+  border-bottom-color: transparent;
+  filter: drop-shadow(0 0 18px rgba(143, 124, 255, 0.22));
+}
+
+body.day-theme[data-routine-mode="awake"] .state-orbit,
+body.day-theme[data-day-period="morning"] .state-orbit {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.74),
+    0 24px 52px rgba(218, 149, 71, 0.18),
+    0 0 38px rgba(255, 211, 122, 0.12);
+}
+
+body.day-theme[data-routine-mode="awake"] .state-orbit::before,
+body.day-theme[data-day-period="morning"] .state-orbit::before {
+  animation: orbitMorningGlow 16s ease-in-out infinite alternate;
+}
+
+body.day-theme[data-routine-mode="awake"] .orbit-ring,
+body.day-theme[data-day-period="morning"] .orbit-ring {
+  filter: drop-shadow(0 0 16px rgba(255, 211, 122, 0.25));
+}
+
+.live-assistant-card #liveAssistantKicker,
+.smart-insight-card span {
+  letter-spacing: .035em;
+}
+
+.live-assistant-card[data-status="awake"] {
+  border-color: rgba(255, 211, 122, 0.24);
+}
+
+.routine-progress-card .drawer-section-title strong {
+  color: var(--sage);
+  font-size: .78rem;
+  white-space: nowrap;
+}
+
+.daily-rhythm article {
+  grid-template-columns: 86px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+}
+
+.daily-rhythm b {
+  grid-column: 2 / 3;
+  grid-row: 1;
+  justify-self: start;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.daily-rhythm i {
+  grid-column: 2 / 3;
+  grid-row: 2;
+  width: 100%;
+  margin-top: 3px;
+}
+
+.weekly-overview-card .drawer-section-title,
+.routine-progress-card .drawer-section-title,
+.day-story-card .drawer-section-title {
+  align-items: center;
+}
+
+@keyframes orbitStarsSlow {
+  0% { opacity: .64; transform: translate3d(0, 0, 0) scale(1); }
+  50% { opacity: .95; transform: translate3d(2px, -4px, 0) scale(1.012); }
+  100% { opacity: .72; transform: translate3d(-2px, 3px, 0) scale(.995); }
+}
+
+@keyframes orbitMorningGlow {
+  0% { opacity: .75; transform: translate3d(0, 0, 0) scale(1); }
+  100% { opacity: .98; transform: translate3d(7px, 3px, 0) scale(1.025); }
+}
+
+@media (max-width: 460px) {
+  .smart-insight-card,
+  .live-assistant-card,
+  .routine-progress-card,
+  .intelligent-timeline-card,
+  .weekly-overview-card,
+  .day-story-card {
+    padding: 15px;
+    border-radius: 22px;
+  }
+  .live-assistant-card {
+    grid-template-columns: minmax(0, 1fr) 50px;
+    gap: 10px;
+  }
+  .live-assistant-badge {
+    width: 50px;
+    height: 50px;
+    border-radius: 18px;
+    font-size: 1.45rem;
+  }
+  .daily-rhythm article,
+  .weekly-overview article {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+  .weekly-overview article b {
+    grid-column: 2 / 3;
+    justify-self: start;
+  }
+}
+
+/* v75.2 — evita duplicidade: o tempo atual aparece apenas no card central. */
+#activeTimerCard {
+  display: none !important;
+}

@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v74-16-revisao-final";
+const CACHE_NAME = "ninou-v75-2-sem-timer-duplicado";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=74.16",
-  "/css/app.legacy.css?v=74.16",
-  "/app.js?v=74.16",
-  "/js/app.legacy.js?v=74.16",
+  "/styles.css?v=75.2",
+  "/css/app.legacy.css?v=75.2",
+  "/app.js?v=75.2",
+  "/js/app.legacy.js?v=75.2",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -25,6 +25,7 @@ const APP_SHELL = [
   "/js/storage/local-storage.js",
   "/js/ui/event-formatters.js",
   "/js/ui/home.js",
+  "/js/ui/intelligence.js",
   "/js/ui/charts.js",
   "/js/ui/record-sheet.js",
   "/js/ui/navigation.js",

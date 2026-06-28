@@ -1,19 +1,7 @@
-# Ninou v74.16 — revisão final do roadmap estável
+# Ninou v75.2 — Sem timer duplicado
 
-Esta versão consolida a base v74 com foco em estabilidade, preservação dos dados locais, revisão do sono, Diário, Dados, Perfil, Sons e cache do PWA.
+Versão baseada na v75.1.
 
-## Principais pontos revisados
+Correção principal: a tela Hoje não mostra mais dois cronômetros para o mesmo estado. O tempo atual fica somente no card central, e o botão principal abaixo dele executa a ação correta.
 
-- Tela Inicial, Diário, Dados, Perfil e Sons preservados.
-- Timers de acordado/dormindo revisados.
-- Registro `Acordou` mantido como evento real.
-- Soneca, sono noturno e despertar noturno com início/fim manual.
-- Janela acordado salva nos registros de sono quando há despertar anterior válido.
-- Amamentação mista preserva E, D e Total.
-- Últimos registros e últimos 5 dias validados.
-- Dados locais preservados mesmo sem login ou ao desconectar do Firebase.
-- Service Worker atualizado para `ninou-v74-16-revisao-final`.
-
-## Importante após publicar
-
-Depois de subir no Vercel/GitHub, faça hard refresh. No iPhone, caso esteja usando como PWA instalado na Tela de Início, remova o atalho antigo e adicione novamente para garantir que o cache antigo foi descartado.
+Depois de publicar, limpe o cache do PWA ou remova e adicione novamente o atalho no iPhone.

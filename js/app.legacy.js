@@ -15,6 +15,7 @@ import { buildExportEvents } from "./services/export-service.js";
 import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventsForDay, getLatestEvent, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartDesc, updateEventKeepingDuration } from "./domain/records.js";
 import { formatEventMeta as formatRoutineEventMeta, getEventCardMarkup, getEventRenderSignature as buildEventRenderSignature, getMiniEventMarkup, getTimelineRenderSignature as buildTimelineSignature } from "./ui/event-formatters.js";
 import { renderHomeSummary as renderHomeSummaryPanel, renderTodayLastEvents as renderTodayLastEventsPanel } from "./ui/home.js";
+import { renderDailyRhythm, renderDayStory, renderIntelligentTimeline, renderLiveAssistant, renderSmartInsight, renderTrendKpis, renderWeeklyOverview } from "./ui/intelligence.js";
 import { formatNumber as formatChartNumber, getReportDays as buildReportDays, getSleepReportDays as buildSleepReportDays, renderBarChart as renderSharedBarChart, renderTodayMiniChart as renderTodayMiniChartPanel } from "./ui/charts.js";
 import { applyRecordSheetType as renderRecordSheetType, closeRecordSheet as closeRecordSheetPanel, getRecordSheetDetailValue as resolveRecordSheetDetailValue, hydrateRecordSheetFromEvent as hydrateRecordSheetFromEventPanel, prepareRecordSheetForOpen, resetRecordSheet, isTypeWithManualEnd } from "./ui/record-sheet.js";
 import { buildDeleteConfirmationText, buildManualEventPayload, clearRecordFormAfterSave } from "./domain/event-editor.js";
@@ -118,6 +119,14 @@ const diaperBars = document.querySelector("#diaperBars");
 const medicationBars = document.querySelector("#medicationBars");
 const todayLastEvents = document.querySelector("#todayLastEvents");
 const todayMiniChart = document.querySelector("#todayMiniChart");
+const smartInsightCard = document.querySelector("#smartInsightCard");
+const liveAssistantCard = document.querySelector("#liveAssistantCard");
+const routineProgressStatus = document.querySelector("#routineProgressStatus");
+const dailyRhythm = document.querySelector("#dailyRhythm");
+const intelligentTimeline = document.querySelector("#intelligentTimeline");
+const weeklyOverview = document.querySelector("#weeklyOverview");
+const dayStoryText = document.querySelector("#dayStoryText");
+const trendKpis = document.querySelector("#trendKpis");
 const bottleAmountRange = document.querySelector("#bottleAmountRange");
 const bottleAmountDisplay = document.querySelector("#bottleAmountDisplay");
 const breastTimerPanel = document.querySelector("#breastTimerPanel");
@@ -1192,6 +1201,18 @@ function renderBarChart(container, days, getValue, formatValue = formatNumber) {
 
 function renderSupplementalReports() {
   const reportDays = getReportDays(7);
+  renderTrendKpis({
+    container: trendKpis,
+    state,
+    todayStart: getDayStart(),
+    now: Date.now(),
+    dayMs: day,
+    getSleepMsForRange,
+    countFeeding: countFeedingEvents,
+    countDiaper: countDiaperEvents,
+    countMedication: countMedicationEvents,
+    formatShortDuration,
+  });
 
   renderBarChart(
     breastfeedingBars,
@@ -1240,9 +1261,83 @@ function renderTodayMiniChart() {
   });
 }
 
+function renderIntelligentHomeSections() {
+  const todayStart = getDayStart();
+  const now = Date.now();
+  renderSmartInsight({
+    container: smartInsightCard,
+    state,
+    now,
+    todayStart,
+    dayMs: day,
+    wakeWindowMinutes,
+    formatShortDuration,
+    formatTime,
+    getSleepMsForRange,
+    countFeeding: countFeedingEvents,
+    countDiaper: countDiaperEvents,
+  });
+  renderLiveAssistant({
+    card: liveAssistantCard,
+    state,
+    now,
+    todayStart,
+    dayMs: day,
+    wakeWindowMinutes,
+    formatShortDuration,
+    formatTime,
+    getSleepMsForRange,
+  });
+  renderDailyRhythm({
+    container: dailyRhythm,
+    statusElement: routineProgressStatus,
+    state,
+    todayStart,
+    now,
+    dayMs: day,
+    getSleepMsForRange,
+    countFeeding: countFeedingEvents,
+    countDiaper: countDiaperEvents,
+    countMedication: countMedicationEvents,
+    formatShortDuration,
+  });
+  renderIntelligentTimeline({
+    container: intelligentTimeline,
+    state,
+    todayStart,
+    dayMs: day,
+    formatShortDuration,
+    formatTime,
+  });
+  renderWeeklyOverview({
+    container: weeklyOverview,
+    state,
+    todayStart,
+    dayMs: day,
+    getSleepMsForRange,
+    countFeeding: countFeedingEvents,
+    countDiaper: countDiaperEvents,
+    countMedication: countMedicationEvents,
+    formatShortDuration,
+  });
+  renderDayStory({
+    element: dayStoryText,
+    state,
+    todayStart,
+    now,
+    dayMs: day,
+    getSleepMsForRange,
+    countFeeding: countFeedingEvents,
+    countDiaper: countDiaperEvents,
+    countMedication: countMedicationEvents,
+    formatShortDuration,
+  });
+}
+
 function renderTodayHomeSections() {
   renderTodayLastEvents();
   renderTodayMiniChart();
+  renderIntelligentHomeSections();
 }
 
 function formatBreastTimer(ms) {
@@ -1394,6 +1489,13 @@ function deleteBabyWeight(id) {
   renderWeightProfile();
 }
 
+function updateAmbientState() {
+  const hourNow = new Date().getHours();
+  const period = hourNow >= 5 && hourNow < 12 ? "morning" : hourNow >= 12 && hourNow < 18 ? "day" : "night";
+  document.body.dataset.dayPeriod = period;
+  document.body.dataset.routineMode = state?.mode || "idle";
+}
+
 function updateTheme() {
   updateThemeBody({
     body: document.body,
@@ -1401,6 +1503,7 @@ function updateTheme() {
     profile: babyProfile,
     storageKey: storageKeys.themeMode,
   });
+  updateAmbientState();
 }
 
 function renderAll() {
@@ -1429,6 +1532,7 @@ function renderLiveTick() {
   liveTickMinute = currentMinute;
   setText(stateHint, getWakeWindowText());
   renderSummary();
+  renderIntelligentHomeSections();
 }
 
 function finishSleep() {

@@ -24,6 +24,8 @@ export function initSleepSounds({ root = document } = {}) {
   const currentIcon = root.querySelector("#soundCurrentIcon");
   const currentTitle = root.querySelector("#soundCurrentTitle");
   const currentDesc = root.querySelector("#soundCurrentDesc");
+  const elapsedLabel = root.querySelector("#soundElapsed");
+  const remainingShortLabel = root.querySelector("#soundRemainingShort");
   const optionButtons = root.querySelectorAll(".sound-option");
 
   if (!audio || !playPauseButton || !stopButton || !optionButtons.length) return null;
@@ -47,6 +49,9 @@ export function initSleepSounds({ root = document } = {}) {
     const progress = getSoundProgressPercent(remaining);
 
     setText(timerLabel, formatSoundTime(remaining));
+    const elapsed = SOUND_DURATION_MS - remaining;
+    setText(elapsedLabel, formatSoundTime(elapsed).replace(/^00:/, ""));
+    setText(remainingShortLabel, formatSoundTime(remaining).replace(/^00:/, ""));
     if (progressBar) progressBar.style.width = `${progress}%`;
 
     if (remaining <= 0) {
