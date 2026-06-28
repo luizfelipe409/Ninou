@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-2-sem-timer-duplicado";
+const CACHE_NAME = "ninou-v75-6-admin-whatsapp-users";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.2",
-  "/css/app.legacy.css?v=75.2",
-  "/app.js?v=75.2",
-  "/js/app.legacy.js?v=75.2",
+  "/styles.css?v=75.6",
+  "/css/app.legacy.css?v=75.6",
+  "/app.js?v=75.6",
+  "/js/app.legacy.js?v=75.6",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

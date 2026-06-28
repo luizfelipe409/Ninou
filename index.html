@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.2" />
+    <link rel="stylesheet" href="./styles.css?v=75.6" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -66,7 +66,7 @@
           <div id="liveAssistantBadge" class="live-assistant-badge">✨</div>
         </section>
 
-        <!-- v75.2: card de timer secundário removido para evitar duplicidade.
+        <!-- v75.6: acesso familiar por convite, contato WhatsApp e painel admin com contagem.
              O status principal fica no card central e a ação fica no botão principal. -->
 
         <section class="main-action-area" aria-label="Ação principal">
@@ -426,16 +426,86 @@
             </div>
           </article>
           <article class="login-card">
-            <span>Login familiar</span>
-            <strong>Entrar ou criar conta</strong>
-            <p id="loginHelper">Use o mesmo e-mail e senha nos celulares para compartilhar a rotina do bebê.</p>
+            <span>Acesso familiar</span>
+            <strong>Entrar no Ninou</strong>
+            <p id="loginHelper">Entre com sua conta. Novos usuários entram por convite do administrador do app.</p>
             <div class="login-fields">
               <input id="loginEmail" type="email" placeholder="email@familia.com" />
               <input id="loginPassword" type="password" placeholder="Senha" autocomplete="current-password" />
             </div>
             <div class="login-actions">
               <button id="loginButton" type="button">Entrar</button>
-              <button id="createAccountButton" class="secondary-login" type="button">Criar conta nova</button>
+              <button id="createAccountButton" class="secondary-login" type="button">Criar conta</button>
+            </div>
+          </article>
+          <article class="admin-access-card" id="familyAccessCard">
+            <span>Administração do app</span>
+            <strong id="familyAccessTitle">Convites e permissões</strong>
+            <p id="familyAccessText">Somente o administrador do app pode gerar convites. Pessoas convidadas acessam com e-mail e senha próprios.</p>
+            <div class="access-status-row">
+              <span id="familyAccessBadge" class="access-badge">Sem login</span>
+              <button id="createFamilyButton" class="secondary-login" type="button" hidden>Ativar família</button>
+            </div>
+            <div class="invite-accept-box">
+              <label>
+                Código de convite
+                <input id="inviteCodeInput" type="text" placeholder="Ex.: NINOU-AB12-CD34" autocomplete="off" />
+              </label>
+              <button id="acceptInviteButton" class="secondary-login" type="button">Aceitar convite</button>
+              <p class="invite-note">Use esse campo quando receber um convite do administrador do app.</p>
+            </div>
+            <div id="adminInvitePanel" class="admin-invite-panel" hidden>
+              <div class="admin-stats-card" aria-live="polite">
+                <div class="admin-stats-header">
+                  <div>
+                    <span>Visão do Admin</span>
+                    <strong>Usuários autorizados</strong>
+                  </div>
+                  <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
+                </div>
+                <div class="admin-stats-grid">
+                  <article>
+                    <span>Usuários</span>
+                    <strong id="adminUsersCount">--</strong>
+                    <small>vinculados à família</small>
+                  </article>
+                  <article>
+                    <span>Convites</span>
+                    <strong id="adminPendingInvitesCount">--</strong>
+                    <small>pendentes</small>
+                  </article>
+                  <article>
+                    <span>Aceitos</span>
+                    <strong id="adminAcceptedInvitesCount">--</strong>
+                    <small>convites aceitos</small>
+                  </article>
+                </div>
+                <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar os usuários autorizados.</p>
+              </div>
+              <div class="admin-invite-header">
+                <strong>Convidar usuário</strong>
+                <em>Somente o admin do app gera convites. Compartilhe o código ou link com quem poderá acessar a rotina.</em>
+              </div>
+              <label>
+                E-mail do convidado
+                <input id="adminInviteEmail" type="email" placeholder="familiar@email.com" autocomplete="off" />
+              </label>
+              <label>
+                Permissão
+                <select id="adminInviteRole">
+                  <option value="responsavel">Responsável — registra, edita e exclui</option>
+                  <option value="cuidador">Cuidador — registra e acompanha</option>
+                  <option value="visualizacao">Visualização — apenas acompanha</option>
+                </select>
+              </label>
+              <button id="createInviteButton" type="button">Gerar convite</button>
+              <div id="inviteResult" class="invite-result" hidden></div>
+              <div class="invite-list-box">
+                <span>Últimos convites</span>
+                <ul id="inviteList" class="invite-list">
+                  <li>Nenhum convite gerado neste aparelho.</li>
+                </ul>
+              </div>
             </div>
           </article>
           <article class="wake-window-card">
@@ -569,6 +639,11 @@
     </section>
 
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
-    <script type="module" src="./app.js?v=75.2"></script>
+    <a id="guestWhatsappButton" class="guest-whatsapp-button" href="https://wa.me/5521981904591?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20acessar%20o%20Ninou.%20Pode%20me%20enviar%20um%20convite%3F" target="_blank" rel="noopener noreferrer" aria-label="Falar com o administrador pelo WhatsApp" hidden>
+      <span aria-hidden="true">☘</span>
+      <strong>Solicitar acesso</strong>
+    </a>
+
+    <script type="module" src="./app.js?v=75.6"></script>
   </body>
 </html>

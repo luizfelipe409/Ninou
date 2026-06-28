@@ -1,7 +1,36 @@
-# Ninou v75.2 — Sem timer duplicado
+# Ninou v75.5 — Admin global por convite
 
-Versão baseada na v75.1.
+Esta versão transforma o painel de administração em um painel exclusivo do e-mail dono do app:
 
-Correção principal: a tela Hoje não mostra mais dois cronômetros para o mesmo estado. O tempo atual fica somente no card central, e o botão principal abaixo dele executa a ação correta.
+`luizfelipe.dasilva@gmail.com`
 
-Depois de publicar, limpe o cache do PWA ou remova e adicione novamente o atalho no iPhone.
+## O que mudou
+
+- Somente o e-mail admin vê o painel de convites.
+- Convidados não veem o painel Admin, mesmo que tenham acesso à rotina familiar.
+- A família principal do app é ativada automaticamente para o admin global ao entrar.
+- O admin pode convidar usuários por e-mail e escolher permissões:
+  - Responsável
+  - Cuidador
+  - Visualização
+- A opção de convidar outro administrador foi removida da interface.
+- Usuários sem convite ficam bloqueados nas funções principais e são direcionados ao Perfil/Login.
+- A v75.3/v75.4 foi preservada, incluindo a correção visual da Rotina do dia sem sobreposição.
+
+## Importante
+
+Para segurança real em produção, aplique as regras sugeridas em:
+
+`docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_5.md`
+
+O frontend esconde o painel, mas quem realmente protege os dados é o Firestore.
+
+## v75.6 — Admin, WhatsApp e contagem de usuários
+
+- Botão pequeno de WhatsApp para visitantes sem acesso.
+- Mensagem pronta de interesse ao admin.
+- Número configurado: +55 21 98190-4591.
+- Painel Admin exclusivo para `luizfelipe.dasilva@gmail.com`.
+- Contagem de usuários autorizados/vinculados à família.
+- Contagem de convites pendentes e aceitos.
+- Cache atualizado para `ninou-v75-6-admin-whatsapp-users`.

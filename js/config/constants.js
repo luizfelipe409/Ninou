@@ -7,6 +7,8 @@ export const storageKeys = Object.freeze({
   dayState: "ninou.demo.dayState",
   themeMode: "ninou.demo.themeMode",
   weights: "ninou.demo.weights",
+  access: "ninou.demo.access",
+  pendingInvite: "ninou.demo.pendingInvite",
 });
 
 export const firebaseConfig = Object.freeze({

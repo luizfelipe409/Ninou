@@ -96,6 +96,25 @@ const loginPassword = document.querySelector("#loginPassword");
 const loginButton = document.querySelector("#loginButton");
 const createAccountButton = document.querySelector("#createAccountButton");
 const loginHelper = document.querySelector("#loginHelper");
+const familyAccessCard = document.querySelector("#familyAccessCard");
+const familyAccessTitle = document.querySelector("#familyAccessTitle");
+const familyAccessText = document.querySelector("#familyAccessText");
+const familyAccessBadge = document.querySelector("#familyAccessBadge");
+const createFamilyButton = document.querySelector("#createFamilyButton");
+const inviteCodeInput = document.querySelector("#inviteCodeInput");
+const acceptInviteButton = document.querySelector("#acceptInviteButton");
+const adminInvitePanel = document.querySelector("#adminInvitePanel");
+const adminInviteEmail = document.querySelector("#adminInviteEmail");
+const adminInviteRole = document.querySelector("#adminInviteRole");
+const createInviteButton = document.querySelector("#createInviteButton");
+const inviteResult = document.querySelector("#inviteResult");
+const inviteList = document.querySelector("#inviteList");
+const adminUsersCount = document.querySelector("#adminUsersCount");
+const adminPendingInvitesCount = document.querySelector("#adminPendingInvitesCount");
+const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesCount");
+const adminStatsHint = document.querySelector("#adminStatsHint");
+const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
+const guestWhatsappButton = document.querySelector("#guestWhatsappButton");
 const resetDataButton = document.querySelector("#resetDataButton");
 const exportJsonButton = document.querySelector("#exportJsonButton");
 const exportCsvButton = document.querySelector("#exportCsvButton");
@@ -143,6 +162,31 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
+const GLOBAL_APP_ADMIN_EMAIL = "luizfelipe.dasilva@gmail.com";
+const APP_ADMIN_FAMILY_ID = "ninou-family-luizfelipe";
+const ADMIN_WHATSAPP_NUMBER = "5521981904591";
+const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
+const ADMIN_WHATSAPP_URL = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(ADMIN_WHATSAPP_MESSAGE)}`;
+
+function isGlobalAdminEmail(email = "") {
+  return normalizeEmail(email) === GLOBAL_APP_ADMIN_EMAIL;
+}
+
+function isGlobalAppAdmin(user = cloudUser) {
+  return Boolean(user && isGlobalAdminEmail(user.email));
+}
+
+function getEffectiveRole(role = familyAccess?.role || "responsavel", email = cloudUser?.email || familyAccess?.email || "") {
+  const normalized = normalizeRole(role);
+  if (normalized === "admin" && !isGlobalAdminEmail(email)) return "responsavel";
+  return normalized;
+}
+
+function normalizeInviteRole(value = "responsavel") {
+  const role = normalizeRole(value);
+  return role === "admin" ? "responsavel" : role;
+}
+
 let currentSheetType = "sono";
 let currentEditingEventId = null;
 let currentDiaryFilter = "all";
@@ -154,6 +198,10 @@ let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVers
 let firebaseServices = null;
 let firebaseServicesPromise = null;
 let cloudUser = null;
+let familyAccess = loadFamilyAccess();
+let pendingInviteCode = getInitialInviteCode();
+let recentInvites = [];
+let adminStatsRequestId = 0;
 let profileUnsubscribe = null;
 let dayUnsubscribe = null;
 let profileCloudSaveTimer = null;
@@ -254,12 +302,511 @@ function isLoggedIn() {
   return Boolean(cloudUser);
 }
 
-function requireLogin(actionText = "salvar dados") {
-  if (isLoggedIn()) return true;
-  setSyncStatus("offline");
-  if (loginHelper) {
-    loginHelper.textContent = `Dados salvos neste aparelho. Entre com e-mail e senha para sincronizar ${actionText} entre celulares.`;
+function hasFamilyAccess() {
+  return Boolean(cloudUser && familyAccess?.familyId);
+}
+
+function canUsePrivateFeatures() {
+  return hasFamilyAccess();
+}
+
+
+function hasPermissionForAction(actionText = "") {
+  if (!hasFamilyAccess()) return false;
+  const role = getEffectiveRole(familyAccess.role);
+  if (role === "admin" || role === "responsavel") return true;
+
+  const text = String(actionText).toLowerCase();
+  const sensitive = /(editar|excluir|zerar|perfil|foto|peso|janela|exportar|backup)/.test(text);
+
+  if (role === "cuidador") {
+    return !sensitive;
   }
+
+  return false;
+}
+
+function requireLogin(actionText = "usar o Ninou") {
+  if (canUsePrivateFeatures() && hasPermissionForAction(actionText)) return true;
+  if (canUsePrivateFeatures() && !hasPermissionForAction(actionText)) {
+    if (loginHelper) loginHelper.textContent = `Seu perfil (${getRoleLabel(familyAccess.role)}) não permite ${actionText}.`;
+    return false;
+  }
+  setSyncStatus(isLoggedIn() ? "loading" : "offline", cloudUser?.email || "");
+  showScreen("profile");
+  if (loginHelper) {
+    loginHelper.textContent = isLoggedIn()
+      ? `Sua conta precisa estar vinculada a uma família para ${actionText}. Use um convite do administrador do app.`
+      : `Entre com uma conta autorizada para ${actionText}. Novos usuários entram por convite do administrador do app.`;
+  }
+  return false;
+}
+
+function normalizeEmail(value = "") {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeInviteCode(value = "") {
+  return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+}
+
+function normalizeRole(value = "responsavel") {
+  return ["admin", "responsavel", "cuidador", "visualizacao"].includes(value) ? value : "responsavel";
+}
+
+function getRoleLabel(role = "responsavel") {
+  const labels = {
+    admin: "Administrador",
+    responsavel: "Responsável",
+    cuidador: "Cuidador",
+    visualizacao: "Visualização",
+  };
+  return labels[normalizeRole(role)] || labels.responsavel;
+}
+
+function loadFamilyAccess() {
+  try {
+    const data = JSON.parse(localStorage.getItem(storageKeys.access) || "null");
+    if (!data || typeof data !== "object" || !data.familyId) return null;
+    return {
+      familyId: String(data.familyId),
+      role: normalizeRole(data.role),
+      email: normalizeEmail(data.email),
+      ownerUid: data.ownerUid ? String(data.ownerUid) : "",
+      acceptedAt: data.acceptedAt || data.createdAt || "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveFamilyAccess(access) {
+  familyAccess = access?.familyId
+    ? {
+        familyId: String(access.familyId),
+        role: getEffectiveRole(access.role, access.email || cloudUser?.email || ""),
+        email: normalizeEmail(access.email || cloudUser?.email || ""),
+        ownerUid: access.ownerUid ? String(access.ownerUid) : "",
+        acceptedAt: access.acceptedAt || access.createdAt || new Date().toISOString(),
+      }
+    : null;
+
+  if (familyAccess) {
+    localStorage.setItem(storageKeys.access, JSON.stringify(familyAccess));
+  } else {
+    localStorage.removeItem(storageKeys.access);
+  }
+
+  renderFamilyAccessPanel();
+  return familyAccess;
+}
+
+function getInitialInviteCode() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const code = normalizeInviteCode(params.get("convite") || params.get("invite") || localStorage.getItem(storageKeys.pendingInvite) || "");
+    if (code) localStorage.setItem(storageKeys.pendingInvite, code);
+    return code;
+  } catch {
+    return normalizeInviteCode(localStorage.getItem(storageKeys.pendingInvite) || "");
+  }
+}
+
+function createInviteCode() {
+  const bytes = new Uint8Array(6);
+  if (window.crypto?.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index += 1) bytes[index] = Math.floor(Math.random() * 256);
+  }
+  const token = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+  return `NINOU-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}`;
+}
+
+function buildInviteLink(code) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set("convite", code);
+  return url.toString();
+}
+
+function getActiveFamilyId() {
+  return familyAccess?.familyId || (cloudUser ? cloudUser.uid : "");
+}
+
+function isFamilyAdmin() {
+  return hasFamilyAccess() && isGlobalAppAdmin();
+}
+
+
+function updateGuestWhatsappButton() {
+  if (!guestWhatsappButton) return;
+  const shouldShow = !isGlobalAppAdmin() && !hasFamilyAccess();
+  guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
+  guestWhatsappButton.hidden = !shouldShow;
+  document.body.classList.toggle("guest-whatsapp-visible", shouldShow);
+}
+
+function setAdminStatsPlaceholder(message = "Entre como admin para visualizar os usuários autorizados.") {
+  setText(adminUsersCount, "--");
+  setText(adminPendingInvitesCount, "--");
+  setText(adminAcceptedInvitesCount, "--");
+  setText(adminStatsHint, message);
+}
+
+function renderAdminStats(stats = null) {
+  if (!adminUsersCount || !adminPendingInvitesCount || !adminAcceptedInvitesCount) return;
+
+  if (!stats) {
+    setAdminStatsPlaceholder();
+    return;
+  }
+
+  setText(adminUsersCount, String(stats.membersCount ?? 0));
+  setText(adminPendingInvitesCount, String(stats.pendingInvitesCount ?? 0));
+  setText(adminAcceptedInvitesCount, String(stats.acceptedInvitesCount ?? 0));
+  setText(
+    adminStatsHint,
+    `${pluralize(stats.membersCount ?? 0, "usuário autorizado", "usuários autorizados")} na família principal. Contas criadas no Firebase sem convite não aparecem aqui até aceitarem acesso.`,
+  );
+}
+
+async function refreshAdminStats(options = {}) {
+  if (!isFamilyAdmin() || !familyAccess?.familyId) {
+    renderAdminStats(null);
+    return null;
+  }
+
+  const requestId = ++adminStatsRequestId;
+  if (!options.silent) setAdminStatsPlaceholder("Atualizando contagem...");
+  if (refreshAdminStatsButton) refreshAdminStatsButton.disabled = true;
+
+  try {
+    const services = await getFirebaseServices();
+    const familyId = familyAccess.familyId;
+    const [membersSnapshot, invitesSnapshot] = await Promise.all([
+      services.getDocs(services.collection(services.db, "families", familyId, "members")),
+      services.getDocs(services.collection(services.db, "families", familyId, "invites")),
+    ]);
+
+    let membersCount = 0;
+    membersSnapshot.forEach((memberDoc) => {
+      const data = memberDoc.data() || {};
+      if ((data.status || "active") !== "removed") membersCount += 1;
+    });
+
+    let pendingInvitesCount = 0;
+    let acceptedInvitesCount = 0;
+    invitesSnapshot.forEach((inviteDoc) => {
+      const data = inviteDoc.data() || {};
+      if (data.status === "active" || data.status === "accepted") acceptedInvitesCount += 1;
+      else if (!data.status || data.status === "pending") pendingInvitesCount += 1;
+    });
+
+    const stats = { membersCount, pendingInvitesCount, acceptedInvitesCount };
+    if (requestId === adminStatsRequestId) renderAdminStats(stats);
+    return stats;
+  } catch (error) {
+    console.error("Erro ao carregar usuários autorizados:", error);
+    if (requestId === adminStatsRequestId) {
+      setAdminStatsPlaceholder("Não foi possível carregar a contagem. Revise as regras do Firestore.");
+    }
+    return null;
+  } finally {
+    if (refreshAdminStatsButton) refreshAdminStatsButton.disabled = false;
+  }
+}
+
+function renderInviteList() {
+  if (!inviteList) return;
+  if (!recentInvites.length) {
+    inviteList.innerHTML = "<li>Nenhum convite gerado neste aparelho.</li>";
+    return;
+  }
+
+  inviteList.innerHTML = recentInvites.slice(0, 5).map((invite) => `
+    <li>
+      <strong>${escapeHtml(invite.email || "Convite sem e-mail")}</strong>
+      <span>${escapeHtml(getRoleLabel(invite.role))} • ${escapeHtml(invite.code)}</span>
+    </li>
+  `).join("");
+}
+
+function renderFamilyAccessPanel() {
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const admin = isFamilyAdmin();
+  const email = cloudUser?.email || familyAccess?.email || "";
+  const effectiveRole = authorized ? getEffectiveRole(familyAccess.role, email) : "";
+
+  if (familyAccessTitle) {
+    familyAccessTitle.textContent = authorized
+      ? (appAdmin ? "Admin do app conectado" : "Família conectada")
+      : connected
+        ? (appAdmin ? "Admin pronto para ativar" : "Conta sem convite")
+        : "Convites e permissões";
+  }
+
+  if (familyAccessText) {
+    familyAccessText.textContent = authorized
+      ? (appAdmin
+        ? `${email} é o administrador do Ninou. Somente esta conta pode acessar o painel de convites.`
+        : `${email} está conectado como ${getRoleLabel(effectiveRole)}. Os registros são sincronizados no ambiente da família.`)
+      : connected
+        ? (appAdmin
+          ? "Ative a família principal para começar a convidar usuários por e-mail."
+          : "Esta conta ainda não possui convite. Peça um convite ao administrador do app.")
+        : "Entre com sua conta para aceitar convite. O painel Admin aparece somente para o e-mail administrador do app.";
+  }
+
+  if (familyAccessBadge) {
+    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin do app" : getRoleLabel(effectiveRole)) : connected ? "Aguardando convite" : "Sem login";
+    familyAccessBadge.dataset.role = authorized ? effectiveRole : "offline";
+  }
+
+  if (createFamilyButton) {
+    createFamilyButton.hidden = !connected || authorized || !appAdmin;
+    createFamilyButton.textContent = "Ativar família principal";
+  }
+
+  if (adminInvitePanel) {
+    adminInvitePanel.hidden = !admin;
+  }
+
+  if (admin) {
+    refreshAdminStats({ silent: true });
+  } else {
+    renderAdminStats(null);
+  }
+
+  if (acceptInviteButton) {
+    acceptInviteButton.disabled = !connected || appAdmin;
+    acceptInviteButton.textContent = appAdmin ? "Admin não precisa de convite" : "Aceitar convite";
+  }
+
+  if (inviteCodeInput) {
+    inviteCodeInput.disabled = appAdmin;
+    if (pendingInviteCode && !inviteCodeInput.value) inviteCodeInput.value = pendingInviteCode;
+  }
+
+  renderInviteList();
+}
+
+async function readAccountAccessFromCloud(user = cloudUser) {
+  if (!user) return null;
+  const services = await getFirebaseServices();
+  const accessRef = services.doc(services.db, "users", user.uid, "access", "ninou");
+  const snapshot = await services.getDoc(accessRef);
+  if (!snapshot.exists()) return null;
+  const data = snapshot.data() || {};
+  return saveFamilyAccess({
+    familyId: data.familyId,
+    role: data.role,
+    email: data.email || user.email || "",
+    ownerUid: data.ownerUid || "",
+    acceptedAt: data.acceptedAt || data.createdAt || "",
+  });
+}
+
+async function saveAccountAccessToCloud(access, user = cloudUser) {
+  if (!user || !access?.familyId) return null;
+  const services = await getFirebaseServices();
+  const payload = {
+    familyId: access.familyId,
+    role: getEffectiveRole(access.role, access.email || user.email || ""),
+    email: normalizeEmail(access.email || user.email || ""),
+    ownerUid: access.ownerUid || access.familyId,
+    updatedAt: services.serverTimestamp(),
+  };
+
+  await services.setDoc(services.doc(services.db, "users", user.uid, "access", "ninou"), payload, { merge: true });
+  await services.setDoc(services.doc(services.db, "families", access.familyId, "members", user.uid), {
+    ...payload,
+    uid: user.uid,
+    status: "active",
+    joinedAt: services.serverTimestamp(),
+  }, { merge: true });
+
+  return saveFamilyAccess({ ...payload, acceptedAt: new Date().toISOString() });
+}
+
+async function activatePersonalFamily() {
+  if (!cloudUser) {
+    if (loginHelper) loginHelper.textContent = "Entre antes de ativar sua família.";
+    return null;
+  }
+
+  if (!isGlobalAppAdmin()) {
+    if (loginHelper) loginHelper.textContent = "Apenas o e-mail administrador do app pode ativar a família principal.";
+    return null;
+  }
+
+  const access = {
+    familyId: APP_ADMIN_FAMILY_ID,
+    role: "admin",
+    email: cloudUser.email || "",
+    ownerUid: cloudUser.uid,
+    createdAt: new Date().toISOString(),
+  };
+
+  const services = await getFirebaseServices();
+  await services.setDoc(services.doc(services.db, "families", access.familyId), {
+    ownerUid: cloudUser.uid,
+    ownerEmail: cloudUser.email || "",
+    createdAt: services.serverTimestamp(),
+    updatedAt: services.serverTimestamp(),
+  }, { merge: true });
+  await saveAccountAccessToCloud(access);
+  await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+  await saveDayToCloud();
+  if (loginHelper) loginHelper.textContent = "Família principal ativada. Você é o admin do app e já pode gerar convites.";
+  renderAuthControls();
+  refreshAdminStats({ silent: true });
+  return familyAccess;
+}
+
+async function createFamilyInvite() {
+  if (!cloudUser || !isFamilyAdmin()) {
+    if (loginHelper) loginHelper.textContent = "Apenas o admin do app pode gerar convites.";
+    return;
+  }
+
+  const email = normalizeEmail(adminInviteEmail?.value || "");
+  const role = normalizeInviteRole(adminInviteRole?.value || "responsavel");
+
+  if (!email || !email.includes("@")) {
+    if (inviteResult) {
+      inviteResult.hidden = false;
+      inviteResult.textContent = "Digite o e-mail do convidado.";
+    }
+    adminInviteEmail?.focus();
+    return;
+  }
+
+  const services = await getFirebaseServices();
+  const code = createInviteCode();
+  const payload = {
+    code,
+    familyId: familyAccess.familyId,
+    email,
+    role,
+    status: "pending",
+    createdBy: cloudUser.uid,
+    createdByEmail: cloudUser.email || "",
+    createdAt: services.serverTimestamp(),
+  };
+
+  createInviteButton.disabled = true;
+  if (inviteResult) {
+    inviteResult.hidden = false;
+    inviteResult.textContent = "Gerando convite...";
+  }
+
+  try {
+    await services.setDoc(services.doc(services.db, "invites", code), payload, { merge: true });
+    await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), payload, { merge: true });
+    const link = buildInviteLink(code);
+    recentInvites.unshift({ code, email, role, link });
+    renderInviteList();
+    refreshAdminStats({ silent: true });
+    if (inviteResult) {
+      inviteResult.innerHTML = `
+        <strong>Convite criado</strong>
+        <span>Código: ${escapeHtml(code)}</span>
+        <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>
+      `;
+    }
+    if (adminInviteEmail) adminInviteEmail.value = "";
+  } catch (error) {
+    console.error("Erro ao criar convite:", error);
+    if (inviteResult) inviteResult.textContent = getFirebaseErrorMessage(error);
+  } finally {
+    createInviteButton.disabled = false;
+  }
+}
+
+async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingInviteCode || "", options = {}) {
+  const code = normalizeInviteCode(codeValue);
+  if (!code) {
+    if (!options.silent && loginHelper) loginHelper.textContent = "Digite o código de convite.";
+    inviteCodeInput?.focus();
+    return false;
+  }
+
+  if (!cloudUser) {
+    pendingInviteCode = code;
+    localStorage.setItem(storageKeys.pendingInvite, code);
+    if (!options.silent && loginHelper) loginHelper.textContent = "Entre ou crie sua conta para aceitar o convite.";
+    showScreen("profile");
+    return false;
+  }
+
+  if (isGlobalAppAdmin()) {
+    if (!options.silent && loginHelper) loginHelper.textContent = "A conta admin do app não precisa aceitar convite.";
+    return false;
+  }
+
+  const services = await getFirebaseServices();
+  const inviteRef = services.doc(services.db, "invites", code);
+  const snapshot = await services.getDoc(inviteRef);
+
+  if (!snapshot.exists()) {
+    if (!options.silent && loginHelper) loginHelper.textContent = "Convite não encontrado ou expirado.";
+    return false;
+  }
+
+  const invite = snapshot.data() || {};
+  const inviteEmail = normalizeEmail(invite.email || "");
+  const userEmail = normalizeEmail(cloudUser.email || "");
+
+  if (invite.status && invite.status !== "pending" && invite.status !== "active") {
+    if (!options.silent && loginHelper) loginHelper.textContent = "Este convite já foi usado ou cancelado.";
+    return false;
+  }
+
+  if (inviteEmail && inviteEmail !== userEmail) {
+    if (!options.silent && loginHelper) loginHelper.textContent = `Este convite foi criado para ${inviteEmail}. Entre com esse e-mail.`;
+    return false;
+  }
+
+  const access = {
+    familyId: String(invite.familyId || ""),
+    role: normalizeInviteRole(invite.role),
+    email: userEmail,
+    ownerUid: invite.createdBy || invite.ownerUid || "",
+    acceptedAt: new Date().toISOString(),
+  };
+
+  if (!access.familyId) {
+    if (!options.silent && loginHelper) loginHelper.textContent = "Convite inválido: família não encontrada.";
+    return false;
+  }
+
+  await saveAccountAccessToCloud(access);
+  await services.setDoc(inviteRef, {
+    status: "active",
+    acceptedBy: cloudUser.uid,
+    acceptedByEmail: userEmail,
+    acceptedAt: services.serverTimestamp(),
+  }, { merge: true });
+  await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), {
+    ...invite,
+    ...access,
+    code,
+    status: "active",
+    acceptedBy: cloudUser.uid,
+    acceptedByEmail: userEmail,
+    acceptedAt: services.serverTimestamp(),
+  }, { merge: true });
+
+  pendingInviteCode = "";
+  localStorage.removeItem(storageKeys.pendingInvite);
+  if (inviteCodeInput) inviteCodeInput.value = "";
+  if (!options.silent && loginHelper) loginHelper.textContent = "Convite aceito. Rotina familiar conectada.";
+  await connectCurrentAccount();
+  renderAll();
   return true;
 }
 
@@ -413,12 +960,16 @@ function getCurrentDayId() {
 
 function getCloudProfileRef() {
   if (!firebaseServices || !cloudUser) return null;
-  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "profile", "main");
+  const familyId = getActiveFamilyId();
+  if (!familyId) return null;
+  return firebaseServices.doc(firebaseServices.db, "families", familyId, "profile", "main");
 }
 
 function getCloudDayRef(dayId = getCurrentDayId()) {
   if (!firebaseServices || !cloudUser) return null;
-  return firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "days", dayId);
+  const familyId = getActiveFamilyId();
+  if (!familyId) return null;
+  return firebaseServices.doc(firebaseServices.db, "families", familyId, "days", dayId);
 }
 
 function unsubscribeCloudListeners() {
@@ -430,21 +981,30 @@ function unsubscribeCloudListeners() {
 
 function renderAuthControls() {
   const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
   loginButton.textContent = connected ? "Conectado" : "Entrar";
   loginButton.disabled = connected;
-  createAccountButton.textContent = connected ? "Sair" : "Criar conta nova";
+  createAccountButton.textContent = connected ? "Sair" : "Criar conta";
   createAccountButton.classList.toggle("logout-button", connected);
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
+  document.body.classList.toggle("access-locked", !authorized);
+  updateGuestWhatsappButton();
+  renderFamilyAccessPanel();
+  if (!authorized) {
+    updateScreenVisibility({ target: "profile", navButtons, screens });
+  }
 }
 
 function clearLocalAccountData() {
-  // Local-first: desconectar ou abrir o app sem login não pode apagar rotina, perfil, foto ou pesos.
-  // A limpeza completa do dia continua disponível apenas no botão "Zerar dia".
+  // Local-first: desconectar ou abrir o app sem login não apaga rotina, perfil, foto ou pesos.
+  // O acesso familiar é removido apenas deste aparelho; a família continua salva no Firebase.
   localStorage.removeItem(storageKeys.email);
+  saveFamilyAccess(null);
   cloudUser = null;
   pendingProfilePhotoSave = false;
   if (loginPassword) loginPassword.value = "";
+  renderAuthControls();
   renderAll();
 }
 
@@ -642,7 +1202,7 @@ async function initFirebaseAuthState() {
       loginEmail.value = "";
       loginPassword.value = "";
       renderAuthControls();
-      loginHelper.textContent = "Entre com e-mail e senha para sincronizar entre aparelhos.";
+      loginHelper.textContent = "Entre com sua conta. Novos usuários acessam por convite do administrador do app.";
       return;
     }
 
@@ -651,16 +1211,38 @@ async function initFirebaseAuthState() {
 
     setSyncStatus("loading", user.email || "");
     renderAuthControls();
-    loginHelper.textContent = "Conectando à conta...";
+    loginHelper.textContent = "Verificando acesso familiar...";
 
     try {
+      const restoredAccess = await readAccountAccessFromCloud(user);
+      if (!restoredAccess) saveFamilyAccess(null);
+
+      if (!hasFamilyAccess() && isGlobalAppAdmin(user)) {
+        loginHelper.textContent = "Conta admin conectada. Ativando família principal...";
+        await activatePersonalFamily();
+      }
+
+      if (pendingInviteCode && !isGlobalAppAdmin(user)) {
+        await acceptFamilyInvite(pendingInviteCode, { silent: true });
+      }
+
+      if (!hasFamilyAccess()) {
+        loginHelper.textContent = isGlobalAppAdmin(user) ? "Conta admin conectada. Ative a família principal para gerar convites." : "Conta conectada. Aceite um convite do administrador do app.";
+        setSyncStatus("loading", user.email || "");
+        renderAuthControls();
+        showScreen("profile");
+        return;
+      }
+
       await connectCurrentAccount();
       setSyncStatus("online", user.email || "");
-      loginHelper.textContent = "Conta conectada e sincronizando.";
+      loginHelper.textContent = isGlobalAppAdmin(user) ? "Admin do app conectado. Você pode gerar convites no Perfil." : `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
+      renderAuthControls();
     } catch (error) {
       console.error("Erro ao conectar família:", error);
       setSyncStatus("error", user.email || "");
       loginHelper.textContent = getFirebaseErrorMessage(error);
+      renderAuthControls();
     }
   });
 }
@@ -1516,6 +2098,7 @@ function renderAll() {
   renderSleepReport();
   renderSupplementalReports();
   renderTodayHomeSections();
+  renderFamilyAccessPanel();
 }
 
 function renderLiveTick() {
@@ -1568,7 +2151,11 @@ function scrollDiaryFilters() {
 }
 
 function showScreen(target) {
-  updateScreenVisibility({ target, navButtons, screens });
+  const nextTarget = target !== "profile" && !canUsePrivateFeatures() ? "profile" : target;
+  if (nextTarget === "profile" && target !== "profile" && loginHelper) {
+    loginHelper.textContent = "Entre com uma conta autorizada para acessar as funções do Ninou.";
+  }
+  updateScreenVisibility({ target: nextTarget, navButtons, screens });
 }
 
 function setDiaryFilter(filter) {
@@ -2077,6 +2664,49 @@ profilePhotoInput.addEventListener("change", async () => {
 
 loginButton.addEventListener("click", signInAccount);
 createAccountButton.addEventListener("click", createAccount);
+if (createFamilyButton) {
+  createFamilyButton.addEventListener("click", () => {
+    activatePersonalFamily().catch((error) => {
+      console.error("Erro ao ativar família:", error);
+      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    });
+  });
+}
+if (acceptInviteButton) {
+  acceptInviteButton.addEventListener("click", () => {
+    acceptFamilyInvite().catch((error) => {
+      console.error("Erro ao aceitar convite:", error);
+      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    });
+  });
+}
+if (createInviteButton) {
+  createInviteButton.addEventListener("click", () => {
+    createFamilyInvite().catch((error) => {
+      console.error("Erro ao gerar convite:", error);
+      if (inviteResult) {
+        inviteResult.hidden = false;
+        inviteResult.textContent = getFirebaseErrorMessage(error);
+      }
+    });
+  });
+}
+if (refreshAdminStatsButton) {
+  refreshAdminStatsButton.addEventListener("click", () => refreshAdminStats());
+}
+if (inviteResult) {
+  inviteResult.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-copy-invite]");
+    if (!button) return;
+    const text = button.dataset.copyInvite || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = "Link copiado";
+    } catch {
+      button.textContent = "Copie manualmente";
+    }
+  });
+}
 
 function initSleepSounds() {
   initSleepSoundsPanel();
@@ -2097,6 +2727,7 @@ initDiaryDatePicker();
 syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
+renderAuthControls();
 renderAll();
 updateDiaryChipsMoreButton();
 initSleepSounds();

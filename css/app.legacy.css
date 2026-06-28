@@ -3307,3 +3307,415 @@ body.day-theme[data-day-period="morning"] .orbit-ring {
 #activeTimerCard {
   display: none !important;
 }
+
+/* v75.3 - Rotina do dia: evita sobreposição de rótulos longos no iPhone */
+@media (max-width: 560px) {
+  .routine-progress-card .daily-rhythm {
+    gap: 14px;
+  }
+
+  .routine-progress-card .daily-rhythm article {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    align-items: start !important;
+    gap: 4px !important;
+  }
+
+  .routine-progress-card .daily-rhythm span,
+  .routine-progress-card .daily-rhythm b,
+  .routine-progress-card .daily-rhythm i {
+    grid-column: 1 / -1 !important;
+    min-width: 0;
+  }
+
+  .routine-progress-card .daily-rhythm span {
+    grid-row: auto !important;
+    line-height: 1.08;
+  }
+
+  .routine-progress-card .daily-rhythm b {
+    grid-row: auto !important;
+    justify-self: start !important;
+    white-space: normal !important;
+    line-height: 1.22;
+    font-size: 0.92rem;
+  }
+
+  .routine-progress-card .daily-rhythm i {
+    grid-row: auto !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+  }
+}
+
+/* v75.4 - Acesso familiar por convite */
+.access-locked .bottom-nav button:not([data-target="profile"]) {
+  opacity: 0.45;
+}
+
+.admin-access-card {
+  gap: 14px;
+}
+
+.access-status-row,
+.admin-invite-header,
+.invite-result,
+.invite-list li {
+  display: flex;
+  gap: 10px;
+}
+
+.access-status-row {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.access-badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #efeaff;
+  background: rgba(151, 124, 255, 0.18);
+  border: 1px solid rgba(173, 148, 255, 0.28);
+}
+
+.access-badge[data-role="admin"] {
+  color: #8cf0c7;
+  background: rgba(69, 207, 159, 0.14);
+  border-color: rgba(105, 232, 190, 0.34);
+}
+
+.access-badge[data-role="responsavel"] {
+  color: #f5e7ff;
+  background: rgba(154, 126, 255, 0.20);
+}
+
+.access-badge[data-role="cuidador"] {
+  color: #bee8ff;
+  background: rgba(119, 190, 255, 0.14);
+}
+
+.access-badge[data-role="visualizacao"] {
+  color: #e6ddff;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.invite-accept-box,
+.admin-invite-panel,
+.invite-list-box {
+  display: grid;
+  gap: 12px;
+}
+
+.invite-accept-box label,
+.admin-invite-panel label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.invite-accept-box input,
+.admin-invite-panel input,
+.admin-invite-panel select {
+  width: 100%;
+  border: 1px solid rgba(184, 164, 255, 0.25);
+  border-radius: 16px;
+  padding: 13px 14px;
+  color: var(--text);
+  background: rgba(15, 13, 50, 0.62);
+  font: inherit;
+  font-weight: 800;
+  outline: none;
+}
+
+.invite-note,
+.admin-invite-header em {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.admin-invite-header {
+  flex-direction: column;
+}
+
+.admin-invite-panel {
+  margin-top: 2px;
+  border-top: 1px solid rgba(184, 164, 255, 0.15);
+  padding-top: 14px;
+}
+
+.invite-result {
+  flex-direction: column;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(122, 96, 230, 0.18);
+  border: 1px solid rgba(164, 139, 255, 0.25);
+  color: var(--text);
+}
+
+.invite-result span {
+  word-break: break-all;
+  color: var(--muted);
+}
+
+.invite-result button {
+  width: fit-content;
+  min-height: 38px;
+  border-radius: 999px;
+  padding: 0 14px;
+  border: 1px solid rgba(136, 232, 195, 0.34);
+  background: rgba(105, 232, 190, 0.15);
+  color: #91f1cd;
+  font-weight: 900;
+}
+
+.invite-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.invite-list li {
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.invite-list li span {
+  font-size: 0.84rem;
+  color: var(--muted);
+  word-break: break-word;
+}
+
+body.day-theme .access-badge,
+body.day-theme .invite-result,
+body.day-theme .invite-list li,
+body.day-theme .invite-accept-box input,
+body.day-theme .admin-invite-panel input,
+body.day-theme .admin-invite-panel select {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(119, 91, 192, 0.18);
+}
+
+@media (max-width: 560px) {
+  .access-status-row {
+    align-items: stretch;
+  }
+
+  .access-status-row > * {
+    width: 100%;
+  }
+
+  .invite-result button {
+    width: 100%;
+  }
+}
+
+/* v75.6 - Contato WhatsApp sem login e contagem no painel admin */
+.guest-whatsapp-button {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 999px;
+  color: #062d1d;
+  background: linear-gradient(135deg, #8cf0c7, #49d892);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28), 0 0 0 6px rgba(73, 216, 146, 0.13);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: -0.01em;
+  transform: translateZ(0);
+}
+
+.guest-whatsapp-button[hidden] {
+  display: none !important;
+}
+
+.guest-whatsapp-button span {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #1fae62;
+  font-size: 0;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.guest-whatsapp-button span::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-left-color: transparent;
+  transform: rotate(-30deg);
+}
+
+.guest-whatsapp-button span::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  bottom: 6px;
+  width: 7px;
+  height: 7px;
+  background: #1fae62;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-16deg);
+}
+
+.guest-whatsapp-button strong {
+  white-space: nowrap;
+}
+
+.admin-stats-card {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 4px;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(124, 229, 194, 0.08);
+  border: 1px solid rgba(124, 229, 194, 0.2);
+}
+
+.admin-stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-stats-header div {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-stats-header span,
+.admin-stats-grid span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-stats-header strong {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.admin-refresh-button {
+  min-height: 34px;
+  border: 1px solid rgba(124, 229, 194, 0.28);
+  border-radius: 999px;
+  padding: 0 12px;
+  color: #91f1cd;
+  background: rgba(124, 229, 194, 0.1);
+  font-weight: 900;
+  font-size: 0.76rem;
+}
+
+.admin-refresh-button:disabled {
+  opacity: 0.55;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-stats-grid article {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-stats-grid strong {
+  color: var(--text);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.admin-stats-grid small,
+.admin-stats-hint {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.28;
+}
+
+.admin-stats-hint {
+  margin: 0;
+}
+
+body.day-theme .admin-stats-card,
+body.day-theme .admin-stats-grid article {
+  background: rgba(255, 255, 255, 0.74);
+  border-color: rgba(119, 91, 192, 0.16);
+}
+
+body.day-theme .guest-whatsapp-button {
+  box-shadow: 0 18px 34px rgba(78, 73, 42, 0.18), 0 0 0 6px rgba(73, 216, 146, 0.16);
+}
+
+@media (max-width: 430px) {
+  .guest-whatsapp-button {
+    right: 14px;
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    min-height: 38px;
+    padding: 7px 10px 7px 7px;
+    font-size: 0.72rem;
+  }
+
+  .guest-whatsapp-button span {
+    width: 25px;
+    height: 25px;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-stats-grid article {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+
+  .admin-stats-grid span,
+  .admin-stats-grid small {
+    grid-column: 1;
+  }
+
+  .admin-stats-grid strong {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 1.7rem;
+  }
+}
