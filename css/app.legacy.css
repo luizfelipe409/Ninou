@@ -3896,7 +3896,7 @@ body.day-theme .invite-accept-box {
   }
 }
 
-/* v75.11 - Admin limpo e profissional */
+/* v75.12 - Admin limpo e profissional */
 .admin-clean-panel {
   gap: 18px !important;
   padding: 0 !important;
@@ -4120,6 +4120,52 @@ body.day-theme .invite-accept-box {
 .admin-access-card .invite-accept-box[hidden],
 .admin-clean-panel[hidden] {
   display: none !important;
+}
+
+
+/* v75.12 - Migração segura de dados locais para a família */
+.admin-migration-card {
+  border-color: rgba(122, 236, 190, 0.26);
+}
+
+.admin-migration-status {
+  margin: 0;
+  color: rgba(233, 226, 255, 0.74);
+  line-height: 1.45;
+  font-weight: 750;
+}
+
+.admin-migration-list {
+  margin-top: 2px;
+}
+
+.admin-migration-source {
+  border-color: rgba(122, 236, 190, 0.24);
+}
+
+.admin-migration-source.is-best {
+  background: linear-gradient(145deg, rgba(91, 229, 170, 0.14), rgba(31, 26, 82, 0.52));
+}
+
+#restoreFamilyDataButton {
+  min-height: 48px;
+  border-radius: 999px;
+  border: 1px solid rgba(122, 236, 190, 0.4);
+  background: rgba(122, 236, 190, 0.16);
+  color: #8df3c9;
+  font-weight: 950;
+}
+
+#restoreFamilyDataButton[hidden] {
+  display: none !important;
+}
+
+body.day-theme .admin-migration-status {
+  color: rgba(74, 47, 36, 0.72);
+}
+
+body.day-theme .admin-migration-source.is-best {
+  background: linear-gradient(145deg, rgba(108, 213, 159, 0.2), rgba(255, 248, 237, 0.9));
 }
 
 body.day-theme .admin-clean-hero,

@@ -117,6 +117,9 @@ const adminPendingInvitesCount = document.querySelector("#adminPendingInvitesCou
 const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesCount");
 const adminStatsHint = document.querySelector("#adminStatsHint");
 const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
+const adminMigrationStatus = document.querySelector("#adminMigrationStatus");
+const adminMigrationSources = document.querySelector("#adminMigrationSources");
+const restoreFamilyDataButton = document.querySelector("#restoreFamilyDataButton");
 const guestWhatsappButton = document.querySelector("#guestWhatsappButton");
 const resetDataButton = document.querySelector("#resetDataButton");
 const exportJsonButton = document.querySelector("#exportJsonButton");
@@ -652,6 +655,275 @@ function setAdminStatsPlaceholder(message = "Entre como admin para visualizar os
   setText(adminStatsHint, message);
 }
 
+function getAccountCacheSuffix(key) {
+  return String(key).replace("ninou.demo.", "");
+}
+
+function readJsonValue(value, fallback = null) {
+  if (value === null || typeof value === "undefined" || value === "") return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function getCachedOwnerEmails() {
+  const emails = new Set();
+  const prefix = `${accountCachePrefix}.`;
+  const suffixes = visibleContextKeys.map((key) => getAccountCacheSuffix(key));
+
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index) || "";
+    if (!key.startsWith(prefix)) continue;
+
+    suffixes.forEach((suffix) => {
+      const tail = `.${suffix}`;
+      if (key.endsWith(tail)) {
+        const email = normalizeEmail(key.slice(prefix.length, -tail.length));
+        if (email) emails.add(email);
+      }
+    });
+  }
+
+  return Array.from(emails);
+}
+
+function readCachedContextForOwner(email = "") {
+  const ownerEmail = normalizeEmail(email);
+  if (!ownerEmail) return null;
+
+  const getCachedValue = (key) => localStorage.getItem(getAccountCacheKey(ownerEmail, key));
+  const profileRaw = getCachedValue(storageKeys.profile);
+  const profile = normalizeBabyProfile(readJsonValue(profileRaw, {}));
+  const photo = getCachedValue(storageKeys.photo) || "";
+  const wakeWindow = Number(getCachedValue(storageKeys.wakeWindow)) || 70;
+  const profileVersion = Number(getCachedValue(storageKeys.profileVersion)) || 0;
+  const dayStateRaw = getCachedValue(storageKeys.dayState);
+  const dayState = normalizeDayState(readJsonValue(dayStateRaw, {}));
+  const weightsRaw = getCachedValue(storageKeys.weights);
+  const weights = normalizeWeights(readJsonValue(weightsRaw, []));
+  const eventsCount = Array.isArray(dayState.events) ? dayState.events.length : 0;
+  const hasProfile = hasProfileContent(profile, photo, wakeWindow);
+  const hasDay = hasRoutineDayContent(dayState);
+  const hasWeights = weights.length > 0;
+
+  if (!hasProfile && !hasDay && !hasWeights) return null;
+
+  const score = (hasProfile ? 100 : 0)
+    + (photo ? 40 : 0)
+    + Math.min(eventsCount, 30)
+    + Math.min(weights.length * 5, 25)
+    + Math.min(Math.floor(profileVersion / 1000000000000), 10);
+
+  return {
+    email: ownerEmail,
+    profile,
+    profileRaw,
+    photo,
+    wakeWindow,
+    profileVersion,
+    dayState,
+    dayStateRaw,
+    weights,
+    weightsRaw,
+    eventsCount,
+    hasProfile,
+    hasDay,
+    hasWeights,
+    score,
+  };
+}
+
+function getRestorableContexts() {
+  return getCachedOwnerEmails()
+    .map(readCachedContextForOwner)
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || String(a.email).localeCompare(String(b.email)));
+}
+
+function getBestRestorableContext() {
+  const currentEmail = normalizeEmail(cloudUser?.email || "");
+  return getRestorableContexts().find((context) => context.email !== currentEmail) || null;
+}
+
+function getContextBabyLabel(context) {
+  if (!context) return "dados locais";
+  const name = getBabyNameFromProfile(context.profile || {});
+  const parts = [];
+  if (name && name !== "Bebê") parts.push(name);
+  if (context.eventsCount) parts.push(`${context.eventsCount} registros de hoje`);
+  if (context.photo) parts.push("foto salva");
+  if (context.weights?.length) parts.push(`${context.weights.length} pesos`);
+  return parts.length ? parts.join(" • ") : "perfil salvo neste aparelho";
+}
+
+function renderFamilyMigrationPanel() {
+  if (!adminMigrationStatus || !adminMigrationSources || !restoreFamilyDataButton) return;
+
+  const contexts = isFamilyAdmin() ? getRestorableContexts().filter((context) => context.email !== normalizeEmail(cloudUser?.email || "")) : [];
+  const best = contexts[0] || null;
+
+  if (!isFamilyAdmin()) {
+    adminMigrationStatus.textContent = "Entre como admin para revisar dados salvos neste aparelho.";
+    adminMigrationSources.innerHTML = "<li>Nenhuma conta em análise.</li>";
+    restoreFamilyDataButton.hidden = true;
+    return;
+  }
+
+  if (!best) {
+    adminMigrationStatus.textContent = "Nenhum dado antigo encontrado neste aparelho. Se a família já tiver dados no Firebase, eles aparecem automaticamente após sincronizar.";
+    adminMigrationSources.innerHTML = "<li>Nenhum cache antigo encontrado neste aparelho.</li>";
+    restoreFamilyDataButton.hidden = true;
+    return;
+  }
+
+  adminMigrationStatus.textContent = `Encontramos dados salvos de ${best.email}. Você pode importar esse perfil para a família principal se os dados do Francisco ainda não aparecerem.`;
+  adminMigrationSources.innerHTML = contexts.slice(0, 3).map((context, index) => `
+    <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
+      <div>
+        <strong>${escapeHtml(context.email)}</strong>
+        <span>${escapeHtml(getContextBabyLabel(context))}</span>
+      </div>
+      ${index === 0 ? "<small>Melhor opção</small>" : ""}
+    </li>
+  `).join("");
+  restoreFamilyDataButton.hidden = false;
+  restoreFamilyDataButton.disabled = false;
+}
+
+function applyCachedContextToCurrentView(context) {
+  if (!context) return false;
+
+  if (context.profileRaw !== null && typeof context.profileRaw !== "undefined") {
+    localStorage.setItem(storageKeys.profile, context.profileRaw);
+  } else {
+    localStorage.setItem(storageKeys.profile, JSON.stringify(context.profile || createDefaultBabyProfile()));
+  }
+
+  if (context.photo) localStorage.setItem(storageKeys.photo, context.photo);
+  else localStorage.removeItem(storageKeys.photo);
+
+  localStorage.setItem(storageKeys.wakeWindow, String(context.wakeWindow || 70));
+  localStorage.setItem(storageKeys.profileVersion, String(Math.max(Date.now(), Number(context.profileVersion) || 0)));
+
+  if (context.dayStateRaw !== null && typeof context.dayStateRaw !== "undefined") {
+    localStorage.setItem(storageKeys.dayState, context.dayStateRaw);
+  } else {
+    localStorage.setItem(storageKeys.dayState, JSON.stringify(context.dayState || createEmptyDayState()));
+  }
+
+  if (context.weightsRaw !== null && typeof context.weightsRaw !== "undefined") {
+    localStorage.setItem(storageKeys.weights, context.weightsRaw);
+  } else if (Array.isArray(context.weights)) {
+    localStorage.setItem(storageKeys.weights, JSON.stringify(context.weights));
+  }
+
+  wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
+  babyProfile = loadBabyProfile();
+  currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
+  profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || Date.now();
+  state = loadLocalDayState();
+  setVisibleDataOwnerEmail(normalizeEmail(cloudUser?.email || familyAccess?.email || GLOBAL_APP_ADMIN_EMAIL));
+  persistVisibleContextForCurrentOwner();
+  refreshVisibleContextUi();
+  return true;
+}
+
+async function familyCloudHasContent() {
+  if (!firebaseServices || !familyAccess?.familyId) return { profile: false, day: false };
+
+  const profileRef = getCloudProfileRef();
+  const dayRef = getCloudDayRef();
+  let profile = false;
+  let dayContent = false;
+
+  try {
+    if (profileRef) {
+      const profileSnap = await firebaseServices.getDoc(profileRef);
+      profile = profileSnap.exists() && hasCloudProfileContent(profileSnap.data() || {});
+    }
+  } catch (error) {
+    console.warn("Não foi possível verificar perfil familiar:", error);
+  }
+
+  try {
+    if (dayRef) {
+      const daySnap = await firebaseServices.getDoc(dayRef);
+      const dayData = daySnap.exists() ? (daySnap.data() || {}) : {};
+      const daySource = dayData.state && typeof dayData.state === "object" ? dayData.state : dayData;
+      dayContent = daySnap.exists() && hasRoutineDayContent(normalizeDayState(daySource));
+    }
+  } catch (error) {
+    console.warn("Não foi possível verificar rotina familiar:", error);
+  }
+
+  return { profile, day: dayContent };
+}
+
+async function uploadCurrentContextToFamily() {
+  await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+  await saveDayToCloud();
+}
+
+async function restoreFamilyDataFromBestCache(options = {}) {
+  if (!isFamilyAdmin()) return false;
+  const context = getBestRestorableContext();
+  if (!context) {
+    if (!options.silent && adminMigrationStatus) adminMigrationStatus.textContent = "Nenhum dado antigo encontrado neste aparelho para importar.";
+    renderFamilyMigrationPanel();
+    return false;
+  }
+
+  if (!options.silent) {
+    const ok = window.confirm(`Importar os dados salvos de ${context.email} para a família principal do Ninou? Isso substituirá a visualização familiar neste aparelho e sincronizará o perfil/rotina atuais.`);
+    if (!ok) return false;
+  }
+
+  if (restoreFamilyDataButton) {
+    restoreFamilyDataButton.disabled = true;
+    restoreFamilyDataButton.textContent = "Importando...";
+  }
+  if (adminMigrationStatus) adminMigrationStatus.textContent = `Importando dados de ${context.email}...`;
+
+  try {
+    applyCachedContextToCurrentView(context);
+    await uploadCurrentContextToFamily();
+    setSyncStatus("online", cloudUser?.email || "");
+    if (loginHelper) loginHelper.textContent = "Dados do Francisco importados para a família principal.";
+    if (adminMigrationStatus) adminMigrationStatus.textContent = `Dados importados de ${context.email}. Os membros autorizados já devem enxergar o perfil e a rotina familiar.`;
+    renderFamilyMigrationPanel();
+    return true;
+  } catch (error) {
+    console.error("Erro ao importar dados para a família:", error);
+    if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
+    setSyncStatus("offline", cloudUser?.email || "");
+    return false;
+  } finally {
+    if (restoreFamilyDataButton) {
+      restoreFamilyDataButton.disabled = false;
+      restoreFamilyDataButton.textContent = "Importar dados encontrados";
+    }
+  }
+}
+
+async function autoSeedFamilyFromLocalCache() {
+  if (!isFamilyAdmin()) return false;
+  const context = getBestRestorableContext();
+  if (!context) {
+    renderFamilyMigrationPanel();
+    return false;
+  }
+
+  const cloudContent = await familyCloudHasContent();
+  if (cloudContent.profile || cloudContent.day) {
+    renderFamilyMigrationPanel();
+    return false;
+  }
+
+  return restoreFamilyDataFromBestCache({ silent: true });
+}
+
 function renderAdminAccessLists(stats = null) {
   if (adminPendingInviteList) {
     const pending = Array.isArray(stats?.pendingInvites) ? stats.pendingInvites : [];
@@ -713,6 +985,7 @@ function renderAdminStats(stats = null) {
     `${pluralize(stats.membersCount ?? 0, "usuário autorizado", "usuários autorizados")} na família principal. O admin vê somente convites e acessos.`,
   );
   renderAdminAccessLists(stats);
+  renderFamilyMigrationPanel();
 }
 
 async function refreshAdminStats(options = {}) {
@@ -858,6 +1131,7 @@ function renderFamilyAccessPanel() {
   } else {
     renderAdminStats(null);
   }
+  renderFamilyMigrationPanel();
 
   if (acceptInviteButton) {
     acceptInviteButton.disabled = !connected || appAdmin;
@@ -939,6 +1213,7 @@ async function activatePersonalFamily() {
       updatedAt: services.serverTimestamp(),
     }, { merge: true });
     await saveAccountAccessToCloud(access);
+    await autoSeedFamilyFromLocalCache();
     if (hasProfileContent()) {
       await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
     }
@@ -1087,7 +1362,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.11 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.12 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -1193,6 +1468,9 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     if (inviteCodeInput) inviteCodeInput.value = "";
     if (!options.silent && loginHelper) loginHelper.textContent = "Convite aceito. Rotina familiar conectada.";
     renderAuthControls();
+    const cloudContentAfterInvite = await familyCloudHasContent();
+    if (!cloudContentAfterInvite.profile && hasProfileContent()) await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+    if (!cloudContentAfterInvite.day && hasRoutineDayContent()) await saveDayToCloud();
     await connectCurrentAccount();
     setSyncStatus("online", cloudUser.email || "");
     showScreen("home");
@@ -1202,7 +1480,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.11 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.12 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -3115,6 +3393,14 @@ if (createInviteButton) {
 }
 if (refreshAdminStatsButton) {
   refreshAdminStatsButton.addEventListener("click", () => refreshAdminStats());
+}
+if (restoreFamilyDataButton) {
+  restoreFamilyDataButton.addEventListener("click", () => {
+    restoreFamilyDataFromBestCache().catch((error) => {
+      console.error("Erro ao importar dados familiares:", error);
+      if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
+    });
+  });
 }
 if (adminInvitePanel) {
   adminInvitePanel.addEventListener("click", async (event) => {
