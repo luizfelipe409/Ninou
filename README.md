@@ -1,10 +1,19 @@
-# Ninou v75.22 — Admin isolado com correção visual
+# Ninou v75.24 — Painel admin profissional
 
-Correções principais:
-- painel admin não colapsa/parece zoomado no desktop/mobile;
-- foto pessoal do admin fica visível e editável;
-- texto de sincronização do admin não fala que está sincronizando rotina familiar;
-- permissão visual passa a aparecer como Acesso completo/Cuidador/Somente visualização;
-- regras mantêm users/{uid}/account/profile para foto pessoal do admin.
+Versão baseada na v75.23, sem necessidade de instalar versões intermediárias.
 
-Publique as regras em docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_22.md.
+## Principais mudanças
+
+- Painel admin não abre dados de família automaticamente.
+- Área de famílias/clientes com abertura manual da família principal.
+- Botão para visualizar a rotina familiar como admin e voltar ao painel.
+- Perfil pessoal do admin separado do perfil do bebê.
+- Checklist pré e pós-migração: perfil, dias, registros, pesos, vínculo da conta e destino.
+- Convites com nomes de permissão mais claros na interface.
+- Logout mantém limpeza de convite pendente e dados visíveis.
+
+## Publicação
+
+Suba esta versão no Vercel e limpe o cache/PWA no iPhone.
+
+As regras compatíveis estão em `docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_24.md`.

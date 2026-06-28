@@ -118,8 +118,14 @@ const adminPendingInvitesCount = document.querySelector("#adminPendingInvitesCou
 const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesCount");
 const adminStatsHint = document.querySelector("#adminStatsHint");
 const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
+const adminClientsList = document.querySelector("#adminClientsList");
+const adminSelectedFamilyHint = document.querySelector("#adminSelectedFamilyHint");
+const adminOpenFamilyButton = document.querySelector("#adminOpenFamilyButton");
+const adminPreviewBanner = document.querySelector("#adminPreviewBanner");
+const adminReturnToPanelButton = document.querySelector("#adminReturnToPanelButton");
 const adminMigrationStatus = document.querySelector("#adminMigrationStatus");
 const adminMigrationSources = document.querySelector("#adminMigrationSources");
+const adminMigrationChecklist = document.querySelector("#adminMigrationChecklist");
 const restoreFamilyDataButton = document.querySelector("#restoreFamilyDataButton");
 const adminMigrationUidInput = document.querySelector("#adminMigrationUidInput");
 const scanLegacyUidButton = document.querySelector("#scanLegacyUidButton");
@@ -217,7 +223,7 @@ function setAdminAccountPhoto(dataUrl = "", user = cloudUser) {
 }
 
 function isAdminPanelOnlyContext() {
-  return Boolean(isGlobalAppAdmin() && activeScreenName === "profile");
+  return Boolean(isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen);
 }
 
 function getEffectiveRole(role = familyAccess?.role || "responsavel", email = cloudUser?.email || familyAccess?.email || "") {
@@ -441,6 +447,7 @@ function refreshVisibleContextUi() {
   if (wakeWindowInput) wakeWindowInput.value = String(wakeWindowMinutes);
   if (wakeWindowValue) wakeWindowValue.textContent = String(wakeWindowMinutes);
   renderAuthControls();
+  renderAdminClients(null);
   renderAll();
 }
 
@@ -673,6 +680,19 @@ function getInitialInviteCode() {
   } catch {
     return normalizeInviteCode(localStorage.getItem(storageKeys.pendingInvite) || "");
   }
+}
+
+function clearPendingInviteCode() {
+  pendingInviteCode = "";
+  try { localStorage.removeItem(storageKeys.pendingInvite); } catch {}
+  if (inviteCodeInput) inviteCodeInput.value = "";
+}
+
+function resetMigrationSearchState() {
+  legacyCloudContexts = [];
+  legacyCloudScanState = "idle";
+  legacyCloudScanError = "";
+  lastMigrationResult = null;
 }
 
 function createInviteCode() {
@@ -1584,9 +1604,8 @@ async function scanLegacySourceByManualEmail() {
       return null;
     }
 
-    const foundUids = new Set(contexts.map((context) => context.uid));
-    const existing = legacyCloudContexts.filter((item) => !foundUids.has(item.uid));
-    legacyCloudContexts = [...contexts, ...existing].sort(compareMigrationContexts);
+    // Busca manual deve mostrar apenas a origem solicitada, sem misturar outros clientes encontrados antes.
+    legacyCloudContexts = contexts.sort(compareMigrationContexts);
     legacyCloudScanState = "done";
     renderFamilyMigrationPanel({ skipScan: true });
     return contexts[0] || null;
@@ -1626,8 +1645,8 @@ async function scanLegacySourceByManualUid() {
       return null;
     }
     context.discovery = Array.from(new Set([...(context.discovery || []), "manual"]));
-    const existing = legacyCloudContexts.filter((item) => item.uid !== uid);
-    legacyCloudContexts = [context, ...existing].sort(compareMigrationContexts);
+    // Busca manual por UID também deve isolar a origem escolhida.
+    legacyCloudContexts = [context].sort(compareMigrationContexts);
     legacyCloudScanState = "done";
     renderFamilyMigrationPanel({ skipScan: true });
     return context;
@@ -1682,6 +1701,49 @@ function getBestRestorableSource() {
   return getCombinedRestorableContexts()[0] || null;
 }
 
+function getChecklistItemMarkup(title, detail, ok = false) {
+  return `<li class="${ok ? "is-ok" : ""}"><strong>${escapeHtml(title)}</strong><small>${escapeHtml(detail)}</small></li>`;
+}
+
+function renderMigrationChecklist(result = null, context = null) {
+  if (!adminMigrationChecklist) return;
+
+  if (result) {
+    adminMigrationChecklist.innerHTML = `
+      <span>Checklist pós-migração</span>
+      <ul>
+        ${getChecklistItemMarkup("Perfil familiar", `Atualizado em families/${result.familyId}/profile/main`, true)}
+        ${getChecklistItemMarkup("Dias migrados", `${result.days} dia(s) copiados`, result.days > 0)}
+        ${getChecklistItemMarkup("Registros migrados", `${result.events} registro(s) copiados`, result.events > 0)}
+        ${getChecklistItemMarkup("Pesos migrados", `${result.weights || 0} peso(s) encontrado(s)`, (result.weights || 0) > 0)}
+        ${getChecklistItemMarkup("Conta de origem", result.linkedSourceAccount ? "Vinculada como Responsável" : "Origem preservada; vínculo não confirmado", Boolean(result.linkedSourceAccount))}
+        ${getChecklistItemMarkup("Destino", `families/${result.familyId}`, true)}
+      </ul>`;
+    return;
+  }
+
+  if (context) {
+    const weightsCount = normalizeWeights(context.weights || context.profile?.weights || []).length;
+    adminMigrationChecklist.innerHTML = `
+      <span>Prévia da migração</span>
+      <ul>
+        ${getChecklistItemMarkup("Origem", context.email || context.uid || "Conta encontrada", true)}
+        ${getChecklistItemMarkup("Registros", `${getContextEventsCount(context)} registro(s) em ${getContextDaysCount(context)} dia(s)`, getContextEventsCount(context) > 0)}
+        ${getChecklistItemMarkup("Foto do bebê", context.photo ? "Foto encontrada" : "Nenhuma foto encontrada nesta origem", Boolean(context.photo))}
+        ${getChecklistItemMarkup("Pesos", `${weightsCount} peso(s) encontrado(s)`, weightsCount > 0)}
+        ${getChecklistItemMarkup("Destino planejado", `families/${familyAccess?.familyId || APP_ADMIN_FAMILY_ID}`, true)}
+      </ul>`;
+    return;
+  }
+
+  adminMigrationChecklist.innerHTML = `
+    <span>Checklist</span>
+    <ul>
+      ${getChecklistItemMarkup("Aguardando busca", "Informe e-mail ou UID para iniciar o diagnóstico", false)}
+      ${getChecklistItemMarkup("Sem varredura automática", "O painel não carrega clientes sem você pedir", true)}
+    </ul>`;
+}
+
 function renderFamilyMigrationPanel(options = {}) {
   if (!adminMigrationStatus || !adminMigrationSources || !restoreFamilyDataButton) return;
 
@@ -1697,6 +1759,7 @@ function renderFamilyMigrationPanel(options = {}) {
         <small>Concluído</small>
       </li>`;
     restoreFamilyDataButton.hidden = true;
+    renderMigrationChecklist(result);
     return;
   }
 
@@ -1704,15 +1767,20 @@ function renderFamilyMigrationPanel(options = {}) {
     adminMigrationStatus.textContent = "Entre como admin para revisar e migrar dados antigos.";
     adminMigrationSources.innerHTML = "<li>Nenhuma conta em análise.</li>";
     restoreFamilyDataButton.hidden = true;
+    renderMigrationChecklist(null);
     return;
-  }
-
-  if (!options.skipScan && legacyCloudScanState === "idle") {
-    scanLegacyCloudSources({ silent: true });
   }
 
   const contexts = getCombinedRestorableContexts();
   const best = contexts[0] || null;
+
+  if (legacyCloudScanState === "idle" && !best) {
+    adminMigrationStatus.textContent = "Nenhuma busca iniciada. Para migrar dados antigos, informe o e-mail antigo ou o UID do Firebase. O painel admin não varre todos os clientes automaticamente.";
+    adminMigrationSources.innerHTML = "<li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>";
+    restoreFamilyDataButton.hidden = true;
+    renderMigrationChecklist(null);
+    return;
+  }
 
   if (legacyCloudScanState === "loading") {
     adminMigrationStatus.textContent = "Buscando dados antigos no Firebase e neste aparelho...";
@@ -1724,6 +1792,7 @@ function renderFamilyMigrationPanel(options = {}) {
         </li>`).join("")
       : "<li>Procurando em users, profile, days e activities...</li>";
     restoreFamilyDataButton.hidden = true;
+    renderMigrationChecklist(best);
     return;
   }
 
@@ -1731,6 +1800,7 @@ function renderFamilyMigrationPanel(options = {}) {
     adminMigrationStatus.textContent = legacyCloudScanError || "Não foi possível buscar dados antigos no Firebase. Revise as regras do Firestore.";
     adminMigrationSources.innerHTML = "<li>Falha ao acessar dados legados. Publique as regras de migração e tente novamente.</li>";
     restoreFamilyDataButton.hidden = true;
+    renderMigrationChecklist(null);
     return;
   }
 
@@ -1738,10 +1808,11 @@ function renderFamilyMigrationPanel(options = {}) {
     adminMigrationStatus.textContent = "Nenhum dado antigo encontrado automaticamente. Se você vê activities no Firebase, cole o UID antigo acima e toque em Buscar por UID.";
     adminMigrationSources.innerHTML = "<li>Nenhuma origem automática encontrada. Use a busca por UID se o documento users/{uid} só possuir subcoleções.</li>";
     restoreFamilyDataButton.hidden = true;
+    renderMigrationChecklist(null);
     return;
   }
 
-  adminMigrationStatus.textContent = `Encontramos ${getContextEventsCount(best)} registros em ${getContextDaysCount(best)} dia(s) de ${best.email || best.uid}. Escolha a busca por e-mail/UID se quiser forçar uma origem específica antes de migrar.`;
+  adminMigrationStatus.textContent = `Busca carregada: ${getContextEventsCount(best)} registros em ${getContextDaysCount(best)} dia(s) de ${best.email || best.uid}. Confira a origem abaixo antes de migrar.`;
   adminMigrationSources.innerHTML = contexts.slice(0, 5).map((context, index) => `
     <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
       <div>
@@ -1751,6 +1822,7 @@ function renderFamilyMigrationPanel(options = {}) {
       ${context.discovery?.includes("email") ? "<small>Busca por e-mail</small>" : context.discovery?.includes("manual") ? "<small>UID manual</small>" : (index === 0 ? "<small>Melhor opção</small>" : `<small>${context.source === "cloud" ? "Firebase" : "Aparelho"}</small>`) }
     </li>
   `).join("");
+  renderMigrationChecklist(null, best);
   restoreFamilyDataButton.hidden = false;
   restoreFamilyDataButton.disabled = false;
   restoreFamilyDataButton.textContent = best.source === "cloud" ? "Migrar dados do Firebase" : "Importar dados encontrados";
@@ -1935,7 +2007,11 @@ async function uploadCurrentContextToFamily() {
 
 async function restoreFamilyDataFromBestSource(options = {}) {
   if (!isFamilyAdmin()) return false;
-  if (legacyCloudScanState === "idle") await scanLegacyCloudSources({ silent: true });
+  if (legacyCloudScanState === "idle" && !legacyCloudContexts.length) {
+    if (!options.silent && adminMigrationStatus) adminMigrationStatus.textContent = "Antes de migrar, busque uma origem específica por e-mail ou UID.";
+    renderFamilyMigrationPanel({ skipScan: true });
+    return false;
+  }
   const context = getBestRestorableSource();
   if (!context) {
     if (!options.silent && adminMigrationStatus) adminMigrationStatus.textContent = "Nenhum dado antigo encontrado no Firebase ou neste aparelho para migrar.";
@@ -2001,6 +2077,48 @@ async function autoSeedFamilyFromLocalCache() {
   return restoreFamilyDataFromBestSource({ silent: true });
 }
 
+function renderAdminClients(stats = null) {
+  const appAdmin = isGlobalAppAdmin();
+  const previewOpen = Boolean(window.__ninouAdminFamilyDataOpen);
+
+  if (adminClientsList) {
+    if (!appAdmin) {
+      adminClientsList.innerHTML = "<li>Entre como admin para visualizar famílias.</li>";
+    } else {
+      const membersCount = stats?.membersCount ?? 0;
+      const pendingCount = stats?.pendingInvitesCount ?? 0;
+      adminClientsList.innerHTML = `
+        <li class="admin-access-item admin-client-item">
+          <div>
+            <strong>Família principal</strong>
+            <span>${escapeHtml(APP_ADMIN_FAMILY_ID)} • ${membersCount} membro(s) • ${pendingCount} convite(s) pendente(s)</span>
+          </div>
+          <small>${previewOpen ? "Aberta para visualização" : "Não aberta automaticamente"}</small>
+        </li>`;
+    }
+  }
+
+  if (adminSelectedFamilyHint) {
+    adminSelectedFamilyHint.textContent = previewOpen
+      ? `Visualizando ${APP_ADMIN_FAMILY_ID}. Use Voltar ao painel para sair da rotina familiar.`
+      : "Nenhuma família aberta no painel. A rotina só carrega após toque manual.";
+  }
+
+  if (adminOpenFamilyButton) {
+    adminOpenFamilyButton.hidden = !appAdmin;
+    adminOpenFamilyButton.disabled = !isFamilyAdmin() || previewOpen;
+    adminOpenFamilyButton.textContent = previewOpen ? "Família aberta" : "Visualizar família principal";
+  }
+
+  if (adminReturnToPanelButton) {
+    adminReturnToPanelButton.hidden = !appAdmin || !previewOpen;
+  }
+
+  if (adminPreviewBanner) {
+    adminPreviewBanner.hidden = !appAdmin || !previewOpen;
+  }
+}
+
 function renderAdminAccessLists(stats = null) {
   if (adminPendingInviteList) {
     const pending = Array.isArray(stats?.pendingInvites) ? stats.pendingInvites : [];
@@ -2050,6 +2168,7 @@ function renderAdminStats(stats = null) {
 
   if (!stats) {
     setAdminStatsPlaceholder();
+    renderAdminClients(null);
     renderAdminAccessLists(null);
     return;
   }
@@ -2061,6 +2180,7 @@ function renderAdminStats(stats = null) {
     adminStatsHint,
     `${pluralize(stats.membersCount ?? 0, "usuário autorizado", "usuários autorizados")} na família principal. O admin vê somente convites e acessos.`,
   );
+  renderAdminClients(stats);
   renderAdminAccessLists(stats);
   renderFamilyMigrationPanel();
 }
@@ -2196,7 +2316,8 @@ function renderFamilyAccessPanel() {
   }
 
   if (inviteAcceptBox) {
-    inviteAcceptBox.hidden = appAdmin || authorized;
+    // Evita mostrar código antigo na tela de visitante/desconectado.
+    inviteAcceptBox.hidden = !connected || appAdmin || authorized;
   }
 
   if (adminInvitePanel) {
@@ -2209,6 +2330,7 @@ function renderFamilyAccessPanel() {
     renderAdminStats(null);
   }
   renderFamilyMigrationPanel();
+  renderAdminClients();
 
   if (acceptInviteButton) {
     acceptInviteButton.disabled = !connected || appAdmin;
@@ -2216,8 +2338,12 @@ function renderFamilyAccessPanel() {
   }
 
   if (inviteCodeInput) {
-    inviteCodeInput.disabled = appAdmin;
-    if (pendingInviteCode && !inviteCodeInput.value) inviteCodeInput.value = pendingInviteCode;
+    inviteCodeInput.disabled = !connected || appAdmin;
+    if (!connected || appAdmin || authorized) {
+      inviteCodeInput.value = "";
+    } else if (pendingInviteCode && !inviteCodeInput.value) {
+      inviteCodeInput.value = pendingInviteCode;
+    }
   }
 
   renderInviteList();
@@ -2673,7 +2799,7 @@ function renderBabyIdentity() {
     profileBabyAge,
   });
 
-  if (isGlobalAppAdmin() && activeScreenName === "profile") {
+  if (isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen) {
     if (diaryTitle) diaryTitle.textContent = "Painel admin";
     if (babyAgeLine) babyAgeLine.textContent = "Convites, membros, migração e gestão de acessos";
     if (profileBabyName) profileBabyName.textContent = getAdminAccountLabel();
@@ -2800,15 +2926,18 @@ function unsubscribeCloudListeners() {
 
 function updateBodyModeClasses() {
   const appAdmin = Boolean(isGlobalAppAdmin());
-  document.body.classList.toggle("global-admin-mode", appAdmin);
-  document.body.classList.toggle("admin-panel-only", Boolean(isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen));
+  const previewOpen = Boolean(window.__ninouAdminFamilyDataOpen);
+  document.body.classList.toggle("global-admin-mode", appAdmin && !previewOpen);
+  document.body.classList.toggle("admin-panel-only", appAdmin && !previewOpen);
+  document.body.classList.toggle("admin-family-preview", appAdmin && previewOpen);
+  renderAdminClients();
 }
 
 function renderAuthControls() {
   const connected = isLoggedIn();
   const authorized = hasFamilyAccess();
   const appAdmin = isGlobalAppAdmin();
-  const routineAuthorized = authorized && !appAdmin;
+  const routineAuthorized = authorized && (!appAdmin || Boolean(window.__ninouAdminFamilyDataOpen));
   loginButton.textContent = connected ? "Conectado" : "Entrar";
   loginButton.disabled = connected;
   createAccountButton.textContent = connected ? "Sair" : "Criar conta";
@@ -2832,13 +2961,51 @@ function clearLocalAccountData() {
   localStorage.removeItem(storageKeys.email);
   resetVisibleContextForGuest();
   saveFamilyAccess(null);
+  clearPendingInviteCode();
   window.__ninouAdminFamilyDataOpen = false;
-  lastMigrationResult = null;
+  resetMigrationSearchState();
   cloudUser = null;
   pendingProfilePhotoSave = false;
   if (loginPassword) loginPassword.value = "";
   renderAuthControls();
   renderAll();
+}
+
+async function openAdminFamilyPreview() {
+  if (!isGlobalAppAdmin()) return false;
+  if (!familyAccess?.familyId) ensureGlobalAdminAccess(cloudUser);
+  window.__ninouAdminFamilyDataOpen = true;
+  updateBodyModeClasses();
+  setSyncStatus("loading", cloudUser?.email || "");
+  try {
+    await connectCurrentAccount();
+    setSyncStatus("online", cloudUser?.email || "");
+    if (loginHelper) loginHelper.textContent = "Visualizando a família principal como administrador.";
+    showScreen("today");
+    renderAdminClients();
+    return true;
+  } catch (error) {
+    console.error("Erro ao abrir visualização familiar:", error);
+    window.__ninouAdminFamilyDataOpen = false;
+    updateBodyModeClasses();
+    if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    renderAdminClients();
+    return false;
+  }
+}
+
+async function returnToAdminPanel() {
+  if (!isGlobalAppAdmin()) return;
+  unsubscribeCloudListeners();
+  window.__ninouAdminFamilyDataOpen = false;
+  prepareAdminPanelContext(cloudUser);
+  ensureGlobalAdminAccess(cloudUser);
+  await loadAdminAccountProfileFromCloud(cloudUser);
+  setSyncStatus("online", cloudUser?.email || "");
+  if (loginHelper) loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
+  renderAuthControls();
+  renderAll();
+  showScreen("profile");
 }
 
 async function connectCurrentAccount() {
@@ -3085,6 +3252,8 @@ async function initFirebaseAuthState() {
     try {
       if (isGlobalAppAdmin(user)) {
         prepareAdminPanelContext(user);
+        resetMigrationSearchState();
+        clearPendingInviteCode();
         ensureGlobalAdminAccess(user);
         renderAuthControls();
         loginHelper.textContent = "Admin conectado. Preparando painel...";
@@ -4604,6 +4773,22 @@ if (createInviteButton) {
 }
 if (refreshAdminStatsButton) {
   refreshAdminStatsButton.addEventListener("click", () => refreshAdminStats());
+}
+if (adminOpenFamilyButton) {
+  adminOpenFamilyButton.addEventListener("click", () => {
+    openAdminFamilyPreview().catch((error) => {
+      console.error("Erro ao abrir família como admin:", error);
+      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    });
+  });
+}
+if (adminReturnToPanelButton) {
+  adminReturnToPanelButton.addEventListener("click", () => {
+    returnToAdminPanel().catch((error) => {
+      console.error("Erro ao voltar ao painel admin:", error);
+      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    });
+  });
 }
 if (restoreFamilyDataButton) {
   restoreFamilyDataButton.addEventListener("click", () => {

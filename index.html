@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.21" />
+    <link rel="stylesheet" href="./styles.css?v=75.24" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -36,6 +36,14 @@
         </div>
         <button class="sync-pill offline" type="button" aria-label="Status da sincronização">Off-line</button>
       </header>
+
+      <section id="adminPreviewBanner" class="admin-preview-banner" hidden>
+        <div>
+          <span>Visualização admin</span>
+          <strong>Você está vendo a rotina da família selecionada.</strong>
+        </div>
+        <button id="adminReturnToPanelButton" type="button">Voltar ao painel</button>
+      </section>
 
       <section class="screen active" data-screen="today" aria-label="Hoje">
         <div class="today-topline">
@@ -458,8 +466,8 @@
               <section class="admin-clean-hero" aria-live="polite">
                 <div>
                   <span>Admin do app</span>
-                  <strong>Controle de acesso</strong>
-                  <p>Convide pessoas, acompanhe pendências e gerencie quem pode acessar a família principal.</p>
+                  <strong>Painel administrativo</strong>
+                  <p>Gerencie convites, famílias, migrações e diagnósticos sem abrir a rotina de nenhum cliente automaticamente.</p>
                 </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
               </section>
@@ -491,15 +499,33 @@
                 <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar os usuários autorizados.</p>
               </section>
 
+              <section class="admin-clean-section admin-family-client-card">
+                <div class="admin-invite-header">
+                  <strong>Famílias / clientes</strong>
+                  <em>O painel não abre dados familiares automaticamente. Escolha uma família apenas quando quiser testar ou visualizar.</em>
+                </div>
+                <ul id="adminClientsList" class="admin-access-list admin-clients-list">
+                  <li>Atualize o painel para ver a família principal.</li>
+                </ul>
+                <p id="adminSelectedFamilyHint" class="admin-stats-hint">Nenhuma família aberta no painel.</p>
+                <button id="adminOpenFamilyButton" class="secondary-login admin-open-family-button" type="button">Visualizar família principal</button>
+              </section>
+
               <section class="admin-clean-section admin-migration-card">
                 <div class="admin-invite-header">
                   <strong>Dados da família</strong>
-                  <em>Busca dados antigos no Firebase e neste aparelho para migrar à família principal.</em>
+                  <em>Migração manual por e-mail ou UID. O painel não varre clientes automaticamente.</em>
                 </div>
-                <p id="adminMigrationStatus" class="admin-migration-status">Buscando dados antigos no Firebase e neste aparelho...</p>
+                <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID para migrar uma origem específica.</p>
                 <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
-                  <li>A busca ainda não começou.</li>
+                  <li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>
                 </ul>
+                <div id="adminMigrationChecklist" class="admin-migration-checklist" aria-live="polite">
+                  <span>Checklist</span>
+                  <ul>
+                    <li><strong>Aguardando busca</strong><small>O diagnóstico aparece antes e depois da migração.</small></li>
+                  </ul>
+                </div>
                 <div class="admin-manual-migration">
                   <label>
                     E-mail da conta antiga
@@ -531,9 +557,9 @@
                 <label>
                   Permissão
                   <select id="adminInviteRole">
-                    <option value="responsavel">Acesso completo</option>
-                    <option value="cuidador">Cuidador</option>
-                    <option value="visualizacao">Somente visualização</option>
+                    <option value="responsavel">Responsável — acesso completo</option>
+                    <option value="cuidador">Cuidador — registra rotina</option>
+                    <option value="visualizacao">Visualização — somente leitura</option>
                   </select>
                 </label>
                 <button id="createInviteButton" type="button">Gerar convite</button>
@@ -704,6 +730,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.21"></script>
+    <script type="module" src="./app.js?v=75.24"></script>
   </body>
 </html>
