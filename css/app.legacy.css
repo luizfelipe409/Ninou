@@ -4557,3 +4557,86 @@ body.global-admin-mode .admin-refresh-button {
     width: 100%;
   }
 }
+
+/* v75.21 - Admin separado dos dados da família */
+body.admin-panel-only .baby-profile-card,
+body.admin-panel-only .weight-profile-block {
+  display: none !important;
+}
+
+body.admin-panel-only .profile-card #profileBabyName {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+body.admin-panel-only .profile-card #profileBabyAge {
+  text-transform: none;
+}
+
+
+/* v75.22 - Admin isolado, responsivo e sem aparência de zoom/corte */
+body.global-admin-mode {
+  display: block !important;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+body.global-admin-mode .phone-shell {
+  inline-size: min(720px, 100vw) !important;
+  width: min(720px, 100vw) !important;
+  max-inline-size: 100vw !important;
+  min-inline-size: 0 !important;
+  margin-inline: auto !important;
+  overflow-x: hidden !important;
+}
+
+body.global-admin-mode.admin-panel-only .profile-card {
+  display: grid !important;
+  order: -3;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+body.global-admin-mode.admin-panel-only .profile-card img {
+  justify-self: center;
+}
+
+body.global-admin-mode.admin-panel-only .profile-card #profileBabyName,
+body.global-admin-mode.admin-panel-only .profile-card #profileBabyAge {
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+body.global-admin-mode .admin-clean-panel strong,
+body.global-admin-mode .admin-clean-panel span,
+body.global-admin-mode .admin-clean-panel em,
+body.global-admin-mode .admin-clean-panel p,
+body.global-admin-mode .admin-clean-panel small,
+body.global-admin-mode .admin-clean-panel li {
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+body.global-admin-mode .admin-clean-hero strong {
+  line-height: 1.08;
+}
+
+body.global-admin-mode .admin-invite-header,
+body.global-admin-mode .admin-clean-hero,
+body.global-admin-mode .admin-stats-header,
+body.global-admin-mode .access-status-row {
+  min-width: 0;
+}
+
+body.day-theme #adminInviteRole,
+body.day-theme .admin-clean-panel select {
+  color: #2f211b !important;
+  -webkit-text-fill-color: #2f211b !important;
+}
+
+body.global-admin-mode .sync-card #syncStatusText {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}

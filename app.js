@@ -1,6 +1,6 @@
-// Ninou v75.20 - Gráficos familiares e pesos migrados
+// Ninou v75.21 - Admin isolado e perfil pessoal
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.20";
+const NINOU_APP_VERSION = "75.21";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.20" />
+    <link rel="stylesheet" href="./styles.css?v=75.21" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -364,7 +364,7 @@
           <span id="profileBabyName">Bebê</span>
           <strong id="profileBabyAge">Preencha o nascimento</strong>
           <label class="photo-button">
-            Trocar foto
+            <span id="profilePhotoButtonText">Trocar foto</span>
             <input id="profilePhotoInput" type="file" accept="image/*" />
           </label>
         </div>
@@ -439,7 +439,7 @@
             </div>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
-            <span>Administração do Ninou</span>
+            <span>Painel admin</span>
             <strong id="familyAccessTitle">Convites e permissões</strong>
             <p id="familyAccessText">Somente o administrador do app pode gerar convites. Pessoas convidadas acessam com e-mail e senha próprios.</p>
             <div class="access-status-row">
@@ -459,7 +459,7 @@
                 <div>
                   <span>Admin do app</span>
                   <strong>Controle de acesso</strong>
-                  <p>Convide pessoas, acompanhe pendências e gerencie quem pode acessar a rotina do Francisco.</p>
+                  <p>Convide pessoas, acompanhe pendências e gerencie quem pode acessar a família principal.</p>
                 </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
               </section>
@@ -531,9 +531,9 @@
                 <label>
                   Permissão
                   <select id="adminInviteRole">
-                    <option value="responsavel">Responsável — registra, edita e exclui</option>
-                    <option value="cuidador">Cuidador — registra e acompanha</option>
-                    <option value="visualizacao">Visualização — apenas acompanha</option>
+                    <option value="responsavel">Acesso completo</option>
+                    <option value="cuidador">Cuidador</option>
+                    <option value="visualizacao">Somente visualização</option>
                   </select>
                 </label>
                 <button id="createInviteButton" type="button">Gerar convite</button>
@@ -704,6 +704,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.20"></script>
+    <script type="module" src="./app.js?v=75.21"></script>
   </body>
 </html>

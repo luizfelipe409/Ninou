@@ -90,6 +90,7 @@ const babyNameInput = document.querySelector("#babyNameInput");
 const babyArticleInput = document.querySelector("#babyArticleInput");
 const babyBirthInput = document.querySelector("#babyBirthInput");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
+const profilePhotoButtonText = document.querySelector("#profilePhotoButtonText");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const loginEmail = document.querySelector("#loginEmail");
 const loginPassword = document.querySelector("#loginPassword");
@@ -186,6 +187,39 @@ function isGlobalAppAdmin(user = cloudUser) {
   return Boolean(user && isGlobalAdminEmail(user.email));
 }
 
+function getAdminAccountPhotoKey(user = cloudUser) {
+  const key = normalizeEmail(user?.email || user?.uid || GLOBAL_APP_ADMIN_EMAIL) || "admin";
+  return `ninou.admin.accountPhoto.${key}`;
+}
+
+function getAdminAccountLabel(user = cloudUser) {
+  const email = normalizeEmail(user?.email || "");
+  return user?.displayName || (email ? email : "Administrador");
+}
+
+function loadAdminAccountPhoto(user = cloudUser) {
+  try {
+    return localStorage.getItem(getAdminAccountPhotoKey(user)) || "";
+  } catch {
+    return "";
+  }
+}
+
+function setAdminAccountPhoto(dataUrl = "", user = cloudUser) {
+  adminAccountPhoto = dataUrl || "";
+  try {
+    const key = getAdminAccountPhotoKey(user);
+    if (adminAccountPhoto) localStorage.setItem(key, adminAccountPhoto);
+    else localStorage.removeItem(key);
+  } catch {
+    // A foto pessoal segue visível na sessão mesmo se o cache local estiver indisponível.
+  }
+}
+
+function isAdminPanelOnlyContext() {
+  return Boolean(isGlobalAppAdmin() && activeScreenName === "profile");
+}
+
 function getEffectiveRole(role = familyAccess?.role || "responsavel", email = cloudUser?.email || familyAccess?.email || "") {
   const normalized = normalizeRole(role);
   if (normalized === "admin" && !isGlobalAdminEmail(email)) return "responsavel";
@@ -208,6 +242,7 @@ let familyDayIdsCacheAt = 0;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
 let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
+let adminAccountPhoto = "";
 let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
 let firebaseServices = null;
 let firebaseServicesPromise = null;
@@ -432,12 +467,69 @@ function resetVisibleContextForGuest() {
   if (previousOwner) saveCurrentVisibleContextForOwner(previousOwner);
   clearGenericVisibleContext();
   setVisibleDataOwnerEmail("");
+  resetFamilyDayCache();
+  selectedDiaryDay = null;
+  autoSelectedLatestFamilyDay = false;
   wakeWindowMinutes = 70;
   babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
   currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
   updateProfilePhoto("./icons/icon-192.png");
+}
+
+
+function prepareAdminPanelContext(user = cloudUser) {
+  const previousOwner = getVisibleDataOwnerEmail();
+  if (previousOwner) saveCurrentVisibleContextForOwner(previousOwner);
+  clearGenericVisibleContext();
+  setVisibleDataOwnerEmail("");
+  resetFamilyDayCache();
+  selectedDiaryDay = null;
+  autoSelectedLatestFamilyDay = false;
+  window.__ninouAdminFamilyDataOpen = false;
+  wakeWindowMinutes = 70;
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
+  currentProfilePhoto = "";
+  profileClientUpdatedAt = 0;
+  state = createEmptyDayState();
+  adminAccountPhoto = loadAdminAccountPhoto(user);
+  updateProfilePhoto("./icons/icon-192.png");
+  refreshVisibleContextUi();
+}
+
+async function loadAdminAccountProfileFromCloud(user = cloudUser) {
+  if (!user || !isGlobalAppAdmin(user)) return null;
+  try {
+    const services = await getFirebaseServices();
+    const snapshot = await services.getDoc(services.doc(services.db, "users", user.uid, "account", "profile"));
+    const data = snapshot.exists() ? snapshot.data() || {} : {};
+    if (data.photo) setAdminAccountPhoto(String(data.photo), user);
+    else adminAccountPhoto = loadAdminAccountPhoto(user);
+    renderBabyIdentity();
+    return data;
+  } catch (error) {
+    console.warn("Não foi possível carregar o perfil pessoal do admin:", error);
+    adminAccountPhoto = loadAdminAccountPhoto(user);
+    renderBabyIdentity();
+    return null;
+  }
+}
+
+async function saveAdminAccountProfileToCloud() {
+  if (!cloudUser || !isGlobalAppAdmin()) return false;
+  try {
+    const services = await getFirebaseServices();
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "account", "profile"), {
+      email: normalizeEmail(cloudUser.email || GLOBAL_APP_ADMIN_EMAIL),
+      photo: adminAccountPhoto || "",
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível salvar a foto pessoal do admin:", error);
+    return false;
+  }
 }
 
 function hasRoutineDayContent(dayState = state) {
@@ -454,6 +546,7 @@ function hasFamilyAccess() {
 }
 
 function canUsePrivateFeatures() {
+  if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) return false;
   return hasFamilyAccess();
 }
 
@@ -525,9 +618,9 @@ function normalizeRole(value = "responsavel") {
 function getRoleLabel(role = "responsavel") {
   const labels = {
     admin: "Administrador",
-    responsavel: "Responsável",
+    responsavel: "Acesso completo",
     cuidador: "Cuidador",
-    visualizacao: "Visualização",
+    visualizacao: "Somente visualização",
   };
   return labels[normalizeRole(role)] || labels.responsavel;
 }
@@ -1868,10 +1961,18 @@ Os dados antigos não serão apagados.`);
   try {
     const migrationResult = await uploadMigrationContextToFamily(context);
     resetFamilyDayCache();
-    await loadFamilyDayIds({ force: true });
-    applyMigrationContextToCurrentView(context);
+    if (!isGlobalAppAdmin()) {
+      await loadFamilyDayIds({ force: true });
+      applyMigrationContextToCurrentView(context);
+    } else {
+      window.__ninouAdminFamilyDataOpen = false;
+      resetVisibleContextForGuest();
+      saveFamilyAccess(buildGlobalAdminAccess(cloudUser));
+      await loadAdminAccountProfileFromCloud(cloudUser);
+      showScreen("profile");
+    }
     setSyncStatus("online", cloudUser?.email || "");
-    if (loginHelper) loginHelper.textContent = "Dados do Francisco migrados para a família principal.";
+    if (loginHelper) loginHelper.textContent = "Dados migrados para a família principal sem abrir a rotina no painel admin.";
     lastMigrationResult = migrationResult;
     legacyCloudScanState = "done";
     renderFamilyMigrationPanel({ skipScan: true });
@@ -2067,7 +2168,7 @@ function renderFamilyAccessPanel() {
 
   if (familyAccessTitle) {
     familyAccessTitle.textContent = authorized
-      ? (appAdmin ? "Administração do Ninou" : "Família conectada")
+      ? (appAdmin ? "Painel admin" : "Família conectada")
       : connected
         ? "Conta aguardando convite"
         : "Convites e permissões";
@@ -2076,7 +2177,7 @@ function renderFamilyAccessPanel() {
   if (familyAccessText) {
     familyAccessText.textContent = authorized
       ? (appAdmin
-        ? `Você está conectado como admin do app. Use este painel apenas para convites, usuários e permissões.`
+        ? `Você está conectado como admin. Os dados da família não são abertos automaticamente; o painel mostra apenas convites, membros e migração.`
         : `${email} está conectado como ${getRoleLabel(effectiveRole)}. Os registros são sincronizados no ambiente da família.`)
       : connected
         ? "Esta conta ainda não possui convite. Peça um convite ao administrador do app ou entre com o e-mail convidado."
@@ -2084,7 +2185,7 @@ function renderFamilyAccessPanel() {
   }
 
   if (familyAccessBadge) {
-    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin do app" : getRoleLabel(effectiveRole)) : connected ? "Sem convite" : "Visitante";
+    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? "Sem convite" : "Visitante";
     familyAccessBadge.dataset.role = authorized ? effectiveRole : "offline";
   }
 
@@ -2189,13 +2290,8 @@ async function activatePersonalFamily() {
       updatedAt: services.serverTimestamp(),
     }, { merge: true });
     await saveAccountAccessToCloud(access);
-    await autoSeedFamilyFromLocalCache();
-    if (hasProfileContent()) {
-      await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
-    }
-    if (hasRoutineDayContent()) {
-      await saveDayToCloud();
-    }
+    // Admin não abre nem grava dados da família automaticamente.
+    // Isso evita vazar dados de um bebê/cliente no painel administrativo.
     setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) loginHelper.textContent = "Admin do app conectado. Você já pode gerar convites no Perfil.";
     refreshAdminStats({ silent: true });
@@ -2578,9 +2674,16 @@ function renderBabyIdentity() {
   });
 
   if (isGlobalAppAdmin() && activeScreenName === "profile") {
-    if (diaryTitle) diaryTitle.textContent = "Painel admin do Ninou";
-    if (babyAgeLine) babyAgeLine.textContent = "Convites, membros e migração da família principal";
+    if (diaryTitle) diaryTitle.textContent = "Painel admin";
+    if (babyAgeLine) babyAgeLine.textContent = "Convites, membros, migração e gestão de acessos";
+    if (profileBabyName) profileBabyName.textContent = getAdminAccountLabel();
+    if (profileBabyAge) profileBabyAge.textContent = "Perfil pessoal do administrador";
+    if (profilePhoto) profilePhoto.src = adminAccountPhoto || "./icons/icon-192.png";
+    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Trocar minha foto";
+  } else if (profilePhotoButtonText) {
+    profilePhotoButtonText.textContent = "Trocar foto";
   }
+  updateBodyModeClasses();
 }
 
 function syncBabyProfileForm() {
@@ -2694,9 +2797,18 @@ function unsubscribeCloudListeners() {
   dayUnsubscribe = null;
 }
 
+
+function updateBodyModeClasses() {
+  const appAdmin = Boolean(isGlobalAppAdmin());
+  document.body.classList.toggle("global-admin-mode", appAdmin);
+  document.body.classList.toggle("admin-panel-only", Boolean(isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen));
+}
+
 function renderAuthControls() {
   const connected = isLoggedIn();
   const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const routineAuthorized = authorized && !appAdmin;
   loginButton.textContent = connected ? "Conectado" : "Entrar";
   loginButton.disabled = connected;
   createAccountButton.textContent = connected ? "Sair" : "Criar conta";
@@ -2704,9 +2816,9 @@ function renderAuthControls() {
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
   document.body.classList.toggle("access-locked", false);
-  document.body.classList.toggle("global-admin-mode", Boolean(isGlobalAppAdmin() && hasFamilyAccess()));
+  updateBodyModeClasses();
   openSheetButtons.forEach((button) => {
-    const shouldHide = !authorized;
+    const shouldHide = !routineAuthorized;
     button.hidden = shouldHide;
     button.setAttribute("aria-hidden", shouldHide ? "true" : "false");
   });
@@ -2720,6 +2832,8 @@ function clearLocalAccountData() {
   localStorage.removeItem(storageKeys.email);
   resetVisibleContextForGuest();
   saveFamilyAccess(null);
+  window.__ninouAdminFamilyDataOpen = false;
+  lastMigrationResult = null;
   cloudUser = null;
   pendingProfilePhotoSave = false;
   if (loginPassword) loginPassword.value = "";
@@ -2970,12 +3084,13 @@ async function initFirebaseAuthState() {
 
     try {
       if (isGlobalAppAdmin(user)) {
+        prepareAdminPanelContext(user);
         ensureGlobalAdminAccess(user);
         renderAuthControls();
-        loginHelper.textContent = "Admin do app conectado. Preparando sincronização...";
+        loginHelper.textContent = "Admin conectado. Preparando painel...";
         await activatePersonalFamily();
-        await connectCurrentAccount();
-        loginHelper.textContent = "Admin do app conectado. Painel administrativo ativo.";
+        await loadAdminAccountProfileFromCloud(user);
+        loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
         renderAuthControls();
         showScreen("profile");
         return;
@@ -3923,6 +4038,7 @@ function showScreen(target) {
   activeScreenName = target || activeScreenName;
   updateScreenVisibility({ target, navButtons, screens });
   renderBabyIdentity();
+  updateBodyModeClasses();
 }
 
 function setDiaryFilter(filter) {
@@ -4008,7 +4124,9 @@ function setSyncStatus(status = "offline", email = "") {
   syncPill.classList.toggle("offline", !online);
   syncStatusTitle.textContent = online ? "Sincronização ativa" : loading ? "Conectando" : error ? "Erro na sincronização" : "Sincronização off-line";
   syncStatusText.textContent = online
-    ? `${email} está sincronizando a rotina familiar em tempo real.`
+    ? (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen
+      ? "Painel administrativo ativo. A rotina de uma família só deve ser aberta quando selecionada."
+      : `${email} está sincronizando a rotina familiar em tempo real.`)
     : loading
       ? "Conectando ao Firebase..."
       : error
@@ -4392,6 +4510,13 @@ if (themeModeInput) {
   themeModeInput.addEventListener("change", () => {
     const nextMode = readThemeModeInput(themeModeInput);
     babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: nextMode });
+
+    if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) {
+      try { localStorage.setItem(storageKeys.themeMode, nextMode); } catch {}
+      updateTheme();
+      return;
+    }
+
     markProfileLocallyChanged();
     saveBabyProfile();
     scheduleProfileCloudSave();
@@ -4416,13 +4541,24 @@ if (weightHistoryList) {
 }
 
 profilePhotoInput.addEventListener("change", async () => {
+  const file = profilePhotoInput.files?.[0];
+  if (!file) return;
+
+  if (isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen) {
+    const dataUrl = await resizeImage(file);
+    setAdminAccountPhoto(dataUrl);
+    if (profilePhoto) profilePhoto.src = dataUrl;
+    await saveAdminAccountProfileToCloud();
+    if (loginHelper) loginHelper.textContent = "Foto pessoal do admin atualizada.";
+    profilePhotoInput.value = "";
+    return;
+  }
+
   if (!requireLogin("salvar a foto")) {
     profilePhotoInput.value = "";
     return;
   }
 
-  const file = profilePhotoInput.files?.[0];
-  if (!file) return;
   const dataUrl = await resizeImage(file);
   currentProfilePhoto = dataUrl;
   markProfileLocallyChanged();
@@ -4434,6 +4570,7 @@ profilePhotoInput.addEventListener("change", async () => {
   }
   persistVisibleContextForCurrentOwner();
   scheduleProfileCloudSave({ includePhoto: true });
+  profilePhotoInput.value = "";
 });
 
 loginButton.addEventListener("click", signInAccount);
