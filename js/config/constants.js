@@ -9,6 +9,7 @@ export const storageKeys = Object.freeze({
   weights: "ninou.demo.weights",
   access: "ninou.demo.access",
   pendingInvite: "ninou.demo.pendingInvite",
+  dataOwnerEmail: "ninou.demo.dataOwnerEmail",
 });
 
 export const firebaseConfig = Object.freeze({

@@ -3729,3 +3729,169 @@ body.day-theme .guest-whatsapp-button {
 body:not(.access-locked) .bottom-nav button {
   opacity: 1;
 }
+
+
+/* v75.9 - administração mais clara e sem vazamento visual entre contas */
+.admin-access-card {
+  gap: 18px !important;
+}
+
+.admin-access-card > span {
+  display: block;
+  margin-bottom: -6px;
+}
+
+.admin-access-card > strong,
+#familyAccessTitle {
+  line-height: 1.18;
+}
+
+#familyAccessText {
+  margin: -4px 0 0;
+  line-height: 1.45;
+}
+
+.access-status-row {
+  margin-top: 2px;
+}
+
+.invite-accept-box,
+.admin-invite-panel,
+.invite-list-box {
+  gap: 14px;
+}
+
+.invite-accept-box {
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-invite-panel {
+  margin-top: 4px;
+  padding-top: 18px;
+  gap: 16px;
+}
+
+.admin-stats-card {
+  gap: 14px;
+  padding: 16px;
+  margin: 2px 0 4px;
+}
+
+.admin-stats-header {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-stats-header div {
+  gap: 4px;
+}
+
+.admin-refresh-button {
+  flex: 0 0 auto;
+}
+
+.admin-stats-grid {
+  gap: 10px;
+}
+
+.admin-stats-grid article {
+  min-height: 86px;
+  padding: 12px;
+  align-content: center;
+}
+
+.admin-stats-grid small,
+.admin-stats-hint,
+.invite-note,
+.admin-invite-header em {
+  line-height: 1.42;
+}
+
+.admin-invite-header {
+  gap: 6px;
+}
+
+.admin-invite-panel label {
+  gap: 9px;
+}
+
+.invite-result {
+  gap: 8px;
+  padding: 14px;
+}
+
+.invite-list li {
+  gap: 6px;
+  padding: 12px 14px;
+}
+
+body.day-theme .invite-accept-box {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(119, 91, 192, 0.14);
+}
+
+@media (max-width: 430px) {
+  .admin-access-card {
+    gap: 16px !important;
+  }
+
+  .admin-stats-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .admin-stats-header {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-refresh-button {
+    justify-self: start;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .admin-stats-grid article {
+    grid-template-columns: minmax(58px, auto) 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    row-gap: 2px;
+    min-height: 74px;
+    align-items: center;
+  }
+
+  .admin-stats-grid strong {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    font-size: 1.85rem;
+    text-align: center;
+  }
+
+  .admin-stats-grid span,
+  .admin-stats-grid small {
+    grid-column: 2;
+  }
+
+  .invite-accept-box,
+  .admin-invite-panel,
+  .invite-list-box {
+    gap: 13px;
+  }
+
+  .invite-accept-box {
+    padding: 13px;
+  }
+
+  .admin-invite-panel input,
+  .admin-invite-panel select,
+  .invite-accept-box input {
+    min-height: 48px;
+  }
+}

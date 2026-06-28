@@ -297,6 +297,134 @@ function loadLocalDayState() {
 
 function saveLocalDayState() {
   localStorage.setItem(storageKeys.dayState, JSON.stringify(normalizeDayState(state)));
+  persistVisibleContextForCurrentOwner();
+}
+
+const visibleContextKeys = [
+  storageKeys.profile,
+  storageKeys.profileVersion,
+  storageKeys.photo,
+  storageKeys.dayState,
+  storageKeys.wakeWindow,
+  storageKeys.weights,
+];
+const accountCachePrefix = "ninou.accountCache";
+
+function getAccountCacheKey(email, key) {
+  return `${accountCachePrefix}.${normalizeEmail(email)}.${String(key).replace("ninou.demo.", "")}`;
+}
+
+function getVisibleDataOwnerEmail() {
+  return normalizeEmail(localStorage.getItem(storageKeys.dataOwnerEmail) || "");
+}
+
+function setVisibleDataOwnerEmail(email = "") {
+  const normalized = normalizeEmail(email);
+  if (normalized) localStorage.setItem(storageKeys.dataOwnerEmail, normalized);
+  else localStorage.removeItem(storageKeys.dataOwnerEmail);
+}
+
+function saveCurrentVisibleContextForOwner(email = "") {
+  const ownerEmail = normalizeEmail(email);
+  if (!ownerEmail) return;
+
+  visibleContextKeys.forEach((key) => {
+    try {
+      const scopedKey = getAccountCacheKey(ownerEmail, key);
+      const value = localStorage.getItem(key);
+      if (value === null || typeof value === "undefined") {
+        localStorage.removeItem(scopedKey);
+      } else {
+        localStorage.setItem(scopedKey, value);
+      }
+    } catch {
+      // Ignora limite de armazenamento local. Os dados principais continuam no Firebase.
+    }
+  });
+}
+
+function persistVisibleContextForCurrentOwner() {
+  const ownerEmail = getVisibleDataOwnerEmail() || normalizeEmail(cloudUser?.email || familyAccess?.email || "");
+  if (!ownerEmail) return;
+  setVisibleDataOwnerEmail(ownerEmail);
+  saveCurrentVisibleContextForOwner(ownerEmail);
+}
+
+function clearGenericVisibleContext() {
+  visibleContextKeys.forEach((key) => {
+    try { localStorage.removeItem(key); } catch {}
+  });
+}
+
+function restoreVisibleContextForOwner(email = "") {
+  const ownerEmail = normalizeEmail(email);
+  clearGenericVisibleContext();
+
+  let restoredAny = false;
+  if (ownerEmail) {
+    visibleContextKeys.forEach((key) => {
+      try {
+        const value = localStorage.getItem(getAccountCacheKey(ownerEmail, key));
+        if (value !== null && typeof value !== "undefined") {
+          localStorage.setItem(key, value);
+          restoredAny = true;
+        }
+      } catch {}
+    });
+  }
+
+  wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
+  babyProfile = loadBabyProfile();
+  currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
+  profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
+  state = loadLocalDayState();
+  setVisibleDataOwnerEmail(ownerEmail);
+  return restoredAny;
+}
+
+function refreshVisibleContextUi() {
+  updateProfilePhoto(currentProfilePhoto || "./icons/icon-192.png");
+  syncBabyProfileForm();
+  if (wakeWindowInput) wakeWindowInput.value = String(wakeWindowMinutes);
+  if (wakeWindowValue) wakeWindowValue.textContent = String(wakeWindowMinutes);
+  renderAuthControls();
+  renderAll();
+}
+
+function prepareVisibleContextForAccount(user = cloudUser) {
+  const email = normalizeEmail(user?.email || "");
+  if (!email) return;
+
+  const previousOwner = getVisibleDataOwnerEmail();
+  if (previousOwner && previousOwner !== email) {
+    saveCurrentVisibleContextForOwner(previousOwner);
+  }
+
+  if (previousOwner !== email) {
+    restoreVisibleContextForOwner(email);
+    saveFamilyAccess(null);
+    refreshVisibleContextUi();
+  } else {
+    setVisibleDataOwnerEmail(email);
+  }
+}
+
+function resetVisibleContextForGuest() {
+  const previousOwner = getVisibleDataOwnerEmail();
+  if (previousOwner) saveCurrentVisibleContextForOwner(previousOwner);
+  clearGenericVisibleContext();
+  setVisibleDataOwnerEmail("");
+  wakeWindowMinutes = 70;
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
+  currentProfilePhoto = "";
+  profileClientUpdatedAt = 0;
+  state = createEmptyDayState();
+  updateProfilePhoto("./icons/icon-192.png");
+}
+
+function hasRoutineDayContent(dayState = state) {
+  const events = Array.isArray(dayState?.events) ? dayState.events : [];
+  return events.length > 0 || Boolean(dayState?.mode && dayState.mode !== "idle" && Number.isFinite(Number(dayState?.activeStartedAt)));
 }
 
 function isLoggedIn() {
@@ -644,6 +772,10 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
     updatedAt: services.serverTimestamp(),
   };
 
+  if (access.inviteCode) {
+    payload.inviteCode = normalizeInviteCode(access.inviteCode);
+  }
+
   await services.setDoc(services.doc(services.db, "users", user.uid, "access", "ninou"), payload, { merge: true });
   await services.setDoc(services.doc(services.db, "families", access.familyId, "members", user.uid), {
     ...payload,
@@ -679,8 +811,12 @@ async function activatePersonalFamily() {
       updatedAt: services.serverTimestamp(),
     }, { merge: true });
     await saveAccountAccessToCloud(access);
-    await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
-    await saveDayToCloud();
+    if (hasProfileContent()) {
+      await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
+    }
+    if (hasRoutineDayContent()) {
+      await saveDayToCloud();
+    }
     setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) loginHelper.textContent = "Admin do app conectado. Você já pode gerar convites no Perfil.";
     refreshAdminStats({ silent: true });
@@ -736,7 +872,13 @@ async function createFamilyInvite() {
 
   try {
     await services.setDoc(services.doc(services.db, "invites", code), payload, { merge: true });
-    await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), payload, { merge: true });
+
+    try {
+      await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), payload, { merge: true });
+    } catch (mirrorError) {
+      console.warn("Convite criado na coleção principal, mas não foi espelhado na família:", mirrorError);
+    }
+
     const link = buildInviteLink(code);
     recentInvites.unshift({ code, email, role, link });
     renderInviteList();
@@ -751,7 +893,11 @@ async function createFamilyInvite() {
     if (adminInviteEmail) adminInviteEmail.value = "";
   } catch (error) {
     console.error("Erro ao criar convite:", error);
-    if (inviteResult) inviteResult.textContent = getFirebaseErrorMessage(error);
+    if (inviteResult) {
+      inviteResult.textContent = error?.code === "permission-denied"
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.8 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        : getFirebaseErrorMessage(error);
+    }
   } finally {
     createInviteButton.disabled = false;
   }
@@ -806,6 +952,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     role: normalizeInviteRole(invite.role),
     email: userEmail,
     ownerUid: invite.createdBy || invite.ownerUid || "",
+    inviteCode: code,
     acceptedAt: new Date().toISOString(),
   };
 
@@ -821,15 +968,19 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     acceptedByEmail: userEmail,
     acceptedAt: services.serverTimestamp(),
   }, { merge: true });
-  await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), {
-    ...invite,
-    ...access,
-    code,
-    status: "active",
-    acceptedBy: cloudUser.uid,
-    acceptedByEmail: userEmail,
-    acceptedAt: services.serverTimestamp(),
-  }, { merge: true });
+  try {
+    await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), {
+      ...invite,
+      ...access,
+      code,
+      status: "active",
+      acceptedBy: cloudUser.uid,
+      acceptedByEmail: userEmail,
+      acceptedAt: services.serverTimestamp(),
+    }, { merge: true });
+  } catch (mirrorError) {
+    console.warn("Convite aceito, mas o espelho da família não foi atualizado:", mirrorError);
+  }
 
   pendingInviteCode = "";
   localStorage.removeItem(storageKeys.pendingInvite);
@@ -893,6 +1044,7 @@ function loadBabyProfile() {
 
 function saveBabyProfile() {
   babyProfile = persistBabyProfile(babyProfile, { profileClientUpdatedAt });
+  persistVisibleContextForCurrentOwner();
 }
 
 
@@ -1029,9 +1181,10 @@ function renderAuthControls() {
 }
 
 function clearLocalAccountData() {
-  // Local-first: desconectar ou abrir o app sem login não apaga rotina, perfil, foto ou pesos.
-  // O acesso familiar é removido apenas deste aparelho; a família continua salva no Firebase.
+  // Privacidade no aparelho: ao sair da conta, os dados da família logada são guardados
+  // em cache separado por e-mail e a visualização volta para o modo visitante sem dados.
   localStorage.removeItem(storageKeys.email);
+  resetVisibleContextForGuest();
   saveFamilyAccess(null);
   cloudUser = null;
   pendingProfilePhotoSave = false;
@@ -1104,6 +1257,7 @@ function applyCloudProfile(data = {}) {
       updateProfilePhoto("./icons/icon-192.png");
     }
 
+    persistVisibleContextForCurrentOwner();
     syncBabyProfileForm();
     wakeWindowInput.value = String(wakeWindowMinutes);
     wakeWindowValue.textContent = String(wakeWindowMinutes);
@@ -1163,6 +1317,7 @@ function scheduleDayCloudSave() {
 async function saveDayToCloud() {
   const dayRef = getCloudDayRef();
   if (!dayRef || applyingCloudState) return;
+  if (!hasRoutineDayContent()) return;
 
   try {
     await firebaseServices.setDoc(
@@ -1210,7 +1365,8 @@ async function subscribeToCloudDay() {
 
   dayUnsubscribe = firebaseServices.onSnapshot(dayRef, (snapshot) => {
     if (!snapshot.exists()) {
-      saveDayToCloud();
+      if (hasRoutineDayContent()) saveDayToCloud();
+      else renderAll();
       return;
     }
 
@@ -1238,6 +1394,7 @@ async function initFirebaseAuthState() {
       return;
     }
 
+    prepareVisibleContextForAccount(user);
     localStorage.setItem(storageKeys.email, user.email || "");
     loginEmail.value = user.email || "";
 
@@ -2255,6 +2412,7 @@ function updateWakeWindow(value, options = {}) {
   if (!options.skipPersist) {
     markProfileLocallyChanged();
     localStorage.setItem(storageKeys.wakeWindow, String(nextValue));
+    persistVisibleContextForCurrentOwner();
   }
   renderSummary();
   if (!options.skipPersist) {
@@ -2701,6 +2859,7 @@ profilePhotoInput.addEventListener("change", async () => {
   } catch {
     // A foto continua visível mesmo se o navegador não permitir salvar localmente.
   }
+  persistVisibleContextForCurrentOwner();
   scheduleProfileCloudSave({ includePhoto: true });
 });
 
