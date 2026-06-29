@@ -1,6 +1,6 @@
-// Ninou v75.28 - experiência geral do produto
+// Ninou v75.37 - fotos otimizadas no Firestore sem Firebase Storage
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.28";
+const NINOU_APP_VERSION = "75.37";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

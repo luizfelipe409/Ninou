@@ -1,22 +1,20 @@
-# Ninou v75.28 — experiência da família e produto
+# Ninou v75.37 — fotos no Firestore sem Storage
 
-Esta versão parte da v75.27 e pode ser instalada diretamente.
+Esta versão retrocede a v75.36 porque o Firebase Storage pode gerar custo.
 
-## Novidades
+Você pode instalar direto esta versão para manter as melhorias até a v75.35 e voltar a salvar fotos no Firestore/localStorage.
 
-- Tela inicial “Hoje com o bebê” com últimos registros e próxima sugestão.
-- Resumo inteligente do dia.
-- Alertas leves e acolhedores.
-- Crescimento com peso atual, evolução e gráfico simples.
-- Histórico de alterações por cuidador/usuário.
-- Onboarding para pessoa convidada.
-- Painel admin com visão de saúde do sistema.
-- Permissões explicadas no convite.
-- Exportação JSON, CSV, prévia para PDF e WhatsApp.
-- Estados vazios e espaçamentos revisados.
+## Alterações principais
 
-## Regras Firebase
+- Remove a dependência da lógica de Firebase Storage.
+- Foto do bebê volta a salvar no documento `families/{familyId}/profile/main`, campo `photo`.
+- Foto pessoal do admin volta a salvar em `users/{uid}/account/profile`, campo `photo`.
+- A imagem agora é reduzida para 260x260 em JPEG 0.72 para ocupar menos espaço no Firestore.
+- Não precisa publicar regras de Storage.
 
-As regras estão em:
+## Instalação
 
-`docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_28.md`
+1. Suba esta versão no Vercel.
+2. Publique apenas as regras Firestore em `docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_37.md`.
+3. Não publique regras de Storage.
+4. Limpe o cache/PWA no iPhone depois do deploy.

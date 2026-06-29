@@ -1336,6 +1336,53 @@ body.day-theme .state-orbit strong {
   font-weight: 950;
 }
 
+
+.export-personal-message {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(245, 238, 255, 0.08);
+}
+
+.export-personal-message label {
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 238, 255, 0.72);
+}
+
+.export-personal-message input,
+.export-personal-message textarea {
+  width: 100%;
+  border: 1px solid rgba(245, 238, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(12, 11, 32, 0.24);
+  color: var(--ink);
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 800;
+  outline: none;
+}
+
+.export-personal-message textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.export-personal-message input::placeholder,
+.export-personal-message textarea::placeholder {
+  color: rgba(245, 238, 255, 0.36);
+}
+
+.export-personal-message small {
+  color: rgba(245, 238, 255, 0.56);
+  line-height: 1.35;
+}
+
 .danger-card button {
   min-height: 44px;
   border: 1px solid rgba(255, 154, 118, 0.32);
@@ -5405,3 +5452,228 @@ body.day-theme .weight-sparkline {
     justify-content: center;
   }
 }
+
+/* v75.29 — refinamento da tela Hoje: relógio volta a ser o protagonista */
+.screen[data-screen="today"] > .state-orbit {
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.screen[data-screen="today"] > .today-overview-card {
+  margin-top: 2px;
+}
+
+.today-overview-head span#todayOverviewKicker {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 0.86rem;
+  font-weight: 850;
+  color: rgba(124, 229, 194, 0.9);
+}
+
+body.day-theme .today-overview-head span#todayOverviewKicker {
+  color: rgba(45, 111, 94, 0.92);
+}
+
+@media (max-width: 430px) {
+  .state-orbit {
+    min-height: 328px;
+  }
+
+  .state-orbit strong {
+    font-size: clamp(3.35rem, 15vw, 4.35rem);
+    letter-spacing: -0.05em;
+  }
+
+  .today-overview-card {
+    border-radius: 24px;
+  }
+}
+
+/* v75.30 — assistente de rotina, crescimento e exportações refinadas */
+.smart-insight-card span {
+  color: rgba(124, 229, 194, 0.92);
+  font-weight: 850;
+}
+
+.section-helper {
+  margin: -4px 0 8px;
+  color: rgba(245, 238, 255, 0.66);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.today-last-card .drawer-section-title span,
+.day-story-card .drawer-section-title span,
+.intelligent-timeline-card .drawer-section-title span {
+  letter-spacing: 0.02em;
+}
+
+.today-last-events .mini-event.empty,
+.intelligent-timeline .timeline-empty {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.065);
+  color: rgba(245, 238, 255, 0.72);
+  line-height: 1.42;
+}
+
+.growth-history-mini {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.growth-history-mini article {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.growth-history-mini strong {
+  font-size: 0.94rem;
+  white-space: nowrap;
+}
+
+.growth-history-mini span,
+.growth-history-mini article {
+  color: rgba(245, 238, 255, 0.66);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.export-card p {
+  max-width: 28rem;
+}
+
+body.day-theme .section-helper,
+body.day-theme .today-last-events .mini-event.empty,
+body.day-theme .intelligent-timeline .timeline-empty,
+body.day-theme .growth-history-mini span,
+body.day-theme .growth-history-mini article {
+  color: rgba(61, 52, 74, 0.66);
+}
+
+body.day-theme .today-last-events .mini-event.empty,
+body.day-theme .intelligent-timeline .timeline-empty,
+body.day-theme .growth-history-mini article {
+  background: rgba(102, 78, 140, 0.07);
+}
+
+@media (max-width: 430px) {
+  .growth-history-mini article {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+}
+
+
+body.day-theme .export-personal-message {
+  background: rgba(102, 78, 140, 0.06);
+  border-color: rgba(67, 50, 94, 0.10);
+}
+
+body.day-theme .export-personal-message label {
+  color: rgba(61, 52, 74, 0.70);
+}
+
+body.day-theme .export-personal-message input,
+body.day-theme .export-personal-message textarea {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(67, 50, 94, 0.14);
+  color: #3b2f4b;
+}
+
+body.day-theme .export-personal-message input::placeholder,
+body.day-theme .export-personal-message textarea::placeholder {
+  color: rgba(61, 52, 74, 0.38);
+}
+
+body.day-theme .export-personal-message small {
+  color: rgba(61, 52, 74, 0.58);
+}
+
+/* v75.32 — observações, histórico e permissões mais claras */
+.day-notes-card {
+  margin-top: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045));
+  border-radius: 26px;
+  padding: 18px;
+  box-shadow: 0 18px 42px rgba(8, 8, 28, 0.14);
+}
+.day-notes-card textarea {
+  width: 100%;
+  min-height: 104px;
+  resize: vertical;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 12px;
+  background: rgba(255,255,255,.08);
+  color: var(--ink);
+  font: inherit;
+}
+.day-notes-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.day-notes-actions small {
+  color: rgba(245, 238, 255, 0.66);
+  line-height: 1.35;
+}
+body.day-theme .day-notes-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 237, 0.88));
+  border-color: rgba(67, 50, 94, 0.10);
+  box-shadow: 0 16px 34px rgba(116, 94, 145, 0.10);
+}
+body.day-theme .day-notes-actions small { color: rgba(61, 52, 74, 0.66); }
+body.day-theme .day-notes-card textarea { background: rgba(102, 78, 140, 0.06); color: #3d344a; }
+@media (max-width: 520px) {
+  .day-notes-actions { align-items: stretch; flex-direction: column; }
+  .day-notes-actions button { width: 100%; }
+}
+
+/* v75.33 — exportação por período e modo consulta */
+.export-period-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+.export-period-grid label:first-child { grid-column: 1 / -1; }
+.export-period-grid label { display: grid; gap: 6px; padding: 10px 12px; border-radius: 18px; background: rgba(255,255,255,.065); color: rgba(245,238,255,.72); font-size: .8rem; font-weight: 800; }
+.export-period-grid input, .export-period-grid select { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 10px; color: var(--ink); background: rgba(255,255,255,.08); font: inherit; }
+.consult-mode-button { width: 100%; margin: 4px 0 10px; }
+body.day-theme .export-period-grid label { background: rgba(102,78,140,.06); color: rgba(61,52,74,.7); }
+body.day-theme .export-period-grid input, body.day-theme .export-period-grid select { background: rgba(255,255,255,.78); color: #3d344a; }
+@media (max-width: 460px) { .export-period-grid { grid-template-columns: 1fr; } }
+
+/* v75.34 — polimento visual dos botões e ícones */
+.quick-actions-heading { margin: 4px 2px -2px; display: flex; justify-content: space-between; align-items: end; gap: 10px; }
+.quick-actions-heading span { color: rgba(245,238,255,.64); font-size: .76rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.quick-actions-heading strong { color: rgba(245,238,255,.82); font-size: .86rem; }
+.quick-actions button, .start-choice button { position: relative; overflow: hidden; min-height: 68px; border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.055)); box-shadow: 0 14px 30px rgba(7,8,25,.12); }
+.quick-actions button::after, .start-choice button::after { content: ""; position: absolute; inset: auto 12px 10px 58px; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,.28), transparent); }
+.quick-actions .action-icon, .start-choice .action-icon { width: 44px; height: 44px; background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.36), rgba(255,255,255,.10)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+.quick-actions button > span:last-child, .start-choice button > span:last-child { font-size: .84rem; letter-spacing: -.01em; }
+body.day-theme .quick-actions-heading span { color: rgba(61,52,74,.56); }
+body.day-theme .quick-actions-heading strong { color: rgba(61,52,74,.78); }
+body.day-theme .quick-actions button, body.day-theme .start-choice button { background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(255,248,237,.86)); box-shadow: 0 12px 28px rgba(116,94,145,.10); }
+body.day-theme .quick-actions .action-icon, body.day-theme .start-choice .action-icon { background: rgba(102,78,140,.07); }
+@media (max-width: 380px) { .quick-actions button { grid-template-columns: 40px 1fr; padding-inline: 10px; } .quick-actions .action-icon { width: 40px; height: 40px; } }
+
+/* v75.37 — central de avisos e lembretes leves */
+.notification-center-card { margin-top: 12px; border: 1px solid rgba(124, 229, 194, 0.24); background: linear-gradient(145deg, rgba(124,229,194,.10), rgba(255,255,255,.045)); border-radius: 26px; padding: 18px; box-shadow: 0 18px 42px rgba(8, 8, 28, 0.14); }
+.notification-center-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 9px; }
+.notification-center-list li { display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 18px; background: rgba(255,255,255,.07); }
+.notification-center-list i { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.12); font-style: normal; }
+.notification-center-list strong { display: block; font-size: .92rem; }
+.notification-center-list span { display: block; margin-top: 2px; color: rgba(245,238,255,.68); font-size: .8rem; line-height: 1.35; }
+body.day-theme .notification-center-card { background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(235,251,244,.86)); border-color: rgba(45,111,94,.12); box-shadow: 0 16px 34px rgba(116, 94, 145, 0.10); }
+body.day-theme .notification-center-list li { background: rgba(45,111,94,.06); }
+body.day-theme .notification-center-list i { background: rgba(45,111,94,.08); }
+body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }

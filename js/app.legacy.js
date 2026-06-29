@@ -138,6 +138,8 @@ const todayOverviewTitle = document.querySelector("#todayOverviewTitle");
 const todayOverviewGrid = document.querySelector("#todayOverviewGrid");
 const todayOverviewSuggestion = document.querySelector("#todayOverviewSuggestion");
 const gentleAlertCard = document.querySelector("#gentleAlertCard");
+const notificationCenterCard = document.querySelector("#notificationCenterCard");
+const notificationCenterList = document.querySelector("#notificationCenterList");
 const daySummaryMoment = document.querySelector("#daySummaryMoment");
 const daySummaryText = document.querySelector("#daySummaryText");
 const todayGrowthWeight = document.querySelector("#todayGrowthWeight");
@@ -147,7 +149,11 @@ const trendGrowthStatus = document.querySelector("#trendGrowthStatus");
 const trendGrowthWeight = document.querySelector("#trendGrowthWeight");
 const trendGrowthHint = document.querySelector("#trendGrowthHint");
 const trendWeightSparkline = document.querySelector("#trendWeightSparkline");
+const growthHistoryMini = document.querySelector("#growthHistoryMini");
 const auditTrailList = document.querySelector("#auditTrailList");
+const dayNotesTextarea = document.querySelector("#dayNotesTextarea");
+const saveDayNotesButton = document.querySelector("#saveDayNotesButton");
+const dayNotesStatus = document.querySelector("#dayNotesStatus");
 const familyWelcomeCard = document.querySelector("#familyWelcomeCard");
 const familyWelcomeTitle = document.querySelector("#familyWelcomeTitle");
 const familyWelcomeText = document.querySelector("#familyWelcomeText");
@@ -166,6 +172,12 @@ const exportJsonButton = document.querySelector("#exportJsonButton");
 const exportCsvButton = document.querySelector("#exportCsvButton");
 const exportPdfButton = document.querySelector("#exportPdfButton");
 const shareWhatsappButton = document.querySelector("#shareWhatsappButton");
+const whatsappNumberInput = document.querySelector("#whatsappNumberInput");
+const whatsappMessageInput = document.querySelector("#whatsappMessageInput");
+const exportRangeSelect = document.querySelector("#exportRangeSelect");
+const exportStartDateInput = document.querySelector("#exportStartDateInput");
+const exportEndDateInput = document.querySelector("#exportEndDateInput");
+const prepareConsultButton = document.querySelector("#prepareConsultButton");
 const syncPill = document.querySelector(".sync-pill");
 const syncStatusTitle = document.querySelector("#syncStatusTitle");
 const syncStatusText = document.querySelector("#syncStatusText");
@@ -4706,7 +4718,7 @@ function renderTodayOverview() {
   const diaperText = lastDiaper ? `${formatTime(lastDiaper.start)}${lastDiaper.detail && lastDiaper.detail !== "Não se aplica" ? ` • ${lastDiaper.detail}` : ""}` : "Sem registro";
 
   if (todayOverviewTitle) todayOverviewTitle.textContent = `Hoje com ${baby}`;
-  if (todayOverviewKicker) todayOverviewKicker.textContent = getDayLabel(todayStart) || "Hoje";
+  if (todayOverviewKicker) todayOverviewKicker.textContent = "Assistente de rotina";
   todayOverviewGrid.innerHTML = [
     ["Última mamadeira", bottleText],
     ["Última fralda", diaperText],
@@ -4715,14 +4727,14 @@ function renderTodayOverview() {
   ].map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join("");
 
   if (todayOverviewSuggestion) {
-    let suggestion = "Registre a primeira ação para o Ninou montar um acompanhamento gentil.";
+    let suggestion = "Registre a primeira ação para o Ninou acompanhar o dia com você.";
     if (state.mode === "sleeping") suggestion = `${baby} está dormindo agora. O resumo será atualizado quando acordar.`;
     else if (Number.isFinite(Number(state.activeStartedAt))) {
       const awakeMs = now - Number(state.activeStartedAt);
       const targetMs = wakeWindowMinutes * 60000;
       if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
       else suggestion = `Rotina em andamento. Próxima janela de sono estimada em ${formatShortDuration(Math.max(0, targetMs - awakeMs))}.`;
-    } else if (events.length) suggestion = `Hoje já há ${events.length} ${events.length === 1 ? "registro" : "registros"}. O Ninou segue acompanhando o dia.`;
+    } else if (events.length) suggestion = `Hoje já há ${events.length} ${events.length === 1 ? "registro" : "registros"}. O Ninou está organizando a rotina do dia para você.`;
     todayOverviewSuggestion.textContent = suggestion;
   }
 }
@@ -4741,22 +4753,22 @@ function renderGentleAlert() {
 
   if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
     const awakeMs = now - Number(state.activeStartedAt);
-    if (awakeMs >= wakeWindowMinutes * 60000) {
+    if (awakeMs >= wakeWindowMinutes * 60000 * 0.9) {
       title = `${baby} está acordado há ${formatShortDuration(awakeMs)}`;
-      text = "Talvez seja um bom momento para observar bocejos, irritação ou sinais de sono.";
+      text = "Talvez seja um bom momento para observar sinais de sono com calma, sem pressa.";
       show = true;
     }
   }
 
   if (!show && lastFeed && now - Number(lastFeed.start) >= 3 * hour) {
-    title = `Já faz ${formatShortDuration(now - Number(lastFeed.start))} desde a última alimentação`;
-    text = "Apenas um lembrete gentil para conferir se está tudo bem com a rotina.";
+    title = `Última alimentação há ${formatShortDuration(now - Number(lastFeed.start))}`;
+    text = "Um lembrete suave para conferir se a próxima mamada já faz sentido na rotina de vocês.";
     show = true;
   }
 
   if (!show && lastDiaper && now - Number(lastDiaper.start) >= 4 * hour) {
     title = `Última fralda às ${formatTime(lastDiaper.start)}`;
-    text = "Quando fizer sentido para vocês, vale conferir a próxima troca.";
+    text = "Quando fizer sentido para vocês, vale dar uma olhada na próxima troca.";
     show = true;
   }
 
@@ -4766,6 +4778,61 @@ function renderGentleAlert() {
   }
 }
 
+function getBottleMlTotal(events = []) {
+  return events.reduce((total, event) => {
+    if (event.type !== "mamadeira") return total;
+    const detail = String(event.detail || "");
+    const match = detail.match(/(\d+(?:[,.]\d+)?)\s*ml/i);
+    if (!match) return total;
+    const value = Number(match[1].replace(",", "."));
+    return Number.isFinite(value) ? total + value : total;
+  }, 0);
+}
+
+
+function getNotificationItems() {
+  const todayStart = getDayStart();
+  const events = getFamilyEventsForWindow(todayStart, todayStart + day);
+  const latestBottle = [...events].reverse().find((event) => event.type === "mamadeira" || event.type === "amamentacao");
+  const latestDiaper = [...events].reverse().find((event) => event.type === "fralda");
+  const latestAny = [...events].reverse()[0] || null;
+  const items = [];
+  const now = Date.now();
+  if (!events.length) {
+    items.push({ icon: "✨", title: "Dia pronto para começar", text: "Quando houver o primeiro registro, o Ninou monta lembretes suaves para acompanhar a rotina." });
+    return items;
+  }
+  if (latestBottle) {
+    const elapsed = now - Number(latestBottle.start);
+    if (elapsed > 2.5 * hour) items.push({ icon: "🍼", title: "Alimentação", text: `Já faz ${formatShortDuration(elapsed)} desde a última alimentação registrada.` });
+  }
+  if (latestDiaper) {
+    const elapsed = now - Number(latestDiaper.start);
+    if (elapsed > 3 * hour) items.push({ icon: "🧷", title: "Fralda", text: `Última fralda registrada há ${formatShortDuration(elapsed)}.` });
+  }
+  if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
+    const awake = now - Number(state.activeStartedAt);
+    if (awake > wakeWindowMinutes * 60000) items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
+  }
+  if (latestAny?.createdByName || latestAny?.createdByEmail) {
+    items.push({ icon: "👥", title: "Última atualização", text: `${latestAny.createdByName || latestAny.createdByEmail} registrou ${getEventConfig(latestAny.type).title.toLowerCase()} às ${formatTime(latestAny.start)}.` });
+  }
+  if (!items.length) items.push({ icon: "🌿", title: "Tudo tranquilo", text: "Os registros de hoje estão organizados. O Ninou avisará quando houver algo útil para lembrar." });
+  return items.slice(0, 4);
+}
+
+function renderNotificationCenter() {
+  if (!notificationCenterList) return;
+  const items = getNotificationItems();
+  notificationCenterList.innerHTML = items.map((item) => `
+    <li>
+      <i>${escapeHtml(item.icon)}</i>
+      <div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.text)}</span></div>
+    </li>
+  `).join("");
+  if (notificationCenterCard) notificationCenterCard.hidden = false;
+}
+
 function renderDaySummaryCard() {
   if (!daySummaryText) return;
   const todayStart = getDayStart();
@@ -4773,13 +4840,15 @@ function renderDaySummaryCard() {
   const events = getFamilyEventsForWindow(todayStart, todayStart + day);
   const sleepMs = getSleepMsForRange(todayStart, Math.min(todayStart + day, now));
   const feeds = countFeedingEvents(events);
+  const bottleMl = Math.round(getBottleMlTotal(events));
   const diapers = countDiaperEvents(events);
   const naps = events.filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)).length;
   const meds = countMedicationEvents(events);
   const latest = [...events].sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
-  if (daySummaryMoment) daySummaryMoment.textContent = new Date(now).getHours() >= 20 ? "Fechamento do dia" : "Em andamento";
+  const baby = getBabyDisplayName();
+  if (daySummaryMoment) daySummaryMoment.textContent = new Date(now).getHours() >= 20 ? "Fechamento do dia" : "Resumo em tempo real";
   if (!events.length) {
-    daySummaryText.textContent = `Nenhum registro ainda. Quando ${getBabyDisplayName()} mamar, dormir ou trocar fralda, use os botões rápidos para começar o diário.`;
+    daySummaryText.textContent = `Nenhum registro ainda. Quando ${baby} mamar, dormir ou trocar fralda, toque em um botão rápido para o Ninou montar o resumo automaticamente.`;
     return;
   }
   const latestTitle = latest ? getEventConfig(latest.type).title.toLowerCase() : "registro";
@@ -4788,8 +4857,10 @@ function renderDaySummaryCard() {
     `${diapers} ${diapers === 1 ? "fralda" : "fraldas"}`,
     `${naps} ${naps === 1 ? "sono" : "sonos"}`,
   ];
+  if (bottleMl) parts.push(`${bottleMl} ml em mamadeiras`);
   if (meds) parts.push(`${meds} ${meds === 1 ? "medicamento" : "medicamentos"}`);
-  daySummaryText.textContent = `Hoje: ${parts.join(", ")}. Total de sono: ${formatShortDuration(sleepMs)}. Último registro: ${latestTitle} às ${latest ? formatTime(latest.start) : "--"}.`;
+  const lastText = latest ? `Último registro: ${latestTitle} às ${formatTime(latest.start)}.` : "";
+  daySummaryText.textContent = `Hoje ${baby} teve ${parts.join(", ")}. Total de sono: ${formatShortDuration(sleepMs)}. ${lastText}`.trim();
 }
 
 function getSortedWeightsAsc() {
@@ -4816,6 +4887,22 @@ function renderSparkline(container, weights = []) {
   }).join("");
 }
 
+function renderGrowthHistoryMini(weights = []) {
+  if (!growthHistoryMini) return;
+  const recent = weights.slice(-4).reverse();
+  if (!recent.length) {
+    growthHistoryMini.innerHTML = `<article>Cadastre o primeiro peso no perfil para acompanhar o crescimento.</article>`;
+    return;
+  }
+  growthHistoryMini.innerHTML = recent.map((item, index) => {
+    const previous = weights[weights.length - 1 - index - 1];
+    const diff = previous ? Number(item.value) - Number(previous.value) : 0;
+    const diffText = previous ? `${diff >= 0 ? "+" : ""}${Math.round(diff * 1000)} g` : "primeiro registro";
+    const dateText = String(item.date || "").split("-").reverse().join("/");
+    return `<article><strong>${escapeHtml(formatKg(item.value))}</strong><span>${escapeHtml(dateText)} • ${escapeHtml(diffText)}</span></article>`;
+  }).join("");
+}
+
 function renderGrowthPanels() {
   const weights = getSortedWeightsAsc();
   const latest = weights[weights.length - 1];
@@ -4829,6 +4916,7 @@ function renderGrowthPanels() {
     if (trendGrowthStatus) trendGrowthStatus.textContent = "Acompanhe no perfil";
     renderSparkline(todayWeightSparkline, []);
     renderSparkline(trendWeightSparkline, []);
+    renderGrowthHistoryMini([]);
     return;
   }
 
@@ -4840,6 +4928,7 @@ function renderGrowthPanels() {
   if (trendGrowthStatus) trendGrowthStatus.textContent = `${weights.length} ${weights.length === 1 ? "peso" : "pesos"}`;
   renderSparkline(todayWeightSparkline, weights);
   renderSparkline(trendWeightSparkline, weights);
+  renderGrowthHistoryMini(weights);
 }
 
 function renderAuditTrail() {
@@ -4856,12 +4945,33 @@ function renderAuditTrail() {
   }).join("");
 }
 
+
+function renderDayNotesPanel() {
+  if (!dayNotesTextarea) return;
+  const value = typeof state.dayNotes === "string" ? state.dayNotes : "";
+  if (document.activeElement !== dayNotesTextarea) {
+    dayNotesTextarea.value = value;
+  }
+  if (dayNotesStatus) {
+    dayNotesStatus.textContent = value.trim() ? "Observação salva neste dia." : "Nenhuma observação salva neste dia.";
+  }
+}
+
+function saveDayNotes() {
+  if (!requireLogin("salvar observações do dia")) return;
+  state.dayNotes = dayNotesTextarea?.value?.trim() || "";
+  saveDayState();
+  renderDayNotesPanel();
+}
+
 function renderProductExperienceSections() {
   renderTodayOverview();
   renderGentleAlert();
   renderDaySummaryCard();
   renderGrowthPanels();
+  renderDayNotesPanel();
   renderAuditTrail();
+  renderNotificationCenter();
 }
 
 function saveBabyWeight() {
@@ -5328,38 +5438,70 @@ function getExportEvents() {
   return buildExportEvents(state.events, getEventConfig);
 }
 
+function getExportWindow() {
+  const selectedStart = selectedDiaryDay ?? getDayStart();
+  const selectedDayId = toDateInputValue(selectedStart);
+  const mode = exportRangeSelect?.value || "day";
+  let start = selectedStart;
+  let end = selectedStart + day;
+  let label = formatReportDate(selectedDayId);
+
+  if (mode === "7" || mode === "30") {
+    const count = Number(mode);
+    start = getDayStart() - (count - 1) * day;
+    end = getDayStart() + day;
+    label = `Últimos ${count} dias`;
+  } else if (mode === "custom") {
+    const startText = exportStartDateInput?.value || selectedDayId;
+    const endText = exportEndDateInput?.value || selectedDayId;
+    const startDate = parseLocalDate(startText) || new Date(selectedStart);
+    const endDate = parseLocalDate(endText) || new Date(selectedStart);
+    start = getDayStart(Math.min(startDate.getTime(), endDate.getTime()));
+    end = getDayStart(Math.max(startDate.getTime(), endDate.getTime())) + day;
+    label = `${formatReportDate(toDateInputValue(start))} a ${formatReportDate(toDateInputValue(end - day))}`;
+  }
+
+  return { mode, start, end, label, dayId: selectedDayId };
+}
+
+function getDayNotesForWindow(start, end) {
+  syncSelectedDayIntoFamilyCache();
+  const notes = [];
+  for (let cursor = getDayStart(start); cursor < end; cursor += day) {
+    const dayId = toDateInputValue(cursor);
+    const note = getFamilyDayState(dayId).dayNotes || "";
+    if (note.trim()) notes.push(`${formatReportDate(dayId)}: ${note.trim()}`);
+  }
+  return notes;
+}
+
 function getExportPayload() {
-  const todayStart = selectedDiaryDay ?? getDayStart();
-  const selectedState = getFamilyDayState(toDateInputValue(todayStart));
+  const windowInfo = getExportWindow();
+  const selectedState = getFamilyDayState(windowInfo.dayId);
+  const events = getFamilyEventsForWindow(windowInfo.start, windowInfo.end);
+  const dayNotesList = getDayNotesForWindow(windowInfo.start, windowInfo.end);
   return {
     app: "Ninou",
     exportedAt: new Date().toISOString(),
     exportedBy: cloudUser?.email || "",
-    day: toDateInputValue(todayStart),
+    day: windowInfo.dayId,
+    period: {
+      label: windowInfo.label,
+      start: toDateInputValue(windowInfo.start),
+      end: toDateInputValue(windowInfo.end - day),
+      mode: windowInfo.mode,
+    },
     profile: normalizeBabyProfile(babyProfile),
+    weights: getSortedWeightsAsc(),
     wakeWindowMinutes,
     state: normalizeDayState(selectedState),
-    events: buildExportEvents(selectedState.events || [], getEventConfig),
+    dayNotes: windowInfo.mode === "day" ? (selectedState.dayNotes || "") : dayNotesList.join("\n"),
+    events: buildExportEvents(events, getEventConfig),
+    summary: {
+      text: daySummaryText?.textContent || "",
+      exportedFrom: "Ninou v75.33",
+    },
   };
-}
-
-function buildRoutineSummaryText(payload = getExportPayload()) {
-  const events = (payload.events || []);
-  const sleepMinutes = events.reduce((total, event) => total + (String(event.type).includes("sono") || event.type === "dormir" ? Number(event.durationMinutes || 0) : 0), 0);
-  const feeds = events.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
-  const diapers = events.filter((event) => event.type === "fralda").length;
-  const meds = events.filter((event) => event.type === "medicamento").length;
-  const latest = [...events].sort((a, b) => String(b.start).localeCompare(String(a.start)))[0];
-  const baby = getBabyDisplayName();
-  return [
-    `Resumo Ninou — ${baby}`,
-    `Data: ${payload.day.split("-").reverse().join("/")}`,
-    `Sono: ${formatShortDuration(sleepMinutes * 60000)}`,
-    `Alimentações: ${feeds}`,
-    `Fraldas: ${diapers}`,
-    meds ? `Medicamentos: ${meds}` : "",
-    latest ? `Último registro: ${latest.title} às ${formatTime(new Date(latest.start).getTime())}` : "Sem registros no dia.",
-  ].filter(Boolean).join("\n");
 }
 
 function downloadFile(filename, content, type) {
@@ -5379,10 +5521,192 @@ function escapeCsv(value) {
   return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
+function formatReportDate(value) {
+  const text = String(value || "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text.split("-").reverse().join("/");
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? text : date.toLocaleDateString("pt-BR");
+}
+
+function normalizeWhatsappNumber(value = "") {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  while (digits.startsWith("00")) digits = digits.slice(2);
+  if (digits.startsWith("0")) digits = digits.slice(1);
+  if (digits.length === 10 || digits.length === 11) digits = `55${digits}`;
+  return digits;
+}
+
+function getRoutineStats(payload = getExportPayload()) {
+  const events = payload.events || [];
+  const sleepMinutes = events.reduce((total, event) => {
+    const type = String(event.type || "");
+    const isSleep = type.includes("sono") || type === "dormir";
+    return total + (isSleep ? Number(event.durationMinutes || 0) : 0);
+  }, 0);
+  const feeds = events.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
+  const diapers = events.filter((event) => event.type === "fralda").length;
+  const meds = events.filter((event) => event.type === "medicamento").length;
+  const naps = events.filter((event) => String(event.type || "").includes("sono") || event.type === "dormir").length;
+  const bottleMl = events.reduce((total, event) => {
+    if (event.type !== "mamadeira") return total;
+    const match = String(event.detail || "").match(/(\d+(?:[,.]\d+)?)\s*ml/i);
+    if (!match) return total;
+    const value = Number(match[1].replace(",", "."));
+    return Number.isFinite(value) ? total + value : total;
+  }, 0);
+  const latest = [...events].sort((a, b) => String(b.start).localeCompare(String(a.start)))[0] || null;
+  return { sleepMinutes, feeds, diapers, meds, naps, bottleMl: Math.round(bottleMl), latest };
+}
+
+function getWeightReportInfo(weights = []) {
+  const sorted = [...(weights || [])].filter((item) => Number.isFinite(Number(item.value))).sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+  const latest = sorted[sorted.length - 1] || null;
+  const previous = sorted[sorted.length - 2] || null;
+  const diff = latest && previous ? Number(latest.value) - Number(previous.value) : null;
+  return { sorted, latest, previous, diff };
+}
+
+function buildRoutineSummaryText(payload = getExportPayload()) {
+  const stats = getRoutineStats(payload);
+  const weightInfo = getWeightReportInfo(payload.weights || []);
+  const latestWeight = weightInfo.latest;
+  const baby = getBabyDisplayName();
+  return [
+    `Resumo Ninou - ${baby}`,
+    `Período: ${payload.period?.label || formatReportDate(payload.day)}`,
+    `Sono total: ${formatShortDuration(stats.sleepMinutes * 60000)}`,
+    `Alimentações: ${stats.feeds}${stats.bottleMl ? ` (${stats.bottleMl} ml em mamadeiras)` : ""}`,
+    `Fraldas: ${stats.diapers}`,
+    stats.meds ? `Medicamentos: ${stats.meds}` : "",
+    stats.latest ? `Último registro: ${stats.latest.title} às ${formatTime(new Date(stats.latest.start).getTime())}` : "Sem registros no dia.",
+    latestWeight ? `Peso atual: ${formatKg(latestWeight.value)} (${formatReportDate(latestWeight.date)})` : "",
+    payload.dayNotes ? `Observações do dia: ${payload.dayNotes}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+function buildPrintableReportHtml(payload = getExportPayload()) {
+  const baby = getBabyDisplayName();
+  const stats = getRoutineStats(payload);
+  const weightInfo = getWeightReportInfo(payload.weights || []);
+  const eventRows = (payload.events || []).map((event, index) => {
+    const startTime = formatTime(new Date(event.start).getTime());
+    const endTime = event.end && event.end !== event.start ? formatTime(new Date(event.end).getTime()) : "";
+    const actor = event.updatedByName || event.updatedByEmail || event.createdByName || event.createdByEmail || "";
+    const detail = [event.detail, event.notes ? `Obs.: ${event.notes}` : ""].filter(Boolean).join(" - ");
+    return `<tr><td><b>${escapeHtml(startTime)}</b>${endTime ? `<small>até ${escapeHtml(endTime)}</small>` : ""}</td><td><strong>${escapeHtml(event.title)}</strong><small>${escapeHtml(event.type || "")}</small></td><td>${escapeHtml(detail || "-")}</td><td>${escapeHtml(String(event.durationMinutes || "-"))}</td><td>${escapeHtml(actor || "-")}</td></tr>`;
+  }).join("") || `<tr><td colspan="5" class="empty-cell">Sem registros nesta data.</td></tr>`;
+
+  const weightRows = weightInfo.sorted.slice(-10).reverse().map((item) => `<tr><td>${escapeHtml(formatReportDate(item.date))}</td><td><strong>${escapeHtml(formatKg(item.value))}</strong></td></tr>`).join("") || `<tr><td colspan="2" class="empty-cell">Sem pesos cadastrados.</td></tr>`;
+  const weightDelta = weightInfo.diff === null ? "Sem comparação anterior" : `${weightInfo.diff >= 0 ? "+" : ""}${weightInfo.diff.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg desde o peso anterior`;
+  const reportTitle = `Relatório da rotina - ${baby}`;
+  const safeSummary = escapeHtml(buildRoutineSummaryText(payload)).replaceAll("\n", "<br>");
+  const dayNotesBlock = payload.dayNotes ? `<section><h2>Observações do dia</h2><div class="growth-note">${escapeHtml(payload.dayNotes)}</div></section>` : "";
+  const cards = [
+    ["Sono", formatShortDuration(stats.sleepMinutes * 60000), "Total no dia"],
+    ["Alimentações", String(stats.feeds), stats.bottleMl ? `${stats.bottleMl} ml em mamadeiras` : "Mamadas e mamadeiras"],
+    ["Fraldas", String(stats.diapers), "Trocas registradas"],
+    ["Peso atual", weightInfo.latest ? formatKg(weightInfo.latest.value) : "Sem peso", weightInfo.latest ? formatReportDate(weightInfo.latest.date) : "Cadastre no perfil"],
+  ].map(([label, value, hint]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(hint)}</small></article>`).join("");
+
+  return `<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(reportTitle)}</title>
+  <style>
+    :root{--ink:#30263f;--muted:#756985;--soft:#f8f2e9;--card:#fffaf3;--line:#e8d9ca;--sage:#1f6b57;--purple:#4b3a78;--accent:#8f7cff}
+    *{box-sizing:border-box}
+    body{margin:0;background:#f2eadf;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
+    .page{max-width:900px;margin:0 auto;padding:32px}
+    .cover{padding:28px;border-radius:30px;background:linear-gradient(135deg,#fffaf3,#efe7ff);border:1px solid rgba(75,58,120,.12);box-shadow:0 18px 50px rgba(67,50,94,.12)}
+    .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+    .brand span{font-size:13px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
+    .brand b{padding:8px 14px;border-radius:999px;background:#e2f5eb;color:var(--sage);font-size:13px}
+    h1{font-size:34px;line-height:1.08;margin:0 0 8px}
+    .subtitle{font-size:16px;color:var(--muted);margin:0}
+    .summary{margin-top:22px;padding:18px;border-radius:22px;background:rgba(255,255,255,.64);border:1px solid rgba(75,58,120,.10)}
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+    .cards article{padding:16px;border-radius:20px;background:var(--card);border:1px solid rgba(75,58,120,.10)}
+    .cards span,.cards small{display:block;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .cards strong{display:block;margin:8px 0 4px;font-size:22px;color:var(--purple)}
+    section{margin-top:24px;padding:22px;border-radius:26px;background:#fffaf5;border:1px solid var(--line);break-inside:avoid}
+    h2{font-size:22px;margin:0 0 12px;color:var(--purple)}
+    .section-hint{margin:-4px 0 14px;color:var(--muted)}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;overflow:hidden;border-radius:18px;border:1px solid var(--line)}
+    th{background:#efe7ff;color:var(--purple);font-size:12px;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:12px}
+    td{padding:13px 12px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9}
+    td small{display:block;color:var(--muted);margin-top:3px}
+    .empty-cell{text-align:center;color:var(--muted);padding:22px}
+    .growth-note{padding:14px 16px;border-radius:18px;background:#e9f7f1;color:var(--sage);font-weight:800;margin-bottom:12px}
+    .footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    @media print{body{background:#fff}.page{padding:0}.cover,section{box-shadow:none}.no-print{display:none}.cards{grid-template-columns:repeat(4,1fr)} }
+    @media (max-width:760px){.page{padding:16px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:28px}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="cover">
+      <div class="brand"><span>Ninou</span><b>Relatório da rotina</b></div>
+      <h1>${escapeHtml(reportTitle)}</h1>
+      <p class="subtitle">Período: ${escapeHtml(payload.period?.label || formatReportDate(payload.day))} • Exportado em ${escapeHtml(new Date(payload.exportedAt).toLocaleString("pt-BR"))}${payload.exportedBy ? ` • por ${escapeHtml(payload.exportedBy)}` : ""}</p>
+      <div class="summary">${safeSummary}</div>
+      <div class="cards">${cards}</div>
+    </div>
+
+    <section>
+      <h2>Rotina do dia</h2>
+      <p class="section-hint">Linha do tempo dos registros selecionados para consulta, acompanhamento ou compartilhamento com responsáveis.</p>
+      <table><thead><tr><th>Hora</th><th>Registro</th><th>Detalhe</th><th>Min</th><th>Responsável</th></tr></thead><tbody>${eventRows}</tbody></table>
+    </section>
+
+    ${dayNotesBlock}
+
+    <section>
+      <h2>Crescimento</h2>
+      <div class="growth-note">${escapeHtml(weightInfo.latest ? `${formatKg(weightInfo.latest.value)} em ${formatReportDate(weightInfo.latest.date)}. ${weightDelta}` : "Nenhum peso cadastrado para este bebê.")}</div>
+      <table><thead><tr><th>Data</th><th>Peso</th></tr></thead><tbody>${weightRows}</tbody></table>
+    </section>
+
+    <p class="footer">Relatório gerado pelo Ninou. Use Arquivo > Imprimir ou Salvar como PDF.</p>
+  </main>
+  <script>window.onload=()=>setTimeout(()=>window.print(),350)</script>
+</body>
+</html>`;
+}
+
+function buildWhatsappShareText(payload = getExportPayload()) {
+  const custom = whatsappMessageInput?.value?.trim() || "";
+  const summary = buildRoutineSummaryText(payload);
+  return custom ? `${custom}\n\n${summary}` : `Olá! Segue o resumo da rotina pelo Ninou.\n\n${summary}`;
+}
+
+
+function prepareConsultMode() {
+  if (exportRangeSelect) exportRangeSelect.value = "30";
+  const payload = getExportPayload();
+  const baby = getBabyDisplayName();
+  const stats = getRoutineStats(payload);
+  const weightInfo = getWeightReportInfo(payload.weights || []);
+  const lines = [
+    `Olá, segue o resumo do Ninou para a consulta de ${baby}.`,
+    `Período: ${payload.period?.label || formatReportDate(payload.day)}.`,
+    "",
+    "Principais pontos:",
+    `• Sono registrado: ${formatShortDuration(stats.sleepMinutes * 60000)}`,
+    `• Alimentações: ${stats.feeds}${stats.bottleMl ? ` (${stats.bottleMl} ml em mamadeiras)` : ""}`,
+    `• Fraldas: ${stats.diapers}`,
+    weightInfo.latest ? `• Peso atual: ${formatKg(weightInfo.latest.value)} em ${formatReportDate(weightInfo.latest.date)}` : "• Peso atual: não cadastrado",
+    payload.dayNotes ? `• Observações: ${payload.dayNotes.split("\n").slice(-2).join(" | ")}` : "",
+  ].filter(Boolean);
+  if (whatsappMessageInput) whatsappMessageInput.value = lines.join("\n");
+}
+
 function exportRoutine(format) {
   if (!requireLogin("exportar a rotina")) return;
   const payload = getExportPayload();
-  const filenameBase = `ninou-${payload.day}`;
+  const filenameBase = `ninou-${String(payload.period?.start || payload.day)}-${String(payload.period?.end || payload.day)}`;
 
   if (format === "csv") {
     const header = ["id", "tipo", "titulo", "inicio", "fim", "duracao_min", "detalhe", "observacoes", "criado_por", "editado_por"];
@@ -5398,23 +5722,42 @@ function exportRoutine(format) {
       event.createdByEmail || "",
       event.updatedByEmail || "",
     ]);
-    const csv = [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
+    const weightRows = (payload.weights || []).map((item) => [item.date, item.value, item.id || ""]);
+    const csvParts = [
+      [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n"),
+      "",
+      ["pesos", "valor_kg", "id"].map(escapeCsv).join(","),
+      ...weightRows.map((row) => row.map(escapeCsv).join(",")),
+    ];
+    const csv = csvParts.join("\n");
     downloadFile(`${filenameBase}.csv`, csv, "text/csv;charset=utf-8");
     return;
   }
 
   if (format === "pdf") {
-    const rows = payload.events.map((event) => `<tr><td>${escapeHtml(formatTime(new Date(event.start).getTime()))}</td><td>${escapeHtml(event.title)}</td><td>${escapeHtml(event.detail || "")}</td><td>${escapeHtml(String(event.durationMinutes || ""))}</td></tr>`).join("") || `<tr><td colspan="4">Sem registros nesta data.</td></tr>`;
-    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Ninou ${escapeHtml(payload.day)}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:28px;color:#241f35}h1{margin:0 0 6px}p{line-height:1.45}table{width:100%;border-collapse:collapse;margin-top:18px}td,th{border-bottom:1px solid #ddd;padding:10px;text-align:left}small{color:#665}</style></head><body><h1>Resumo Ninou — ${escapeHtml(getBabyDisplayName())}</h1><p>${escapeHtml(buildRoutineSummaryText(payload)).replaceAll("\n", "<br>")}</p><table><thead><tr><th>Hora</th><th>Registro</th><th>Detalhe</th><th>Min</th></tr></thead><tbody>${rows}</tbody></table><small>Use imprimir/salvar como PDF no navegador.</small><script>window.onload=()=>setTimeout(()=>window.print(),250)</script></body></html>`;
+    const html = buildPrintableReportHtml(payload);
     const win = window.open("", "_blank", "noopener,noreferrer");
-    if (win) { win.document.write(html); win.document.close(); }
-    else downloadFile(`${filenameBase}.html`, html, "text/html;charset=utf-8");
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    } else {
+      downloadFile(`${filenameBase}-relatorio.html`, html, "text/html;charset=utf-8");
+      window.alert("O navegador bloqueou a janela do PDF. Baixei um HTML pronto para abrir e salvar como PDF.");
+    }
     return;
   }
 
   if (format === "whatsapp") {
-    const text = encodeURIComponent(buildRoutineSummaryText(payload));
-    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
+    const rawNumber = whatsappNumberInput?.value?.trim() || "";
+    const number = normalizeWhatsappNumber(rawNumber);
+    if (rawNumber && (number.length < 12 || number.length > 13)) {
+      window.alert("Confira o número do WhatsApp. Use DDD + número, por exemplo: 21999999999.");
+      whatsappNumberInput?.focus();
+      return;
+    }
+    const text = encodeURIComponent(buildWhatsappShareText(payload));
+    const url = number ? `https://wa.me/${number}?text=${text}` : `https://wa.me/?text=${text}`;
+    window.open(url, "_blank", "noopener,noreferrer");
     return;
   }
 
@@ -5426,7 +5769,8 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  return resizeProfileImage(file, { size: 320, quality: 0.82 });
+  // v75.37: foto menor para caber melhor no Firestore sem depender do Firebase Storage.
+  return resizeProfileImage(file, { size: 260, quality: 0.72 });
 }
 
 bindBottomNavigation(navButtons, showScreen);
@@ -5480,6 +5824,8 @@ saveButton.addEventListener("click", saveManualEvent);
 resetDataButton.addEventListener("click", resetDayData);
 exportJsonButton.addEventListener("click", () => exportRoutine("json"));
 exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
+if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
+if (prepareConsultButton) prepareConsultButton.addEventListener("click", prepareConsultMode);
 if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
 if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));

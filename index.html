@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.28" />
+    <link rel="stylesheet" href="./styles.css?v=75.37" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -51,10 +51,18 @@
           <button class="ghost-link" type="button" data-target-shortcut="profile">Perfil</button>
         </div>
 
+        <section class="state-orbit">
+          <div class="orbit-ring" aria-hidden="true"></div>
+          <div id="orbitEvents" class="orbit-events" aria-label="Atividades das últimas 24 horas"></div>
+          <span id="stateLabel">Rotina zerada</span>
+          <strong id="stateClock">00:00:00</strong>
+          <p id="stateHint">Escolha como começar o dia.</p>
+        </section>
+
         <section class="today-overview-card" aria-label="Hoje com o bebê">
           <div class="today-overview-head">
             <div>
-              <span id="todayOverviewKicker">Hoje</span>
+              <span id="todayOverviewKicker">Assistente de rotina</span>
               <strong id="todayOverviewTitle">Hoje com o bebê</strong>
             </div>
             <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
@@ -66,14 +74,6 @@
             <article><span>Tempo acordado</span><strong>0 min</strong></article>
           </div>
           <p id="todayOverviewSuggestion" class="today-overview-suggestion">Registre a primeira ação para o Ninou montar um acompanhamento gentil.</p>
-        </section>
-
-        <section class="state-orbit">
-          <div class="orbit-ring" aria-hidden="true"></div>
-          <div id="orbitEvents" class="orbit-events" aria-label="Atividades das últimas 24 horas"></div>
-          <span id="stateLabel">Rotina zerada</span>
-          <strong id="stateClock">00:00:00</strong>
-          <p id="stateHint">Escolha como começar o dia.</p>
         </section>
 
         <section id="smartInsightCard" class="smart-insight-card" aria-live="polite">
@@ -88,6 +88,16 @@
           <p>O Ninou mostrará lembretes leves conforme os registros aparecerem.</p>
         </section>
 
+        <section id="notificationCenterCard" class="notification-center-card" aria-label="Avisos e lembretes do Ninou">
+          <div class="drawer-section-title">
+            <span>Avisos</span>
+            <strong>Lembretes do Ninou</strong>
+          </div>
+          <ul id="notificationCenterList" class="notification-center-list">
+            <li>Os lembretes aparecem conforme a rotina for registrada.</li>
+          </ul>
+        </section>
+
         <section id="liveAssistantCard" class="live-assistant-card" aria-live="polite" hidden>
           <div>
             <span id="liveAssistantKicker">Próxima ação</span>
@@ -97,7 +107,7 @@
           <div id="liveAssistantBadge" class="live-assistant-badge">✨</div>
         </section>
 
-        <!-- v75.12: painel admin limpo, profissional e focado em convites/usuários.
+        <!-- v75.37: painel admin limpo, profissional e focado em convites/usuários.
              O status principal fica no card central e a ação fica no botão principal. -->
 
         <section class="main-action-area" aria-label="Ação principal">
@@ -117,6 +127,10 @@
           </div>
         </section>
 
+        <div class="quick-actions-heading">
+          <span>Atalhos principais</span>
+          <strong>Registre em poucos toques</strong>
+        </div>
         <section class="quick-actions" aria-label="Ações rápidas">
           <button type="button" data-open-sheet="amamentacao">
             <span class="action-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
@@ -222,18 +236,19 @@
 
         <section class="day-story-card" aria-label="Como foi o dia do bebê">
           <div class="drawer-section-title">
-            <span>Como foi o dia?</span>
+            <span>Resumo inteligente</span>
             <button class="ghost-link" type="button" data-target-shortcut="trends">Ver dados</button>
           </div>
-          <p id="dayStoryText">O resumo do dia aparecerá conforme você registrar a rotina.</p>
+          <p id="dayStoryText">O Ninou vai transformar os registros em uma leitura simples do dia.</p>
         </section>
-        <section class="last-card today-last-card" aria-label="Últimos registros de hoje">
+        <section class="last-card today-last-card" aria-label="Últimos registros importantes de hoje">
           <div class="drawer-section-title">
-            <span>Últimos registros</span>
+            <span>Últimos registros importantes</span>
             <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
           </div>
+          <p class="section-helper">O Ninou destaca os acontecimentos mais recentes da rotina para você retomar o cuidado rapidamente.</p>
           <div id="todayLastEvents" class="drawer-last-events today-last-events">
-            <article class="mini-event empty">Nenhum registro ainda.</article>
+            <article class="mini-event empty">Quando houver registros, os últimos momentos importantes aparecerão aqui.</article>
           </div>
         </section>
 
@@ -281,6 +296,19 @@
             </div>
           </li>
         </ol>
+        <section class="day-notes-card" aria-label="Observações importantes do dia">
+          <div class="drawer-section-title">
+            <span>Observações do dia</span>
+            <strong>Notas da família</strong>
+          </div>
+          <p class="section-helper">Registre percepções importantes para pais, cuidadores ou pediatra, sem substituir orientação médica.</p>
+          <textarea id="dayNotesTextarea" rows="4" placeholder="Ex.: Dormiu melhor após o banho, teve mais cólica pela manhã, aceitou menos mamadeira à noite."></textarea>
+          <div class="day-notes-actions">
+            <small id="dayNotesStatus">Nenhuma observação salva neste dia.</small>
+            <button id="saveDayNotesButton" class="secondary-login" type="button">Salvar observação</button>
+          </div>
+        </section>
+
         <section class="audit-card" aria-label="Histórico de alterações">
           <div class="drawer-section-title">
             <span>Histórico de alterações</span>
@@ -328,6 +356,9 @@
               <p id="trendGrowthHint">Registre o peso para ver evolução e histórico.</p>
             </div>
             <div id="trendWeightSparkline" class="weight-sparkline weight-sparkline-large" aria-label="Gráfico simples de peso"></div>
+          </div>
+          <div id="growthHistoryMini" class="growth-history-mini" aria-label="Histórico recente de peso">
+            <article>Cadastre pelo menos um peso para acompanhar o crescimento.</article>
           </div>
         </section>
         <section class="report-stack" aria-label="Gráficos dos últimos 7 dias">
@@ -748,14 +779,48 @@
             <p id="syncStatusText">Entre com e-mail e senha para ativar a sincronização entre aparelhos.</p>
           </article>
           <article class="export-card">
-            <span>Backup</span>
-            <strong>Exportar rotina</strong>
-            <p>Baixe os dados do dia atual para guardar uma cópia de segurança.</p>
+            <span>Backup e compartilhamento</span>
+            <strong>Relatório da rotina</strong>
+            <p>Gere um PDF mais bonito, baixe os dados ou envie um resumo personalizado pelo WhatsApp.</p>
+
+            <div class="export-period-grid" aria-label="Período do relatório">
+              <label>
+                Período do relatório
+                <select id="exportRangeSelect">
+                  <option value="day">Data aberta</option>
+                  <option value="7">Últimos 7 dias</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="custom">Período personalizado</option>
+                </select>
+              </label>
+              <label>
+                Início
+                <input id="exportStartDateInput" type="date" />
+              </label>
+              <label>
+                Fim
+                <input id="exportEndDateInput" type="date" />
+              </label>
+            </div>
+            <button id="prepareConsultButton" class="secondary-login consult-mode-button" type="button">Preparar para consulta</button>
+
+            <div class="export-personal-message">
+              <label for="whatsappNumberInput">Número para WhatsApp</label>
+              <input id="whatsappNumberInput" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ex.: 21999999999" />
+              <small>Use DDD + número. Se quiser, inclua 55 no início.</small>
+            </div>
+
+            <div class="export-personal-message">
+              <label for="whatsappMessageInput">Mensagem personalizada</label>
+              <textarea id="whatsappMessageInput" rows="4" placeholder="Ex.: Oi, segue o resumo da rotina do Francisco para acompanhar a consulta."></textarea>
+              <small>O resumo do Ninou será incluído abaixo da sua mensagem.</small>
+            </div>
+
             <div class="export-actions">
-              <button id="exportJsonButton" type="button">JSON</button>
+              <button id="exportPdfButton" type="button">Gerar PDF</button>
+              <button id="shareWhatsappButton" type="button">Enviar WhatsApp</button>
               <button id="exportCsvButton" type="button">CSV</button>
-              <button id="exportPdfButton" type="button">PDF</button>
-              <button id="shareWhatsappButton" type="button">WhatsApp</button>
+              <button id="exportJsonButton" type="button">JSON</button>
             </div>
           </article>
           <article class="danger-card">
@@ -872,6 +937,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.28"></script>
+    <script type="module" src="./app.js?v=75.37"></script>
   </body>
 </html>

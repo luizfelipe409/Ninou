@@ -28,6 +28,7 @@ export function createEmptyDayState() {
     lastWakeWindowMs: null,
     events: [],
     auditLog: [],
+    dayNotes: "",
   };
 }
 
@@ -113,6 +114,7 @@ export function normalizeDayState(dayState = {}) {
           eventId: typeof item.eventId === "string" ? item.eventId : "",
         }))
       : [],
+    dayNotes: typeof dayState.dayNotes === "string" ? dayState.dayNotes : "",
   };
 }
 

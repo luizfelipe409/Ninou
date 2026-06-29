@@ -50,8 +50,8 @@ export function getNextNapInfo({ state, wakeWindowMinutes, now, formatTime, form
 
   if (diff < 0) {
     return {
-      title: "Atrasada",
-      hint: `Passou há ${formatShortDuration(Math.abs(diff))}.`,
+      title: "Observar sinais",
+      hint: `Janela estimada há ${formatShortDuration(Math.abs(diff))}.`,
       status: "overdue",
     };
   }
@@ -120,7 +120,7 @@ export function renderTodayLastEvents({ container, state, todayStart, dayMs, get
   const events = sortEventsByStartDesc(getEventsForDay(state.events, todayStart, dayMs)).slice(0, limit);
 
   if (!events.length) {
-    container.innerHTML = `<article class="mini-event empty">Nenhum registro ainda.</article>`;
+    container.innerHTML = `<article class="mini-event empty">Quando houver registros, os momentos importantes aparecerão aqui.</article>`;
     return;
   }
 

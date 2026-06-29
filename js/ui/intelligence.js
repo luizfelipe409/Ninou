@@ -70,11 +70,11 @@ export function renderSmartInsight({
     : 0;
 
   let title = "Ninou está aprendendo a rotina";
-  let text = "Registre sono, mamadas e fraldas para eu mostrar observações simples, sem repetir o timer principal.";
+  let text = "Registre sono, mamadas e fraldas para o Ninou transformar o dia em orientações simples e acolhedoras.";
 
   if (events.length < 2) {
     title = "Ainda há poucos registros hoje";
-    text = "Com mais alguns registros, o Ninou compara o dia com a média recente do bebê.";
+    text = "Com mais alguns registros, o Ninou compara o dia com a média recente e mostra um resumo mais útil.";
   } else if (sleepEvents.length >= 3) {
     const starts = sleepEvents.map((event) => new Date(event.start).getHours() * 60 + new Date(event.start).getMinutes());
     const minStart = Math.min(...starts);
@@ -114,7 +114,7 @@ export function renderSmartInsight({
   }
 
   container.innerHTML = `
-    <span>💡 Observação</span>
+    <span>💡 Assistente Ninou</span>
     <strong>${escapeHtml(title)}</strong>
     <p>${escapeHtml(text)}</p>
   `;
@@ -200,7 +200,7 @@ export function renderIntelligentTimeline({ container, state, todayStart, dayMs 
   if (!container) return;
   const events = sortEventsByStartAsc(getEventsForDay(state.events || [], todayStart, dayMs)).slice(-limit);
   if (!events.length) {
-    container.innerHTML = `<article class="timeline-empty">Ainda não há registros suficientes para montar a linha do tempo.</article>`;
+    container.innerHTML = `<article class="timeline-empty">A linha do tempo aparecerá assim que você registrar mamadas, sono, fraldas ou medicamentos.</article>`;
     return;
   }
 
@@ -210,7 +210,7 @@ export function renderIntelligentTimeline({ container, state, todayStart, dayMs 
       ? formatShortDuration(event.end - event.start)
       : "";
     const detail = cleanDetail(event);
-    const subtitle = [duration, detail].filter(Boolean).join(" • ") || "Registro rápido";
+    const subtitle = [duration, detail].filter(Boolean).join(" • ") || "Registro da rotina";
     return `
       <article class="intelligent-timeline-item ${isSleepEvent(event) ? "is-duration" : ""}">
         <time>${escapeHtml(eventTime(event, formatTime))}</time>
@@ -279,8 +279,8 @@ export function renderDayStory({
   const events = getEventsForDay(state.events || [], todayStart, dayMs);
   if (events.length < 3) {
     element.textContent = events.length
-      ? "Resumo parcial: ainda há poucos registros para contar como foi o dia com segurança."
-      : "O resumo do dia aparecerá conforme você registrar a rotina.";
+      ? "Resumo parcial: ainda há poucos registros, mas o Ninou já está organizando o dia."
+      : "O Ninou vai montar um resumo acolhedor conforme a rotina for registrada.";
     return;
   }
   const sleepMs = getSleepMsForRange(todayStart, todayEnd);
