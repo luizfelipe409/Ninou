@@ -472,7 +472,8 @@
           <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
           <span id="profileBabyName">Bebê</span>
           <strong id="profileBabyAge">Preencha o nascimento</strong>
-          <div class="avatar-only-badge" id="profilePhotoButtonText">Somente avatar</div>
+          <div class="avatar-only-badge" id="profilePhotoButtonText">Avatar 3D Soft</div>
+          <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
         <section class="settings-list">
           <article class="baby-profile-card">
@@ -497,19 +498,23 @@
           <article class="avatar-test-card avatar-compact-card" id="babyAvatarTestCard">
             <div class="avatar-test-header">
               <div>
-                <span>Avatar infantil</span>
-                <strong>Rostinho do bebê</strong>
-                <p>Escolha um rostinho e uma cor de fundo. Leve, simples e sem foto.</p>
+                <span>Avatar do bebê</span>
+                <strong>Estilo 3D Soft</strong>
+                <p>Escolha um bebê mais novinho e personalize o cabelinho, o tom de pele e o fundo.</p>
               </div>
               <div class="avatar-preview-wrap">
                 <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
               </div>
             </div>
-            <section class="avatar-picker-section" data-avatar-section="icon">
-              <strong>Escolha um rostinho</strong>
+            <section class="avatar-picker-section" data-avatar-section="hair">
+              <strong>Cabelinho</strong>
               <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
             </section>
-            <section class="avatar-picker-section" data-avatar-section="color">
+            <section class="avatar-picker-section" data-avatar-section="skin">
+              <strong>Tom de pele</strong>
+              <div class="avatar-option-row" id="avatarSkinOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="background">
               <strong>Cor de fundo</strong>
               <div class="avatar-option-row" id="avatarColorOptions"></div>
             </section>
@@ -517,9 +522,11 @@
               <div id="avatarBackgroundOptions"></div>
               <div id="avatarAccessoryOptions"></div>
             </div>
-            <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">✓ Salvar avatar</button>
-            <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Agora não</button>
-            <p id="babyAvatarStatus" class="form-status">O avatar é leve, privado e não usa foto.</p>
+            <div class="avatar-editor-actions">
+              <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">✓ Salvar avatar</button>
+              <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
+            </div>
+            <p id="babyAvatarStatus" class="form-status">Depois de salvar, as opções ficam escondidas e só voltam ao tocar em Editar avatar.</p>
           </article>
 
           <article class="appearance-profile-block">
@@ -574,9 +581,9 @@
           </article>
 
           <article class="caregiver-profile-block" id="caregiverIdentityCard">
-            <span>Configuração da conta</span>
-            <strong>Identificação nos registros</strong>
-            <p>Escolha ou edite como seu nome e vínculo aparecerão nos registros da rotina. Essa informação é salva na sua conta e será usada automaticamente nos próximos registros.</p>
+            <span>Configuração deste aparelho</span>
+            <strong>Identificação neste celular</strong>
+            <p>Escolha como seu nome e vínculo aparecerão nos registros feitos por este celular. Essa informação fica salva neste aparelho; assim, mesmo usando a mesma conta da família, cada cuidador aparece com o próprio nome.</p>
             <label>
               Seu nome no app
               <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />

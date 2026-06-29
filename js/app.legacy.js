@@ -94,7 +94,10 @@ const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profilePhotoButtonText = document.querySelector("#profilePhotoButtonText");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
+const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
+const editBabyAvatarButton = document.querySelector("#editBabyAvatarButton");
 const avatarIconOptions = document.querySelector("#avatarIconOptions");
+const avatarSkinOptions = document.querySelector("#avatarSkinOptions");
 const avatarColorOptions = document.querySelector("#avatarColorOptions");
 const avatarBackgroundOptions = document.querySelector("#avatarBackgroundOptions");
 const avatarAccessoryOptions = document.querySelector("#avatarAccessoryOptions");
@@ -319,7 +322,7 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.42.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+// v75.43: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
 try {
   if (!localStorage.getItem(storageKeys.email)) {
     [
@@ -374,37 +377,46 @@ let breastTimerState = createBreastTimerState();
 let state = loadLocalDayState();
 
 let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
+let avatarEditorForceOpen = false;
 
-const babyAvatarIconOptions = Object.freeze([
-  { id: "baby-curl", label: "Topete", face: "curl", skin: "#ffd7b5", hair: "#a96835", blush: "#f7a9a0", smile: "happy" },
-  { id: "baby-bow", label: "Lacinho", face: "bow", skin: "#ffd2ba", hair: "#7b4a2d", blush: "#f4a0aa", smile: "happy" },
-  { id: "baby-soft", label: "Suave", face: "soft", skin: "#ffe0c7", hair: "#b98a5b", blush: "#f2afa6", smile: "calm" },
-  { id: "baby-sleepy", label: "Soninho", face: "sleepy", skin: "#f5c6a8", hair: "#6d4935", blush: "#ee9c9c", smile: "sleep" },
-  { id: "baby-smile", label: "Sorriso", face: "smile", skin: "#f4b996", hair: "#45301e", blush: "#ef969c", smile: "open" },
-  { id: "baby-round", label: "Bochechas", face: "round", skin: "#ffd9c0", hair: "#8b5a3c", blush: "#ffa9a9", smile: "happy" },
-  { id: "baby-wave", label: "Onda", face: "wave", skin: "#eeb38c", hair: "#2f2118", blush: "#ef8d90", smile: "calm" },
-  { id: "baby-star", label: "Estrelinha", face: "star", skin: "#ffe4c9", hair: "#c1783f", blush: "#f4a0a0", smile: "happy" },
+const babyAvatarHairOptions = Object.freeze([
+  { id: "topetinho", label: "Topetinho", hairTone: "#b77743", style: "topetinho" },
+  { id: "quase-sem-cabelo", label: "Quase sem cabelo", hairTone: "#d3a070", style: "quase-sem-cabelo" },
+  { id: "onduladinho-curto", label: "Onduladinho curto", hairTone: "#8a5a34", style: "onduladinho-curto" },
+  { id: "duas-chuquinhas", label: "Duas chuquinhas", hairTone: "#8a5532", style: "duas-chuquinhas" },
+  { id: "franjinha-delicada", label: "Franjinha delicada", hairTone: "#a97143", style: "franjinha-delicada" },
+  { id: "cachinhos-curtos", label: "Cachinhos curtos", hairTone: "#6e4328", style: "cachinhos-curtos" },
 ]);
 
-const babyAvatarColorOptions = Object.freeze([
-  { id: "lilac", label: "Lilás", value: "#d9c8ff", text: "#3b2a73" },
-  { id: "rose", label: "Rosa", value: "#ffc8d6", text: "#743244" },
-  { id: "peach", label: "Pêssego", value: "#ffc8a6", text: "#7b3b20" },
-  { id: "butter", label: "Amarelo", value: "#ffe09a", text: "#6f4b02" },
-  { id: "mint", label: "Menta", value: "#bdebd8", text: "#17644e" },
-  { id: "sky", label: "Azul", value: "#b7e8f6", text: "#225d78" },
+const babyAvatarSkinOptions = Object.freeze([
+  { id: "pele-clara", label: "Clara", value: "#ffe2c8", blush: "#f7b1a8", nose: "#dd9d7f" },
+  { id: "pele-clara-rosada", label: "Rosada", value: "#ffd3bb", blush: "#f2a3a8", nose: "#d89476" },
+  { id: "pele-media-clara", label: "Média clara", value: "#f7c39e", blush: "#f09b9c", nose: "#ca8c6b" },
+  { id: "pele-media", label: "Média", value: "#ebb07f", blush: "#e28b8c", nose: "#b87b58" },
+  { id: "pele-media-escura", label: "Média escura", value: "#c9824e", blush: "#d57a76", nose: "#945633" },
+  { id: "pele-escura", label: "Escura", value: "#8f5a34", blush: "#b6645f", nose: "#6b3f24" },
 ]);
 
 const babyAvatarBackgroundOptions = Object.freeze([
-  { id: "plain", label: "Liso", emoji: "◯" },
+  { id: "lilas", label: "Lilás", value: "#d8c6ff", text: "#3b2a73", accent: "#c3afff" },
+  { id: "azul", label: "Azul", value: "#bfe7ff", text: "#225d78", accent: "#9fd9fb" },
+  { id: "rosa", label: "Rosa", value: "#ffcbe9", text: "#7c4165", accent: "#f8b0da" },
+  { id: "menta", label: "Menta", value: "#cceedd", text: "#17644e", accent: "#b0e3ce" },
+  { id: "amarelo", label: "Amarelo", value: "#f8e6a3", text: "#6f4b02", accent: "#f4d77e" },
+  { id: "creme", label: "Creme", value: "#f7e4cf", text: "#7a5a3a", accent: "#eed4b6" },
+  { id: "pessego", label: "Pêssego", value: "#ffd7c0", text: "#7b3b20", accent: "#ffc3a0" },
 ]);
 
-const babyAvatarAccessoryOptions = Object.freeze([
-  { id: "none", label: "Sem", emoji: "⊘" },
-]);
+function getAvatarBackgroundOption(avatar = {}) {
+  return babyAvatarBackgroundOptions.find((item) => item.id === avatar.background) || babyAvatarBackgroundOptions[0];
+}
 
-function getAvatarPalette(avatar = {}) {
-  return babyAvatarColorOptions.find((item) => item.id === avatar.color) || babyAvatarColorOptions[0];
+function getAvatarHairOption(avatar = {}) {
+  return babyAvatarHairOptions.find((item) => item.id === avatar.hair) || babyAvatarHairOptions[0];
+}
+
+function getAvatarSkinOption(avatar = {}) {
+  return babyAvatarSkinOptions.find((item) => item.id === avatar.skin) || babyAvatarSkinOptions[0];
 }
 
 function getAvatarOption(options, id, fallbackIndex = 0) {
@@ -413,10 +425,10 @@ function getAvatarOption(options, id, fallbackIndex = 0) {
 
 function normalizeAvatarDraft(avatar = {}) {
   return {
-    icon: getAvatarOption(babyAvatarIconOptions, avatar.icon || "baby-curl", 0).id,
-    color: getAvatarPalette(avatar).id,
-    background: "plain",
-    accessory: "none",
+    face: "3d-soft",
+    hair: getAvatarOption(babyAvatarHairOptions, avatar.hair || avatar.icon || "topetinho", 0).id,
+    skin: getAvatarOption(babyAvatarSkinOptions, avatar.skin || "pele-clara", 0).id,
+    background: getAvatarOption(babyAvatarBackgroundOptions, avatar.background || avatar.color || "lilas", 0).id,
   };
 }
 
@@ -424,33 +436,69 @@ function escapeSvgText(value = "") {
   return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function buildAvatarBackgroundMarkup(_avatar = {}) {
-  return '<circle cx="48" cy="52" r="5" fill="white" opacity=".42"/><circle cx="152" cy="58" r="4" fill="white" opacity=".36"/><path d="M38 150c22 10 47 11 68 2" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" opacity=".28"/>';
+function buildAvatarBackgroundMarkup(avatar = {}) {
+  const palette = getAvatarBackgroundOption(avatar);
+  return `<circle cx="53" cy="54" r="10" fill="white" opacity=".34"/><circle cx="145" cy="65" r="7" fill="white" opacity=".25"/><circle cx="148" cy="144" r="12" fill="${palette.accent}" opacity=".34"/><circle cx="58" cy="145" r="8" fill="white" opacity=".18"/>`;
+}
+
+function getAvatarOutfitFill(backgroundId) {
+  const map = {
+    lilas: "#bda8ff",
+    azul: "#9ad9ff",
+    rosa: "#ffb7dc",
+    menta: "#ace0ca",
+    amarelo: "#f4d77e",
+    creme: "#eed4b6",
+    pessego: "#ffc19b",
+  };
+  return map[backgroundId] || "#bda8ff";
+}
+
+function getAvatarHairMarkup(hair) {
+  const tone = hair.hairTone;
+  const styles = {
+    topetinho: `<path d="M99 55c-6-10 2-21 14-19 10 2 14 14 5 21-4-5-10-6-19-2z" fill="${tone}"/><path d="M77 66c12-16 39-18 56-4" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/>`,
+    "quase-sem-cabelo": `<path d="M84 62c10-9 26-10 37-1" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round" opacity=".75"/>`,
+    "onduladinho-curto": `<path d="M72 68c15-18 49-20 61-4" fill="none" stroke="${tone}" stroke-width="12" stroke-linecap="round"/><path d="M83 56c8 8 14 10 22 0 6 6 11 8 18 1" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
+    "duas-chuquinhas": `<path d="M76 70c12-13 34-17 49-8" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/><circle cx="67" cy="70" r="10" fill="${tone}"/><circle cx="133" cy="70" r="10" fill="${tone}"/><circle cx="63" cy="60" r="4" fill="#f5a5c8"/><circle cx="137" cy="60" r="4" fill="#f5a5c8"/>`,
+    "franjinha-delicada": `<path d="M72 66c18-18 51-18 63-1" fill="none" stroke="${tone}" stroke-width="11" stroke-linecap="round"/><path d="M77 69c6-8 15-11 23-8 8-7 18-9 26-5" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
+    "cachinhos-curtos": `<circle cx="80" cy="60" r="9" fill="${tone}"/><circle cx="95" cy="54" r="9" fill="${tone}"/><circle cx="111" cy="56" r="9" fill="${tone}"/><circle cx="126" cy="63" r="9" fill="${tone}"/><path d="M73 69c17-16 44-17 57-2" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/>`,
+  };
+  return styles[hair.style] || styles.topetinho;
 }
 
 function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
   const normalized = normalizeAvatarDraft(avatar);
-  const palette = getAvatarPalette(normalized);
-  const face = getAvatarOption(babyAvatarIconOptions, normalized.icon, 0);
-  const hairMarkup = {
-    curl: '<path d="M95 53c18-18 42-8 38 12-3 14-20 15-28 8 13-1 17-13 7-17-8-3-15 2-17 7z" fill="{hair}"/>',
-    bow: '<path d="M76 54c14-12 35-14 50-1" fill="none" stroke="{hair}" stroke-width="11" stroke-linecap="round"/><text x="116" y="54" font-size="24" text-anchor="middle">🎀</text>',
-    soft: '<path d="M70 58c19-19 51-19 67 0" fill="none" stroke="{hair}" stroke-width="10" stroke-linecap="round"/>',
-    sleepy: '<path d="M64 62c20-24 59-24 78 1" fill="none" stroke="{hair}" stroke-width="12" stroke-linecap="round"/>',
-    smile: '<path d="M68 58c18-20 58-20 70 4" fill="none" stroke="{hair}" stroke-width="13" stroke-linecap="round"/><path d="M102 45c14-5 26 2 27 13" fill="none" stroke="{hair}" stroke-width="9" stroke-linecap="round"/>',
-    round: '<path d="M72 58c18-14 49-15 64 1" fill="none" stroke="{hair}" stroke-width="11" stroke-linecap="round"/><circle cx="100" cy="51" r="9" fill="{hair}"/>',
-    wave: '<path d="M63 60c18-23 39-8 53-20 7 12 25 12 29 28" fill="none" stroke="{hair}" stroke-width="11" stroke-linecap="round"/>',
-    star: '<path d="M70 60c17-18 48-18 64 0" fill="none" stroke="{hair}" stroke-width="10" stroke-linecap="round"/><text x="136" y="61" font-size="22">⭐</text>',
-  }[face.face] || '';
-  const eyeMarkup = face.smile === "sleep"
-    ? '<path d="M75 104q9 7 18 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/><path d="M113 104q9 7 18 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/>'
-    : '<path d="M76 101q8 9 17 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/><path d="M113 101q8 9 17 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/>';
-  const mouthMarkup = face.smile === "open"
-    ? '<path d="M88 128q12 14 25 0" fill="none" stroke="#8b4a3a" stroke-width="5" stroke-linecap="round"/><ellipse cx="101" cy="132" rx="7" ry="4" fill="#d87475" opacity=".8"/>'
-    : '<path d="M88 126q13 11 26 0" fill="none" stroke="#8b4a3a" stroke-width="5" stroke-linecap="round"/>';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="bg" cx="34%" cy="25%" r="82%"><stop offset="0" stop-color="#fffdf8" stop-opacity=".9"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#2d2250" flood-opacity=".13"/></filter></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.78)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><circle cx="100" cy="105" r="56" fill="${face.skin}"/><circle cx="66" cy="106" r="13" fill="${face.skin}"/><circle cx="134" cy="106" r="13" fill="${face.skin}"/>${hairMarkup.replaceAll('{hair}', face.hair)}${eyeMarkup}<circle cx="75" cy="118" r="8" fill="${face.blush}" opacity=".72"/><circle cx="126" cy="118" r="8" fill="${face.blush}" opacity=".72"/><path d="M99 111q5 4 0 8" fill="none" stroke="#d99375" stroke-width="4" stroke-linecap="round"/>${mouthMarkup}<path d="M62 158c20 18 57 23 77 0" fill="#c9ead8" opacity=".92"/></g></svg>`;
+  const palette = getAvatarBackgroundOption(normalized);
+  const hair = getAvatarHairOption(normalized);
+  const skin = getAvatarSkinOption(normalized);
+  const outfit = getAvatarOutfitFill(normalized.background);
+  const hairMarkup = getAvatarHairMarkup(hair);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="bg" cx="35%" cy="25%" r="84%"><stop offset="0" stop-color="#fffefc" stop-opacity=".96"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><radialGradient id="faceGlow" cx="45%" cy="30%" r="70%"><stop offset="0" stop-color="#fff5ec" stop-opacity=".9"/><stop offset="1" stop-color="${skin.value}"/></radialGradient><linearGradient id="romper" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".45"/><stop offset="1" stop-color="${outfit}"/></linearGradient><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#2d2250" flood-opacity=".14"/></filter></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><ellipse cx="100" cy="152" rx="46" ry="30" fill="url(#romper)"/><path d="M61 154c17-12 62-14 78 0" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="98" r="57" fill="url(#faceGlow)"/><ellipse cx="59" cy="101" rx="9" ry="14" fill="${skin.value}"/><ellipse cx="141" cy="101" rx="9" ry="14" fill="${skin.value}"/>${hairMarkup}<ellipse cx="80" cy="98" rx="14" ry="18" fill="#ffffff" opacity=".94"/><ellipse cx="120" cy="98" rx="14" ry="18" fill="#ffffff" opacity=".94"/><ellipse cx="80" cy="101" rx="10" ry="13" fill="#2f2a34"/><ellipse cx="120" cy="101" rx="10" ry="13" fill="#2f2a34"/><ellipse cx="77" cy="97" rx="3.3" ry="4.2" fill="#ffffff"/><ellipse cx="117" cy="97" rx="3.3" ry="4.2" fill="#ffffff"/><ellipse cx="73" cy="113" rx="9" ry="6" fill="${skin.blush}" opacity=".65"/><ellipse cx="127" cy="113" rx="9" ry="6" fill="${skin.blush}" opacity=".65"/><path d="M100 103c4 4 3 8 0 11" fill="none" stroke="${skin.nose}" stroke-width="3.5" stroke-linecap="round"/><path d="M87 123q14 13 28 0" fill="#f79da5" opacity=".9" stroke="#b25f60" stroke-width="4" stroke-linecap="round"/><path d="M82 77q7-4 15 0" fill="none" stroke="#8d6b57" stroke-width="3" stroke-linecap="round" opacity=".45"/><path d="M103 77q7-4 15 0" fill="none" stroke="#8d6b57" stroke-width="3" stroke-linecap="round" opacity=".45"/></g></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
+
+function renderAvatarEditorVisibility() {
+  const visible = avatarEditorForceOpen || !babyProfile.avatarConfigured;
+  if (babyAvatarCard) babyAvatarCard.hidden = !visible;
+  if (editBabyAvatarButton) {
+    editBabyAvatarButton.textContent = visible ? "Fechar edição do avatar" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
+  }
+}
+
+function openAvatarEditor() {
+  avatarEditorForceOpen = true;
+  renderAvatarEditorVisibility();
+  renderAvatarCustomizer();
+  babyAvatarCard?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function closeAvatarEditor(statusText = "") {
+  avatarEditorForceOpen = false;
+  renderAvatarEditorVisibility();
+  if (statusText && babyAvatarStatus) babyAvatarStatus.textContent = statusText;
+}
+
 
 function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = "member") {
   const base = `${label || "Responsável"}-${seed || "ninou"}-${variant}`;
@@ -475,15 +523,21 @@ function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = 
 function renderAvatarOptionButton(container, options, type, avatar = pendingBabyAvatar) {
   if (!container) return;
   const selected = avatar[type];
-  container.innerHTML = options.map((item) => {
-    const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || '#33224d'}"` : "";
-    const preview = type === "icon"
-      ? `<img class="avatar-face-thumb" src="${getBabyAvatarDataUrl({ ...avatar, icon: item.id })}" alt="" />`
-      : "";
-    const content = item.value ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>` : `${preview || `<span class="avatar-emoji" aria-hidden="true">${escapeHtml(item.emoji || "👶")}</span>`}<small>${escapeHtml(item.label)}</small>`;
-    return `<button type="button" class="avatar-choice ${selected === item.id ? 'selected' : ''}" data-avatar-type="${type}" data-avatar-value="${escapeHtml(item.id)}" aria-pressed="${selected === item.id ? 'true' : 'false'}"${style}>${content}</button>`;
-  }).join("");
+  const swatchTypes = new Set(["skin", "background"]);
+
+  container.innerHTML = options
+    .map((item) => {
+      const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || item.value || "#33224d"}"` : "";
+      const preview = type === "hair" ? `<img class="avatar-face-thumb" src="${getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" />` : "";
+      const content = swatchTypes.has(type)
+        ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>`
+        : `${preview}<small>${escapeHtml(item.label)}</small>`;
+
+      return `<button type="button" class="avatar-choice ${selected === item.id ? "selected" : ""}" data-avatar-type="${escapeHtml(type)}" data-avatar-value="${escapeHtml(item.id)}" aria-pressed="${selected === item.id ? "true" : "false"}"${style}>${content}</button>`;
+    })
+    .join("");
 }
+
 
 function applyAvatarPreview(avatar = pendingBabyAvatar) {
   const src = getBabyAvatarDataUrl(avatar);
@@ -494,23 +548,30 @@ function applyAvatarPreview(avatar = pendingBabyAvatar) {
 }
 
 function renderAvatarCustomizer() {
-  pendingBabyAvatar = normalizeAvatarDraft(pendingBabyAvatar?.icon ? pendingBabyAvatar : babyProfile.avatar || {});
-  renderAvatarOptionButton(avatarIconOptions, babyAvatarIconOptions, "icon", pendingBabyAvatar);
-  renderAvatarOptionButton(avatarColorOptions, babyAvatarColorOptions, "color", pendingBabyAvatar);
-  renderAvatarOptionButton(avatarBackgroundOptions, babyAvatarBackgroundOptions, "background", pendingBabyAvatar);
-  renderAvatarOptionButton(avatarAccessoryOptions, babyAvatarAccessoryOptions, "accessory", pendingBabyAvatar);
+  pendingBabyAvatar = normalizeAvatarDraft(pendingBabyAvatar?.hair ? pendingBabyAvatar : babyProfile.avatar || {});
+  renderAvatarOptionButton(avatarIconOptions, babyAvatarHairOptions, "hair", pendingBabyAvatar);
+  renderAvatarOptionButton(avatarSkinOptions, babyAvatarSkinOptions, "skin", pendingBabyAvatar);
+  renderAvatarOptionButton(avatarColorOptions, babyAvatarBackgroundOptions, "background", pendingBabyAvatar);
+  if (avatarBackgroundOptions) avatarBackgroundOptions.innerHTML = "";
+  if (avatarAccessoryOptions) avatarAccessoryOptions.innerHTML = "";
   applyAvatarPreview(pendingBabyAvatar);
+  renderAvatarEditorVisibility();
 }
+
 
 function updatePendingAvatar(type, value) {
   pendingBabyAvatar = normalizeAvatarDraft({ ...pendingBabyAvatar, [type]: value });
   renderAvatarCustomizer();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar para guardar.";
+  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar para guardar e aplicar no perfil.";
 }
 
 function saveBabyAvatarFromDraft() {
   if (!requireLogin("salvar o avatar")) return;
-  babyProfile = normalizeBabyProfile({ ...babyProfile, avatar: normalizeAvatarDraft(pendingBabyAvatar) });
+  babyProfile = normalizeBabyProfile({
+    ...babyProfile,
+    avatar: normalizeAvatarDraft(pendingBabyAvatar),
+    avatarConfigured: true,
+  });
   currentProfilePhoto = "";
   localStorage.removeItem(storageKeys.photo);
   markProfileLocallyChanged();
@@ -518,9 +579,10 @@ function saveBabyAvatarFromDraft() {
   renderAvatarCustomizer();
   renderBabyIdentity();
   scheduleProfileCloudSave();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Avatar salvo. Você pode mudar quando quiser.";
-  if (loginHelper) loginHelper.textContent = "Avatar do bebê salvo. O app continua sem foto e sem Storage.";
+  closeAvatarEditor("Avatar salvo com sucesso. Toque em Editar avatar quando quiser mudar.");
+  if (loginHelper) loginHelper.textContent = "Avatar 3D Soft salvo. O perfil continua leve, bonito e sem foto.";
 }
+
 
 
 function createEmptyDayState() {
@@ -607,6 +669,7 @@ function getCurrentActorProfile() {
   return {
     uid: getCurrentActorUid(),
     email,
+    deviceId: getOrCreateCaregiverDeviceId(),
     displayName,
     relationshipLabel,
     familyId: familyAccess?.familyId || "",
@@ -624,19 +687,45 @@ function getCurrentActorRelationship() {
 }
 
 const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
+const caregiverDeviceIdKey = "ninou.deviceId";
+
+/*
+  v75.43 — identificação por aparelho
+
+  A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
+  Por isso, a identificação do cuidador não pode ser salva na conta global.
+  Ela fica salva somente neste aparelho:
+  - celular do Felipe: Felipe / Pai
+  - celular da Maria: Maria / Mãe
+*/
+function getOrCreateCaregiverDeviceId() {
+  try {
+    const current = String(localStorage.getItem(caregiverDeviceIdKey) || "").trim();
+    if (current) return current;
+    const randomPart = (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const deviceId = `device-${String(randomPart).replace(/[^a-zA-Z0-9-]/g, "").slice(0, 48)}`;
+    localStorage.setItem(caregiverDeviceIdKey, deviceId);
+    return deviceId;
+  } catch {
+    return "device-local";
+  }
+}
 
 function getCurrentIdentityEmail() {
   return normalizeEmail(cloudUser?.email || familyAccess?.email || "");
 }
 
-function getCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
+function getCaregiverIdentityKey() {
+  return `${caregiverIdentityStoragePrefix}.${getOrCreateCaregiverDeviceId()}`;
+}
+
+function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
   return `${caregiverIdentityStoragePrefix}.${normalizeEmail(email || "local")}`;
 }
 
-function clearCaregiverIdentityForEmail(email = getCurrentIdentityEmail()) {
-  const normalized = normalizeEmail(email || "");
-  if (!normalized) return;
-  try { localStorage.removeItem(getCaregiverIdentityKey(normalized)); } catch {}
+function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
+  // v75.43: não limpamos a identificação local do aparelho ao trocar/logout de conta.
+  // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
 function getCaregiverRelationLabel(value = "") {
@@ -654,10 +743,19 @@ function getCaregiverRelationLabel(value = "") {
 }
 
 function loadCurrentCaregiverIdentity() {
-  const email = getCurrentIdentityEmail();
-  if (!email) return { name: "", relation: "", label: "" };
   try {
-    const data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey(email)) || "{}");
+    let data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey()) || "{}");
+
+    // Migração suave: se este aparelho tinha identidade antiga por e-mail, copia uma vez
+    // para a nova chave por dispositivo, sem depender da conta compartilhada.
+    if (!data.displayName && !data.name && !data.relationship && !data.relation) {
+      const legacyData = JSON.parse(localStorage.getItem(getLegacyCaregiverIdentityKey()) || "{}");
+      if (legacyData.displayName || legacyData.name || legacyData.relationship || legacyData.relation) {
+        data = legacyData;
+        localStorage.setItem(getCaregiverIdentityKey(), JSON.stringify({ ...legacyData, deviceId: getOrCreateCaregiverDeviceId() }));
+      }
+    }
+
     const name = String(data.displayName || data.name || "").trim();
     const relation = String(data.relationship || data.relation || "").trim();
     const relationLabel = String(data.relationshipLabel || getCaregiverRelationLabel(relation) || "").trim();
@@ -666,15 +764,15 @@ function loadCurrentCaregiverIdentity() {
       relation,
       relationshipLabel: relationLabel,
       label: name || relationLabel,
+      deviceId: String(data.deviceId || getOrCreateCaregiverDeviceId()).trim(),
     };
   } catch {
-    return { name: "", relation: "", relationshipLabel: "", label: "" };
+    return { name: "", relation: "", relationshipLabel: "", label: "", deviceId: getOrCreateCaregiverDeviceId() };
   }
 }
 
 function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
-  if (!email) return false;
   const cleanName = String(name || "").trim();
   const cleanRelation = String(relation || "").trim();
   const relationshipLabel = String(extras.relationshipLabel || getCaregiverRelationLabel(cleanRelation) || "").trim();
@@ -682,6 +780,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const payload = {
     uid: String(extras.uid || getCurrentActorUid() || "").trim(),
     email,
+    deviceId: getOrCreateCaregiverDeviceId(),
     displayName: cleanName,
     name: cleanName,
     relationship: cleanRelation,
@@ -689,10 +788,11 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
     relationshipLabel,
     familyId: extras.familyId || familyAccess?.familyId || "",
     accessLevel: extras.accessLevel || getRoleLabel(role),
+    savedLocally: true,
     updatedAt: extras.updatedAt || new Date().toISOString(),
   };
   try {
-    localStorage.setItem(getCaregiverIdentityKey(email), JSON.stringify(payload));
+    localStorage.setItem(getCaregiverIdentityKey(), JSON.stringify(payload));
   } catch {}
   return true;
 }
@@ -710,57 +810,30 @@ function renderCaregiverIdentityPanel() {
   }
   if (caregiverIdentityStatus) {
     caregiverIdentityStatus.textContent = identity.label
-      ? `Próximos registros aparecerão como ${identity.label}. Você pode editar nome e vínculo acima quando precisar.`
-      : "Defina como você quer aparecer nos próximos registros.";
+      ? `Próximos registros feitos neste celular aparecerão como ${identity.label}. Você pode editar nome e vínculo neste aparelho quando precisar.`
+      : "Defina como este celular deve aparecer nos próximos registros.";
   }
 }
 
 async function saveCaregiverIdentityFromForm() {
   const name = caregiverNameInput?.value || "";
   const relation = caregiverRelationInput?.value || "";
+
+  // v75.43: salva somente neste aparelho.
+  // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
+  // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
   saveCurrentCaregiverIdentity(name, relation);
   const identity = loadCurrentCaregiverIdentity();
+
   if (saveCaregiverIdentityButton) {
     saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
   }
+
   if (caregiverIdentityStatus) caregiverIdentityStatus.textContent = identity.label
-    ? `Próximos registros aparecerão como ${identity.label}.`
-    : "Identificação limpa. Usaremos o e-mail quando necessário.";
+    ? `Próximos registros feitos neste celular aparecerão como ${identity.label}.`
+    : "Identificação limpa neste aparelho. Usaremos o e-mail quando necessário.";
 
-  if (cloudUser && firebaseServices) {
-    try {
-      const profileRef = firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "account", "profile");
-      const profileSnapshot = await firebaseServices.getDoc(profileRef);
-      const identityPayload = {
-        uid: cloudUser.uid,
-        email: normalizeEmail(cloudUser.email || ""),
-        displayName: String(name || "").trim(),
-        relationship: String(relation || "").trim(),
-        relation: String(relation || "").trim(),
-        relationshipLabel: getCaregiverRelationLabel(relation),
-        familyId: familyAccess?.familyId || "",
-        accessLevel: getRoleLabel(getEffectiveRole(familyAccess?.role || "responsavel", cloudUser.email || "")),
-        updatedAt: firebaseServices.serverTimestamp(),
-      };
-      if (!profileSnapshot.exists() || !profileSnapshot.data()?.createdAt) {
-        identityPayload.createdAt = firebaseServices.serverTimestamp();
-      }
-      await firebaseServices.setDoc(profileRef, identityPayload, { merge: true });
-
-      const rootPayload = { ...identityPayload };
-      await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid), rootPayload, { merge: true });
-
-      if (familyAccess?.familyId) {
-        await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "families", familyAccess.familyId, "members", cloudUser.uid), {
-          displayName: identityPayload.displayName,
-          relationshipLabel: identityPayload.relationshipLabel,
-          updatedAt: firebaseServices.serverTimestamp(),
-        }, { merge: true });
-      }
-    } catch (error) {
-      console.warn("Não foi possível salvar a identificação no perfil da conta:", error);
-    }
-  }
+  renderCaregiverIdentityPanel();
 }
 
 function getActorDisplayNameFromEvent(event = {}) {
@@ -795,6 +868,7 @@ function makeAuditEntry(action, event, at = new Date().toISOString()) {
     at,
     byUid: actor.uid,
     byEmail: actor.email,
+    byDeviceId: actor.deviceId,
     byName: actor.displayName || actor.label,
     byRelationship: actor.relationshipLabel,
     eventId: event?.id || "",
@@ -816,6 +890,7 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
     updatedAt: nowIso,
     createdByUid: actor.uid,
     createdByEmail: actor.email,
+    createdByDeviceId: actor.deviceId,
     createdByName: actor.displayName,
     createdByRelationship: actor.relationshipLabel,
     lastAction: "adicionou",
@@ -1033,35 +1108,18 @@ async function saveAdminAccountProfileToCloud() {
 
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
-  if (!user || !firebaseServices) return null;
-  try {
-    const profileSnapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid, "account", "profile"));
-    let data = profileSnapshot.exists() ? profileSnapshot.data() || {} : {};
-    if (!data.displayName && !data.relationship && !data.relation && !data.relationshipLabel) {
-      const rootSnapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid));
-      data = rootSnapshot.exists() ? rootSnapshot.data() || {} : data;
-    }
-    const dataEmail = normalizeEmail(data.email || user.email || "");
-    if (data.email && dataEmail !== normalizeEmail(user.email || "")) {
-      data = {};
-    }
-    if (data.displayName || data.relationship || data.relation || data.relationshipLabel) {
-      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relationship || data.relation || ""), {
-        uid: user.uid,
-        familyId: data.familyId || familyAccess?.familyId || "",
-        accessLevel: data.accessLevel || "",
-        relationshipLabel: data.relationshipLabel || "",
-      });
-      renderCaregiverIdentityPanel();
-    } else {
-      clearCaregiverIdentityForEmail(user.email || "");
-      renderCaregiverIdentityPanel();
-    }
-    return data;
-  } catch (error) {
-    console.warn("Não foi possível carregar a identificação da conta:", error);
-    return null;
-  }
+  /*
+    v75.43: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
+    mas cada aparelho deve registrar com o próprio nome.
+    Por isso, não carregamos displayName/relationship da nuvem para este campo,
+    para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
+  */
+  renderCaregiverIdentityPanel();
+  return {
+    source: "device",
+    deviceId: getOrCreateCaregiverDeviceId(),
+    email: normalizeEmail(user?.email || ""),
+  };
 }
 
 function hasRoutineDayContent(dayState = state) {
@@ -3869,7 +3927,7 @@ function renderBabyIdentity() {
   } else {
     applyAvatarPreview(babyProfile.avatar || pendingBabyAvatar);
     if (profilePhoto) profilePhoto.src = getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Somente avatar";
+    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatar 3D Soft";
   }
   updateBodyModeClasses();
 }
@@ -5926,6 +5984,7 @@ function saveManualEvent() {
       updatedAt: new Date().toISOString(),
       updatedByUid: actor.uid,
       updatedByEmail: actor.email,
+      updatedByDeviceId: actor.deviceId,
       updatedByName: actor.displayName,
       updatedByRelationship: actor.relationshipLabel,
       lastAction: "editou",
@@ -6476,7 +6535,7 @@ if (weightHistoryList) {
   });
 }
 
-[avatarIconOptions, avatarColorOptions, avatarBackgroundOptions, avatarAccessoryOptions].forEach((container) => {
+[avatarIconOptions, avatarSkinOptions, avatarColorOptions].forEach((container) => {
   container?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-avatar-type][data-avatar-value]");
     if (!button) return;
@@ -6492,11 +6551,21 @@ avatarTabs.forEach((button) => {
   });
 });
 
+if (editBabyAvatarButton) {
+  editBabyAvatarButton.addEventListener("click", () => {
+    if (babyAvatarCard?.hidden) {
+      openAvatarEditor();
+    } else {
+      closeAvatarEditor("Editor fechado. Toque em Editar avatar para abrir novamente.");
+    }
+  });
+}
+
 if (saveBabyAvatarButton) saveBabyAvatarButton.addEventListener("click", saveBabyAvatarFromDraft);
 if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
   pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || {});
   renderAvatarCustomizer();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Sem problema. Você pode testar o avatar depois.";
+  closeAvatarEditor("Editor fechado. O avatar atual foi mantido.");
 });
 
 if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {

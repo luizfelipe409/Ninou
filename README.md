@@ -1,4 +1,4 @@
-# Ninou v75.42.1 — Somente avatar
+# Ninou v75.44 — Somente avatar
 
 Versão criada para testar avatares antes de substituir definitivamente a foto do bebê.
 
@@ -49,3 +49,23 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Falhas pontuais de leitura/escrita no Firestore agora viram aviso no painel, sem rebaixar o admin para visitante.
 - Mantém o avatar limpo: somente rostinhos infantis e cor de fundo.
 - Mantém isolamento de conta e evita reaproveitar identificação de outro usuário.
+
+
+## v75.44 — Identificação por aparelho
+
+Esta versão ajusta o uso familiar real do Ninou:
+
+- Felipe e Maria podem usar a mesma conta `francisco@gmail.com`.
+- A identificação do cuidador é salva localmente por aparelho, não na conta global.
+- O celular do Felipe pode registrar como Felipe/Pai.
+- O celular da Maria pode registrar como Maria/Mãe.
+- Novos registros salvam `createdByDeviceId`, `createdByName` e `createdByRelationship`.
+- A tela agora informa que a identificação fica salva neste celular.
+- O app não grava mais essa identificação em `users/{uid}/account/profile`, evitando que um aparelho sobrescreva o outro.
+
+
+## v75.44 — Avatar 3D Soft moderno
+
+- Avatares do bebê redesenhados em estilo 3D Soft, com aparência mais novinha e moderna.
+- Personalização agora foca em cabelinho, tom de pele e cor de fundo.
+- Depois de salvar, o editor some da tela e só reaparece ao tocar em **Editar avatar** abaixo da foto do perfil.

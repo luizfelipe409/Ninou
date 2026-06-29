@@ -6,19 +6,23 @@ export const defaultWakeWindowMinutes = 70;
 export const profileThemeModes = Object.freeze(["auto", "light", "dark"]);
 
 export const defaultBabyAvatar = Object.freeze({
-  icon: "baby",
-  color: "lilac",
-  background: "moon",
-  accessory: "none",
+  face: "3d-soft",
+  hair: "topetinho",
+  skin: "pele-clara",
+  background: "lilas",
 });
 
 export function normalizeBabyAvatar(avatar = {}) {
   const source = avatar && typeof avatar === "object" ? avatar : {};
+  const legacyHair = typeof source.icon === "string" && source.icon ? source.icon : "";
+  const legacySkin = typeof source.skin === "string" && source.skin ? source.skin : "";
+  const legacyBackground = typeof source.color === "string" && source.color ? source.color : "";
+
   return {
-    icon: typeof source.icon === "string" && source.icon ? source.icon : defaultBabyAvatar.icon,
-    color: typeof source.color === "string" && source.color ? source.color : defaultBabyAvatar.color,
-    background: typeof source.background === "string" && source.background ? source.background : defaultBabyAvatar.background,
-    accessory: typeof source.accessory === "string" && source.accessory ? source.accessory : defaultBabyAvatar.accessory,
+    face: "3d-soft",
+    hair: typeof source.hair === "string" && source.hair ? source.hair : (legacyHair || defaultBabyAvatar.hair),
+    skin: legacySkin || defaultBabyAvatar.skin,
+    background: legacyBackground || defaultBabyAvatar.background,
   };
 }
 
@@ -33,18 +37,24 @@ export function getDefaultBabyProfile() {
     birthDate: "",
     themeMode: normalizeThemeMode(readString(storageKeys.themeMode, "auto")),
     avatar: normalizeBabyAvatar(),
+    avatarConfigured: false,
     weights: loadLocalWeights(),
   };
 }
 
 export function normalizeBabyProfile(profile = {}) {
   const themeMode = normalizeThemeMode(profile.themeMode || readString(storageKeys.themeMode, "auto"));
+  const avatar = normalizeBabyAvatar(profile.avatar || profile.babyAvatar || profile.babyAvatarConfig);
+  const explicitConfigured = typeof profile.avatarConfigured === "boolean" ? profile.avatarConfigured : null;
+  const inferredConfigured = JSON.stringify(avatar) !== JSON.stringify(defaultBabyAvatar);
+
   return {
     name: typeof profile.name === "string" ? profile.name : "",
     article: profile.article === "da" ? "da" : "do",
     birthDate: typeof profile.birthDate === "string" ? profile.birthDate : "",
     themeMode,
-    avatar: normalizeBabyAvatar(profile.avatar || profile.babyAvatar || profile.babyAvatarConfig),
+    avatar,
+    avatarConfigured: explicitConfigured === null ? inferredConfigured : explicitConfigured,
     weights: normalizeWeights(profile.weights || loadLocalWeights()),
   };
 }
@@ -81,7 +91,7 @@ export function hasProfileContent(profile = {}, _photo = "", windowMinutes = def
       normalizedProfile.birthDate ||
       normalizedProfile.article === "da" ||
       normalizedProfile.themeMode !== "auto" ||
-      JSON.stringify(normalizedProfile.avatar) !== JSON.stringify(defaultBabyAvatar) ||
+      normalizedProfile.avatarConfigured ||
       normalizedProfile.weights.length > 0 ||
       windowMinutes !== defaultWakeWindowMinutes,
   );

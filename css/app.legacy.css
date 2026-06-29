@@ -6267,3 +6267,126 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
+
+
+/* v75.44 — avatar 3D soft moderno e editor sob demanda */
+.avatar-edit-trigger {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 197, 225, .95), rgba(215, 196, 255, .96));
+  color: #4a2c71;
+  font: inherit;
+  font-weight: 800;
+  padding: 12px 18px;
+  box-shadow: 0 10px 24px rgba(110, 88, 170, .16);
+}
+
+.avatar-edit-trigger:active {
+  transform: translateY(1px);
+}
+
+.avatar-test-card[hidden] {
+  display: none !important;
+}
+
+.avatar-compact-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,249,252,.98));
+  border: 1px solid rgba(222, 208, 244, .78);
+  box-shadow: 0 18px 38px rgba(95, 70, 139, .08);
+}
+
+.avatar-compact-card .avatar-test-header {
+  gap: 16px;
+  align-items: center;
+}
+
+.avatar-compact-card .avatar-test-header span {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(238, 222, 255, .9);
+}
+
+.avatar-compact-card .avatar-test-header strong {
+  font-size: 1.35rem;
+}
+
+.avatar-compact-card .avatar-preview-wrap {
+  min-width: 122px;
+  padding: 10px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(252, 248, 255, .95), rgba(246, 239, 255, .96));
+  box-shadow: inset 0 0 0 1px rgba(220, 207, 244, .65);
+}
+
+.avatar-compact-card .baby-avatar-preview {
+  width: 112px;
+  height: 112px;
+  border-radius: 28px;
+}
+
+.avatar-compact-card .avatar-picker-section {
+  display: grid;
+  gap: 12px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.avatar-compact-card .avatar-option-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.avatar-compact-card .avatar-choice {
+  min-height: 108px;
+  border-radius: 24px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 8px 18px rgba(104, 82, 154, .08);
+}
+
+.avatar-compact-card .avatar-choice.selected {
+  border-color: rgba(124, 87, 196, .9);
+  box-shadow: 0 0 0 4px rgba(181, 157, 240, .24), 0 16px 26px rgba(108, 82, 160, .14);
+}
+
+.avatar-face-thumb {
+  width: 78px;
+  height: 78px;
+  border-radius: 22px;
+  box-shadow: 0 10px 22px rgba(115, 86, 178, .10);
+}
+
+.avatar-compact-card .avatar-option-row .avatar-choice {
+  min-height: 86px;
+}
+
+.avatar-compact-card .avatar-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.8), 0 6px 14px rgba(91, 66, 130, .12);
+}
+
+.avatar-editor-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.avatar-compact-card .avatar-save-button,
+.avatar-compact-card .avatar-skip-button {
+  flex: 1 1 180px;
+}
+
+@media (max-width: 560px) {
+  .avatar-compact-card .avatar-option-grid.icon-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .avatar-compact-card .avatar-option-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
