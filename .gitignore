@@ -1,0 +1,6 @@
+.vercel
+node_modules
+.DS_Store
+teste-layout.html
+teste-layout.css
+teste-layout.js

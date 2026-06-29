@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ninou</title>
+    <meta name="theme-color" content="#101029" />
+    <meta name="description" content="Diário de sono, mamadas, fraldas e rotina do bebê." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Ninou" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="preload" as="image" href="./icons/actions/acordou.png" />
+    <link rel="preload" as="image" href="./icons/actions/soneca.png" />
+    <link rel="preload" as="image" href="./icons/actions/dormir.png" />
+    <link rel="preload" as="image" href="./icons/actions/despertar-noturno.png" />
+    <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
+    <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
+    <link rel="preload" as="image" href="./icons/actions/fralda.png" />
+    <link rel="stylesheet" href="./styles.css?v=75.41.1" />
+  </head>
+  <body>
+    <main class="phone-shell" aria-label="Protótipo completo Ninou">
+      <header class="app-header">
+        <div class="identity">
+          <img src="./icons/icon-192.png" alt="" />
+          <div>
+            <span>Ninou</span>
+            <strong id="diaryTitle">Diário do bebê</strong>
+          </div>
+        </div>
+        <button class="sync-pill offline" type="button" aria-label="Status da sincronização">Off-line</button>
+      </header>
+
+      <section id="adminPreviewBanner" class="admin-preview-banner" hidden>
+        <div>
+          <span>Visualização admin</span>
+          <strong>Você está vendo a rotina da família selecionada.</strong>
+        </div>
+        <button id="adminReturnToPanelButton" type="button">Voltar ao painel</button>
+      </section>
+
+      <section class="screen active" data-screen="today" aria-label="Hoje">
+        <div class="today-topline">
+          <span id="babyAgeLine">Nascimento não preenchido</span>
+          <button class="ghost-link" type="button" data-target-shortcut="profile">Perfil</button>
+        </div>
+
+        <section class="state-orbit">
+          <div class="orbit-ring" aria-hidden="true"></div>
+          <div id="orbitEvents" class="orbit-events" aria-label="Atividades das últimas 24 horas"></div>
+          <span id="stateLabel">Rotina zerada</span>
+          <strong id="stateClock">00:00:00</strong>
+          <p id="stateHint">Escolha como começar o dia.</p>
+        </section>
+
+        <section class="today-overview-card" aria-label="Hoje com o bebê">
+          <div class="today-overview-head">
+            <div>
+              <span id="todayOverviewKicker">Assistente de rotina</span>
+              <strong id="todayOverviewTitle">Hoje com o bebê</strong>
+            </div>
+            <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
+          </div>
+          <div id="todayOverviewGrid" class="today-overview-grid">
+            <article><span>Última mamadeira</span><strong>Sem registro</strong></article>
+            <article><span>Última fralda</span><strong>Sem registro</strong></article>
+            <article><span>Última soneca</span><strong>Sem registro</strong></article>
+            <article><span>Tempo acordado</span><strong>0 min</strong></article>
+          </div>
+          <p id="todayOverviewSuggestion" class="today-overview-suggestion">Registre a primeira ação para o Ninou montar um acompanhamento gentil.</p>
+        </section>
+
+        <section id="smartInsightCard" class="smart-insight-card" aria-live="polite">
+          <span>💡 Observação</span>
+          <strong>Começando a aprender a rotina</strong>
+          <p>Registre sono, mamadas e fraldas para o Ninou mostrar observações úteis.</p>
+        </section>
+
+        <section id="gentleAlertCard" class="gentle-alert-card" aria-live="polite" hidden>
+          <span>🌿 Lembrete gentil</span>
+          <strong>Rotina tranquila</strong>
+          <p>O Ninou mostrará lembretes leves conforme os registros aparecerem.</p>
+        </section>
+
+        <section id="notificationCenterCard" class="notification-center-card" aria-label="Avisos e lembretes do Ninou">
+          <div class="drawer-section-title">
+            <span>Avisos</span>
+            <strong>Lembretes do Ninou</strong>
+          </div>
+          <ul id="notificationCenterList" class="notification-center-list">
+            <li>
+              <i aria-hidden="true">🌿</i>
+              <div>
+                <strong>Rotina pronta</strong>
+                <span>Os lembretes aparecem conforme a rotina for registrada.</span>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section id="liveAssistantCard" class="live-assistant-card" aria-live="polite" hidden>
+          <div>
+            <span id="liveAssistantKicker">Próxima ação</span>
+            <strong id="liveAssistantTitle">Rotina pronta para começar</strong>
+            <p id="liveAssistantText">O Ninou mostra a próxima ação conforme a rotina for registrada.</p>
+          </div>
+          <div id="liveAssistantBadge" class="live-assistant-badge">✨</div>
+        </section>
+
+        <!-- v75.37: painel admin limpo, profissional e focado em convites/usuários.
+             O status principal fica no card central e a ação fica no botão principal. -->
+
+        <section class="main-action-area" aria-label="Ação principal">
+          <button id="wakeAction" class="primary-action" type="button" hidden>
+            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span id="wakeActionLabel">Acordou</span>
+          </button>
+          <div id="startChoice" class="start-choice">
+            <button type="button" data-start-mode="awake">
+              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Acordou</span>
+            </button>
+            <button type="button" data-start-mode="sleeping">
+              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Iniciar soneca</span>
+            </button>
+          </div>
+        </section>
+
+        <div class="quick-actions-heading">
+          <span>Atalhos principais</span>
+          <strong>Registre em poucos toques</strong>
+        </div>
+        <section class="quick-actions" aria-label="Ações rápidas">
+          <button type="button" data-open-sheet="amamentacao">
+            <span class="action-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span>Amamentação</span>
+          </button>
+          <button type="button" data-open-sheet="fralda">
+            <span class="action-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span>Fralda</span>
+          </button>
+          <button type="button" data-open-sheet="mamadeira">
+            <span class="action-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span>Mamadeira</span>
+          </button>
+          <button type="button" data-open-sheet="medicamento">
+            <span class="action-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span>
+            <span>Medicamento</span>
+          </button>
+        </section>
+
+        <section class="next-card" aria-label="Próxima soneca">
+          <div>
+            <span>Próxima soneca</span>
+            <strong>Aguardando</strong>
+            <p>Escolha como começar a rotina diária.</p>
+          </div>
+          <div class="mini-ring">70</div>
+        </section>
+
+        <section class="summary-grid" aria-label="Resumo de hoje">
+          <article>
+            <span>Sono</span>
+            <strong>0 min</strong>
+          </article>
+          <article>
+            <span>Acordado</span>
+            <strong>0 min</strong>
+          </article>
+          <article>
+            <span>Mamadas</span>
+            <strong>0</strong>
+          </article>
+          <article>
+            <span>Fraldas</span>
+            <strong>0</strong>
+          </article>
+          <article>
+            <span>Medicamentos</span>
+            <strong>0</strong>
+          </article>
+        </section>
+
+        <section class="day-summary-card" aria-label="Resumo inteligente do dia">
+          <div class="drawer-section-title">
+            <span>Resumo de hoje</span>
+            <strong id="daySummaryMoment">Em andamento</strong>
+          </div>
+          <p id="daySummaryText">Conforme você registrar a rotina, o Ninou resume sono, mamadas, fraldas e último registro.</p>
+        </section>
+
+        <section id="todayGrowthCard" class="growth-card" aria-label="Crescimento do bebê">
+          <div class="drawer-section-title">
+            <span>Crescimento</span>
+            <button class="ghost-link" type="button" data-target-shortcut="profile">Atualizar peso</button>
+          </div>
+          <div class="growth-card-body">
+            <div>
+              <strong id="todayGrowthWeight">Sem peso cadastrado</strong>
+              <p id="todayGrowthHint">Cadastre pesos no perfil para acompanhar a evolução.</p>
+            </div>
+            <div id="todayWeightSparkline" class="weight-sparkline" aria-label="Evolução de peso"></div>
+          </div>
+        </section>
+
+        <section class="routine-progress-card" aria-label="Rotina do dia">
+          <div class="drawer-section-title">
+            <span>Rotina do dia</span>
+            <strong id="routineProgressStatus">Média recente</strong>
+          </div>
+          <div id="dailyRhythm" class="daily-rhythm">
+            <article><span>Sono</span><b>0 min hoje</b><i style="--p: 0%"></i></article>
+            <article><span>Mamadas</span><b>0 hoje</b><i style="--p: 0%"></i></article>
+            <article><span>Fraldas</span><b>0 hoje</b><i style="--p: 0%"></i></article>
+          </div>
+        </section>
+
+        <section class="intelligent-timeline-card" aria-label="Linha do tempo inteligente de hoje">
+          <div class="drawer-section-title">
+            <span>Linha do tempo inteligente</span>
+            <button class="ghost-link" type="button" data-target-shortcut="diary">Abrir diário</button>
+          </div>
+          <div id="intelligentTimeline" class="intelligent-timeline">
+            <article class="timeline-empty">Ainda não há registros suficientes para montar a linha do tempo.</article>
+          </div>
+        </section>
+
+        <section class="weekly-overview-card" aria-label="Histórico semanal rápido">
+          <div class="drawer-section-title">
+            <span>Resumo</span>
+            <strong>Últimos 7 dias</strong>
+          </div>
+          <div id="weeklyOverview" class="weekly-overview"></div>
+        </section>
+
+        <section class="day-story-card" aria-label="Como foi o dia do bebê">
+          <div class="drawer-section-title">
+            <span>Resumo inteligente</span>
+            <button class="ghost-link" type="button" data-target-shortcut="trends">Ver dados</button>
+          </div>
+          <p id="dayStoryText">O Ninou vai transformar os registros em uma leitura simples do dia.</p>
+        </section>
+        <section class="last-card today-last-card" aria-label="Últimos registros importantes de hoje">
+          <div class="drawer-section-title">
+            <span>Últimos registros importantes</span>
+            <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
+          </div>
+          <p class="section-helper">O Ninou destaca os acontecimentos mais recentes da rotina para você retomar o cuidado rapidamente.</p>
+          <div id="todayLastEvents" class="drawer-last-events today-last-events">
+            <article class="mini-event empty">Quando houver registros, os últimos momentos importantes aparecerão aqui.</article>
+          </div>
+        </section>
+
+        <section class="last-card five-day-actions-card" aria-label="Resumo rápido dos últimos 5 dias">
+          <div class="chart-title">
+            <div>
+              <span>Últimos 5 dias</span>
+              <strong>Quantidade de ações</strong>
+            </div>
+          </div>
+          <p class="chart-helper">Total de registros feitos por dia, somando sono, mamadas, fraldas, mamadeiras e medicamentos.</p>
+          <div id="todayMiniChart" class="mini-chart actions-mini-chart" aria-label="Quantidade de ações registradas nos últimos 5 dias"></div>
+        </section>
+
+      </section>
+
+      <section class="screen" data-screen="diary" aria-label="Diário">
+        <div class="section-title">
+          <div>
+            <span id="diaryDateHint">Hoje</span>
+            <strong id="diaryDateTitle">Diário</strong>
+          </div>
+        </div>
+        <label class="date-filter">
+          Data do diário
+          <input id="diaryDateInput" type="date" />
+          <span class="field-chevron date-chevron" aria-hidden="true"></span>
+        </label>
+        <div class="chips-shell">
+          <div class="chips" aria-label="Filtros">
+            <button class="active" type="button" data-diary-filter="all">Todos</button>
+            <button type="button" data-diary-filter="sleep">Sono</button>
+            <button type="button" data-diary-filter="feeding">Alimentação</button>
+            <button type="button" data-diary-filter="diaper">Fralda</button>
+            <button type="button" data-diary-filter="medicine">Medicamento</button>
+          </div>
+          <button id="diaryChipsMoreButton" class="chips-more-button" type="button" aria-label="Mostrar mais filtros" title="Mostrar mais filtros"><span aria-hidden="true"></span></button>
+        </div>
+        <ol class="timeline">
+          <li class="event-card">
+            <i class="mark"></i>
+            <div>
+              <strong>Nenhum registro</strong>
+              <span>Escolha uma data ou crie um novo registro.</span>
+            </div>
+          </li>
+        </ol>
+        <section class="day-notes-card" aria-label="Observações importantes do dia">
+          <div class="drawer-section-title">
+            <span>Observações do dia</span>
+            <strong>Notas da família</strong>
+          </div>
+          <p class="section-helper">Registre percepções importantes para pais, cuidadores ou pediatra, sem substituir orientação médica.</p>
+          <textarea id="dayNotesTextarea" rows="4" placeholder="Ex.: Dormiu melhor após o banho, teve mais cólica pela manhã, aceitou menos mamadeira à noite."></textarea>
+          <div class="day-notes-actions">
+            <small id="dayNotesStatus">Nenhuma observação salva neste dia.</small>
+            <button id="saveDayNotesButton" class="secondary-login" type="button">Salvar observação</button>
+          </div>
+        </section>
+
+        <section class="audit-card" aria-label="Ajustes técnicos dos registros">
+          <div class="drawer-section-title">
+            <span>Ajustes dos registros</span>
+            <strong>Edições e exclusões</strong>
+          </div>
+          <ul id="auditTrailList" class="audit-list">
+            <li>Nenhum ajuste técnico registrado nesta data.</li>
+          </ul>
+        </section>
+      </section>
+
+      <section class="screen" data-screen="trends" aria-label="Relatórios da rotina">
+        <div class="section-title">
+          <div>
+            <span>Últimos 7 dias</span>
+            <strong>Relatórios</strong>
+          </div>
+        </div>
+        <section class="trend-summary">
+          <article>
+            <span>Média de sono</span>
+            <strong id="sleepAverage">0 min</strong>
+            <p id="sleepAverageHint">Sono registrado por dia.</p>
+          </article>
+          <article>
+            <span>Sonecas/dia</span>
+            <strong id="napAverage">0</strong>
+            <p id="napAverageHint">Média de sonecas e noites.</p>
+          </article>
+        </section>
+        <section id="trendKpis" class="trend-kpis" aria-label="Resumo rápido dos dados de hoje">
+          <article><span>Sono hoje</span><strong>0 min</strong><p>Total dormido desde meia-noite.</p></article>
+          <article><span>Mamadas</span><strong>0</strong><p>Amamentação e mamadeira.</p></article>
+          <article><span>Fraldas</span><strong>0</strong><p>Trocas registradas hoje.</p></article>
+          <article><span>Medicamentos</span><strong>0</strong><p>Doses registradas hoje.</p></article>
+        </section>
+        <section id="trendGrowthCard" class="growth-card growth-card-trends" aria-label="Evolução de peso">
+          <div class="drawer-section-title">
+            <span>Peso e crescimento</span>
+            <strong id="trendGrowthStatus">Acompanhe no perfil</strong>
+          </div>
+          <div class="growth-card-body">
+            <div>
+              <strong id="trendGrowthWeight">Sem peso cadastrado</strong>
+              <p id="trendGrowthHint">Registre o peso para ver evolução e histórico.</p>
+            </div>
+            <div id="trendWeightSparkline" class="weight-sparkline weight-sparkline-large" aria-label="Gráfico simples de peso"></div>
+          </div>
+          <div id="growthHistoryMini" class="growth-history-mini" aria-label="Histórico recente de peso">
+            <article>Cadastre pelo menos um peso para acompanhar o crescimento.</article>
+          </div>
+        </section>
+        <section class="report-stack" aria-label="Gráficos dos últimos 7 dias">
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 7 dias -</span><strong>Sono</strong></div>
+            <div id="sleepBars" class="bars" aria-label="Sono por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 7 dias -</span><strong>Amamentação</strong></div>
+            <div id="breastfeedingBars" class="bars compact-bars" aria-label="Amamentações por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 7 dias -</span><strong>Mamadeira</strong></div>
+            <div id="bottleBars" class="bars compact-bars" aria-label="Volume de mamadeira por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 7 dias -</span><strong>Fraldas</strong></div>
+            <div id="diaperBars" class="bars compact-bars" aria-label="Fraldas por dia"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-title"><span>Últimos 7 dias -</span><strong>Medicamentos</strong></div>
+            <div id="medicationBars" class="bars compact-bars" aria-label="Medicamentos por dia"></div>
+          </article>
+        </section>
+        <section class="insights">
+          <article>
+            <span>Melhor janela</span>
+            <strong id="bestWindow">Sem dados</strong>
+            <p id="bestWindowHint">Registre mais sonecas para calcular a janela mais comum.</p>
+          </article>
+          <article>
+            <span>Rotina</span>
+            <strong id="routineStatus">Aprendendo</strong>
+            <p id="routineHint">A rotina será calculada com base nos horários das sonecas.</p>
+          </article>
+        </section>
+      </section>
+
+      <section class="screen" data-screen="sounds" aria-label="Sons para dormir">
+        <section class="sounds-hero">
+          <div class="sounds-hero-icon">♪</div>
+          <div>
+            <span>Sons para dormir</span>
+            <strong>Escolha um som relaxante</strong>
+            <p>Toque por 1 hora, com repetição automática até o timer terminar.</p>
+          </div>
+        </section>
+
+        <section id="soundPlayerCard" class="sound-player-card" aria-label="Player de som para dormir">
+          <div class="sound-player-topline">
+            <span id="soundStatus">Pronto para tocar</span>
+            <strong id="soundTimer">01:00:00</strong>
+          </div>
+          <div class="sound-current">
+            <i id="soundCurrentIcon">💗</i>
+            <div>
+              <strong id="soundCurrentTitle">Som do útero</strong>
+              <p id="soundCurrentDesc">Som acolhedor inspirado no ambiente intrauterino.</p>
+            </div>
+          </div>
+          <div class="sound-progress" aria-hidden="true"><i id="soundProgress"></i></div>
+          <div class="sound-player-meta">
+            <span id="soundElapsed">00:00</span>
+            <span>Repetir ativo • para em 1h</span>
+            <span id="soundRemainingShort">60:00</span>
+          </div>
+          <div class="sound-controls">
+            <button id="soundPlayPause" class="sound-main-button" type="button">▶ Tocar por 1h</button>
+            <button id="soundStop" class="sound-stop-button" type="button">Parar</button>
+          </div>
+        </section>
+
+        <section class="sound-list" aria-label="Escolha um som">
+          <button class="sound-option active" type="button" data-sound-key="womb">
+            <span class="sound-option-icon">💗</span>
+            <span>
+              <strong>Som do útero</strong>
+              <em>Som profundo e acolhedor para acalmar.</em>
+            </span>
+            <i>▶</i>
+          </button>
+          <button class="sound-option" type="button" data-sound-key="relax">
+            <span class="sound-option-icon">🌙</span>
+            <span>
+              <strong>Som para relaxar</strong>
+              <em>Som contínuo e tranquilo para preparar o sono.</em>
+            </span>
+            <i>▶</i>
+          </button>
+          <button class="sound-option" type="button" data-sound-key="rhythm">
+            <span class="sound-option-icon">🧸</span>
+            <span>
+              <strong>Ritmo suave bebê</strong>
+              <em>Ritmo leve para manter uma rotina calma.</em>
+            </span>
+            <i>▶</i>
+          </button>
+        </section>
+
+        <section class="sound-note">
+          <strong>Observação</strong>
+          <p>O som começa após tocar em play e fica em repetição até completar 1 hora. No iPhone, mantenha o modo silencioso desligado e o volume ativo para melhor reprodução.</p>
+        </section>
+      </section>
+
+      <section class="screen" data-screen="profile" aria-label="Perfil">
+        <div class="profile-card">
+          <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
+          <span id="profileBabyName">Bebê</span>
+          <strong id="profileBabyAge">Preencha o nascimento</strong>
+          <div class="avatar-only-badge" id="profilePhotoButtonText">Somente avatar</div>
+        </div>
+        <section class="settings-list">
+          <article class="baby-profile-card">
+            <span>Perfil do bebê</span>
+            <strong>Dados principais</strong>
+            <label>
+              Nome do bebê
+              <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
+            </label>
+            <label>
+              Como mostrar no diário
+              <select id="babyArticleInput">
+                <option value="do">Diário do</option>
+                <option value="da">Diário da</option>
+              </select>
+            </label>
+            <label>
+              Dia de nascimento
+              <input id="babyBirthInput" type="date" />
+            </label>
+          </article>
+          <article class="avatar-test-card" id="babyAvatarTestCard">
+            <div class="avatar-test-header">
+              <div>
+                <span>Versão teste</span>
+                <strong>Escolha o avatar do bebê</strong>
+                <p>Personalize ícone, cor, fundo e acessório sem salvar foto no banco.</p>
+              </div>
+              <div class="avatar-preview-wrap">
+                <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
+              </div>
+            </div>
+            <div class="avatar-tabs" aria-label="Categorias de personalização do avatar">
+              <button type="button" class="active" data-avatar-jump="icon">🧸 Ícone</button>
+              <button type="button" data-avatar-jump="color">💧 Cor</button>
+              <button type="button" data-avatar-jump="background">◯ Fundo</button>
+              <button type="button" data-avatar-jump="accessory">☆ Acessório</button>
+            </div>
+            <section class="avatar-picker-section" data-avatar-section="icon">
+              <strong>Escolha um ícone</strong>
+              <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="color">
+              <strong>Escolha uma cor</strong>
+              <div class="avatar-option-row" id="avatarColorOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="background">
+              <strong>Escolha um fundo</strong>
+              <div class="avatar-option-row" id="avatarBackgroundOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="accessory">
+              <strong>Escolha um acessório</strong>
+              <div class="avatar-option-row" id="avatarAccessoryOptions"></div>
+            </section>
+            <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">✓ Salvar avatar de teste</button>
+            <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Agora não</button>
+            <p id="babyAvatarStatus" class="form-status">O avatar é leve, privado e pode ser alterado quando quiser.</p>
+          </article>
+
+          <article class="appearance-profile-block">
+            <span>Aparência</span>
+            <strong>Tema do app</strong>
+            <p>Escolha se o Ninou muda sozinho conforme o horário ou se fica sempre claro/escuro.</p>
+            <label>
+              Modo de visual
+              <select id="themeModeInput">
+                <option value="auto">Automático — dia/noite</option>
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+              </select>
+            </label>
+          </article>
+          <article class="weight-profile-block">
+            <div class="weight-profile-header">
+              <span>Peso do bebê</span>
+              <strong id="lastWeightValue">Nenhum peso cadastrado</strong>
+              <p id="lastWeightHint">Cadastre o peso mais recente para acompanhar a evolução.</p>
+            </div>
+            <div class="weight-input-row">
+              <label>
+                Data da pesagem
+                <input id="babyWeightDateInput" type="date" />
+              </label>
+              <label>
+                Peso em kg
+                <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
+              </label>
+            </div>
+            <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Salvar peso</button>
+            <div class="weight-history-card">
+              <span>3 últimos pesos</span>
+              <ol id="weightHistoryList" class="weight-history-list">
+                <li>Nenhum peso cadastrado.</li>
+              </ol>
+            </div>
+          </article>
+          <article class="login-card">
+            <span>Acesso familiar</span>
+            <strong>Entrar no Ninou</strong>
+            <p id="loginHelper">Entre com sua conta. Novos usuários entram por convite do administrador do app.</p>
+            <div class="login-fields">
+              <input id="loginEmail" type="email" placeholder="email@familia.com" />
+              <input id="loginPassword" type="password" placeholder="Senha" autocomplete="current-password" />
+            </div>
+            <div class="login-actions">
+              <button id="loginButton" type="button">Entrar</button>
+              <button id="createAccountButton" class="secondary-login" type="button">Criar conta</button>
+            </div>
+          </article>
+
+          <article class="caregiver-profile-block" id="caregiverIdentityCard">
+            <span>Configuração da conta</span>
+            <strong>Identificação nos registros</strong>
+            <p>Escolha ou edite como seu nome e vínculo aparecerão nos registros da rotina. Essa informação é salva na sua conta e será usada automaticamente nos próximos registros.</p>
+            <label>
+              Seu nome no app
+              <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />
+            </label>
+            <label>
+              Seu vínculo com o bebê
+              <select id="caregiverRelationInput">
+                <option value="">Escolher depois</option>
+                <option value="pai">Pai</option>
+                <option value="mae">Mãe</option>
+                <option value="avo">Avó</option>
+                <option value="avo_masculino">Avô</option>
+                <option value="baba">Babá</option>
+                <option value="responsavel">Responsável</option>
+                <option value="outro">Familiar</option>
+              </select>
+            </label>
+            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar identificação</button>
+            <p id="caregiverIdentityStatus" class="form-status">Usaremos essa identificação nos próximos registros.</p>
+          </article>
+          <article class="admin-access-card" id="familyAccessCard">
+            <span>Acesso familiar</span>
+            <strong id="familyAccessTitle">Convites e permissões</strong>
+            <p id="familyAccessText">Somente o administrador do app pode gerar convites. Pessoas convidadas acessam com e-mail e senha próprios.</p>
+            <div class="access-status-row">
+              <span id="familyAccessBadge" class="access-badge">Sem login</span>
+              <button id="createFamilyButton" class="secondary-login" type="button" hidden>Ativar família</button>
+            </div>
+            <div id="familyWelcomeCard" class="family-welcome-card" hidden>
+              <span>Bem-vindo ao Ninou</span>
+              <strong id="familyWelcomeTitle">Você foi convidado para acompanhar a rotina.</strong>
+              <p id="familyWelcomeText">Seu acesso aparecerá aqui após aceitar o convite.</p>
+              <button id="familyWelcomeStartButton" class="secondary-login" type="button">Começar a acompanhar</button>
+            </div>
+            <div class="invite-accept-box">
+              <label>
+                Código de convite
+                <input id="inviteCodeInput" type="text" placeholder="Ex.: NINOU-AB12-CD34" autocomplete="off" />
+              </label>
+              <button id="acceptInviteButton" class="secondary-login" type="button">Aceitar convite</button>
+              <p class="invite-note">Use esse campo apenas se você recebeu um convite.</p>
+            </div>
+            <div id="adminInvitePanel" class="admin-invite-panel admin-clean-panel" hidden>
+              <section class="admin-clean-hero" aria-live="polite">
+                <div>
+                  <span>Admin do app</span>
+                  <strong>Painel admin</strong>
+                  <p>Gerencie sua conta, famílias, membros, convites, migrações e diagnósticos com dados familiares carregados apenas sob demanda.</p>
+                </div>
+                <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
+              </section>
+
+              <section class="admin-stats-card admin-clean-section" aria-live="polite">
+                <div class="admin-stats-header">
+                  <div>
+                    <span>Resumo</span>
+                    <strong>Visão geral</strong>
+                  </div>
+                </div>
+                <div class="admin-stats-grid admin-health-grid">
+                  <article>
+                    <span>Famílias</span>
+                    <strong id="adminFamiliesCount">--</strong>
+                    <small>clientes cadastrados</small>
+                  </article>
+                  <article>
+                    <span>Usuários</span>
+                    <strong id="adminKnownUsersStat">--</strong>
+                    <small>encontrados no banco</small>
+                  </article>
+                  <article>
+                    <span>Convites pendentes</span>
+                    <strong id="adminPendingInvitesCount">--</strong>
+                    <small>família selecionada</small>
+                  </article>
+                  <article>
+                    <span>Última migração</span>
+                    <strong id="adminLastMigrationStatus">--</strong>
+                    <small>status</small>
+                  </article>
+                </div>
+                <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar os usuários autorizados.</p>
+              </section>
+
+              <section id="adminCreateFamilySection" class="admin-clean-section admin-create-family-card">
+                <div class="admin-invite-header">
+                  <strong>Criar família/cliente</strong>
+                  <em>Use quando uma pessoa vai acessar o Ninou pela primeira vez e ainda não pertence a nenhuma família.</em>
+                </div>
+                <div class="admin-form-grid admin-create-family-grid">
+                  <label>
+                    Nome da família
+                    <input id="adminNewFamilyNameInput" type="text" placeholder="Ex.: Família Sofia" autocomplete="off" />
+                  </label>
+                  <label>
+                    Nome do bebê
+                    <input id="adminNewBabyNameInput" type="text" placeholder="Ex.: Sofia" autocomplete="off" />
+                  </label>
+                  <label>
+                    Como chamar no app
+                    <select id="adminNewBabyArticleInput">
+                      <option value="o">o bebê</option>
+                      <option value="a">a bebê</option>
+                    </select>
+                  </label>
+                  <label>
+                    E-mail do responsável, opcional
+                    <input id="adminNewResponsibleEmailInput" type="email" placeholder="responsavel@email.com" autocomplete="off" />
+                  </label>
+                </div>
+                <p class="admin-section-note">Ao criar, o painel seleciona a nova família. Se houver e-mail, um convite de responsável é gerado para essa família.</p>
+                <button id="adminCreateClientFamilyButton" type="button">Criar família/cliente</button>
+                <div id="adminCreateFamilyResult" class="invite-result admin-create-family-result" hidden></div>
+              </section>
+
+              <section class="admin-clean-section admin-family-client-card">
+                <div class="admin-invite-header">
+                  <strong>Famílias</strong>
+                  <em>Selecione uma família para visualizar, convidar, migrar ou dar suporte. O admin não vira membro.</em>
+                </div>
+                <ul id="adminClientsList" class="admin-access-list admin-clients-list">
+                  <li>Atualize o painel para ver as famílias disponíveis.</li>
+                </ul>
+                <p id="adminSelectedFamilyHint" class="admin-stats-hint">Nenhuma rotina aberta. Escolha uma família e toque em Abrir rotina apenas quando precisar validar ou dar suporte.</p>
+                <div class="admin-card-actions admin-family-actions">
+                  <button id="adminOpenFamilyButton" class="secondary-login admin-open-family-button" type="button">Abrir rotina da família selecionada</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="members">Gerenciar membros</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="invite">Criar convite</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="migration">Migrar dados</button>
+                </div>
+              </section>
+
+              <section id="adminMigrationSection" class="admin-clean-section admin-migration-card">
+                <div class="admin-invite-header">
+                  <strong>Migração de dados</strong>
+                  <em>Copie dados antigos para a família selecionada. A origem só é carregada quando você busca por e-mail ou UID.</em>
+                </div>
+                <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID para migrar uma origem específica.</p>
+                <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
+                  <li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>
+                </ul>
+                <div id="adminMigrationChecklist" class="admin-migration-checklist" aria-live="polite">
+                  <span>Checklist</span>
+                  <ul>
+                    <li><strong>Aguardando busca</strong><small>O diagnóstico aparece antes e depois da migração.</small></li>
+                  </ul>
+                </div>
+                <div class="admin-manual-migration">
+                  <label>
+                    E-mail da conta antiga
+                    <input id="adminMigrationEmailInput" type="email" placeholder="Ex.: francisco@gmail.com" autocomplete="off" />
+                  </label>
+                  <button id="scanLegacyEmailButton" class="secondary-login" type="button">Buscar por e-mail</button>
+                  <small>Use primeiro esta opção quando souber o e-mail antigo. Ela prioriza exatamente essa conta na migração.</small>
+                </div>
+                <div class="admin-manual-migration">
+                  <label>
+                    UID da conta antiga, se souber
+                    <input id="adminMigrationUidInput" type="text" placeholder="Cole o UID antigo do Firebase" autocomplete="off" />
+                  </label>
+                  <button id="scanLegacyUidButton" class="secondary-login" type="button">Buscar por UID</button>
+                  <small>Use quando os dados aparecem em users/{uid}/activities, mas a busca por e-mail não encontra.</small>
+                </div>
+                <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
+              </section>
+
+              <section id="adminInviteSection" class="admin-clean-section admin-create-invite-card">
+                <div class="admin-invite-header">
+                  <strong>Convidar pessoa</strong>
+                  <em>O convite sempre entra na família selecionada. Ele nunca cria “família do admin”.</em>
+                </div>
+                <label>
+                  E-mail do convidado
+                  <input id="adminInviteEmail" type="email" placeholder="familiar@email.com" autocomplete="off" />
+                </label>
+                <label>
+                  Permissão
+                  <select id="adminInviteRole">
+                    <option value="responsavel">Responsável — acesso completo</option>
+                    <option value="cuidador">Cuidador — registra rotina</option>
+                    <option value="visualizacao">Visualização — somente leitura</option>
+                  </select>
+                </label>
+                <div class="permission-guide" aria-label="Descrição das permissões">
+                  <article><strong>Responsável</strong><span>Edita perfil, rotina, membros e convites.</span></article>
+                  <article><strong>Cuidador</strong><span>Registra rotina, mas não altera membros.</span></article>
+                  <article><strong>Visualização</strong><span>Acompanha os dados sem editar.</span></article>
+                </div>
+                <button id="createInviteButton" type="button">Gerar convite</button>
+                <div id="inviteResult" class="invite-result" hidden></div>
+              </section>
+
+              <section class="admin-clean-section admin-list-section">
+                <div class="admin-invite-header">
+                  <strong>Convites pendentes</strong>
+                  <em>Copie o código ou link e envie para a pessoa convidada.</em>
+                </div>
+                <ul id="adminPendingInviteList" class="admin-access-list">
+                  <li>Nenhum convite pendente.</li>
+                </ul>
+              </section>
+
+              <section class="admin-clean-section admin-list-section admin-support-section">
+                <div class="admin-invite-header">
+                  <strong>Acesso administrativo</strong>
+                  <em>O admin pode abrir qualquer família para suporte, mas não aparece como membro da família.</em>
+                </div>
+                <ul id="adminSupportAccessList" class="admin-access-list">
+                  <li>Entre como admin para visualizar o acesso administrativo.</li>
+                </ul>
+              </section>
+
+              <section id="adminMembersSection" class="admin-clean-section admin-list-section">
+                <div class="admin-invite-header">
+                  <strong>Membros desta família</strong>
+                  <em>Pessoas realmente vinculadas à família selecionada. O admin do app fica separado em acesso administrativo.</em>
+                </div>
+                <ul id="adminMembersList" class="admin-access-list">
+                  <li>Nenhum membro autorizado ainda.</li>
+                </ul>
+              </section>
+
+              <section class="admin-clean-section admin-list-section admin-users-section">
+                <div class="admin-invite-header">
+                  <strong>Usuários encontrados no banco</strong>
+                  <em>Contas localizadas no Firestore. Crie uma família para usuários novos ou vincule a uma família existente.</em>
+                </div>
+                <ul id="adminKnownUsersList" class="admin-access-list">
+                  <li>Atualize o painel para localizar usuários cadastrados.</li>
+                </ul>
+              </section>
+
+              <div class="invite-list-box admin-local-invites" hidden>
+                <span>Convites recentes neste aparelho</span>
+                <ul id="inviteList" class="invite-list">
+                  <li>Nenhum convite gerado neste aparelho.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+          <article class="wake-window-card">
+            <span>Janela de despertar</span>
+            <strong><span id="wakeWindowValue">70</span> min</strong>
+            <label>
+              Minutos acordado
+              <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
+            </label>
+          </article>
+          <article>
+            <span>Sincronização</span>
+            <strong id="syncStatusTitle">Sincronização off-line</strong>
+            <p id="syncStatusText">Entre com e-mail e senha para ativar a sincronização entre aparelhos.</p>
+          </article>
+          <article class="export-card">
+            <span>Backup e compartilhamento</span>
+            <strong>Relatório da rotina</strong>
+            <p>Gere um PDF mais bonito, baixe os dados ou envie um resumo personalizado pelo WhatsApp.</p>
+
+            <div class="export-period-grid" aria-label="Período do relatório">
+              <label>
+                Período do relatório
+                <select id="exportRangeSelect">
+                  <option value="day">Data aberta</option>
+                  <option value="7">Últimos 7 dias</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="custom">Período personalizado</option>
+                </select>
+              </label>
+              <label>
+                Início
+                <input id="exportStartDateInput" type="date" />
+              </label>
+              <label>
+                Fim
+                <input id="exportEndDateInput" type="date" />
+              </label>
+            </div>
+            <button id="prepareConsultButton" class="secondary-login consult-mode-button" type="button">Preparar para consulta</button>
+
+            <div class="export-personal-message">
+              <label for="whatsappNumberInput">Número para WhatsApp</label>
+              <input id="whatsappNumberInput" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ex.: 21999999999" />
+              <small>Use DDD + número. Se quiser, inclua 55 no início.</small>
+            </div>
+
+            <div class="export-personal-message">
+              <label for="whatsappMessageInput">Mensagem personalizada</label>
+              <textarea id="whatsappMessageInput" rows="4" placeholder="Ex.: Oi, segue o resumo da rotina do Francisco para acompanhar a consulta."></textarea>
+              <small>O resumo do Ninou será incluído abaixo da sua mensagem.</small>
+            </div>
+
+            <div class="export-actions">
+              <button id="exportPdfButton" type="button">Gerar PDF</button>
+              <button id="shareWhatsappButton" type="button">Enviar WhatsApp</button>
+              <button id="exportCsvButton" type="button">CSV</button>
+              <button id="exportJsonButton" type="button">JSON</button>
+            </div>
+          </article>
+          <article class="danger-card">
+            <span>Rotina diária</span>
+            <strong>Zerar o dia</strong>
+            <p>Limpa os registros de hoje e reinicia os contadores da rotina.</p>
+            <button id="resetDataButton" type="button">Zerar dia</button>
+          </article>
+        </section>
+      </section>
+
+      <button class="fab icon-button-add" type="button" data-open-sheet="sono" aria-label="Novo registro"></button>
+
+      <nav class="bottom-nav" aria-label="Menu principal">
+        <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
+        <button type="button" data-target="diary">≡<span>Diário</span></button>
+        <button type="button" data-target="trends">▥<span>Dados</span></button>
+        <button type="button" data-target="sounds">♪<span>Sons</span></button>
+        <button type="button" data-target="profile">○<span>Perfil</span></button>
+      </nav>
+    </main>
+
+    <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+    <section id="recordSheet" class="record-sheet" aria-label="Novo registro" hidden>
+      <div class="sheet-handle"></div>
+      <div class="section-title">
+        <div>
+          <span>Novo registro</span>
+          <strong id="sheetTitle">Soneca</strong>
+        </div>
+        <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
+      </div>
+      <div class="record-types">
+        <button type="button" data-sheet-type="acordou"><span class="type-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
+        <button class="active" type="button" data-sheet-type="sono"><span class="type-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Soneca</span></button>
+        <button type="button" data-sheet-type="dormir"><span class="type-icon"><img class="icon-art icon-art-dormir" src="./icons/actions/dormir.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Noite</span></button>
+        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img class="icon-art icon-art-despertar-noturno" src="./icons/actions/despertar-noturno.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Despertar noturno</span></button>
+        <button type="button" data-sheet-type="amamentacao"><span class="type-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Amamentação</span></button>
+        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamadeira</span></button>
+        <button type="button" data-sheet-type="fralda"><span class="type-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Fralda</span></button>
+        <button type="button" data-sheet-type="medicamento"><span class="type-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><span>Medicamento</span></button>
+      </div>
+      <form class="record-form">
+        <label>
+          <span id="sheetStartLabel">Horário</span>
+          <input id="sheetStartTimeInput" type="datetime-local" />
+        </label>
+        <label id="sheetEndTimeField" class="sheet-end-time-field" hidden>
+          <span id="sheetEndLabel">Fim</span>
+          <input id="sheetEndTimeInput" type="datetime-local" />
+        </label>
+        <div id="sleepDurationPreview" class="sleep-duration-preview" hidden aria-live="polite"></div>
+        <label class="select-label">
+          <span id="sheetDetailLabel">Detalhe</span>
+          <select id="sheetDetail">
+            <option>Não se aplica</option>
+          </select>
+          <span class="field-chevron select-chevron" aria-hidden="true"></span>
+        </label>
+        <section id="breastTimerPanel" class="breast-timer-panel" hidden aria-label="Timer da amamentação">
+          <div class="breast-timer-head">
+            <div>
+              <span>Timer da mamada</span>
+              <strong id="breastTimerTotal">00:00</strong>
+            </div>
+            <button id="resetBreastTimerButton" type="button">Zerar</button>
+          </div>
+          <div class="breast-side-grid">
+            <button type="button" data-breast-side="left">
+              <span>E</span>
+              <strong id="leftBreastTimer">00:00</strong>
+              <small>Esquerdo</small>
+            </button>
+            <button type="button" data-breast-side="right">
+              <span>D</span>
+              <strong id="rightBreastTimer">00:00</strong>
+              <small>Direito</small>
+            </button>
+          </div>
+          <p>Toque em E ou D para iniciar/pausar o tempo de cada peito.</p>
+        </section>
+        <label id="sheetAmountField" class="amount-field" hidden>
+          <span>Quantidade</span>
+          <input id="sheetAmountInput" class="amount-hidden-input" type="number" min="0" max="350" step="5" placeholder="ml" inputmode="numeric" />
+          <div class="milk-slider-card">
+            <strong id="bottleAmountDisplay">105 ml</strong>
+            <input id="bottleAmountRange" class="milk-range" type="range" min="0" max="350" step="5" value="105" />
+            <div class="range-scale"><span>0</span><span>350 ml</span></div>
+          </div>
+        </label>
+        <label>
+          Observações
+          <textarea rows="3" placeholder="Observações sobre este registro"></textarea>
+        </label>
+        <button class="save-button" type="button">Registrar</button>
+      </form>
+    </section>
+
+    <section id="orbitClusterSheet" class="orbit-cluster-sheet" aria-label="Registros próximos" hidden>
+      <div class="sheet-handle"></div>
+      <div class="section-title">
+        <div>
+          <span>Registros próximos</span>
+          <strong id="orbitClusterTitle">Atividades no mesmo horário</strong>
+        </div>
+        <button id="closeOrbitCluster" class="round-action icon-button-close" type="button" aria-label="Fechar registros próximos"></button>
+      </div>
+      <div id="orbitClusterList" class="cluster-list"></div>
+    </section>
+
+    <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
+    <a id="guestWhatsappButton" class="guest-whatsapp-button" href="https://wa.me/5521981904591?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20acessar%20o%20Ninou.%20Pode%20me%20enviar%20um%20convite%3F" target="_blank" rel="noopener noreferrer" aria-label="Falar com o administrador pelo WhatsApp" hidden>
+      <span aria-hidden="true">☘</span>
+      <strong>Solicitar acesso</strong>
+    </a>
+
+    <script type="module" src="./app.js?v=75.41.1"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "Ninou",
+  "short_name": "Ninou",
+  "description": "Diário sincronizado de sono, mamadas, fraldas e rotina do bebê.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101029",
+  "theme_color": "#101029",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
