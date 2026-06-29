@@ -319,7 +319,7 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.42: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+// v75.42.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
 try {
   if (!localStorage.getItem(storageKeys.email)) {
     [
@@ -3348,11 +3348,13 @@ async function activatePersonalFamily() {
     refreshAdminStats({ silent: true });
   } catch (error) {
     console.error("Erro ao ativar família principal no Firebase:", error);
-    setSyncStatus("offline", cloudUser.email || "");
+    // v75.42.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
+    // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
+    setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) {
-      loginHelper.textContent = "Admin liberado neste aparelho. Para gerar convites e sincronizar, revise as regras do Firestore.";
+      loginHelper.textContent = "Admin conectado. Se convites, famílias ou contagens não aparecerem, revise as regras do Firestore.";
     }
-    setAdminStatsPlaceholder("Admin liberado. A contagem depende das regras do Firestore.");
+    setAdminStatsPlaceholder("Admin conectado. A contagem depende das regras do Firestore.");
   }
 
   renderAuthControls();
@@ -4350,6 +4352,7 @@ async function initFirebaseAuthState() {
         loginHelper.textContent = "Admin conectado. Preparando painel...";
         await activatePersonalFamily();
         await loadAdminAccountProfileFromCloud(user);
+        setSyncStatus("online", user.email || "");
         loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
         renderAuthControls();
         showScreen("profile");
@@ -5709,6 +5712,15 @@ function setSyncStatus(status = "offline", email = "") {
   if (status.includes?.("@") && !email) {
     email = status;
     status = "online";
+  }
+
+  // v75.42.1: o admin global não deve aparecer como "Off-line" depois do login.
+  // O painel administrativo depende da autenticação do admin e de regras globais;
+  // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
+  // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
+  if ((status === "offline" || status === "error") && cloudUser && isGlobalAppAdmin(cloudUser)) {
+    status = "online";
+    email = email || cloudUser.email || GLOBAL_APP_ADMIN_EMAIL;
   }
 
   const online = status === "online";

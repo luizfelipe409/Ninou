@@ -1,6 +1,6 @@
-// Ninou v75.42 - áudio otimizado, cache sob demanda e Diário revisado
+// Ninou v75.42.1 - admin online estável, conta isolada e avatar limpo
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.42";
+const NINOU_APP_VERSION = "75.42.1";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

@@ -1,4 +1,4 @@
-# Ninou v75.42 — Somente avatar
+# Ninou v75.42.1 — Somente avatar
 
 Versão criada para testar avatares antes de substituir definitivamente a foto do bebê.
 
@@ -41,3 +41,11 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Dados antigos de foto são ignorados e substituídos visualmente pelo avatar.
 - O painel admin passa a mostrar avatares visuais diferentes por família, membro, usuário conhecido e admin.
 - Não usa Firebase Storage e não salva imagem/base64 como fluxo principal.
+
+
+## v75.42.1 — Admin online estável
+
+- Corrige o status visual do admin global para não aparecer como "Off-line" após login.
+- Falhas pontuais de leitura/escrita no Firestore agora viram aviso no painel, sem rebaixar o admin para visitante.
+- Mantém o avatar limpo: somente rostinhos infantis e cor de fundo.
+- Mantém isolamento de conta e evita reaproveitar identificação de outro usuário.
