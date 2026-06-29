@@ -27,6 +27,7 @@ export function createEmptyDayState() {
     lastWakeWindowStartedAt: null,
     lastWakeWindowMs: null,
     events: [],
+    auditLog: [],
   };
 }
 
@@ -34,7 +35,7 @@ export function createEventId(type, start) {
   return `${type}-${Math.round(start)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export function makeEvent(type, start, end = start, detail = "", notes = "") {
+export function makeEvent(type, start, end = start, detail = "", notes = "", meta = {}) {
   return {
     id: createEventId(type, start),
     type,
@@ -42,6 +43,7 @@ export function makeEvent(type, start, end = start, detail = "", notes = "") {
     end,
     detail,
     notes,
+    ...meta,
   };
 }
 
@@ -68,6 +70,13 @@ export function normalizeEvent(event = {}) {
     end: Number.isFinite(end) ? end : start,
     detail: typeof event.detail === "string" ? event.detail : "",
     notes: typeof event.notes === "string" ? event.notes : "",
+    createdAt: typeof event.createdAt === "string" ? event.createdAt : "",
+    createdByEmail: typeof event.createdByEmail === "string" ? event.createdByEmail : "",
+    createdByName: typeof event.createdByName === "string" ? event.createdByName : "",
+    updatedAt: typeof event.updatedAt === "string" ? event.updatedAt : "",
+    updatedByEmail: typeof event.updatedByEmail === "string" ? event.updatedByEmail : "",
+    updatedByName: typeof event.updatedByName === "string" ? event.updatedByName : "",
+    lastAction: typeof event.lastAction === "string" ? event.lastAction : "",
     ...(Number.isFinite(wakeWindowStartedAt) && Number.isFinite(wakeWindowMs) && wakeWindowMs > 0
       ? { wakeWindowStartedAt, wakeWindowMs }
       : {}),
@@ -93,6 +102,17 @@ export function normalizeDayState(dayState = {}) {
     lastWakeWindowStartedAt: Number.isFinite(lastWakeWindowStartedAt) ? lastWakeWindowStartedAt : null,
     lastWakeWindowMs: Number.isFinite(lastWakeWindowMs) && lastWakeWindowMs > 0 ? lastWakeWindowMs : null,
     events: Array.isArray(dayState.events) ? dayState.events.map(normalizeEvent).filter(Boolean) : [],
+    auditLog: Array.isArray(dayState.auditLog)
+      ? dayState.auditLog.slice(-60).map((item = {}) => ({
+          id: typeof item.id === "string" ? item.id : `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          action: typeof item.action === "string" ? item.action : "alterou",
+          title: typeof item.title === "string" ? item.title : "Registro",
+          at: typeof item.at === "string" ? item.at : "",
+          byEmail: typeof item.byEmail === "string" ? item.byEmail : "",
+          byName: typeof item.byName === "string" ? item.byName : "",
+          eventId: typeof item.eventId === "string" ? item.eventId : "",
+        }))
+      : [],
   };
 }
 
@@ -144,6 +164,10 @@ export function updateEventKeepingDuration(event, updates = {}) {
     end,
     detail: updates.detail ?? event.detail ?? "",
     notes: updates.notes ?? event.notes ?? "",
+    updatedAt: updates.updatedAt ?? event.updatedAt ?? "",
+    updatedByEmail: updates.updatedByEmail ?? event.updatedByEmail ?? "",
+    updatedByName: updates.updatedByName ?? event.updatedByName ?? "",
+    lastAction: updates.lastAction ?? event.lastAction ?? "",
   });
 
   if (Number.isFinite(Number(updates.wakeWindowStartedAt)) && Number.isFinite(Number(updates.wakeWindowMs)) && Number(updates.wakeWindowMs) > 0) {

@@ -3644,7 +3644,7 @@ body.day-theme .admin-invite-panel select {
 
 .admin-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 8px;
 }
 
@@ -4818,5 +4818,590 @@ body.admin-family-preview .profile-card #profileBabyAge {
 
   .admin-migration-checklist {
     padding: 12px;
+  }
+}
+
+/* v75.25 - UX do painel admin: famílias, membros e usuários do banco separados */
+body.global-admin-mode .settings-list {
+  gap: 16px;
+}
+
+body.global-admin-mode .admin-clean-panel {
+  gap: 16px !important;
+}
+
+body.global-admin-mode .admin-clean-hero,
+body.global-admin-mode .admin-clean-section {
+  padding: 18px;
+}
+
+body.global-admin-mode .admin-clean-hero {
+  align-items: center;
+}
+
+body.global-admin-mode .admin-clean-section .admin-invite-header {
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+body.global-admin-mode .admin-clean-section .admin-invite-header strong {
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+body.global-admin-mode .admin-clean-section .admin-invite-header em {
+  max-width: 58ch;
+  font-size: 0.9rem;
+  line-height: 1.48;
+}
+
+.admin-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.admin-card-actions button,
+body.global-admin-mode .admin-card-actions button {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 999px;
+  white-space: normal;
+  padding: 0 12px;
+}
+
+.admin-client-item {
+  border-color: rgba(122, 236, 190, 0.28);
+  background: linear-gradient(145deg, rgba(122, 236, 190, 0.10), rgba(21, 17, 62, 0.48));
+}
+
+.admin-client-item strong {
+  font-size: 1.08rem;
+}
+
+.admin-client-id {
+  margin-top: 6px !important;
+  font-size: 0.78rem !important;
+  opacity: 0.78;
+}
+
+.admin-member-item {
+  border-color: rgba(122, 236, 190, 0.22);
+}
+
+.admin-known-user-item {
+  border-color: rgba(150, 202, 255, 0.24);
+}
+
+.admin-known-user-item.is-member {
+  opacity: 0.82;
+  border-color: rgba(122, 236, 190, 0.18);
+}
+
+.admin-known-user-item > small,
+.admin-member-item > small,
+.admin-client-item > small {
+  justify-self: start;
+}
+
+.admin-users-section {
+  border-color: rgba(150, 202, 255, 0.25);
+}
+
+body.global-admin-mode .admin-access-actions {
+  align-items: center;
+}
+
+body.global-admin-mode .admin-access-actions button {
+  min-height: 40px;
+}
+
+body.global-admin-mode .admin-stats-grid article {
+  min-height: 88px;
+}
+
+body.global-admin-mode .admin-migration-card,
+body.global-admin-mode .admin-create-invite-card,
+body.global-admin-mode .admin-list-section,
+body.global-admin-mode .admin-family-client-card {
+  scroll-margin-top: 18px;
+}
+
+body.day-theme .admin-client-item {
+  background: linear-gradient(145deg, rgba(92, 201, 151, 0.12), rgba(255, 248, 237, 0.92));
+  border-color: rgba(45, 130, 98, 0.22);
+}
+
+body.day-theme .admin-known-user-item {
+  border-color: rgba(78, 132, 178, 0.20);
+}
+
+@media (max-width: 640px) {
+  .admin-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  body.global-admin-mode .admin-clean-hero,
+  body.global-admin-mode .admin-clean-section {
+    padding: 16px;
+  }
+
+  body.global-admin-mode .admin-access-item {
+    gap: 10px;
+  }
+
+  body.global-admin-mode .admin-clean-section .admin-invite-header {
+    margin-bottom: 10px;
+  }
+}
+
+
+/* v75.26 — admin como suporte, não membro da família */
+.admin-support-section .admin-support-item {
+  border-color: rgba(255, 210, 120, 0.28);
+  background: linear-gradient(145deg, rgba(255, 210, 120, 0.11), rgba(21, 17, 62, 0.44));
+}
+
+.admin-client-item.is-selected-family {
+  border-color: rgba(122, 236, 190, 0.55);
+  box-shadow: 0 14px 34px rgba(24, 196, 143, 0.13);
+}
+
+.admin-client-item .admin-access-actions {
+  align-items: flex-end;
+}
+
+.admin-client-item .admin-access-actions small {
+  align-self: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+}
+
+.admin-client-item .admin-access-actions button {
+  min-height: 38px;
+}
+
+@media (max-width: 560px) {
+  .admin-client-item .admin-access-actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .admin-client-item .admin-access-actions small {
+    align-self: flex-start;
+  }
+}
+
+/* v75.27 — criação de família/cliente e revisão geral de UX */
+:root {
+  --admin-card-gap: 14px;
+}
+
+.admin-clean-panel {
+  gap: 18px;
+}
+
+.admin-create-family-card {
+  border-color: rgba(255, 211, 122, 0.32);
+  background: linear-gradient(145deg, rgba(255, 211, 122, 0.10), rgba(21, 17, 62, 0.42));
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.admin-section-note {
+  margin: 10px 0 14px;
+  color: rgba(245, 238, 255, 0.76);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.admin-create-family-card > button,
+.admin-create-invite-card > button,
+.admin-migration-card > button {
+  width: 100%;
+  min-height: 46px;
+}
+
+.admin-create-family-result {
+  margin-top: 12px;
+}
+
+.admin-client-item > div:first-child,
+.admin-known-user-item > div:first-child,
+.admin-member-item > div:first-child {
+  min-width: 0;
+}
+
+.admin-client-item strong,
+.admin-known-user-item strong,
+.admin-member-item strong {
+  overflow-wrap: anywhere;
+}
+
+.admin-access-item span,
+.admin-access-item small,
+.admin-section-note,
+.admin-stats-hint,
+.admin-migration-status {
+  overflow-wrap: anywhere;
+}
+
+.admin-card-actions {
+  gap: 10px;
+}
+
+.admin-card-actions button,
+.admin-access-actions button,
+.admin-clean-panel button {
+  border-radius: 16px;
+}
+
+.admin-access-actions {
+  gap: 8px;
+}
+
+.admin-access-actions button {
+  padding-inline: 12px;
+}
+
+body.day-theme .admin-create-family-card {
+  background: linear-gradient(145deg, rgba(255, 211, 122, 0.20), rgba(255, 248, 237, 0.94));
+  border-color: rgba(168, 125, 33, 0.25);
+}
+
+body.day-theme .admin-section-note {
+  color: rgba(61, 52, 74, 0.74);
+}
+
+@media (max-width: 760px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-clean-panel {
+    gap: 14px;
+  }
+
+  .admin-access-actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .admin-access-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-clean-hero p,
+  .admin-clean-section .admin-invite-header em,
+  .admin-section-note {
+    font-size: 0.84rem;
+  }
+
+  .admin-stats-grid {
+    gap: 8px;
+  }
+
+  .admin-stats-grid article {
+    padding: 12px 10px;
+  }
+}
+
+/* v75.28 — experiência da família: Hoje, alertas, crescimento, auditoria e exportações */
+.today-overview-card,
+.day-summary-card,
+.growth-card,
+.audit-card,
+.gentle-alert-card,
+.family-welcome-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045));
+  border-radius: 26px;
+  padding: 18px;
+  box-shadow: 0 18px 42px rgba(8, 8, 28, 0.16);
+}
+
+.today-overview-card {
+  margin-top: 12px;
+  display: grid;
+  gap: 14px;
+}
+
+.today-overview-head,
+.growth-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.today-overview-head span,
+.drawer-section-title span,
+.gentle-alert-card span,
+.family-welcome-card span {
+  color: rgba(245, 238, 255, 0.70);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.today-overview-head strong,
+.family-welcome-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.18rem;
+}
+
+.today-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.today-overview-grid article {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.today-overview-grid span,
+.day-summary-card span,
+.growth-card span {
+  display: block;
+  color: rgba(245, 238, 255, 0.68);
+  font-size: 0.78rem;
+}
+
+.today-overview-grid strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.98rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.today-overview-suggestion,
+.day-summary-card p,
+.growth-card p,
+.gentle-alert-card p,
+.family-welcome-card p {
+  margin: 0;
+  color: rgba(245, 238, 255, 0.76);
+  line-height: 1.45;
+}
+
+.gentle-alert-card {
+  margin-top: 12px;
+  border-color: rgba(255, 211, 122, 0.28);
+  background: linear-gradient(145deg, rgba(255, 211, 122, 0.12), rgba(255, 255, 255, 0.05));
+}
+
+.gentle-alert-card strong {
+  display: block;
+  margin: 4px 0 6px;
+  font-size: 1.02rem;
+}
+
+.day-summary-card,
+.growth-card,
+.audit-card {
+  margin-top: 14px;
+}
+
+.growth-card-body > div:first-child {
+  min-width: 0;
+  flex: 1;
+}
+
+.growth-card-body strong {
+  display: block;
+  font-size: 1.28rem;
+  margin-bottom: 4px;
+}
+
+.weight-sparkline {
+  width: 104px;
+  min-width: 104px;
+  height: 62px;
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.weight-sparkline-large {
+  width: 138px;
+  min-width: 138px;
+  height: 78px;
+}
+
+.weight-sparkline i {
+  width: 9px;
+  height: var(--h, 16%);
+  min-height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, rgba(124, 229, 194, 0.95), rgba(122, 157, 255, 0.65));
+  display: block;
+}
+
+.weight-sparkline span {
+  align-self: center;
+  color: rgba(245, 238, 255, 0.62);
+  font-size: 0.72rem;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.audit-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.audit-list li {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.065);
+  display: grid;
+  gap: 3px;
+}
+
+.audit-list strong {
+  font-size: 0.92rem;
+}
+
+.audit-list span,
+.event-audit-line {
+  color: rgba(245, 238, 255, 0.62);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.event-audit-line {
+  display: block;
+  margin-top: 6px;
+}
+
+.family-welcome-card {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+  border-color: rgba(124, 229, 194, 0.25);
+}
+
+.family-welcome-card button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.permission-guide {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.permission-guide article {
+  padding: 11px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.065);
+  display: grid;
+  gap: 3px;
+}
+
+.permission-guide strong {
+  font-size: 0.9rem;
+}
+
+.permission-guide span {
+  color: rgba(245, 238, 255, 0.66);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.admin-health-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.export-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.day-theme .today-overview-card,
+body.day-theme .day-summary-card,
+body.day-theme .growth-card,
+body.day-theme .audit-card,
+body.day-theme .family-welcome-card,
+body.day-theme .gentle-alert-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 248, 237, 0.88));
+  border-color: rgba(67, 50, 94, 0.10);
+  box-shadow: 0 16px 34px rgba(116, 94, 145, 0.10);
+}
+
+body.day-theme .today-overview-head span,
+body.day-theme .drawer-section-title span,
+body.day-theme .today-overview-grid span,
+body.day-theme .day-summary-card span,
+body.day-theme .growth-card span,
+body.day-theme .gentle-alert-card span,
+body.day-theme .family-welcome-card span,
+body.day-theme .audit-list span,
+body.day-theme .event-audit-line,
+body.day-theme .permission-guide span,
+body.day-theme .today-overview-suggestion,
+body.day-theme .day-summary-card p,
+body.day-theme .growth-card p,
+body.day-theme .gentle-alert-card p,
+body.day-theme .family-welcome-card p {
+  color: rgba(61, 52, 74, 0.68);
+}
+
+body.day-theme .today-overview-grid article,
+body.day-theme .audit-list li,
+body.day-theme .permission-guide article,
+body.day-theme .weight-sparkline {
+  background: rgba(102, 78, 140, 0.07);
+}
+
+@media (max-width: 520px) {
+  .today-overview-card,
+  .day-summary-card,
+  .growth-card,
+  .audit-card,
+  .gentle-alert-card,
+  .family-welcome-card {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .today-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .today-overview-head,
+  .growth-card-body {
+    flex-direction: column;
+  }
+
+  .weight-sparkline,
+  .weight-sparkline-large {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
   }
 }

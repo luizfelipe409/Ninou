@@ -113,16 +113,45 @@ const inviteResult = document.querySelector("#inviteResult");
 const inviteList = document.querySelector("#inviteList");
 const adminPendingInviteList = document.querySelector("#adminPendingInviteList");
 const adminMembersList = document.querySelector("#adminMembersList");
+const adminKnownUsersList = document.querySelector("#adminKnownUsersList");
 const adminUsersCount = document.querySelector("#adminUsersCount");
+const adminFamiliesCount = document.querySelector("#adminFamiliesCount");
+const adminKnownUsersStat = document.querySelector("#adminKnownUsersStat");
 const adminPendingInvitesCount = document.querySelector("#adminPendingInvitesCount");
 const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesCount");
+const adminLastMigrationStatus = document.querySelector("#adminLastMigrationStatus");
 const adminStatsHint = document.querySelector("#adminStatsHint");
 const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
 const adminClientsList = document.querySelector("#adminClientsList");
 const adminSelectedFamilyHint = document.querySelector("#adminSelectedFamilyHint");
 const adminOpenFamilyButton = document.querySelector("#adminOpenFamilyButton");
+const adminCreateClientFamilyButton = document.querySelector("#adminCreateClientFamilyButton");
+const adminNewFamilyNameInput = document.querySelector("#adminNewFamilyNameInput");
+const adminNewBabyNameInput = document.querySelector("#adminNewBabyNameInput");
+const adminNewBabyArticleInput = document.querySelector("#adminNewBabyArticleInput");
+const adminNewResponsibleEmailInput = document.querySelector("#adminNewResponsibleEmailInput");
+const adminCreateFamilyResult = document.querySelector("#adminCreateFamilyResult");
 const adminPreviewBanner = document.querySelector("#adminPreviewBanner");
 const adminReturnToPanelButton = document.querySelector("#adminReturnToPanelButton");
+const todayOverviewKicker = document.querySelector("#todayOverviewKicker");
+const todayOverviewTitle = document.querySelector("#todayOverviewTitle");
+const todayOverviewGrid = document.querySelector("#todayOverviewGrid");
+const todayOverviewSuggestion = document.querySelector("#todayOverviewSuggestion");
+const gentleAlertCard = document.querySelector("#gentleAlertCard");
+const daySummaryMoment = document.querySelector("#daySummaryMoment");
+const daySummaryText = document.querySelector("#daySummaryText");
+const todayGrowthWeight = document.querySelector("#todayGrowthWeight");
+const todayGrowthHint = document.querySelector("#todayGrowthHint");
+const todayWeightSparkline = document.querySelector("#todayWeightSparkline");
+const trendGrowthStatus = document.querySelector("#trendGrowthStatus");
+const trendGrowthWeight = document.querySelector("#trendGrowthWeight");
+const trendGrowthHint = document.querySelector("#trendGrowthHint");
+const trendWeightSparkline = document.querySelector("#trendWeightSparkline");
+const auditTrailList = document.querySelector("#auditTrailList");
+const familyWelcomeCard = document.querySelector("#familyWelcomeCard");
+const familyWelcomeTitle = document.querySelector("#familyWelcomeTitle");
+const familyWelcomeText = document.querySelector("#familyWelcomeText");
+const familyWelcomeStartButton = document.querySelector("#familyWelcomeStartButton");
 const adminMigrationStatus = document.querySelector("#adminMigrationStatus");
 const adminMigrationSources = document.querySelector("#adminMigrationSources");
 const adminMigrationChecklist = document.querySelector("#adminMigrationChecklist");
@@ -135,6 +164,8 @@ const guestWhatsappButton = document.querySelector("#guestWhatsappButton");
 const resetDataButton = document.querySelector("#resetDataButton");
 const exportJsonButton = document.querySelector("#exportJsonButton");
 const exportCsvButton = document.querySelector("#exportCsvButton");
+const exportPdfButton = document.querySelector("#exportPdfButton");
+const shareWhatsappButton = document.querySelector("#shareWhatsappButton");
 const syncPill = document.querySelector(".sync-pill");
 const syncStatusTitle = document.querySelector("#syncStatusTitle");
 const syncStatusText = document.querySelector("#syncStatusText");
@@ -191,6 +222,34 @@ function isGlobalAdminEmail(email = "") {
 
 function isGlobalAppAdmin(user = cloudUser) {
   return Boolean(user && isGlobalAdminEmail(user.email));
+}
+
+function loadSelectedAdminFamilyId() {
+  try {
+    return String(localStorage.getItem("ninou.admin.selectedFamilyId") || APP_ADMIN_FAMILY_ID);
+  } catch {
+    return APP_ADMIN_FAMILY_ID;
+  }
+}
+
+function getActiveAdminFamilyId() {
+  return selectedAdminFamilyId || APP_ADMIN_FAMILY_ID;
+}
+
+function saveSelectedAdminFamilyId(familyId = APP_ADMIN_FAMILY_ID) {
+  selectedAdminFamilyId = String(familyId || APP_ADMIN_FAMILY_ID);
+  try { localStorage.setItem("ninou.admin.selectedFamilyId", selectedAdminFamilyId); } catch {}
+  return selectedAdminFamilyId;
+}
+
+function getSelectedFamilyIdForAdminOrAccess() {
+  return isGlobalAppAdmin() ? getActiveAdminFamilyId() : (familyAccess?.familyId || APP_ADMIN_FAMILY_ID);
+}
+
+function getAdminSelectedFamilyLabel(stats = null) {
+  const selectedId = getActiveAdminFamilyId();
+  const family = Array.isArray(stats?.families) ? stats.families.find((item) => item.id === selectedId) : null;
+  return family?.name || stats?.familyName || babyProfile?.name || "Família selecionada";
 }
 
 function getAdminAccountPhotoKey(user = cloudUser) {
@@ -257,6 +316,7 @@ let familyAccess = loadFamilyAccess();
 let pendingInviteCode = getInitialInviteCode();
 let recentInvites = [];
 let adminStatsRequestId = 0;
+let selectedAdminFamilyId = loadSelectedAdminFamilyId();
 let activeScreenName = "today";
 let lastMigrationResult = null;
 let legacyCloudContexts = [];
@@ -334,8 +394,44 @@ function applyWakeWindowMetadata(event, excludeEventId = null) {
   return event;
 }
 
+function getCurrentActorEmail() {
+  return normalizeEmail(cloudUser?.email || familyAccess?.email || "") || "este aparelho";
+}
+
+function getCurrentActorName() {
+  const email = getCurrentActorEmail();
+  if (!email || email === "este aparelho") return "este aparelho";
+  if (isGlobalAdminEmail(email)) return "Admin";
+  return email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function makeAuditEntry(action, event, at = new Date().toISOString()) {
+  const config = event?.type ? getEventConfig(event.type) : { title: "Registro" };
+  return {
+    id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    action,
+    title: config.title || "Registro",
+    at,
+    byEmail: getCurrentActorEmail(),
+    byName: getCurrentActorName(),
+    eventId: event?.id || "",
+  };
+}
+
+function pushAuditEntry(action, event) {
+  state.auditLog = Array.isArray(state.auditLog) ? state.auditLog : [];
+  state.auditLog.push(makeAuditEntry(action, event));
+  state.auditLog = state.auditLog.slice(-60);
+}
+
 function makeEvent(type, start, end = start, detail = "", notes = "") {
-  return applyWakeWindowMetadata(createRoutineEvent(type, start, end, detail, notes));
+  const nowIso = new Date().toISOString();
+  return applyWakeWindowMetadata(createRoutineEvent(type, start, end, detail, notes, {
+    createdAt: nowIso,
+    createdByEmail: getCurrentActorEmail(),
+    createdByName: getCurrentActorName(),
+    lastAction: "adicionou",
+  }));
 }
 
 function normalizeEvent(event = {}) {
@@ -727,6 +823,25 @@ function createInviteCodeForEmail(email = "", familyId = APP_ADMIN_FAMILY_ID) {
   return `NINOU-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}`;
 }
 
+function slugifyFamilyText(value = "familia") {
+  const slug = String(value || "familia")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 30);
+  return slug || "familia";
+}
+
+function createFamilyIdFromNames(familyName = "", babyName = "") {
+  const base = slugifyFamilyText(babyName || familyName || "familia");
+  const token = stableInviteToken(`${base}|${familyName}|${babyName}|${cloudUser?.uid || "admin"}|${Date.now()}`)
+    .slice(0, 6)
+    .toLowerCase();
+  return `family-${base}-${token}`;
+}
+
 function buildInviteLink(code) {
   const url = new URL(window.location.href);
   url.search = "";
@@ -850,22 +965,25 @@ function buildFamilyStateForRecentWindow(count = 7, anchorStart = getDayStart())
 }
 
 function isFamilyAdmin() {
-  return hasFamilyAccess() && isGlobalAppAdmin();
+  if (isGlobalAppAdmin()) return true;
+  return hasFamilyAccess() && getEffectiveRole(familyAccess?.role) === "admin";
 }
 
-function buildGlobalAdminAccess(user = cloudUser) {
+function buildGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamilyId()) {
   if (!user || !isGlobalAppAdmin(user)) return null;
   return {
-    familyId: APP_ADMIN_FAMILY_ID,
+    familyId: String(familyId || APP_ADMIN_FAMILY_ID),
     role: "admin",
     email: user.email || GLOBAL_APP_ADMIN_EMAIL,
     ownerUid: user.uid,
+    accessMode: "support",
     acceptedAt: new Date().toISOString(),
   };
 }
 
-function ensureGlobalAdminAccess(user = cloudUser) {
-  const access = buildGlobalAdminAccess(user);
+function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamilyId()) {
+  const selectedFamily = saveSelectedAdminFamilyId(familyId);
+  const access = buildGlobalAdminAccess(user, selectedFamily);
   if (!access) return null;
   return saveFamilyAccess(access);
 }
@@ -881,10 +999,13 @@ function updateGuestWhatsappButton() {
   document.body.classList.toggle("guest-whatsapp-visible", shouldShow);
 }
 
-function setAdminStatsPlaceholder(message = "Entre como admin para visualizar os usuários autorizados.") {
+function setAdminStatsPlaceholder(message = "Entre como admin para visualizar o painel.") {
   setText(adminUsersCount, "--");
+  setText(adminFamiliesCount, "--");
+  setText(adminKnownUsersStat, "--");
   setText(adminPendingInvitesCount, "--");
   setText(adminAcceptedInvitesCount, "--");
+  setText(adminLastMigrationStatus, "--");
   setText(adminStatsHint, message);
 }
 
@@ -1326,6 +1447,11 @@ function getLegacyUidFromPath(path = "") {
   return match ? match[1] : "";
 }
 
+function getFamilyIdFromProfilePath(path = "") {
+  const match = String(path || "").match(/^families\/([^/]+)\/profile\//);
+  return match ? match[1] : "";
+}
+
 async function readMaybeCollectionGroup(services, groupName) {
   if (!services.collectionGroup) return [];
   try {
@@ -1749,7 +1875,7 @@ function renderFamilyMigrationPanel(options = {}) {
 
   if (lastMigrationResult && !options.forceList) {
     const result = lastMigrationResult;
-    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família principal. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
+    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família selecionada. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
     adminMigrationSources.innerHTML = `
       <li class="admin-migration-source is-best">
         <div>
@@ -1929,7 +2055,7 @@ async function linkMigrationSourceAccountToFamily(context, familyId, sourceLabel
 
 async function uploadMigrationContextToFamily(context) {
   const services = await getFirebaseServices();
-  const familyId = familyAccess?.familyId || APP_ADMIN_FAMILY_ID;
+  const familyId = getSelectedFamilyIdForAdminOrAccess();
   const sourceLabel = context.source === "cloud" ? `users/${context.uid || context.email}` : `cache/${context.email}`;
   const migrationId = `${Date.now()}-${String(context.uid || context.email || "origem").replace(/[^a-z0-9]+/gi, "-").slice(0, 32)}`;
   const normalizedWeights = normalizeWeights(context.weights || context.profile?.weights || []);
@@ -1941,7 +2067,8 @@ async function uploadMigrationContextToFamily(context) {
   await services.setDoc(services.doc(services.db, "families", familyId), {
     ownerUid: cloudUser.uid,
     ownerEmail: cloudUser.email || "",
-    title: "Família do Francisco",
+    title: normalizedProfile.name || "Família selecionada",
+    customerLabel: "Cliente / família cadastrada",
     latestMigratedDayId: Object.keys(context.dayStates || {}).filter(isDateId).sort().at(-1) || "",
     migratedDayIds: Object.keys(context.dayStates || {}).filter(isDateId).sort(),
     updatedAt: services.serverTimestamp(),
@@ -2020,9 +2147,10 @@ async function restoreFamilyDataFromBestSource(options = {}) {
   }
 
   if (!options.silent) {
-    const ok = window.confirm(`Copiar ${getContextEventsCount(context)} registros em ${getContextDaysCount(context)} dia(s) de ${context.email || context.uid} para a família principal do Ninou?
+    const destinationFamilyId = getSelectedFamilyIdForAdminOrAccess();
+    const ok = window.confirm(`Copiar ${getContextEventsCount(context)} registros em ${getContextDaysCount(context)} dia(s) de ${context.email || context.uid} para a família selecionada?
 
-Destino: families/${familyAccess?.familyId || APP_ADMIN_FAMILY_ID}
+Destino: families/${destinationFamilyId}
 
 Os dados antigos não serão apagados.`);
     if (!ok) return false;
@@ -2043,7 +2171,7 @@ Os dados antigos não serão apagados.`);
     } else {
       window.__ninouAdminFamilyDataOpen = false;
       resetVisibleContextForGuest();
-      saveFamilyAccess(buildGlobalAdminAccess(cloudUser));
+      saveFamilyAccess(buildGlobalAdminAccess(cloudUser, getActiveAdminFamilyId()));
       await loadAdminAccountProfileFromCloud(cloudUser);
       showScreen("profile");
     }
@@ -2077,37 +2205,199 @@ async function autoSeedFamilyFromLocalCache() {
   return restoreFamilyDataFromBestSource({ silent: true });
 }
 
+function getFamilyDisplayName(stats = null) {
+  const raw = stats?.familyName || stats?.profileName || babyProfile?.name || "Francisco";
+  return escapeHtml(raw || "Família");
+}
+
+function getPendingInviteText(count = 0) {
+  const total = Number(count || 0);
+  return total > 0 ? `${total} convite(s) pendente(s)` : "Sem convites pendentes";
+}
+
+function getKnownUserSourceLabel(user = {}) {
+  const labels = {
+    users: "Cadastro",
+    account: "Perfil pessoal",
+    access: "Acesso",
+    profile: "Perfil antigo",
+    member: "Membro",
+    invite: "Convite",
+  };
+  const sources = Array.isArray(user.sources) ? user.sources : [];
+  const unique = Array.from(new Set(sources.map((source) => labels[source] || source).filter(Boolean)));
+  return unique.slice(0, 3).join(" • ") || "Firestore";
+}
+
+function getKnownUserStatusLabel(user = {}) {
+  if (user.isAppAdmin) return "Admin do app";
+  if (user.isMember) return "Membro da família selecionada";
+  if (user.hasFamilyAccess) return "Tem acesso familiar";
+  if (user.hasPendingInvite) return "Convite pendente";
+  return "Sem vínculo com a família selecionada";
+}
+
+function scrollAdminSection(sectionId = "") {
+  const target = document.getElementById(sectionId);
+  if (!target) return;
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function fillAdminInviteEmail(email = "") {
+  if (!adminInviteEmail) return;
+  adminInviteEmail.value = normalizeEmail(email);
+  scrollAdminSection("adminInviteSection");
+  setTimeout(() => adminInviteEmail?.focus?.(), 320);
+}
+
+function fillAdminMigrationEmail(email = "") {
+  if (!adminMigrationEmailInput) return;
+  adminMigrationEmailInput.value = normalizeEmail(email);
+  scrollAdminSection("adminMigrationSection");
+  setTimeout(() => adminMigrationEmailInput?.focus?.(), 320);
+}
+
+async function authorizeKnownUserAsCaregiver(uid = "", email = "") {
+  const cleanUid = String(uid || "").trim();
+  const cleanEmail = normalizeEmail(email || "");
+  if (!isGlobalAppAdmin() || !cleanUid) return false;
+
+  const services = await getFirebaseServices();
+  const familyId = getSelectedFamilyIdForAdminOrAccess();
+  const nowIso = new Date().toISOString();
+  const payload = {
+    familyId,
+    role: "cuidador",
+    email: cleanEmail,
+    status: "active",
+    inviteCode: "admin-manual",
+    acceptedAt: nowIso,
+    updatedAt: services.serverTimestamp(),
+  };
+
+  await services.setDoc(services.doc(services.db, "users", cleanUid, "access", "ninou"), payload, { merge: true });
+  await services.setDoc(services.doc(services.db, "families", familyId, "members", cleanUid), {
+    ...payload,
+    joinedAt: services.serverTimestamp(),
+    addedBy: cloudUser?.uid || "admin",
+  }, { merge: true });
+
+  if (cleanEmail) {
+    await services.setDoc(services.doc(services.db, "users", cleanUid, "account", "profile"), {
+      email: cleanEmail,
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+  }
+
+  if (loginHelper) loginHelper.textContent = `${cleanEmail || cleanUid} foi autorizado como cuidador desta família.`;
+  await refreshAdminStats({ silent: true });
+  return true;
+}
+
+function renderKnownUsersList(stats = null) {
+  if (!adminKnownUsersList) return;
+
+  if (!isGlobalAppAdmin()) {
+    adminKnownUsersList.innerHTML = "<li>Entre como admin para localizar usuários cadastrados.</li>";
+    return;
+  }
+
+  const users = Array.isArray(stats?.knownUsers) ? stats.knownUsers : [];
+  if (!users.length) {
+    adminKnownUsersList.innerHTML = "<li>Nenhum usuário adicional encontrado no Firestore. Usuários sem documento em users/{uid} só aparecem após criarem perfil, acesso ou convite.</li>";
+    return;
+  }
+
+  adminKnownUsersList.innerHTML = users.slice(0, 24).map((user) => {
+    const email = escapeHtml(user.email || "E-mail não identificado");
+    const uid = escapeHtml(user.uid || "");
+    const source = escapeHtml(getKnownUserSourceLabel(user));
+    const status = escapeHtml(getKnownUserStatusLabel(user));
+    const canLink = Boolean(user.uid && !user.isMember && !user.isAppAdmin);
+    const safeEmailAttr = escapeHtml(user.email || "");
+    const safeUidAttr = escapeHtml(user.uid || "");
+    const primaryLine = user.uid ? `UID: ${uid}` : "Sem UID disponível no painel";
+    const linkButton = canLink
+      ? `<button type="button" data-link-known-user="${safeUidAttr}" data-link-known-email="${safeEmailAttr}">Autorizar como cuidador</button>`
+      : "";
+    const inviteButton = user.email && !user.isMember && !user.isAppAdmin
+      ? `<button type="button" data-fill-invite-email="${safeEmailAttr}">Convidar</button>`
+      : "";
+    const migrateButton = user.email && !user.isAppAdmin
+      ? `<button type="button" data-fill-migration-email="${safeEmailAttr}">Migrar dados</button>`
+      : "";
+    const createFamilyButtonMarkup = user.email && !user.hasFamilyAccess && !user.isAppAdmin
+      ? `<button type="button" data-fill-new-family-responsible="${safeEmailAttr}">Criar família</button>`
+      : "";
+    const actions = [createFamilyButtonMarkup, inviteButton, linkButton, migrateButton].filter(Boolean).join("");
+
+    return `
+      <li class="admin-access-item admin-known-user-item ${user.isMember ? "is-member" : ""}">
+        <div>
+          <strong>${email}</strong>
+          <span>${status} • ${source}</span>
+          <small>${escapeHtml(primaryLine)}</small>
+        </div>
+        ${actions ? `<div class="admin-access-actions">${actions}</div>` : `<small>Já aparece em membros desta família.</small>`}
+      </li>
+    `;
+  }).join("");
+}
+
 function renderAdminClients(stats = null) {
   const appAdmin = isGlobalAppAdmin();
   const previewOpen = Boolean(window.__ninouAdminFamilyDataOpen);
+  const selectedId = getActiveAdminFamilyId();
+  const families = Array.isArray(stats?.families) && stats.families.length
+    ? stats.families
+    : [{
+        id: selectedId,
+        name: stats?.familyName || "Francisco",
+        subtitle: "Cliente / família cadastrada",
+        membersCount: stats?.membersCount ?? 0,
+        pendingInvitesCount: stats?.pendingInvitesCount ?? 0,
+      }];
 
   if (adminClientsList) {
     if (!appAdmin) {
-      adminClientsList.innerHTML = "<li>Entre como admin para visualizar famílias.</li>";
+      adminClientsList.innerHTML = "<li>Entre como admin para visualizar famílias/clientes.</li>";
     } else {
-      const membersCount = stats?.membersCount ?? 0;
-      const pendingCount = stats?.pendingInvitesCount ?? 0;
-      adminClientsList.innerHTML = `
-        <li class="admin-access-item admin-client-item">
-          <div>
-            <strong>Família principal</strong>
-            <span>${escapeHtml(APP_ADMIN_FAMILY_ID)} • ${membersCount} membro(s) • ${pendingCount} convite(s) pendente(s)</span>
-          </div>
-          <small>${previewOpen ? "Aberta para visualização" : "Não aberta automaticamente"}</small>
-        </li>`;
+      adminClientsList.innerHTML = families.map((family) => {
+        const isSelected = family.id === selectedId;
+        const membersLabel = Number.isFinite(Number(family.membersCount))
+          ? pluralize(Number(family.membersCount), "membro", "membros")
+          : "membros sob consulta";
+        const pendingLabel = Number.isFinite(Number(family.pendingInvitesCount))
+          ? getPendingInviteText(Number(family.pendingInvitesCount))
+          : "convites sob consulta";
+        return `
+          <li class="admin-access-item admin-client-item ${isSelected ? "is-selected-family" : ""}">
+            <div>
+              <strong>${escapeHtml(family.name || "Família sem nome")}</strong>
+              <span>${escapeHtml(family.subtitle || "Cliente / família cadastrada")} • ${escapeHtml(membersLabel)} • ${escapeHtml(pendingLabel)}</span>
+              <span class="admin-client-id">ID: ${escapeHtml(family.id)}</span>
+            </div>
+            <div class="admin-access-actions">
+              <small>${isSelected ? (previewOpen ? "Aberta no modo admin" : "Selecionada") : "Fechada"}</small>
+              ${isSelected ? "" : `<button type="button" data-select-admin-family="${escapeHtml(family.id)}">Selecionar</button>`}
+              <button type="button" data-open-admin-family="${escapeHtml(family.id)}">${isSelected && previewOpen ? "Rotina aberta" : "Abrir rotina"}</button>
+            </div>
+          </li>`;
+      }).join("");
     }
   }
 
   if (adminSelectedFamilyHint) {
+    const selectedLabel = getAdminSelectedFamilyLabel(stats);
     adminSelectedFamilyHint.textContent = previewOpen
-      ? `Visualizando ${APP_ADMIN_FAMILY_ID}. Use Voltar ao painel para sair da rotina familiar.`
-      : "Nenhuma família aberta no painel. A rotina só carrega após toque manual.";
+      ? `Você está visualizando a rotina de ${selectedLabel} como administrador. Use Voltar ao painel para sair da visualização familiar.`
+      : `Família selecionada: ${selectedLabel}. A rotina só abre quando você tocar em Abrir rotina.`;
   }
 
   if (adminOpenFamilyButton) {
     adminOpenFamilyButton.hidden = !appAdmin;
-    adminOpenFamilyButton.disabled = !isFamilyAdmin() || previewOpen;
-    adminOpenFamilyButton.textContent = previewOpen ? "Família aberta" : "Visualizar família principal";
+    adminOpenFamilyButton.disabled = !appAdmin || previewOpen;
+    adminOpenFamilyButton.textContent = previewOpen ? "Rotina aberta" : "Abrir rotina da família selecionada";
   }
 
   if (adminReturnToPanelButton) {
@@ -2119,7 +2409,26 @@ function renderAdminClients(stats = null) {
   }
 }
 
+function renderAdminSupportAccess(stats = null) {
+  const list = document.querySelector("#adminSupportAccessList");
+  if (!list) return;
+  if (!isGlobalAppAdmin()) {
+    list.innerHTML = "<li>Entre como admin para visualizar o acesso administrativo.</li>";
+    return;
+  }
+  const selectedLabel = getAdminSelectedFamilyLabel(stats);
+  list.innerHTML = `
+    <li class="admin-access-item admin-support-item">
+      <div>
+        <strong>${escapeHtml(cloudUser?.email || GLOBAL_APP_ADMIN_EMAIL)}</strong>
+        <span>Admin do app — acesso de suporte</span>
+        <small>Você pode abrir ${escapeHtml(selectedLabel)} para suporte, sem virar membro da família.</small>
+      </div>
+    </li>`;
+}
+
 function renderAdminAccessLists(stats = null) {
+  renderAdminSupportAccess(stats);
   if (adminPendingInviteList) {
     const pending = Array.isArray(stats?.pendingInvites) ? stats.pendingInvites : [];
     if (!pending.length) {
@@ -2146,25 +2455,27 @@ function renderAdminAccessLists(stats = null) {
   }
 
   if (adminMembersList) {
-    const members = Array.isArray(stats?.members) ? stats.members : [];
+    const members = Array.isArray(stats?.members) ? stats.members.filter((member) => !member.isAdmin) : [];
     if (!members.length) {
-      adminMembersList.innerHTML = "<li>Nenhum usuário autorizado ainda.</li>";
+      adminMembersList.innerHTML = "<li>Nenhum membro autorizado ainda.</li>";
     } else {
-      adminMembersList.innerHTML = members.slice(0, 10).map((member) => `
-        <li class="admin-access-item">
+      adminMembersList.innerHTML = members.slice(0, 12).map((member) => `
+        <li class="admin-access-item admin-member-item">
           <div>
             <strong>${escapeHtml(member.email || "Usuário sem e-mail")}</strong>
-            <span>${escapeHtml(getRoleLabel(member.role))}${member.isAdmin ? " • Admin do app" : ""}</span>
+            <span>${escapeHtml(getRoleLabel(member.role))}</span>
           </div>
-          <small>${member.joinedAt ? "Entrou na família" : "Autorizado"}</small>
+          <small>${member.joinedAt ? "Membro ativo" : "Autorizado"}</small>
         </li>
       `).join("");
     }
   }
+
+  renderKnownUsersList(stats);
 }
 
 function renderAdminStats(stats = null) {
-  if (!adminUsersCount || !adminPendingInvitesCount || !adminAcceptedInvitesCount) return;
+  if (!adminPendingInvitesCount && !adminFamiliesCount && !adminKnownUsersStat) return;
 
   if (!stats) {
     setAdminStatsPlaceholder();
@@ -2174,11 +2485,14 @@ function renderAdminStats(stats = null) {
   }
 
   setText(adminUsersCount, String(stats.membersCount ?? 0));
+  setText(adminFamiliesCount, String(stats.familiesCount ?? 0));
+  setText(adminKnownUsersStat, String(stats.knownUsersCount ?? 0));
   setText(adminPendingInvitesCount, String(stats.pendingInvitesCount ?? 0));
   setText(adminAcceptedInvitesCount, String(stats.acceptedInvitesCount ?? 0));
+  setText(adminLastMigrationStatus, lastMigrationResult ? "Concluída" : "Sem migração");
   setText(
     adminStatsHint,
-    `${pluralize(stats.membersCount ?? 0, "usuário autorizado", "usuários autorizados")} na família principal. O admin vê somente convites e acessos.`,
+    `${pluralize(stats.familiesCount ?? 0, "família cadastrada", "famílias cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "usuário encontrado", "usuários encontrados")} no Firestore.`,
   );
   renderAdminClients(stats);
   renderAdminAccessLists(stats);
@@ -2186,34 +2500,50 @@ function renderAdminStats(stats = null) {
 }
 
 async function refreshAdminStats(options = {}) {
-  if (!isFamilyAdmin() || !familyAccess?.familyId) {
+  if (!isFamilyAdmin()) {
     renderAdminStats(null);
     return null;
   }
 
+  if (isGlobalAppAdmin()) ensureGlobalAdminAccess(cloudUser, getActiveAdminFamilyId());
+
   const requestId = ++adminStatsRequestId;
-  if (!options.silent) setAdminStatsPlaceholder("Atualizando contagem...");
+  if (!options.silent) setAdminStatsPlaceholder("Atualizando painel...");
   if (refreshAdminStatsButton) refreshAdminStatsButton.disabled = true;
 
   try {
     const services = await getFirebaseServices();
-    const familyId = familyAccess.familyId;
-    const [membersSnapshot, globalInvitesSnapshot] = await Promise.all([
+    const familyId = getSelectedFamilyIdForAdminOrAccess();
+    const [membersSnapshot, globalInvitesSnapshot, familiesSnapshot, familySnap, familyProfileSnap, usersSnapshot, accessSnapshot, accountSnapshot, profileSnapshot] = await Promise.all([
       services.getDocs(services.collection(services.db, "families", familyId, "members")),
       services.getDocs(services.collection(services.db, "invites")),
+      services.getDocs(services.query(services.collection(services.db, "families"), services.limit(50))),
+      services.getDoc(services.doc(services.db, "families", familyId)),
+      services.getDoc(services.doc(services.db, "families", familyId, "profile", "main")),
+      services.getDocs(services.query(services.collection(services.db, "users"), services.limit(80))),
+      services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "access"), services.limit(120))) : Promise.resolve({ docs: [], forEach() {} }),
+      services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "account"), services.limit(120))) : Promise.resolve({ docs: [], forEach() {} }),
+      services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "profile"), services.limit(120))) : Promise.resolve({ docs: [], forEach() {} }),
     ]);
 
     const members = [];
+    const memberUidSet = new Set();
+    const memberEmailSet = new Set();
     membersSnapshot.forEach((memberDoc) => {
       const data = memberDoc.data() || {};
       if ((data.status || "active") === "removed") return;
       const email = normalizeEmail(data.email || "");
       const role = getEffectiveRole(data.role || "visualizacao", email);
+      const isAdminMember = isGlobalAdminEmail(email) || role === "admin";
+      if (!isAdminMember) {
+        memberUidSet.add(memberDoc.id);
+        if (email) memberEmailSet.add(email);
+      }
       members.push({
         uid: memberDoc.id,
         email,
         role,
-        isAdmin: isGlobalAdminEmail(email),
+        isAdmin: isAdminMember,
         joinedAt: data.joinedAt || data.acceptedAt || data.updatedAt || null,
       });
     });
@@ -2221,11 +2551,13 @@ async function refreshAdminStats(options = {}) {
 
     const pendingMap = new Map();
     const acceptedEmails = new Set();
+    const invitedEmails = new Set();
     globalInvitesSnapshot.forEach((inviteDoc) => {
       const data = inviteDoc.data() || {};
       if (data.familyId !== familyId) return;
       const emailKey = normalizeEmail(data.email || inviteDoc.id);
       const status = data.status || "pending";
+      if (emailKey) invitedEmails.add(emailKey);
       const invite = {
         code: data.code || inviteDoc.id,
         email: emailKey,
@@ -2243,19 +2575,113 @@ async function refreshAdminStats(options = {}) {
     acceptedEmails.forEach((email) => pendingMap.delete(email));
     const pendingInvites = Array.from(pendingMap.values()).filter((invite) => invite.email);
 
+    const knownUserMap = new Map();
+    const addKnownUser = (uid = "", data = {}, source = "users", path = "") => {
+      const cleanUid = String(uid || "").trim();
+      const email = normalizeEmail(data.email || data.ownerEmail || data.userEmail || data.accountEmail || "");
+      if (!cleanUid && !email) return;
+      const key = cleanUid || `email:${email}`;
+      const existing = knownUserMap.get(key) || {
+        uid: cleanUid,
+        email,
+        role: "",
+        familyId: "",
+        sources: [],
+        paths: [],
+        hasFamilyAccess: false,
+        hasPendingInvite: false,
+        isMember: false,
+      };
+      if (!existing.uid && cleanUid) existing.uid = cleanUid;
+      if (!existing.email && email) existing.email = email;
+      if (data.role && !existing.role) existing.role = normalizeRole(data.role);
+      if (data.familyId && !existing.familyId) existing.familyId = data.familyId;
+      if (data.familyId === familyId) existing.hasFamilyAccess = true;
+      if (!existing.sources.includes(source)) existing.sources.push(source);
+      if (path && !existing.paths.includes(path)) existing.paths.push(path);
+      knownUserMap.set(key, existing);
+    };
+
+    usersSnapshot.forEach((userDoc) => addKnownUser(userDoc.id, userDoc.data() || {}, "users", userDoc.ref?.path || ""));
+    accessSnapshot.forEach((docSnap) => {
+      const path = docSnap.ref?.path || "";
+      const uid = getLegacyUidFromPath(path);
+      if (!uid) return;
+      addKnownUser(uid, docSnap.data() || {}, "access", path);
+    });
+    accountSnapshot.forEach((docSnap) => {
+      const path = docSnap.ref?.path || "";
+      const uid = getLegacyUidFromPath(path);
+      if (!uid) return;
+      addKnownUser(uid, docSnap.data() || {}, "account", path);
+    });
+    const familyProfileById = new Map();
+    profileSnapshot.forEach((docSnap) => {
+      const path = docSnap.ref?.path || "";
+      const uid = getLegacyUidFromPath(path);
+      const profileFamilyId = getFamilyIdFromProfilePath(path);
+      if (profileFamilyId) familyProfileById.set(profileFamilyId, docSnap.data() || {});
+      if (!uid) return;
+      addKnownUser(uid, docSnap.data() || {}, "profile", path);
+    });
+    members.filter((member) => !member.isAdmin).forEach((member) => addKnownUser(member.uid, { email: member.email, role: member.role, familyId }, "member", `families/${familyId}/members/${member.uid}`));
+    invitedEmails.forEach((email) => addKnownUser("", { email, familyId }, "invite", `invites/${email}`));
+
+    const knownUsers = Array.from(knownUserMap.values()).map((user) => {
+      const email = normalizeEmail(user.email || "");
+      const isMember = (user.uid && memberUidSet.has(user.uid)) || (email && memberEmailSet.has(email));
+      return {
+        ...user,
+        email,
+        isAppAdmin: isGlobalAdminEmail(email),
+        isMember,
+        hasFamilyAccess: Boolean(user.hasFamilyAccess || isMember),
+        hasPendingInvite: Boolean(email && pendingMap.has(email)),
+      };
+    }).sort((a, b) => Number(Boolean(b.isMember)) - Number(Boolean(a.isMember))
+      || String(a.email || a.uid).localeCompare(String(b.email || b.uid)));
+
+    const familyData = familySnap.exists?.() ? (familySnap.data() || {}) : {};
+    const familyProfileData = familyProfileSnap.exists?.() ? (familyProfileSnap.data() || {}) : {};
+    const familyName = familyProfileData.name || familyData.name || familyData.title || "Francisco";
+    const familySummaries = [];
+    familiesSnapshot.forEach((familyDoc) => {
+      const data = familyDoc.data() || {};
+      const profile = familyDoc.id === familyId ? familyProfileData : (familyProfileById.get(familyDoc.id) || {});
+      familySummaries.push({
+        id: familyDoc.id,
+        name: profile.name || data.name || data.title || (familyDoc.id === APP_ADMIN_FAMILY_ID ? "Francisco" : `Família ${familyDoc.id.slice(0, 8)}`),
+        subtitle: data.customerLabel || data.subtitle || "Cliente / família cadastrada",
+        membersCount: familyDoc.id === familyId ? members.filter((member) => !member.isAdmin).length : (Number.isFinite(Number(data.membersCount)) ? Number(data.membersCount) : null),
+        pendingInvitesCount: familyDoc.id === familyId ? pendingInvites.length : (Number.isFinite(Number(data.pendingInvitesCount)) ? Number(data.pendingInvitesCount) : null),
+      });
+    });
+    if (!familySummaries.some((family) => family.id === familyId)) {
+      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Cliente / família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
+    }
+    familySummaries.sort((a, b) => Number(b.id === familyId) - Number(a.id === familyId) || String(a.name).localeCompare(String(b.name)));
+
+    const visibleMembers = members.filter((member) => !member.isAdmin);
     const stats = {
+      familyName,
+      familyData,
+      families: familySummaries,
       members,
       pendingInvites,
-      membersCount: members.length,
+      knownUsers,
+      familiesCount: familySummaries.length,
+      membersCount: visibleMembers.length,
       pendingInvitesCount: pendingInvites.length,
       acceptedInvitesCount: acceptedEmails.size,
+      knownUsersCount: knownUsers.length,
     };
     if (requestId === adminStatsRequestId) renderAdminStats(stats);
     return stats;
   } catch (error) {
-    console.error("Erro ao carregar usuários autorizados:", error);
+    console.error("Erro ao carregar painel admin:", error);
     if (requestId === adminStatsRequestId) {
-      setAdminStatsPlaceholder("Não foi possível carregar a contagem. Revise as regras do Firestore.");
+      setAdminStatsPlaceholder("Não foi possível carregar o painel. Revise as regras do Firestore.");
+      renderKnownUsersList(null);
     }
     return null;
   } finally {
@@ -2346,6 +2772,17 @@ function renderFamilyAccessPanel() {
     }
   }
 
+  if (familyWelcomeCard) {
+    const showWelcome = connected && authorized && !appAdmin;
+    familyWelcomeCard.hidden = !showWelcome;
+    if (showWelcome) {
+      const roleLabel = getRoleLabel(effectiveRole);
+      const baby = getBabyDisplayName();
+      if (familyWelcomeTitle) familyWelcomeTitle.textContent = `Você acompanha a rotina de ${baby}.`;
+      if (familyWelcomeText) familyWelcomeText.textContent = `Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`;
+    }
+  }
+
   renderInviteList();
 }
 
@@ -2368,19 +2805,23 @@ async function readAccountAccessFromCloud(user = cloudUser) {
 
 async function saveAccountAccessToCloud(access, user = cloudUser) {
   if (!user || !access?.familyId) return null;
-  const services = await getFirebaseServices();
   const payload = {
     familyId: access.familyId,
     role: getEffectiveRole(access.role, access.email || user.email || ""),
     email: normalizeEmail(access.email || user.email || ""),
     ownerUid: access.ownerUid || access.familyId,
-    updatedAt: services.serverTimestamp(),
   };
 
   if (access.inviteCode) {
     payload.inviteCode = normalizeInviteCode(access.inviteCode);
   }
 
+  if (isGlobalAppAdmin(user)) {
+    return saveFamilyAccess({ ...payload, updatedAt: new Date().toISOString(), acceptedAt: new Date().toISOString() });
+  }
+
+  const services = await getFirebaseServices();
+  payload.updatedAt = services.serverTimestamp();
   await services.setDoc(services.doc(services.db, "users", user.uid, "access", "ninou"), payload, { merge: true });
   await services.setDoc(services.doc(services.db, "families", access.familyId, "members", user.uid), {
     ...payload,
@@ -2403,19 +2844,23 @@ async function activatePersonalFamily() {
     return null;
   }
 
-  const access = buildGlobalAdminAccess(cloudUser);
+  const access = buildGlobalAdminAccess(cloudUser, getActiveAdminFamilyId());
   saveFamilyAccess(access);
   renderAuthControls();
 
   try {
     const services = await getFirebaseServices();
-    await services.setDoc(services.doc(services.db, "families", access.familyId), {
-      ownerUid: cloudUser.uid,
-      ownerEmail: cloudUser.email || "",
+    const familyPayload = {
+      supportAdminUid: cloudUser.uid,
+      supportAdminEmail: cloudUser.email || "",
+      customerLabel: "Cliente / família cadastrada",
       createdAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
-    }, { merge: true });
-    await saveAccountAccessToCloud(access);
+    };
+    if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = "Francisco";
+    await services.setDoc(services.doc(services.db, "families", access.familyId), familyPayload, { merge: true });
+    // O admin tem acesso global por regra, não precisa virar membro da família.
+    // Isso evita que clientes pareçam "família do admin".
     // Admin não abre nem grava dados da família automaticamente.
     // Isso evita vazar dados de um bebê/cliente no painel administrativo.
     setSyncStatus("online", cloudUser.email || "");
@@ -2446,7 +2891,7 @@ async function cancelFamilyInvite(codeValue = "") {
       updatedAt: services.serverTimestamp(),
     }, { merge: true });
     try {
-      await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), {
+      await services.setDoc(services.doc(services.db, "families", getSelectedFamilyIdForAdminOrAccess(), "invites", code), {
         status: "cancelled",
         cancelledBy: cloudUser.uid,
         cancelledAt: services.serverTimestamp(),
@@ -2471,6 +2916,134 @@ async function cancelFamilyInvite(codeValue = "") {
   }
 }
 
+async function createAdminClientFamily() {
+  if (!cloudUser || !isGlobalAppAdmin()) {
+    if (loginHelper) loginHelper.textContent = "Apenas o admin do app pode criar famílias/clientes.";
+    return null;
+  }
+
+  const familyNameRaw = String(adminNewFamilyNameInput?.value || "").trim();
+  const babyNameRaw = String(adminNewBabyNameInput?.value || "").trim();
+  const responsibleEmail = normalizeEmail(adminNewResponsibleEmailInput?.value || "");
+  const babyArticle = (adminNewBabyArticleInput?.value === "a") ? "a" : "o";
+
+  if (!familyNameRaw && !babyNameRaw) {
+    if (adminCreateFamilyResult) {
+      adminCreateFamilyResult.hidden = false;
+      adminCreateFamilyResult.textContent = "Informe pelo menos o nome da família ou o nome do bebê.";
+    }
+    adminNewFamilyNameInput?.focus();
+    return null;
+  }
+
+  if (responsibleEmail && !responsibleEmail.includes("@")) {
+    if (adminCreateFamilyResult) {
+      adminCreateFamilyResult.hidden = false;
+      adminCreateFamilyResult.textContent = "Confira o e-mail do responsável ou deixe o campo em branco.";
+    }
+    adminNewResponsibleEmailInput?.focus();
+    return null;
+  }
+
+  const babyName = babyNameRaw || familyNameRaw.replace(/^família\s+/i, "").replace(/^familia\s+/i, "") || "Bebê";
+  const familyName = familyNameRaw || `Família ${babyName}`;
+  const familyId = createFamilyIdFromNames(familyName, babyName);
+  const services = await getFirebaseServices();
+
+  if (adminCreateClientFamilyButton) {
+    adminCreateClientFamilyButton.disabled = true;
+    adminCreateClientFamilyButton.textContent = "Criando...";
+  }
+  if (adminCreateFamilyResult) {
+    adminCreateFamilyResult.hidden = false;
+    adminCreateFamilyResult.textContent = "Criando família/cliente...";
+  }
+
+  try {
+    const familyPayload = {
+      title: familyName,
+      name: familyName,
+      babyName,
+      babyArticle,
+      customerLabel: "Cliente / família cadastrada",
+      status: "active",
+      supportAdminUid: cloudUser.uid,
+      supportAdminEmail: cloudUser.email || "",
+      membersCount: 0,
+      pendingInvitesCount: responsibleEmail ? 1 : 0,
+      createdByAdmin: cloudUser.uid,
+      createdByAdminEmail: cloudUser.email || "",
+      createdAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    };
+
+    await services.setDoc(services.doc(services.db, "families", familyId), familyPayload, { merge: true });
+    await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
+      name: babyName,
+      familyName,
+      article: babyArticle,
+      weights: [],
+      createdByAdmin: cloudUser.uid,
+      clientUpdatedAt: new Date().toISOString(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    let inviteMarkup = "";
+    if (responsibleEmail) {
+      const role = "responsavel";
+      const code = createInviteCodeForEmail(responsibleEmail, familyId);
+      const link = buildInviteLink(code);
+      const payload = {
+        code,
+        familyId,
+        email: responsibleEmail,
+        role,
+        status: "pending",
+        createdBy: cloudUser.uid,
+        createdByEmail: cloudUser.email || "",
+        createdAt: services.serverTimestamp(),
+        updatedAt: services.serverTimestamp(),
+      };
+      await services.setDoc(services.doc(services.db, "invites", code), payload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
+      recentInvites.unshift({ code, email: responsibleEmail, role, link });
+      renderInviteList();
+      inviteMarkup = `
+        <span>Convite de responsável criado para ${escapeHtml(responsibleEmail)}</span>
+        <span>Código: ${escapeHtml(code)}</span>
+        <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link do convite</button>`;
+    }
+
+    saveSelectedAdminFamilyId(familyId);
+    ensureGlobalAdminAccess(cloudUser, familyId);
+    window.__ninouAdminFamilyDataOpen = false;
+
+    if (adminCreateFamilyResult) {
+      adminCreateFamilyResult.innerHTML = `
+        <strong>Família criada</strong>
+        <span>${escapeHtml(familyName)} foi selecionada no painel.</span>
+        <span>ID: ${escapeHtml(familyId)}</span>
+        ${inviteMarkup || "<span>Agora você pode criar um convite para o responsável.</span>"}`;
+    }
+
+    if (adminNewFamilyNameInput) adminNewFamilyNameInput.value = "";
+    if (adminNewBabyNameInput) adminNewBabyNameInput.value = "";
+    if (adminNewResponsibleEmailInput) adminNewResponsibleEmailInput.value = "";
+    if (loginHelper) loginHelper.textContent = "Família criada e selecionada no painel admin.";
+    await refreshAdminStats({ silent: true });
+    return familyId;
+  } catch (error) {
+    console.error("Erro ao criar família/cliente:", error);
+    if (adminCreateFamilyResult) adminCreateFamilyResult.textContent = getFirebaseErrorMessage(error);
+    return null;
+  } finally {
+    if (adminCreateClientFamilyButton) {
+      adminCreateClientFamilyButton.disabled = false;
+      adminCreateClientFamilyButton.textContent = "Criar família/cliente";
+    }
+  }
+}
+
 async function createFamilyInvite() {
   if (!cloudUser || !isFamilyAdmin()) {
     if (loginHelper) loginHelper.textContent = "Apenas o admin do app pode gerar convites.";
@@ -2490,7 +3063,9 @@ async function createFamilyInvite() {
   }
 
   const services = await getFirebaseServices();
-  const code = createInviteCodeForEmail(email, familyAccess.familyId);
+  const familyId = getSelectedFamilyIdForAdminOrAccess();
+  const familyLabel = getAdminSelectedFamilyLabel();
+  const code = createInviteCodeForEmail(email, familyId);
   const inviteRef = services.doc(services.db, "invites", code);
   const link = buildInviteLink(code);
 
@@ -2509,7 +3084,7 @@ async function createFamilyInvite() {
         if (inviteResult) {
           inviteResult.innerHTML = `
             <strong>Convite já aceito</strong>
-            <span>${escapeHtml(email)} já está autorizado na família.</span>
+            <span>${escapeHtml(email)} já está autorizado na família selecionada.</span>
             <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link novamente</button>
           `;
         }
@@ -2522,7 +3097,7 @@ async function createFamilyInvite() {
 
     const payload = {
       code,
-      familyId: familyAccess.familyId,
+      familyId,
       email,
       role,
       status: "pending",
@@ -2536,10 +3111,10 @@ async function createFamilyInvite() {
     }
 
     await services.setDoc(inviteRef, payload, { merge: true });
-    await cleanupDuplicatePendingInvites(services, email, familyAccess.familyId, code);
+    await cleanupDuplicatePendingInvites(services, email, familyId, code);
 
     try {
-      await services.setDoc(services.doc(services.db, "families", familyAccess.familyId, "invites", code), payload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
     } catch (mirrorError) {
       console.warn("Convite criado na coleção principal, mas não foi espelhado na família:", mirrorError);
     }
@@ -2550,6 +3125,7 @@ async function createFamilyInvite() {
     if (inviteResult) {
       inviteResult.innerHTML = `
         <strong>Convite pronto</strong>
+        <span>Família: ${escapeHtml(familyLabel)}</span>
         <span>Código: ${escapeHtml(code)}</span>
         <span>Envie para: ${escapeHtml(email)}</span>
         <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>
@@ -2671,7 +3247,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     if (!cloudContentAfterInvite.day && hasRoutineDayContent()) await saveDayToCloud();
     await connectCurrentAccount();
     setSyncStatus("online", cloudUser.email || "");
-    showScreen("home");
+    showScreen("today");
     renderAll();
     return true;
   } catch (error) {
@@ -2705,6 +3281,7 @@ function addAwakeEvent(start = Date.now(), detail = "Acordou", notes = "") {
   if (alreadyExists) return null;
   const wakeEvent = makeEvent("acordou", start, start, detail || "Acordou", notes || "");
   state.events.push(wakeEvent);
+  pushAuditEntry("adicionou", wakeEvent);
   return wakeEvent;
 }
 
@@ -2971,16 +3548,16 @@ function clearLocalAccountData() {
   renderAll();
 }
 
-async function openAdminFamilyPreview() {
+async function openAdminFamilyPreview(familyId = getActiveAdminFamilyId()) {
   if (!isGlobalAppAdmin()) return false;
-  if (!familyAccess?.familyId) ensureGlobalAdminAccess(cloudUser);
+  ensureGlobalAdminAccess(cloudUser, familyId);
   window.__ninouAdminFamilyDataOpen = true;
   updateBodyModeClasses();
   setSyncStatus("loading", cloudUser?.email || "");
   try {
     await connectCurrentAccount();
     setSyncStatus("online", cloudUser?.email || "");
-    if (loginHelper) loginHelper.textContent = "Visualizando a família principal como administrador.";
+    if (loginHelper) loginHelper.textContent = `Visualizando ${getAdminSelectedFamilyLabel()} como administrador.`;
     showScreen("today");
     renderAdminClients();
     return true;
@@ -2999,7 +3576,7 @@ async function returnToAdminPanel() {
   unsubscribeCloudListeners();
   window.__ninouAdminFamilyDataOpen = false;
   prepareAdminPanelContext(cloudUser);
-  ensureGlobalAdminAccess(cloudUser);
+  ensureGlobalAdminAccess(cloudUser, getActiveAdminFamilyId());
   await loadAdminAccountProfileFromCloud(cloudUser);
   setSyncStatus("online", cloudUser?.email || "");
   if (loginHelper) loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
@@ -4089,6 +4666,204 @@ function renderWeightProfile() {
   });
 }
 
+function getBabyDisplayName() {
+  return getBabyName() || "bebê";
+}
+
+function getLatestEventByTypes(events = [], types = []) {
+  const typeSet = new Set(types);
+  return [...events].filter((event) => typeSet.has(event.type)).sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
+}
+
+function getLatestSleepEvent(events = []) {
+  return [...events].filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)).sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
+}
+
+function getBottleAmountText(event) {
+  const detail = String(event?.detail || "").trim();
+  const ml = detail.match(/(\d+(?:[,.]\d+)?)\s*ml/i)?.[0] || "";
+  return ml ? ` • ${ml}` : "";
+}
+
+function renderTodayOverview() {
+  if (!todayOverviewGrid) return;
+  const todayStart = getDayStart();
+  const now = Date.now();
+  const events = getFamilyEventsForWindow(todayStart, todayStart + day);
+  const baby = getBabyDisplayName();
+  const lastBottle = getLatestEventByTypes(events, ["mamadeira"]);
+  const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
+  const lastSleep = getLatestSleepEvent(events);
+  const awakeText = state.mode === "sleeping"
+    ? "Dormindo agora"
+    : Number.isFinite(Number(state.activeStartedAt))
+      ? formatShortDuration(Math.max(0, now - Number(state.activeStartedAt)))
+      : formatShortDuration(getAwakeMsForRange(todayStart, Math.min(todayStart + day, now)));
+  const napText = lastSleep
+    ? `${formatTime(lastSleep.start)}–${formatTime(lastSleep.end)}`
+    : "Sem registro";
+  const bottleText = lastBottle ? `${formatTime(lastBottle.start)}${getBottleAmountText(lastBottle)}` : "Sem registro";
+  const diaperText = lastDiaper ? `${formatTime(lastDiaper.start)}${lastDiaper.detail && lastDiaper.detail !== "Não se aplica" ? ` • ${lastDiaper.detail}` : ""}` : "Sem registro";
+
+  if (todayOverviewTitle) todayOverviewTitle.textContent = `Hoje com ${baby}`;
+  if (todayOverviewKicker) todayOverviewKicker.textContent = getDayLabel(todayStart) || "Hoje";
+  todayOverviewGrid.innerHTML = [
+    ["Última mamadeira", bottleText],
+    ["Última fralda", diaperText],
+    ["Última soneca", napText],
+    ["Tempo acordado", awakeText],
+  ].map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join("");
+
+  if (todayOverviewSuggestion) {
+    let suggestion = "Registre a primeira ação para o Ninou montar um acompanhamento gentil.";
+    if (state.mode === "sleeping") suggestion = `${baby} está dormindo agora. O resumo será atualizado quando acordar.`;
+    else if (Number.isFinite(Number(state.activeStartedAt))) {
+      const awakeMs = now - Number(state.activeStartedAt);
+      const targetMs = wakeWindowMinutes * 60000;
+      if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
+      else suggestion = `Rotina em andamento. Próxima janela de sono estimada em ${formatShortDuration(Math.max(0, targetMs - awakeMs))}.`;
+    } else if (events.length) suggestion = `Hoje já há ${events.length} ${events.length === 1 ? "registro" : "registros"}. O Ninou segue acompanhando o dia.`;
+    todayOverviewSuggestion.textContent = suggestion;
+  }
+}
+
+function renderGentleAlert() {
+  if (!gentleAlertCard) return;
+  const todayStart = getDayStart();
+  const now = Date.now();
+  const events = getFamilyEventsForWindow(todayStart, todayStart + day);
+  const baby = getBabyDisplayName();
+  const lastFeed = getLatestEventByTypes(events, ["mamadeira", "amamentacao"]);
+  const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
+  let title = "Rotina tranquila";
+  let text = "O Ninou mostrará lembretes leves conforme os registros aparecerem.";
+  let show = false;
+
+  if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
+    const awakeMs = now - Number(state.activeStartedAt);
+    if (awakeMs >= wakeWindowMinutes * 60000) {
+      title = `${baby} está acordado há ${formatShortDuration(awakeMs)}`;
+      text = "Talvez seja um bom momento para observar bocejos, irritação ou sinais de sono.";
+      show = true;
+    }
+  }
+
+  if (!show && lastFeed && now - Number(lastFeed.start) >= 3 * hour) {
+    title = `Já faz ${formatShortDuration(now - Number(lastFeed.start))} desde a última alimentação`;
+    text = "Apenas um lembrete gentil para conferir se está tudo bem com a rotina.";
+    show = true;
+  }
+
+  if (!show && lastDiaper && now - Number(lastDiaper.start) >= 4 * hour) {
+    title = `Última fralda às ${formatTime(lastDiaper.start)}`;
+    text = "Quando fizer sentido para vocês, vale conferir a próxima troca.";
+    show = true;
+  }
+
+  gentleAlertCard.hidden = !show;
+  if (show) {
+    gentleAlertCard.innerHTML = `<span>🌿 Lembrete gentil</span><strong>${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p>`;
+  }
+}
+
+function renderDaySummaryCard() {
+  if (!daySummaryText) return;
+  const todayStart = getDayStart();
+  const now = Date.now();
+  const events = getFamilyEventsForWindow(todayStart, todayStart + day);
+  const sleepMs = getSleepMsForRange(todayStart, Math.min(todayStart + day, now));
+  const feeds = countFeedingEvents(events);
+  const diapers = countDiaperEvents(events);
+  const naps = events.filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)).length;
+  const meds = countMedicationEvents(events);
+  const latest = [...events].sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
+  if (daySummaryMoment) daySummaryMoment.textContent = new Date(now).getHours() >= 20 ? "Fechamento do dia" : "Em andamento";
+  if (!events.length) {
+    daySummaryText.textContent = `Nenhum registro ainda. Quando ${getBabyDisplayName()} mamar, dormir ou trocar fralda, use os botões rápidos para começar o diário.`;
+    return;
+  }
+  const latestTitle = latest ? getEventConfig(latest.type).title.toLowerCase() : "registro";
+  const parts = [
+    `${feeds} ${feeds === 1 ? "alimentação" : "alimentações"}`,
+    `${diapers} ${diapers === 1 ? "fralda" : "fraldas"}`,
+    `${naps} ${naps === 1 ? "sono" : "sonos"}`,
+  ];
+  if (meds) parts.push(`${meds} ${meds === 1 ? "medicamento" : "medicamentos"}`);
+  daySummaryText.textContent = `Hoje: ${parts.join(", ")}. Total de sono: ${formatShortDuration(sleepMs)}. Último registro: ${latestTitle} às ${latest ? formatTime(latest.start) : "--"}.`;
+}
+
+function getSortedWeightsAsc() {
+  return normalizeWeights(babyProfile.weights || loadLocalWeights()).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function formatKg(value) {
+  return `${Number(value).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg`;
+}
+
+function renderSparkline(container, weights = []) {
+  if (!container) return;
+  if (weights.length < 2) {
+    container.innerHTML = `<span>Gráfico aparece com 2 pesos</span>`;
+    return;
+  }
+  const values = weights.map((item) => Number(item.value));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const spread = Math.max(0.001, max - min);
+  container.innerHTML = weights.slice(-8).map((item) => {
+    const height = Math.max(10, Math.round(((Number(item.value) - min) / spread) * 70 + 18));
+    return `<i style="--h:${height}%" title="${escapeHtml(item.date)} • ${escapeHtml(formatKg(item.value))}"><b></b></i>`;
+  }).join("");
+}
+
+function renderGrowthPanels() {
+  const weights = getSortedWeightsAsc();
+  const latest = weights[weights.length - 1];
+  const previous = weights[weights.length - 2];
+  const targetWeightEls = [todayGrowthWeight, trendGrowthWeight].filter(Boolean);
+  const targetHintEls = [todayGrowthHint, trendGrowthHint].filter(Boolean);
+
+  if (!latest) {
+    targetWeightEls.forEach((el) => { el.textContent = "Sem peso cadastrado"; });
+    targetHintEls.forEach((el) => { el.textContent = "Cadastre pesos no perfil para acompanhar a evolução."; });
+    if (trendGrowthStatus) trendGrowthStatus.textContent = "Acompanhe no perfil";
+    renderSparkline(todayWeightSparkline, []);
+    renderSparkline(trendWeightSparkline, []);
+    return;
+  }
+
+  const delta = previous ? Number(latest.value) - Number(previous.value) : 0;
+  const deltaText = previous ? `${delta >= 0 ? "+" : ""}${Math.round(delta * 1000)} g desde ${previous.date.split("-").reverse().join("/")}` : "Primeiro peso registrado";
+  const latestDate = latest.date.split("-").reverse().join("/");
+  targetWeightEls.forEach((el) => { el.textContent = formatKg(latest.value); });
+  targetHintEls.forEach((el) => { el.textContent = `Último registro: ${latestDate}. ${deltaText}.`; });
+  if (trendGrowthStatus) trendGrowthStatus.textContent = `${weights.length} ${weights.length === 1 ? "peso" : "pesos"}`;
+  renderSparkline(todayWeightSparkline, weights);
+  renderSparkline(trendWeightSparkline, weights);
+}
+
+function renderAuditTrail() {
+  if (!auditTrailList) return;
+  const items = (Array.isArray(state.auditLog) ? state.auditLog : []).slice(-8).reverse();
+  if (!items.length) {
+    auditTrailList.innerHTML = "<li>Nenhuma alteração registrada nesta data.</li>";
+    return;
+  }
+  auditTrailList.innerHTML = items.map((item) => {
+    const actor = item.byName || item.byEmail || "este aparelho";
+    const when = item.at ? formatTime(new Date(item.at).getTime()) : "--:--";
+    return `<li><strong>${escapeHtml(item.title || "Registro")}</strong><span>${escapeHtml(item.action || "alterou")} por ${escapeHtml(actor)} • ${escapeHtml(when)}</span></li>`;
+  }).join("");
+}
+
+function renderProductExperienceSections() {
+  renderTodayOverview();
+  renderGentleAlert();
+  renderDaySummaryCard();
+  renderGrowthPanels();
+  renderAuditTrail();
+}
+
 function saveBabyWeight() {
   const weightForm = readWeightFormValue({ babyWeightInput, babyWeightDateInput });
   if (!weightForm.valid) {
@@ -4105,6 +4880,7 @@ function saveBabyWeight() {
   scheduleProfileCloudSave();
   clearWeightForm({ babyWeightInput });
   renderWeightProfile();
+  renderGrowthPanels();
 }
 
 function editBabyWeight(id) {
@@ -4149,6 +4925,7 @@ function renderAll() {
   renderSleepReport();
   renderSupplementalReports();
   renderTodayHomeSections();
+  renderProductExperienceSections();
   renderFamilyAccessPanel();
 }
 
@@ -4167,13 +4944,16 @@ function renderLiveTick() {
   setText(stateHint, getWakeWindowText());
   renderSummary();
   renderIntelligentHomeSections();
+  renderProductExperienceSections();
 }
 
 function finishSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const finishedAt = Date.now();
   const activeType = state.activeType || "sono";
+  const beforeIds = new Set((state.events || []).map((event) => event.id));
   state = finishActiveSleep(state, makeEvent, finishedAt);
+  (state.events || []).filter((event) => !beforeIds.has(event.id)).forEach((event) => pushAuditEntry("adicionou", event));
   addAwakeEvent(finishedAt, activeType === "dormir" ? "Após sono noturno" : "Após soneca");
   saveDayState();
 }
@@ -4483,9 +5263,16 @@ function saveManualEvent() {
       notes: payload.notes,
       wakeWindowStartedAt: wakeWindow?.wakeWindowStartedAt,
       wakeWindowMs: wakeWindow?.wakeWindowMs,
+      updatedAt: new Date().toISOString(),
+      updatedByEmail: getCurrentActorEmail(),
+      updatedByName: getCurrentActorName(),
+      lastAction: "editou",
     });
+    pushAuditEntry("editou", existingEvent);
   } else if ((payload.type === "sono" || payload.type === "dormir" || payload.type === "despertar-noturno") && payload.hasManualEnd) {
-    state.events.push(makeEvent(payload.type, payload.start, payload.end, payload.detail, payload.notes));
+    const newEvent = makeEvent(payload.type, payload.start, payload.end, payload.detail, payload.notes);
+    state.events.push(newEvent);
+    pushAuditEntry("adicionou", newEvent);
   } else if (payload.type === "acordou") {
     if (state.mode === "sleeping" && canUseManualTimeForLiveState(payload.start)) {
       state = finishActiveSleep(state, makeEvent, payload.start);
@@ -4498,7 +5285,9 @@ function saveManualEvent() {
   } else if (startsLiveSleep) {
     startLiveSleepFromManualEvent(payload.type, payload.start, payload.detail, payload.notes);
   } else {
-    state.events.push(makeEvent(payload.type, payload.start, payload.hasManualEnd ? payload.end : payload.start, payload.detail, payload.notes));
+    const newEvent = makeEvent(payload.type, payload.start, payload.hasManualEnd ? payload.end : payload.start, payload.detail, payload.notes);
+    state.events.push(newEvent);
+    pushAuditEntry("adicionou", newEvent);
   }
 
   clearRecordFormAfterSave({
@@ -4529,6 +5318,7 @@ function deleteEvent(eventId) {
   if (!event) return;
   if (!window.confirm(buildDeleteConfirmationText(event, { getEventConfig, formatTime }))) return;
 
+  pushAuditEntry("excluiu", event);
   state.events = removeEventById(state.events, eventId);
   saveDayState();
   renderAll();
@@ -4539,16 +5329,37 @@ function getExportEvents() {
 }
 
 function getExportPayload() {
+  const todayStart = selectedDiaryDay ?? getDayStart();
+  const selectedState = getFamilyDayState(toDateInputValue(todayStart));
   return {
     app: "Ninou",
     exportedAt: new Date().toISOString(),
     exportedBy: cloudUser?.email || "",
-    day: getCurrentDayId(),
+    day: toDateInputValue(todayStart),
     profile: normalizeBabyProfile(babyProfile),
     wakeWindowMinutes,
-    state: normalizeDayState(state),
-    events: getExportEvents(),
+    state: normalizeDayState(selectedState),
+    events: buildExportEvents(selectedState.events || [], getEventConfig),
   };
+}
+
+function buildRoutineSummaryText(payload = getExportPayload()) {
+  const events = (payload.events || []);
+  const sleepMinutes = events.reduce((total, event) => total + (String(event.type).includes("sono") || event.type === "dormir" ? Number(event.durationMinutes || 0) : 0), 0);
+  const feeds = events.filter((event) => event.type === "mamadeira" || event.type === "amamentacao").length;
+  const diapers = events.filter((event) => event.type === "fralda").length;
+  const meds = events.filter((event) => event.type === "medicamento").length;
+  const latest = [...events].sort((a, b) => String(b.start).localeCompare(String(a.start)))[0];
+  const baby = getBabyDisplayName();
+  return [
+    `Resumo Ninou — ${baby}`,
+    `Data: ${payload.day.split("-").reverse().join("/")}`,
+    `Sono: ${formatShortDuration(sleepMinutes * 60000)}`,
+    `Alimentações: ${feeds}`,
+    `Fraldas: ${diapers}`,
+    meds ? `Medicamentos: ${meds}` : "",
+    latest ? `Último registro: ${latest.title} às ${formatTime(new Date(latest.start).getTime())}` : "Sem registros no dia.",
+  ].filter(Boolean).join("\n");
 }
 
 function downloadFile(filename, content, type) {
@@ -4574,7 +5385,7 @@ function exportRoutine(format) {
   const filenameBase = `ninou-${payload.day}`;
 
   if (format === "csv") {
-    const header = ["id", "tipo", "titulo", "inicio", "fim", "duracao_min", "detalhe", "observacoes"];
+    const header = ["id", "tipo", "titulo", "inicio", "fim", "duracao_min", "detalhe", "observacoes", "criado_por", "editado_por"];
     const rows = payload.events.map((event) => [
       event.id,
       event.type,
@@ -4584,9 +5395,26 @@ function exportRoutine(format) {
       event.durationMinutes,
       event.detail,
       event.notes,
+      event.createdByEmail || "",
+      event.updatedByEmail || "",
     ]);
     const csv = [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
     downloadFile(`${filenameBase}.csv`, csv, "text/csv;charset=utf-8");
+    return;
+  }
+
+  if (format === "pdf") {
+    const rows = payload.events.map((event) => `<tr><td>${escapeHtml(formatTime(new Date(event.start).getTime()))}</td><td>${escapeHtml(event.title)}</td><td>${escapeHtml(event.detail || "")}</td><td>${escapeHtml(String(event.durationMinutes || ""))}</td></tr>`).join("") || `<tr><td colspan="4">Sem registros nesta data.</td></tr>`;
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Ninou ${escapeHtml(payload.day)}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:28px;color:#241f35}h1{margin:0 0 6px}p{line-height:1.45}table{width:100%;border-collapse:collapse;margin-top:18px}td,th{border-bottom:1px solid #ddd;padding:10px;text-align:left}small{color:#665}</style></head><body><h1>Resumo Ninou — ${escapeHtml(getBabyDisplayName())}</h1><p>${escapeHtml(buildRoutineSummaryText(payload)).replaceAll("\n", "<br>")}</p><table><thead><tr><th>Hora</th><th>Registro</th><th>Detalhe</th><th>Min</th></tr></thead><tbody>${rows}</tbody></table><small>Use imprimir/salvar como PDF no navegador.</small><script>window.onload=()=>setTimeout(()=>window.print(),250)</script></body></html>`;
+    const win = window.open("", "_blank", "noopener,noreferrer");
+    if (win) { win.document.write(html); win.document.close(); }
+    else downloadFile(`${filenameBase}.html`, html, "text/html;charset=utf-8");
+    return;
+  }
+
+  if (format === "whatsapp") {
+    const text = encodeURIComponent(buildRoutineSummaryText(payload));
+    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
     return;
   }
 
@@ -4652,6 +5480,9 @@ saveButton.addEventListener("click", saveManualEvent);
 resetDataButton.addEventListener("click", resetDayData);
 exportJsonButton.addEventListener("click", () => exportRoutine("json"));
 exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
+if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
+if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
+if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
 
 wakeWindowInput.addEventListener("input", () => {
   const nextValue = Number(wakeWindowInput.value);
@@ -4774,6 +5605,17 @@ if (createInviteButton) {
 if (refreshAdminStatsButton) {
   refreshAdminStatsButton.addEventListener("click", () => refreshAdminStats());
 }
+if (adminCreateClientFamilyButton) {
+  adminCreateClientFamilyButton.addEventListener("click", () => {
+    createAdminClientFamily().catch((error) => {
+      console.error("Erro ao criar família/cliente:", error);
+      if (adminCreateFamilyResult) {
+        adminCreateFamilyResult.hidden = false;
+        adminCreateFamilyResult.textContent = getFirebaseErrorMessage(error);
+      }
+    });
+  });
+}
 if (adminOpenFamilyButton) {
   adminOpenFamilyButton.addEventListener("click", () => {
     openAdminFamilyPreview().catch((error) => {
@@ -4825,6 +5667,64 @@ if (adminInvitePanel) {
       } catch {
         copyButton.textContent = "Copie manualmente";
       }
+      return;
+    }
+
+    const selectFamilyButton = event.target.closest("[data-select-admin-family]");
+    if (selectFamilyButton) {
+      const familyId = selectFamilyButton.dataset.selectAdminFamily || APP_ADMIN_FAMILY_ID;
+      window.__ninouAdminFamilyDataOpen = false;
+      ensureGlobalAdminAccess(cloudUser, familyId);
+      if (loginHelper) loginHelper.textContent = "Família selecionada no painel. A rotina ainda não foi aberta.";
+      await refreshAdminStats();
+      return;
+    }
+
+    const openFamilyButton = event.target.closest("[data-open-admin-family]");
+    if (openFamilyButton) {
+      const familyId = openFamilyButton.dataset.openAdminFamily || APP_ADMIN_FAMILY_ID;
+      openFamilyButton.disabled = true;
+      openFamilyButton.textContent = "Abrindo...";
+      await openAdminFamilyPreview(familyId);
+      return;
+    }
+
+    const scrollButton = event.target.closest("[data-admin-scroll]");
+    if (scrollButton) {
+      const target = scrollButton.dataset.adminScroll || "";
+      const map = { "create-family": "adminCreateFamilySection", members: "adminMembersSection", invite: "adminInviteSection", migration: "adminMigrationSection" };
+      scrollAdminSection(map[target] || target);
+      return;
+    }
+
+    const newFamilyResponsibleButton = event.target.closest("[data-fill-new-family-responsible]");
+    if (newFamilyResponsibleButton) {
+      if (adminNewResponsibleEmailInput) adminNewResponsibleEmailInput.value = newFamilyResponsibleButton.dataset.fillNewFamilyResponsible || "";
+      scrollAdminSection("adminCreateFamilySection");
+      adminNewFamilyNameInput?.focus();
+      return;
+    }
+
+    const inviteEmailButton = event.target.closest("[data-fill-invite-email]");
+    if (inviteEmailButton) {
+      fillAdminInviteEmail(inviteEmailButton.dataset.fillInviteEmail || "");
+      return;
+    }
+
+    const migrationEmailButton = event.target.closest("[data-fill-migration-email]");
+    if (migrationEmailButton) {
+      fillAdminMigrationEmail(migrationEmailButton.dataset.fillMigrationEmail || "");
+      return;
+    }
+
+    const linkKnownUserButton = event.target.closest("[data-link-known-user]");
+    if (linkKnownUserButton) {
+      linkKnownUserButton.disabled = true;
+      linkKnownUserButton.textContent = "Autorizando...";
+      await authorizeKnownUserAsCaregiver(
+        linkKnownUserButton.dataset.linkKnownUser || "",
+        linkKnownUserButton.dataset.linkKnownEmail || "",
+      );
       return;
     }
 

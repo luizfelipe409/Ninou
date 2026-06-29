@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.24" />
+    <link rel="stylesheet" href="./styles.css?v=75.28" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -51,6 +51,23 @@
           <button class="ghost-link" type="button" data-target-shortcut="profile">Perfil</button>
         </div>
 
+        <section class="today-overview-card" aria-label="Hoje com o bebê">
+          <div class="today-overview-head">
+            <div>
+              <span id="todayOverviewKicker">Hoje</span>
+              <strong id="todayOverviewTitle">Hoje com o bebê</strong>
+            </div>
+            <button class="ghost-link" type="button" data-target-shortcut="diary">Ver diário</button>
+          </div>
+          <div id="todayOverviewGrid" class="today-overview-grid">
+            <article><span>Última mamadeira</span><strong>Sem registro</strong></article>
+            <article><span>Última fralda</span><strong>Sem registro</strong></article>
+            <article><span>Última soneca</span><strong>Sem registro</strong></article>
+            <article><span>Tempo acordado</span><strong>0 min</strong></article>
+          </div>
+          <p id="todayOverviewSuggestion" class="today-overview-suggestion">Registre a primeira ação para o Ninou montar um acompanhamento gentil.</p>
+        </section>
+
         <section class="state-orbit">
           <div class="orbit-ring" aria-hidden="true"></div>
           <div id="orbitEvents" class="orbit-events" aria-label="Atividades das últimas 24 horas"></div>
@@ -63,6 +80,12 @@
           <span>💡 Observação</span>
           <strong>Começando a aprender a rotina</strong>
           <p>Registre sono, mamadas e fraldas para o Ninou mostrar observações úteis.</p>
+        </section>
+
+        <section id="gentleAlertCard" class="gentle-alert-card" aria-live="polite" hidden>
+          <span>🌿 Lembrete gentil</span>
+          <strong>Rotina tranquila</strong>
+          <p>O Ninou mostrará lembretes leves conforme os registros aparecerem.</p>
         </section>
 
         <section id="liveAssistantCard" class="live-assistant-card" aria-live="polite" hidden>
@@ -143,6 +166,28 @@
             <span>Medicamentos</span>
             <strong>0</strong>
           </article>
+        </section>
+
+        <section class="day-summary-card" aria-label="Resumo inteligente do dia">
+          <div class="drawer-section-title">
+            <span>Resumo de hoje</span>
+            <strong id="daySummaryMoment">Em andamento</strong>
+          </div>
+          <p id="daySummaryText">Conforme você registrar a rotina, o Ninou resume sono, mamadas, fraldas e último registro.</p>
+        </section>
+
+        <section id="todayGrowthCard" class="growth-card" aria-label="Crescimento do bebê">
+          <div class="drawer-section-title">
+            <span>Crescimento</span>
+            <button class="ghost-link" type="button" data-target-shortcut="profile">Atualizar peso</button>
+          </div>
+          <div class="growth-card-body">
+            <div>
+              <strong id="todayGrowthWeight">Sem peso cadastrado</strong>
+              <p id="todayGrowthHint">Cadastre pesos no perfil para acompanhar a evolução.</p>
+            </div>
+            <div id="todayWeightSparkline" class="weight-sparkline" aria-label="Evolução de peso"></div>
+          </div>
         </section>
 
         <section class="routine-progress-card" aria-label="Rotina do dia">
@@ -236,6 +281,15 @@
             </div>
           </li>
         </ol>
+        <section class="audit-card" aria-label="Histórico de alterações">
+          <div class="drawer-section-title">
+            <span>Histórico de alterações</span>
+            <strong>Últimas ações</strong>
+          </div>
+          <ul id="auditTrailList" class="audit-list">
+            <li>Nenhuma alteração registrada nesta data.</li>
+          </ul>
+        </section>
       </section>
 
       <section class="screen" data-screen="trends" aria-label="Relatórios da rotina">
@@ -262,6 +316,19 @@
           <article><span>Mamadas</span><strong>0</strong><p>Amamentação e mamadeira.</p></article>
           <article><span>Fraldas</span><strong>0</strong><p>Trocas registradas hoje.</p></article>
           <article><span>Medicamentos</span><strong>0</strong><p>Doses registradas hoje.</p></article>
+        </section>
+        <section id="trendGrowthCard" class="growth-card growth-card-trends" aria-label="Evolução de peso">
+          <div class="drawer-section-title">
+            <span>Peso e crescimento</span>
+            <strong id="trendGrowthStatus">Acompanhe no perfil</strong>
+          </div>
+          <div class="growth-card-body">
+            <div>
+              <strong id="trendGrowthWeight">Sem peso cadastrado</strong>
+              <p id="trendGrowthHint">Registre o peso para ver evolução e histórico.</p>
+            </div>
+            <div id="trendWeightSparkline" class="weight-sparkline weight-sparkline-large" aria-label="Gráfico simples de peso"></div>
+          </div>
         </section>
         <section class="report-stack" aria-label="Gráficos dos últimos 7 dias">
           <article class="chart-card">
@@ -454,6 +521,12 @@
               <span id="familyAccessBadge" class="access-badge">Sem login</span>
               <button id="createFamilyButton" class="secondary-login" type="button" hidden>Ativar família</button>
             </div>
+            <div id="familyWelcomeCard" class="family-welcome-card" hidden>
+              <span>Bem-vindo ao Ninou</span>
+              <strong id="familyWelcomeTitle">Você foi convidado para acompanhar a rotina.</strong>
+              <p id="familyWelcomeText">Seu acesso aparecerá aqui após aceitar o convite.</p>
+              <button id="familyWelcomeStartButton" class="secondary-login" type="button">Começar a acompanhar</button>
+            </div>
             <div class="invite-accept-box">
               <label>
                 Código de convite
@@ -466,8 +539,8 @@
               <section class="admin-clean-hero" aria-live="polite">
                 <div>
                   <span>Admin do app</span>
-                  <strong>Painel administrativo</strong>
-                  <p>Gerencie convites, famílias, migrações e diagnósticos sem abrir a rotina de nenhum cliente automaticamente.</p>
+                  <strong>Painel admin</strong>
+                  <p>Gerencie sua conta, famílias, membros, convites, migrações e diagnósticos com dados familiares carregados apenas sob demanda.</p>
                 </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
               </section>
@@ -476,45 +549,87 @@
                 <div class="admin-stats-header">
                   <div>
                     <span>Resumo</span>
-                    <strong>Família principal</strong>
+                    <strong>Visão geral</strong>
                   </div>
                 </div>
-                <div class="admin-stats-grid">
+                <div class="admin-stats-grid admin-health-grid">
+                  <article>
+                    <span>Famílias</span>
+                    <strong id="adminFamiliesCount">--</strong>
+                    <small>clientes cadastrados</small>
+                  </article>
                   <article>
                     <span>Usuários</span>
-                    <strong id="adminUsersCount">--</strong>
-                    <small>autorizados</small>
+                    <strong id="adminKnownUsersStat">--</strong>
+                    <small>encontrados no banco</small>
                   </article>
                   <article>
-                    <span>Pendentes</span>
+                    <span>Convites pendentes</span>
                     <strong id="adminPendingInvitesCount">--</strong>
-                    <small>convites</small>
+                    <small>família selecionada</small>
                   </article>
                   <article>
-                    <span>Aceitos</span>
-                    <strong id="adminAcceptedInvitesCount">--</strong>
-                    <small>convites</small>
+                    <span>Última migração</span>
+                    <strong id="adminLastMigrationStatus">--</strong>
+                    <small>status</small>
                   </article>
                 </div>
                 <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar os usuários autorizados.</p>
               </section>
 
-              <section class="admin-clean-section admin-family-client-card">
+              <section id="adminCreateFamilySection" class="admin-clean-section admin-create-family-card">
                 <div class="admin-invite-header">
-                  <strong>Famílias / clientes</strong>
-                  <em>O painel não abre dados familiares automaticamente. Escolha uma família apenas quando quiser testar ou visualizar.</em>
+                  <strong>Criar família/cliente</strong>
+                  <em>Use quando uma pessoa vai acessar o Ninou pela primeira vez e ainda não pertence a nenhuma família.</em>
                 </div>
-                <ul id="adminClientsList" class="admin-access-list admin-clients-list">
-                  <li>Atualize o painel para ver a família principal.</li>
-                </ul>
-                <p id="adminSelectedFamilyHint" class="admin-stats-hint">Nenhuma família aberta no painel.</p>
-                <button id="adminOpenFamilyButton" class="secondary-login admin-open-family-button" type="button">Visualizar família principal</button>
+                <div class="admin-form-grid admin-create-family-grid">
+                  <label>
+                    Nome da família
+                    <input id="adminNewFamilyNameInput" type="text" placeholder="Ex.: Família Sofia" autocomplete="off" />
+                  </label>
+                  <label>
+                    Nome do bebê
+                    <input id="adminNewBabyNameInput" type="text" placeholder="Ex.: Sofia" autocomplete="off" />
+                  </label>
+                  <label>
+                    Como chamar no app
+                    <select id="adminNewBabyArticleInput">
+                      <option value="o">o bebê</option>
+                      <option value="a">a bebê</option>
+                    </select>
+                  </label>
+                  <label>
+                    E-mail do responsável, opcional
+                    <input id="adminNewResponsibleEmailInput" type="email" placeholder="responsavel@email.com" autocomplete="off" />
+                  </label>
+                </div>
+                <p class="admin-section-note">Ao criar, o painel seleciona a nova família. Se houver e-mail, um convite de responsável é gerado para essa família.</p>
+                <button id="adminCreateClientFamilyButton" type="button">Criar família/cliente</button>
+                <div id="adminCreateFamilyResult" class="invite-result admin-create-family-result" hidden></div>
               </section>
 
-              <section class="admin-clean-section admin-migration-card">
+              <section class="admin-clean-section admin-family-client-card">
                 <div class="admin-invite-header">
-                  <strong>Dados da família</strong>
-                  <em>Migração manual por e-mail ou UID. O painel não varre clientes automaticamente.</em>
+                  <strong>Famílias</strong>
+                  <em>Selecione uma família para visualizar, convidar, migrar ou dar suporte. O admin não vira membro.</em>
+                </div>
+                <ul id="adminClientsList" class="admin-access-list admin-clients-list">
+                  <li>Atualize o painel para ver as famílias disponíveis.</li>
+                </ul>
+                <p id="adminSelectedFamilyHint" class="admin-stats-hint">Nenhuma rotina aberta. Escolha uma família e toque em Abrir rotina apenas quando precisar validar ou dar suporte.</p>
+                <div class="admin-card-actions admin-family-actions">
+                  <button id="adminOpenFamilyButton" class="secondary-login admin-open-family-button" type="button">Abrir rotina da família selecionada</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="members">Gerenciar membros</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="invite">Criar convite</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="migration">Migrar dados</button>
+                </div>
+              </section>
+
+              <section id="adminMigrationSection" class="admin-clean-section admin-migration-card">
+                <div class="admin-invite-header">
+                  <strong>Migração de dados</strong>
+                  <em>Copie dados antigos para a família selecionada. A origem só é carregada quando você busca por e-mail ou UID.</em>
                 </div>
                 <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID para migrar uma origem específica.</p>
                 <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
@@ -545,10 +660,10 @@
                 <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
               </section>
 
-              <section class="admin-clean-section admin-create-invite-card">
+              <section id="adminInviteSection" class="admin-clean-section admin-create-invite-card">
                 <div class="admin-invite-header">
                   <strong>Convidar pessoa</strong>
-                  <em>O convidado deverá entrar com o mesmo e-mail informado aqui.</em>
+                  <em>O convite sempre entra na família selecionada. Ele nunca cria “família do admin”.</em>
                 </div>
                 <label>
                   E-mail do convidado
@@ -562,6 +677,11 @@
                     <option value="visualizacao">Visualização — somente leitura</option>
                   </select>
                 </label>
+                <div class="permission-guide" aria-label="Descrição das permissões">
+                  <article><strong>Responsável</strong><span>Edita perfil, rotina, membros e convites.</span></article>
+                  <article><strong>Cuidador</strong><span>Registra rotina, mas não altera membros.</span></article>
+                  <article><strong>Visualização</strong><span>Acompanha os dados sem editar.</span></article>
+                </div>
                 <button id="createInviteButton" type="button">Gerar convite</button>
                 <div id="inviteResult" class="invite-result" hidden></div>
               </section>
@@ -576,13 +696,33 @@
                 </ul>
               </section>
 
-              <section class="admin-clean-section admin-list-section">
+              <section class="admin-clean-section admin-list-section admin-support-section">
                 <div class="admin-invite-header">
-                  <strong>Usuários autorizados</strong>
-                  <em>Pessoas que já podem acessar a rotina da família.</em>
+                  <strong>Acesso administrativo</strong>
+                  <em>O admin pode abrir qualquer família para suporte, mas não aparece como membro da família.</em>
+                </div>
+                <ul id="adminSupportAccessList" class="admin-access-list">
+                  <li>Entre como admin para visualizar o acesso administrativo.</li>
+                </ul>
+              </section>
+
+              <section id="adminMembersSection" class="admin-clean-section admin-list-section">
+                <div class="admin-invite-header">
+                  <strong>Membros desta família</strong>
+                  <em>Pessoas realmente vinculadas à família selecionada. O admin do app fica separado em acesso administrativo.</em>
                 </div>
                 <ul id="adminMembersList" class="admin-access-list">
-                  <li>Nenhum usuário autorizado ainda.</li>
+                  <li>Nenhum membro autorizado ainda.</li>
+                </ul>
+              </section>
+
+              <section class="admin-clean-section admin-list-section admin-users-section">
+                <div class="admin-invite-header">
+                  <strong>Usuários encontrados no banco</strong>
+                  <em>Contas localizadas no Firestore. Crie uma família para usuários novos ou vincule a uma família existente.</em>
+                </div>
+                <ul id="adminKnownUsersList" class="admin-access-list">
+                  <li>Atualize o painel para localizar usuários cadastrados.</li>
                 </ul>
               </section>
 
@@ -614,6 +754,8 @@
             <div class="export-actions">
               <button id="exportJsonButton" type="button">JSON</button>
               <button id="exportCsvButton" type="button">CSV</button>
+              <button id="exportPdfButton" type="button">PDF</button>
+              <button id="shareWhatsappButton" type="button">WhatsApp</button>
             </div>
           </article>
           <article class="danger-card">
@@ -730,6 +872,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.24"></script>
+    <script type="module" src="./app.js?v=75.28"></script>
   </body>
 </html>

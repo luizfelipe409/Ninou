@@ -10,5 +10,12 @@ export function buildExportEvents(events = [], getEventConfig) {
       durationMinutes: Math.round(Math.max(0, event.end - event.start) / 60000),
       detail: event.detail || "",
       notes: event.notes || "",
+      createdAt: event.createdAt || "",
+      createdByEmail: event.createdByEmail || "",
+      createdByName: event.createdByName || "",
+      updatedAt: event.updatedAt || "",
+      updatedByEmail: event.updatedByEmail || "",
+      updatedByName: event.updatedByName || "",
+      lastAction: event.lastAction || "",
     }));
 }

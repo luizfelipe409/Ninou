@@ -112,6 +112,9 @@ export function getEventRenderSignature(event, options = {}) {
     event.detail,
     event.notes,
     Math.round(Number(event.wakeWindowMs) || 0),
+    event.createdByEmail || "",
+    event.updatedByEmail || "",
+    event.lastAction || "",
   ].join("|");
 }
 
@@ -139,6 +142,9 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   const config = getEventConfig(event.type);
   const parts = getEventDisplayParts(event);
   const notes = event.notes && event.type !== "medicamento" ? `<p>${escapeHtml(event.notes)}</p>` : "";
+  const actorName = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
+  const action = event.lastAction === "editou" ? "Editado por" : "Adicionado por";
+  const actor = actorName ? `<small class="event-audit-line">${escapeHtml(action)} ${escapeHtml(actorName)}</small>` : "";
   return `
     <i class="mark ${config.arcType}">${config.icon}</i>
     <div class="event-main">
@@ -147,6 +153,7 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
         <span class="event-meta-primary">${escapeHtml(parts.primary)}</span>
         ${parts.secondary ? `<span class="event-meta-extra">${escapeHtml(parts.secondary)}</span>` : ""}
         ${notes}
+        ${actor}
       </div>
       <div class="event-actions">
         <button class="event-action-button edit" type="button" data-event-edit="${escapeHtml(event.id)}" aria-label="Editar ${escapeHtml(config.title)}">
