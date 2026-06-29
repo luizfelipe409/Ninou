@@ -6562,3 +6562,88 @@ body.guest-locked .state-orbit {
     height: 84px;
   }
 }
+
+
+/* v75.48 — avatar premium realista e mais intuitivo */
+.avatar-compact-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.985), rgba(255,250,247,.98));
+}
+
+.avatar-compact-card .avatar-test-header strong {
+  letter-spacing: -.03em;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  min-height: 154px;
+  padding: 15px 12px 16px;
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(251,248,255,.96));
+}
+
+.avatar-face-thumb {
+  width: 102px;
+  height: 102px;
+  border-radius: 50%;
+  box-shadow: 0 14px 28px rgba(96, 68, 150, .13);
+}
+
+.avatar-compact-card .avatar-choice small {
+  font-size: .9rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: #5a4a7a;
+}
+
+.avatar-compact-card .avatar-option-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.avatar-compact-card .avatar-option-row .avatar-choice {
+  min-height: 94px;
+  border-radius: 24px;
+}
+
+.avatar-compact-card .avatar-swatch {
+  width: 42px;
+  height: 42px;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.72), rgba(255,255,255,0) 36%),
+    radial-gradient(circle at 74% 76%, rgba(0,0,0,.09), rgba(0,0,0,0) 36%),
+    var(--swatch);
+}
+
+#avatarHairColorOptions .avatar-swatch {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.32), rgba(255,255,255,0) 34%),
+    linear-gradient(135deg, rgba(255,255,255,.16), rgba(0,0,0,.08)),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.12) 0 3px, rgba(0,0,0,.025) 3px 7px),
+    var(--swatch);
+}
+
+.avatar-compact-card .baby-avatar-preview {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+}
+
+.avatar-compact-card .avatar-preview-wrap {
+  min-width: 142px;
+  border-radius: 36px;
+}
+
+@media (max-width: 560px) {
+  .avatar-compact-card .avatar-option-grid.icon-grid,
+  .avatar-compact-card .avatar-option-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .avatar-face-thumb {
+    width: 92px;
+    height: 92px;
+  }
+}

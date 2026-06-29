@@ -1,6 +1,6 @@
-// Ninou v75.47.1 - correção de carregamento, fallback claro e avatares premium
+// Ninou v75.48 - avatares premium baseados na análise, SVG leve e UX revisada
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.47.1";
+const NINOU_APP_VERSION = "75.48";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
