@@ -544,6 +544,30 @@
               <button id="createAccountButton" class="secondary-login" type="button">Criar conta</button>
             </div>
           </article>
+
+          <article class="caregiver-profile-block" id="caregiverIdentityCard">
+            <span>Quem está registrando</span>
+            <strong>Identificação nos registros</strong>
+            <p>Use seu nome ou vínculo para o diário mostrar “Adicionado por Pai”, “Mãe” ou pelo seu nome, em vez do nome do bebê.</p>
+            <label>
+              Seu nome no app
+              <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />
+            </label>
+            <label>
+              Seu vínculo
+              <select id="caregiverRelationInput">
+                <option value="">Escolher depois</option>
+                <option value="pai">Pai</option>
+                <option value="mae">Mãe</option>
+                <option value="avo">Avó/avô</option>
+                <option value="cuidador">Cuidador(a)</option>
+                <option value="responsavel">Responsável</option>
+                <option value="outro">Familiar</option>
+              </select>
+            </label>
+            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar identificação</button>
+            <p id="caregiverIdentityStatus" class="form-status">Usaremos essa identificação nos próximos registros.</p>
+          </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Painel admin</span>
             <strong id="familyAccessTitle">Convites e permissões</strong>

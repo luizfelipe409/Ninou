@@ -128,6 +128,15 @@ export function getTimelineRenderSignature(selectedStart, selectedEnd, currentDi
   ].join("::");
 }
 
+function getSafeActorName(event = {}) {
+  const raw = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
+  const text = String(raw || "").trim();
+  if (!text) return "";
+  const babyName = String(globalThis.window?.__ninouCurrentBabyName || "").trim().toLowerCase();
+  if (babyName && text.toLowerCase() === babyName) return "Responsável";
+  return text;
+}
+
 export function getEventCardMarkup(event, { empty = false } = {}) {
   if (empty) {
     return `
@@ -142,7 +151,7 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   const config = getEventConfig(event.type);
   const parts = getEventDisplayParts(event);
   const notes = event.notes && event.type !== "medicamento" ? `<p>${escapeHtml(event.notes)}</p>` : "";
-  const actorName = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
+  const actorName = getSafeActorName(event);
   const action = event.lastAction === "editou" ? "Editado por" : "Adicionado por";
   const actor = actorName ? `<small class="event-audit-line">${escapeHtml(action)} ${escapeHtml(actorName)}</small>` : "";
   return `

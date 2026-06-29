@@ -1,20 +1,15 @@
-# Ninou v75.37 — fotos no Firestore sem Storage
+# Ninou v75.38 — correções de relatório, WhatsApp, peso e autoria
 
-Esta versão retrocede a v75.36 porque o Firebase Storage pode gerar custo.
+Correções aplicadas sobre a v75.37, mantendo fotos no Firestore sem Firebase Storage.
 
-Você pode instalar direto esta versão para manter as melhorias até a v75.35 e voltar a salvar fotos no Firestore/localStorage.
+- WhatsApp sem resumo duplicado quando a mensagem personalizada já contém o resumo.
+- Peso exibido corretamente em kg quando dados antigos vieram em gramas, ex.: 4300 → 4,300 kg.
+- Diferença de peso exibida em gramas quando fizer mais sentido.
+- Gráfico de peso trocado para linha simples, mais realista que barras.
+- Identificação de quem registra: Pai, Mãe, Cuidador(a), Responsável ou nome escolhido.
+- Registros antigos com nome igual ao bebê aparecem como “Responsável”.
+- Relatório/PDF com tabela mais compacta e sem estourar margem no iPhone.
+- Título do relatório diferencia rotina do dia e rotina do período.
+- Botão “Preparar para consulta” respeita o período selecionado, sem forçar últimos 30 dias.
 
-## Alterações principais
-
-- Remove a dependência da lógica de Firebase Storage.
-- Foto do bebê volta a salvar no documento `families/{familyId}/profile/main`, campo `photo`.
-- Foto pessoal do admin volta a salvar em `users/{uid}/account/profile`, campo `photo`.
-- A imagem agora é reduzida para 260x260 em JPEG 0.72 para ocupar menos espaço no Firestore.
-- Não precisa publicar regras de Storage.
-
-## Instalação
-
-1. Suba esta versão no Vercel.
-2. Publique apenas as regras Firestore em `docs/FIRESTORE_RULES_ADMIN_GLOBAL_V75_37.md`.
-3. Não publique regras de Storage.
-4. Limpe o cache/PWA no iPhone depois do deploy.
+Regras Firestore permanecem as mesmas da v75.37. Não usa Firebase Storage.

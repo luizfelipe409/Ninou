@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-37-foto_firestore_sem_storage";
+const CACHE_NAME = "ninou-v75-38-relatorio_peso_autoria";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.37",
-  "/css/app.legacy.css?v=75.37",
-  "/app.js?v=75.37",
-  "/js/app.legacy.js?v=75.37",
+  "/styles.css?v=75.38",
+  "/css/app.legacy.css?v=75.38",
+  "/app.js?v=75.38",
+  "/js/app.legacy.js?v=75.38",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

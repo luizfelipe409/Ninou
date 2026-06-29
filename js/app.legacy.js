@@ -97,6 +97,11 @@ const loginPassword = document.querySelector("#loginPassword");
 const loginButton = document.querySelector("#loginButton");
 const createAccountButton = document.querySelector("#createAccountButton");
 const loginHelper = document.querySelector("#loginHelper");
+const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
+const caregiverNameInput = document.querySelector("#caregiverNameInput");
+const caregiverRelationInput = document.querySelector("#caregiverRelationInput");
+const saveCaregiverIdentityButton = document.querySelector("#saveCaregiverIdentityButton");
+const caregiverIdentityStatus = document.querySelector("#caregiverIdentityStatus");
 const familyAccessCard = document.querySelector("#familyAccessCard");
 const familyAccessTitle = document.querySelector("#familyAccessTitle");
 const familyAccessText = document.querySelector("#familyAccessText");
@@ -413,8 +418,113 @@ function getCurrentActorEmail() {
 function getCurrentActorName() {
   const email = getCurrentActorEmail();
   if (!email || email === "este aparelho") return "este aparelho";
+
+  const localIdentity = loadCurrentCaregiverIdentity();
+  if (localIdentity.label) return localIdentity.label;
+
   if (isGlobalAdminEmail(email)) return "Admin";
   return email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
+
+function getCurrentIdentityEmail() {
+  return normalizeEmail(cloudUser?.email || familyAccess?.email || "");
+}
+
+function getCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
+  return `${caregiverIdentityStoragePrefix}.${normalizeEmail(email || "local")}`;
+}
+
+function getCaregiverRelationLabel(value = "") {
+  const labels = {
+    pai: "Pai",
+    mae: "Mãe",
+    avo: "Avó/avô",
+    cuidador: "Cuidador(a)",
+    responsavel: "Responsável",
+    outro: "Familiar",
+  };
+  return labels[String(value || "").trim()] || "";
+}
+
+function loadCurrentCaregiverIdentity() {
+  const email = getCurrentIdentityEmail();
+  if (!email) return { name: "", relation: "", label: "" };
+  try {
+    const data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey(email)) || "{}");
+    const name = String(data.name || "").trim();
+    const relation = String(data.relation || "").trim();
+    const relationLabel = getCaregiverRelationLabel(relation);
+    return {
+      name,
+      relation,
+      label: name || relationLabel,
+    };
+  } catch {
+    return { name: "", relation: "", label: "" };
+  }
+}
+
+function saveCurrentCaregiverIdentity(name = "", relation = "") {
+  const email = getCurrentIdentityEmail();
+  if (!email) return false;
+  const payload = {
+    name: String(name || "").trim(),
+    relation: String(relation || "").trim(),
+    updatedAt: new Date().toISOString(),
+  };
+  try {
+    localStorage.setItem(getCaregiverIdentityKey(email), JSON.stringify(payload));
+  } catch {}
+  return true;
+}
+
+function renderCaregiverIdentityPanel() {
+  if (!caregiverIdentityCard) return;
+  const logged = Boolean(cloudUser);
+  caregiverIdentityCard.hidden = !logged;
+  if (!logged) return;
+  const identity = loadCurrentCaregiverIdentity();
+  if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || "";
+  if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || "";
+  if (caregiverIdentityStatus) {
+    caregiverIdentityStatus.textContent = identity.label
+      ? `Próximos registros aparecerão como ${identity.label}.`
+      : "Defina como você quer aparecer nos próximos registros.";
+  }
+}
+
+async function saveCaregiverIdentityFromForm() {
+  const name = caregiverNameInput?.value || "";
+  const relation = caregiverRelationInput?.value || "";
+  saveCurrentCaregiverIdentity(name, relation);
+  const identity = loadCurrentCaregiverIdentity();
+  if (caregiverIdentityStatus) caregiverIdentityStatus.textContent = identity.label
+    ? `Identificação salva: ${identity.label}.`
+    : "Identificação limpa. Usaremos o e-mail quando necessário.";
+
+  if (cloudUser && firebaseServices) {
+    try {
+      await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "account", "profile"), {
+        email: normalizeEmail(cloudUser.email || ""),
+        displayName: String(name || "").trim(),
+        relation: String(relation || "").trim(),
+        updatedAt: firebaseServices.serverTimestamp(),
+      }, { merge: true });
+    } catch (error) {
+      console.warn("Não foi possível salvar a identificação no perfil da conta:", error);
+    }
+  }
+}
+
+function getActorDisplayNameFromEvent(event = {}) {
+  const raw = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
+  const text = String(raw || "").trim();
+  if (!text) return "";
+  const baby = String(getBabyDisplayName() || "").trim().toLowerCase();
+  if (baby && text.toLowerCase() === baby) return "Responsável";
+  return text;
 }
 
 function makeAuditEntry(action, event, at = new Date().toISOString()) {
@@ -621,6 +731,9 @@ async function loadAdminAccountProfileFromCloud(user = cloudUser) {
     const data = snapshot.exists() ? snapshot.data() || {} : {};
     if (data.photo) setAdminAccountPhoto(String(data.photo), user);
     else adminAccountPhoto = loadAdminAccountPhoto(user);
+    if (data.displayName || data.relation) {
+      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relation || ""));
+    }
     renderBabyIdentity();
     return data;
   } catch (error) {
@@ -644,6 +757,23 @@ async function saveAdminAccountProfileToCloud() {
   } catch (error) {
     console.warn("Não foi possível salvar a foto pessoal do admin:", error);
     return false;
+  }
+}
+
+
+async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
+  if (!user || !firebaseServices) return null;
+  try {
+    const snapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid, "account", "profile"));
+    const data = snapshot.exists() ? snapshot.data() || {} : {};
+    if (data.displayName || data.relation) {
+      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relation || ""));
+      renderCaregiverIdentityPanel();
+    }
+    return data;
+  } catch (error) {
+    console.warn("Não foi possível carregar a identificação da conta:", error);
+    return null;
   }
 }
 
@@ -3381,6 +3511,7 @@ function getBabyAgeText() {
 }
 
 function renderBabyIdentity() {
+  window.__ninouCurrentBabyName = getBabyDisplayName();
   renderBabyIdentityPanel(babyProfile, {
     diaryTitle,
     babyAgeLine,
@@ -3542,6 +3673,7 @@ function renderAuthControls() {
   });
   updateGuestWhatsappButton();
   renderFamilyAccessPanel();
+  renderCaregiverIdentityPanel();
 }
 
 function clearLocalAccountData() {
@@ -3862,6 +3994,7 @@ async function initFirebaseAuthState() {
         restoredAccess = null;
       }
       if (!restoredAccess) saveFamilyAccess(null);
+      await loadCurrentAccountIdentityFromCloud(user);
 
       if (pendingInviteCode) {
         await acceptFamilyInvite(pendingInviteCode, { silent: true });
@@ -4815,7 +4948,7 @@ function getNotificationItems() {
     if (awake > wakeWindowMinutes * 60000) items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
   }
   if (latestAny?.createdByName || latestAny?.createdByEmail) {
-    items.push({ icon: "👥", title: "Última atualização", text: `${latestAny.createdByName || latestAny.createdByEmail} registrou ${getEventConfig(latestAny.type).title.toLowerCase()} às ${formatTime(latestAny.start)}.` });
+    items.push({ icon: "👥", title: "Última atualização", text: `${getActorDisplayNameFromEvent(latestAny)} registrou ${getEventConfig(latestAny.type).title.toLowerCase()} às ${formatTime(latestAny.start)}.` });
   }
   if (!items.length) items.push({ icon: "🌿", title: "Tudo tranquilo", text: "Os registros de hoje estão organizados. O Ninou avisará quando houver algo útil para lembrar." });
   return items.slice(0, 4);
@@ -4867,24 +5000,52 @@ function getSortedWeightsAsc() {
   return normalizeWeights(babyProfile.weights || loadLocalWeights()).sort((a, b) => a.date.localeCompare(b.date));
 }
 
+function getWeightKgValue(value) {
+  const raw = Number(value);
+  if (!Number.isFinite(raw)) return null;
+  // Migrações antigas podem ter vindo em gramas, ex.: 4300. No app exibimos sempre em kg real.
+  return raw > 40 ? raw / 1000 : raw;
+}
+
 function formatKg(value) {
-  return `${Number(value).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg`;
+  const kg = getWeightKgValue(value);
+  if (kg === null) return "Sem peso";
+  const digits = kg < 10 ? 3 : 2;
+  return `${kg.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: 3 })} kg`;
+}
+
+function formatWeightDelta(diff) {
+  if (diff === null || !Number.isFinite(Number(diff))) return "Sem comparação anterior";
+  const kg = Math.abs(Number(diff));
+  const sign = Number(diff) >= 0 ? "+" : "-";
+  if (kg < 1) return `${sign}${Math.round(kg * 1000)} g desde o peso anterior`;
+  return `${sign}${kg.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg desde o peso anterior`;
 }
 
 function renderSparkline(container, weights = []) {
   if (!container) return;
-  if (weights.length < 2) {
+  const normalized = weights
+    .map((item) => ({ ...item, kg: getWeightKgValue(item.value) }))
+    .filter((item) => Number.isFinite(item.kg))
+    .slice(-8);
+  if (normalized.length < 2) {
     container.innerHTML = `<span>Gráfico aparece com 2 pesos</span>`;
     return;
   }
-  const values = weights.map((item) => Number(item.value));
+  const values = normalized.map((item) => item.kg);
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const spread = Math.max(0.001, max - min);
-  container.innerHTML = weights.slice(-8).map((item) => {
-    const height = Math.max(10, Math.round(((Number(item.value) - min) / spread) * 70 + 18));
-    return `<i style="--h:${height}%" title="${escapeHtml(item.date)} • ${escapeHtml(formatKg(item.value))}"><b></b></i>`;
-  }).join("");
+  const spread = Math.max(0.05, max - min);
+  const width = 138;
+  const height = 76;
+  const points = normalized.map((item, index) => {
+    const x = normalized.length === 1 ? width / 2 : (index / (normalized.length - 1)) * (width - 18) + 9;
+    const y = height - 12 - ((item.kg - min) / spread) * (height - 26);
+    return { x, y, item };
+  });
+  const path = points.map((point, index) => `${index ? "L" : "M"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+  const circles = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3.2"><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></circle>`).join("");
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso"><path d="${path}" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>${circles}</svg>`;
 }
 
 function renderGrowthHistoryMini(weights = []) {
@@ -4896,8 +5057,8 @@ function renderGrowthHistoryMini(weights = []) {
   }
   growthHistoryMini.innerHTML = recent.map((item, index) => {
     const previous = weights[weights.length - 1 - index - 1];
-    const diff = previous ? Number(item.value) - Number(previous.value) : 0;
-    const diffText = previous ? `${diff >= 0 ? "+" : ""}${Math.round(diff * 1000)} g` : "primeiro registro";
+    const diff = previous ? (getWeightKgValue(item.value) || 0) - (getWeightKgValue(previous.value) || 0) : 0;
+    const diffText = previous ? formatWeightDelta(diff).replace(" desde o peso anterior", "") : "primeiro registro";
     const dateText = String(item.date || "").split("-").reverse().join("/");
     return `<article><strong>${escapeHtml(formatKg(item.value))}</strong><span>${escapeHtml(dateText)} • ${escapeHtml(diffText)}</span></article>`;
   }).join("");
@@ -4920,8 +5081,8 @@ function renderGrowthPanels() {
     return;
   }
 
-  const delta = previous ? Number(latest.value) - Number(previous.value) : 0;
-  const deltaText = previous ? `${delta >= 0 ? "+" : ""}${Math.round(delta * 1000)} g desde ${previous.date.split("-").reverse().join("/")}` : "Primeiro peso registrado";
+  const delta = previous ? (getWeightKgValue(latest.value) || 0) - (getWeightKgValue(previous.value) || 0) : 0;
+  const deltaText = previous ? `${formatWeightDelta(delta).replace(" desde o peso anterior", "")} desde ${previous.date.split("-").reverse().join("/")}` : "Primeiro peso registrado";
   const latestDate = latest.date.split("-").reverse().join("/");
   targetWeightEls.forEach((el) => { el.textContent = formatKg(latest.value); });
   targetHintEls.forEach((el) => { el.textContent = `Último registro: ${latestDate}. ${deltaText}.`; });
@@ -4939,7 +5100,7 @@ function renderAuditTrail() {
     return;
   }
   auditTrailList.innerHTML = items.map((item) => {
-    const actor = item.byName || item.byEmail || "este aparelho";
+    const actor = getActorDisplayNameFromEvent({ createdByName: item.byName, createdByEmail: item.byEmail }) || "este aparelho";
     const when = item.at ? formatTime(new Date(item.at).getTime()) : "--:--";
     return `<li><strong>${escapeHtml(item.title || "Registro")}</strong><span>${escapeHtml(item.action || "alterou")} por ${escapeHtml(actor)} • ${escapeHtml(when)}</span></li>`;
   }).join("");
@@ -5037,6 +5198,7 @@ function renderAll() {
   renderTodayHomeSections();
   renderProductExperienceSections();
   renderFamilyAccessPanel();
+  renderCaregiverIdentityPanel();
 }
 
 function renderLiveTick() {
@@ -5499,7 +5661,7 @@ function getExportPayload() {
     events: buildExportEvents(events, getEventConfig),
     summary: {
       text: daySummaryText?.textContent || "",
-      exportedFrom: "Ninou v75.33",
+      exportedFrom: "Ninou v75.38",
     },
   };
 }
@@ -5560,10 +5722,13 @@ function getRoutineStats(payload = getExportPayload()) {
 }
 
 function getWeightReportInfo(weights = []) {
-  const sorted = [...(weights || [])].filter((item) => Number.isFinite(Number(item.value))).sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+  const sorted = [...(weights || [])]
+    .map((item) => ({ ...item, kg: getWeightKgValue(item.value) }))
+    .filter((item) => Number.isFinite(item.kg))
+    .sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
   const latest = sorted[sorted.length - 1] || null;
   const previous = sorted[sorted.length - 2] || null;
-  const diff = latest && previous ? Number(latest.value) - Number(previous.value) : null;
+  const diff = latest && previous ? Number(latest.kg) - Number(previous.kg) : null;
   return { sorted, latest, previous, diff };
 }
 
@@ -5592,20 +5757,20 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
   const eventRows = (payload.events || []).map((event, index) => {
     const startTime = formatTime(new Date(event.start).getTime());
     const endTime = event.end && event.end !== event.start ? formatTime(new Date(event.end).getTime()) : "";
-    const actor = event.updatedByName || event.updatedByEmail || event.createdByName || event.createdByEmail || "";
+    const actor = getActorDisplayNameFromEvent(event);
     const detail = [event.detail, event.notes ? `Obs.: ${event.notes}` : ""].filter(Boolean).join(" - ");
     return `<tr><td><b>${escapeHtml(startTime)}</b>${endTime ? `<small>até ${escapeHtml(endTime)}</small>` : ""}</td><td><strong>${escapeHtml(event.title)}</strong><small>${escapeHtml(event.type || "")}</small></td><td>${escapeHtml(detail || "-")}</td><td>${escapeHtml(String(event.durationMinutes || "-"))}</td><td>${escapeHtml(actor || "-")}</td></tr>`;
   }).join("") || `<tr><td colspan="5" class="empty-cell">Sem registros nesta data.</td></tr>`;
 
   const weightRows = weightInfo.sorted.slice(-10).reverse().map((item) => `<tr><td>${escapeHtml(formatReportDate(item.date))}</td><td><strong>${escapeHtml(formatKg(item.value))}</strong></td></tr>`).join("") || `<tr><td colspan="2" class="empty-cell">Sem pesos cadastrados.</td></tr>`;
-  const weightDelta = weightInfo.diff === null ? "Sem comparação anterior" : `${weightInfo.diff >= 0 ? "+" : ""}${weightInfo.diff.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg desde o peso anterior`;
+  const weightDelta = formatWeightDelta(weightInfo.diff);
   const reportTitle = `Relatório da rotina - ${baby}`;
   const safeSummary = escapeHtml(buildRoutineSummaryText(payload)).replaceAll("\n", "<br>");
   const dayNotesBlock = payload.dayNotes ? `<section><h2>Observações do dia</h2><div class="growth-note">${escapeHtml(payload.dayNotes)}</div></section>` : "";
   const cards = [
-    ["Sono", formatShortDuration(stats.sleepMinutes * 60000), "Total no dia"],
+    ["Sono", formatShortDuration(stats.sleepMinutes * 60000), payload.period?.mode === "day" ? "Total no dia" : "Total do período"],
     ["Alimentações", String(stats.feeds), stats.bottleMl ? `${stats.bottleMl} ml em mamadeiras` : "Mamadas e mamadeiras"],
-    ["Fraldas", String(stats.diapers), "Trocas registradas"],
+    ["Fraldas", String(stats.diapers), payload.period?.mode === "day" ? "Trocas do dia" : "Trocas no período"],
     ["Peso atual", weightInfo.latest ? formatKg(weightInfo.latest.value) : "Sem peso", weightInfo.latest ? formatReportDate(weightInfo.latest.date) : "Cadastre no perfil"],
   ].map(([label, value, hint]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(hint)}</small></article>`).join("");
 
@@ -5619,7 +5784,7 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     :root{--ink:#30263f;--muted:#756985;--soft:#f8f2e9;--card:#fffaf3;--line:#e8d9ca;--sage:#1f6b57;--purple:#4b3a78;--accent:#8f7cff}
     *{box-sizing:border-box}
     body{margin:0;background:#f2eadf;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
-    .page{max-width:900px;margin:0 auto;padding:32px}
+    .page{width:100%;max-width:820px;margin:0 auto;padding:24px}
     .cover{padding:28px;border-radius:30px;background:linear-gradient(135deg,#fffaf3,#efe7ff);border:1px solid rgba(75,58,120,.12);box-shadow:0 18px 50px rgba(67,50,94,.12)}
     .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
     .brand span{font-size:13px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
@@ -5634,15 +5799,16 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     section{margin-top:24px;padding:22px;border-radius:26px;background:#fffaf5;border:1px solid var(--line);break-inside:avoid}
     h2{font-size:22px;margin:0 0 12px;color:var(--purple)}
     .section-hint{margin:-4px 0 14px;color:var(--muted)}
-    table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;overflow:hidden;border-radius:18px;border:1px solid var(--line)}
-    th{background:#efe7ff;color:var(--purple);font-size:12px;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:12px}
-    td{padding:13px 12px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9}
+    .table-wrap{width:100%;overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed;min-width:0}
+    th{background:#efe7ff;color:var(--purple);font-size:11px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px;word-break:break-word}
+    td{padding:11px 10px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9;word-break:break-word}
     td small{display:block;color:var(--muted);margin-top:3px}
     .empty-cell{text-align:center;color:var(--muted);padding:22px}
     .growth-note{padding:14px 16px;border-radius:18px;background:#e9f7f1;color:var(--sage);font-weight:800;margin-bottom:12px}
     .footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
-    @media print{body{background:#fff}.page{padding:0}.cover,section{box-shadow:none}.no-print{display:none}.cards{grid-template-columns:repeat(4,1fr)} }
-    @media (max-width:760px){.page{padding:16px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:28px}}
+    @media print{body{background:#fff}.page{max-width:100%;padding:0}.cover,section{box-shadow:none}.no-print{display:none}.cards{grid-template-columns:repeat(4,1fr)}table{font-size:11px}th,td{padding:8px 7px}}
+    @media (max-width:760px){.page{padding:14px}.cover,section{padding:18px;border-radius:22px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:26px}table{font-size:12px}th,td{padding:9px 8px}}
   </style>
 </head>
 <body>
@@ -5656,9 +5822,9 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     </div>
 
     <section>
-      <h2>Rotina do dia</h2>
+      <h2>${payload.period?.mode === "day" ? "Rotina do dia" : "Rotina do período"}</h2>
       <p class="section-hint">Linha do tempo dos registros selecionados para consulta, acompanhamento ou compartilhamento com responsáveis.</p>
-      <table><thead><tr><th>Hora</th><th>Registro</th><th>Detalhe</th><th>Min</th><th>Responsável</th></tr></thead><tbody>${eventRows}</tbody></table>
+      <div class="table-wrap"><table><thead><tr><th>Hora</th><th>Registro</th><th>Detalhe</th><th>Min</th><th>Responsável</th></tr></thead><tbody>${eventRows}</tbody></table></div>
     </section>
 
     ${dayNotesBlock}
@@ -5666,7 +5832,7 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     <section>
       <h2>Crescimento</h2>
       <div class="growth-note">${escapeHtml(weightInfo.latest ? `${formatKg(weightInfo.latest.value)} em ${formatReportDate(weightInfo.latest.date)}. ${weightDelta}` : "Nenhum peso cadastrado para este bebê.")}</div>
-      <table><thead><tr><th>Data</th><th>Peso</th></tr></thead><tbody>${weightRows}</tbody></table>
+      <div class="table-wrap"><table><thead><tr><th>Data</th><th>Peso</th></tr></thead><tbody>${weightRows}</tbody></table></div>
     </section>
 
     <p class="footer">Relatório gerado pelo Ninou. Use Arquivo > Imprimir ou Salvar como PDF.</p>
@@ -5679,12 +5845,14 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
 function buildWhatsappShareText(payload = getExportPayload()) {
   const custom = whatsappMessageInput?.value?.trim() || "";
   const summary = buildRoutineSummaryText(payload);
-  return custom ? `${custom}\n\n${summary}` : `Olá! Segue o resumo da rotina pelo Ninou.\n\n${summary}`;
+  if (!custom) return `Olá! Segue o resumo da rotina pelo Ninou.\n\n${summary}`;
+
+  const customAlreadyHasSummary = /Resumo Ninou|Principais pontos|Sono registrado|Alimentações:|Fraldas:|Período:/i.test(custom);
+  return customAlreadyHasSummary ? custom : `${custom}\n\n${summary}`;
 }
 
 
 function prepareConsultMode() {
-  if (exportRangeSelect) exportRangeSelect.value = "30";
   const payload = getExportPayload();
   const baby = getBabyDisplayName();
   const stats = getRoutineStats(payload);
@@ -5825,6 +5993,7 @@ resetDataButton.addEventListener("click", resetDayData);
 exportJsonButton.addEventListener("click", () => exportRoutine("json"));
 exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
 if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
+if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", saveCaregiverIdentityFromForm);
 if (prepareConsultButton) prepareConsultButton.addEventListener("click", prepareConsultMode);
 if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
 if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
