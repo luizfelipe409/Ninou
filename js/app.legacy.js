@@ -323,7 +323,7 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.43: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+// v75.46: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
 try {
   if (!localStorage.getItem(storageKeys.email)) {
     [
@@ -472,15 +472,16 @@ function getAvatarOutfitFill(backgroundId) {
 }
 
 function getAvatarHairMarkup(hair, tone) {
+  const shine = "rgba(255,255,255,.28)";
   const styles = {
-    "menino-topete": `<path d="M90 57c7-10 28-17 45-7 7 5 10 13 8 19-11-8-32-10-53-2z" fill="${tone}"/><path d="M78 69c14-14 42-18 59-7" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/>`,
-    "menino-curtinho": `<path d="M75 68c15-16 47-17 60-2" fill="none" stroke="${tone}" stroke-width="12" stroke-linecap="round"/><path d="M81 59c6-6 15-8 22-6 8-5 18-5 24-1" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
-    "menino-cacheado": `<circle cx="78" cy="63" r="9" fill="${tone}"/><circle cx="93" cy="56" r="9" fill="${tone}"/><circle cx="109" cy="56" r="9" fill="${tone}"/><circle cx="124" cy="62" r="9" fill="${tone}"/><path d="M74 71c17-15 45-16 56-2" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
-    "menino-moicano": `<path d="M100 46c6 6 10 13 10 20-6-3-12-3-19 0 0-7 2-14 9-20z" fill="${tone}"/><path d="M80 70c14-12 41-13 54-2" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/>`,
-    "menina-franjinha": `<path d="M72 66c18-18 51-18 63-1" fill="none" stroke="${tone}" stroke-width="11" stroke-linecap="round"/><path d="M76 70c8-7 17-10 25-8 8-5 17-6 25-3" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
-    "menina-chuquinhas": `<path d="M76 70c12-13 34-17 49-8" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/><circle cx="67" cy="70" r="10" fill="${tone}"/><circle cx="133" cy="70" r="10" fill="${tone}"/><circle cx="63" cy="60" r="4" fill="#f5a5c8"/><circle cx="137" cy="60" r="4" fill="#f5a5c8"/>`,
-    "menina-bob": `<path d="M70 68c17-18 54-18 66 0" fill="none" stroke="${tone}" stroke-width="12" stroke-linecap="round"/><path d="M71 72c-3 22 5 38 8 45" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/><path d="M129 72c3 22-5 38-8 45" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/>`,
-    "menina-cachinhos": `<circle cx="74" cy="68" r="9" fill="${tone}"/><circle cx="88" cy="58" r="9" fill="${tone}"/><circle cx="102" cy="55" r="9" fill="${tone}"/><circle cx="116" cy="58" r="9" fill="${tone}"/><circle cx="130" cy="68" r="9" fill="${tone}"/><path d="M75 72c16-15 43-15 53 0" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
+    "menino-topete": `<path d="M64 84c5-28 26-41 54-36 22 4 33 19 32 40-14-15-33-21-54-17-14 3-24 7-32 13z" fill="${tone}"/><path d="M91 53c9-14 30-14 42-3-18 0-30 7-43 20" fill="${tone}"/><path d="M88 63c18-9 36-9 49 2" fill="none" stroke="${shine}" stroke-width="4" stroke-linecap="round"/>`,
+    "menino-curtinho": `<path d="M66 82c5-23 24-34 49-32 21 2 33 14 36 33-20-12-61-12-85-1z" fill="${tone}"/><path d="M78 66c18-9 42-10 58-1" fill="none" stroke="${shine}" stroke-width="4" stroke-linecap="round"/>`,
+    "menino-cacheado": `<path d="M63 82c8-23 27-35 52-33 23 2 35 14 38 34-8-6-16-8-26-8-11-14-31-13-42 0-9 0-16 2-22 7z" fill="${tone}"/><circle cx="81" cy="64" r="9" fill="${tone}"/><circle cx="98" cy="57" r="10" fill="${tone}"/><circle cx="116" cy="58" r="10" fill="${tone}"/><circle cx="132" cy="67" r="9" fill="${tone}"/>`,
+    "menino-moicano": `<path d="M70 83c9-21 26-31 51-28 18 2 29 13 32 29-19-11-56-12-83-1z" fill="${tone}"/><path d="M98 47c13 6 22 17 24 29-13-7-25-8-39-1 2-12 6-22 15-28z" fill="${tone}"/><path d="M96 55c9 4 15 10 18 18" fill="none" stroke="${shine}" stroke-width="4" stroke-linecap="round"/>`,
+    "menina-franjinha": `<path d="M61 88c3-29 24-45 54-42 27 3 42 20 42 45-18-16-38-22-62-17-15 3-26 8-34 14z" fill="${tone}"/><path d="M69 78c14-15 35-20 56-14-8 10-22 15-40 16" fill="${tone}"/><path d="M86 60c17-6 37-4 51 7" fill="none" stroke="${shine}" stroke-width="4" stroke-linecap="round"/>`,
+    "menina-chuquinhas": `<path d="M65 83c6-24 25-37 53-33 21 3 34 16 36 36-23-14-63-14-89-3z" fill="${tone}"/><ellipse cx="55" cy="82" rx="14" ry="17" fill="${tone}"/><ellipse cx="146" cy="82" rx="14" ry="17" fill="${tone}"/><circle cx="54" cy="65" r="4" fill="#f2a6c9"/><circle cx="147" cy="65" r="4" fill="#f2a6c9"/>`,
+    "menina-bob": `<path d="M60 89c2-29 23-44 53-42 28 2 45 20 46 48-8 29-15 41-28 47 3-17 5-38 1-56-18-13-46-13-64 1-4 19-1 40 2 56-13-7-20-24-10-54z" fill="${tone}"/><path d="M77 65c20-9 43-8 60 3" fill="none" stroke="${shine}" stroke-width="4" stroke-linecap="round"/>`,
+    "menina-cachinhos": `<path d="M62 86c6-25 27-39 55-36 23 3 37 17 40 39-9-8-19-11-30-10-12-14-34-14-47 0-8 0-14 2-18 7z" fill="${tone}"/><circle cx="67" cy="82" r="10" fill="${tone}"/><circle cx="80" cy="64" r="10" fill="${tone}"/><circle cx="99" cy="56" r="11" fill="${tone}"/><circle cx="119" cy="58" r="11" fill="${tone}"/><circle cx="137" cy="73" r="10" fill="${tone}"/>`,
   };
   return styles[hair.style] || styles["menino-topete"];
 }
@@ -498,10 +499,35 @@ function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
 }
 
 function renderAvatarEditorVisibility() {
-  const visible = avatarEditorForceOpen || !babyProfile.avatarConfigured;
+  const canEditAvatar = canUsePrivateFeatures();
+  const visible = canEditAvatar && (avatarEditorForceOpen || !babyProfile.avatarConfigured);
   if (babyAvatarCard) babyAvatarCard.hidden = !visible;
   if (editBabyAvatarButton) {
+    editBabyAvatarButton.hidden = !canEditAvatar;
+    editBabyAvatarButton.disabled = !canEditAvatar;
     editBabyAvatarButton.textContent = visible ? "Fechar edição do avatar" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
+  }
+}
+
+function applyGuestInteractionLock() {
+  const locked = !isLoggedIn();
+  document.body.classList.toggle("guest-locked", locked);
+  const disabledElements = [
+    babyNameInput, babyArticleInput, babyBirthInput, themeModeInput,
+    babyWeightInput, babyWeightDateInput, saveBabyWeightButton,
+    caregiverNameInput, caregiverRelationInput, saveCaregiverIdentityButton,
+    saveBabyAvatarButton, skipBabyAvatarButton,
+    inviteCodeInput, acceptInviteButton,
+  ];
+  disabledElements.forEach((element) => {
+    if (!element) return;
+    element.disabled = locked;
+    element.setAttribute("aria-disabled", locked ? "true" : "false");
+  });
+  if (locked) {
+    avatarEditorForceOpen = false;
+    if (babyAvatarCard) babyAvatarCard.hidden = true;
+    if (editBabyAvatarButton) editBabyAvatarButton.hidden = true;
   }
 }
 
@@ -708,7 +734,7 @@ const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
 const caregiverDeviceIdKey = "ninou.deviceId";
 
 /*
-  v75.43 — identificação por aparelho
+  v75.46 — identificação por aparelho
 
   A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
   Por isso, a identificação do cuidador não pode ser salva na conta global.
@@ -742,7 +768,7 @@ function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
 }
 
 function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
-  // v75.43: não limpamos a identificação local do aparelho ao trocar/logout de conta.
+  // v75.46: não limpamos a identificação local do aparelho ao trocar/logout de conta.
   // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
@@ -837,7 +863,7 @@ async function saveCaregiverIdentityFromForm() {
   const name = caregiverNameInput?.value || "";
   const relation = caregiverRelationInput?.value || "";
 
-  // v75.43: salva somente neste aparelho.
+  // v75.46: salva somente neste aparelho.
   // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
   // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
   saveCurrentCaregiverIdentity(name, relation);
@@ -1127,7 +1153,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.43: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
+    v75.46: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3311,7 +3337,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.42: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
+  // v75.46: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
   const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
   for (const familyId of [...new Set(candidateFamilies)]) {
     try {
@@ -3424,7 +3450,7 @@ async function activatePersonalFamily() {
     refreshAdminStats({ silent: true });
   } catch (error) {
     console.error("Erro ao ativar família principal no Firebase:", error);
-    // v75.42.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
+    // v75.46: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
     // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
     setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) {
@@ -4082,7 +4108,8 @@ function renderAuthControls() {
   createAccountButton.classList.toggle("logout-button", connected);
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
-  document.body.classList.toggle("access-locked", false);
+  document.body.classList.toggle("access-locked", !routineAuthorized);
+  applyGuestInteractionLock();
   updateBodyModeClasses();
   openSheetButtons.forEach((button) => {
     const shouldHide = !routineAuthorized;
@@ -4607,6 +4634,16 @@ function runActiveTimerAction() {
 }
 
 function renderCurrentState() {
+  if (!canUsePrivateFeatures()) {
+    setHidden(wakeAction, true);
+    setHidden(startChoice, true);
+    setText(stateLabel, "Acesso necessário");
+    setText(stateClock, "--:--");
+    setText(stateHint, "Entre com login e senha ou solicite acesso para registrar a rotina.");
+    renderActiveTimerCard();
+    return;
+  }
+
   if (state.mode === "idle") {
     setHidden(wakeAction, true);
     setHidden(startChoice, false);
@@ -4619,7 +4656,13 @@ function renderCurrentState() {
 
   setHidden(wakeAction, false);
   setHidden(startChoice, true);
-  const elapsed = Date.now() - state.activeStartedAt;
+  const elapsed = Date.now() - Number(state.activeStartedAt || Date.now());
+  if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 48 * hour) {
+    state = createEmptyDayState();
+    saveLocalDayState();
+    renderCurrentState();
+    return;
+  }
   const sleeping = state.mode === "sleeping";
   const nightWakeActive = getActiveNightWakeEvent();
   setText(wakeActionLabel, sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca");
@@ -5590,6 +5633,7 @@ function renderProductExperienceSections() {
 }
 
 function saveBabyWeight() {
+  if (!requireLogin("registrar peso")) return;
   const weightForm = readWeightFormValue({ babyWeightInput, babyWeightDateInput });
   if (!weightForm.valid) {
     if (babyWeightInput) babyWeightInput.focus();
@@ -5658,9 +5702,17 @@ function renderAll() {
 function renderLiveTick() {
   updateTheme();
 
+  if (!canUsePrivateFeatures()) return;
   if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return;
+  const liveElapsed = Date.now() - Number(state.activeStartedAt || Date.now());
+  if (!Number.isFinite(liveElapsed) || liveElapsed < 0 || liveElapsed > 48 * hour) {
+    state = createEmptyDayState();
+    saveLocalDayState();
+    renderAll();
+    return;
+  }
 
-  setText(stateClock, formatDuration(Date.now() - state.activeStartedAt));
+  setText(stateClock, formatDuration(liveElapsed));
   renderActiveTimerCard();
 
   const currentMinute = Math.floor(Date.now() / 60000);
@@ -5790,7 +5842,7 @@ function setSyncStatus(status = "offline", email = "") {
     status = "online";
   }
 
-  // v75.42.1: o admin global não deve aparecer como "Off-line" depois do login.
+  // v75.46: o admin global não deve aparecer como "Off-line" depois do login.
   // O painel administrativo depende da autenticação do admin e de regras globais;
   // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
   // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
@@ -6433,7 +6485,7 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  // v75.42: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
+  // v75.46: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
   return resizeProfileImage(file, { size: 120, quality: 0.5 });
 }
 

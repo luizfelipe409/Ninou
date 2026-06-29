@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.42.1" />
+    <link rel="stylesheet" href="./styles.css?v=75.46" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -54,6 +54,24 @@
           <span id="stateLabel">Rotina zerada</span>
           <strong id="stateClock">00:00:00</strong>
           <p id="stateHint">Escolha como começar o dia.</p>
+        </section>
+
+
+        <section class="main-action-area" aria-label="Ação principal">
+          <button id="wakeAction" class="primary-action" type="button" hidden>
+            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span id="wakeActionLabel">Acordou</span>
+          </button>
+          <div id="startChoice" class="start-choice">
+            <button type="button" data-start-mode="awake">
+              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Acordou</span>
+            </button>
+            <button type="button" data-start-mode="sleeping">
+              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Iniciar soneca</span>
+            </button>
+          </div>
         </section>
 
         <section class="today-overview-card" aria-label="Hoje com o bebê">
@@ -112,23 +130,6 @@
 
         <!-- v75.37: painel admin limpo, profissional e focado em convites/usuários.
              O status principal fica no card central e a ação fica no botão principal. -->
-
-        <section class="main-action-area" aria-label="Ação principal">
-          <button id="wakeAction" class="primary-action" type="button" hidden>
-            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-            <span id="wakeActionLabel">Acordou</span>
-          </button>
-          <div id="startChoice" class="start-choice">
-            <button type="button" data-start-mode="awake">
-              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Acordou</span>
-            </button>
-            <button type="button" data-start-mode="sleeping">
-              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Iniciar soneca</span>
-            </button>
-          </div>
-        </section>
 
         <div class="quick-actions-heading">
           <span>Atalhos principais</span>
@@ -500,7 +501,7 @@
               <div>
                 <span>Avatar do bebê</span>
                 <strong>Estilo 3D Soft</strong>
-                <p>Escolha um bebê mais novinho e personalize o estilo de menino ou menina, a cor do cabelo, o tom de pele e o fundo.</p>
+                <p>Escolha um bebê mais novinho com cabelo mais natural, opções de menino e menina, cor do cabelo, tom de pele e fundo.</p>
               </div>
               <div class="avatar-preview-wrap">
                 <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
@@ -1001,6 +1002,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.42.1"></script>
+    <script type="module" src="./app.js?v=75.46"></script>
   </body>
 </html>

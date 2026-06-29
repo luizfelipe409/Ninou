@@ -6421,3 +6421,68 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* v75.46 — bloqueio real do modo offline e ação principal abaixo do relógio */
+.main-action-area {
+  margin-top: 12px;
+  margin-bottom: 18px;
+}
+
+.primary-action,
+.start-choice button {
+  gap: 14px !important;
+}
+
+.primary-action .action-icon,
+.start-choice .action-icon {
+  margin-right: 4px;
+}
+
+body.guest-locked .screen[data-screen="today"] .today-overview-card,
+body.guest-locked .screen[data-screen="today"] #smartInsightCard,
+body.guest-locked .screen[data-screen="today"] #gentleAlertCard,
+body.guest-locked .screen[data-screen="today"] #notificationCenterCard,
+body.guest-locked .screen[data-screen="today"] #liveAssistantCard,
+body.guest-locked .screen[data-screen="today"] .product-experience-card,
+body.guest-locked .screen[data-screen="today"] .routine-progress-card,
+body.guest-locked .screen[data-screen="today"] .intelligent-timeline-card,
+body.guest-locked .screen[data-screen="today"] .weekly-overview-card,
+body.guest-locked .screen[data-screen="today"] .day-story-card,
+body.guest-locked .screen[data-screen="diary"],
+body.guest-locked .screen[data-screen="reports"],
+body.guest-locked .screen[data-screen="sounds"] {
+  display: none !important;
+}
+
+body.guest-locked .main-action-area,
+body.guest-locked #babyAvatarTestCard,
+body.guest-locked #editBabyAvatarButton,
+body.guest-locked .baby-profile-card,
+body.guest-locked .appearance-profile-block,
+body.guest-locked .weight-profile-block,
+body.guest-locked #caregiverIdentityCard,
+body.guest-locked #familyAccessCard,
+body.guest-locked .admin-access-card:not(#familyAccessCard) {
+  display: none !important;
+}
+
+body.guest-locked .login-card {
+  display: grid !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+body.guest-locked #guestWhatsappButton {
+  pointer-events: auto !important;
+}
+
+body.guest-locked .state-orbit {
+  opacity: .92;
+}
+
+@media (max-width: 560px) {
+  .main-action-area {
+    margin-top: 10px;
+  }
+}

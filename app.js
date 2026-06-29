@@ -1,6 +1,6 @@
-// Ninou v75.45 - avatar 3D soft com opções de menino, menina e cores de cabelo
+// Ninou v75.46 - bloqueio offline, ação sob relógio e avatar refinado
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.45";
+const NINOU_APP_VERSION = "75.46";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
