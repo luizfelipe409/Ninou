@@ -1,6 +1,6 @@
-// Ninou v75.46 - bloqueio offline, ação sob relógio e avatar refinado
+// Ninou v75.47 - avatares premium 3D soft com cabelo mais realista, tons de pele e cores de cabelo
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.46";
+const NINOU_APP_VERSION = "75.47";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

@@ -6486,3 +6486,79 @@ body.guest-locked .state-orbit {
     margin-top: 10px;
   }
 }
+
+
+/* v75.47 — avatares premium mais realistas */
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  min-height: 142px;
+  padding: 14px 12px 16px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,247,255,.96));
+}
+
+.avatar-face-thumb {
+  width: 92px;
+  height: 92px;
+  border-radius: 28px;
+  box-shadow: 0 12px 24px rgba(115, 86, 178, .12);
+}
+
+.avatar-compact-card .avatar-choice small {
+  font-size: .88rem;
+  font-weight: 700;
+  color: #5a4a7a;
+}
+
+.avatar-compact-card .avatar-option-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.avatar-compact-card .avatar-option-row .avatar-choice {
+  min-height: 96px;
+  border-radius: 24px;
+}
+
+.avatar-compact-card .avatar-swatch {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.78), rgba(255,255,255,0) 38%),
+    radial-gradient(circle at 70% 72%, rgba(0,0,0,.08), rgba(0,0,0,0) 35%),
+    var(--swatch);
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.82), 0 8px 16px rgba(91, 66, 130, .14);
+}
+
+#avatarHairColorOptions .avatar-swatch {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), rgba(255,255,255,0) 30%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.14) 0 4px, rgba(0,0,0,.02) 4px 8px),
+    var(--swatch);
+}
+
+.avatar-compact-card .baby-avatar-preview {
+  width: 122px;
+  height: 122px;
+  border-radius: 32px;
+}
+
+.avatar-compact-card .avatar-preview-wrap {
+  min-width: 132px;
+}
+
+@media (max-width: 560px) {
+  .avatar-compact-card .avatar-option-grid.icon-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .avatar-face-thumb {
+    width: 84px;
+    height: 84px;
+  }
+}

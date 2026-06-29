@@ -7,7 +7,7 @@ export const profileThemeModes = Object.freeze(["auto", "light", "dark"]);
 
 export const defaultBabyAvatar = Object.freeze({
   face: "3d-soft",
-  hair: "menino-topete",
+  hair: "bebe-curlinho",
   hairColor: "castanho-claro",
   skin: "pele-clara",
   background: "lilas",

@@ -1,8 +1,8 @@
-# Ninou v75.46 — Somente avatar
+# Ninou v75.47 — Somente avatar
 
 Versão criada para testar avatares antes de substituir definitivamente a foto do bebê.
 
-## Novidades v75.46
+## Novidades v75.47
 
 - Nova seção no Perfil: **Escolha o avatar do bebê**.
 - Avatar personalizável por:
@@ -34,7 +34,7 @@ Versão criada para testar avatares antes de substituir definitivamente a foto d
 Esta versão é uma versão de teste visual. A ideia é validar com usuários se o avatar personalizável substitui bem a foto real do bebê antes de tornar essa mudança definitiva.
 
 
-## Novidades v75.46
+## Novidades v75.47
 
 - O app passa a usar somente avatar para representar o bebê.
 - Upload de foto e fotos antigas deixam de ser exibidos.
@@ -43,7 +43,7 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Não usa Firebase Storage e não salva imagem/base64 como fluxo principal.
 
 
-## v75.46 — Admin online estável
+## v75.47 — Admin online estável
 
 - Corrige o status visual do admin global para não aparecer como "Off-line" após login.
 - Falhas pontuais de leitura/escrita no Firestore agora viram aviso no painel, sem rebaixar o admin para visitante.
@@ -51,7 +51,7 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Mantém isolamento de conta e evita reaproveitar identificação de outro usuário.
 
 
-## v75.46 — Identificação por aparelho
+## v75.47 — Identificação por aparelho
 
 Esta versão ajusta o uso familiar real do Ninou:
 
@@ -64,14 +64,14 @@ Esta versão ajusta o uso familiar real do Ninou:
 - O app não grava mais essa identificação em `users/{uid}/account/profile`, evitando que um aparelho sobrescreva o outro.
 
 
-## v75.46 — Avatar 3D Soft moderno
+## v75.47 — Avatar 3D Soft moderno
 
 - Avatares do bebê redesenhados em estilo 3D Soft, com aparência mais novinha e moderna.
 - Personalização agora foca em cabelinho, tom de pele e cor de fundo.
 - Depois de salvar, o editor some da tela e só reaparece ao tocar em **Editar avatar** abaixo da foto do perfil.
 
 
-## v75.46 — menino, menina e cores de cabelo
+## v75.47 — menino, menina e cores de cabelo
 
 - Melhora os cabelos dos avatares.
 - Adiciona opções de **menino** e **menina**.
@@ -79,7 +79,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Mantém edição sob demanda: depois de salvar, o editor some e volta só no botão **Editar avatar**.
 
 
-## v75.46 — Correções de UX offline, ação principal e avatar
+## v75.47 — Correções de UX offline, ação principal e avatar
 
 - Modo offline bloqueia edição de avatar, peso, perfil e registros.
 - Sem login, a única interação é preencher login/senha ou tocar em Solicitar acesso.
@@ -87,3 +87,12 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Adicionado respiro visual entre ícone e texto do botão.
 - Corrigido tempo acordado absurdo em estado offline/cache antigo.
 - Cabelos dos avatares foram redesenhados com formas mais naturais.
+
+
+## v75.47 — Avatares premium 3D
+
+- Novo conjunto de avatares com aparência mais delicada e realista.
+- Estilos de menino e menina inspirados no mock aprovado.
+- Cabelo com desenho mais natural.
+- Mantidas opções de cor de cabelo, tom de pele e fundo.
+- Continuidade das regras de bloqueio offline da v75.46.
