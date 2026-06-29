@@ -4,3 +4,4 @@ node_modules
 teste-layout.html
 teste-layout.css
 teste-layout.js
+.env*
