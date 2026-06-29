@@ -1,11 +1,14 @@
-// Ninou v75.47 - avatares premium 3D soft com cabelo mais realista, tons de pele e cores de cabelo
+// Ninou v75.47.1 - correção de carregamento, fallback claro e avatares premium
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.47";
+const NINOU_APP_VERSION = "75.47.1";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
+  document.documentElement.style.background = "#fff7ef";
+  document.body.style.background = "#fff7ef";
+  document.body.style.color = "#2f2353";
   const fallback = document.createElement("div");
-  fallback.style.cssText = "margin:16px;padding:14px;border-radius:16px;background:#fff3f3;color:#4a1220;font:14px system-ui";
-  fallback.textContent = "Não foi possível carregar o aplicativo. Atualize a página ou limpe o cache do navegador.";
+  fallback.style.cssText = "margin:16px;padding:18px;border-radius:20px;background:#fff3f3;color:#4a1220;font:15px system-ui;box-shadow:0 12px 30px rgba(74,18,32,.08)";
+  fallback.innerHTML = "<strong>Não foi possível carregar o Ninou.</strong><br>Atualize a página. Se continuar, remova o app da tela inicial e instale novamente.";
   document.body.prepend(fallback);
 });

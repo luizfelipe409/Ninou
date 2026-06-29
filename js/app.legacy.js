@@ -323,7 +323,7 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.47: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+// v75.47.1.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
 try {
   if (!localStorage.getItem(storageKeys.email)) {
     [
@@ -542,7 +542,7 @@ function applyGuestInteractionLock() {
   document.body.classList.toggle("guest-locked", locked);
   const disabledElements = [
     babyNameInput, babyArticleInput, babyBirthInput, themeModeInput,
-    babyWeightInput, babyWeightDateInput, addWeightButton,
+    babyWeightInput, babyWeightDateInput, saveBabyWeightButton,
     caregiverNameInput, caregiverRelationInput, saveCaregiverIdentityButton,
     saveBabyAvatarButton, skipBabyAvatarButton,
     inviteCodeInput, acceptInviteButton,
@@ -762,7 +762,7 @@ const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
 const caregiverDeviceIdKey = "ninou.deviceId";
 
 /*
-  v75.47 — identificação por aparelho
+  v75.47.1.1 — identificação por aparelho
 
   A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
   Por isso, a identificação do cuidador não pode ser salva na conta global.
@@ -796,7 +796,7 @@ function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
 }
 
 function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
-  // v75.47: não limpamos a identificação local do aparelho ao trocar/logout de conta.
+  // v75.47.1.1: não limpamos a identificação local do aparelho ao trocar/logout de conta.
   // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
@@ -891,7 +891,7 @@ async function saveCaregiverIdentityFromForm() {
   const name = caregiverNameInput?.value || "";
   const relation = caregiverRelationInput?.value || "";
 
-  // v75.47: salva somente neste aparelho.
+  // v75.47.1.1: salva somente neste aparelho.
   // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
   // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
   saveCurrentCaregiverIdentity(name, relation);
@@ -1181,7 +1181,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.47: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
+    v75.47.1.1: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3365,7 +3365,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.47: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
+  // v75.47.1.1: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
   const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
   for (const familyId of [...new Set(candidateFamilies)]) {
     try {
@@ -3478,7 +3478,7 @@ async function activatePersonalFamily() {
     refreshAdminStats({ silent: true });
   } catch (error) {
     console.error("Erro ao ativar família principal no Firebase:", error);
-    // v75.47: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
+    // v75.47.1.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
     // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
     setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) {
@@ -5870,7 +5870,7 @@ function setSyncStatus(status = "offline", email = "") {
     status = "online";
   }
 
-  // v75.47: o admin global não deve aparecer como "Off-line" depois do login.
+  // v75.47.1.1: o admin global não deve aparecer como "Off-line" depois do login.
   // O painel administrativo depende da autenticação do admin e de regras globais;
   // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
   // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
@@ -6513,7 +6513,7 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  // v75.47: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
+  // v75.47.1.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
   return resizeProfileImage(file, { size: 120, quality: 0.5 });
 }
 
