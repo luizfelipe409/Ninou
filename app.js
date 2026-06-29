@@ -1,6 +1,6 @@
-// Ninou v75.48 - avatares premium baseados na análise, SVG leve e UX revisada
+// Ninou v75.49 - avatares premium detalhados com acabamento 3D soft refinado
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.48";
+const NINOU_APP_VERSION = "75.49";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

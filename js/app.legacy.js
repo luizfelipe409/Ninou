@@ -323,7 +323,7 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.48: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+// v75.49.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
 try {
   if (!localStorage.getItem(storageKeys.email)) {
     [
@@ -503,19 +503,26 @@ function escapeSvgText(value = "") {
 
 function buildAvatarBackgroundMarkup(avatar = {}) {
   const palette = getAvatarBackgroundOption(avatar);
-  return `<circle cx="53" cy="50" r="12" fill="white" opacity=".42"/><circle cx="148" cy="60" r="8" fill="white" opacity=".32"/><circle cx="145" cy="148" r="16" fill="${palette.accent}" opacity=".92"/><circle cx="58" cy="148" r="8" fill="white" opacity=".24"/><path d="M36 132c18 20 43 31 75 31 22 0 41-5 57-16" fill="none" stroke="white" stroke-opacity=".26" stroke-width="5" stroke-linecap="round"/>`;
+  return `
+    <circle cx="50" cy="52" r="12" fill="white" opacity=".42"/>
+    <circle cx="148" cy="58" r="9" fill="white" opacity=".3"/>
+    <circle cx="146" cy="148" r="15" fill="${palette.accent}" opacity=".88"/>
+    <circle cx="58" cy="147" r="8" fill="white" opacity=".22"/>
+    <ellipse cx="100" cy="155" rx="60" ry="18" fill="white" opacity=".09"/>
+    <path d="M38 132c18 19 42 29 73 29 24 0 44-5 60-16" fill="none" stroke="white" stroke-opacity=".2" stroke-width="5" stroke-linecap="round"/>
+  `;
 }
 
 function getAvatarOutfitFill(backgroundId) {
   const map = {
-    lavanda: { base: "#b9a4ef", shadow: "#977fd6" },
-    "rosa-nevoa": { base: "#efb8c6", shadow: "#db97aa" },
-    menta: { base: "#a7d9c6", shadow: "#86bea9" },
-    "pessego-fundo": { base: "#f1b892", shadow: "#dc966c" },
-    "azul-neblina": { base: "#a8c9ec", shadow: "#85afd7" },
-    "amarelo-creme": { base: "#f2cf77", shadow: "#dcb553" },
-    salvia: { base: "#b9cda8", shadow: "#99b086" },
-    areia: { base: "#dec7b7", shadow: "#c2a696" },
+    lavanda: { base: "#c7b8fb", shadow: "#9f88e4", highlight: "#f6f2ff" },
+    "rosa-nevoa": { base: "#f3c3d1", shadow: "#db9aad", highlight: "#fff2f6" },
+    menta: { base: "#bde4d4", shadow: "#8dbda8", highlight: "#f2fcf7" },
+    "pessego-fundo": { base: "#f5c5a5", shadow: "#de9a73", highlight: "#fff3eb" },
+    "azul-neblina": { base: "#bbd6f2", shadow: "#8fafcf", highlight: "#f2f8ff" },
+    "amarelo-creme": { base: "#f6dd92", shadow: "#e0b95d", highlight: "#fff8e5" },
+    salvia: { base: "#c8d9b7", shadow: "#9fb389", highlight: "#f6fbf1" },
+    areia: { base: "#e6d4c5", shadow: "#c8ab98", highlight: "#fff8f3" },
   };
   return map[backgroundId] || map.lavanda;
 }
@@ -528,64 +535,64 @@ function getAvatarHairMarkup(hair, tone) {
   const base = tone.value;
   const shadow = tone.shadow;
   const hi = tone.highlight;
-  const soft = `.94`;
   const styles = {
     "topetinho-suave": `
-      <path d="M57 94c2-30 23-51 54-52 34-1 56 20 59 53-17-15-40-20-65-17-21 2-36 8-48 16z" fill="${shadow}" opacity=".96"/>
-      <path d="M61 90c5-25 25-42 51-42 28 0 48 16 53 43-19-11-40-14-62-10-17 3-31 7-42 9z" fill="${base}" opacity="${soft}"/>
-      <path d="M86 50c11-12 32-15 45-3 9 8 8 21-1 30-10-14-26-17-45-8 4-6 4-12 1-19z" fill="${base}"/>
-      ${hairLockPath("M86 61c16-9 35-9 48 2", hi, .82, 4)}
-      ${hairLockPath("M79 78c18-8 42-8 58 0", hi, .45, 3)}
+      <path d="M69 93c1-18 10-35 26-44 18-10 42-10 60 2 11 8 18 21 20 36-15-9-33-13-54-13-21 0-39 5-52 19z" fill="${shadow}" opacity=".94"/>
+      <path d="M72 90c3-16 12-29 26-37 16-9 38-9 54 2 10 7 16 19 18 32-14-8-32-11-52-11-19 0-34 4-46 14z" fill="${base}"/>
+      <path d="M94 49c7-6 16-9 26-9 15 0 27 8 32 21 2 6 2 12-1 18-4-8-10-14-18-18-8-5-19-7-31-5-7 2-13 5-17 10-2-5-1-11 1-17 2-5 5-9 8-12z" fill="${base}"/>
+      ${hairLockPath("M90 57c9-6 20-8 31-7 10 1 19 5 26 11", hi, .78, 4)}
+      ${hairLockPath("M82 76c12-5 26-8 40-8 13 0 25 3 36 8", hi, .34, 3)}
     `,
     "franjinha-natural": `
-      <path d="M58 93c4-29 25-49 55-50 33-1 54 19 58 52-16-13-38-17-64-13-19 3-34 7-49 11z" fill="${shadow}"/>
-      <path d="M62 90c7-24 27-40 52-40 27 0 46 15 52 41-16-9-36-11-59-8-18 2-32 5-45 7z" fill="${base}"/>
-      <path d="M72 70c17-14 38-18 62-10-7 4-14 10-21 19-7-7-14-10-22-10-6 0-12 1-19 1z" fill="${base}"/>
-      ${hairLockPath("M78 67c16-7 36-8 53-1", hi, .78, 4)}
-      ${hairLockPath("M86 75c8-5 17-5 25 1", hi, .36, 3)}
+      <path d="M68 92c2-18 11-35 28-44 18-9 42-8 59 4 11 8 18 21 19 35-14-9-32-13-53-12-21 0-39 5-53 17z" fill="${shadow}" opacity=".94"/>
+      <path d="M71 89c4-16 13-29 27-37 16-8 38-8 54 3 10 7 16 18 18 31-14-8-31-10-50-9-20 1-35 5-49 12z" fill="${base}"/>
+      <path d="M75 73c8-8 18-12 31-13 12 0 22 3 31 10-4 1-8 3-11 6-5 4-9 8-14 11-4 2-9 3-13 2-5 0-9-2-14-5-4-2-8-5-10-11z" fill="${base}"/>
+      ${hairLockPath("M83 64c7-3 15-5 24-5 10 0 19 3 26 8", hi, .74, 4)}
+      ${hairLockPath("M93 76c6-3 11-4 17-4 7 0 12 1 18 4", hi, .34, 3)}
     `,
     "ondinha-lateral": `
-      <path d="M57 94c3-31 26-51 58-51 32 0 53 19 56 52-20-16-45-19-75-12-15 4-27 8-39 11z" fill="${shadow}"/>
-      <path d="M61 90c6-24 27-41 55-40 27 1 45 16 50 40-18-10-41-12-66-6-16 4-29 6-39 6z" fill="${base}"/>
-      <path d="M78 61c20-17 45-15 65 0-24 4-43 16-58 33-7-6-10-16-7-33z" fill="${base}"/>
-      ${hairLockPath("M84 61c16-7 33-5 49 4", hi, .75, 4)}
-      ${hairLockPath("M91 72c12-6 25-6 38 0", hi, .38, 3)}
+      <path d="M67 92c2-19 12-36 29-44 20-10 45-8 62 6 10 8 16 20 17 33-15-9-33-11-53-8-18 2-36 6-55 13z" fill="${shadow}" opacity=".94"/>
+      <path d="M71 89c4-16 14-29 28-37 17-8 39-7 55 4 9 6 14 17 16 29-14-7-30-9-48-6-19 2-36 6-51 10z" fill="${base}"/>
+      <path d="M84 55c9-6 19-9 30-9 12 0 22 4 31 11 5 5 9 10 11 16-9 0-18 2-27 7-9 6-18 14-25 25-7-2-14-6-19-13-4-8-4-21-1-37z" fill="${base}"/>
+      ${hairLockPath("M87 61c12-5 25-4 37 1", hi, .7, 4)}
+      ${hairLockPath("M97 72c9-3 19-3 28 0", hi, .32, 3)}
     `,
     "cachinhos-fofos": `
-      <path d="M59 95c4-31 28-51 60-48 28 2 47 21 49 51-18-13-42-18-68-14-17 3-31 7-41 11z" fill="${shadow}"/>
-      <circle cx="74" cy="82" r="12" fill="${base}"/><circle cx="83" cy="66" r="13" fill="${base}"/><circle cx="101" cy="56" r="15" fill="${base}"/><circle cx="121" cy="59" r="14" fill="${base}"/><circle cx="139" cy="73" r="13" fill="${base}"/><circle cx="148" cy="91" r="11" fill="${base}"/>
-      <path d="M70 91c22-13 54-14 75 1-16-8-39-10-66-4z" fill="${base}"/>
-      ${hairLockPath("M82 78c16-11 36-13 53-3", hi, .68, 4)}
-      ${hairLockPath("M92 60c8-7 20-8 29-3", hi, .44, 3)}
+      <path d="M68 94c2-19 12-36 28-45 18-9 41-9 59 3 11 8 18 20 21 35-15-8-33-10-54-9-21 1-39 5-54 16z" fill="${shadow}" opacity=".94"/>
+      <circle cx="76" cy="79" r="9.5" fill="${base}"/><circle cx="86" cy="66" r="10.5" fill="${base}"/><circle cx="101" cy="57" r="11.5" fill="${base}"/><circle cx="119" cy="58" r="11.5" fill="${base}"/><circle cx="134" cy="67" r="10.5" fill="${base}"/><circle cx="145" cy="80" r="9.5" fill="${base}"/>
+      <path d="M76 88c11-9 26-13 42-13 16 0 31 4 43 13-14-5-29-7-43-7-15 0-29 2-42 7z" fill="${base}"/>
+      ${hairLockPath("M84 72c7-5 15-8 24-8 8 0 16 2 23 7", hi, .56, 4)}
+      ${hairLockPath("M96 58c5-3 9-4 15-4 5 0 10 2 14 5", hi, .34, 3)}
     `,
     "cacheado-curto": `
-      <path d="M57 97c3-33 27-53 62-52 33 1 54 22 55 55-15-13-38-18-68-15-22 2-38 7-49 12z" fill="${shadow}"/>
-      <circle cx="68" cy="87" r="10" fill="${base}"/><circle cx="77" cy="71" r="12" fill="${base}"/><circle cx="92" cy="60" r="13" fill="${base}"/><circle cx="109" cy="55" r="13" fill="${base}"/><circle cx="126" cy="60" r="13" fill="${base}"/><circle cx="142" cy="72" r="12" fill="${base}"/><circle cx="151" cy="89" r="10" fill="${base}"/><circle cx="93" cy="80" r="12" fill="${base}"/><circle cx="119" cy="80" r="12" fill="${base}"/>
-      ${hairLockPath("M78 84c17-11 43-12 61-1", hi, .58, 4)}
-      ${hairLockPath("M88 62c13-7 30-8 44-2", hi, .38, 3)}
+      <path d="M68 95c2-19 12-37 29-46 19-9 44-9 61 4 11 8 18 21 20 36-15-8-34-10-55-9-21 1-39 5-55 15z" fill="${shadow}" opacity=".94"/>
+      <circle cx="74" cy="80" r="9" fill="${base}"/><circle cx="84" cy="68" r="10" fill="${base}"/><circle cx="98" cy="59" r="11" fill="${base}"/><circle cx="114" cy="57" r="11" fill="${base}"/><circle cx="129" cy="61" r="10.5" fill="${base}"/><circle cx="141" cy="71" r="10" fill="${base}"/><circle cx="148" cy="84" r="8.5" fill="${base}"/><circle cx="91" cy="81" r="9.5" fill="${base}"/><circle cx="114" cy="80" r="9.5" fill="${base}"/>
+      <path d="M78 89c11-8 25-12 39-12 15 0 29 4 40 11-13-4-26-6-40-6-14 0-27 2-39 7z" fill="${base}"/>
+      ${hairLockPath("M86 72c13-7 28-8 42-3", hi, .48, 4)}
+      ${hairLockPath("M96 58c6-3 13-4 20-4 7 1 12 2 18 5", hi, .28, 3)}
     `,
     "bob-bebe": `
-      <path d="M54 91c3-32 26-52 59-53 36-1 59 21 61 57-1 23-8 41-20 54-7 7-15 12-25 15 9-25 8-55-1-78-13-11-44-12-59 0-9 23-8 53 1 78-10-3-18-9-25-17-12-14-16-33-11-56z" fill="${shadow}"/>
-      <path d="M60 88c7-27 29-43 57-42 29 1 49 18 52 46-17-12-40-16-65-12-17 3-32 6-44 8z" fill="${base}"/>
-      <path d="M75 63c18-10 42-11 63 0" fill="none" stroke="${hi}" stroke-width="4" stroke-linecap="round" opacity=".72"/>
-      ${hairLockPath("M67 91c-5 18-2 36 5 50", hi, .24, 4)}
-      ${hairLockPath("M152 91c4 18 1 36-7 50", hi, .24, 4)}
+      <path d="M66 90c2-19 12-37 29-46 20-10 47-9 65 6 10 8 16 19 17 31-1 23-8 42-20 56-6 6-13 10-22 13 6-19 7-40 4-57-9-9-23-14-38-14s-28 5-37 15c-3 17-2 37 4 56-10-3-18-8-25-15-13-14-19-32-17-45z" fill="${shadow}" opacity=".94"/>
+      <path d="M71 87c4-16 14-30 29-38 17-9 39-8 56 4 10 7 16 18 18 31-13-8-30-11-49-11-19 0-36 5-54 14z" fill="${base}"/>
+      ${hairLockPath("M80 61c8-4 17-6 27-6 11 0 22 3 31 9", hi, .64, 4)}
+      ${hairLockPath("M78 93c-3 14-2 28 3 41", hi, .18, 4)}
+      ${hairLockPath("M145 93c2 14 1 28-4 41", hi, .18, 4)}
     `,
     "faixinha-baby": `
-      <path d="M58 93c4-29 26-49 57-49 32 0 54 20 57 51-16-13-39-17-64-13-20 3-35 7-50 11z" fill="${shadow}"/>
-      <path d="M63 89c7-23 27-38 53-38 27 0 46 15 51 40-17-9-40-12-62-9-18 3-31 6-42 7z" fill="${base}"/>
-      <path d="M61 69c24-7 56-7 80 1" fill="none" stroke="#f2c966" stroke-width="11" stroke-linecap="round"/>
-      <path d="M139 59c9 0 16 7 17 16-7-1-12-5-16-11-5 6-11 10-18 11 2-9 8-16 17-16z" fill="#f2c966"/>
-      <circle cx="139" cy="69" r="4" fill="#fff4b5"/>
-      ${hairLockPath("M80 63c14-5 33-5 48 0", hi, .55, 3)}
+      <path d="M68 92c2-18 11-35 28-44 18-9 42-8 59 4 11 8 18 21 19 35-14-9-32-13-53-12-21 0-39 5-53 17z" fill="${shadow}" opacity=".94"/>
+      <path d="M71 89c4-16 13-29 27-37 16-8 38-8 54 3 10 7 16 18 18 31-14-8-31-10-50-9-20 1-35 5-49 12z" fill="${base}"/>
+      <path d="M69 70c21-4 44-4 64 0" fill="none" stroke="#f1cb60" stroke-width="10" stroke-linecap="round"/>
+      <path d="M128 61c8 0 14 6 15 14-6-1-10-4-14-9-4 5-9 8-15 9 2-8 7-14 14-14z" fill="#f1cb60"/>
+      <circle cx="128" cy="69" r="3.7" fill="#fff2a7"/>
+      ${hairLockPath("M83 63c6-3 13-4 21-4 8 0 16 2 23 5", hi, .44, 3)}
     `,
     "laco-delicado": `
-      <path d="M58 94c3-31 26-51 58-51 32 0 53 19 56 52-18-15-41-19-67-15-20 3-35 8-47 14z" fill="${shadow}"/>
-      <path d="M62 90c6-24 27-40 53-40 27 0 46 15 51 41-17-10-38-13-61-9-18 3-32 6-43 8z" fill="${base}"/>
-      <path d="M80 63c14-11 33-14 51-6" fill="none" stroke="${hi}" stroke-width="4" stroke-linecap="round" opacity=".72"/>
-      <path d="M83 41c10 1 16 9 16 20-7-1-12-5-16-11-4 6-10 10-17 11 1-11 7-19 17-20z" fill="#ef9fc7"/>
-      <circle cx="83" cy="52" r="5" fill="#fad0e2"/>
-      <path d="M86 58c8-7 18-8 29-5-4 8-12 13-25 14z" fill="${base}"/>
+      <path d="M68 92c2-18 11-35 28-44 18-9 42-8 59 4 11 8 18 21 19 35-14-9-32-13-53-12-21 0-39 5-53 17z" fill="${shadow}" opacity=".94"/>
+      <path d="M71 89c4-16 13-29 27-37 16-8 38-8 54 3 10 7 16 18 18 31-14-8-31-10-50-9-20 1-35 5-49 12z" fill="${base}"/>
+      <path d="M84 44c8 0 14 6 15 16-6-1-10-5-15-10-4 5-9 9-15 10 1-9 7-16 15-16z" fill="#ef9fc7"/>
+      <circle cx="84" cy="53" r="4.8" fill="#fad0e2"/>
+      <path d="M86 60c6-4 13-6 21-6 8 0 15 2 21 6" fill="none" stroke="${hi}" stroke-width="4" stroke-linecap="round" opacity=".62"/>
+      <path d="M87 58c6-4 13-6 20-6-3 7-10 11-20 13z" fill="${base}"/>
     `,
   };
   return styles[hair.style] || styles["topetinho-suave"];
@@ -599,7 +606,7 @@ function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
   const skin = getAvatarSkinOption(normalized);
   const outfit = getAvatarOutfitFill(normalized.background);
   const hairMarkup = getAvatarHairMarkup(hair, hairColor);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Avatar do bebê"><defs><radialGradient id="bg" cx="36%" cy="24%" r="88%"><stop offset="0" stop-color="${palette.accent}"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><radialGradient id="skin" cx="42%" cy="26%" r="75%"><stop offset="0" stop-color="#fff8f1"/><stop offset=".56" stop-color="${skin.value}"/><stop offset="1" stop-color="${skin.shade}"/></radialGradient><linearGradient id="body" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".86"/><stop offset="1" stop-color="${outfit.base}"/></linearGradient><filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#2d2250" flood-opacity=".14"/></filter></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><ellipse cx="100" cy="154" rx="51" ry="31" fill="url(#body)"/><path d="M58 156c17-12 68-12 84 0" fill="none" stroke="#fff" stroke-opacity=".62" stroke-width="4" stroke-linecap="round"/><path d="M66 169c13-11 55-12 68 0" fill="none" stroke="${outfit.shadow}" stroke-opacity=".55" stroke-width="8" stroke-linecap="round"/><ellipse cx="59" cy="103" rx="9" ry="14" fill="${skin.value}"/><ellipse cx="141" cy="103" rx="9" ry="14" fill="${skin.value}"/><circle cx="100" cy="98" r="58" fill="url(#skin)"/><path d="M74 84c8-27 43-34 55-2" fill="white" opacity=".17"/>${hairMarkup}<ellipse cx="80" cy="100" rx="15" ry="19" fill="#fff" opacity=".98"/><ellipse cx="120" cy="100" rx="15" ry="19" fill="#fff" opacity=".98"/><ellipse cx="80" cy="103" rx="10.5" ry="13.4" fill="#3a3033"/><ellipse cx="120" cy="103" rx="10.5" ry="13.4" fill="#3a3033"/><ellipse cx="80" cy="104" rx="4.1" ry="5.3" fill="#000" opacity=".45"/><ellipse cx="120" cy="104" rx="4.1" ry="5.3" fill="#000" opacity=".45"/><ellipse cx="77" cy="98" rx="3.4" ry="4.1" fill="#fff"/><ellipse cx="117" cy="98" rx="3.4" ry="4.1" fill="#fff"/><path d="M70 88q10-7 21 0" fill="none" stroke="#8d6b57" stroke-width="3" stroke-linecap="round" opacity=".34"/><path d="M109 88q10-7 21 0" fill="none" stroke="#8d6b57" stroke-width="3" stroke-linecap="round" opacity=".34"/><ellipse cx="73" cy="117" rx="10" ry="6.4" fill="${skin.blush}" opacity=".62"/><ellipse cx="127" cy="117" rx="10" ry="6.4" fill="${skin.blush}" opacity=".62"/><path d="M100 105c3.7 3.7 2.8 8.2-.2 11.2" fill="none" stroke="${skin.nose}" stroke-width="3.1" stroke-linecap="round"/><path d="M88 126q12 10 24 0" fill="none" stroke="${skin.lip}" stroke-width="4" stroke-linecap="round"/><path d="M91 127q9 4 18 0" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="2" stroke-linecap="round"/></g></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Avatar do bebê"><defs><radialGradient id="bg" cx="36%" cy="22%" r="88%"><stop offset="0" stop-color="${palette.accent}"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><radialGradient id="ring" cx="35%" cy="25%" r="90%"><stop offset="0" stop-color="#ffffff" stop-opacity=".92"/><stop offset="1" stop-color="#eadfff" stop-opacity=".82"/></radialGradient><radialGradient id="skin" cx="42%" cy="26%" r="75%"><stop offset="0" stop-color="#fffaf4"/><stop offset=".5" stop-color="${skin.value}"/><stop offset="1" stop-color="${skin.shade}"/></radialGradient><linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${outfit.highlight}"/><stop offset=".65" stop-color="${outfit.base}"/><stop offset="1" stop-color="${outfit.shadow}"/></linearGradient><linearGradient id="blanket" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".88"/><stop offset="1" stop-color="${outfit.base}" stop-opacity=".45"/></linearGradient><filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#2d2250" flood-opacity=".14"/></filter><clipPath id="hairClip"><circle cx="100" cy="98" r="58"/></clipPath></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><circle cx="100" cy="100" r="66" fill="url(#ring)" opacity=".42"/><ellipse cx="100" cy="155" rx="53" ry="32" fill="url(#body)"/><path d="M54 156c18-13 74-13 92 0" fill="none" stroke="#fff" stroke-opacity=".66" stroke-width="4" stroke-linecap="round"/><path d="M68 149c8 13 22 20 32 20 11 0 24-7 32-20" fill="none" stroke="url(#blanket)" stroke-width="11" stroke-linecap="round" opacity=".78"/><ellipse cx="59" cy="103" rx="8" ry="13" fill="${skin.shade}" opacity=".92"/><ellipse cx="141" cy="103" rx="8" ry="13" fill="${skin.shade}" opacity=".92"/><circle cx="100" cy="98" r="58" fill="url(#skin)"/><path d="M78 83c7-24 37-31 49-3" fill="white" opacity=".18"/><g clip-path="url(#hairClip)">${hairMarkup}</g><ellipse cx="80" cy="100" rx="14.8" ry="18.5" fill="#fff" opacity=".98"/><ellipse cx="120" cy="100" rx="14.8" ry="18.5" fill="#fff" opacity=".98"/><ellipse cx="80" cy="103" rx="10.2" ry="13" fill="#3c3134"/><ellipse cx="120" cy="103" rx="10.2" ry="13" fill="#3c3134"/><ellipse cx="80" cy="104" rx="3.9" ry="5.1" fill="#000" opacity=".42"/><ellipse cx="120" cy="104" rx="3.9" ry="5.1" fill="#000" opacity=".42"/><ellipse cx="77" cy="98" rx="3.3" ry="4" fill="#fff"/><ellipse cx="117" cy="98" rx="3.3" ry="4" fill="#fff"/><ellipse cx="82" cy="101" rx="1.8" ry="2.2" fill="#fff" opacity=".7"/><ellipse cx="122" cy="101" rx="1.8" ry="2.2" fill="#fff" opacity=".7"/><path d="M70 88q10-6 20 0" fill="none" stroke="#8d6b57" stroke-width="2.8" stroke-linecap="round" opacity=".28"/><path d="M110 88q10-6 20 0" fill="none" stroke="#8d6b57" stroke-width="2.8" stroke-linecap="round" opacity=".28"/><ellipse cx="74" cy="117" rx="10" ry="6.3" fill="${skin.blush}" opacity=".62"/><ellipse cx="126" cy="117" rx="10" ry="6.3" fill="${skin.blush}" opacity=".62"/><path d="M100 105c3 3.5 2.4 7.3-.2 10.1" fill="none" stroke="${skin.nose}" stroke-width="3" stroke-linecap="round" opacity=".9"/><path d="M90 126q10 7 20 0" fill="none" stroke="${skin.lip}" stroke-width="3.8" stroke-linecap="round"/><path d="M92 127q8 3 16 0" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="1.8" stroke-linecap="round"/></g></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
@@ -729,7 +736,7 @@ function saveBabyAvatarFromDraft() {
   renderBabyIdentity();
   scheduleProfileCloudSave();
   closeAvatarEditor("Avatar salvo com sucesso. Toque em Editar avatar quando quiser mudar.");
-  if (loginHelper) loginHelper.textContent = "Avatar premium salvo. O perfil agora usa o novo avatar mais delicado, leve e privado.";
+  if (loginHelper) loginHelper.textContent = "Avatar premium salvo com acabamento mais detalhado e visual mais refinado.";
 }
 
 
@@ -839,7 +846,7 @@ const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
 const caregiverDeviceIdKey = "ninou.deviceId";
 
 /*
-  v75.48 — identificação por aparelho
+  v75.49.1 — identificação por aparelho
 
   A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
   Por isso, a identificação do cuidador não pode ser salva na conta global.
@@ -873,7 +880,7 @@ function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
 }
 
 function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
-  // v75.48: não limpamos a identificação local do aparelho ao trocar/logout de conta.
+  // v75.49.1: não limpamos a identificação local do aparelho ao trocar/logout de conta.
   // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
@@ -968,7 +975,7 @@ async function saveCaregiverIdentityFromForm() {
   const name = caregiverNameInput?.value || "";
   const relation = caregiverRelationInput?.value || "";
 
-  // v75.48: salva somente neste aparelho.
+  // v75.49.1: salva somente neste aparelho.
   // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
   // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
   saveCurrentCaregiverIdentity(name, relation);
@@ -1258,7 +1265,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.48: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
+    v75.49.1: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3442,7 +3449,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.48: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
+  // v75.49.1: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
   const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
   for (const familyId of [...new Set(candidateFamilies)]) {
     try {
@@ -3555,7 +3562,7 @@ async function activatePersonalFamily() {
     refreshAdminStats({ silent: true });
   } catch (error) {
     console.error("Erro ao ativar família principal no Firebase:", error);
-    // v75.48: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
+    // v75.49.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
     // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
     setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) {
@@ -5947,7 +5954,7 @@ function setSyncStatus(status = "offline", email = "") {
     status = "online";
   }
 
-  // v75.48: o admin global não deve aparecer como "Off-line" depois do login.
+  // v75.49.1: o admin global não deve aparecer como "Off-line" depois do login.
   // O painel administrativo depende da autenticação do admin e de regras globais;
   // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
   // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
@@ -6590,7 +6597,7 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  // v75.48: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
+  // v75.49.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
   return resizeProfileImage(file, { size: 120, quality: 0.5 });
 }
 

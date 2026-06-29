@@ -6647,3 +6647,28 @@ body.guest-locked .state-orbit {
     height: 92px;
   }
 }
+
+
+/* v75.49 — polimento premium do editor de avatar */
+.avatar-compact-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,246,255,.98));
+  box-shadow: 0 22px 42px rgba(77, 56, 125, .12);
+}
+
+.avatar-compact-card .avatar-choice {
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(247,244,252,.96));
+  border-color: rgba(221, 214, 240, .95);
+}
+
+.avatar-compact-card .avatar-choice.selected {
+  box-shadow: 0 0 0 4px rgba(181, 157, 240, .22), 0 18px 28px rgba(107, 82, 160, .16);
+}
+
+.avatar-face-thumb {
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.65), rgba(255,255,255,0) 45%);
+}
+
+.avatar-compact-card .baby-avatar-preview {
+  width: 128px;
+  height: 128px;
+}
