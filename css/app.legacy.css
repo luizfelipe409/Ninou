@@ -6390,3 +6390,34 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/* v75.45 — refinamento de estilos menino/menina e cor de cabelo */
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  min-height: 122px;
+}
+
+.avatar-compact-card .avatar-option-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.avatar-compact-card .avatar-option-row#avatarHairColorOptions,
+#avatarHairColorOptions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#avatarHairColorOptions .avatar-choice small {
+  font-size: .83rem;
+}
+
+@media (max-width: 560px) {
+  .avatar-compact-card .avatar-option-grid.icon-grid,
+  .avatar-compact-card .avatar-option-row,
+  #avatarHairColorOptions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

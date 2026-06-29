@@ -1,4 +1,4 @@
-# Ninou v75.44 — Somente avatar
+# Ninou v75.45 — Somente avatar
 
 Versão criada para testar avatares antes de substituir definitivamente a foto do bebê.
 
@@ -51,7 +51,7 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Mantém isolamento de conta e evita reaproveitar identificação de outro usuário.
 
 
-## v75.44 — Identificação por aparelho
+## v75.45 — Identificação por aparelho
 
 Esta versão ajusta o uso familiar real do Ninou:
 
@@ -64,8 +64,16 @@ Esta versão ajusta o uso familiar real do Ninou:
 - O app não grava mais essa identificação em `users/{uid}/account/profile`, evitando que um aparelho sobrescreva o outro.
 
 
-## v75.44 — Avatar 3D Soft moderno
+## v75.45 — Avatar 3D Soft moderno
 
 - Avatares do bebê redesenhados em estilo 3D Soft, com aparência mais novinha e moderna.
 - Personalização agora foca em cabelinho, tom de pele e cor de fundo.
 - Depois de salvar, o editor some da tela e só reaparece ao tocar em **Editar avatar** abaixo da foto do perfil.
+
+
+## v75.45 — menino, menina e cores de cabelo
+
+- Melhora os cabelos dos avatares.
+- Adiciona opções de **menino** e **menina**.
+- Adiciona mais de uma **cor de cabelo**.
+- Mantém edição sob demanda: depois de salvar, o editor some e volta só no botão **Editar avatar**.

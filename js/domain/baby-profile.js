@@ -7,7 +7,8 @@ export const profileThemeModes = Object.freeze(["auto", "light", "dark"]);
 
 export const defaultBabyAvatar = Object.freeze({
   face: "3d-soft",
-  hair: "topetinho",
+  hair: "menino-topete",
+  hairColor: "castanho-claro",
   skin: "pele-clara",
   background: "lilas",
 });
@@ -17,10 +18,12 @@ export function normalizeBabyAvatar(avatar = {}) {
   const legacyHair = typeof source.icon === "string" && source.icon ? source.icon : "";
   const legacySkin = typeof source.skin === "string" && source.skin ? source.skin : "";
   const legacyBackground = typeof source.color === "string" && source.color ? source.color : "";
+  const legacyHairColor = typeof source.hairColor === "string" && source.hairColor ? source.hairColor : "";
 
   return {
     face: "3d-soft",
     hair: typeof source.hair === "string" && source.hair ? source.hair : (legacyHair || defaultBabyAvatar.hair),
+    hairColor: legacyHairColor || defaultBabyAvatar.hairColor,
     skin: legacySkin || defaultBabyAvatar.skin,
     background: legacyBackground || defaultBabyAvatar.background,
   };

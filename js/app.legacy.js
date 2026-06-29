@@ -97,6 +97,7 @@ const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
 const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
 const editBabyAvatarButton = document.querySelector("#editBabyAvatarButton");
 const avatarIconOptions = document.querySelector("#avatarIconOptions");
+const avatarHairColorOptions = document.querySelector("#avatarHairColorOptions");
 const avatarSkinOptions = document.querySelector("#avatarSkinOptions");
 const avatarColorOptions = document.querySelector("#avatarColorOptions");
 const avatarBackgroundOptions = document.querySelector("#avatarBackgroundOptions");
@@ -380,12 +381,23 @@ let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 let avatarEditorForceOpen = false;
 
 const babyAvatarHairOptions = Object.freeze([
-  { id: "topetinho", label: "Topetinho", hairTone: "#b77743", style: "topetinho" },
-  { id: "quase-sem-cabelo", label: "Quase sem cabelo", hairTone: "#d3a070", style: "quase-sem-cabelo" },
-  { id: "onduladinho-curto", label: "Onduladinho curto", hairTone: "#8a5a34", style: "onduladinho-curto" },
-  { id: "duas-chuquinhas", label: "Duas chuquinhas", hairTone: "#8a5532", style: "duas-chuquinhas" },
-  { id: "franjinha-delicada", label: "Franjinha delicada", hairTone: "#a97143", style: "franjinha-delicada" },
-  { id: "cachinhos-curtos", label: "Cachinhos curtos", hairTone: "#6e4328", style: "cachinhos-curtos" },
+  { id: "menino-topete", label: "Menino • Topete", previewLabel: "Topete", style: "menino-topete" },
+  { id: "menino-curtinho", label: "Menino • Curtinho", previewLabel: "Curtinho", style: "menino-curtinho" },
+  { id: "menino-cacheado", label: "Menino • Cacheadinho", previewLabel: "Cacheadinho", style: "menino-cacheado" },
+  { id: "menino-moicano", label: "Menino • Moicano suave", previewLabel: "Moicano", style: "menino-moicano" },
+  { id: "menina-franjinha", label: "Menina • Franjinha", previewLabel: "Franjinha", style: "menina-franjinha" },
+  { id: "menina-chuquinhas", label: "Menina • Chuquinhas", previewLabel: "Chuquinhas", style: "menina-chuquinhas" },
+  { id: "menina-bob", label: "Menina • Bob curto", previewLabel: "Bob curto", style: "menina-bob" },
+  { id: "menina-cachinhos", label: "Menina • Cachinhos", previewLabel: "Cachinhos", style: "menina-cachinhos" },
+]);
+
+const babyAvatarHairColorOptions = Object.freeze([
+  { id: "preto", label: "Preto", value: "#2c221d" },
+  { id: "castanho-escuro", label: "Castanho escuro", value: "#5b3a29" },
+  { id: "castanho-medio", label: "Castanho médio", value: "#7b4e31" },
+  { id: "castanho-claro", label: "Castanho claro", value: "#b77743" },
+  { id: "loiro", label: "Loiro", value: "#d7b36a" },
+  { id: "ruivo", label: "Ruivo", value: "#b85d34" },
 ]);
 
 const babyAvatarSkinOptions = Object.freeze([
@@ -415,6 +427,10 @@ function getAvatarHairOption(avatar = {}) {
   return babyAvatarHairOptions.find((item) => item.id === avatar.hair) || babyAvatarHairOptions[0];
 }
 
+function getAvatarHairColorOption(avatar = {}) {
+  return babyAvatarHairColorOptions.find((item) => item.id === avatar.hairColor) || babyAvatarHairColorOptions[3];
+}
+
 function getAvatarSkinOption(avatar = {}) {
   return babyAvatarSkinOptions.find((item) => item.id === avatar.skin) || babyAvatarSkinOptions[0];
 }
@@ -426,7 +442,8 @@ function getAvatarOption(options, id, fallbackIndex = 0) {
 function normalizeAvatarDraft(avatar = {}) {
   return {
     face: "3d-soft",
-    hair: getAvatarOption(babyAvatarHairOptions, avatar.hair || avatar.icon || "topetinho", 0).id,
+    hair: getAvatarOption(babyAvatarHairOptions, avatar.hair || avatar.icon || "menino-topete", 0).id,
+    hairColor: getAvatarOption(babyAvatarHairColorOptions, avatar.hairColor || "castanho-claro", 3).id,
     skin: getAvatarOption(babyAvatarSkinOptions, avatar.skin || "pele-clara", 0).id,
     background: getAvatarOption(babyAvatarBackgroundOptions, avatar.background || avatar.color || "lilas", 0).id,
   };
@@ -454,26 +471,28 @@ function getAvatarOutfitFill(backgroundId) {
   return map[backgroundId] || "#bda8ff";
 }
 
-function getAvatarHairMarkup(hair) {
-  const tone = hair.hairTone;
+function getAvatarHairMarkup(hair, tone) {
   const styles = {
-    topetinho: `<path d="M99 55c-6-10 2-21 14-19 10 2 14 14 5 21-4-5-10-6-19-2z" fill="${tone}"/><path d="M77 66c12-16 39-18 56-4" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/>`,
-    "quase-sem-cabelo": `<path d="M84 62c10-9 26-10 37-1" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round" opacity=".75"/>`,
-    "onduladinho-curto": `<path d="M72 68c15-18 49-20 61-4" fill="none" stroke="${tone}" stroke-width="12" stroke-linecap="round"/><path d="M83 56c8 8 14 10 22 0 6 6 11 8 18 1" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
-    "duas-chuquinhas": `<path d="M76 70c12-13 34-17 49-8" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/><circle cx="67" cy="70" r="10" fill="${tone}"/><circle cx="133" cy="70" r="10" fill="${tone}"/><circle cx="63" cy="60" r="4" fill="#f5a5c8"/><circle cx="137" cy="60" r="4" fill="#f5a5c8"/>`,
-    "franjinha-delicada": `<path d="M72 66c18-18 51-18 63-1" fill="none" stroke="${tone}" stroke-width="11" stroke-linecap="round"/><path d="M77 69c6-8 15-11 23-8 8-7 18-9 26-5" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
-    "cachinhos-curtos": `<circle cx="80" cy="60" r="9" fill="${tone}"/><circle cx="95" cy="54" r="9" fill="${tone}"/><circle cx="111" cy="56" r="9" fill="${tone}"/><circle cx="126" cy="63" r="9" fill="${tone}"/><path d="M73 69c17-16 44-17 57-2" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/>`,
+    "menino-topete": `<path d="M90 57c7-10 28-17 45-7 7 5 10 13 8 19-11-8-32-10-53-2z" fill="${tone}"/><path d="M78 69c14-14 42-18 59-7" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/>`,
+    "menino-curtinho": `<path d="M75 68c15-16 47-17 60-2" fill="none" stroke="${tone}" stroke-width="12" stroke-linecap="round"/><path d="M81 59c6-6 15-8 22-6 8-5 18-5 24-1" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
+    "menino-cacheado": `<circle cx="78" cy="63" r="9" fill="${tone}"/><circle cx="93" cy="56" r="9" fill="${tone}"/><circle cx="109" cy="56" r="9" fill="${tone}"/><circle cx="124" cy="62" r="9" fill="${tone}"/><path d="M74 71c17-15 45-16 56-2" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
+    "menino-moicano": `<path d="M100 46c6 6 10 13 10 20-6-3-12-3-19 0 0-7 2-14 9-20z" fill="${tone}"/><path d="M80 70c14-12 41-13 54-2" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/>`,
+    "menina-franjinha": `<path d="M72 66c18-18 51-18 63-1" fill="none" stroke="${tone}" stroke-width="11" stroke-linecap="round"/><path d="M76 70c8-7 17-10 25-8 8-5 17-6 25-3" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
+    "menina-chuquinhas": `<path d="M76 70c12-13 34-17 49-8" fill="none" stroke="${tone}" stroke-width="10" stroke-linecap="round"/><circle cx="67" cy="70" r="10" fill="${tone}"/><circle cx="133" cy="70" r="10" fill="${tone}"/><circle cx="63" cy="60" r="4" fill="#f5a5c8"/><circle cx="137" cy="60" r="4" fill="#f5a5c8"/>`,
+    "menina-bob": `<path d="M70 68c17-18 54-18 66 0" fill="none" stroke="${tone}" stroke-width="12" stroke-linecap="round"/><path d="M71 72c-3 22 5 38 8 45" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/><path d="M129 72c3 22-5 38-8 45" fill="none" stroke="${tone}" stroke-width="9" stroke-linecap="round"/>`,
+    "menina-cachinhos": `<circle cx="74" cy="68" r="9" fill="${tone}"/><circle cx="88" cy="58" r="9" fill="${tone}"/><circle cx="102" cy="55" r="9" fill="${tone}"/><circle cx="116" cy="58" r="9" fill="${tone}"/><circle cx="130" cy="68" r="9" fill="${tone}"/><path d="M75 72c16-15 43-15 53 0" fill="none" stroke="${tone}" stroke-width="8" stroke-linecap="round"/>`,
   };
-  return styles[hair.style] || styles.topetinho;
+  return styles[hair.style] || styles["menino-topete"];
 }
 
 function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
   const normalized = normalizeAvatarDraft(avatar);
   const palette = getAvatarBackgroundOption(normalized);
   const hair = getAvatarHairOption(normalized);
+  const hairColor = getAvatarHairColorOption(normalized);
   const skin = getAvatarSkinOption(normalized);
   const outfit = getAvatarOutfitFill(normalized.background);
-  const hairMarkup = getAvatarHairMarkup(hair);
+  const hairMarkup = getAvatarHairMarkup(hair, hairColor.value);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="bg" cx="35%" cy="25%" r="84%"><stop offset="0" stop-color="#fffefc" stop-opacity=".96"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><radialGradient id="faceGlow" cx="45%" cy="30%" r="70%"><stop offset="0" stop-color="#fff5ec" stop-opacity=".9"/><stop offset="1" stop-color="${skin.value}"/></radialGradient><linearGradient id="romper" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".45"/><stop offset="1" stop-color="${outfit}"/></linearGradient><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#2d2250" flood-opacity=".14"/></filter></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><ellipse cx="100" cy="152" rx="46" ry="30" fill="url(#romper)"/><path d="M61 154c17-12 62-14 78 0" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="98" r="57" fill="url(#faceGlow)"/><ellipse cx="59" cy="101" rx="9" ry="14" fill="${skin.value}"/><ellipse cx="141" cy="101" rx="9" ry="14" fill="${skin.value}"/>${hairMarkup}<ellipse cx="80" cy="98" rx="14" ry="18" fill="#ffffff" opacity=".94"/><ellipse cx="120" cy="98" rx="14" ry="18" fill="#ffffff" opacity=".94"/><ellipse cx="80" cy="101" rx="10" ry="13" fill="#2f2a34"/><ellipse cx="120" cy="101" rx="10" ry="13" fill="#2f2a34"/><ellipse cx="77" cy="97" rx="3.3" ry="4.2" fill="#ffffff"/><ellipse cx="117" cy="97" rx="3.3" ry="4.2" fill="#ffffff"/><ellipse cx="73" cy="113" rx="9" ry="6" fill="${skin.blush}" opacity=".65"/><ellipse cx="127" cy="113" rx="9" ry="6" fill="${skin.blush}" opacity=".65"/><path d="M100 103c4 4 3 8 0 11" fill="none" stroke="${skin.nose}" stroke-width="3.5" stroke-linecap="round"/><path d="M87 123q14 13 28 0" fill="#f79da5" opacity=".9" stroke="#b25f60" stroke-width="4" stroke-linecap="round"/><path d="M82 77q7-4 15 0" fill="none" stroke="#8d6b57" stroke-width="3" stroke-linecap="round" opacity=".45"/><path d="M103 77q7-4 15 0" fill="none" stroke="#8d6b57" stroke-width="3" stroke-linecap="round" opacity=".45"/></g></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
@@ -498,8 +517,6 @@ function closeAvatarEditor(statusText = "") {
   renderAvatarEditorVisibility();
   if (statusText && babyAvatarStatus) babyAvatarStatus.textContent = statusText;
 }
-
-
 function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = "member") {
   const base = `${label || "Responsável"}-${seed || "ninou"}-${variant}`;
   let hash = 0;
@@ -523,7 +540,7 @@ function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = 
 function renderAvatarOptionButton(container, options, type, avatar = pendingBabyAvatar) {
   if (!container) return;
   const selected = avatar[type];
-  const swatchTypes = new Set(["skin", "background"]);
+  const swatchTypes = new Set(["skin", "background", "hairColor"]);
 
   container.innerHTML = options
     .map((item) => {
@@ -550,6 +567,7 @@ function applyAvatarPreview(avatar = pendingBabyAvatar) {
 function renderAvatarCustomizer() {
   pendingBabyAvatar = normalizeAvatarDraft(pendingBabyAvatar?.hair ? pendingBabyAvatar : babyProfile.avatar || {});
   renderAvatarOptionButton(avatarIconOptions, babyAvatarHairOptions, "hair", pendingBabyAvatar);
+  renderAvatarOptionButton(avatarHairColorOptions, babyAvatarHairColorOptions, "hairColor", pendingBabyAvatar);
   renderAvatarOptionButton(avatarSkinOptions, babyAvatarSkinOptions, "skin", pendingBabyAvatar);
   renderAvatarOptionButton(avatarColorOptions, babyAvatarBackgroundOptions, "background", pendingBabyAvatar);
   if (avatarBackgroundOptions) avatarBackgroundOptions.innerHTML = "";
@@ -580,7 +598,7 @@ function saveBabyAvatarFromDraft() {
   renderBabyIdentity();
   scheduleProfileCloudSave();
   closeAvatarEditor("Avatar salvo com sucesso. Toque em Editar avatar quando quiser mudar.");
-  if (loginHelper) loginHelper.textContent = "Avatar 3D Soft salvo. O perfil continua leve, bonito e sem foto.";
+  if (loginHelper) loginHelper.textContent = "Avatar 3D Soft salvo com estilo de menino/menina e cor de cabelo personalizada.";
 }
 
 
@@ -6535,7 +6553,7 @@ if (weightHistoryList) {
   });
 }
 
-[avatarIconOptions, avatarSkinOptions, avatarColorOptions].forEach((container) => {
+[avatarIconOptions, avatarHairColorOptions, avatarSkinOptions, avatarColorOptions].forEach((container) => {
   container?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-avatar-type][data-avatar-value]");
     if (!button) return;
