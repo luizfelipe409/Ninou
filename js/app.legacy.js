@@ -4669,8 +4669,8 @@ function renderSleepReport() {
     routineStatus.textContent = "Em ajuste";
     routineHint.textContent = "Há alguma variação, mas já existe um padrão se formando.";
   } else {
-    routineStatus.textContent = "Irregular";
-    routineHint.textContent = "Os horários ainda variam bastante; mais registros ajudam a orientar.";
+    routineStatus.textContent = "Horários variados";
+    routineHint.textContent = "As sonecas começaram em horários bem diferentes nos últimos registros.";
   }
 }
 
@@ -5742,10 +5742,40 @@ function getExportEvents() {
   return buildExportEvents(state.events, getEventConfig);
 }
 
+function getCustomExportRange(selectedDayId = getSelectedDayId()) {
+  const startText = exportStartDateInput?.value || selectedDayId;
+  const endText = exportEndDateInput?.value || selectedDayId;
+  const startDate = parseLocalDate(startText) || parseLocalDate(selectedDayId) || new Date();
+  const endDate = parseLocalDate(endText) || parseLocalDate(selectedDayId) || startDate;
+  const start = getDayStart(Math.min(startDate.getTime(), endDate.getTime()));
+  const end = getDayStart(Math.max(startDate.getTime(), endDate.getTime())) + day;
+  return {
+    start,
+    end,
+    startId: toDateInputValue(start),
+    endId: toDateInputValue(end - day),
+  };
+}
+
+function getEffectiveExportRangeMode(selectedDayId = getSelectedDayId()) {
+  const selectedMode = exportRangeSelect?.value || "day";
+  const startText = exportStartDateInput?.value || "";
+  const endText = exportEndDateInput?.value || "";
+  if (selectedMode === "day" && startText && endText && startText !== endText) return "custom";
+  return selectedMode;
+}
+
+function syncExportRangeModeFromDates() {
+  if (!exportRangeSelect || !exportStartDateInput || !exportEndDateInput) return;
+  if (exportStartDateInput.value && exportEndDateInput.value && exportStartDateInput.value !== exportEndDateInput.value) {
+    exportRangeSelect.value = "custom";
+  }
+}
+
 function getExportWindow() {
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const selectedDayId = toDateInputValue(selectedStart);
-  const mode = exportRangeSelect?.value || "day";
+  const mode = getEffectiveExportRangeMode(selectedDayId);
   let start = selectedStart;
   let end = selectedStart + day;
   let label = formatReportDate(selectedDayId);
@@ -5756,13 +5786,12 @@ function getExportWindow() {
     end = getDayStart() + day;
     label = `Últimos ${count} dias`;
   } else if (mode === "custom") {
-    const startText = exportStartDateInput?.value || selectedDayId;
-    const endText = exportEndDateInput?.value || selectedDayId;
-    const startDate = parseLocalDate(startText) || new Date(selectedStart);
-    const endDate = parseLocalDate(endText) || new Date(selectedStart);
-    start = getDayStart(Math.min(startDate.getTime(), endDate.getTime()));
-    end = getDayStart(Math.max(startDate.getTime(), endDate.getTime())) + day;
-    label = `${formatReportDate(toDateInputValue(start))} a ${formatReportDate(toDateInputValue(end - day))}`;
+    const range = getCustomExportRange(selectedDayId);
+    start = range.start;
+    end = range.end;
+    label = range.startId === range.endId
+      ? formatReportDate(range.startId)
+      : `${formatReportDate(range.startId)} a ${formatReportDate(range.endId)}`;
   }
 
   return { mode, start, end, label, dayId: selectedDayId };
@@ -6139,6 +6168,8 @@ if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("c
 if (prepareConsultButton) prepareConsultButton.addEventListener("click", prepareConsultMode);
 if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
 if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
+if (exportStartDateInput) exportStartDateInput.addEventListener("change", syncExportRangeModeFromDates);
+if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
 
 wakeWindowInput.addEventListener("input", () => {
