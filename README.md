@@ -1,8 +1,8 @@
-# Ninou v75.41.1 — Somente avatar
+# Ninou v75.42 — Somente avatar
 
 Versão criada para testar avatares antes de substituir definitivamente a foto do bebê.
 
-## Novidades v75.41.1
+## Novidades v75.42
 
 - Nova seção no Perfil: **Escolha o avatar do bebê**.
 - Avatar personalizável por:
@@ -34,7 +34,7 @@ Versão criada para testar avatares antes de substituir definitivamente a foto d
 Esta versão é uma versão de teste visual. A ideia é validar com usuários se o avatar personalizável substitui bem a foto real do bebê antes de tornar essa mudança definitiva.
 
 
-## Novidades v75.41.1
+## Novidades v75.42
 
 - O app passa a usar somente avatar para representar o bebê.
 - Upload de foto e fotos antigas deixam de ser exibidos.

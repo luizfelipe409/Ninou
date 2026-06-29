@@ -319,6 +319,22 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
+// v75.42: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+try {
+  if (!localStorage.getItem(storageKeys.email)) {
+    [
+      storageKeys.profile,
+      storageKeys.profileVersion,
+      storageKeys.dayState,
+      storageKeys.wakeWindow,
+      storageKeys.weights,
+      storageKeys.photo,
+      storageKeys.access,
+      storageKeys.dataOwnerEmail,
+    ].forEach((key) => localStorage.removeItem(key));
+  }
+} catch {}
+
 let currentSheetType = "sono";
 let currentEditingEventId = null;
 let currentDiaryFilter = "all";
@@ -360,48 +376,31 @@ let state = loadLocalDayState();
 let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 
 const babyAvatarIconOptions = Object.freeze([
-  { id: "bear", label: "Ursinho", emoji: "🧸" },
-  { id: "moon", label: "Lua", emoji: "🌙" },
-  { id: "cloud", label: "Nuvem", emoji: "☁️" },
-  { id: "baby", label: "Bebê", emoji: "👶" },
-  { id: "bottle", label: "Mamadeira", emoji: "🍼" },
-  { id: "heart", label: "Coração", emoji: "💗" },
-  { id: "star", label: "Estrela", emoji: "⭐" },
-  { id: "balloon", label: "Balão", emoji: "🎈" },
-  { id: "duck", label: "Patinho", emoji: "🐥" },
-  { id: "stroller", label: "Carrinho", emoji: "🛒" },
-  { id: "rainbow", label: "Arco-íris", emoji: "🌈" },
-  { id: "pacifier", label: "Chupeta", emoji: "🧷" },
+  { id: "baby-curl", label: "Topete", face: "curl", skin: "#ffd7b5", hair: "#a96835", blush: "#f7a9a0", smile: "happy" },
+  { id: "baby-bow", label: "Lacinho", face: "bow", skin: "#ffd2ba", hair: "#7b4a2d", blush: "#f4a0aa", smile: "happy" },
+  { id: "baby-soft", label: "Suave", face: "soft", skin: "#ffe0c7", hair: "#b98a5b", blush: "#f2afa6", smile: "calm" },
+  { id: "baby-sleepy", label: "Soninho", face: "sleepy", skin: "#f5c6a8", hair: "#6d4935", blush: "#ee9c9c", smile: "sleep" },
+  { id: "baby-smile", label: "Sorriso", face: "smile", skin: "#f4b996", hair: "#45301e", blush: "#ef969c", smile: "open" },
+  { id: "baby-round", label: "Bochechas", face: "round", skin: "#ffd9c0", hair: "#8b5a3c", blush: "#ffa9a9", smile: "happy" },
+  { id: "baby-wave", label: "Onda", face: "wave", skin: "#eeb38c", hair: "#2f2118", blush: "#ef8d90", smile: "calm" },
+  { id: "baby-star", label: "Estrelinha", face: "star", skin: "#ffe4c9", hair: "#c1783f", blush: "#f4a0a0", smile: "happy" },
 ]);
 
 const babyAvatarColorOptions = Object.freeze([
   { id: "lilac", label: "Lilás", value: "#d9c8ff", text: "#3b2a73" },
-  { id: "rose", label: "Rosa", value: "#ffb7c4", text: "#743244" },
-  { id: "peach", label: "Pêssego", value: "#ffc096", text: "#7b3b20" },
-  { id: "butter", label: "Amarelo", value: "#ffd97a", text: "#6f4b02" },
+  { id: "rose", label: "Rosa", value: "#ffc8d6", text: "#743244" },
+  { id: "peach", label: "Pêssego", value: "#ffc8a6", text: "#7b3b20" },
+  { id: "butter", label: "Amarelo", value: "#ffe09a", text: "#6f4b02" },
   { id: "mint", label: "Menta", value: "#bdebd8", text: "#17644e" },
-  { id: "sky", label: "Azul", value: "#aee4f2", text: "#225d78" },
-  { id: "periwinkle", label: "Azul lilás", value: "#bbc8ff", text: "#27356d" },
-  { id: "sand", label: "Areia", value: "#eacbaa", text: "#6c4427" },
+  { id: "sky", label: "Azul", value: "#b7e8f6", text: "#225d78" },
 ]);
 
 const babyAvatarBackgroundOptions = Object.freeze([
   { id: "plain", label: "Liso", emoji: "◯" },
-  { id: "stars", label: "Estrelas", emoji: "✨" },
-  { id: "clouds", label: "Nuvens", emoji: "☁️" },
-  { id: "hearts", label: "Corações", emoji: "♡" },
-  { id: "dots", label: "Bolinhas", emoji: "•" },
-  { id: "moon", label: "Noite", emoji: "🌙" },
 ]);
 
 const babyAvatarAccessoryOptions = Object.freeze([
   { id: "none", label: "Sem", emoji: "⊘" },
-  { id: "bow", label: "Laço", emoji: "🎀" },
-  { id: "beanie", label: "Touca", emoji: "🧢" },
-  { id: "pacifier", label: "Chupeta", emoji: "🍼" },
-  { id: "star", label: "Estrela", emoji: "⭐" },
-  { id: "crown", label: "Coroa", emoji: "👑" },
-  { id: "sparkles", label: "Brilho", emoji: "✨" },
 ]);
 
 function getAvatarPalette(avatar = {}) {
@@ -414,10 +413,10 @@ function getAvatarOption(options, id, fallbackIndex = 0) {
 
 function normalizeAvatarDraft(avatar = {}) {
   return {
-    icon: getAvatarOption(babyAvatarIconOptions, avatar.icon || "baby", 3).id,
+    icon: getAvatarOption(babyAvatarIconOptions, avatar.icon || "baby-curl", 0).id,
     color: getAvatarPalette(avatar).id,
-    background: getAvatarOption(babyAvatarBackgroundOptions, avatar.background || "moon", 5).id,
-    accessory: getAvatarOption(babyAvatarAccessoryOptions, avatar.accessory || "none", 0).id,
+    background: "plain",
+    accessory: "none",
   };
 }
 
@@ -425,23 +424,31 @@ function escapeSvgText(value = "") {
   return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function buildAvatarBackgroundMarkup(avatar = {}) {
-  const type = avatar.background || "plain";
-  if (type === "stars") return '<text x="35" y="42" font-size="22" opacity=".82">✨</text><text x="142" y="58" font-size="18" opacity=".68">✦</text><text x="52" y="160" font-size="16" opacity=".56">✧</text><text x="150" y="150" font-size="18" opacity=".62">✨</text>';
-  if (type === "clouds") return '<text x="22" y="64" font-size="34" opacity=".82">☁️</text><text x="126" y="144" font-size="34" opacity=".72">☁️</text>';
-  if (type === "hearts") return '<text x="32" y="52" font-size="22" opacity=".7">♡</text><text x="142" y="62" font-size="18" opacity=".72">♥</text><text x="46" y="158" font-size="16" opacity=".62">♡</text><text x="148" y="148" font-size="18" opacity=".64">♡</text>';
-  if (type === "dots") return '<circle cx="42" cy="46" r="5" fill="white" opacity=".62"/><circle cx="72" cy="148" r="4" fill="white" opacity=".55"/><circle cx="152" cy="76" r="5" fill="white" opacity=".66"/><circle cx="132" cy="142" r="4" fill="white" opacity=".5"/>';
-  if (type === "moon") return '<text x="32" y="62" font-size="34" opacity=".92">🌙</text><text x="132" y="56" font-size="18" opacity=".78">✨</text><text x="48" y="154" font-size="24" opacity=".75">☁️</text>';
-  return '';
+function buildAvatarBackgroundMarkup(_avatar = {}) {
+  return '<circle cx="48" cy="52" r="5" fill="white" opacity=".42"/><circle cx="152" cy="58" r="4" fill="white" opacity=".36"/><path d="M38 150c22 10 47 11 68 2" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" opacity=".28"/>';
 }
 
 function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
   const normalized = normalizeAvatarDraft(avatar);
   const palette = getAvatarPalette(normalized);
-  const icon = getAvatarOption(babyAvatarIconOptions, normalized.icon, 3);
-  const accessory = getAvatarOption(babyAvatarAccessoryOptions, normalized.accessory, 0);
-  const accessoryMarkup = normalized.accessory === "none" ? "" : `<text x="136" y="55" font-size="30" text-anchor="middle">${escapeSvgText(accessory.emoji)}</text>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="g" cx="36%" cy="28%" r="85%"><stop offset="0" stop-color="#fffdf7" stop-opacity=".86"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#2d2250" flood-opacity=".13"/></filter></defs><circle cx="100" cy="100" r="96" fill="url(#g)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<circle cx="100" cy="108" r="58" fill="rgba(255,255,255,.62)" filter="url(#s)"/><text x="100" y="127" text-anchor="middle" dominant-baseline="middle" font-size="72">${escapeSvgText(icon.emoji)}</text>${accessoryMarkup}</svg>`;
+  const face = getAvatarOption(babyAvatarIconOptions, normalized.icon, 0);
+  const hairMarkup = {
+    curl: '<path d="M95 53c18-18 42-8 38 12-3 14-20 15-28 8 13-1 17-13 7-17-8-3-15 2-17 7z" fill="{hair}"/>',
+    bow: '<path d="M76 54c14-12 35-14 50-1" fill="none" stroke="{hair}" stroke-width="11" stroke-linecap="round"/><text x="116" y="54" font-size="24" text-anchor="middle">🎀</text>',
+    soft: '<path d="M70 58c19-19 51-19 67 0" fill="none" stroke="{hair}" stroke-width="10" stroke-linecap="round"/>',
+    sleepy: '<path d="M64 62c20-24 59-24 78 1" fill="none" stroke="{hair}" stroke-width="12" stroke-linecap="round"/>',
+    smile: '<path d="M68 58c18-20 58-20 70 4" fill="none" stroke="{hair}" stroke-width="13" stroke-linecap="round"/><path d="M102 45c14-5 26 2 27 13" fill="none" stroke="{hair}" stroke-width="9" stroke-linecap="round"/>',
+    round: '<path d="M72 58c18-14 49-15 64 1" fill="none" stroke="{hair}" stroke-width="11" stroke-linecap="round"/><circle cx="100" cy="51" r="9" fill="{hair}"/>',
+    wave: '<path d="M63 60c18-23 39-8 53-20 7 12 25 12 29 28" fill="none" stroke="{hair}" stroke-width="11" stroke-linecap="round"/>',
+    star: '<path d="M70 60c17-18 48-18 64 0" fill="none" stroke="{hair}" stroke-width="10" stroke-linecap="round"/><text x="136" y="61" font-size="22">⭐</text>',
+  }[face.face] || '';
+  const eyeMarkup = face.smile === "sleep"
+    ? '<path d="M75 104q9 7 18 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/><path d="M113 104q9 7 18 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/>'
+    : '<path d="M76 101q8 9 17 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/><path d="M113 101q8 9 17 0" fill="none" stroke="#3b2a37" stroke-width="5" stroke-linecap="round"/>';
+  const mouthMarkup = face.smile === "open"
+    ? '<path d="M88 128q12 14 25 0" fill="none" stroke="#8b4a3a" stroke-width="5" stroke-linecap="round"/><ellipse cx="101" cy="132" rx="7" ry="4" fill="#d87475" opacity=".8"/>'
+    : '<path d="M88 126q13 11 26 0" fill="none" stroke="#8b4a3a" stroke-width="5" stroke-linecap="round"/>';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="bg" cx="34%" cy="25%" r="82%"><stop offset="0" stop-color="#fffdf8" stop-opacity=".9"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#2d2250" flood-opacity=".13"/></filter></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.78)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><circle cx="100" cy="105" r="56" fill="${face.skin}"/><circle cx="66" cy="106" r="13" fill="${face.skin}"/><circle cx="134" cy="106" r="13" fill="${face.skin}"/>${hairMarkup.replaceAll('{hair}', face.hair)}${eyeMarkup}<circle cx="75" cy="118" r="8" fill="${face.blush}" opacity=".72"/><circle cx="126" cy="118" r="8" fill="${face.blush}" opacity=".72"/><path d="M99 111q5 4 0 8" fill="none" stroke="#d99375" stroke-width="4" stroke-linecap="round"/>${mouthMarkup}<path d="M62 158c20 18 57 23 77 0" fill="#c9ead8" opacity=".92"/></g></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
@@ -470,7 +477,10 @@ function renderAvatarOptionButton(container, options, type, avatar = pendingBaby
   const selected = avatar[type];
   container.innerHTML = options.map((item) => {
     const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || '#33224d'}"` : "";
-    const content = item.value ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>` : `<span class="avatar-emoji" aria-hidden="true">${escapeHtml(item.emoji)}</span><small>${escapeHtml(item.label)}</small>`;
+    const preview = type === "icon"
+      ? `<img class="avatar-face-thumb" src="${getBabyAvatarDataUrl({ ...avatar, icon: item.id })}" alt="" />`
+      : "";
+    const content = item.value ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>` : `${preview || `<span class="avatar-emoji" aria-hidden="true">${escapeHtml(item.emoji || "👶")}</span>`}<small>${escapeHtml(item.label)}</small>`;
     return `<button type="button" class="avatar-choice ${selected === item.id ? 'selected' : ''}" data-avatar-type="${type}" data-avatar-value="${escapeHtml(item.id)}" aria-pressed="${selected === item.id ? 'true' : 'false'}"${style}>${content}</button>`;
   }).join("");
 }
@@ -495,7 +505,7 @@ function renderAvatarCustomizer() {
 function updatePendingAvatar(type, value) {
   pendingBabyAvatar = normalizeAvatarDraft({ ...pendingBabyAvatar, [type]: value });
   renderAvatarCustomizer();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar de teste para guardar.";
+  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar para guardar.";
 }
 
 function saveBabyAvatarFromDraft() {
@@ -508,8 +518,8 @@ function saveBabyAvatarFromDraft() {
   renderAvatarCustomizer();
   renderBabyIdentity();
   scheduleProfileCloudSave();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Avatar de teste salvo. Você pode mudar quando quiser.";
-  if (loginHelper) loginHelper.textContent = "Avatar do bebê salvo sem usar foto ou Storage.";
+  if (babyAvatarStatus) babyAvatarStatus.textContent = "Avatar salvo. Você pode mudar quando quiser.";
+  if (loginHelper) loginHelper.textContent = "Avatar do bebê salvo. O app continua sem foto e sem Storage.";
 }
 
 
@@ -621,6 +631,12 @@ function getCurrentIdentityEmail() {
 
 function getCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
   return `${caregiverIdentityStoragePrefix}.${normalizeEmail(email || "local")}`;
+}
+
+function clearCaregiverIdentityForEmail(email = getCurrentIdentityEmail()) {
+  const normalized = normalizeEmail(email || "");
+  if (!normalized) return;
+  try { localStorage.removeItem(getCaregiverIdentityKey(normalized)); } catch {}
 }
 
 function getCaregiverRelationLabel(value = "") {
@@ -1025,6 +1041,10 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
       const rootSnapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid));
       data = rootSnapshot.exists() ? rootSnapshot.data() || {} : data;
     }
+    const dataEmail = normalizeEmail(data.email || user.email || "");
+    if (data.email && dataEmail !== normalizeEmail(user.email || "")) {
+      data = {};
+    }
     if (data.displayName || data.relationship || data.relation || data.relationshipLabel) {
       saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relationship || data.relation || ""), {
         uid: user.uid,
@@ -1032,6 +1052,9 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
         accessLevel: data.accessLevel || "",
         relationshipLabel: data.relationshipLabel || "",
       });
+      renderCaregiverIdentityPanel();
+    } else {
+      clearCaregiverIdentityForEmail(user.email || "");
       renderCaregiverIdentityPanel();
     }
     return data;
@@ -3127,7 +3150,7 @@ function renderFamilyAccessPanel() {
     familyAccessTitle.textContent = authorized
       ? (appAdmin ? "Painel admin" : "Família conectada")
       : connected
-        ? "Conta aguardando convite"
+        ? "Conta sem acesso familiar"
         : "Convites e permissões";
   }
 
@@ -3137,12 +3160,12 @@ function renderFamilyAccessPanel() {
         ? `${email} está conectado com acesso completo. Os registros são sincronizados no ambiente da família.`
         : `Você acompanha a rotina de ${baby}. Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`)
       : connected
-        ? "Esta conta ainda não possui convite. Peça um convite ao administrador do app ou entre com o e-mail convidado."
+        ? "Esta conta está conectada, mas ainda não encontramos acesso familiar. Aguarde a sincronização ou use um convite recebido."
         : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou solicite acesso pelo WhatsApp.";
   }
 
   if (familyAccessBadge) {
-    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? "Sem convite" : "Visitante";
+    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? "Sem acesso" : "Visitante";
     familyAccessBadge.dataset.role = authorized ? effectiveRole : "offline";
   }
 
@@ -3200,16 +3223,40 @@ async function readAccountAccessFromCloud(user = cloudUser) {
   const services = await getFirebaseServices();
   const accessRef = services.doc(services.db, "users", user.uid, "access", "ninou");
   const snapshot = await services.getDoc(accessRef);
-  if (!snapshot.exists()) return null;
-  const data = snapshot.data() || {};
-  return saveFamilyAccess({
-    familyId: data.familyId,
-    role: data.role,
-    email: data.email || user.email || "",
-    ownerUid: data.ownerUid || "",
-    inviteCode: data.inviteCode || "",
-    acceptedAt: data.acceptedAt || data.createdAt || "",
-  });
+  if (snapshot.exists()) {
+    const data = snapshot.data() || {};
+    return saveFamilyAccess({
+      familyId: data.familyId,
+      role: data.role,
+      email: data.email || user.email || "",
+      ownerUid: data.ownerUid || "",
+      inviteCode: data.inviteCode || "",
+      acceptedAt: data.acceptedAt || data.createdAt || "",
+    });
+  }
+
+  // v75.42: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
+  const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
+  for (const familyId of [...new Set(candidateFamilies)]) {
+    try {
+      if (!String(familyId).startsWith("ninou-family-")) continue;
+      const memberRef = services.doc(services.db, "families", familyId, "members", user.uid);
+      const memberSnapshot = await services.getDoc(memberRef);
+      if (!memberSnapshot.exists()) continue;
+      const data = memberSnapshot.data() || {};
+      return saveFamilyAccess({
+        familyId,
+        role: data.role || "responsavel",
+        email: data.email || user.email || "",
+        ownerUid: data.ownerUid || data.familyId || familyId,
+        inviteCode: data.inviteCode || "",
+        acceptedAt: data.acceptedAt || data.joinedAt || data.createdAt || "",
+      });
+    } catch (error) {
+      console.warn("Não foi possível verificar membro da família:", familyId, error);
+    }
+  }
+  return null;
 }
 
 async function saveAccountAccessToCloud(access, user = cloudUser) {
@@ -4324,7 +4371,7 @@ async function initFirebaseAuthState() {
       }
 
       if (!hasFamilyAccess()) {
-        loginHelper.textContent = "Conta conectada. Aceite um convite do administrador do app.";
+        loginHelper.textContent = "Conta conectada, mas sem acesso familiar encontrado. Use um convite recebido ou peça ao administrador para verificar o membro da família.";
         setSyncStatus("offline", user.email || "");
         renderAuthControls();
         showScreen("profile");
@@ -6297,7 +6344,7 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  // v75.41.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
+  // v75.42: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
   return resizeProfileImage(file, { size: 120, quality: 0.5 });
 }
 

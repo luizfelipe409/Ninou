@@ -6109,7 +6109,7 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
   }
 }
 
-/* v75.41.1 — somente avatar: remove upload de foto e diferencia avatares no admin */
+/* v75.42 — somente avatar: remove upload de foto e diferencia avatares no admin */
 .avatar-only-badge {
   min-height: 38px;
   display: inline-grid;
@@ -6159,4 +6159,111 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
 .invite-avatar,
 .admin-known-user-item .admin-avatar {
   border-color: rgba(255, 183, 196, .72);
+}
+
+/* v75.42 — avatar limpo: apenas rostinhos de bebê + cor de fundo */
+.avatar-compact-card {
+  gap: 12px;
+  padding: 14px;
+  border-radius: 24px;
+}
+
+.avatar-compact-card .avatar-test-header {
+  grid-template-columns: minmax(0, 1fr) 82px;
+  gap: 10px;
+}
+
+.avatar-compact-card .avatar-test-header strong {
+  font-size: 1.08rem;
+}
+
+.avatar-compact-card .avatar-test-header p {
+  font-size: 0.78rem;
+  line-height: 1.28;
+}
+
+.avatar-compact-card .avatar-preview-wrap {
+  width: 82px;
+  height: 82px;
+  box-shadow: inset 0 0 0 1px rgba(143, 124, 255, 0.12), 0 10px 20px rgba(45, 34, 80, 0.10);
+}
+
+.avatar-compact-card .baby-avatar-preview {
+  width: 76px;
+  height: 76px;
+}
+
+.avatar-compact-card .avatar-picker-section {
+  gap: 8px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.avatar-compact-card .avatar-option-row {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.avatar-compact-card .avatar-choice {
+  min-height: 58px;
+  border-radius: 16px;
+  padding: 6px 4px;
+}
+
+.avatar-face-thumb {
+  width: 42px;
+  height: 42px;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 6px 12px rgba(45, 34, 80, 0.10);
+}
+
+.avatar-compact-card .avatar-swatch {
+  width: 34px;
+  height: 34px;
+}
+
+.avatar-compact-card .avatar-choice small {
+  font-size: 0.56rem;
+}
+
+.avatar-hidden-options {
+  display: none !important;
+}
+
+.avatar-compact-card .avatar-save-button {
+  min-height: 48px;
+}
+
+.profile-card img#profilePhoto {
+  max-width: 78px;
+  max-height: 78px;
+}
+
+@media (max-width: 390px) {
+  .avatar-compact-card .avatar-test-header {
+    grid-template-columns: minmax(0, 1fr) 74px;
+    text-align: left;
+    justify-items: stretch;
+  }
+
+  .avatar-compact-card .avatar-preview-wrap {
+    width: 74px;
+    height: 74px;
+  }
+
+  .avatar-compact-card .baby-avatar-preview {
+    width: 68px;
+    height: 68px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .avatar-compact-card .avatar-option-row {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }

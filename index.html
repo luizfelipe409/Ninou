@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.41.1" />
+    <link rel="stylesheet" href="./styles.css?v=75.42" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -494,42 +494,32 @@
               <input id="babyBirthInput" type="date" />
             </label>
           </article>
-          <article class="avatar-test-card" id="babyAvatarTestCard">
+          <article class="avatar-test-card avatar-compact-card" id="babyAvatarTestCard">
             <div class="avatar-test-header">
               <div>
-                <span>Versão teste</span>
-                <strong>Escolha o avatar do bebê</strong>
-                <p>Personalize ícone, cor, fundo e acessório sem salvar foto no banco.</p>
+                <span>Avatar infantil</span>
+                <strong>Rostinho do bebê</strong>
+                <p>Escolha um rostinho e uma cor de fundo. Leve, simples e sem foto.</p>
               </div>
               <div class="avatar-preview-wrap">
                 <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
               </div>
             </div>
-            <div class="avatar-tabs" aria-label="Categorias de personalização do avatar">
-              <button type="button" class="active" data-avatar-jump="icon">🧸 Ícone</button>
-              <button type="button" data-avatar-jump="color">💧 Cor</button>
-              <button type="button" data-avatar-jump="background">◯ Fundo</button>
-              <button type="button" data-avatar-jump="accessory">☆ Acessório</button>
-            </div>
             <section class="avatar-picker-section" data-avatar-section="icon">
-              <strong>Escolha um ícone</strong>
+              <strong>Escolha um rostinho</strong>
               <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
             </section>
             <section class="avatar-picker-section" data-avatar-section="color">
-              <strong>Escolha uma cor</strong>
+              <strong>Cor de fundo</strong>
               <div class="avatar-option-row" id="avatarColorOptions"></div>
             </section>
-            <section class="avatar-picker-section" data-avatar-section="background">
-              <strong>Escolha um fundo</strong>
-              <div class="avatar-option-row" id="avatarBackgroundOptions"></div>
-            </section>
-            <section class="avatar-picker-section" data-avatar-section="accessory">
-              <strong>Escolha um acessório</strong>
-              <div class="avatar-option-row" id="avatarAccessoryOptions"></div>
-            </section>
-            <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">✓ Salvar avatar de teste</button>
+            <div class="avatar-hidden-options" aria-hidden="true">
+              <div id="avatarBackgroundOptions"></div>
+              <div id="avatarAccessoryOptions"></div>
+            </div>
+            <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">✓ Salvar avatar</button>
             <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Agora não</button>
-            <p id="babyAvatarStatus" class="form-status">O avatar é leve, privado e pode ser alterado quando quiser.</p>
+            <p id="babyAvatarStatus" class="form-status">O avatar é leve, privado e não usa foto.</p>
           </article>
 
           <article class="appearance-profile-block">
@@ -1000,6 +990,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.41.1"></script>
+    <script type="module" src="./app.js?v=75.42"></script>
   </body>
 </html>

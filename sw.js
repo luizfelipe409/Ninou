@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-41-1-somente-avatar-simultaneo";
+const CACHE_NAME = "ninou-v75-42-conta-avatar-limpo";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.41.1",
-  "/css/app.legacy.css?v=75.41.1",
-  "/app.js?v=75.41.1",
-  "/js/app.legacy.js?v=75.41.1",
+  "/styles.css?v=75.42",
+  "/css/app.legacy.css?v=75.42",
+  "/app.js?v=75.42",
+  "/js/app.legacy.js?v=75.42",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
