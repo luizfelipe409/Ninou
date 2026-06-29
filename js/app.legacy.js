@@ -103,6 +103,7 @@ const caregiverRelationInput = document.querySelector("#caregiverRelationInput")
 const saveCaregiverIdentityButton = document.querySelector("#saveCaregiverIdentityButton");
 const caregiverIdentityStatus = document.querySelector("#caregiverIdentityStatus");
 const familyAccessCard = document.querySelector("#familyAccessCard");
+const familyAccessKicker = document.querySelector("#familyAccessCard > span");
 const familyAccessTitle = document.querySelector("#familyAccessTitle");
 const familyAccessText = document.querySelector("#familyAccessText");
 const familyAccessBadge = document.querySelector("#familyAccessBadge");
@@ -155,6 +156,7 @@ const trendGrowthWeight = document.querySelector("#trendGrowthWeight");
 const trendGrowthHint = document.querySelector("#trendGrowthHint");
 const trendWeightSparkline = document.querySelector("#trendWeightSparkline");
 const growthHistoryMini = document.querySelector("#growthHistoryMini");
+const auditCard = document.querySelector(".audit-card");
 const auditTrailList = document.querySelector("#auditTrailList");
 const dayNotesTextarea = document.querySelector("#dayNotesTextarea");
 const saveDayNotesButton = document.querySelector("#saveDayNotesButton");
@@ -415,15 +417,40 @@ function getCurrentActorEmail() {
   return normalizeEmail(cloudUser?.email || familyAccess?.email || "") || "este aparelho";
 }
 
-function getCurrentActorName() {
-  const email = getCurrentActorEmail();
+function getCurrentActorUid() {
+  return String(cloudUser?.uid || "").trim();
+}
+
+function getFallbackActorNameFromEmail(email = getCurrentActorEmail()) {
   if (!email || email === "este aparelho") return "este aparelho";
-
-  const localIdentity = loadCurrentCaregiverIdentity();
-  if (localIdentity.label) return localIdentity.label;
-
   if (isGlobalAdminEmail(email)) return "Admin";
   return email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getCurrentActorProfile() {
+  const email = getCurrentActorEmail();
+  const localIdentity = loadCurrentCaregiverIdentity();
+  const displayName = String(localIdentity.name || "").trim();
+  const relationshipLabel = String(localIdentity.relationshipLabel || getCaregiverRelationLabel(localIdentity.relation) || "").trim();
+  const label = displayName || relationshipLabel || getFallbackActorNameFromEmail(email);
+  const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
+  return {
+    uid: getCurrentActorUid(),
+    email,
+    displayName,
+    relationshipLabel,
+    familyId: familyAccess?.familyId || "",
+    accessLevel: getRoleLabel(role),
+    label,
+  };
+}
+
+function getCurrentActorName() {
+  return getCurrentActorProfile().label;
+}
+
+function getCurrentActorRelationship() {
+  return getCurrentActorProfile().relationshipLabel;
 }
 
 const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
@@ -440,8 +467,10 @@ function getCaregiverRelationLabel(value = "") {
   const labels = {
     pai: "Pai",
     mae: "Mãe",
-    avo: "Avó/avô",
+    avo: "Avó",
+    avo_masculino: "Avô",
     cuidador: "Cuidador(a)",
+    baba: "Babá",
     responsavel: "Responsável",
     outro: "Familiar",
   };
@@ -453,26 +482,38 @@ function loadCurrentCaregiverIdentity() {
   if (!email) return { name: "", relation: "", label: "" };
   try {
     const data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey(email)) || "{}");
-    const name = String(data.name || "").trim();
-    const relation = String(data.relation || "").trim();
-    const relationLabel = getCaregiverRelationLabel(relation);
+    const name = String(data.displayName || data.name || "").trim();
+    const relation = String(data.relationship || data.relation || "").trim();
+    const relationLabel = String(data.relationshipLabel || getCaregiverRelationLabel(relation) || "").trim();
     return {
       name,
       relation,
+      relationshipLabel: relationLabel,
       label: name || relationLabel,
     };
   } catch {
-    return { name: "", relation: "", label: "" };
+    return { name: "", relation: "", relationshipLabel: "", label: "" };
   }
 }
 
-function saveCurrentCaregiverIdentity(name = "", relation = "") {
+function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
   if (!email) return false;
+  const cleanName = String(name || "").trim();
+  const cleanRelation = String(relation || "").trim();
+  const relationshipLabel = String(extras.relationshipLabel || getCaregiverRelationLabel(cleanRelation) || "").trim();
+  const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
   const payload = {
-    name: String(name || "").trim(),
-    relation: String(relation || "").trim(),
-    updatedAt: new Date().toISOString(),
+    uid: String(extras.uid || getCurrentActorUid() || "").trim(),
+    email,
+    displayName: cleanName,
+    name: cleanName,
+    relationship: cleanRelation,
+    relation: cleanRelation,
+    relationshipLabel,
+    familyId: extras.familyId || familyAccess?.familyId || "",
+    accessLevel: extras.accessLevel || getRoleLabel(role),
+    updatedAt: extras.updatedAt || new Date().toISOString(),
   };
   try {
     localStorage.setItem(getCaregiverIdentityKey(email), JSON.stringify(payload));
@@ -488,9 +529,12 @@ function renderCaregiverIdentityPanel() {
   const identity = loadCurrentCaregiverIdentity();
   if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || "";
   if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || "";
+  if (saveCaregiverIdentityButton) {
+    saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
+  }
   if (caregiverIdentityStatus) {
     caregiverIdentityStatus.textContent = identity.label
-      ? `Próximos registros aparecerão como ${identity.label}.`
+      ? `Próximos registros aparecerão como ${identity.label}. Você pode editar nome e vínculo acima quando precisar.`
       : "Defina como você quer aparecer nos próximos registros.";
   }
 }
@@ -500,18 +544,43 @@ async function saveCaregiverIdentityFromForm() {
   const relation = caregiverRelationInput?.value || "";
   saveCurrentCaregiverIdentity(name, relation);
   const identity = loadCurrentCaregiverIdentity();
+  if (saveCaregiverIdentityButton) {
+    saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
+  }
   if (caregiverIdentityStatus) caregiverIdentityStatus.textContent = identity.label
-    ? `Identificação salva: ${identity.label}.`
+    ? `Próximos registros aparecerão como ${identity.label}.`
     : "Identificação limpa. Usaremos o e-mail quando necessário.";
 
   if (cloudUser && firebaseServices) {
     try {
-      await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "account", "profile"), {
+      const profileRef = firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "account", "profile");
+      const profileSnapshot = await firebaseServices.getDoc(profileRef);
+      const identityPayload = {
+        uid: cloudUser.uid,
         email: normalizeEmail(cloudUser.email || ""),
         displayName: String(name || "").trim(),
+        relationship: String(relation || "").trim(),
         relation: String(relation || "").trim(),
+        relationshipLabel: getCaregiverRelationLabel(relation),
+        familyId: familyAccess?.familyId || "",
+        accessLevel: getRoleLabel(getEffectiveRole(familyAccess?.role || "responsavel", cloudUser.email || "")),
         updatedAt: firebaseServices.serverTimestamp(),
-      }, { merge: true });
+      };
+      if (!profileSnapshot.exists() || !profileSnapshot.data()?.createdAt) {
+        identityPayload.createdAt = firebaseServices.serverTimestamp();
+      }
+      await firebaseServices.setDoc(profileRef, identityPayload, { merge: true });
+
+      const rootPayload = { ...identityPayload };
+      await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid), rootPayload, { merge: true });
+
+      if (familyAccess?.familyId) {
+        await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "families", familyAccess.familyId, "members", cloudUser.uid), {
+          displayName: identityPayload.displayName,
+          relationshipLabel: identityPayload.relationshipLabel,
+          updatedAt: firebaseServices.serverTimestamp(),
+        }, { merge: true });
+      }
     } catch (error) {
       console.warn("Não foi possível salvar a identificação no perfil da conta:", error);
     }
@@ -519,28 +588,45 @@ async function saveCaregiverIdentityFromForm() {
 }
 
 function getActorDisplayNameFromEvent(event = {}) {
-  const raw = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
-  const text = String(raw || "").trim();
-  if (!text) return "";
   const baby = String(getBabyDisplayName() || "").trim().toLowerCase();
-  if (baby && text.toLowerCase() === baby) return "Responsável";
-  return text;
+  const candidates = [
+    event.createdByName,
+    event.createdByRelationship,
+    event.authorName,
+    event.responsibleName,
+    event.updatedByName,
+    event.updatedByRelationship,
+  ];
+  for (const candidate of candidates) {
+    const text = String(candidate ?? "").trim();
+    if (!text || text === "undefined" || text === "null") continue;
+    if (baby && text.toLowerCase() === baby) continue;
+    return text;
+  }
+  const fallback = String(event.createdByEmail || event.updatedByEmail || "").trim();
+  if (!fallback || fallback === "undefined" || fallback === "null") return "Responsável";
+  if (baby && fallback.toLowerCase() === baby) return "Responsável";
+  return fallback;
 }
 
 function makeAuditEntry(action, event, at = new Date().toISOString()) {
   const config = event?.type ? getEventConfig(event.type) : { title: "Registro" };
+  const actor = getCurrentActorProfile();
   return {
     id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     action,
     title: config.title || "Registro",
     at,
-    byEmail: getCurrentActorEmail(),
-    byName: getCurrentActorName(),
+    byUid: actor.uid,
+    byEmail: actor.email,
+    byName: actor.displayName || actor.label,
+    byRelationship: actor.relationshipLabel,
     eventId: event?.id || "",
   };
 }
 
 function pushAuditEntry(action, event) {
+  if (action === "adicionou") return;
   state.auditLog = Array.isArray(state.auditLog) ? state.auditLog : [];
   state.auditLog.push(makeAuditEntry(action, event));
   state.auditLog = state.auditLog.slice(-60);
@@ -548,10 +634,14 @@ function pushAuditEntry(action, event) {
 
 function makeEvent(type, start, end = start, detail = "", notes = "") {
   const nowIso = new Date().toISOString();
+  const actor = getCurrentActorProfile();
   return applyWakeWindowMetadata(createRoutineEvent(type, start, end, detail, notes, {
     createdAt: nowIso,
-    createdByEmail: getCurrentActorEmail(),
-    createdByName: getCurrentActorName(),
+    updatedAt: nowIso,
+    createdByUid: actor.uid,
+    createdByEmail: actor.email,
+    createdByName: actor.displayName,
+    createdByRelationship: actor.relationshipLabel,
     lastAction: "adicionou",
   }));
 }
@@ -731,8 +821,13 @@ async function loadAdminAccountProfileFromCloud(user = cloudUser) {
     const data = snapshot.exists() ? snapshot.data() || {} : {};
     if (data.photo) setAdminAccountPhoto(String(data.photo), user);
     else adminAccountPhoto = loadAdminAccountPhoto(user);
-    if (data.displayName || data.relation) {
-      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relation || ""));
+    if (data.displayName || data.relationship || data.relation || data.relationshipLabel) {
+      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relationship || data.relation || ""), {
+        uid: user.uid,
+        familyId: data.familyId || familyAccess?.familyId || "",
+        accessLevel: data.accessLevel || "",
+        relationshipLabel: data.relationshipLabel || "",
+      });
     }
     renderBabyIdentity();
     return data;
@@ -764,10 +859,19 @@ async function saveAdminAccountProfileToCloud() {
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   if (!user || !firebaseServices) return null;
   try {
-    const snapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid, "account", "profile"));
-    const data = snapshot.exists() ? snapshot.data() || {} : {};
-    if (data.displayName || data.relation) {
-      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relation || ""));
+    const profileSnapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid, "account", "profile"));
+    let data = profileSnapshot.exists() ? profileSnapshot.data() || {} : {};
+    if (!data.displayName && !data.relationship && !data.relation && !data.relationshipLabel) {
+      const rootSnapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid));
+      data = rootSnapshot.exists() ? rootSnapshot.data() || {} : data;
+    }
+    if (data.displayName || data.relationship || data.relation || data.relationshipLabel) {
+      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relationship || data.relation || ""), {
+        uid: user.uid,
+        familyId: data.familyId || familyAccess?.familyId || "",
+        accessLevel: data.accessLevel || "",
+        relationshipLabel: data.relationshipLabel || "",
+      });
       renderCaregiverIdentityPanel();
     }
     return data;
@@ -2853,6 +2957,14 @@ function renderFamilyAccessPanel() {
   const admin = isFamilyAdmin();
   const email = cloudUser?.email || familyAccess?.email || "";
   const effectiveRole = authorized ? getEffectiveRole(familyAccess.role, email) : "";
+  const roleLabel = authorized ? getRoleLabel(effectiveRole) : "";
+  const baby = getBabyDisplayName();
+
+  if (familyAccessKicker) {
+    familyAccessKicker.textContent = authorized
+      ? (appAdmin ? "Painel admin" : "Família conectada")
+      : "Acesso familiar";
+  }
 
   if (familyAccessTitle) {
     familyAccessTitle.textContent = authorized
@@ -2865,8 +2977,8 @@ function renderFamilyAccessPanel() {
   if (familyAccessText) {
     familyAccessText.textContent = authorized
       ? (appAdmin
-        ? `Você está conectado como admin. Os dados da família não são abertos automaticamente; o painel mostra apenas convites, membros e migração.`
-        : `${email} está conectado como ${getRoleLabel(effectiveRole)}. Os registros são sincronizados no ambiente da família.`)
+        ? `${email} está conectado com acesso completo. Os registros são sincronizados no ambiente da família.`
+        : `Você acompanha a rotina de ${baby}. Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`)
       : connected
         ? "Esta conta ainda não possui convite. Peça um convite ao administrador do app ou entre com o e-mail convidado."
         : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou solicite acesso pelo WhatsApp.";
@@ -2918,8 +3030,6 @@ function renderFamilyAccessPanel() {
     const showWelcome = connected && authorized && !appAdmin;
     familyWelcomeCard.hidden = !showWelcome;
     if (showWelcome) {
-      const roleLabel = getRoleLabel(effectiveRole);
-      const baby = getBabyDisplayName();
       if (familyWelcomeTitle) familyWelcomeTitle.textContent = `Você acompanha a rotina de ${baby}.`;
       if (familyWelcomeText) familyWelcomeText.textContent = `Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`;
     }
@@ -2971,6 +3081,30 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
     status: "active",
     joinedAt: services.serverTimestamp(),
   }, { merge: true });
+
+  try {
+    const identity = loadCurrentCaregiverIdentity();
+    const profileRef = services.doc(services.db, "users", user.uid, "account", "profile");
+    const profileSnapshot = await services.getDoc(profileRef);
+    const accountPayload = {
+      uid: user.uid,
+      email: payload.email,
+      displayName: identity.name || "",
+      relationship: identity.relation || "",
+      relation: identity.relation || "",
+      relationshipLabel: identity.relationshipLabel || "",
+      familyId: payload.familyId,
+      accessLevel: getRoleLabel(payload.role),
+      updatedAt: services.serverTimestamp(),
+    };
+    if (!profileSnapshot.exists() || !profileSnapshot.data()?.createdAt) {
+      accountPayload.createdAt = services.serverTimestamp();
+    }
+    await services.setDoc(profileRef, accountPayload, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", user.uid), accountPayload, { merge: true });
+  } catch (error) {
+    console.warn("Acesso salvo, mas o perfil mínimo da conta não foi atualizado:", error);
+  }
 
   return saveFamilyAccess({ ...payload, acceptedAt: new Date().toISOString() });
 }
@@ -4354,7 +4488,7 @@ function renderTimeline() {
 
   timelineRenderSignature = nextSignature;
   timeline.innerHTML = "";
-  diaryDateTitle.textContent = formatDiaryDate(selectedStart);
+  diaryDateTitle.textContent = selectedStart === getDayStart() ? "Diário de hoje" : formatDiaryDate(selectedStart);
   diaryDateHint.textContent = selectedStart === getDayStart() ? "Hoje" : "Data selecionada";
 
   if (!visibleEvents.length) {
@@ -5094,15 +5228,20 @@ function renderGrowthPanels() {
 
 function renderAuditTrail() {
   if (!auditTrailList) return;
-  const items = (Array.isArray(state.auditLog) ? state.auditLog : []).slice(-8).reverse();
+  const items = (Array.isArray(state.auditLog) ? state.auditLog : [])
+    .filter((item) => item?.action && item.action !== "adicionou")
+    .slice(-8)
+    .reverse();
+  if (auditCard) auditCard.hidden = !items.length;
   if (!items.length) {
-    auditTrailList.innerHTML = "<li>Nenhuma alteração registrada nesta data.</li>";
+    auditTrailList.innerHTML = "<li>Nenhum ajuste técnico registrado nesta data.</li>";
     return;
   }
   auditTrailList.innerHTML = items.map((item) => {
-    const actor = getActorDisplayNameFromEvent({ createdByName: item.byName, createdByEmail: item.byEmail }) || "este aparelho";
+    const actor = getActorDisplayNameFromEvent({ createdByName: item.byName, createdByRelationship: item.byRelationship, createdByEmail: item.byEmail }) || "Responsável";
     const when = item.at ? formatTime(new Date(item.at).getTime()) : "--:--";
-    return `<li><strong>${escapeHtml(item.title || "Registro")}</strong><span>${escapeHtml(item.action || "alterou")} por ${escapeHtml(actor)} • ${escapeHtml(when)}</span></li>`;
+    const action = item.action === "excluiu" ? "Excluído por" : "Editado por";
+    return `<li><strong>${escapeHtml(item.title || "Registro")}</strong><span>${escapeHtml(action)} ${escapeHtml(actor)} • ${escapeHtml(when)}</span></li>`;
   }).join("");
 }
 
@@ -5527,6 +5666,7 @@ function saveManualEvent() {
     const wakeWindow = payload.type === "sono" || payload.type === "dormir"
       ? getWakeWindowForSleepStart(payload.start, existingEvent.id)
       : null;
+    const actor = getCurrentActorProfile();
     updateEventKeepingDuration(existingEvent, {
       type: payload.type,
       start: payload.start,
@@ -5536,8 +5676,10 @@ function saveManualEvent() {
       wakeWindowStartedAt: wakeWindow?.wakeWindowStartedAt,
       wakeWindowMs: wakeWindow?.wakeWindowMs,
       updatedAt: new Date().toISOString(),
-      updatedByEmail: getCurrentActorEmail(),
-      updatedByName: getCurrentActorName(),
+      updatedByUid: actor.uid,
+      updatedByEmail: actor.email,
+      updatedByName: actor.displayName,
+      updatedByRelationship: actor.relationshipLabel,
       lastAction: "editou",
     });
     pushAuditEntry("editou", existingEvent);
@@ -5661,7 +5803,7 @@ function getExportPayload() {
     events: buildExportEvents(events, getEventConfig),
     summary: {
       text: daySummaryText?.textContent || "",
-      exportedFrom: "Ninou v75.38",
+      exportedFrom: "Ninou v75.31",
     },
   };
 }

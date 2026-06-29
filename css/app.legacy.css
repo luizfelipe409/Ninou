@@ -3428,30 +3428,33 @@ body.day-theme[data-day-period="morning"] .orbit-ring {
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #efeaff;
-  background: rgba(151, 124, 255, 0.18);
-  border: 1px solid rgba(173, 148, 255, 0.28);
+  color: #173f33;
+  background: #dff8ec;
+  border: 1px solid rgba(44, 132, 103, 0.34);
 }
 
 .access-badge[data-role="admin"] {
-  color: #8cf0c7;
-  background: rgba(69, 207, 159, 0.14);
-  border-color: rgba(105, 232, 190, 0.34);
+  color: #342466;
+  background: #eee8ff;
+  border-color: rgba(93, 72, 168, 0.34);
 }
 
 .access-badge[data-role="responsavel"] {
-  color: #f5e7ff;
-  background: rgba(154, 126, 255, 0.20);
+  color: #163f33;
+  background: #dcf6e9;
+  border-color: rgba(39, 128, 96, 0.34);
 }
 
 .access-badge[data-role="cuidador"] {
-  color: #bee8ff;
-  background: rgba(119, 190, 255, 0.14);
+  color: #263f73;
+  background: #e1efff;
+  border-color: rgba(75, 116, 191, 0.28);
 }
 
 .access-badge[data-role="visualizacao"] {
-  color: #e6ddff;
-  background: rgba(255, 255, 255, 0.10);
+  color: #463a69;
+  background: #f0ecff;
+  border-color: rgba(100, 79, 153, 0.24);
 }
 
 .invite-accept-box,
@@ -3555,6 +3558,30 @@ body.day-theme .admin-invite-panel input,
 body.day-theme .admin-invite-panel select {
   background: rgba(255, 255, 255, 0.72);
   border-color: rgba(119, 91, 192, 0.18);
+}
+
+body.day-theme .access-badge {
+  color: #173f33;
+  background: #dff8ec;
+  border-color: rgba(44, 132, 103, 0.34);
+}
+
+body.day-theme .access-badge[data-role="admin"] {
+  color: #342466;
+  background: #eee8ff;
+  border-color: rgba(93, 72, 168, 0.34);
+}
+
+body.day-theme .access-badge[data-role="cuidador"] {
+  color: #263f73;
+  background: #e1efff;
+  border-color: rgba(75, 116, 191, 0.28);
+}
+
+body.day-theme .access-badge[data-role="visualizacao"] {
+  color: #463a69;
+  background: #f0ecff;
+  border-color: rgba(100, 79, 153, 0.24);
 }
 
 @media (max-width: 560px) {
@@ -5669,10 +5696,12 @@ body.day-theme .quick-actions .action-icon, body.day-theme .start-choice .action
 /* v75.37 — central de avisos e lembretes leves */
 .notification-center-card { margin-top: 12px; border: 1px solid rgba(124, 229, 194, 0.24); background: linear-gradient(145deg, rgba(124,229,194,.10), rgba(255,255,255,.045)); border-radius: 26px; padding: 18px; box-shadow: 0 18px 42px rgba(8, 8, 28, 0.14); }
 .notification-center-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 9px; }
-.notification-center-list li { display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 18px; background: rgba(255,255,255,.07); }
+.notification-center-list li { display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: center; gap: 10px; padding: 11px 12px; border-radius: 18px; background: rgba(255,255,255,.07); }
+.notification-center-list li > div { min-width: 0; }
+.notification-center-list li:not(:has(> i)) { display: block; }
 .notification-center-list i { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.12); font-style: normal; }
-.notification-center-list strong { display: block; font-size: .92rem; }
-.notification-center-list span { display: block; margin-top: 2px; color: rgba(245,238,255,.68); font-size: .8rem; line-height: 1.35; }
+.notification-center-list strong { display: block; font-size: .92rem; line-height: 1.22; overflow-wrap: normal; word-break: normal; }
+.notification-center-list span { display: block; margin-top: 2px; color: rgba(245,238,255,.68); font-size: .8rem; line-height: 1.35; overflow-wrap: normal; word-break: normal; }
 body.day-theme .notification-center-card { background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(235,251,244,.86)); border-color: rgba(45,111,94,.12); box-shadow: 0 16px 34px rgba(116, 94, 145, 0.10); }
 body.day-theme .notification-center-list li { background: rgba(45,111,94,.06); }
 body.day-theme .notification-center-list i { background: rgba(45,111,94,.08); }
@@ -5696,7 +5725,45 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
 .caregiver-profile-block label + label {
   margin-top: 12px;
 }
+.caregiver-profile-block {
+  display: grid;
+  gap: 12px;
+}
+.caregiver-profile-block #saveCaregiverIdentityButton {
+  justify-self: start;
+  margin-top: 4px;
+}
 .caregiver-profile-block .form-status {
-  margin-top: 10px;
+  margin-top: 2px;
   color: rgba(117, 105, 133, .92);
+  line-height: 1.35;
+}
+
+/* v75.31 — Diário: títulos legíveis e ações sem comprimir o texto */
+.timeline .event-main {
+  grid-template-columns: 1fr !important;
+  align-items: start;
+}
+.timeline .event-text strong {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none;
+}
+.timeline .event-text span,
+.timeline .event-text p {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.timeline .event-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: 8px;
+  justify-content: stretch;
+  margin-top: 2px !important;
+}
+.timeline .event-action-button {
+  justify-content: center;
+  min-width: 0;
+  width: 100%;
 }

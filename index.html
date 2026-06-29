@@ -22,7 +22,7 @@
     <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
     <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
     <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.37" />
+    <link rel="stylesheet" href="./styles.css?v=75.31.2" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Protótipo completo Ninou">
@@ -94,7 +94,13 @@
             <strong>Lembretes do Ninou</strong>
           </div>
           <ul id="notificationCenterList" class="notification-center-list">
-            <li>Os lembretes aparecem conforme a rotina for registrada.</li>
+            <li>
+              <i aria-hidden="true">🌿</i>
+              <div>
+                <strong>Rotina pronta</strong>
+                <span>Os lembretes aparecem conforme a rotina for registrada.</span>
+              </div>
+            </li>
           </ul>
         </section>
 
@@ -309,13 +315,13 @@
           </div>
         </section>
 
-        <section class="audit-card" aria-label="Histórico de alterações">
+        <section class="audit-card" aria-label="Ajustes técnicos dos registros">
           <div class="drawer-section-title">
-            <span>Histórico de alterações</span>
-            <strong>Últimas ações</strong>
+            <span>Ajustes dos registros</span>
+            <strong>Edições e exclusões</strong>
           </div>
           <ul id="auditTrailList" class="audit-list">
-            <li>Nenhuma alteração registrada nesta data.</li>
+            <li>Nenhum ajuste técnico registrado nesta data.</li>
           </ul>
         </section>
       </section>
@@ -546,21 +552,22 @@
           </article>
 
           <article class="caregiver-profile-block" id="caregiverIdentityCard">
-            <span>Quem está registrando</span>
+            <span>Configuração da conta</span>
             <strong>Identificação nos registros</strong>
-            <p>Use seu nome ou vínculo para o diário mostrar “Adicionado por Pai”, “Mãe” ou pelo seu nome, em vez do nome do bebê.</p>
+            <p>Escolha ou edite como seu nome e vínculo aparecerão nos registros da rotina. Essa informação é salva na sua conta e será usada automaticamente nos próximos registros.</p>
             <label>
               Seu nome no app
               <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />
             </label>
             <label>
-              Seu vínculo
+              Seu vínculo com o bebê
               <select id="caregiverRelationInput">
                 <option value="">Escolher depois</option>
                 <option value="pai">Pai</option>
                 <option value="mae">Mãe</option>
-                <option value="avo">Avó/avô</option>
-                <option value="cuidador">Cuidador(a)</option>
+                <option value="avo">Avó</option>
+                <option value="avo_masculino">Avô</option>
+                <option value="baba">Babá</option>
                 <option value="responsavel">Responsável</option>
                 <option value="outro">Familiar</option>
               </select>
@@ -569,7 +576,7 @@
             <p id="caregiverIdentityStatus" class="form-status">Usaremos essa identificação nos próximos registros.</p>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
-            <span>Painel admin</span>
+            <span>Acesso familiar</span>
             <strong id="familyAccessTitle">Convites e permissões</strong>
             <p id="familyAccessText">Somente o administrador do app pode gerar convites. Pessoas convidadas acessam com e-mail e senha próprios.</p>
             <div class="access-status-row">
@@ -961,6 +968,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.37"></script>
+    <script type="module" src="./app.js?v=75.31.2"></script>
   </body>
 </html>
