@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-49-conta-avatar-limpo";
+const CACHE_NAME = "ninou-v75-56-3-refinamento-final-geral";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.49",
-  "/css/app.legacy.css?v=75.49",
-  "/app.js?v=75.49",
-  "/js/app.legacy.js?v=75.49",
+  "/styles.css?v=75.56.3",
+  "/css/app.legacy.css?v=75.56.3",
+  "/app.js?v=75.56.3",
+  "/js/app.legacy.js?v=75.56.3",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -49,6 +49,18 @@ const APP_SHELL = [
   "/icons/actions/fralda.png",
   "/icons/actions/mamadeira.png",
   "/icons/actions/soneca.png",
+  "/icons/baby-avatars/avatar-01.png",
+  "/icons/baby-avatars/avatar-02.png",
+  "/icons/baby-avatars/avatar-03.png",
+  "/icons/baby-avatars/avatar-04.png",
+  "/icons/baby-avatars/avatar-05.png",
+  "/icons/baby-avatars/avatar-06.png",
+  "/icons/baby-avatars/avatar-07.png",
+  "/icons/baby-avatars/avatar-08.png",
+  "/icons/baby-avatars/avatar-09.png",
+  "/icons/baby-avatars/avatar-10.png",
+  "/icons/baby-avatars/avatar-11.png",
+  "/icons/baby-avatars/avatar-12.png",
 ];
 
 self.addEventListener("install", (event) => {

@@ -323,7 +323,7 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.49.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
+// v75.56.2.1.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
 try {
   if (!localStorage.getItem(storageKeys.email)) {
     [
@@ -381,14 +381,18 @@ let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 let avatarEditorForceOpen = false;
 
 const babyAvatarHairOptions = Object.freeze([
-  { id: "topetinho-suave", label: "Topetinho suave", style: "topetinho-suave" },
-  { id: "franjinha-natural", label: "Franjinha natural", style: "franjinha-natural" },
-  { id: "ondinha-lateral", label: "Ondinha lateral", style: "ondinha-lateral" },
-  { id: "cachinhos-fofos", label: "Cachinhos fofos", style: "cachinhos-fofos" },
-  { id: "cacheado-curto", label: "Cacheado curto", style: "cacheado-curto" },
-  { id: "bob-bebe", label: "Bob bebê", style: "bob-bebe" },
-  { id: "faixinha-baby", label: "Faixinha baby", style: "faixinha-baby" },
-  { id: "laco-delicado", label: "Laço delicado", style: "laco-delicado" },
+  { id: "avatar-01", label: "Bebê lilás", src: "./icons/baby-avatars/avatar-01.png" },
+  { id: "avatar-02", label: "Menino castanho", src: "./icons/baby-avatars/avatar-02.png" },
+  { id: "avatar-03", label: "Menina com laço", src: "./icons/baby-avatars/avatar-03.png" },
+  { id: "avatar-04", label: "Menino cacheado", src: "./icons/baby-avatars/avatar-04.png" },
+  { id: "avatar-05", label: "Menino ondulado", src: "./icons/baby-avatars/avatar-05.png" },
+  { id: "avatar-06", label: "Menina loira", src: "./icons/baby-avatars/avatar-06.png" },
+  { id: "avatar-07", label: "Bebê cacheadinho", src: "./icons/baby-avatars/avatar-07.png" },
+  { id: "avatar-08", label: "Bebê ruivinho", src: "./icons/baby-avatars/avatar-08.png" },
+  { id: "avatar-09", label: "Bebê com touca", src: "./icons/baby-avatars/avatar-09.png" },
+  { id: "avatar-10", label: "Menina com tiara", src: "./icons/baby-avatars/avatar-10.png" },
+  { id: "avatar-11", label: "Menino raspadinho", src: "./icons/baby-avatars/avatar-11.png" },
+  { id: "avatar-12", label: "Menino cabelo preto", src: "./icons/baby-avatars/avatar-12.png" },
 ]);
 
 const babyAvatarHairColorOptions = Object.freeze([
@@ -423,19 +427,24 @@ const babyAvatarBackgroundOptions = Object.freeze([
 ]);
 
 const legacyAvatarHairMap = Object.freeze({
-  "bebe-curlinho": "topetinho-suave",
-  "menina-laco": "laco-delicado",
-  "menino-franja": "franjinha-natural",
-  "menina-faixa": "faixinha-baby",
-  "menino-cacheado": "cacheado-curto",
-  "menina-bob": "bob-bebe",
-  "menino-topete": "topetinho-suave",
-  "topetinho": "topetinho-suave",
-  "quase-sem-cabelo": "franjinha-natural",
-  "onduladinho-curto": "ondinha-lateral",
-  "duas-chuquinhas": "laco-delicado",
-  "franjinha-delicada": "franjinha-natural",
-  "cachinhos-curtos": "cacheado-curto",
+  "bebe-curlinho": "avatar-01",
+  "menina-laco": "avatar-03",
+  "menino-franja": "avatar-02",
+  "menina-faixa": "avatar-10",
+  "menino-cacheado": "avatar-04",
+  "menina-bob": "avatar-10",
+  "menino-topete": "avatar-05",
+  "topetinho": "avatar-05",
+  "quase-sem-cabelo": "avatar-01",
+  "onduladinho-curto": "avatar-05",
+  "duas-chuquinhas": "avatar-06",
+  "franjinha-delicada": "avatar-03",
+  "cachinhos-curtos": "avatar-07",
+  "ondinha-lateral": "avatar-05",
+  "cacheado-curto": "avatar-07",
+  "bob-bebe": "avatar-10",
+  "faixinha-baby": "avatar-10",
+  "laco-delicado": "avatar-03",
 });
 
 const legacyAvatarHairColorMap = Object.freeze({
@@ -484,16 +493,12 @@ function getAvatarOption(options, id, fallbackIndex = 0) {
 }
 
 function normalizeAvatarDraft(avatar = {}) {
-  const hairId = legacyAvatarHairMap[avatar.hair] || legacyAvatarHairMap[avatar.icon] || avatar.hair || avatar.icon || "topetinho-suave";
-  const hairColorId = legacyAvatarHairColorMap[avatar.hairColor] || avatar.hairColor || "castanho-mel";
-  const skinId = legacyAvatarSkinMap[avatar.skin] || avatar.skin || "marfim";
-  const backgroundId = legacyAvatarBackgroundMap[avatar.background] || legacyAvatarBackgroundMap[avatar.color] || avatar.background || avatar.color || "lavanda";
+  const presetId = legacyAvatarHairMap[avatar.hair] || legacyAvatarHairMap[avatar.icon] || avatar.hair || avatar.icon || "avatar-01";
   return {
-    face: "3d-soft-premium",
-    hair: getAvatarOption(babyAvatarHairOptions, hairId, 0).id,
-    hairColor: getAvatarOption(babyAvatarHairColorOptions, hairColorId, 4).id,
-    skin: getAvatarOption(babyAvatarSkinOptions, skinId, 0).id,
-    background: getAvatarOption(babyAvatarBackgroundOptions, backgroundId, 0).id,
+    hair: getAvatarOption(babyAvatarHairOptions, presetId, 0).id,
+    hairColor: "castanho-mel",
+    skin: "marfim",
+    background: "lavanda",
   };
 }
 
@@ -537,62 +542,30 @@ function getAvatarHairMarkup(hair, tone) {
   const hi = tone.highlight;
   const styles = {
     "topetinho-suave": `
-      <path d="M69 93c1-18 10-35 26-44 18-10 42-10 60 2 11 8 18 21 20 36-15-9-33-13-54-13-21 0-39 5-52 19z" fill="${shadow}" opacity=".94"/>
-      <path d="M72 90c3-16 12-29 26-37 16-9 38-9 54 2 10 7 16 19 18 32-14-8-32-11-52-11-19 0-34 4-46 14z" fill="${base}"/>
-      <path d="M94 49c7-6 16-9 26-9 15 0 27 8 32 21 2 6 2 12-1 18-4-8-10-14-18-18-8-5-19-7-31-5-7 2-13 5-17 10-2-5-1-11 1-17 2-5 5-9 8-12z" fill="${base}"/>
-      ${hairLockPath("M90 57c9-6 20-8 31-7 10 1 19 5 26 11", hi, .78, 4)}
-      ${hairLockPath("M82 76c12-5 26-8 40-8 13 0 25 3 36 8", hi, .34, 3)}
+      <path d="M52 104C54 84 63 66 79 54C92 45 109 43 124 48C140 54 151 67 154 88C139 78 121 74 100 74C79 74 62 80 52 104Z" fill="${shadow}" opacity=".94"/>
+      <path d="M56 101C59 85 67 72 80 61C92 53 107 51 121 55C134 59 144 69 148 83C135 76 119 73 100 73C82 73 68 77 56 101Z" fill="${base}"/>
+      <path d="M77 58C85 51 94 48 104 48C116 48 126 52 133 60C125 58 116 57 104 57C93 57 85 58 77 58Z" fill="${hi}" opacity=".42"/>
+      <path d="M93 60C97 56 101 55 105 56C109 57 113 60 117 64C112 64 108 65 103 65C98 65 94 64 88 64C89 62 91 61 93 60Z" fill="${base}" opacity=".98"/>
+      ${hairLockPath("M75 63C84 60 92 59 100 59C108 59 117 60 125 64", hi, .62, 3.4)}
+      ${hairLockPath("M66 76C76 72 87 70 100 70C113 70 124 72 134 76", hi, .30, 2.6)}
+      ${hairLockPath("M60 89C72 84 85 82 100 82C115 82 128 84 140 89", shadow, .12, 2.4)}
     `,
     "franjinha-natural": `
-      <path d="M68 92c2-18 11-35 28-44 18-9 42-8 59 4 11 8 18 21 19 35-14-9-32-13-53-12-21 0-39 5-53 17z" fill="${shadow}" opacity=".94"/>
-      <path d="M71 89c4-16 13-29 27-37 16-8 38-8 54 3 10 7 16 18 18 31-14-8-31-10-50-9-20 1-35 5-49 12z" fill="${base}"/>
-      <path d="M75 73c8-8 18-12 31-13 12 0 22 3 31 10-4 1-8 3-11 6-5 4-9 8-14 11-4 2-9 3-13 2-5 0-9-2-14-5-4-2-8-5-10-11z" fill="${base}"/>
-      ${hairLockPath("M83 64c7-3 15-5 24-5 10 0 19 3 26 8", hi, .74, 4)}
-      ${hairLockPath("M93 76c6-3 11-4 17-4 7 0 12 1 18 4", hi, .34, 3)}
-    `,
-    "ondinha-lateral": `
-      <path d="M67 92c2-19 12-36 29-44 20-10 45-8 62 6 10 8 16 20 17 33-15-9-33-11-53-8-18 2-36 6-55 13z" fill="${shadow}" opacity=".94"/>
-      <path d="M71 89c4-16 14-29 28-37 17-8 39-7 55 4 9 6 14 17 16 29-14-7-30-9-48-6-19 2-36 6-51 10z" fill="${base}"/>
-      <path d="M84 55c9-6 19-9 30-9 12 0 22 4 31 11 5 5 9 10 11 16-9 0-18 2-27 7-9 6-18 14-25 25-7-2-14-6-19-13-4-8-4-21-1-37z" fill="${base}"/>
-      ${hairLockPath("M87 61c12-5 25-4 37 1", hi, .7, 4)}
-      ${hairLockPath("M97 72c9-3 19-3 28 0", hi, .32, 3)}
+      <path d="M52 104C54 84 63 66 79 54C94 45 111 45 126 50C140 55 149 68 152 88C139 77 121 72 100 72C79 72 62 78 52 104Z" fill="${shadow}" opacity=".94"/>
+      <path d="M56 101C59 85 67 73 80 63C92 55 107 53 121 57C133 61 142 70 146 82C134 75 118 71 100 71C83 71 68 76 56 101Z" fill="${base}"/>
+      <path d="M67 73C73 77 79 82 86 86C90 89 95 91 100 91C105 91 110 89 114 86C121 82 127 77 133 73C125 69 115 67 100 67C85 67 75 69 67 73Z" fill="${base}"/>
+      <path d="M75 67C82 63 90 61 100 61C110 61 118 63 125 67" fill="none" stroke="${hi}" stroke-width="3.3" stroke-linecap="round" opacity=".58"/>
+      <path d="M70 77C76 81 82 85 88 88" fill="none" stroke="${shadow}" stroke-width="2" stroke-linecap="round" opacity=".22"/>
+      <path d="M130 77C124 81 118 85 112 88" fill="none" stroke="${shadow}" stroke-width="2" stroke-linecap="round" opacity=".22"/>
+      <path d="M91 86C94 89 97 90 100 90C103 90 106 89 109 86" fill="none" stroke="${hi}" stroke-width="2.2" stroke-linecap="round" opacity=".24"/>
     `,
     "cachinhos-fofos": `
-      <path d="M68 94c2-19 12-36 28-45 18-9 41-9 59 3 11 8 18 20 21 35-15-8-33-10-54-9-21 1-39 5-54 16z" fill="${shadow}" opacity=".94"/>
-      <circle cx="76" cy="79" r="9.5" fill="${base}"/><circle cx="86" cy="66" r="10.5" fill="${base}"/><circle cx="101" cy="57" r="11.5" fill="${base}"/><circle cx="119" cy="58" r="11.5" fill="${base}"/><circle cx="134" cy="67" r="10.5" fill="${base}"/><circle cx="145" cy="80" r="9.5" fill="${base}"/>
-      <path d="M76 88c11-9 26-13 42-13 16 0 31 4 43 13-14-5-29-7-43-7-15 0-29 2-42 7z" fill="${base}"/>
-      ${hairLockPath("M84 72c7-5 15-8 24-8 8 0 16 2 23 7", hi, .56, 4)}
-      ${hairLockPath("M96 58c5-3 9-4 15-4 5 0 10 2 14 5", hi, .34, 3)}
-    `,
-    "cacheado-curto": `
-      <path d="M68 95c2-19 12-37 29-46 19-9 44-9 61 4 11 8 18 21 20 36-15-8-34-10-55-9-21 1-39 5-55 15z" fill="${shadow}" opacity=".94"/>
-      <circle cx="74" cy="80" r="9" fill="${base}"/><circle cx="84" cy="68" r="10" fill="${base}"/><circle cx="98" cy="59" r="11" fill="${base}"/><circle cx="114" cy="57" r="11" fill="${base}"/><circle cx="129" cy="61" r="10.5" fill="${base}"/><circle cx="141" cy="71" r="10" fill="${base}"/><circle cx="148" cy="84" r="8.5" fill="${base}"/><circle cx="91" cy="81" r="9.5" fill="${base}"/><circle cx="114" cy="80" r="9.5" fill="${base}"/>
-      <path d="M78 89c11-8 25-12 39-12 15 0 29 4 40 11-13-4-26-6-40-6-14 0-27 2-39 7z" fill="${base}"/>
-      ${hairLockPath("M86 72c13-7 28-8 42-3", hi, .48, 4)}
-      ${hairLockPath("M96 58c6-3 13-4 20-4 7 1 12 2 18 5", hi, .28, 3)}
-    `,
-    "bob-bebe": `
-      <path d="M66 90c2-19 12-37 29-46 20-10 47-9 65 6 10 8 16 19 17 31-1 23-8 42-20 56-6 6-13 10-22 13 6-19 7-40 4-57-9-9-23-14-38-14s-28 5-37 15c-3 17-2 37 4 56-10-3-18-8-25-15-13-14-19-32-17-45z" fill="${shadow}" opacity=".94"/>
-      <path d="M71 87c4-16 14-30 29-38 17-9 39-8 56 4 10 7 16 18 18 31-13-8-30-11-49-11-19 0-36 5-54 14z" fill="${base}"/>
-      ${hairLockPath("M80 61c8-4 17-6 27-6 11 0 22 3 31 9", hi, .64, 4)}
-      ${hairLockPath("M78 93c-3 14-2 28 3 41", hi, .18, 4)}
-      ${hairLockPath("M145 93c2 14 1 28-4 41", hi, .18, 4)}
-    `,
-    "faixinha-baby": `
-      <path d="M68 92c2-18 11-35 28-44 18-9 42-8 59 4 11 8 18 21 19 35-14-9-32-13-53-12-21 0-39 5-53 17z" fill="${shadow}" opacity=".94"/>
-      <path d="M71 89c4-16 13-29 27-37 16-8 38-8 54 3 10 7 16 18 18 31-14-8-31-10-50-9-20 1-35 5-49 12z" fill="${base}"/>
-      <path d="M69 70c21-4 44-4 64 0" fill="none" stroke="#f1cb60" stroke-width="10" stroke-linecap="round"/>
-      <path d="M128 61c8 0 14 6 15 14-6-1-10-4-14-9-4 5-9 8-15 9 2-8 7-14 14-14z" fill="#f1cb60"/>
-      <circle cx="128" cy="69" r="3.7" fill="#fff2a7"/>
-      ${hairLockPath("M83 63c6-3 13-4 21-4 8 0 16 2 23 5", hi, .44, 3)}
-    `,
-    "laco-delicado": `
-      <path d="M68 92c2-18 11-35 28-44 18-9 42-8 59 4 11 8 18 21 19 35-14-9-32-13-53-12-21 0-39 5-53 17z" fill="${shadow}" opacity=".94"/>
-      <path d="M71 89c4-16 13-29 27-37 16-8 38-8 54 3 10 7 16 18 18 31-14-8-31-10-50-9-20 1-35 5-49 12z" fill="${base}"/>
-      <path d="M84 44c8 0 14 6 15 16-6-1-10-5-15-10-4 5-9 9-15 10 1-9 7-16 15-16z" fill="#ef9fc7"/>
-      <circle cx="84" cy="53" r="4.8" fill="#fad0e2"/>
-      <path d="M86 60c6-4 13-6 21-6 8 0 15 2 21 6" fill="none" stroke="${hi}" stroke-width="4" stroke-linecap="round" opacity=".62"/>
-      <path d="M87 58c6-4 13-6 20-6-3 7-10 11-20 13z" fill="${base}"/>
+      <path d="M51 104C54 84 63 67 78 55C92 45 109 43 124 48C141 54 152 68 155 89C140 79 122 74 100 74C78 74 61 79 51 104Z" fill="${shadow}" opacity=".94"/>
+      <circle cx="67" cy="84" r="10.5" fill="${base}"/><circle cx="80" cy="69" r="11" fill="${base}"/><circle cx="96" cy="61" r="12" fill="${base}"/><circle cx="114" cy="61" r="12" fill="${base}"/><circle cx="130" cy="69" r="11" fill="${base}"/><circle cx="143" cy="84" r="10.5" fill="${base}"/><circle cx="84" cy="86" r="9.4" fill="${base}"/><circle cx="100" cy="82" r="10.4" fill="${base}"/><circle cx="116" cy="86" r="9.4" fill="${base}"/>
+      <path d="M71 93C79 86 88 82 100 82C112 82 121 86 129 93" fill="${base}" opacity=".98"/>
+      ${hairLockPath("M77 70C82 66 88 63 95 62", hi, .42, 2.8)}
+      ${hairLockPath("M105 62C112 63 118 66 123 70", hi, .42, 2.8)}
+      ${hairLockPath("M88 88C92 85 96 84 100 84C104 84 108 85 112 88", hi, .20, 2.2)}
     `,
   };
   return styles[hair.style] || styles["topetinho-suave"];
@@ -600,14 +573,8 @@ function getAvatarHairMarkup(hair, tone) {
 
 function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
   const normalized = normalizeAvatarDraft(avatar);
-  const palette = getAvatarBackgroundOption(normalized);
-  const hair = getAvatarHairOption(normalized);
-  const hairColor = getAvatarHairColorOption(normalized);
-  const skin = getAvatarSkinOption(normalized);
-  const outfit = getAvatarOutfitFill(normalized.background);
-  const hairMarkup = getAvatarHairMarkup(hair, hairColor);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Avatar do bebê"><defs><radialGradient id="bg" cx="36%" cy="22%" r="88%"><stop offset="0" stop-color="${palette.accent}"/><stop offset="1" stop-color="${palette.value}"/></radialGradient><radialGradient id="ring" cx="35%" cy="25%" r="90%"><stop offset="0" stop-color="#ffffff" stop-opacity=".92"/><stop offset="1" stop-color="#eadfff" stop-opacity=".82"/></radialGradient><radialGradient id="skin" cx="42%" cy="26%" r="75%"><stop offset="0" stop-color="#fffaf4"/><stop offset=".5" stop-color="${skin.value}"/><stop offset="1" stop-color="${skin.shade}"/></radialGradient><linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${outfit.highlight}"/><stop offset=".65" stop-color="${outfit.base}"/><stop offset="1" stop-color="${outfit.shadow}"/></linearGradient><linearGradient id="blanket" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".88"/><stop offset="1" stop-color="${outfit.base}" stop-opacity=".45"/></linearGradient><filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#2d2250" flood-opacity=".14"/></filter><clipPath id="hairClip"><circle cx="100" cy="98" r="58"/></clipPath></defs><circle cx="100" cy="100" r="96" fill="url(#bg)"/><circle cx="100" cy="100" r="91" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="6"/>${buildAvatarBackgroundMarkup(normalized)}<g filter="url(#shadow)"><circle cx="100" cy="100" r="66" fill="url(#ring)" opacity=".42"/><ellipse cx="100" cy="155" rx="53" ry="32" fill="url(#body)"/><path d="M54 156c18-13 74-13 92 0" fill="none" stroke="#fff" stroke-opacity=".66" stroke-width="4" stroke-linecap="round"/><path d="M68 149c8 13 22 20 32 20 11 0 24-7 32-20" fill="none" stroke="url(#blanket)" stroke-width="11" stroke-linecap="round" opacity=".78"/><ellipse cx="59" cy="103" rx="8" ry="13" fill="${skin.shade}" opacity=".92"/><ellipse cx="141" cy="103" rx="8" ry="13" fill="${skin.shade}" opacity=".92"/><circle cx="100" cy="98" r="58" fill="url(#skin)"/><path d="M78 83c7-24 37-31 49-3" fill="white" opacity=".18"/><g clip-path="url(#hairClip)">${hairMarkup}</g><ellipse cx="80" cy="100" rx="14.8" ry="18.5" fill="#fff" opacity=".98"/><ellipse cx="120" cy="100" rx="14.8" ry="18.5" fill="#fff" opacity=".98"/><ellipse cx="80" cy="103" rx="10.2" ry="13" fill="#3c3134"/><ellipse cx="120" cy="103" rx="10.2" ry="13" fill="#3c3134"/><ellipse cx="80" cy="104" rx="3.9" ry="5.1" fill="#000" opacity=".42"/><ellipse cx="120" cy="104" rx="3.9" ry="5.1" fill="#000" opacity=".42"/><ellipse cx="77" cy="98" rx="3.3" ry="4" fill="#fff"/><ellipse cx="117" cy="98" rx="3.3" ry="4" fill="#fff"/><ellipse cx="82" cy="101" rx="1.8" ry="2.2" fill="#fff" opacity=".7"/><ellipse cx="122" cy="101" rx="1.8" ry="2.2" fill="#fff" opacity=".7"/><path d="M70 88q10-6 20 0" fill="none" stroke="#8d6b57" stroke-width="2.8" stroke-linecap="round" opacity=".28"/><path d="M110 88q10-6 20 0" fill="none" stroke="#8d6b57" stroke-width="2.8" stroke-linecap="round" opacity=".28"/><ellipse cx="74" cy="117" rx="10" ry="6.3" fill="${skin.blush}" opacity=".62"/><ellipse cx="126" cy="117" rx="10" ry="6.3" fill="${skin.blush}" opacity=".62"/><path d="M100 105c3 3.5 2.4 7.3-.2 10.1" fill="none" stroke="${skin.nose}" stroke-width="3" stroke-linecap="round" opacity=".9"/><path d="M90 126q10 7 20 0" fill="none" stroke="${skin.lip}" stroke-width="3.8" stroke-linecap="round"/><path d="M92 127q8 3 16 0" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="1.8" stroke-linecap="round"/></g></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  const preset = getAvatarHairOption(normalized);
+  return preset.src || babyAvatarHairOptions[0].src;
 }
 
 function renderAvatarEditorVisibility() {
@@ -617,7 +584,7 @@ function renderAvatarEditorVisibility() {
   if (editBabyAvatarButton) {
     editBabyAvatarButton.hidden = !canEditAvatar;
     editBabyAvatarButton.disabled = !canEditAvatar;
-    editBabyAvatarButton.textContent = visible ? "Fechar edição do avatar" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
+    editBabyAvatarButton.textContent = visible ? "Fechar coleção premium" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
   }
 }
 
@@ -683,7 +650,7 @@ function renderAvatarOptionButton(container, options, type, avatar = pendingBaby
   container.innerHTML = options
     .map((item) => {
       const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || item.value || "#33224d"}"` : "";
-      const preview = type === "hair" ? `<img class="avatar-face-thumb" src="${getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" />` : "";
+      const preview = type === "hair" ? `<img class="avatar-face-thumb avatar-preset-thumb" src="${item.src || getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" />` : "";
       const content = swatchTypes.has(type)
         ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>`
         : `${preview}<small>${escapeHtml(item.label)}</small>`;
@@ -705,9 +672,21 @@ function applyAvatarPreview(avatar = pendingBabyAvatar) {
 function renderAvatarCustomizer() {
   pendingBabyAvatar = normalizeAvatarDraft(pendingBabyAvatar?.hair ? pendingBabyAvatar : babyProfile.avatar || {});
   renderAvatarOptionButton(avatarIconOptions, babyAvatarHairOptions, "hair", pendingBabyAvatar);
-  renderAvatarOptionButton(avatarHairColorOptions, babyAvatarHairColorOptions, "hairColor", pendingBabyAvatar);
-  renderAvatarOptionButton(avatarSkinOptions, babyAvatarSkinOptions, "skin", pendingBabyAvatar);
-  renderAvatarOptionButton(avatarColorOptions, babyAvatarBackgroundOptions, "background", pendingBabyAvatar);
+  if (avatarHairColorOptions) {
+    avatarHairColorOptions.innerHTML = "";
+    avatarHairColorOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
+  }
+  if (avatarSkinOptions) {
+    avatarSkinOptions.innerHTML = "";
+    avatarSkinOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
+  }
+  if (avatarColorOptions) {
+    avatarColorOptions.innerHTML = "";
+    avatarColorOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
+  }
+  if (avatarIconOptions) {
+    avatarIconOptions.closest(".avatar-picker-section")?.removeAttribute("hidden");
+  }
   if (avatarBackgroundOptions) avatarBackgroundOptions.innerHTML = "";
   if (avatarAccessoryOptions) avatarAccessoryOptions.innerHTML = "";
   applyAvatarPreview(pendingBabyAvatar);
@@ -718,7 +697,7 @@ function renderAvatarCustomizer() {
 function updatePendingAvatar(type, value) {
   pendingBabyAvatar = normalizeAvatarDraft({ ...pendingBabyAvatar, [type]: value });
   renderAvatarCustomizer();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar para guardar e aplicar no perfil.";
+  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar para aplicar.";
 }
 
 function saveBabyAvatarFromDraft() {
@@ -735,8 +714,8 @@ function saveBabyAvatarFromDraft() {
   renderAvatarCustomizer();
   renderBabyIdentity();
   scheduleProfileCloudSave();
-  closeAvatarEditor("Avatar salvo com sucesso. Toque em Editar avatar quando quiser mudar.");
-  if (loginHelper) loginHelper.textContent = "Avatar premium salvo com acabamento mais detalhado e visual mais refinado.";
+  closeAvatarEditor("Avatar salvo com sucesso. O editor foi fechado para manter o perfil limpo.");
+  if (loginHelper) loginHelper.textContent = "Avatar salvo com sucesso.";
 }
 
 
@@ -846,7 +825,7 @@ const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
 const caregiverDeviceIdKey = "ninou.deviceId";
 
 /*
-  v75.49.1 — identificação por aparelho
+  v75.56.2.1.1 — identificação por aparelho
 
   A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
   Por isso, a identificação do cuidador não pode ser salva na conta global.
@@ -880,7 +859,7 @@ function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
 }
 
 function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
-  // v75.49.1: não limpamos a identificação local do aparelho ao trocar/logout de conta.
+  // v75.56.2.1.1: não limpamos a identificação local do aparelho ao trocar/logout de conta.
   // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
@@ -975,7 +954,7 @@ async function saveCaregiverIdentityFromForm() {
   const name = caregiverNameInput?.value || "";
   const relation = caregiverRelationInput?.value || "";
 
-  // v75.49.1: salva somente neste aparelho.
+  // v75.56.2.1.1: salva somente neste aparelho.
   // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
   // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
   saveCurrentCaregiverIdentity(name, relation);
@@ -1265,7 +1244,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.49.1: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
+    v75.56.2.1.1: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3449,7 +3428,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.49.1: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
+  // v75.56.2.1.1: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
   const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
   for (const familyId of [...new Set(candidateFamilies)]) {
     try {
@@ -3562,7 +3541,7 @@ async function activatePersonalFamily() {
     refreshAdminStats({ silent: true });
   } catch (error) {
     console.error("Erro ao ativar família principal no Firebase:", error);
-    // v75.49.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
+    // v75.56.2.1.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
     // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
     setSyncStatus("online", cloudUser.email || "");
     if (loginHelper) {
@@ -5954,7 +5933,7 @@ function setSyncStatus(status = "offline", email = "") {
     status = "online";
   }
 
-  // v75.49.1: o admin global não deve aparecer como "Off-line" depois do login.
+  // v75.56.2.1.1: o admin global não deve aparecer como "Off-line" depois do login.
   // O painel administrativo depende da autenticação do admin e de regras globais;
   // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
   // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
@@ -6597,7 +6576,7 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  // v75.49.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
+  // v75.56.2.1.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
   return resizeProfileImage(file, { size: 120, quality: 0.5 });
 }
 
@@ -6738,7 +6717,7 @@ if (editBabyAvatarButton) {
     if (babyAvatarCard?.hidden) {
       openAvatarEditor();
     } else {
-      closeAvatarEditor("Editor fechado. Toque em Editar avatar para abrir novamente.");
+      closeAvatarEditor("Editor fechado.");
     }
   });
 }
@@ -6752,7 +6731,7 @@ if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
 
 if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
   profilePhotoInput.value = "";
-  if (loginHelper) loginHelper.textContent = "O Ninou agora usa somente avatar. Fotos antigas e novos uploads não são usados.";
+  if (loginHelper) loginHelper.textContent = "O Ninou agora usa somente avatars ilustrados prontos. Fotos antigas e novos uploads não são usados.";
 });
 
 loginButton.addEventListener("click", signInAccount);
@@ -6966,7 +6945,7 @@ initFirebaseAuthState().catch((error) => {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").then((registration) => {
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
     }).catch((error) => {
       console.warn("Service worker não registrado:", error);

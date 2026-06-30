@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ninou</title>
-    <meta name="theme-color" content="#101029" />
+    <meta name="theme-color" content="#f8f6fc" />
     <meta name="description" content="Diário de sono, mamadas, fraldas e rotina do bebê." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -19,10 +19,10 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.49" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.3" />
   </head>
   <body>
-    <main class="phone-shell" aria-label="Protótipo completo Ninou">
+    <main class="phone-shell premium-final-shell" aria-label="Ninou">
       <header class="app-header">
         <div class="identity">
           <img src="./icons/icon-192.png" alt="" />
@@ -473,7 +473,8 @@
           <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
           <span id="profileBabyName">Bebê</span>
           <strong id="profileBabyAge">Preencha o nascimento</strong>
-          <div class="avatar-only-badge" id="profilePhotoButtonText">Avatar 3D Soft</div>
+          <p class="profile-hero-note">Perfil privado, salvo com cuidado e sem foto real.</p>
+          <div class="avatar-only-badge" id="profilePhotoButtonText">Coleção premium</div>
           <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
         <section class="settings-list">
@@ -497,30 +498,35 @@
             </label>
           </article>
           <article class="avatar-test-card avatar-compact-card" id="babyAvatarTestCard">
-            <div class="avatar-test-header">
-              <div>
+            <div class="avatar-test-header avatar-minimal-header">
+              <div class="avatar-copy-column compact-copy">
                 <span>Avatar do bebê</span>
-                <strong>Avatar premium detalhado</strong>
-                <p>Escolha um bebê com acabamento 3D Soft premium: traços mais delicados, cabelo melhor desenhado, tons de pele inclusivos, cores de cabelo e fundos suaves. Tudo leve, privado e sem foto real.</p>
+                <strong>Coleção premium</strong>
+                <p>Escolha um dos 12 avatares premium. Tudo local, leve e sem foto real.</p>
+                <div class="premium-inline-badges compact-badges" aria-label="Benefícios da coleção premium">
+                  <span>12 opções</span>
+                  <span>Privado</span>
+                </div>
               </div>
-              <div class="avatar-preview-wrap">
+              <div class="avatar-preview-wrap avatar-preview-panel minimal-preview-panel">
                 <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
+                <div class="avatar-preview-caption minimal-caption">Avatar atual</div>
               </div>
             </div>
             <section class="avatar-picker-section" data-avatar-section="hair">
-              <strong>Penteado</strong>
+              <strong>Avatares disponíveis</strong>
               <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
             </section>
             <section class="avatar-picker-section" data-avatar-section="hair-color">
-              <strong>Cor do cabelo</strong>
+              <strong hidden>Cor do cabelo</strong>
               <div class="avatar-option-row" id="avatarHairColorOptions"></div>
             </section>
             <section class="avatar-picker-section" data-avatar-section="skin">
-              <strong>Tom de pele</strong>
+              <strong hidden>Tom de pele</strong>
               <div class="avatar-option-row" id="avatarSkinOptions"></div>
             </section>
             <section class="avatar-picker-section" data-avatar-section="background">
-              <strong>Cor de fundo</strong>
+              <strong hidden>Cor de fundo</strong>
               <div class="avatar-option-row" id="avatarColorOptions"></div>
             </section>
             <div class="avatar-hidden-options" aria-hidden="true">
@@ -528,10 +534,10 @@
               <div id="avatarAccessoryOptions"></div>
             </div>
             <div class="avatar-editor-actions">
-              <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">✓ Salvar avatar</button>
+              <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">Salvar avatar</button>
               <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
             </div>
-            <p id="babyAvatarStatus" class="form-status">Depois de salvar, o editor fica escondido e só volta ao tocar em Editar avatar.</p>
+            <p id="babyAvatarStatus" class="form-status">Escolha um avatar e salve. Depois o editor fica oculto.</p>
           </article>
 
           <article class="appearance-profile-block">
@@ -900,11 +906,11 @@
       <button class="fab icon-button-add" type="button" data-open-sheet="sono" aria-label="Novo registro"></button>
 
       <nav class="bottom-nav" aria-label="Menu principal">
-        <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
-        <button type="button" data-target="diary">≡<span>Diário</span></button>
-        <button type="button" data-target="trends">▥<span>Dados</span></button>
-        <button type="button" data-target="sounds">♪<span>Sons</span></button>
-        <button type="button" data-target="profile">○<span>Perfil</span></button>
+        <button class="active" type="button" data-target="today"><span class="nav-symbol" aria-hidden="true">⌂</span><span>Hoje</span></button>
+        <button type="button" data-target="diary"><span class="nav-symbol" aria-hidden="true">☰</span><span>Diário</span></button>
+        <button type="button" data-target="trends"><span class="nav-symbol" aria-hidden="true">▥</span><span>Dados</span></button>
+        <button type="button" data-target="sounds"><span class="nav-symbol" aria-hidden="true">♪</span><span>Sons</span></button>
+        <button type="button" data-target="profile"><span class="nav-symbol" aria-hidden="true">○</span><span>Perfil</span></button>
       </nav>
     </main>
 
@@ -1002,6 +1008,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.49"></script>
+    <script type="module" src="./app.js?v=75.56.3"></script>
   </body>
 </html>
