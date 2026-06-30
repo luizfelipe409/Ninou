@@ -478,16 +478,29 @@
           <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
 
-        <section id="guestWelcomeCard" class="guest-welcome-card" aria-label="Boas-vindas ao Ninou">
-          <span>Bem-vindo ao Ninou</span>
-          <strong>A rotina do bebê organizada em família.</strong>
-          <p>Acompanhe sono, mamadas, fraldas, medicamentos e crescimento com registros simples, gráficos e relatórios prontos para compartilhar.</p>
-          <div class="guest-benefit-grid" aria-label="Recursos do Ninou">
-            <article><b>⏱</b><small>Relógio de rotina</small></article>
-            <article><b>☰</b><small>Diário por data</small></article>
-            <article><b>▥</b><small>Dados e gráficos</small></article>
+        <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome" aria-label="Boas-vindas ao Ninou">
+          <div class="guest-welcome-top">
+            <span>Preview App Store</span>
+            <strong>O diário inteligente do bebê, pronto para a família.</strong>
+            <p>Conheça uma experiência completa com rotina em tempo real, histórico por data, gráficos realistas, sons de descanso e acesso familiar.</p>
+          </div>
+
+          <div class="guest-theme-switch" aria-label="Escolha o tema inicial">
+            <span>Tema inicial</span>
+            <div>
+              <button type="button" data-theme-choice="light">☀ Claro</button>
+              <button type="button" data-theme-choice="dark">🌙 Escuro</button>
+              <button type="button" data-theme-choice="auto">✨ Auto</button>
+            </div>
+          </div>
+
+          <div class="guest-benefit-grid guest-store-benefits" aria-label="Recursos do Ninou">
+            <article><b>⏱</b><small>Rotina ao vivo</small></article>
+            <article><b>☰</b><small>Diário completo</small></article>
+            <article><b>▥</b><small>Gráficos reais</small></article>
             <article><b>♪</b><small>Sons de descanso</small></article>
           </div>
+
           <div class="guest-welcome-actions">
             <button id="guestWelcomeLoginButton" type="button">Entrar</button>
             <button id="guestWelcomeInviteButton" type="button">Tenho convite</button>
@@ -1042,6 +1055,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.56.7"></script>
+    <script type="module" src="./app.js?v=75.56.7.8"></script>
   </body>
 </html>

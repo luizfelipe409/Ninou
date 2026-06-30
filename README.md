@@ -344,7 +344,7 @@ Correções aplicadas antes de publicação:
 - Criado modo visitante premium: Hoje, Diário, Dados e Sons mostram prévias parcialmente borradas com textos explicando os recursos do app.
 - O Perfil continua liberado para login/cadastro.
 - O botão flutuante vira “Entrar para registrar” quando não há conta logada.
-- Mantidas as correções da v75.56.7.4 para tempo acordado após soneca.
+- Mantidas as correções da v75.56.7.8 para tempo acordado após soneca.
 
 ## v75.56.7.8 — demo premium com gráficos fictícios profissionais
 
@@ -364,10 +364,12 @@ Correções aplicadas antes de publicação:
 - Corrige a ação dos botões “Entrar agora” e “Tenho convite” fora da tela Perfil, levando o usuário corretamente para a área de acesso.
 - Mantém as correções anteriores de tempo acordado, dia-calendário, diário e timeline.
 
+## v75.56.7.8 — demo App Store premium
 
-## v75.56.7.8 — correção de carregamento da demo premium
-
-- Corrigida a falha que impedia o Ninou de carregar na v75.56.7.7.
-- Removida função duplicada antiga da demonstração premium que ainda procurava dados `rows` inexistentes.
-- Mantidos os gráficos fictícios, cards premium e botões de acesso da v75.56.7.7.
-- Mantidas as correções de tempo acordado, diário, timeline e reset por dia-calendário.
+- Transforma o modo sem login em uma demonstração de produto mais próxima de App Store.
+- Remove definitivamente o visual borrado para não esconder a demo premium.
+- Adiciona gráficos fictícios mais realistas: barras, linha, composição e linha do tempo.
+- Cada tela pública (Hoje, Diário, Dados e Sons) apresenta benefícios e exemplos coerentes.
+- Corrige o fluxo dos botões “Entrar agora” e “Tenho convite” fora da tela Perfil.
+- Inclui escolha de tema inicial (Claro, Escuro e Auto) diretamente no preview.
+- Mantém as correções de tempo acordado após soneca, dia-calendário e diário.

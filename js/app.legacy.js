@@ -600,7 +600,7 @@ function applyGuestInteractionLock() {
   const locked = !isLoggedIn();
   document.body.classList.toggle("guest-locked", locked);
   const disabledElements = [
-    babyNameInput, babyArticleInput, babyBirthInput, themeModeInput,
+    babyNameInput, babyArticleInput, babyBirthInput,
     babyWeightInput, babyWeightDateInput, saveBabyWeightButton,
     caregiverNameInput, caregiverRelationInput, saveCaregiverIdentityButton,
     saveBabyAvatarButton, skipBabyAvatarButton,
@@ -620,73 +620,179 @@ function applyGuestInteractionLock() {
   renderGuestPremiumContent();
 }
 
+
+const guestThemeOptions = Object.freeze([
+  { mode: "light", label: "Claro", icon: "☀" },
+  { mode: "dark", label: "Escuro", icon: "🌙" },
+  { mode: "auto", label: "Auto", icon: "✨" },
+]);
+
+function normalizeGuestThemeMode(mode = "auto") {
+  return guestThemeOptions.some((option) => option.mode === mode) ? mode : "auto";
+}
+
+function getActiveGuestThemeMode() {
+  return normalizeGuestThemeMode(themeModeInput?.value || babyProfile?.themeMode || localStorage.getItem(storageKeys.themeMode) || "auto");
+}
+
+function renderGuestThemeButtons() {
+  const mode = getActiveGuestThemeMode();
+  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    const active = normalizeGuestThemeMode(button.dataset.themeChoice || "auto") === mode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+}
+
+function setGuestThemeChoice(mode = "auto") {
+  const safeMode = normalizeGuestThemeMode(mode);
+  if (themeModeInput) themeModeInput.value = safeMode;
+  babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: safeMode });
+
+  try {
+    localStorage.setItem(storageKeys.themeMode, safeMode);
+  } catch {}
+
+  updateTheme();
+  renderGuestThemeButtons();
+}
+
+function getGuestThemeSwitchMarkup() {
+  const buttons = guestThemeOptions.map((option) => `
+    <button type="button" data-theme-choice="${option.mode}">
+      <span>${option.icon}</span>
+      <strong>${option.label}</strong>
+    </button>
+  `).join("");
+
+  return `
+    <div class="guest-theme-switch" aria-label="Escolha o tema inicial">
+      <span>Tema inicial</span>
+      <div>${buttons}</div>
+    </div>
+  `;
+}
+
 const guestPremiumContent = {
   today: {
-    kicker: "Demonstração premium",
-    title: "Rotina ao vivo, clara e compartilhada",
-    text: "Uma prévia realista de como o Ninou organiza sono, mamadas, fraldas e alertas ao longo do dia.",
-    accent: "Exemplo de hoje",
+    kicker: "Preview App Store",
+    title: "A rotina do bebê em tempo real",
+    text: "Uma demonstração realista de como a família acompanha sono, mamadas, fraldas e medicamentos em poucos toques.",
+    accent: "Hoje • demonstração",
+    liveTitle: "Francisco acordado",
+    liveValue: "44 min",
+    liveHint: "desde 12:35, após a última soneca",
+    cta: "Entre para transformar este preview em rotina real da família.",
     metrics: [
-      { label: "Acordado agora", value: "44 min", note: "desde 12:35" },
-      { label: "Sono hoje", value: "3h05", note: "1 soneca" },
+      { label: "Sono hoje", value: "3h05", note: "1 soneca concluída" },
       { label: "Mamadas", value: "4", note: "420 ml + peito" },
       { label: "Fraldas", value: "3", note: "2 xixi · 1 mista" },
+      { label: "Próxima dica", value: "14:10", note: "janela de sono" },
     ],
-    chartTitle: "Ritmo do dia",
-    chartSubtitle: "Dados fictícios para visualização",
+    barsTitle: "Ritmo do dia",
+    barsSubtitle: "sono, alimentação e cuidados",
     bars: [
-      { label: "06h", value: "Sono", height: 68 },
-      { label: "08h", value: "Acordou", height: 34 },
-      { label: "10h", value: "Soneca", height: 82 },
-      { label: "12h", value: "Mamou", height: 48 },
-      { label: "14h", value: "Alerta", height: 58 },
+      { label: "06h", value: "Sono", height: 72 },
+      { label: "08h", value: "Acordou", height: 32 },
+      { label: "10h", value: "Soneca", height: 88 },
+      { label: "12h", value: "Mamou", height: 52 },
+      { label: "14h", value: "Dica", height: 64 },
+    ],
+    lineTitle: "Tempo acordado",
+    lineSubtitle: "exemplo ao longo do dia",
+    line: [
+      { label: "07h", value: 0 },
+      { label: "08h", value: 38 },
+      { label: "09h", value: 92 },
+      { label: "10h", value: 15 },
+      { label: "12h", value: 0 },
+      { label: "13h", value: 44 },
+    ],
+    distribution: [
+      { label: "Sono", value: 46 },
+      { label: "Mamada", value: 28 },
+      { label: "Fralda", value: 16 },
+      { label: "Outros", value: 10 },
     ],
     timeline: [
-      { time: "07:41", title: "Acordou", detail: "Começo do dia" },
+      { time: "07:41", title: "Acordou", detail: "começo do dia" },
       { time: "09:30", title: "Soneca", detail: "3h05 de sono" },
       { time: "12:42", title: "Mamadeira", detail: "120 ml" },
     ],
-    insight: "O app cruza os registros para mostrar o tempo acordado correto, última soneca e próximos cuidados.",
+    features: [
+      "Tempo acordado recalculado automaticamente",
+      "Últimos cuidados sempre visíveis",
+      "Sugestões leves sem poluir a rotina",
+    ],
   },
   diary: {
-    kicker: "Histórico demonstrativo",
-    title: "Diário completo por data",
-    text: "Veja como os registros ficam organizados por horário, tipo de cuidado e observações da família.",
-    accent: "Exemplo de 30/06",
+    kicker: "Histórico por data",
+    title: "Diário completo e organizado",
+    text: "O usuário entende como cada registro entra no histórico, com horários, detalhes, observações e separação correta por dia.",
+    accent: "30/06 • exemplo",
+    liveTitle: "Dia completo",
+    liveValue: "11 registros",
+    liveHint: "madrugada, manhã, tarde e noite separados",
+    cta: "Entre para consultar, editar e compartilhar o histórico real.",
     metrics: [
-      { label: "Registros", value: "11", note: "no dia" },
       { label: "Sono", value: "3h05", note: "concluído" },
       { label: "Mamadas", value: "5", note: "peito e mamadeira" },
       { label: "Fraldas", value: "4", note: "com detalhes" },
+      { label: "Observações", value: "2", note: "anotações da família" },
     ],
-    chartTitle: "Registros por período",
-    chartSubtitle: "Manhã, tarde e noite",
+    barsTitle: "Registros por período",
+    barsSubtitle: "distribuição fictícia",
     bars: [
-      { label: "Madrugada", value: "2", height: 34 },
-      { label: "Manhã", value: "6", height: 86 },
-      { label: "Tarde", value: "3", height: 56 },
-      { label: "Noite", value: "1", height: 26 },
+      { label: "Madr.", value: "2", height: 36 },
+      { label: "Manhã", value: "6", height: 88 },
+      { label: "Tarde", value: "3", height: 58 },
+      { label: "Noite", value: "1", height: 28 },
+    ],
+    lineTitle: "Volume de registros",
+    lineSubtitle: "exemplo dos últimos dias",
+    line: [
+      { label: "24", value: 8 },
+      { label: "25", value: 10 },
+      { label: "26", value: 9 },
+      { label: "27", value: 12 },
+      { label: "28", value: 11 },
+      { label: "29", value: 13 },
+      { label: "30", value: 11 },
+    ],
+    distribution: [
+      { label: "Sono", value: 30 },
+      { label: "Mamada", value: 34 },
+      { label: "Fralda", value: 24 },
+      { label: "Medic.", value: 12 },
     ],
     timeline: [
       { time: "03:18", title: "Amamentação", detail: "lado esquerdo" },
       { time: "07:41", title: "Acordou", detail: "registrado pela mãe" },
-      { time: "12:35", title: "Fim da soneca", detail: "tempo acordado recalculado" },
+      { time: "12:35", title: "Fim da soneca", detail: "tempo acordado correto" },
     ],
-    insight: "Cada dia fica separado: ao virar meia-noite, a rotina visual recomeça e o histórico permanece no diário.",
+    features: [
+      "Cada dia recomeça à meia-noite",
+      "Edição de registros com segurança",
+      "Histórico pronto para relatório",
+    ],
   },
   trends: {
-    kicker: "Gráficos de exemplo",
-    title: "Padrões de sono, alimentação e crescimento",
-    text: "Dados fictícios ajudam o usuário a entender como os gráficos reais aparecerão depois dos primeiros registros.",
+    kicker: "Dados inteligentes",
+    title: "Gráficos que explicam a rotina",
+    text: "A demo mostra como sono, mamadas, fraldas e crescimento ficam claros depois dos primeiros dias de uso.",
     accent: "Últimos 7 dias",
+    liveTitle: "Sono médio",
+    liveValue: "14h20",
+    liveHint: "exemplo de tendência semanal",
+    cta: "Entre para trocar estes dados fictícios pelos gráficos reais do bebê.",
     metrics: [
-      { label: "Sono médio", value: "14h20", note: "por dia" },
-      { label: "Mamadas", value: "8/dia", note: "média" },
-      { label: "Fraldas", value: "6/dia", note: "média" },
-      { label: "Peso", value: "+420 g", note: "evolução" },
+      { label: "Mamadas", value: "8/dia", note: "média fictícia" },
+      { label: "Fraldas", value: "6/dia", note: "média fictícia" },
+      { label: "Peso", value: "+420 g", note: "evolução exemplo" },
+      { label: "Regularidade", value: "82%", note: "padrão semanal" },
     ],
-    chartTitle: "Sono nos últimos dias",
-    chartSubtitle: "Exemplo fictício de tendência",
+    barsTitle: "Sono nos últimos dias",
+    barsSubtitle: "exemplo de evolução",
     bars: [
       { label: "Seg", value: "13h", height: 62 },
       { label: "Ter", value: "14h", height: 72 },
@@ -696,43 +802,84 @@ const guestPremiumContent = {
       { label: "Sáb", value: "14h50", height: 84 },
       { label: "Dom", value: "15h10", height: 90 },
     ],
+    lineTitle: "Peso do bebê",
+    lineSubtitle: "linha fictícia de crescimento",
+    line: [
+      { label: "1ª", value: 3.18 },
+      { label: "2ª", value: 3.32 },
+      { label: "3ª", value: 3.48 },
+      { label: "4ª", value: 3.61 },
+      { label: "5ª", value: 3.82 },
+    ],
+    distribution: [
+      { label: "Sono", value: 44 },
+      { label: "Acordado", value: 36 },
+      { label: "Mamadas", value: 12 },
+      { label: "Cuidados", value: 8 },
+    ],
     timeline: [
       { time: "Peso", title: "3,82 kg", detail: "evolução semanal" },
       { time: "Sono", title: "mais regular", detail: "padrão noturno" },
       { time: "Fraldas", title: "dentro da média", detail: "acompanhamento diário" },
     ],
-    insight: "Quando houver dados reais, o Ninou troca esta demonstração por gráficos da família.",
+    features: [
+      "Sono por dia e por período",
+      "Mamadas, fraldas e medicamentos",
+      "Evolução de peso sem complexidade",
+    ],
   },
   sounds: {
-    kicker: "Rotina de descanso",
-    title: "Sons suaves com contexto de uso",
-    text: "A prévia mostra como a tela pode apoiar momentos de sono com escolhas simples e acompanhamento visual.",
-    accent: "Exemplo de uso",
+    kicker: "Ritual de descanso",
+    title: "Sons com contexto de rotina",
+    text: "A tela de sons também vira uma experiência guiada, mostrando como o áudio pode apoiar a hora de dormir.",
+    accent: "Pré-sono • exemplo",
+    liveTitle: "Som favorito",
+    liveValue: "Útero",
+    liveHint: "sessão de 28 min em volume baixo",
+    cta: "Entre para usar os sons junto com a rotina real da família.",
     metrics: [
-      { label: "Favorito", value: "Útero", note: "som contínuo" },
       { label: "Sessão", value: "28 min", note: "até relaxar" },
       { label: "Volume", value: "Baixo", note: "ambiente calmo" },
       { label: "Rotina", value: "Noite", note: "pré-sono" },
+      { label: "Uso", value: "4x", note: "última semana" },
     ],
-    chartTitle: "Uso nos últimos descansos",
-    chartSubtitle: "Dados fictícios de demonstração",
+    barsTitle: "Uso dos sons",
+    barsSubtitle: "últimos descansos fictícios",
     bars: [
       { label: "Útero", value: "42min", height: 88 },
       { label: "Relaxar", value: "25min", height: 58 },
       { label: "Ritmo", value: "18min", height: 42 },
+    ],
+    lineTitle: "Tempo para relaxar",
+    lineSubtitle: "tendência fictícia",
+    line: [
+      { label: "Seg", value: 34 },
+      { label: "Ter", value: 31 },
+      { label: "Qua", value: 29 },
+      { label: "Qui", value: 28 },
+      { label: "Sex", value: 24 },
+    ],
+    distribution: [
+      { label: "Útero", value: 52 },
+      { label: "Relaxar", value: 30 },
+      { label: "Ritmo", value: 18 },
     ],
     timeline: [
       { time: "20:10", title: "Som do útero", detail: "preparar o berço" },
       { time: "20:32", title: "Relaxar", detail: "volume baixo" },
       { time: "20:45", title: "Dormiu", detail: "rotina concluída" },
     ],
-    insight: "A tela fica simples para o uso noturno, sem poluir a experiência da família.",
+    features: [
+      "Sons simples para uso noturno",
+      "Timer com repetição controlada",
+      "Rotina de descanso mais previsível",
+    ],
   },
 };
 
 function getGuestMetricMarkup(metric) {
   return `
-    <article class="guest-showcase-metric">
+    <article class="guest-store-metric">
       <span>${escapeHtml(metric.label)}</span>
       <strong>${escapeHtml(metric.value)}</strong>
       <small>${escapeHtml(metric.note)}</small>
@@ -743,7 +890,7 @@ function getGuestMetricMarkup(metric) {
 function getGuestBarMarkup(bar) {
   const height = Math.max(18, Math.min(96, Number(bar.height) || 40));
   return `
-    <span class="guest-chart-bar" style="--h:${height}%">
+    <span class="guest-store-bar" style="--h:${height}%">
       <i aria-hidden="true"></i>
       <b>${escapeHtml(bar.label)}</b>
       <em>${escapeHtml(bar.value)}</em>
@@ -751,9 +898,62 @@ function getGuestBarMarkup(bar) {
   `;
 }
 
+function getGuestLineChartMarkup(points = []) {
+  const safePoints = Array.isArray(points) ? points : [];
+  const values = safePoints.map((point) => Number(point.value)).filter(Number.isFinite);
+  const min = values.length ? Math.min(...values) : 0;
+  const max = values.length ? Math.max(...values) : 1;
+  const range = Math.max(0.001, max - min);
+  const count = Math.max(1, safePoints.length - 1);
+
+  const coords = safePoints.map((point, index) => {
+    const x = 10 + (index / count) * 180;
+    const value = Number(point.value);
+    const normalized = Number.isFinite(value) ? (value - min) / range : 0.5;
+    const y = 82 - normalized * 58;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+
+  const dots = safePoints.map((point, index) => {
+    const x = 10 + (index / count) * 180;
+    const value = Number(point.value);
+    const normalized = Number.isFinite(value) ? (value - min) / range : 0.5;
+    const y = 82 - normalized * 58;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.8"></circle>`;
+  }).join("");
+
+  const labels = safePoints.map((point) => `<span>${escapeHtml(point.label)}</span>`).join("");
+
+  return `
+    <div class="guest-store-line">
+      <svg viewBox="0 0 200 96" role="img" aria-hidden="true" focusable="false">
+        <path d="M10 82H190M10 52H190M10 22H190"></path>
+        <polyline points="${coords}"></polyline>
+        ${dots}
+      </svg>
+      <div class="guest-store-line-labels">${labels}</div>
+    </div>
+  `;
+}
+
+function getGuestDistributionMarkup(items = []) {
+  return items.map((item, index) => {
+    const value = Math.max(0, Math.min(100, Number(item.value) || 0));
+    return `
+      <article class="guest-store-ring" style="--value:${value};--ring-index:${index}">
+        <i aria-hidden="true"></i>
+        <div>
+          <strong>${escapeHtml(String(value))}%</strong>
+          <span>${escapeHtml(item.label)}</span>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
 function getGuestTimelineMarkup(row) {
   return `
-    <article class="guest-showcase-row">
+    <article class="guest-store-row">
       <time>${escapeHtml(row.time)}</time>
       <div>
         <strong>${escapeHtml(row.title)}</strong>
@@ -763,36 +963,77 @@ function getGuestTimelineMarkup(row) {
   `;
 }
 
+function getGuestFeatureMarkup(feature) {
+  return `<li><span aria-hidden="true">✓</span>${escapeHtml(feature)}</li>`;
+}
+
 function getGuestPremiumCardMarkup(screenKey) {
   const item = guestPremiumContent[screenKey] || guestPremiumContent.today;
   const metrics = item.metrics.map(getGuestMetricMarkup).join("");
   const bars = item.bars.map(getGuestBarMarkup).join("");
   const timeline = item.timeline.map(getGuestTimelineMarkup).join("");
+  const features = item.features.map(getGuestFeatureMarkup).join("");
 
   return `
-    <div class="guest-showcase-hero">
-      <span>${escapeHtml(item.kicker)}</span>
-      <strong>${escapeHtml(item.title)}</strong>
-      <p>${escapeHtml(item.text)}</p>
-    </div>
+    <div class="guest-store-layout">
+      <section class="guest-store-hero" aria-label="Apresentação do Ninou">
+        <span>${escapeHtml(item.kicker)}</span>
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.text)}</p>
+        ${getGuestThemeSwitchMarkup()}
+        <ul class="guest-store-features">${features}</ul>
+      </section>
 
-    <div class="guest-showcase-panel" aria-label="Demonstração fictícia do Ninou">
-      <div class="guest-showcase-topline">
-        <span>${escapeHtml(item.accent)}</span>
-        <b>Dados fictícios</b>
-      </div>
-      <div class="guest-showcase-metrics">${metrics}</div>
-      <div class="guest-showcase-chart-card">
-        <div>
-          <span>${escapeHtml(item.chartTitle)}</span>
-          <strong>${escapeHtml(item.chartSubtitle)}</strong>
+      <section class="guest-store-preview" aria-label="Demonstração fictícia">
+        <div class="guest-preview-phone">
+          <div class="guest-preview-topline">
+            <span>${escapeHtml(item.accent)}</span>
+            <b>Dados fictícios</b>
+          </div>
+          <div class="guest-live-card">
+            <span>${escapeHtml(item.liveTitle)}</span>
+            <strong>${escapeHtml(item.liveValue)}</strong>
+            <p>${escapeHtml(item.liveHint)}</p>
+          </div>
+          <div class="guest-store-metrics">${metrics}</div>
+          <div class="guest-store-chart">
+            <div>
+              <span>${escapeHtml(item.barsTitle)}</span>
+              <strong>${escapeHtml(item.barsSubtitle)}</strong>
+            </div>
+            <div class="guest-store-bars">${bars}</div>
+          </div>
         </div>
-        <div class="guest-showcase-bars" style="--bar-count:${item.bars.length}" aria-hidden="true">${bars}</div>
-      </div>
-      <div class="guest-showcase-timeline">${timeline}</div>
+
+        <div class="guest-store-analytics">
+          <article class="guest-store-analytic-card">
+            <div>
+              <span>${escapeHtml(item.lineTitle)}</span>
+              <strong>${escapeHtml(item.lineSubtitle)}</strong>
+            </div>
+            ${getGuestLineChartMarkup(item.line)}
+          </article>
+
+          <article class="guest-store-analytic-card">
+            <div>
+              <span>Composição</span>
+              <strong>leitura rápida</strong>
+            </div>
+            <div class="guest-store-rings">${getGuestDistributionMarkup(item.distribution)}</div>
+          </article>
+
+          <article class="guest-store-analytic-card guest-store-timeline-card">
+            <div>
+              <span>Linha do tempo</span>
+              <strong>exemplo realista</strong>
+            </div>
+            <div class="guest-store-timeline">${timeline}</div>
+          </article>
+        </div>
+      </section>
     </div>
 
-    <p class="guest-showcase-insight">${escapeHtml(item.insight)}</p>
+    <p class="guest-store-cta">${escapeHtml(item.cta)}</p>
 
     <div class="guest-premium-actions">
       <button type="button" data-guest-action="login">Entrar agora</button>
@@ -815,6 +1056,7 @@ function renderGuestPremiumContent() {
   card.className = "guest-premium-card";
   card.setAttribute("aria-label", "Prévia premium do Ninou");
   card.innerHTML = getGuestPremiumCardMarkup(key);
+  renderGuestThemeButtons();
   card.addEventListener("click", (event) => {
     const guestAction = event.target.closest("[data-guest-action]");
     if (!guestAction) return;
@@ -7283,10 +7525,20 @@ if (guestOnboardingModal) {
   });
 }
 document.addEventListener("click", (event) => {
+  const themeAction = event.target.closest("[data-theme-choice]");
+  if (themeAction) {
+    event.preventDefault();
+    event.stopPropagation();
+    setGuestThemeChoice(themeAction.dataset.themeChoice || "auto");
+    return;
+  }
+
   const guestAction = event.target.closest("[data-guest-action]");
   if (!guestAction) return;
+  event.preventDefault();
+  event.stopPropagation();
   focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
-});
+}, true);
 
 wakeWindowInput.addEventListener("input", () => {
   const nextValue = Number(wakeWindowInput.value);
@@ -7318,6 +7570,7 @@ if (themeModeInput) {
     if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) {
       try { localStorage.setItem(storageKeys.themeMode, nextMode); } catch {}
       updateTheme();
+      renderGuestThemeButtons();
       return;
     }
 

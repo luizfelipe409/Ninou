@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-56-7-8-demo-premium-graficos";
+const CACHE_NAME = "ninou-v75-56-7-8-demo-app-store-premium";
 const APP_SHELL = [
   "/",
   "/index.html",
