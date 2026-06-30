@@ -196,7 +196,7 @@ export function renderDailyRhythm({
   }
 }
 
-export function renderIntelligentTimeline({ container, state, todayStart, dayMs = DAY, formatShortDuration, formatTime, limit = 10 }) {
+export function renderIntelligentTimeline({ container, state, todayStart, dayMs = DAY, formatShortDuration, formatTime, limit = 48 }) {
   if (!container) return;
   const events = sortEventsByStartAsc(getEventsForDay(state.events || [], todayStart, dayMs)).slice(-limit);
   if (!events.length) {

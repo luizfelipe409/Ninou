@@ -1328,6 +1328,25 @@ function ensureTodaySelectedForRoutineWrite() {
   renderAll();
 }
 
+
+function ensureTodaySelectedForView() {
+  const todayId = getCurrentDayId();
+  if (getSelectedDayId() === todayId) return false;
+
+  syncSelectedDayIntoFamilyCache();
+  setSelectedDiaryDayById(todayId);
+  state = getFamilyDayState(todayId);
+  saveLocalDayState();
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
+
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    void subscribeToCloudDay(todayId, { allowAutoLatest: false });
+  }
+
+  return true;
+}
+
 function normalizeEmail(value = "") {
   return String(value || "").trim().toLowerCase();
 }
@@ -3993,8 +4012,9 @@ function getAwakeEventInActiveWindow(start = Date.now(), excludeEventId = null) 
   const safeStart = Number(start);
   const windowStart = windowBase - 5 * 60000;
   const windowEnd = Math.max(Date.now() + 2 * 60000, safeStart + 2 * 60000);
+  const candidateEvents = getFamilyEventsForWindow(windowStart, windowEnd);
 
-  return (state.events || []).find((event) => (
+  return candidateEvents.find((event) => (
     event?.id !== excludeEventId &&
     event.type === "acordou" &&
     Number(event.start) >= windowStart &&
@@ -4505,18 +4525,21 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
   const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
 
-  const hasDeletedEvents = getDeletedEventIdsFromState(state).size > 0;
-  if (!dayStateHasVisibleContent(state) && !hasDeletedEvents) return;
+  const selectedDayId = getSelectedDayId();
+  const sourceState = safeDayId === selectedDayId
+    ? normalizeDayState(state)
+    : normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+
+  const hasDeletedEvents = getDeletedEventIdsFromState(sourceState).size > 0;
+  if (!dayStateHasVisibleContent(sourceState) && !hasDeletedEvents) return;
 
   try {
-    let dayPayload = normalizeDayState(state);
+    let dayPayload = sourceState;
 
     try {
       const currentSnapshot = await firebaseServices.getDoc(dayRef);
       if (currentSnapshot.exists()) {
         dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentSnapshot.data() || {});
-        state = dayPayload;
-        saveLocalDayState();
       }
     } catch (mergeError) {
       console.warn("Não foi possível mesclar rotina antes de salvar. Salvando estado local atual:", mergeError);
@@ -4530,10 +4553,19 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
       },
       { merge: true },
     );
+
     familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(dayPayload) };
-    if (!familyDayIdsCache.includes(safeDayId)) familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
+    if (dayStateHasVisibleContent(dayPayload) && !familyDayIdsCache.includes(safeDayId)) {
+      familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
+    }
     updateDiaryDateRangeFromFamilyDays();
-    renderAll();
+
+    if (safeDayId === selectedDayId) {
+      state = dayPayload;
+      saveLocalDayState();
+      renderAll();
+    }
+
     setSyncStatus("online", cloudUser.email);
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
@@ -4971,9 +5003,12 @@ function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, l
 function renderOrbit() {
   const now = Date.now();
   const dayAgo = now - 24 * hour;
-  const items = state.events
-    .filter((event) => event.start >= dayAgo)
-    .slice(-14)
+  const rollingEvents = getFamilyEventsForWindow(dayAgo, now)
+    .filter((event) => Number(event.start) >= dayAgo && Number(event.start) <= now)
+    .sort((a, b) => Number(a.start) - Number(b.start));
+
+  const items = rollingEvents
+    .slice(-48)
     .map((event) => ({
       event,
       active: false,
@@ -5015,6 +5050,7 @@ function renderOrbit() {
   });
 }
 
+
 function renderTimeline() {
   const lastCard = document.querySelector(".last-card .event-card");
   if (!timeline) return;
@@ -5037,7 +5073,7 @@ function renderTimeline() {
     timeline.append(createEmptyTimelineItem(getEventCardMarkup(null, { empty: true })));
   }
 
-  visibleEvents.slice(0, 8).forEach((event) => {
+  visibleEvents.forEach((event) => {
     const item = document.createElement("li");
     item.className = "event-card";
     item.innerHTML = getEventCardMarkup(event);
@@ -5332,13 +5368,20 @@ function renderIntelligentHomeSections() {
     countMedication: countMedicationEvents,
     formatShortDuration,
   });
+  const rolling24hStart = now - 24 * hour;
+  const rolling24hState = {
+    ...recentFamilyState,
+    events: getFamilyEventsForWindow(rolling24hStart, now),
+  };
+
   renderIntelligentTimeline({
     container: intelligentTimeline,
-    state,
-    todayStart,
-    dayMs: day,
+    state: rolling24hState,
+    todayStart: rolling24hStart,
+    dayMs: 24 * hour,
     formatShortDuration,
     formatTime,
+    limit: 48,
   });
   renderWeeklyOverview({
     container: weeklyOverview,
@@ -5953,6 +5996,19 @@ function showScreen(target) {
   // Visitantes podem navegar pelas telas para conhecer o Ninou.
   // O bloqueio acontece apenas nas ações que gravam/alteram dados via requireLogin().
   activeScreenName = target || activeScreenName;
+
+  if (activeScreenName === "today") {
+    ensureTodaySelectedForView();
+    if (firebaseServices && cloudUser && hasFamilyAccess()) {
+      void loadFamilyDayIds({ force: true }).then(() => {
+        orbitRenderSignature = "";
+        renderOrbit();
+        renderTodayHomeSections();
+        renderSupplementalReports();
+      });
+    }
+  }
+
   updateScreenVisibility({ target, navButtons, screens });
   renderBabyIdentity();
   updateBodyModeClasses();
@@ -6234,6 +6290,16 @@ function saveManualEvent() {
   }
 
   const existingEvent = payload.editingEventId ? getEventById(payload.editingEventId) : null;
+  const payloadDayId = getDayIdFromStart(payload.start);
+  const selectedBeforeSaveId = getSelectedDayId();
+
+  if (!existingEvent && payloadDayId !== selectedBeforeSaveId) {
+    syncSelectedDayIntoFamilyCache();
+    setSelectedDiaryDayById(payloadDayId);
+    state = getFamilyDayState(payloadDayId);
+    timelineRenderSignature = "";
+    orbitRenderSignature = "";
+  }
 
   if (payload.type === "acordou") {
     const duplicateWake = getAwakeEventInActiveWindow(payload.start, existingEvent?.id || null);
