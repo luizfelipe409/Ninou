@@ -8313,3 +8313,825 @@ body:has(#profileTabButton[aria-selected="true"]) {
     font-size: 0.76rem;
   }
 }
+
+/* v75.56.7.1 — perfil: legibilidade da coleção premium e espaçamento geral */
+.screen[data-screen="profile"] {
+  gap: 18px;
+  padding-bottom: max(168px, calc(132px + env(safe-area-inset-bottom, 0px)));
+}
+
+.settings-list {
+  gap: 16px;
+}
+
+.settings-list article,
+.settings-list > .appearance-profile-block,
+.settings-list > .weight-profile-block,
+.caregiver-profile-block,
+.admin-access-card,
+.login-card,
+.baby-profile-card {
+  gap: 14px;
+}
+
+.settings-list article {
+  padding: 18px 18px 20px;
+}
+
+.baby-profile-card label,
+.settings-list > .appearance-profile-block label,
+.settings-list > .weight-profile-block label,
+.caregiver-profile-block label,
+.invite-accept-box label {
+  gap: 8px;
+  line-height: 1.22;
+}
+
+.profile-card {
+  gap: 10px;
+  padding: 24px 20px 22px;
+}
+
+.profile-card #profileBabyName,
+.profile-card #profileBabyAge,
+.profile-card .avatar-only-badge {
+  text-align: center;
+}
+
+.profile-card #profileBabyAge {
+  line-height: 1.25;
+  max-width: 22rem;
+}
+
+.profile-card .avatar-only-badge {
+  white-space: normal;
+  max-width: 100%;
+}
+
+.avatar-edit-trigger {
+  width: min(100%, 220px);
+}
+
+.avatar-compact-card {
+  padding: 22px 18px 22px;
+}
+
+.avatar-minimal-header,
+.avatar-test-header.avatar-minimal-header {
+  grid-template-columns: minmax(0, 1fr) 168px;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+
+.compact-copy {
+  gap: 10px;
+  align-content: start;
+}
+
+.avatar-compact-card .avatar-test-header span {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.1;
+}
+
+.avatar-compact-card .avatar-test-header strong {
+  margin-top: 0;
+  font-size: clamp(1.72rem, 2.5vw, 2.12rem);
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+}
+
+.premium-inline-badges.compact-badges {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.premium-inline-badges.compact-badges span {
+  min-height: 32px;
+  line-height: 1.1;
+}
+
+.avatar-preview-wrap.avatar-preview-panel,
+.avatar-preview-wrap.minimal-preview-panel,
+.avatar-preview-panel.minimal-preview-panel {
+  width: 168px;
+  min-width: 168px;
+  min-height: 168px;
+  gap: 10px;
+  justify-self: end;
+}
+
+.avatar-compact-card .baby-avatar-preview,
+#babyAvatarPreview {
+  display: block;
+  margin-inline: auto;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.avatar-preview-caption,
+.avatar-preview-caption.minimal-caption {
+  line-height: 1.15;
+}
+
+body:not(.day-theme) .profile-card {
+  background: linear-gradient(180deg, rgba(34, 29, 76, 0.94), rgba(29, 25, 66, 0.95));
+  border-color: rgba(201, 192, 255, 0.18);
+  box-shadow: 0 22px 50px rgba(7, 8, 28, 0.26);
+}
+
+body:not(.day-theme) .profile-card::before {
+  background: radial-gradient(circle at top left, rgba(144, 112, 232, 0.24), transparent 50%), linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+}
+
+body:not(.day-theme) .avatar-only-badge {
+  background: rgba(150, 116, 239, 0.12);
+  border-color: rgba(201, 192, 255, 0.16);
+  color: #efe9ff;
+  box-shadow: none;
+}
+
+body:not(.day-theme) .avatar-compact-card {
+  background: linear-gradient(180deg, rgba(34, 29, 76, 0.96), rgba(28, 24, 63, 0.96));
+  border-color: rgba(201, 192, 255, 0.16);
+  box-shadow: 0 24px 54px rgba(5, 6, 24, 0.3);
+}
+
+body:not(.day-theme) .avatar-compact-card::before {
+  background: radial-gradient(circle at top left, rgba(145, 112, 235, 0.16), transparent 42%), radial-gradient(circle at top right, rgba(255,255,255,0.08), transparent 44%);
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-test-header span {
+  background: rgba(150, 116, 239, 0.12);
+  color: #d9ceff;
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-test-header strong {
+  color: #f6f2ff;
+}
+
+body:not(.day-theme) .premium-inline-badges.compact-badges span {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(201, 192, 255, 0.12);
+  color: #e6ddff;
+  box-shadow: none;
+}
+
+body:not(.day-theme) .avatar-preview-wrap.avatar-preview-panel,
+body:not(.day-theme) .avatar-preview-wrap.minimal-preview-panel,
+body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(201, 192, 255, 0.14);
+  box-shadow: none;
+}
+
+body:not(.day-theme) .avatar-preview-caption,
+body:not(.day-theme) .avatar-preview-caption.minimal-caption {
+  color: #c6bddf;
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-picker-section {
+  border-top-color: rgba(201, 192, 255, 0.12);
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-picker-section > strong {
+  color: #e6deff;
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice,
+body:not(.day-theme) .avatar-compact-card .avatar-option-row .avatar-choice {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(201, 192, 255, 0.14);
+  box-shadow: none;
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-choice small {
+  color: #f1ebff;
+}
+
+body:not(.day-theme) .avatar-compact-card .form-status {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(201, 192, 255, 0.12);
+  color: #cec5e6;
+}
+
+body.day-theme .avatar-compact-card .avatar-test-header strong {
+  color: #4b327e;
+}
+
+body.day-theme .premium-inline-badges.compact-badges span {
+  color: #6c54a6;
+}
+
+@media (max-width: 720px) {
+  .screen[data-screen="profile"] {
+    gap: 14px;
+    padding-bottom: max(160px, calc(128px + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .settings-list {
+    gap: 14px;
+  }
+
+  .settings-list article {
+    padding: 16px;
+  }
+
+  .profile-card {
+    padding: 20px 16px 18px;
+  }
+
+  .avatar-minimal-header,
+  .avatar-test-header.avatar-minimal-header {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .compact-copy {
+    gap: 8px;
+  }
+
+  .avatar-compact-card .avatar-test-header strong {
+    font-size: 1.64rem;
+  }
+
+  .avatar-preview-wrap.avatar-preview-panel,
+  .avatar-preview-wrap.minimal-preview-panel,
+  .avatar-preview-panel.minimal-preview-panel {
+    width: 100%;
+    min-width: 0;
+    min-height: 124px;
+    justify-self: stretch;
+    padding-inline: 14px;
+  }
+}
+
+/* v75.56.7.3 — padronização fina de espaçamentos + títulos dos avatares */
+.screen[data-screen="profile"] {
+  gap: 16px;
+}
+
+.settings-list {
+  gap: 16px;
+}
+
+.settings-list > * {
+  margin: 0;
+}
+
+.settings-list > article,
+.settings-list > section,
+.settings-list > div,
+.baby-profile-card,
+.caregiver-profile-block,
+.appearance-profile-block,
+.weight-profile-block,
+.admin-access-card,
+.login-card {
+  scroll-margin-top: 18px;
+}
+
+.avatar-compact-card {
+  gap: 18px;
+}
+
+.avatar-compact-card .avatar-picker-section {
+  gap: 12px;
+}
+
+.avatar-compact-card .avatar-picker-section > strong {
+  display: block;
+  margin-bottom: 2px;
+  line-height: 1.18;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  gap: 12px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  padding: 14px 10px 12px;
+  min-height: 162px;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-preset-thumb {
+  flex: 0 0 auto;
+}
+
+.avatar-compact-card .avatar-choice small {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-wrap: balance;
+  max-width: 100%;
+  min-height: 2.35em;
+  margin: 0 auto;
+  padding-inline: 2px;
+  line-height: 1.16;
+}
+
+.avatar-compact-card .avatar-option-row {
+  gap: 10px;
+}
+
+.avatar-compact-card .avatar-option-row .avatar-choice {
+  min-height: 78px;
+}
+
+@media (max-width: 720px) {
+  .screen[data-screen="profile"] {
+    gap: 14px;
+  }
+
+  .settings-list {
+    gap: 14px;
+  }
+
+  .avatar-compact-card {
+    gap: 16px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid {
+    gap: 10px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 154px;
+    padding: 12px 8px 11px;
+  }
+
+  .avatar-compact-card .avatar-choice small {
+    font-size: 0.8rem;
+    min-height: 2.3em;
+  }
+}
+
+@media (max-width: 380px) {
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 148px;
+  }
+
+  .avatar-compact-card .avatar-choice small {
+    font-size: 0.78rem;
+  }
+}
+
+
+/* v75.56.7.3 — revisão geral de espaçamentos: Perfil, Home e Diário */
+:root {
+  --v7573-card-gap: 16px;
+  --v7573-card-pad: 18px;
+  --v7573-card-radius: 24px;
+  --v7573-small-gap: 10px;
+}
+
+.screen[data-screen="today"],
+.screen[data-screen="diary"],
+.screen[data-screen="profile"] {
+  gap: var(--v7573-card-gap);
+}
+
+.screen[data-screen="today"] > *,
+.screen[data-screen="diary"] > *,
+.screen[data-screen="profile"] > * {
+  min-width: 0;
+}
+
+.drawer-section-title,
+.today-overview-head,
+.chart-title,
+.section-title,
+.weight-profile-header,
+.breast-timer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.drawer-section-title > div,
+.today-overview-head > div,
+.chart-title > div,
+.section-title > div,
+.weight-profile-header > div {
+  min-width: 0;
+}
+
+.drawer-section-title span,
+.today-overview-head span,
+.chart-title span,
+.section-title span,
+.settings-list article > span,
+.avatar-compact-card .avatar-picker-section > strong {
+  line-height: 1.16;
+}
+
+.drawer-section-title strong,
+.today-overview-head strong,
+.chart-title strong,
+.section-title strong,
+.settings-list article > strong {
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+}
+
+.drawer-section-title .ghost-link,
+.today-overview-head .ghost-link,
+.chart-title .ghost-link,
+.section-title .ghost-link {
+  flex: 0 0 auto;
+  margin-left: auto;
+  line-height: 1.1;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.summary-grid article,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.today-last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.settings-list article,
+.baby-profile-card,
+.avatar-compact-card,
+.login-card,
+.caregiver-profile-block,
+.admin-access-card {
+  border-radius: var(--v7573-card-radius);
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.today-last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.settings-list article,
+.baby-profile-card,
+.login-card,
+.caregiver-profile-block,
+.admin-access-card {
+  padding: var(--v7573-card-pad);
+}
+
+.today-overview-grid,
+.summary-grid,
+.quick-actions,
+.start-choice,
+.daily-rhythm,
+.weekly-overview,
+.today-last-events,
+.notification-center-list,
+.timeline,
+.settings-list {
+  gap: var(--v7573-card-gap);
+}
+
+.quick-actions-heading {
+  margin-top: 2px;
+}
+
+.quick-actions button,
+.start-choice button {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.quick-actions button > span:last-child,
+.start-choice button > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.18;
+}
+
+.state-orbit {
+  margin-bottom: 2px;
+}
+
+.main-action-area {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.today-overview-card p,
+.smart-insight-card p,
+.gentle-alert-card p,
+.live-assistant-card p,
+.day-summary-card p,
+.growth-card p,
+.day-story-card p,
+.section-helper,
+.chart-helper {
+  line-height: 1.42;
+}
+
+/* Diário: data, filtros, cards e observações com respiro consistente */
+.screen[data-screen="diary"] .section-title {
+  margin-bottom: 0;
+}
+
+.screen[data-screen="diary"] .date-filter {
+  gap: 8px;
+}
+
+.screen[data-screen="diary"] .chips-shell {
+  margin: 0;
+}
+
+.screen[data-screen="diary"] .chips {
+  gap: 10px;
+}
+
+.screen[data-screen="diary"] .chips button {
+  min-height: 42px;
+  padding-inline: 16px;
+  line-height: 1.1;
+}
+
+.timeline .event-card {
+  padding: 16px;
+  border-radius: 24px;
+  gap: 14px;
+  min-width: 0;
+}
+
+.timeline .event-card .mark {
+  flex: 0 0 auto;
+}
+
+.timeline .event-main,
+.timeline .event-text {
+  min-width: 0;
+}
+
+.timeline .event-text strong {
+  line-height: 1.16;
+}
+
+.timeline .event-text span,
+.timeline .event-text p {
+  line-height: 1.36;
+}
+
+.timeline .event-actions {
+  gap: 9px;
+}
+
+.timeline .event-action-button {
+  min-height: 36px;
+  max-width: 100%;
+}
+
+.day-notes-card textarea {
+  line-height: 1.38;
+}
+
+.day-notes-actions {
+  gap: 10px;
+}
+
+/* Perfil: padronização entre cards e campos */
+.screen[data-screen="profile"] {
+  padding-bottom: max(172px, calc(132px + env(safe-area-inset-bottom, 0px)));
+}
+
+.profile-card,
+.settings-list article {
+  width: 100%;
+}
+
+.settings-list {
+  gap: var(--v7573-card-gap);
+}
+
+.settings-list article {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-list article > p,
+.settings-list article .form-status,
+.settings-list article small {
+  line-height: 1.38;
+}
+
+.settings-list label {
+  display: grid;
+  gap: 8px;
+  line-height: 1.22;
+}
+
+.settings-list input,
+.settings-list select,
+.settings-list textarea {
+  min-height: 50px;
+}
+
+.profile-card {
+  gap: 10px;
+}
+
+.profile-card #profileBabyName,
+.profile-card #profileBabyAge,
+.profile-card .avatar-only-badge {
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.profile-card #profileBabyAge {
+  line-height: 1.26;
+}
+
+/* Avatares: títulos nunca saem do card */
+.avatar-compact-card {
+  display: grid;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.avatar-minimal-header,
+.avatar-test-header.avatar-minimal-header {
+  min-width: 0;
+}
+
+.avatar-copy-column.compact-copy {
+  min-width: 0;
+}
+
+.avatar-compact-card .avatar-test-header strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.premium-inline-badges.compact-badges {
+  max-width: 100%;
+}
+
+.avatar-compact-card .avatar-picker-section {
+  min-width: 0;
+  padding-top: 16px;
+  margin-top: 0;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  display: grid;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  min-width: 0;
+  min-height: 166px;
+  overflow: hidden;
+  padding: 14px 10px 12px;
+  border-radius: 22px;
+  grid-template-rows: 88px minmax(38px, auto);
+  align-content: center !important;
+  justify-items: center !important;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-preset-thumb {
+  width: 84px !important;
+  height: 84px !important;
+  max-width: 100%;
+}
+
+.avatar-compact-card .avatar-choice small {
+  width: 100%;
+  max-width: 100%;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: normal !important;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-align: center;
+  line-height: 1.16;
+  min-height: 2.35em;
+  padding-inline: 2px;
+  margin: 0 auto;
+}
+
+.avatar-compact-card .avatar-choice.selected {
+  transform: none !important;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --v7573-card-gap: 14px;
+    --v7573-card-pad: 16px;
+    --v7573-card-radius: 22px;
+  }
+
+  .phone-shell {
+    padding-inline: 14px;
+  }
+
+  .screen[data-screen="profile"] {
+    padding-bottom: max(164px, calc(126px + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .drawer-section-title,
+  .today-overview-head,
+  .chart-title,
+  .section-title {
+    gap: 10px;
+  }
+
+  .screen[data-screen="diary"] .chips {
+    gap: 8px;
+  }
+
+  .screen[data-screen="diary"] .chips button {
+    min-height: 40px;
+    padding-inline: 14px;
+  }
+
+  .timeline .event-card {
+    padding: 15px;
+    border-radius: 22px;
+  }
+
+  .avatar-compact-card {
+    gap: 16px;
+  }
+
+  .avatar-minimal-header,
+  .avatar-test-header.avatar-minimal-header {
+    gap: 14px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid {
+    gap: 10px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 154px;
+    padding: 12px 8px 11px;
+    grid-template-rows: 80px minmax(36px, auto);
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+  .avatar-preset-thumb {
+    width: 76px !important;
+    height: 76px !important;
+  }
+
+  .avatar-compact-card .avatar-choice small {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .phone-shell {
+    padding-inline: 12px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 150px;
+    padding-inline: 7px;
+  }
+
+  .avatar-compact-card .avatar-choice small {
+    font-size: 0.77rem;
+    line-height: 1.14;
+  }
+}
