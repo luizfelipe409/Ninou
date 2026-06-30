@@ -1,6 +1,6 @@
-// Ninou v75.56.3 - refinamento final geral premium
+// Ninou v75.56.4.1 - polimento fino visual
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.56.3";
+const NINOU_APP_VERSION = "75.56.4.1";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

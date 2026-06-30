@@ -7778,7 +7778,7 @@ body:has(#profileTabButton[aria-selected="true"]) {
 }
 
 
-/* v75.56.3 — refinamento final geral: premium clean, home mais editorial e perfil App Store-like */
+/* v75.56.4.1 — refinamento final geral: premium clean, home mais editorial e perfil App Store-like */
 :root {
   --v7563-bg: #f8f6fc;
   --v7563-surface: rgba(255, 255, 255, 0.96);
@@ -8533,5 +8533,724 @@ body.global-admin-mode .bottom-nav button:not([data-target="profile"]) {
   .start-choice button,
   .main-action-area .primary-action {
     transition: none !important;
+  }
+}
+
+
+/* v75.56.4.1.1 — correções de UX: órbita 24h, timeline, contraste e avatares */
+:root {
+  --v7564-ink: #352a59;
+  --v7564-title: #43376d;
+  --v7564-muted: #6a5f8b;
+  --v7564-soft: #8b7eaf;
+  --v7564-chip: #f3eeff;
+  --v7564-border: rgba(203, 193, 233, 0.58);
+}
+
+.phone-shell,
+body.day-theme .phone-shell,
+body:not(.day-theme) .phone-shell {
+  color: var(--v7564-ink);
+}
+
+.state-orbit,
+body.day-theme .state-orbit,
+body:not(.day-theme) .state-orbit,
+body.day-theme[data-routine-mode="awake"] .state-orbit,
+body.day-theme[data-day-period="morning"] .state-orbit {
+  min-height: 306px;
+  padding: 14px 18px 24px;
+}
+
+.orbit-ring {
+  width: 252px !important;
+  height: 252px !important;
+  border-width: 22px !important;
+}
+
+.orbit-ring::before {
+  width: 22px;
+  height: 22px;
+  left: 6px;
+  bottom: 28px;
+  box-shadow: 196px 0 0 rgba(214, 154, 60, 0.16);
+}
+
+body:not(.day-theme) .orbit-ring::before {
+  box-shadow: 196px 0 0 rgba(143, 124, 255, 0.12);
+}
+
+.orbit-events {
+  inset: 12px;
+}
+
+.orbit-event {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.orbit-event i {
+  width: 24px;
+  height: 24px;
+}
+
+.state-orbit > span,
+.state-orbit p,
+body.day-theme .state-orbit > span,
+body.day-theme .state-orbit p,
+body:not(.day-theme) .state-orbit > span,
+body:not(.day-theme) .state-orbit p {
+  color: var(--v7564-muted);
+}
+
+.state-orbit strong,
+body.day-theme .state-orbit strong,
+body:not(.day-theme) .state-orbit strong {
+  color: var(--v7564-title);
+}
+
+.intelligent-timeline-card,
+body.day-theme .intelligent-timeline-card,
+body:not(.day-theme) .intelligent-timeline-card {
+  background: rgba(255,255,255,0.97);
+}
+
+.intelligent-timeline {
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.intelligent-timeline::before {
+  left: 84px;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(139, 106, 228, 0.12), rgba(139, 106, 228, 0.34), rgba(124, 229, 194, 0.16));
+}
+
+.intelligent-timeline-item {
+  grid-template-columns: 72px 38px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 9px 0;
+}
+
+.intelligent-timeline-item time {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  align-self: start;
+  min-height: 28px;
+  margin-top: 2px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--v7564-chip);
+  border: 1px solid var(--v7564-border);
+  color: #5c4b92;
+  font-size: 0.73rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.intelligent-timeline-item .mark {
+  width: 38px;
+  height: 38px;
+  margin-top: -1px;
+}
+
+.intelligent-timeline-item > div {
+  min-width: 0;
+  padding: 2px 0 14px;
+  border-bottom: 1px solid rgba(226, 219, 244, 0.56);
+}
+
+.intelligent-timeline-item:last-child > div {
+  padding-bottom: 4px;
+  border-bottom: 0;
+}
+
+.intelligent-timeline-item strong,
+body.day-theme .intelligent-timeline-item strong,
+body:not(.day-theme) .intelligent-timeline-item strong {
+  color: var(--v7564-title);
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.intelligent-timeline-item span,
+body.day-theme .intelligent-timeline-item span,
+body:not(.day-theme) .intelligent-timeline-item span {
+  color: var(--v7564-muted);
+  font-size: 0.84rem;
+  line-height: 1.34;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.profile-hero-note,
+.avatar-compact-card .avatar-test-header p {
+  display: none !important;
+}
+
+.avatar-only-badge,
+#profilePhotoButtonText {
+  color: #5c4695;
+}
+
+.avatar-compact-card,
+body.day-theme .avatar-compact-card,
+body:not(.day-theme) .avatar-compact-card,
+.profile-card,
+body.day-theme .profile-card,
+body:not(.day-theme) .profile-card {
+  color: var(--v7564-ink);
+}
+
+.avatar-compact-card .avatar-test-header span,
+.avatar-preview-caption.minimal-caption,
+.avatar-compact-card .form-status,
+.avatar-compact-card .avatar-test-header strong + p,
+.profile-card strong#profileBabyAge,
+body.day-theme .profile-card strong#profileBabyAge,
+body:not(.day-theme) .profile-card strong#profileBabyAge {
+  color: var(--v7564-muted);
+}
+
+.avatar-compact-card .avatar-test-header strong,
+.avatar-compact-card .avatar-picker-section > strong,
+.avatar-compact-card .avatar-choice small,
+.profile-card span#profileBabyName,
+body.day-theme .profile-card span#profileBabyName,
+body:not(.day-theme) .profile-card span#profileBabyName {
+  color: var(--v7564-title);
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-preset-thumb,
+.avatar-compact-card .baby-avatar-preview,
+.profile-card img#profilePhoto {
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-preset-thumb {
+  margin-inline: auto;
+}
+
+.avatar-compact-card .avatar-choice.selected {
+  transform: none;
+}
+
+.avatar-compact-card .avatar-choice.selected::after {
+  top: 9px;
+  right: 9px;
+}
+
+@media (max-width: 430px) {
+  .state-orbit,
+  body.day-theme .state-orbit,
+  body:not(.day-theme) .state-orbit,
+  body.day-theme[data-routine-mode="awake"] .state-orbit,
+  body.day-theme[data-day-period="morning"] .state-orbit {
+    min-height: 298px;
+    padding: 14px 14px 22px;
+  }
+
+  .orbit-ring {
+    width: min(244px, calc(100vw - 120px)) !important;
+    height: min(244px, calc(100vw - 120px)) !important;
+  }
+
+  .intelligent-timeline::before {
+    left: 76px;
+  }
+
+  .intelligent-timeline-item {
+    grid-template-columns: 64px 34px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .intelligent-timeline-item time {
+    min-height: 26px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+  }
+
+  .intelligent-timeline-item .mark {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (max-width: 360px) {
+  .intelligent-timeline::before {
+    left: 72px;
+  }
+
+  .intelligent-timeline-item {
+    grid-template-columns: 60px 32px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .intelligent-timeline-item time {
+    min-height: 24px;
+    font-size: 0.68rem;
+    padding: 0 7px;
+  }
+}
+
+
+/* v75.56.4.1 — polimento fino visual: microalinhamentos, timeline e avatares */
+:root {
+  --v75641-title: #3f3368;
+  --v75641-text: #3a315a;
+  --v75641-muted: #655b84;
+  --v75641-soft: #8b7fac;
+  --v75641-border: rgba(203, 193, 233, 0.52);
+  --v75641-border-soft: rgba(221, 214, 241, 0.44);
+  --v75641-surface: rgba(255,255,255,0.975);
+  --v75641-soft-surface: rgba(250,247,255,0.96);
+  --v75641-brand: #7257cf;
+  --v75641-brand-2: #8b6ae4;
+}
+
+/* Home — microalinhamentos finais */
+.app-header {
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.today-topline {
+  min-height: 36px;
+  align-items: center;
+  margin: 0 2px 0;
+}
+
+.today-topline span {
+  color: var(--v75641-muted);
+  line-height: 1.25;
+}
+
+.today-topline .ghost-link,
+.today-overview-head .ghost-link,
+button.ghost-link {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+.state-orbit,
+body.day-theme .state-orbit,
+body:not(.day-theme) .state-orbit,
+body.day-theme[data-routine-mode="awake"] .state-orbit,
+body.day-theme[data-day-period="morning"] .state-orbit {
+  min-height: 310px;
+  padding: 20px 18px 24px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 7px;
+}
+
+.state-orbit > span,
+.state-orbit p,
+body.day-theme .state-orbit > span,
+body.day-theme .state-orbit p,
+body:not(.day-theme) .state-orbit > span,
+body:not(.day-theme) .state-orbit p {
+  position: relative;
+  z-index: 3;
+  color: var(--v75641-muted);
+  max-width: 275px;
+  text-align: center;
+}
+
+.state-orbit strong,
+body.day-theme .state-orbit strong,
+body:not(.day-theme) .state-orbit strong {
+  position: relative;
+  z-index: 3;
+  color: var(--v75641-title);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.94;
+}
+
+.orbit-ring {
+  width: 240px !important;
+  height: 240px !important;
+  border-width: 20px !important;
+}
+
+.orbit-ring::before {
+  width: 20px !important;
+  height: 20px !important;
+  left: 5px !important;
+  bottom: 26px !important;
+  box-shadow: 188px 0 0 rgba(143,124,255,0.12) !important;
+}
+
+body.day-theme .orbit-ring::before {
+  box-shadow: 188px 0 0 rgba(214,154,60,0.14) !important;
+}
+
+.orbit-events {
+  inset: 18px;
+  transform: scale(0.98);
+  transform-origin: center;
+}
+
+.orbit-event {
+  transform: translate(-50%, -50%) scale(0.92);
+}
+
+.orbit-event i {
+  width: 23px;
+  height: 23px;
+}
+
+.main-action-area {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.main-action-area .primary-action,
+.start-choice button {
+  gap: 12px !important;
+}
+
+.main-action-area .primary-action > span:last-child::before,
+.start-choice button > span:last-child::before {
+  content: none !important;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.product-experience-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+body.day-theme .today-overview-card,
+body.day-theme .smart-insight-card,
+body.day-theme .gentle-alert-card,
+body.day-theme .notification-center-card,
+body.day-theme .live-assistant-card,
+body.day-theme .product-experience-card,
+body.day-theme .routine-progress-card,
+body.day-theme .intelligent-timeline-card,
+body.day-theme .weekly-overview-card,
+body.day-theme .day-story-card,
+body:not(.day-theme) .today-overview-card,
+body:not(.day-theme) .smart-insight-card,
+body:not(.day-theme) .gentle-alert-card,
+body:not(.day-theme) .notification-center-card,
+body:not(.day-theme) .live-assistant-card,
+body:not(.day-theme) .product-experience-card,
+body:not(.day-theme) .routine-progress-card,
+body:not(.day-theme) .intelligent-timeline-card,
+body:not(.day-theme) .weekly-overview-card,
+body:not(.day-theme) .day-story-card {
+  color: var(--v75641-text);
+  background: var(--v75641-surface);
+  border-color: var(--v75641-border-soft);
+}
+
+.today-overview-card {
+  padding: 16px;
+  border-radius: 24px;
+}
+
+.today-overview-head {
+  align-items: start;
+}
+
+.today-overview-grid {
+  gap: 8px;
+}
+
+.today-overview-grid article {
+  min-height: 72px;
+  padding: 11px 10px;
+}
+
+.today-overview-grid strong,
+.today-overview-head strong,
+.drawer-section-title strong,
+body.day-theme .today-overview-grid strong,
+body:not(.day-theme) .today-overview-grid strong {
+  color: var(--v75641-title);
+}
+
+.today-overview-grid span,
+.today-overview-suggestion,
+.drawer-section-title span,
+.gentle-alert-card p,
+.smart-insight-card p,
+body.day-theme .today-overview-grid span,
+body:not(.day-theme) .today-overview-grid span {
+  color: var(--v75641-muted);
+}
+
+/* Timeline — acabamento final sem sobreposição */
+.intelligent-timeline {
+  gap: 2px;
+  margin-top: 9px;
+}
+
+.intelligent-timeline::before {
+  left: 78px !important;
+  top: 17px;
+  bottom: 18px;
+  background: linear-gradient(180deg, rgba(114,87,207,0.10), rgba(114,87,207,0.34), rgba(124,229,194,0.14));
+}
+
+.intelligent-timeline-item {
+  grid-template-columns: 66px 36px minmax(0,1fr) !important;
+  gap: 10px !important;
+  align-items: start !important;
+  padding: 9px 0 !important;
+}
+
+.intelligent-timeline-item time {
+  justify-self: end;
+  align-self: start;
+  min-width: 54px;
+  max-width: 64px;
+  min-height: 27px;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #f4efff;
+  border: 1px solid var(--v75641-border);
+  color: #5c4a93 !important;
+  font-size: 0.7rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.intelligent-timeline-item .mark {
+  width: 36px !important;
+  height: 36px !important;
+  margin-top: -2px;
+}
+
+.intelligent-timeline-item > div {
+  min-width: 0;
+  padding: 1px 0 13px;
+  border-bottom: 1px solid rgba(222,214,241,0.52);
+}
+
+.intelligent-timeline-item:last-child > div {
+  border-bottom: 0;
+}
+
+.intelligent-timeline-item strong {
+  color: var(--v75641-title) !important;
+  font-size: 0.94rem;
+  line-height: 1.18;
+}
+
+.intelligent-timeline-item span {
+  color: var(--v75641-muted) !important;
+  font-size: 0.83rem;
+  line-height: 1.32;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+
+/* Perfil e avatares — acabamento premium final */
+.profile-hero-note,
+.avatar-compact-card .avatar-test-header p {
+  display: none !important;
+}
+
+.avatar-only-badge,
+#profilePhotoButtonText {
+  color: #5c4695 !important;
+}
+
+.profile-card,
+.avatar-compact-card {
+  color: var(--v75641-text);
+}
+
+.profile-card span#profileBabyName,
+.avatar-compact-card .avatar-test-header strong,
+.avatar-compact-card .avatar-picker-section > strong,
+.avatar-compact-card .avatar-choice small {
+  color: var(--v75641-title) !important;
+}
+
+.profile-card strong#profileBabyAge,
+.avatar-preview-caption.minimal-caption,
+.avatar-compact-card .form-status,
+.avatar-compact-card .avatar-test-header span {
+  color: var(--v75641-muted) !important;
+}
+
+.avatar-compact-card {
+  padding: 17px 15px 18px;
+  border-radius: 28px;
+}
+
+.avatar-minimal-header {
+  gap: 11px;
+}
+
+.premium-inline-badges.compact-badges {
+  gap: 7px;
+}
+
+.premium-inline-badges.compact-badges span {
+  min-height: 28px;
+  padding: 5px 10px;
+  font-size: 0.74rem;
+  color: #5f4b91 !important;
+}
+
+.minimal-preview-panel {
+  min-height: 104px;
+  align-items: center;
+}
+
+.avatar-compact-card .baby-avatar-preview {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  gap: 9px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  min-height: 150px;
+  padding: 11px 7px 10px;
+  align-content: start;
+  justify-items: center;
+  gap: 7px;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-preset-thumb {
+  width: 82px;
+  height: 82px;
+  margin-inline: auto;
+  object-fit: cover;
+  object-position: center;
+}
+
+.avatar-compact-card .avatar-choice small {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  text-align: center;
+  line-height: 1.12;
+}
+
+.avatar-compact-card .avatar-choice.selected {
+  transform: none !important;
+}
+
+.avatar-compact-card .avatar-choice.selected::after {
+  width: 23px;
+  height: 23px;
+  top: 8px;
+  right: 8px;
+}
+
+.avatar-compact-card .avatar-editor-actions {
+  margin-top: 14px;
+  padding-top: 14px;
+}
+
+.avatar-compact-card .avatar-save-button,
+.avatar-compact-card .avatar-skip-button {
+  min-height: 48px;
+}
+
+@media (max-width: 430px) {
+  .state-orbit,
+  body.day-theme .state-orbit,
+  body:not(.day-theme) .state-orbit,
+  body.day-theme[data-routine-mode="awake"] .state-orbit,
+  body.day-theme[data-day-period="morning"] .state-orbit {
+    min-height: 300px;
+  }
+
+  .orbit-ring {
+    width: min(232px, calc(100vw - 128px)) !important;
+    height: min(232px, calc(100vw - 128px)) !important;
+    border-width: 19px !important;
+  }
+
+  .orbit-events {
+    inset: 20px;
+    transform: scale(0.94);
+  }
+
+  .intelligent-timeline::before {
+    left: 74px !important;
+  }
+
+  .intelligent-timeline-item {
+    grid-template-columns: 62px 34px minmax(0,1fr) !important;
+    gap: 9px !important;
+  }
+
+  .intelligent-timeline-item time {
+    min-width: 50px;
+    max-width: 58px;
+    min-height: 25px;
+    padding: 0 6px;
+    font-size: 0.68rem;
+  }
+
+  .intelligent-timeline-item .mark {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 146px;
+  }
+
+  .avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb,
+  .avatar-preset-thumb {
+    width: 78px;
+    height: 78px;
+  }
+}
+
+@media (max-width: 360px) {
+  .intelligent-timeline::before {
+    left: 68px !important;
+  }
+
+  .intelligent-timeline-item {
+    grid-template-columns: 56px 32px minmax(0,1fr) !important;
+    gap: 8px !important;
+  }
+
+  .intelligent-timeline-item time {
+    min-width: 46px;
+    font-size: 0.66rem;
   }
 }

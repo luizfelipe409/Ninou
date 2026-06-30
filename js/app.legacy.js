@@ -697,7 +697,7 @@ function renderAvatarCustomizer() {
 function updatePendingAvatar(type, value) {
   pendingBabyAvatar = normalizeAvatarDraft({ ...pendingBabyAvatar, [type]: value });
   renderAvatarCustomizer();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar avatar para aplicar.";
+  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar para aplicar.";
 }
 
 function saveBabyAvatarFromDraft() {
@@ -714,7 +714,7 @@ function saveBabyAvatarFromDraft() {
   renderAvatarCustomizer();
   renderBabyIdentity();
   scheduleProfileCloudSave();
-  closeAvatarEditor("Avatar salvo com sucesso. O editor foi fechado para manter o perfil limpo.");
+  closeAvatarEditor("Avatar salvo com sucesso.");
   if (loginHelper) loginHelper.textContent = "Avatar salvo com sucesso.";
 }
 
@@ -4062,7 +4062,7 @@ function renderBabyIdentity() {
   } else {
     applyAvatarPreview(babyProfile.avatar || pendingBabyAvatar);
     if (profilePhoto) profilePhoto.src = getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatar 3D Soft";
+    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Coleção premium";
   }
   updateBodyModeClasses();
 }
@@ -4771,7 +4771,7 @@ function eventPosition(timestamp) {
   const startAngle = 142;
   const arcSize = 256;
   const angle = ((startAngle + progress * arcSize) * Math.PI) / 180;
-  const radius = 132;
+  const radius = 112;
   return {
     x: Math.round(Math.cos(angle) * radius),
     y: Math.round(Math.sin(angle) * radius),
@@ -6726,7 +6726,7 @@ if (saveBabyAvatarButton) saveBabyAvatarButton.addEventListener("click", saveBab
 if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
   pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || {});
   renderAvatarCustomizer();
-  closeAvatarEditor("Editor fechado. O avatar atual foi mantido.");
+  closeAvatarEditor("Editor fechado.");
 });
 
 if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
