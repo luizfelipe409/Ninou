@@ -219,7 +219,7 @@ export function renderIntelligentTimeline({ container, state, todayStart, dayMs 
   const windowEnd = todayStart + dayMs;
   const events = sortEventsByStartAsc(dedupeIntelligenceEvents((state.events || []).filter((event) => eventOverlapsIntelligenceWindow(event, todayStart, windowEnd)))).slice(-limit);
   if (!events.length) {
-    container.innerHTML = `<article class="timeline-empty">A linha do tempo aparecerá assim que você registrar mamadas, sono, fraldas ou medicamentos.</article>`;
+    container.innerHTML = `<article class="timeline-empty">Ainda não há registros suficientes. Comece com sono, mamada, fralda ou medicamento para montar a linha do tempo inteligente.</article>`;
     return;
   }
 

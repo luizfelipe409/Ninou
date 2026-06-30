@@ -9135,3 +9135,600 @@ body.day-theme .premium-inline-badges.compact-badges span {
     line-height: 1.14;
   }
 }
+
+/* v75.56.7.5 — modo visitante premium + ajustes finais de perfil */
+:root {
+  --guest-card-bg: rgba(18, 16, 48, 0.82);
+  --guest-card-border: rgba(201, 192, 255, 0.24);
+  --guest-card-shadow: 0 22px 54px rgba(5, 6, 24, 0.36);
+}
+
+body.day-theme {
+  --guest-card-bg: rgba(255, 248, 238, 0.88);
+  --guest-card-border: rgba(122, 88, 146, 0.16);
+  --guest-card-shadow: 0 22px 54px rgba(116, 94, 145, 0.16);
+}
+
+/* Perfil: contraste corrigido no modo escuro */
+body:not(.day-theme) .screen[data-screen="profile"] .profile-card,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-compact-card,
+body:not(.day-theme) .screen[data-screen="profile"] .settings-list article {
+  color: var(--ink);
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] .profile-card #profileBabyName,
+body:not(.day-theme) .screen[data-screen="profile"] .profile-card #profileBabyAge,
+body:not(.day-theme) .screen[data-screen="profile"] .profile-card strong,
+body:not(.day-theme) .screen[data-screen="profile"] .profile-card span,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-compact-card .avatar-test-header strong,
+body:not(.day-theme) .screen[data-screen="profile"] .baby-profile-card strong,
+body:not(.day-theme) .screen[data-screen="profile"] .settings-list strong {
+  color: #f7f3ff !important;
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] .profile-card #profileBabyAge,
+body:not(.day-theme) .screen[data-screen="profile"] .settings-list p,
+body:not(.day-theme) .screen[data-screen="profile"] .settings-list label,
+body:not(.day-theme) .screen[data-screen="profile"] .form-status,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-preview-caption,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-compact-card .avatar-test-header span {
+  color: #cfc6eb !important;
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-only-badge,
+body:not(.day-theme) .screen[data-screen="profile"] #profilePhotoButtonText {
+  color: #f3edff !important;
+  background: rgba(143, 124, 255, 0.16) !important;
+  border-color: rgba(201, 192, 255, 0.22) !important;
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] input,
+body:not(.day-theme) .screen[data-screen="profile"] select,
+body:not(.day-theme) .screen[data-screen="profile"] textarea {
+  color: #f7f3ff;
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(201, 192, 255, 0.16);
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] input::placeholder,
+body:not(.day-theme) .screen[data-screen="profile"] textarea::placeholder {
+  color: rgba(247, 243, 255, 0.42);
+}
+
+/* Perfil: respiro revisado sem deixar buracos no final */
+.screen[data-screen="profile"] {
+  gap: 15px;
+  padding-bottom: max(132px, calc(106px + env(safe-area-inset-bottom, 0px)));
+}
+
+.settings-list {
+  gap: 15px;
+}
+
+.settings-list article {
+  gap: 13px;
+}
+
+.profile-card,
+.avatar-compact-card,
+.settings-list article {
+  scroll-margin-top: 16px;
+}
+
+/* Diário: reduz espaço excessivo após o card Zerar dia mantendo proteção da barra inferior */
+.screen[data-screen="diary"] .danger-card {
+  margin-bottom: -10px;
+}
+
+body:not(.global-admin-mode) .phone-shell {
+  padding-bottom: 92px;
+}
+
+@media (max-width: 430px) {
+  body:not(.global-admin-mode) .phone-shell {
+    padding-bottom: 96px;
+  }
+
+  .screen[data-screen="profile"] {
+    padding-bottom: max(132px, calc(106px + env(safe-area-inset-bottom, 0px)));
+  }
+}
+
+/* Modo visitante premium: mostra uma prévia bonita em vez de esconder tudo */
+body.guest-locked .screen.active[data-screen="diary"],
+body.guest-locked .screen.active[data-screen="trends"],
+body.guest-locked .screen.active[data-screen="sounds"] {
+  display: grid !important;
+}
+
+body.guest-locked .screen.active:not([data-screen="profile"]) {
+  position: relative;
+  min-height: 430px;
+  isolation: isolate;
+}
+
+body.guest-locked .screen.active:not([data-screen="profile"]) > * {
+  filter: blur(3px) saturate(0.88);
+  opacity: 0.48;
+  pointer-events: none !important;
+  user-select: none;
+}
+
+body.guest-locked .screen.active:not([data-screen="profile"])::before {
+  content: "";
+  position: absolute;
+  inset: -8px -2px 0;
+  z-index: 8;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 24% 12%, rgba(143, 124, 255, 0.20), transparent 32%),
+    linear-gradient(180deg, rgba(16, 16, 41, 0.28), rgba(16, 16, 41, 0.08));
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+body.day-theme.guest-locked .screen.active:not([data-screen="profile"])::before {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255, 211, 122, 0.22), transparent 30%),
+    linear-gradient(180deg, rgba(255, 246, 235, 0.26), rgba(255, 246, 235, 0.08));
+}
+
+body.guest-locked .screen.active:not([data-screen="profile"])::after {
+  position: sticky;
+  top: 18px;
+  z-index: 9;
+  width: min(100%, 360px);
+  justify-self: center;
+  display: block;
+  padding: 22px 20px;
+  border-radius: 28px;
+  border: 1px solid var(--guest-card-border);
+  background: var(--guest-card-bg);
+  color: #f7f3ff;
+  box-shadow: var(--guest-card-shadow);
+  text-align: left;
+  white-space: pre-line;
+  line-height: 1.35;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+body.day-theme.guest-locked .screen.active:not([data-screen="profile"])::after {
+  color: #302454;
+}
+
+body.guest-locked .screen.active[data-screen="today"]::after {
+  content: "Rotina ao vivo do bebê\A\ARegistre sono, mamadas, fraldas e medicamentos em poucos toques. Entre para acompanhar o dia em tempo real com relógio, lembretes e resumo inteligente.";
+}
+
+body.guest-locked .screen.active[data-screen="diary"]::after {
+  content: "Diário completo da rotina\A\AVeja todos os registros do dia, edite informações, salve observações e compartilhe relatórios com quem cuida do bebê. Entre para acessar o histórico familiar.";
+}
+
+body.guest-locked .screen.active[data-screen="trends"]::after {
+  content: "Dados e evolução\A\AEntenda padrões de sono, alimentação, fraldas, peso e crescimento com gráficos simples. Entre para visualizar os dados da família com segurança.";
+}
+
+body.guest-locked .screen.active[data-screen="sounds"]::after {
+  content: "Sons para a rotina de descanso\A\AUse sons leves para criar um ambiente mais calmo na hora de dormir. Entre para personalizar a experiência do bebê.";
+}
+
+/* Visitante: botão flutuante vira CTA elegante */
+body.guest-locked .fab {
+  width: min(220px, calc(100vw - 40px));
+  height: 56px;
+  right: max(14px, calc((100vw - 430px) / 2 + 14px));
+  bottom: 94px;
+  border-radius: 999px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+body.guest-locked .fab.icon-button-add::before {
+  display: none !important;
+}
+
+body.guest-locked .fab.icon-button-add::after {
+  content: "Entrar para registrar";
+  position: static;
+  width: auto;
+  height: auto;
+  display: block;
+  transform: none;
+  background: transparent;
+  border-radius: 0;
+  color: currentColor;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  body.guest-locked .screen.active:not([data-screen="profile"])::after {
+    padding: 20px 18px;
+    border-radius: 24px;
+    font-size: 0.94rem;
+  }
+
+  body.guest-locked .fab {
+    width: min(204px, calc(100vw - 34px));
+    height: 54px;
+    right: 12px;
+    bottom: 88px;
+    font-size: 0.86rem;
+  }
+}
+
+/* v75.56.7.6 — onboarding premium + estados vazios profissionais */
+.guest-welcome-card,
+.privacy-note-card {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(201, 192, 255, 0.18);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(143, 124, 255, 0.16), transparent 38%),
+    rgba(34, 29, 76, 0.76);
+  padding: 18px;
+  color: var(--ink);
+  box-shadow: 0 18px 42px rgba(6, 7, 28, 0.18);
+}
+
+body.day-theme .guest-welcome-card,
+body.day-theme .privacy-note-card {
+  border-color: rgba(122, 88, 146, 0.16);
+  background:
+    radial-gradient(circle at top left, rgba(255, 211, 122, 0.24), transparent 38%),
+    rgba(255, 243, 229, 0.86);
+  color: #302454;
+  box-shadow: 0 18px 38px rgba(116, 94, 145, 0.12);
+}
+
+body:not(.guest-locked) .guest-welcome-card {
+  display: none !important;
+}
+
+.guest-welcome-card > span,
+.privacy-note-card > span,
+.guest-premium-card > span,
+.guest-login-dialog > span {
+  color: var(--sage);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.day-theme .guest-welcome-card > span,
+body.day-theme .privacy-note-card > span,
+body.day-theme .guest-premium-card > span,
+body.day-theme .guest-login-dialog > span {
+  color: #7d5d3d;
+}
+
+.guest-welcome-card > strong,
+.privacy-note-card > strong,
+.guest-premium-card > strong,
+.guest-login-dialog > strong {
+  display: block;
+  font-size: clamp(1.22rem, 4vw, 1.55rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.guest-welcome-card p,
+.privacy-note-card p,
+.guest-premium-card p,
+.guest-login-dialog p {
+  margin: 0;
+  color: rgba(247, 243, 255, 0.74);
+  line-height: 1.45;
+  font-weight: 750;
+}
+
+body.day-theme .guest-welcome-card p,
+body.day-theme .privacy-note-card p,
+body.day-theme .guest-premium-card p,
+body.day-theme .guest-login-dialog p {
+  color: rgba(48, 36, 84, 0.68);
+}
+
+.guest-benefit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.guest-benefit-grid article {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  min-height: 56px;
+  border: 1px solid rgba(201, 192, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  padding: 10px;
+}
+
+body.day-theme .guest-benefit-grid article {
+  border-color: rgba(122, 88, 146, 0.12);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.guest-benefit-grid b {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(143, 124, 255, 0.14);
+  color: var(--plum-soft);
+}
+
+body.day-theme .guest-benefit-grid b {
+  background: rgba(122, 88, 146, 0.08);
+  color: #765d3e;
+}
+
+.guest-benefit-grid small {
+  color: inherit;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.guest-welcome-actions,
+.guest-premium-actions,
+.guest-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.guest-welcome-actions button,
+.guest-premium-actions button,
+.guest-modal-actions button {
+  min-height: 48px;
+  border-radius: 16px;
+  font-weight: 950;
+  border: 1px solid rgba(201, 192, 255, 0.18);
+}
+
+.guest-welcome-actions button:first-child,
+.guest-premium-actions button:first-child,
+.guest-modal-actions button:first-child {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(135deg, var(--plum), #9d7cf4);
+  box-shadow: 0 14px 26px rgba(143, 124, 255, 0.22);
+}
+
+.guest-welcome-actions button:last-child,
+.guest-premium-actions button:last-child,
+.guest-modal-actions button:last-child {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+body.day-theme .guest-welcome-actions button:last-child,
+body.day-theme .guest-premium-actions button:last-child,
+body.day-theme .guest-modal-actions button:last-child {
+  color: #302454;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+/* Card real do modo visitante: substitui o texto pseudo-elemento e permite ações */
+body.guest-locked .screen.active:not([data-screen="profile"])::after {
+  display: none !important;
+  content: none !important;
+}
+
+body.guest-locked .screen.active:not([data-screen="profile"]) {
+  padding-top: 4px;
+}
+
+body.guest-locked .guest-premium-card {
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  user-select: auto !important;
+}
+
+.guest-premium-card {
+  position: sticky;
+  top: 14px;
+  z-index: 10;
+  display: grid;
+  gap: 12px;
+  width: min(100%, 376px);
+  justify-self: center;
+  border: 1px solid var(--guest-card-border);
+  border-radius: 30px;
+  background: var(--guest-card-bg);
+  color: #f7f3ff;
+  padding: 20px;
+  box-shadow: var(--guest-card-shadow);
+}
+
+body.day-theme .guest-premium-card {
+  color: #302454;
+}
+
+.guest-demo-label {
+  width: max-content;
+  max-width: 100%;
+  border-radius: 999px;
+  background: rgba(124, 229, 194, 0.12);
+  color: var(--sage);
+  padding: 6px 10px;
+  font-size: 0.74rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+body.day-theme .guest-demo-label {
+  background: rgba(59, 169, 141, 0.10);
+  color: #2f7b68;
+}
+
+.guest-demo-list {
+  display: grid;
+  gap: 8px;
+}
+
+.guest-demo-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(201, 192, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.065);
+  padding: 10px 12px;
+}
+
+body.day-theme .guest-demo-row {
+  border-color: rgba(122, 88, 146, 0.11);
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.guest-demo-row span {
+  color: rgba(247, 243, 255, 0.68);
+  font-weight: 900;
+}
+
+body.day-theme .guest-demo-row span {
+  color: rgba(48, 36, 84, 0.62);
+}
+
+.guest-demo-row strong {
+  color: inherit;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.guest-login-modal[hidden] {
+  display: none !important;
+}
+
+.guest-login-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(5, 6, 24, 0.52);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.guest-login-dialog {
+  position: relative;
+  width: min(100%, 360px);
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--guest-card-border);
+  border-radius: 30px;
+  background: var(--guest-card-bg);
+  color: #f7f3ff;
+  padding: 24px 20px 20px;
+  box-shadow: var(--guest-card-shadow);
+}
+
+body.day-theme .guest-login-dialog {
+  color: #302454;
+}
+
+.guest-modal-close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(201, 192, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-size: 1.25rem;
+}
+
+/* Estados vazios para usuário logado: visual mais acolhedor */
+.event-card.empty-event,
+.timeline-empty,
+.mini-event.empty,
+.empty-state {
+  border: 1px dashed rgba(201, 192, 255, 0.24) !important;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.055) !important;
+  color: rgba(247, 243, 255, 0.74) !important;
+  padding: 15px !important;
+}
+
+body.day-theme .event-card.empty-event,
+body.day-theme .timeline-empty,
+body.day-theme .mini-event.empty,
+body.day-theme .empty-state {
+  border-color: rgba(122, 88, 146, 0.16) !important;
+  background: rgba(255, 255, 255, 0.46) !important;
+  color: rgba(48, 36, 84, 0.68) !important;
+}
+
+.event-card.empty-event strong,
+.timeline-empty strong,
+.mini-event.empty strong,
+.empty-state strong {
+  color: var(--ink);
+}
+
+body.day-theme .event-card.empty-event strong,
+body.day-theme .timeline-empty strong,
+body.day-theme .mini-event.empty strong,
+body.day-theme .empty-state strong {
+  color: #302454;
+}
+
+.privacy-note-card {
+  padding: 16px;
+  border-radius: 24px;
+}
+
+@media (max-width: 430px) {
+  .guest-welcome-card,
+  .guest-premium-card,
+  .guest-login-dialog {
+    border-radius: 26px;
+    padding: 18px;
+  }
+
+  .guest-welcome-actions,
+  .guest-premium-actions,
+  .guest-modal-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .guest-benefit-grid {
+    gap: 8px;
+  }
+
+  .guest-benefit-grid article {
+    grid-template-columns: 30px minmax(0, 1fr);
+    padding: 9px;
+  }
+
+  .guest-benefit-grid b {
+    width: 30px;
+    height: 30px;
+    border-radius: 11px;
+  }
+}

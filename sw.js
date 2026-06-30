@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-56-7-4-corrige-tempo-acordado-registros";
+const CACHE_NAME = "ninou-v75-56-7-6-onboarding-premium-estados-vazios";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.56.7.4",
-  "/css/app.legacy.css?v=75.56.7.4",
-  "/app.js?v=75.56.7.4",
-  "/js/app.legacy.js?v=75.56.7.4",
+  "/styles.css?v=75.56.7.6",
+  "/css/app.legacy.css?v=75.56.7.6",
+  "/app.js?v=75.56.7.6",
+  "/js/app.legacy.js?v=75.56.7.6",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

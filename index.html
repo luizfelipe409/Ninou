@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.56.7.4" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.7.6" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -477,6 +477,22 @@
           <div class="avatar-only-badge" id="profilePhotoButtonText">Coleção premium</div>
           <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
+
+        <section id="guestWelcomeCard" class="guest-welcome-card" aria-label="Boas-vindas ao Ninou">
+          <span>Bem-vindo ao Ninou</span>
+          <strong>A rotina do bebê organizada em família.</strong>
+          <p>Acompanhe sono, mamadas, fraldas, medicamentos e crescimento com registros simples, gráficos e relatórios prontos para compartilhar.</p>
+          <div class="guest-benefit-grid" aria-label="Recursos do Ninou">
+            <article><b>⏱</b><small>Relógio de rotina</small></article>
+            <article><b>☰</b><small>Diário por data</small></article>
+            <article><b>▥</b><small>Dados e gráficos</small></article>
+            <article><b>♪</b><small>Sons de descanso</small></article>
+          </div>
+          <div class="guest-welcome-actions">
+            <button id="guestWelcomeLoginButton" type="button">Entrar</button>
+            <button id="guestWelcomeInviteButton" type="button">Tenho convite</button>
+          </div>
+        </section>
         <section class="settings-list">
           <article class="baby-profile-card">
             <span>Perfil do bebê</span>
@@ -588,6 +604,12 @@
               <button id="loginButton" type="button">Entrar</button>
               <button id="createAccountButton" class="secondary-login" type="button">Criar conta</button>
             </div>
+          </article>
+
+          <article class="privacy-note-card">
+            <span>Privacidade</span>
+            <strong>Dados familiares e avatar sem foto real</strong>
+            <p>Os dados do bebê ficam vinculados à família autorizada. O Ninou usa avatares locais e não depende de armazenamento externo de foto real.</p>
           </article>
 
           <article class="caregiver-profile-block" id="caregiverIdentityCard">
@@ -912,6 +934,19 @@
         <button type="button" data-target="profile"><span class="nav-symbol" aria-hidden="true">○</span><span>Perfil</span></button>
       </nav>
     </main>
+
+    <section id="guestOnboardingModal" class="guest-login-modal" aria-label="Entrar no Ninou" hidden>
+      <div class="guest-login-dialog" role="dialog" aria-modal="true" aria-labelledby="guestLoginTitle">
+        <button id="guestModalCloseButton" class="guest-modal-close" type="button" aria-label="Fechar">×</button>
+        <span>Conta familiar</span>
+        <strong id="guestLoginTitle">Entre para salvar a rotina</strong>
+        <p>Os registros ficam seguros na família e podem ser acompanhados em mais de um celular.</p>
+        <div class="guest-modal-actions">
+          <button id="guestModalLoginButton" type="button">Entrar agora</button>
+          <button id="guestModalInviteButton" type="button">Usar convite</button>
+        </div>
+      </div>
+    </section>
 
     <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
     <section id="recordSheet" class="record-sheet" aria-label="Novo registro" hidden>

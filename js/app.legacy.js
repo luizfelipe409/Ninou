@@ -125,6 +125,13 @@ const createFamilyButton = document.querySelector("#createFamilyButton");
 const inviteCodeInput = document.querySelector("#inviteCodeInput");
 const acceptInviteButton = document.querySelector("#acceptInviteButton");
 const inviteAcceptBox = document.querySelector(".invite-accept-box");
+const guestWelcomeCard = document.querySelector("#guestWelcomeCard");
+const guestWelcomeLoginButton = document.querySelector("#guestWelcomeLoginButton");
+const guestWelcomeInviteButton = document.querySelector("#guestWelcomeInviteButton");
+const guestOnboardingModal = document.querySelector("#guestOnboardingModal");
+const guestModalCloseButton = document.querySelector("#guestModalCloseButton");
+const guestModalLoginButton = document.querySelector("#guestModalLoginButton");
+const guestModalInviteButton = document.querySelector("#guestModalInviteButton");
 const adminInvitePanel = document.querySelector("#adminInvitePanel");
 const adminInviteEmail = document.querySelector("#adminInviteEmail");
 const adminInviteRole = document.querySelector("#adminInviteRole");
@@ -609,6 +616,115 @@ function applyGuestInteractionLock() {
     if (babyAvatarCard) babyAvatarCard.hidden = true;
     if (editBabyAvatarButton) editBabyAvatarButton.hidden = true;
   }
+  if (guestWelcomeCard) guestWelcomeCard.hidden = !locked;
+  renderGuestPremiumContent();
+}
+
+const guestPremiumContent = {
+  today: {
+    kicker: "Prévia do Ninou",
+    title: "Rotina ao vivo do bebê",
+    text: "Veja em tempo real quanto tempo o bebê está acordado, quando foi a última soneca e quais cuidados precisam de atenção.",
+    rows: [
+      ["Soneca", "09:30–10:20"],
+      ["Mamadeira", "120 ml"],
+      ["Fralda", "Mista"],
+    ],
+  },
+  diary: {
+    kicker: "Histórico familiar",
+    title: "Diário completo por data",
+    text: "Tenha registros editáveis, observações do dia e histórico organizado para todos os cuidadores autorizados.",
+    rows: [
+      ["Hoje", "Sono, mamadas e fraldas"],
+      ["Observações", "Notas salvas por data"],
+      ["Relatório", "PDF e WhatsApp"],
+    ],
+  },
+  trends: {
+    kicker: "Leitura da rotina",
+    title: "Dados e padrões do bebê",
+    text: "Entenda sono, alimentação, fraldas, peso e crescimento com gráficos simples e fáceis de acompanhar.",
+    rows: [
+      ["Sono", "Média recente"],
+      ["Alimentação", "Mamadas e ml"],
+      ["Crescimento", "Peso do bebê"],
+    ],
+  },
+  sounds: {
+    kicker: "Descanso",
+    title: "Sons suaves para dormir",
+    text: "Apoie a rotina de descanso com sons leves, pensados para momentos calmos do bebê.",
+    rows: [
+      ["Som do útero", "Conforto"],
+      ["Som relaxante", "Sono"],
+      ["Ritmo suave", "Rotina"],
+    ],
+  },
+};
+
+function removeGuestPremiumCards() {
+  document.querySelectorAll(".guest-premium-card").forEach((card) => card.remove());
+}
+
+function getGuestPremiumCardMarkup(screenKey) {
+  const item = guestPremiumContent[screenKey] || guestPremiumContent.today;
+  const rows = item.rows.map(([label, value]) => `
+    <article class="guest-demo-row">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </article>
+  `).join("");
+  return `
+    <span>${escapeHtml(item.kicker)}</span>
+    <strong>${escapeHtml(item.title)}</strong>
+    <p>${escapeHtml(item.text)}</p>
+    <div class="guest-demo-label">Exemplo de acompanhamento</div>
+    <div class="guest-demo-list">${rows}</div>
+    <div class="guest-premium-actions">
+      <button type="button" data-guest-action="login">Entrar agora</button>
+      <button type="button" data-guest-action="invite">Tenho convite</button>
+    </div>
+  `;
+}
+
+function renderGuestPremiumContent() {
+  removeGuestPremiumCards();
+  if (isLoggedIn()) return;
+  const activeScreen = document.querySelector('.screen.active:not([data-screen="profile"])');
+  if (!activeScreen) return;
+  const key = activeScreen.dataset.screen || "today";
+  const card = document.createElement("section");
+  card.className = "guest-premium-card";
+  card.setAttribute("aria-label", "Prévia do Ninou");
+  card.innerHTML = getGuestPremiumCardMarkup(key);
+  activeScreen.prepend(card);
+}
+
+function closeGuestLoginModal() {
+  if (guestOnboardingModal) guestOnboardingModal.hidden = true;
+}
+
+function openGuestLoginModal() {
+  if (isLoggedIn()) {
+    showScreen("profile");
+    return;
+  }
+  if (guestOnboardingModal) guestOnboardingModal.hidden = false;
+}
+
+function focusProfileAccess(mode = "login") {
+  closeGuestLoginModal();
+  showScreen("profile");
+  window.setTimeout(() => {
+    const target = mode === "invite" ? inviteAcceptBox : loginHelper?.closest(".login-card");
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (mode === "invite") {
+      inviteCodeInput?.focus();
+    } else {
+      loginEmail?.focus();
+    }
+  }, 180);
 }
 
 function openAvatarEditor() {
@@ -1304,11 +1420,14 @@ function requireLogin(actionText = "usar o Ninou") {
     return false;
   }
   setSyncStatus(isLoggedIn() ? "loading" : "offline", cloudUser?.email || "");
+  if (!isLoggedIn()) {
+    openGuestLoginModal();
+    if (loginHelper) loginHelper.textContent = `Entre para ${actionText}. Seus registros ficam salvos com segurança na família.`;
+    return false;
+  }
   showScreen("profile");
   if (loginHelper) {
-    loginHelper.textContent = isLoggedIn()
-      ? `Sua conta precisa estar vinculada a uma família para ${actionText}. Use um convite do administrador do app.`
-      : `Entre com uma conta autorizada para ${actionText}. Novos usuários entram por convite do administrador do app.`;
+    loginHelper.textContent = `Sua conta precisa estar vinculada a uma família para ${actionText}. Use um convite do administrador do app.`;
   }
   return false;
 }
@@ -5857,7 +5976,7 @@ function renderDaySummaryCard() {
   const baby = getBabyDisplayName();
   if (daySummaryMoment) daySummaryMoment.textContent = new Date(now).getHours() >= 20 ? "Fechamento do dia" : "Resumo em tempo real";
   if (!events.length) {
-    daySummaryText.textContent = `Nenhum registro ainda. Quando ${baby} mamar, dormir ou trocar fralda, toque em um botão rápido para o Ninou montar o resumo automaticamente.`;
+    daySummaryText.textContent = `Ainda não há registros hoje. Comece com sono, mamada, fralda ou medicamento para o Ninou montar um resumo acolhedor do dia.`;
     return;
   }
   const latestTitle = latest ? getEventConfig(latest.type).title.toLowerCase() : "registro";
@@ -6179,6 +6298,7 @@ function showScreen(target) {
   updateScreenVisibility({ target, navButtons, screens });
   renderBabyIdentity();
   updateBodyModeClasses();
+  renderGuestPremiumContent();
 }
 
 function setDiaryFilter(filter) {
@@ -7019,6 +7139,21 @@ if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exp
 if (exportStartDateInput) exportStartDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
+if (guestWelcomeLoginButton) guestWelcomeLoginButton.addEventListener("click", () => focusProfileAccess("login"));
+if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
+if (guestModalCloseButton) guestModalCloseButton.addEventListener("click", closeGuestLoginModal);
+if (guestModalLoginButton) guestModalLoginButton.addEventListener("click", () => focusProfileAccess("login"));
+if (guestModalInviteButton) guestModalInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
+if (guestOnboardingModal) {
+  guestOnboardingModal.addEventListener("click", (event) => {
+    if (event.target === guestOnboardingModal) closeGuestLoginModal();
+  });
+}
+document.addEventListener("click", (event) => {
+  const guestAction = event.target.closest("[data-guest-action]");
+  if (!guestAction) return;
+  focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
+});
 
 wakeWindowInput.addEventListener("input", () => {
   const nextValue = Number(wakeWindowInput.value);
