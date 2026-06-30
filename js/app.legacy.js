@@ -622,46 +622,184 @@ function applyGuestInteractionLock() {
 
 const guestPremiumContent = {
   today: {
-    kicker: "Prévia do Ninou",
-    title: "Rotina ao vivo do bebê",
-    text: "Veja em tempo real quanto tempo o bebê está acordado, quando foi a última soneca e quais cuidados precisam de atenção.",
-    rows: [
-      ["Soneca", "09:30–10:20"],
-      ["Mamadeira", "120 ml"],
-      ["Fralda", "Mista"],
+    kicker: "Demonstração premium",
+    title: "Rotina ao vivo, clara e compartilhada",
+    text: "Uma prévia realista de como o Ninou organiza sono, mamadas, fraldas e alertas ao longo do dia.",
+    accent: "Exemplo de hoje",
+    metrics: [
+      { label: "Acordado agora", value: "44 min", note: "desde 12:35" },
+      { label: "Sono hoje", value: "3h05", note: "1 soneca" },
+      { label: "Mamadas", value: "4", note: "420 ml + peito" },
+      { label: "Fraldas", value: "3", note: "2 xixi · 1 mista" },
     ],
+    chartTitle: "Ritmo do dia",
+    chartSubtitle: "Dados fictícios para visualização",
+    bars: [
+      { label: "06h", value: "Sono", height: 68 },
+      { label: "08h", value: "Acordou", height: 34 },
+      { label: "10h", value: "Soneca", height: 82 },
+      { label: "12h", value: "Mamou", height: 48 },
+      { label: "14h", value: "Alerta", height: 58 },
+    ],
+    timeline: [
+      { time: "07:41", title: "Acordou", detail: "Começo do dia" },
+      { time: "09:30", title: "Soneca", detail: "3h05 de sono" },
+      { time: "12:42", title: "Mamadeira", detail: "120 ml" },
+    ],
+    insight: "O app cruza os registros para mostrar o tempo acordado correto, última soneca e próximos cuidados.",
   },
   diary: {
-    kicker: "Histórico familiar",
+    kicker: "Histórico demonstrativo",
     title: "Diário completo por data",
-    text: "Tenha registros editáveis, observações do dia e histórico organizado para todos os cuidadores autorizados.",
-    rows: [
-      ["Hoje", "Sono, mamadas e fraldas"],
-      ["Observações", "Notas salvas por data"],
-      ["Relatório", "PDF e WhatsApp"],
+    text: "Veja como os registros ficam organizados por horário, tipo de cuidado e observações da família.",
+    accent: "Exemplo de 30/06",
+    metrics: [
+      { label: "Registros", value: "11", note: "no dia" },
+      { label: "Sono", value: "3h05", note: "concluído" },
+      { label: "Mamadas", value: "5", note: "peito e mamadeira" },
+      { label: "Fraldas", value: "4", note: "com detalhes" },
     ],
+    chartTitle: "Registros por período",
+    chartSubtitle: "Manhã, tarde e noite",
+    bars: [
+      { label: "Madrugada", value: "2", height: 34 },
+      { label: "Manhã", value: "6", height: 86 },
+      { label: "Tarde", value: "3", height: 56 },
+      { label: "Noite", value: "1", height: 26 },
+    ],
+    timeline: [
+      { time: "03:18", title: "Amamentação", detail: "lado esquerdo" },
+      { time: "07:41", title: "Acordou", detail: "registrado pela mãe" },
+      { time: "12:35", title: "Fim da soneca", detail: "tempo acordado recalculado" },
+    ],
+    insight: "Cada dia fica separado: ao virar meia-noite, a rotina visual recomeça e o histórico permanece no diário.",
   },
   trends: {
-    kicker: "Leitura da rotina",
-    title: "Dados e padrões do bebê",
-    text: "Entenda sono, alimentação, fraldas, peso e crescimento com gráficos simples e fáceis de acompanhar.",
-    rows: [
-      ["Sono", "Média recente"],
-      ["Alimentação", "Mamadas e ml"],
-      ["Crescimento", "Peso do bebê"],
+    kicker: "Gráficos de exemplo",
+    title: "Padrões de sono, alimentação e crescimento",
+    text: "Dados fictícios ajudam o usuário a entender como os gráficos reais aparecerão depois dos primeiros registros.",
+    accent: "Últimos 7 dias",
+    metrics: [
+      { label: "Sono médio", value: "14h20", note: "por dia" },
+      { label: "Mamadas", value: "8/dia", note: "média" },
+      { label: "Fraldas", value: "6/dia", note: "média" },
+      { label: "Peso", value: "+420 g", note: "evolução" },
     ],
+    chartTitle: "Sono nos últimos dias",
+    chartSubtitle: "Exemplo fictício de tendência",
+    bars: [
+      { label: "Seg", value: "13h", height: 62 },
+      { label: "Ter", value: "14h", height: 72 },
+      { label: "Qua", value: "13h40", height: 68 },
+      { label: "Qui", value: "15h", height: 88 },
+      { label: "Sex", value: "14h20", height: 78 },
+      { label: "Sáb", value: "14h50", height: 84 },
+      { label: "Dom", value: "15h10", height: 90 },
+    ],
+    timeline: [
+      { time: "Peso", title: "3,82 kg", detail: "evolução semanal" },
+      { time: "Sono", title: "mais regular", detail: "padrão noturno" },
+      { time: "Fraldas", title: "dentro da média", detail: "acompanhamento diário" },
+    ],
+    insight: "Quando houver dados reais, o Ninou troca esta demonstração por gráficos da família.",
   },
   sounds: {
-    kicker: "Descanso",
-    title: "Sons suaves para dormir",
-    text: "Apoie a rotina de descanso com sons leves, pensados para momentos calmos do bebê.",
-    rows: [
-      ["Som do útero", "Conforto"],
-      ["Som relaxante", "Sono"],
-      ["Ritmo suave", "Rotina"],
+    kicker: "Rotina de descanso",
+    title: "Sons suaves com contexto de uso",
+    text: "A prévia mostra como a tela pode apoiar momentos de sono com escolhas simples e acompanhamento visual.",
+    accent: "Exemplo de uso",
+    metrics: [
+      { label: "Favorito", value: "Útero", note: "som contínuo" },
+      { label: "Sessão", value: "28 min", note: "até relaxar" },
+      { label: "Volume", value: "Baixo", note: "ambiente calmo" },
+      { label: "Rotina", value: "Noite", note: "pré-sono" },
     ],
+    chartTitle: "Uso nos últimos descansos",
+    chartSubtitle: "Dados fictícios de demonstração",
+    bars: [
+      { label: "Útero", value: "42min", height: 88 },
+      { label: "Relaxar", value: "25min", height: 58 },
+      { label: "Ritmo", value: "18min", height: 42 },
+    ],
+    timeline: [
+      { time: "20:10", title: "Som do útero", detail: "preparar o berço" },
+      { time: "20:32", title: "Relaxar", detail: "volume baixo" },
+      { time: "20:45", title: "Dormiu", detail: "rotina concluída" },
+    ],
+    insight: "A tela fica simples para o uso noturno, sem poluir a experiência da família.",
   },
 };
+
+function getGuestMetricMarkup(metric) {
+  return `
+    <article class="guest-showcase-metric">
+      <span>${escapeHtml(metric.label)}</span>
+      <strong>${escapeHtml(metric.value)}</strong>
+      <small>${escapeHtml(metric.note)}</small>
+    </article>
+  `;
+}
+
+function getGuestBarMarkup(bar) {
+  const height = Math.max(18, Math.min(96, Number(bar.height) || 40));
+  return `
+    <span class="guest-chart-bar" style="--h:${height}%">
+      <i aria-hidden="true"></i>
+      <b>${escapeHtml(bar.label)}</b>
+      <em>${escapeHtml(bar.value)}</em>
+    </span>
+  `;
+}
+
+function getGuestTimelineMarkup(row) {
+  return `
+    <article class="guest-showcase-row">
+      <time>${escapeHtml(row.time)}</time>
+      <div>
+        <strong>${escapeHtml(row.title)}</strong>
+        <span>${escapeHtml(row.detail)}</span>
+      </div>
+    </article>
+  `;
+}
+
+function getGuestPremiumCardMarkup(screenKey) {
+  const item = guestPremiumContent[screenKey] || guestPremiumContent.today;
+  const metrics = item.metrics.map(getGuestMetricMarkup).join("");
+  const bars = item.bars.map(getGuestBarMarkup).join("");
+  const timeline = item.timeline.map(getGuestTimelineMarkup).join("");
+
+  return `
+    <div class="guest-showcase-hero">
+      <span>${escapeHtml(item.kicker)}</span>
+      <strong>${escapeHtml(item.title)}</strong>
+      <p>${escapeHtml(item.text)}</p>
+    </div>
+
+    <div class="guest-showcase-panel" aria-label="Demonstração fictícia do Ninou">
+      <div class="guest-showcase-topline">
+        <span>${escapeHtml(item.accent)}</span>
+        <b>Dados fictícios</b>
+      </div>
+      <div class="guest-showcase-metrics">${metrics}</div>
+      <div class="guest-showcase-chart-card">
+        <div>
+          <span>${escapeHtml(item.chartTitle)}</span>
+          <strong>${escapeHtml(item.chartSubtitle)}</strong>
+        </div>
+        <div class="guest-showcase-bars" style="--bar-count:${item.bars.length}" aria-hidden="true">${bars}</div>
+      </div>
+      <div class="guest-showcase-timeline">${timeline}</div>
+    </div>
+
+    <p class="guest-showcase-insight">${escapeHtml(item.insight)}</p>
+
+    <div class="guest-premium-actions">
+      <button type="button" data-guest-action="login">Entrar agora</button>
+      <button type="button" data-guest-action="invite">Tenho convite</button>
+    </div>
+  `;
+}
 
 function removeGuestPremiumCards() {
   document.querySelectorAll(".guest-premium-card").forEach((card) => card.remove());
@@ -696,8 +834,15 @@ function renderGuestPremiumContent() {
   const key = activeScreen.dataset.screen || "today";
   const card = document.createElement("section");
   card.className = "guest-premium-card";
-  card.setAttribute("aria-label", "Prévia do Ninou");
+  card.setAttribute("aria-label", "Prévia premium do Ninou");
   card.innerHTML = getGuestPremiumCardMarkup(key);
+  card.addEventListener("click", (event) => {
+    const guestAction = event.target.closest("[data-guest-action]");
+    if (!guestAction) return;
+    event.preventDefault();
+    event.stopPropagation();
+    focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
+  });
   activeScreen.prepend(card);
 }
 
@@ -716,15 +861,24 @@ function openGuestLoginModal() {
 function focusProfileAccess(mode = "login") {
   closeGuestLoginModal();
   showScreen("profile");
+
+  const wantsInvite = mode === "invite";
+  if (loginHelper) {
+    loginHelper.textContent = wantsInvite
+      ? "Entre ou crie sua conta para usar o convite. Depois cole o código recebido pelo administrador."
+      : "Entre para salvar a rotina com segurança e acompanhar o bebê em família.";
+  }
+
   window.setTimeout(() => {
-    const target = mode === "invite" ? inviteAcceptBox : loginHelper?.closest(".login-card");
+    const loginCard = loginHelper?.closest(".login-card");
+    const target = wantsInvite && isLoggedIn() ? inviteAcceptBox : loginCard;
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (mode === "invite") {
+    if (wantsInvite && isLoggedIn()) {
       inviteCodeInput?.focus();
     } else {
       loginEmail?.focus();
     }
-  }, 180);
+  }, 220);
 }
 
 function openAvatarEditor() {
