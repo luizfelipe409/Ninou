@@ -27,6 +27,7 @@ export function createEmptyDayState() {
     lastWakeWindowStartedAt: null,
     lastWakeWindowMs: null,
     events: [],
+    deletedEventIds: [],
     auditLog: [],
     dayNotes: "",
   };
@@ -109,6 +110,9 @@ export function normalizeDayState(dayState = {}) {
     lastWakeWindowStartedAt: Number.isFinite(lastWakeWindowStartedAt) ? lastWakeWindowStartedAt : null,
     lastWakeWindowMs: Number.isFinite(lastWakeWindowMs) && lastWakeWindowMs > 0 ? lastWakeWindowMs : null,
     events: Array.isArray(dayState.events) ? dayState.events.map(normalizeEvent).filter(Boolean) : [],
+    deletedEventIds: Array.isArray(dayState.deletedEventIds)
+      ? [...new Set(dayState.deletedEventIds.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()))].slice(-240)
+      : [],
     auditLog: Array.isArray(dayState.auditLog)
       ? dayState.auditLog.slice(-60).map((item = {}) => ({
           id: typeof item.id === "string" ? item.id : `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,

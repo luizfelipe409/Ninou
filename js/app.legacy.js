@@ -1529,21 +1529,38 @@ function getDayIdFromStart(startValue = getDayStart()) {
   return toDateInputValue(getDayStart(Number(startValue) || Date.now()));
 }
 
+function dayStateHasVisibleContent(dayState = {}) {
+  return hasRoutineDayContent(dayState) || Boolean(String(dayState?.dayNotes || "").trim());
+}
+
 function syncSelectedDayIntoFamilyCache() {
   const dayId = getSelectedDayId();
   if (!isDateId(dayId)) return;
+
+  const selectedState = normalizeDayState(state);
+  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
+  const selectedHasVisibleContent = dayStateHasVisibleContent(selectedState);
+  const cachedHasVisibleContent = dayStateHasVisibleContent(cachedState);
+
   familyDayStatesCache = {
     ...familyDayStatesCache,
-    [dayId]: normalizeDayState(state),
+    [dayId]: selectedHasVisibleContent || !cachedHasVisibleContent ? selectedState : cachedState,
   };
-  if (hasRoutineDayContent(state) && !familyDayIdsCache.includes(dayId)) {
+
+  if (selectedHasVisibleContent && !familyDayIdsCache.includes(dayId)) {
     familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
   }
 }
 
 function getFamilyDayState(dayId) {
-  if (dayId === getSelectedDayId()) return normalizeDayState(state);
-  return normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
+  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
+  if (dayId === getSelectedDayId()) {
+    const selectedState = normalizeDayState(state);
+    return dayStateHasVisibleContent(selectedState) || !dayStateHasVisibleContent(cachedState)
+      ? selectedState
+      : cachedState;
+  }
+  return cachedState;
 }
 
 function getFamilyEventsForWindow(windowStart, windowEnd) {
@@ -3941,6 +3958,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 
 function saveDayState() {
   saveLocalDayState();
+  syncSelectedDayIntoFamilyCache();
   scheduleDayCloudSave();
 }
 
@@ -3948,12 +3966,54 @@ function formatEventMeta(event) {
   return formatRoutineEventMeta(event);
 }
 
-function addAwakeEvent(start = Date.now(), detail = "Acordou", notes = "") {
+function getActiveAwakeWindowStart() {
+  if (state.mode !== "awake") return null;
+  const startedAt = Number(state.activeStartedAt);
+  return Number.isFinite(startedAt) ? startedAt : null;
+}
+
+function getDedupAwakeWindowStart(start = Date.now()) {
+  const activeStart = getActiveAwakeWindowStart();
+  if (!Number.isFinite(activeStart)) return null;
+
+  const safeStart = Number(start);
+  const sleepEnds = (state.events || [])
+    .filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start) && Number(event.end) <= Math.max(safeStart, activeStart) + 2 * 60000)
+    .map((event) => Number(event.end))
+    .filter(Number.isFinite);
+  const lastSleepEnd = sleepEnds.length ? Math.max(...sleepEnds) : null;
+  const candidates = [activeStart, lastSleepEnd].filter(Number.isFinite);
+  return candidates.length ? Math.min(...candidates) : activeStart;
+}
+
+function getAwakeEventInActiveWindow(start = Date.now(), excludeEventId = null) {
+  const windowBase = getDedupAwakeWindowStart(start);
+  if (!Number.isFinite(windowBase)) return null;
+
+  const safeStart = Number(start);
+  const windowStart = windowBase - 5 * 60000;
+  const windowEnd = Math.max(Date.now() + 2 * 60000, safeStart + 2 * 60000);
+
+  return (state.events || []).find((event) => (
+    event?.id !== excludeEventId &&
+    event.type === "acordou" &&
+    Number(event.start) >= windowStart &&
+    Number(event.start) <= windowEnd
+  )) || null;
+}
+
+function addAwakeEvent(start = Date.now(), detail = "Acordou", notes = "", options = {}) {
   state.events = Array.isArray(state.events) ? state.events : [];
+
+  const existingInActiveWindow = getAwakeEventInActiveWindow(start, options.excludeEventId || null);
+  if (existingInActiveWindow) return existingInActiveWindow;
+
   const alreadyExists = state.events.some((event) => (
+    event?.id !== options.excludeEventId &&
     event.type === "acordou" && Math.abs(Number(event.start) - Number(start)) < 60000
   ));
   if (alreadyExists) return null;
+
   const wakeEvent = makeEvent("acordou", start, start, detail || "Acordou", notes || "");
   state.events.push(wakeEvent);
   pushAuditEntry("adicionou", wakeEvent);
@@ -4341,15 +4401,24 @@ function applyCloudProfile(data = {}) {
 function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
   applyingCloudState = true;
   const daySource = data.state && typeof data.state === "object" ? data.state : data;
-  state = normalizeDayState(daySource);
-  if (isDateId(dayId)) {
-    familyDayStatesCache = { ...familyDayStatesCache, [dayId]: normalizeDayState(state) };
-    if (hasRoutineDayContent(state) && !familyDayIdsCache.includes(dayId)) {
-      familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
+  const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
+  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+  const currentSelectedState = safeDayId === getSelectedDayId() ? normalizeDayState(state) : createEmptyDayState();
+  const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
+    ? currentSelectedState
+    : cachedState;
+
+  state = mergeRoutineDayStatesForCloud(localState, daySource);
+  if (isDateId(safeDayId)) {
+    familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(state) };
+    if (dayStateHasVisibleContent(state) && !familyDayIdsCache.includes(safeDayId)) {
+      familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
       updateDiaryDateRangeFromFamilyDays();
     }
   }
   saveLocalDayState();
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
   renderAll();
   applyingCloudState = false;
 }
@@ -4393,27 +4462,41 @@ function scheduleDayCloudSave(dayId = getSelectedDayId()) {
   dayCloudSaveTimer = window.setTimeout(() => saveDayToCloud(safeDayId), 500);
 }
 
+function getDeletedEventIdsFromState(dayState = {}) {
+  return new Set(
+    (Array.isArray(dayState.deletedEventIds) ? dayState.deletedEventIds : [])
+      .filter((item) => typeof item === "string" && item.trim())
+      .map((item) => item.trim()),
+  );
+}
+
 function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}) {
   const cloudSource = cloudData.state && typeof cloudData.state === "object" ? cloudData.state : cloudData;
   const cloudState = normalizeDayState(cloudSource || {});
   const currentState = normalizeDayState(localState || {});
+  const deletedEventIds = new Set([
+    ...getDeletedEventIdsFromState(cloudState),
+    ...getDeletedEventIdsFromState(currentState),
+  ]);
   const eventsById = new Map();
 
   for (const event of Array.isArray(cloudState.events) ? cloudState.events : []) {
     const normalized = normalizeEvent(event);
-    if (normalized?.id) eventsById.set(normalized.id, normalized);
+    if (normalized?.id && !deletedEventIds.has(normalized.id)) eventsById.set(normalized.id, normalized);
   }
 
   for (const event of Array.isArray(currentState.events) ? currentState.events : []) {
     const normalized = normalizeEvent(event);
-    if (normalized?.id) eventsById.set(normalized.id, normalized);
+    if (normalized?.id && !deletedEventIds.has(normalized.id)) eventsById.set(normalized.id, normalized);
   }
 
   return normalizeDayState({
     ...cloudState,
     ...currentState,
+    deletedEventIds: [...deletedEventIds].slice(-240),
     events: sortEventsByStartDesc([...eventsById.values()]),
     notes: currentState.notes || cloudState.notes || "",
+    dayNotes: currentState.dayNotes || cloudState.dayNotes || "",
   });
 }
 
@@ -4421,7 +4504,9 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
-  if (!hasRoutineDayContent()) return;
+
+  const hasDeletedEvents = getDeletedEventIdsFromState(state).size > 0;
+  if (!dayStateHasVisibleContent(state) && !hasDeletedEvents) return;
 
   try {
     let dayPayload = normalizeDayState(state);
@@ -4487,6 +4572,14 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
 
   dayUnsubscribe = firebaseServices.onSnapshot(dayRef, async (snapshot) => {
     if (!snapshot.exists()) {
+      const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+      if (dayStateHasVisibleContent(cachedState)) {
+        state = cachedState;
+        saveLocalDayState();
+        renderAll();
+        return;
+      }
+
       if (safeDayId === getCurrentDayId() && hasRoutineDayContent()) {
         saveDayToCloud(safeDayId);
       } else if (options.allowAutoLatest !== false && safeDayId === getCurrentDayId()) {
@@ -5835,9 +5928,15 @@ function startSleep() {
 
 function startRoutine(mode) {
   if (!requireLogin("salvar a rotina")) return;
+  if (mode === "awake" && getActiveAwakeWindowStart()) {
+    renderAll();
+    return;
+  }
   const startedAt = Date.now();
   state = startRoutineTimer(state, mode, startedAt);
   if (mode === "awake") addAwakeEvent(startedAt, "Início da rotina");
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
   saveDayState();
   renderAll();
 }
@@ -5875,8 +5974,17 @@ function setDiaryFilter(filter) {
 async function setDiaryDate(value) {
   setSelectedDiaryDayById(value || getCurrentDayId());
   timelineRenderSignature = "";
+
+  const selectedDayId = getSelectedDayId();
+  const cachedState = normalizeDayState(familyDayStatesCache[selectedDayId] || createEmptyDayState());
+  if (dayStateHasVisibleContent(cachedState)) {
+    state = cachedState;
+    saveLocalDayState();
+    renderAll();
+  }
+
   if (firebaseServices && cloudUser && hasFamilyAccess()) {
-    await subscribeToCloudDay(getSelectedDayId(), { allowAutoLatest: false });
+    await subscribeToCloudDay(selectedDayId, { allowAutoLatest: false });
   } else {
     renderTimeline();
   }
@@ -6126,6 +6234,15 @@ function saveManualEvent() {
   }
 
   const existingEvent = payload.editingEventId ? getEventById(payload.editingEventId) : null;
+
+  if (payload.type === "acordou") {
+    const duplicateWake = getAwakeEventInActiveWindow(payload.start, existingEvent?.id || null);
+    if (duplicateWake) {
+      window.alert("Já existe um registro de Acordou nesta janela acordada. Para corrigir o horário, edite o registro existente em vez de criar outro.");
+      return;
+    }
+  }
+
   const startsLiveSleep = shouldStartLiveSleepFromManualEvent(payload.type, payload.start, existingEvent);
   const startsLiveAwake = shouldStartLiveAwakeFromManualNightWake(payload.type, payload.start, existingEvent);
 
@@ -6158,10 +6275,14 @@ function saveManualEvent() {
   } else if (payload.type === "acordou") {
     if (state.mode === "sleeping" && canUseManualTimeForLiveState(payload.start)) {
       state = finishActiveSleep(state, makeEvent, payload.start);
-    } else if (canUseManualTimeForLiveState(payload.start)) {
+    } else if (state.mode !== "awake" && canUseManualTimeForLiveState(payload.start)) {
       state = startRoutineTimer(state, "awake", payload.start);
     }
-    addAwakeEvent(payload.start, payload.detail || "Acordou", payload.notes);
+    const addedWakeEvent = addAwakeEvent(payload.start, payload.detail || "Acordou", payload.notes);
+    if (!addedWakeEvent) {
+      window.alert("Não foi possível criar outro Acordou no mesmo minuto. Edite o registro existente se precisar ajustar o horário.");
+      return;
+    }
   } else if (startsLiveAwake) {
     startLiveAwakeFromManualNightWake(payload.start, payload.detail, payload.notes);
   } else if (startsLiveSleep) {
@@ -6184,6 +6305,17 @@ function saveManualEvent() {
     defaultBottleAmount: 105,
   });
   closeSheet();
+
+  if (currentDiaryFilter !== "all") {
+    currentDiaryFilter = "all";
+    diaryFilterButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.diaryFilter === "all");
+    });
+    window.setTimeout(updateDiaryChipsMoreButton, 220);
+  }
+
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
   saveDayState();
   renderAll();
 }
@@ -6201,9 +6333,16 @@ function deleteEvent(eventId) {
   if (!window.confirm(buildDeleteConfirmationText(event, { getEventConfig, formatTime }))) return;
 
   pushAuditEntry("excluiu", event);
+  state.deletedEventIds = [...new Set([...(state.deletedEventIds || []), event.id])].slice(-240);
   state.events = removeEventById(state.events, eventId);
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
   saveDayState();
   renderAll();
+
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    void saveDayToCloud(getSelectedDayId());
+  }
 }
 
 function getExportEvents() {

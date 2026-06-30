@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-56-4-3-restaura-cores-topo-avatar";
+const CACHE_NAME = "ninou-v75-56-5-release-candidate";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.56.4.3",
-  "/css/app.legacy.css?v=75.56.4.3",
-  "/app.js?v=75.56.4.3",
-  "/js/app.legacy.js?v=75.56.4.3",
+  "/styles.css?v=75.56.5",
+  "/css/app.legacy.css?v=75.56.5",
+  "/app.js?v=75.56.5",
+  "/js/app.legacy.js?v=75.56.5",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

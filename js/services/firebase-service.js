@@ -14,6 +14,25 @@ export async function getFirebaseServices() {
     ])
       .then(([appModule, authModule, firestoreModule]) => {
         const app = appModule.initializeApp(firebaseConfig);
+        const db = (() => {
+          try {
+            if (
+              typeof firestoreModule.initializeFirestore === "function" &&
+              typeof firestoreModule.persistentLocalCache === "function"
+            ) {
+              const cacheOptions = typeof firestoreModule.persistentMultipleTabManager === "function"
+                ? { tabManager: firestoreModule.persistentMultipleTabManager() }
+                : null;
+              const localCache = cacheOptions
+                ? firestoreModule.persistentLocalCache(cacheOptions)
+                : firestoreModule.persistentLocalCache();
+              return firestoreModule.initializeFirestore(app, { localCache });
+            }
+          } catch (error) {
+            console.warn("Persistência offline do Firestore indisponível; usando cache padrão em memória.", error);
+          }
+          return firestoreModule.getFirestore(app);
+        })();
 
         firebaseServices = {
           auth: authModule.getAuth(app),
@@ -21,7 +40,7 @@ export async function getFirebaseServices() {
           signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
           signOut: authModule.signOut,
           onAuthStateChanged: authModule.onAuthStateChanged,
-          db: firestoreModule.getFirestore(app),
+          db,
           doc: firestoreModule.doc,
           collection: firestoreModule.collection,
           collectionGroup: firestoreModule.collectionGroup,

@@ -211,9 +211,10 @@ export function renderIntelligentTimeline({ container, state, todayStart, dayMs 
       : "";
     const detail = cleanDetail(event);
     const subtitle = [duration, detail].filter(Boolean).join(" • ") || "Registro da rotina";
+    const timeLabel = eventTime(event, formatTime);
     return `
       <article class="intelligent-timeline-item ${isSleepEvent(event) ? "is-duration" : ""}">
-        <time>${escapeHtml(eventTime(event, formatTime))}</time>
+        <time>${escapeHtml(timeLabel)}</time>
         <i class="mark ${config.arcType}">${config.icon}</i>
         <div>
           <strong>${escapeHtml(config.title)}</strong>
