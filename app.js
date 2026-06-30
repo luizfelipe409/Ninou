@@ -1,6 +1,6 @@
-// Ninou v75.56.6 - correções finais para correção 24h/diário
+// Ninou v75.56.7 - correções finais para correção 24h/diário
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.56.6";
+const NINOU_APP_VERSION = "75.56.7";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

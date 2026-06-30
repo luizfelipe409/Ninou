@@ -196,9 +196,28 @@ export function renderDailyRhythm({
   }
 }
 
+function eventOverlapsIntelligenceWindow(event = {}, windowStart = 0, windowEnd = windowStart + DAY) {
+  const start = Number(event.start);
+  const rawEnd = Number(event.end);
+  const end = Number.isFinite(rawEnd) && rawEnd > start ? rawEnd : start;
+  return Number.isFinite(start) && start < windowEnd && end >= windowStart;
+}
+
+function dedupeIntelligenceEvents(events = []) {
+  const byKey = new Map();
+  for (const event of Array.isArray(events) ? events : []) {
+    const startMinute = Math.round((Number(event.start) || 0) / 60000);
+    const endMinute = Math.round((Number(event.end) || Number(event.start) || 0) / 60000);
+    const key = [event.type || "", startMinute, endMinute, String(event.detail || "").trim().toLowerCase(), String(event.notes || "").trim().toLowerCase()].join("|");
+    if (!byKey.has(key)) byKey.set(key, event);
+  }
+  return [...byKey.values()];
+}
+
 export function renderIntelligentTimeline({ container, state, todayStart, dayMs = DAY, formatShortDuration, formatTime, limit = 48 }) {
   if (!container) return;
-  const events = sortEventsByStartAsc(getEventsForDay(state.events || [], todayStart, dayMs)).slice(-limit);
+  const windowEnd = todayStart + dayMs;
+  const events = sortEventsByStartAsc(dedupeIntelligenceEvents((state.events || []).filter((event) => eventOverlapsIntelligenceWindow(event, todayStart, windowEnd)))).slice(-limit);
   if (!events.length) {
     container.innerHTML = `<article class="timeline-empty">A linha do tempo aparecerá assim que você registrar mamadas, sono, fraldas ou medicamentos.</article>`;
     return;

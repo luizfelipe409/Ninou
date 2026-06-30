@@ -376,6 +376,7 @@ let timelineRenderSignature = "";
 let liveTickMinute = -1;
 let breastTimerState = createBreastTimerState();
 let state = loadLocalDayState();
+let loadedStateDayId = getCurrentDayId();
 
 let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 let avatarEditorForceOpen = false;
@@ -1336,6 +1337,7 @@ function ensureTodaySelectedForView() {
   syncSelectedDayIntoFamilyCache();
   setSelectedDiaryDayById(todayId);
   state = getFamilyDayState(todayId);
+  loadedStateDayId = todayId;
   saveLocalDayState();
   timelineRenderSignature = "";
   orbitRenderSignature = "";
@@ -1552,12 +1554,58 @@ function dayStateHasVisibleContent(dayState = {}) {
   return hasRoutineDayContent(dayState) || Boolean(String(dayState?.dayNotes || "").trim());
 }
 
+function getEventWindowStart(event = {}) {
+  const start = Number(event.start);
+  return Number.isFinite(start) ? start : null;
+}
+
+function getEventWindowEnd(event = {}) {
+  const start = getEventWindowStart(event);
+  if (!Number.isFinite(start)) return null;
+  const end = Number(event.end);
+  return Number.isFinite(end) && end > start ? end : start;
+}
+
+function eventOverlapsWindow(event = {}, windowStart = getDayStart(), windowEnd = windowStart + day) {
+  const start = getEventWindowStart(event);
+  const end = getEventWindowEnd(event);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  return start < windowEnd && end >= windowStart;
+}
+
+function getEventDisplayDedupeKey(event = {}) {
+  const startMinute = Math.round((Number(event.start) || 0) / 60000);
+  const endMinute = Math.round((Number(event.end) || Number(event.start) || 0) / 60000);
+  const type = String(event.type || "").trim();
+  const detail = String(event.detail || "").trim().toLowerCase();
+  const notes = String(event.notes || "").trim().toLowerCase();
+  return [type, startMinute, endMinute, detail, notes].join("|");
+}
+
+function chooseRicherEventForDisplay(current = {}, candidate = {}) {
+  const currentScore = [current.createdByName, current.createdByRelationship, current.updatedAt, current.notes, current.detail].filter(Boolean).length;
+  const candidateScore = [candidate.createdByName, candidate.createdByRelationship, candidate.updatedAt, candidate.notes, candidate.detail].filter(Boolean).length;
+  return candidateScore >= currentScore ? candidate : current;
+}
+
+function dedupeEventsByDisplayKey(events = []) {
+  const byKey = new Map();
+  for (const event of Array.isArray(events) ? events : []) {
+    const normalized = normalizeEvent(event);
+    if (!normalized) continue;
+    const key = getEventDisplayDedupeKey(normalized);
+    const current = byKey.get(key);
+    byKey.set(key, current ? chooseRicherEventForDisplay(current, normalized) : normalized);
+  }
+  return [...byKey.values()].sort((a, b) => Number(a.start) - Number(b.start));
+}
+
 function syncSelectedDayIntoFamilyCache() {
   const dayId = getSelectedDayId();
   if (!isDateId(dayId)) return;
 
-  const selectedState = normalizeDayState(state);
   const cachedState = normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
+  const selectedState = loadedStateDayId === dayId ? normalizeDayState(state) : cachedState;
   const selectedHasVisibleContent = dayStateHasVisibleContent(selectedState);
   const cachedHasVisibleContent = dayStateHasVisibleContent(cachedState);
 
@@ -1572,8 +1620,9 @@ function syncSelectedDayIntoFamilyCache() {
 }
 
 function getFamilyDayState(dayId) {
-  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
-  if (dayId === getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+  if (safeDayId === getSelectedDayId() && loadedStateDayId === safeDayId) {
     const selectedState = normalizeDayState(state);
     return dayStateHasVisibleContent(selectedState) || !dayStateHasVisibleContent(cachedState)
       ? selectedState
@@ -1585,16 +1634,16 @@ function getFamilyDayState(dayId) {
 function getFamilyEventsForWindow(windowStart, windowEnd) {
   syncSelectedDayIntoFamilyCache();
   const events = [];
-  const startDay = getDayStart(windowStart);
+  const startDay = getDayStart(windowStart) - day;
   const endDay = getDayStart(Math.max(windowStart, windowEnd - 1));
   for (let dayStart = startDay; dayStart <= endDay; dayStart += day) {
     const dayId = toDateInputValue(dayStart);
     const dayState = getFamilyDayState(dayId);
     (dayState.events || []).forEach((event) => {
-      if (event.start >= windowStart && event.start < windowEnd) events.push(event);
+      if (eventOverlapsWindow(event, windowStart, windowEnd)) events.push(event);
     });
   }
-  return events.sort((a, b) => Number(a.start) - Number(b.start));
+  return dedupeEventsByDisplayKey(events);
 }
 
 function buildFamilyReportDays(count = 7, anchorStart = getDayStart()) {
@@ -3976,6 +4025,8 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 }
 
 function saveDayState() {
+  loadedStateDayId = getSelectedDayId();
+  state.events = dedupeEventsByDisplayKey(state.events || []);
   saveLocalDayState();
   syncSelectedDayIntoFamilyCache();
   scheduleDayCloudSave();
@@ -4420,27 +4471,38 @@ function applyCloudProfile(data = {}) {
 
 function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
   applyingCloudState = true;
-  const daySource = data.state && typeof data.state === "object" ? data.state : data;
-  const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
-  const currentSelectedState = safeDayId === getSelectedDayId() ? normalizeDayState(state) : createEmptyDayState();
-  const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
-    ? currentSelectedState
-    : cachedState;
+  try {
+    const daySource = data.state && typeof data.state === "object" ? data.state : data;
+    const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
+    const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+    const currentSelectedState = loadedStateDayId === safeDayId ? normalizeDayState(state) : cachedState;
+    const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
+      ? currentSelectedState
+      : cachedState;
+    const mergedState = mergeRoutineDayStatesForCloud(localState, daySource);
 
-  state = mergeRoutineDayStatesForCloud(localState, daySource);
-  if (isDateId(safeDayId)) {
-    familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(state) };
-    if (dayStateHasVisibleContent(state) && !familyDayIdsCache.includes(safeDayId)) {
-      familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
+    if (isDateId(safeDayId)) {
+      familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(mergedState) };
+      if (dayStateHasVisibleContent(mergedState) && !familyDayIdsCache.includes(safeDayId)) {
+        familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
+      }
       updateDiaryDateRangeFromFamilyDays();
     }
+
+    if (safeDayId === getSelectedDayId()) {
+      state = mergedState;
+      loadedStateDayId = safeDayId;
+      saveLocalDayState();
+      timelineRenderSignature = "";
+      orbitRenderSignature = "";
+      renderAll();
+    } else {
+      renderSupplementalReports();
+      renderTodayHomeSections();
+    }
+  } finally {
+    applyingCloudState = false;
   }
-  saveLocalDayState();
-  timelineRenderSignature = "";
-  orbitRenderSignature = "";
-  renderAll();
-  applyingCloudState = false;
 }
 
 function scheduleProfileCloudSave(options = {}) {
@@ -4514,7 +4576,7 @@ function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}) {
     ...cloudState,
     ...currentState,
     deletedEventIds: [...deletedEventIds].slice(-240),
-    events: sortEventsByStartDesc([...eventsById.values()]),
+    events: sortEventsByStartDesc(dedupeEventsByDisplayKey([...eventsById.values()])),
     notes: currentState.notes || cloudState.notes || "",
     dayNotes: currentState.dayNotes || cloudState.dayNotes || "",
   });
@@ -4526,7 +4588,7 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
   if (!dayRef || applyingCloudState) return;
 
   const selectedDayId = getSelectedDayId();
-  const sourceState = safeDayId === selectedDayId
+  const sourceState = safeDayId === selectedDayId && loadedStateDayId === safeDayId
     ? normalizeDayState(state)
     : normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
 
@@ -4606,23 +4668,28 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
     if (!snapshot.exists()) {
       const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
       if (dayStateHasVisibleContent(cachedState)) {
-        state = cachedState;
-        saveLocalDayState();
-        renderAll();
-        return;
-      }
-
-      if (safeDayId === getCurrentDayId() && hasRoutineDayContent()) {
-        saveDayToCloud(safeDayId);
-      } else if (options.allowAutoLatest !== false && safeDayId === getCurrentDayId()) {
-        const switched = await maybeOpenLatestFamilyDayAfterEmptyToday(safeDayId);
-        if (!switched) {
-          state = createEmptyDayState();
+        if (safeDayId === getSelectedDayId()) {
+          state = cachedState;
+          loadedStateDayId = safeDayId;
           saveLocalDayState();
           renderAll();
         }
-      } else {
+        return;
+      }
+
+      if (safeDayId === getCurrentDayId() && loadedStateDayId === safeDayId && hasRoutineDayContent()) {
+        saveDayToCloud(safeDayId);
+      } else if (options.allowAutoLatest !== false && safeDayId === getCurrentDayId()) {
+        const switched = await maybeOpenLatestFamilyDayAfterEmptyToday(safeDayId);
+        if (!switched && safeDayId === getSelectedDayId()) {
+          state = createEmptyDayState();
+          loadedStateDayId = safeDayId;
+          saveLocalDayState();
+          renderAll();
+        }
+      } else if (safeDayId === getSelectedDayId()) {
         state = createEmptyDayState();
+        loadedStateDayId = safeDayId;
         saveLocalDayState();
         renderAll();
       }
@@ -5002,17 +5069,18 @@ function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, l
 
 function renderOrbit() {
   const now = Date.now();
-  const dayAgo = now - 24 * hour;
-  const rollingEvents = getFamilyEventsForWindow(dayAgo, now)
-    .filter((event) => Number(event.start) >= dayAgo && Number(event.start) <= now)
+  const orbitStart = getDayStart(now);
+  const orbitEnd = Math.min(now, orbitStart + day);
+  const dayEvents = getFamilyEventsForWindow(orbitStart, orbitEnd)
+    .filter((event) => eventOverlapsWindow(event, orbitStart, orbitEnd))
     .sort((a, b) => Number(a.start) - Number(b.start));
 
-  const items = rollingEvents
+  const items = dayEvents
     .slice(-48)
     .map((event) => ({
       event,
       active: false,
-      position: eventPosition(event.start),
+      position: eventPosition(Math.max(Number(event.start) || orbitStart, orbitStart)),
     }));
 
   if (state.mode === "sleeping") {
@@ -5029,7 +5097,7 @@ function renderOrbit() {
     items.push({
       event: activeEvent,
       active: true,
-      position: eventPosition(activeEvent.start),
+      position: eventPosition(Math.max(activeEvent.start, orbitStart)),
     });
   }
 
@@ -5057,10 +5125,10 @@ function renderTimeline() {
 
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const selectedEnd = selectedStart + day;
-  const orderedEvents = sortEventsByStartDesc(state.events);
-  const dayEvents = getEventsForDay(orderedEvents, selectedStart, day);
+  const orderedEvents = sortEventsByStartDesc(getFamilyEventsForWindow(selectedStart, selectedEnd));
+  const dayEvents = orderedEvents.filter((event) => eventOverlapsWindow(event, selectedStart, selectedEnd));
   const visibleEvents = dayEvents.filter(matchesDiaryFilter);
-  const latest = getLatestEvent(state.events);
+  const latest = getLatestEvent(dayEvents);
   const nextSignature = getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, latest);
   if (nextSignature === timelineRenderSignature) return;
 
@@ -5368,17 +5436,18 @@ function renderIntelligentHomeSections() {
     countMedication: countMedicationEvents,
     formatShortDuration,
   });
-  const rolling24hStart = now - 24 * hour;
-  const rolling24hState = {
+  const todayTimelineStart = todayStart;
+  const todayTimelineEnd = Math.min(now, todayStart + day);
+  const todayTimelineState = {
     ...recentFamilyState,
-    events: getFamilyEventsForWindow(rolling24hStart, now),
+    events: getFamilyEventsForWindow(todayTimelineStart, todayTimelineEnd),
   };
 
   renderIntelligentTimeline({
     container: intelligentTimeline,
-    state: rolling24hState,
-    todayStart: rolling24hStart,
-    dayMs: 24 * hour,
+    state: todayTimelineState,
+    todayStart: todayTimelineStart,
+    dayMs: day,
     formatShortDuration,
     formatTime,
     limit: 48,
@@ -6009,6 +6078,13 @@ function showScreen(target) {
     }
   }
 
+  if (activeScreenName === "diary" && firebaseServices && cloudUser && hasFamilyAccess()) {
+    void loadFamilyDayIds({ force: true }).then(() => {
+      timelineRenderSignature = "";
+      renderTimeline();
+    });
+  }
+
   updateScreenVisibility({ target, navButtons, screens });
   renderBabyIdentity();
   updateBodyModeClasses();
@@ -6028,16 +6104,21 @@ function setDiaryFilter(filter) {
 }
 
 async function setDiaryDate(value) {
+  syncSelectedDayIntoFamilyCache();
   setSelectedDiaryDayById(value || getCurrentDayId());
   timelineRenderSignature = "";
+  orbitRenderSignature = "";
+
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    await loadFamilyDayIds({ force: false });
+  }
 
   const selectedDayId = getSelectedDayId();
   const cachedState = normalizeDayState(familyDayStatesCache[selectedDayId] || createEmptyDayState());
-  if (dayStateHasVisibleContent(cachedState)) {
-    state = cachedState;
-    saveLocalDayState();
-    renderAll();
-  }
+  state = cachedState;
+  loadedStateDayId = selectedDayId;
+  saveLocalDayState();
+  renderAll();
 
   if (firebaseServices && cloudUser && hasFamilyAccess()) {
     await subscribeToCloudDay(selectedDayId, { allowAutoLatest: false });
@@ -6050,6 +6131,7 @@ function initDiaryDatePicker() {
   const today = getDayStart();
   const minDay = today - 30 * day;
   selectedDiaryDay = today;
+  loadedStateDayId = getSelectedDayId();
   diaryDateInput.min = toDateInputValue(minDay);
   diaryDateInput.max = toDateInputValue(today);
   diaryDateInput.value = toDateInputValue(today);
@@ -6060,6 +6142,7 @@ function resetDayData() {
   state = createEmptyDayState();
   currentDiaryFilter = "all";
   selectedDiaryDay = getDayStart();
+  loadedStateDayId = getSelectedDayId();
   diaryDateInput.value = toDateInputValue(selectedDiaryDay);
   diaryFilterButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.diaryFilter === "all");
@@ -6297,6 +6380,7 @@ function saveManualEvent() {
     syncSelectedDayIntoFamilyCache();
     setSelectedDiaryDayById(payloadDayId);
     state = getFamilyDayState(payloadDayId);
+    loadedStateDayId = payloadDayId;
     timelineRenderSignature = "";
     orbitRenderSignature = "";
   }

@@ -1,6 +1,6 @@
-# Ninou v75.56.6 — refinamento final geral premium
+# Ninou v75.56.7 — refinamento final geral premium
 
-## Novidades v75.56.6
+## Novidades v75.56.7
 
 - Home com visual mais editorial, clean e parecido com app mobile premium.
 - Relógio principal mais claro, com menos ruído visual e ação principal logo abaixo.
@@ -9,16 +9,16 @@
 - Coleção de 12 avatares premium mantida, agora com grade mais nobre, cards maiores e estado selecionado mais claro.
 - Barra inferior refinada com aparência mais nativa, translúcida e confortável para toque.
 - Tema visual mais claro, adulto e luxuoso, mantendo a delicadeza do Ninou.
-- Service Worker atualizado para v75.56.6 e registro com `updateViaCache: "none"`.
+- Service Worker atualizado para v75.56.7 e registro com `updateViaCache: "none"`.
 - Mantidas as travas offline, identificação por aparelho, ausência de foto real e biblioteca local de avatares.
 
 ---
 
-# Ninou v75.56.6.1.1 — Somente avatar
+# Ninou v75.56.7.1.1 — Somente avatar
 
 Versão criada para testar avatares antes de substituir definitivamente a foto do bebê.
 
-## Novidades v75.56.6.1.1
+## Novidades v75.56.7.1.1
 
 - Nova seção no Perfil: **Escolha o avatar do bebê**.
 - Avatar personalizável por:
@@ -50,7 +50,7 @@ Versão criada para testar avatares antes de substituir definitivamente a foto d
 Esta versão é uma versão de teste visual. A ideia é validar com usuários se o avatar personalizável substitui bem a foto real do bebê antes de tornar essa mudança definitiva.
 
 
-## Novidades v75.56.6.1.1
+## Novidades v75.56.7.1.1
 
 - O app passa a usar somente avatar para representar o bebê.
 - Upload de foto e fotos antigas deixam de ser exibidos.
@@ -59,7 +59,7 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Não usa Firebase Storage e não salva imagem/base64 como fluxo principal.
 
 
-## v75.56.6.1.1 — Admin online estável
+## v75.56.7.1.1 — Admin online estável
 
 - Corrige o status visual do admin global para não aparecer como "Off-line" após login.
 - Falhas pontuais de leitura/escrita no Firestore agora viram aviso no painel, sem rebaixar o admin para visitante.
@@ -67,7 +67,7 @@ Esta versão é uma versão de teste visual. A ideia é validar com usuários se
 - Mantém isolamento de conta e evita reaproveitar identificação de outro usuário.
 
 
-## v75.56.6.1.1 — Identificação por aparelho
+## v75.56.7.1.1 — Identificação por aparelho
 
 Esta versão ajusta o uso familiar real do Ninou:
 
@@ -80,14 +80,14 @@ Esta versão ajusta o uso familiar real do Ninou:
 - O app não grava mais essa identificação em `users/{uid}/account/profile`, evitando que um aparelho sobrescreva o outro.
 
 
-## v75.56.6.1.1 — Avatar 3D Soft moderno
+## v75.56.7.1.1 — Avatar 3D Soft moderno
 
 - Avatares do bebê redesenhados em estilo 3D Soft, com aparência mais novinha e moderna.
 - Personalização agora foca em cabelinho, tom de pele e cor de fundo.
 - Depois de salvar, o editor some da tela e só reaparece ao tocar em **Editar avatar** abaixo da foto do perfil.
 
 
-## v75.56.6.1.1 — menino, menina e cores de cabelo
+## v75.56.7.1.1 — menino, menina e cores de cabelo
 
 - Melhora os cabelos dos avatares.
 - Adiciona opções de **menino** e **menina**.
@@ -95,7 +95,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Mantém edição sob demanda: depois de salvar, o editor some e volta só no botão **Editar avatar**.
 
 
-## v75.56.6.1.1 — Correções de UX offline, ação principal e avatar
+## v75.56.7.1.1 — Correções de UX offline, ação principal e avatar
 
 - Modo offline bloqueia edição de avatar, peso, perfil e registros.
 - Sem login, a única interação é preencher login/senha ou tocar em Solicitar acesso.
@@ -105,7 +105,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Cabelos dos avatares foram redesenhados com formas mais naturais.
 
 
-## v75.56.6.1.1 — Avatares premium 3D
+## v75.56.7.1.1 — Avatares premium 3D
 
 - Novo conjunto de avatares com aparência mais delicada e realista.
 - Estilos de menino e menina inspirados no mock aprovado.
@@ -114,14 +114,14 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Continuidade das regras de bloqueio offline da v75.46.
 
 
-## v75.56.6.1.1 — Correção de carregamento
+## v75.56.7.1.1 — Correção de carregamento
 
 - Corrige erro que podia impedir o app de carregar por referência antiga ao botão de peso.
 - Mantém o fallback de erro em tema claro para não abrir a tela preta.
-- Mantém os avatares premium da v75.56.6.1.1.
+- Mantém os avatares premium da v75.56.7.1.1.
 
 
-## v75.56.6.1.1 — Avatares premium baseados na análise
+## v75.56.7.1.1 — Avatares premium baseados na análise
 
 - Redesenho do sistema de avatar com proporção mais jovem: cabeça maior, bochechas cheias, olhos mais baixos e boca menor.
 - Cabelos refeitos com massa base, sombra, mechas e highlights suaves para evitar aparência de “capacete”.
@@ -130,14 +130,14 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Mantém editor escondido após salvar e bloqueado no modo offline.
 
 
-## v75.56.6.1 — Correção dos cabelos
+## v75.56.7.1 — Correção dos cabelos
 
 - Corrige o encaixe dos cabelos dentro da cabeça do avatar.
 - Redesenha os penteados com formas mais contidas e naturais.
 - Aplica clip interno no topo da cabeça para impedir cabelo escapando para fora.
 
 
-## v75.56.6.1 — Avatares premium detalhados
+## v75.56.7.1 — Avatares premium detalhados
 
 - Refinamento completo do acabamento 3D Soft.
 - Cabelos redesenhados com melhor massa, brilho e encaixe.
@@ -145,14 +145,14 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Polimento visual do editor para aparência mais premium.
 
 
-## v75.56.6.1 — referência aprovada
+## v75.56.7.1 — referência aprovada
 
 - Consolida o visual premium aprovado para os avatares.
 - Mantém o estilo 3D Soft detalhado.
 - Organiza a interface do editor em linha com o mock aprovado.
 
 
-## v75.56.6 — Refinamento fino
+## v75.56.7 — Refinamento fino
 
 - Ajusta os avatares para uma proporção mais infantil.
 - Olhos mais suaves e delicados.
@@ -160,7 +160,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Mantém o visual premium 3D Soft aprovado.
 
 
-## v75.56.6 — Foco 1: cabelos mais realistas
+## v75.56.7 — Foco 1: cabelos mais realistas
 
 - Etapa dedicada a melhorar os cabelos dos avatares.
 - Penteados redesenhados com melhor massa, mechas e brilho.
@@ -168,7 +168,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - As próximas etapas previstas continuam sendo: 2) rosto mais bebê recém-nascido; 3) polimento geral do editor.
 
 
-## v75.56.6 — Etapa 2: rosto mais bebê recém-nascido
+## v75.56.7 — Etapa 2: rosto mais bebê recém-nascido
 
 - Cabeça levemente maior e corpo mais discreto.
 - Olhos mais suaves e proporcionais.
@@ -178,7 +178,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Próxima etapa prevista: polimento geral do editor.
 
 
-## v75.56.6 — Etapa 3: polimento geral do editor
+## v75.56.7 — Etapa 3: polimento geral do editor
 
 - Visual do editor reorganizado e mais premium.
 - Cabeçalho, prévia, seções e ações mais elegantes.
@@ -186,7 +186,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Fecha a trilha pedida: 1) cabelos; 2) rosto mais bebê; 3) polimento geral.
 
 
-## v75.56.6 — cabelos reconstruídos com cuidado
+## v75.56.7 — cabelos reconstruídos com cuidado
 
 - Descartei os penteados anteriores.
 - Reconstruí do zero a base do cabelo com foco em eixo central e melhor simetria.
@@ -195,7 +195,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - O objetivo foi trocar quantidade por qualidade e corrigir o problema de cabelo torto.
 
 
-## v75.56.6 — ajuste de proporção
+## v75.56.7 — ajuste de proporção
 
 - Cabeça reduzida.
 - Cabelo com mais presença visual.
@@ -203,7 +203,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Mantidos os 3 penteados-base da reconstrução.
 
 
-## v75.56.6 — biblioteca local com 12 avatares ilustrados premium
+## v75.56.7 — biblioteca local com 12 avatares ilustrados premium
 
 - Substitui o avatar procedural por 12 avatares ilustrados prontos.
 - Biblioteca local no app, sem foto real e sem depender de storage.
@@ -211,7 +211,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Seleção simplificada: agora o usuário escolhe um avatar pronto e salva.
 
 
-## v75.56.6 — premium layout do editor de avatar
+## v75.56.7 — premium layout do editor de avatar
 
 - visual mais sofisticado na tela Perfil;
 - card do perfil com acabamento mais premium;
@@ -220,7 +220,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - CTAs e feedbacks mais refinados.
 
 
-## v75.56.6 — luxuoso, clean e mobile refinado
+## v75.56.7 — luxuoso, clean e mobile refinado
 
 - lapidação da paleta premium com tons mais suaves e elegantes;
 - visual mais clean na tela Perfil;
@@ -229,7 +229,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - melhoria do comportamento no mobile para parecer mais um app premium de App Store.
 
 
-## v75.56.6 — polimento final visual
+## v75.56.7 — polimento final visual
 
 - menos texto e mais foco visual;
 - tela mais minimalista;
@@ -239,7 +239,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - botões e status mais discretos e elegantes.
 
 
-## v75.56.6 — ajustes finais de UX
+## v75.56.7 — ajustes finais de UX
 
 - reduzido o raio da órbita de 24h para evitar corte visual no card principal;
 - linha do tempo inteligente refinada com chips de horário, melhor espaçamento e sem sobreposição;
@@ -248,7 +248,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - removidos os textos “Avatar 3D Soft”, “Tudo local, leve e sem foto real” e “Perfil privado, salvo com cuidado e sem foto real”.
 
 
-## v75.56.6 — polimento fino visual
+## v75.56.7 — polimento fino visual
 
 - Microalinhamentos finais na Home.
 - Órbita 24h com raio mais seguro para evitar corte.
@@ -258,7 +258,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Textos excedentes removidos para manter visual premium.
 
 
-## v75.56.6 — restauração dos temas, relógio e timeline
+## v75.56.7 — restauração dos temas, relógio e timeline
 
 - Restaura as cores do modo claro e escuro como estavam anteriormente.
 - Restaura o card do relógio principal para o comportamento visual anterior.
@@ -267,7 +267,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Mantém o alinhamento visual dos avatares e seleção mais consistente.
 
 
-## v75.56.6 — restauração visual com topo premium
+## v75.56.7 — restauração visual com topo premium
 
 - mantidas as cores originais do modo claro e do modo escuro;
 - mantido o card principal do relógio/arco com estrelas;
@@ -276,11 +276,11 @@ Esta versão ajusta o uso familiar real do Ninou:
 - mantidos os avatares premium criados.
 
 
-## v75.56.6
+## v75.56.7
 - Corrige o alinhamento da prévia do avatar, centralizando imagem e legenda no painel de prévia.
 
 
-## v75.56.6 — polimento final de perfil e avatares
+## v75.56.7 — polimento final de perfil e avatares
 
 - Centraliza definitivamente o avatar no campo de prévia.
 - Mantém as cores anteriores do modo claro/escuro, relógio/arco e linha do tempo.
@@ -288,7 +288,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Evita que cards de avatar “pulem” ou pareçam tortos ao selecionar.
 - Mantém a coleção de 12 avatares premium aprovada.
 
-## v75.56.6 — correção de exclusão, duplicidade e timeline
+## v75.56.7 — correção de exclusão, duplicidade e timeline
 
 - Corrige item excluído do Diário que voltava após sincronização.
 - Adiciona marcação local/de nuvem para impedir que registros excluídos sejam reintroduzidos ao mesclar com Firestore.
@@ -298,7 +298,7 @@ Esta versão ajusta o uso familiar real do Ninou:
 - Preserva cache local do dia para evitar que registros recém-criados desapareçam enquanto o Firebase atualiza.
 
 
-## v75.56.6 — Release Candidate
+## v75.56.7 — Release Candidate
 
 Correções aplicadas antes de publicação:
 
@@ -310,10 +310,20 @@ Correções aplicadas antes de publicação:
 - Mantidos os avatares premium aprovados, as cores anteriores e o card principal do relógio/arco.
 
 
-## v75.56.6 — correção real de 24h e diário completo
+## v75.56.7 — correção real de 24h e diário completo
 
 - A órbita/linha de 24h agora busca eventos na janela móvel das últimas 24 horas usando o cache de dias da família, em vez de depender apenas do dia atualmente aberto no Diário.
 - O Diário deixa de limitar a exibição a 8 registros; agora mostra todos os registros do dia filtrado.
 - A linha do tempo inteligente da Home passa a considerar a janela móvel de 24h e até 48 registros agrupáveis.
 - Registros manuais criados com horário de outro dia são roteados para o dia correto no cache/sincronização.
 - Ao voltar para a tela Hoje, o app restaura o estado do dia atual para evitar misturar a visualização com uma data antiga do Diário.
+
+
+## v75.56.7 — correção de dia-calendário, diário e timeline
+
+- A linha/arco de 24h voltou a respeitar o dia-calendário: começa à 00:00 e reseta à meia-noite.
+- A linha do tempo inteligente da Home mostra somente registros pertinentes ao dia atual, não uma janela móvel das últimas 24h.
+- O Diário protege a troca de datas para não misturar o estado carregado de um dia com outro.
+- Registros de dias anteriores, como antes de 28/06, são carregados do cache familiar/Firebase antes da renderização do Diário.
+- Registros duplicados com mesmo tipo, horário, fim e detalhe são removidos da exibição e do merge com o banco.
+- Eventos que atravessam meia-noite são considerados por sobreposição de janela, mantendo o reset visual do dia sem perder sono que cruzou a virada.
