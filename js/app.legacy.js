@@ -4771,7 +4771,7 @@ function eventPosition(timestamp) {
   const startAngle = 142;
   const arcSize = 256;
   const angle = ((startAngle + progress * arcSize) * Math.PI) / 180;
-  const radius = 112;
+  const radius = 132;
   return {
     x: Math.round(Math.cos(angle) * radius),
     y: Math.round(Math.sin(angle) * radius),
