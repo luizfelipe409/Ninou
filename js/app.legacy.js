@@ -805,27 +805,6 @@ function removeGuestPremiumCards() {
   document.querySelectorAll(".guest-premium-card").forEach((card) => card.remove());
 }
 
-function getGuestPremiumCardMarkup(screenKey) {
-  const item = guestPremiumContent[screenKey] || guestPremiumContent.today;
-  const rows = item.rows.map(([label, value]) => `
-    <article class="guest-demo-row">
-      <span>${escapeHtml(label)}</span>
-      <strong>${escapeHtml(value)}</strong>
-    </article>
-  `).join("");
-  return `
-    <span>${escapeHtml(item.kicker)}</span>
-    <strong>${escapeHtml(item.title)}</strong>
-    <p>${escapeHtml(item.text)}</p>
-    <div class="guest-demo-label">Exemplo de acompanhamento</div>
-    <div class="guest-demo-list">${rows}</div>
-    <div class="guest-premium-actions">
-      <button type="button" data-guest-action="login">Entrar agora</button>
-      <button type="button" data-guest-action="invite">Tenho convite</button>
-    </div>
-  `;
-}
-
 function renderGuestPremiumContent() {
   removeGuestPremiumCards();
   if (isLoggedIn()) return;
