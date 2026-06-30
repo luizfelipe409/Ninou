@@ -4490,7 +4490,7 @@ function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
     }
 
     if (safeDayId === getSelectedDayId()) {
-      state = mergedState;
+      state = reconcileAwakeStateForDay(mergedState, safeDayId);
       loadedStateDayId = safeDayId;
       saveLocalDayState();
       timelineRenderSignature = "";
@@ -4606,6 +4606,8 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
     } catch (mergeError) {
       console.warn("Não foi possível mesclar rotina antes de salvar. Salvando estado local atual:", mergeError);
     }
+
+    dayPayload = reconcileAwakeStateForDay(dayPayload, safeDayId);
 
     await firebaseServices.setDoc(
       dayRef,
@@ -4917,6 +4919,7 @@ function runActiveTimerAction() {
 }
 
 function renderCurrentState() {
+  reconcileCurrentAwakeStateFromEvents();
   if (!canUsePrivateFeatures()) {
     setHidden(wakeAction, true);
     setHidden(startChoice, true);
@@ -5612,6 +5615,89 @@ function getLatestSleepEvent(events = []) {
   return [...events].filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)).sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
 }
 
+function getDayStartFromId(dayId = getSelectedDayId()) {
+  if (!isDateId(dayId)) return getDayStart();
+  return getDayStart(new Date(`${dayId}T12:00:00`).getTime());
+}
+
+function getLatestAwakeBoundaryFromEvents(dayState = state, dayId = getSelectedDayId(), now = Date.now()) {
+  const dayStart = getDayStartFromId(dayId);
+  const dayEnd = dayStart + day;
+  const upperLimit = Math.min(dayEnd, now + 2 * 60000);
+  const events = Array.isArray(dayState?.events) ? dayState.events : [];
+  const candidates = [];
+
+  events.forEach((event) => {
+    const start = Number(event?.start);
+    const end = Number(event?.end);
+
+    if ((event?.type === "acordou" || event?.type === "despertar-noturno")
+      && Number.isFinite(start)
+      && start >= dayStart
+      && start <= upperLimit) {
+      candidates.push(start);
+    }
+
+    if (isSleepEvent(event)
+      && Number.isFinite(start)
+      && Number.isFinite(end)
+      && end > start
+      && end >= dayStart
+      && end <= upperLimit) {
+      candidates.push(end);
+    }
+  });
+
+  if (!candidates.length) return null;
+  return Math.max(...candidates);
+}
+
+function reconcileAwakeStateForDay(dayState = state, dayId = getSelectedDayId(), now = Date.now()) {
+  const nextState = normalizeDayState(dayState || createEmptyDayState());
+  if (nextState.mode === "sleeping") return nextState;
+
+  const boundary = getLatestAwakeBoundaryFromEvents(nextState, dayId, now);
+  if (!Number.isFinite(Number(boundary))) return nextState;
+
+  const currentStart = Number(nextState.activeStartedAt);
+  const shouldUpdate = nextState.mode !== "awake"
+    || !Number.isFinite(currentStart)
+    || Number(boundary) > currentStart + 60000;
+
+  if (!shouldUpdate) return nextState;
+
+  return normalizeDayState({
+    ...nextState,
+    mode: "awake",
+    activeStartedAt: Number(boundary),
+    activeType: "sono",
+    activeDetail: "",
+    activeNotes: "",
+  });
+}
+
+function reconcileCurrentAwakeStateFromEvents(options = {}) {
+  if (state?.mode === "sleeping") return false;
+  const beforeStart = Number(state?.activeStartedAt);
+  const beforeMode = state?.mode || "idle";
+  const nextState = reconcileAwakeStateForDay(state, getSelectedDayId(), Date.now());
+  const afterStart = Number(nextState?.activeStartedAt);
+  const changed = beforeMode !== nextState.mode
+    || (Number.isFinite(afterStart) && (!Number.isFinite(beforeStart) || Math.abs(afterStart - beforeStart) > 1000));
+
+  if (changed) {
+    state = nextState;
+    if (options.persist !== false) {
+      syncSelectedDayIntoFamilyCache();
+      saveLocalDayState();
+    }
+    timelineRenderSignature = "";
+    orbitRenderSignature = "";
+  }
+
+  return changed;
+}
+
 function getBottleAmountText(event) {
   const detail = String(event?.detail || "").trim();
   const ml = detail.match(/(\d+(?:[,.]\d+)?)\s*ml/i)?.[0] || "";
@@ -5627,10 +5713,11 @@ function renderTodayOverview() {
   const lastBottle = getLatestEventByTypes(events, ["mamadeira"]);
   const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
   const lastSleep = getLatestSleepEvent(events);
+  const effectiveAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
   const awakeText = state.mode === "sleeping"
     ? "Dormindo agora"
-    : Number.isFinite(Number(state.activeStartedAt))
-      ? formatShortDuration(Math.max(0, now - Number(state.activeStartedAt)))
+    : Number.isFinite(Number(effectiveAwakeStart))
+      ? formatShortDuration(Math.max(0, now - Number(effectiveAwakeStart)))
       : formatShortDuration(getAwakeMsForRange(todayStart, Math.min(todayStart + day, now)));
   const napText = lastSleep
     ? `${formatTime(lastSleep.start)}–${formatTime(lastSleep.end)}`
@@ -5672,8 +5759,9 @@ function renderGentleAlert() {
   let text = "O Ninou mostrará lembretes leves conforme os registros aparecerem.";
   let show = false;
 
-  if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
-    const awakeMs = now - Number(state.activeStartedAt);
+  const gentleAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
+  if (state.mode === "awake" && Number.isFinite(Number(gentleAwakeStart))) {
+    const awakeMs = now - Number(gentleAwakeStart);
     if (awakeMs >= wakeWindowMinutes * 60000 * 0.9) {
       title = `${baby} está acordado há ${formatShortDuration(awakeMs)}`;
       text = "Talvez seja um bom momento para observar sinais de sono com calma, sem pressa.";
@@ -5981,6 +6069,7 @@ function updateTheme() {
 }
 
 function renderAll() {
+  reconcileCurrentAwakeStateFromEvents();
   updateTheme();
   renderBabyIdentity();
   renderCurrentState();
@@ -5996,6 +6085,7 @@ function renderAll() {
 }
 
 function renderLiveTick() {
+  reconcileCurrentAwakeStateFromEvents();
   updateTheme();
 
   if (!canUsePrivateFeatures()) return;
@@ -6047,6 +6137,7 @@ function startRoutine(mode) {
   const startedAt = Date.now();
   state = startRoutineTimer(state, mode, startedAt);
   if (mode === "awake") addAwakeEvent(startedAt, "Início da rotina");
+  reconcileCurrentAwakeStateFromEvents({ persist: false });
   timelineRenderSignature = "";
   orbitRenderSignature = "";
   saveDayState();

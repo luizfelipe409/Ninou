@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-56-7-3-polimento-geral-perfil-home-diario";
+const CACHE_NAME = "ninou-v75-56-7-4-corrige-tempo-acordado-registros";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.56.7.3",
-  "/css/app.legacy.css?v=75.56.7.3",
-  "/app.js?v=75.56.7.3",
-  "/js/app.legacy.js?v=75.56.7.3",
+  "/styles.css?v=75.56.7.4",
+  "/css/app.legacy.css?v=75.56.7.4",
+  "/app.js?v=75.56.7.4",
+  "/js/app.legacy.js?v=75.56.7.4",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
