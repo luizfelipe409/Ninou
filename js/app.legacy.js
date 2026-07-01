@@ -140,6 +140,14 @@ const dataRealityKicker = document.querySelector("#dataRealityKicker");
 const dataRealityTitle = document.querySelector("#dataRealityTitle");
 const dataRealityText = document.querySelector("#dataRealityText");
 const firstUseChecklistCard = document.querySelector("#firstUseChecklistCard");
+const premiumTrustCard = document.querySelector("#premiumTrustCard");
+const profileReadyCard = document.querySelector("#profileReadyCard");
+const profileReadyKicker = document.querySelector("#profileReadyKicker");
+const profileReadyTitle = document.querySelector("#profileReadyTitle");
+const profileReadyText = document.querySelector("#profileReadyText");
+const profileReadyFamily = document.querySelector("#profileReadyFamily");
+const profileReadyRole = document.querySelector("#profileReadyRole");
+const profileReadyDevice = document.querySelector("#profileReadyDevice");
 const guestOnboardingModal = document.querySelector("#guestOnboardingModal");
 const guestModalCloseButton = document.querySelector("#guestModalCloseButton");
 const guestModalLoginButton = document.querySelector("#guestModalLoginButton");
@@ -1113,9 +1121,13 @@ function updateDataRealityCard() {
   const connected = isLoggedIn();
   const authorized = hasFamilyAccess();
   const appAdmin = isGlobalAppAdmin();
-  const baby = getBabyDisplayName();
 
-  dataRealityCard.hidden = appAdmin && !window.__ninouAdminFamilyDataOpen;
+  if (authorized || (appAdmin && !window.__ninouAdminFamilyDataOpen)) {
+    dataRealityCard.hidden = true;
+    return;
+  }
+
+  dataRealityCard.hidden = false;
 
   if (!connected) {
     dataRealityCard.dataset.mode = "demo";
@@ -1125,18 +1137,58 @@ function updateDataRealityCard() {
     return;
   }
 
-  if (!authorized) {
-    dataRealityCard.dataset.mode = "pending";
-    if (dataRealityKicker) dataRealityKicker.textContent = "Conta conectada";
-    if (dataRealityTitle) dataRealityTitle.textContent = "Falta conectar uma família.";
-    if (dataRealityText) dataRealityText.textContent = "Use o código de convite recebido do administrador para liberar os dados reais da rotina.";
-    return;
+  dataRealityCard.dataset.mode = "pending";
+  if (dataRealityKicker) dataRealityKicker.textContent = "Conta conectada";
+  if (dataRealityTitle) dataRealityTitle.textContent = "Falta conectar uma família.";
+  if (dataRealityText) dataRealityText.textContent = "Use o código de convite recebido do administrador para liberar os dados reais da rotina.";
+}
+
+function isFirstUseChecklistComplete() {
+  if (!hasFamilyAccess()) return false;
+  const identity = loadCurrentCaregiverIdentity();
+  const hasName = Boolean(String(identity.name || "").trim() || String(caregiverNameInput?.value || "").trim());
+  const hasRelation = Boolean(String(identity.relation || "").trim() || String(caregiverRelationInput?.value || "").trim());
+  const hasTheme = ["light", "dark"].includes(String(themeModeInput?.value || babyProfile?.themeMode || "").trim());
+  return hasName && hasRelation && hasTheme;
+}
+
+function isProfileReadyForDailyUse() {
+  return Boolean(hasFamilyAccess() && !isGlobalAppAdmin() && isFirstUseChecklistComplete());
+}
+
+function updateProfileReadyExperience() {
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const ready = isProfileReadyForDailyUse();
+  const familyAdmin = isFamilyAdmin();
+  const baby = getBabyDisplayName();
+  const identity = loadCurrentCaregiverIdentity();
+  const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
+
+  document.body.classList.toggle("profile-daily-ready", ready);
+
+  if (premiumTrustCard) premiumTrustCard.hidden = connected;
+  if (profileReadyCard) {
+    profileReadyCard.hidden = !ready;
+    if (ready) {
+      if (profileReadyKicker) profileReadyKicker.textContent = "Conta pronta";
+      if (profileReadyTitle) profileReadyTitle.textContent = `Perfil de ${baby} configurado.`;
+      if (profileReadyText) profileReadyText.textContent = "O fluxo inicial foi concluído. Esta tela agora mostra somente itens úteis para o uso diário e ajustes pontuais.";
+      if (profileReadyFamily) profileReadyFamily.textContent = `Família de ${baby}`;
+      if (profileReadyRole) profileReadyRole.textContent = getRoleLabel(role);
+      if (profileReadyDevice) profileReadyDevice.textContent = identity.name ? `${identity.name}${identity.relationshipLabel ? ` • ${identity.relationshipLabel}` : ""}` : "Identificado";
+    }
   }
 
-  dataRealityCard.dataset.mode = "real";
-  if (dataRealityKicker) dataRealityKicker.textContent = "Dados reais";
-  if (dataRealityTitle) dataRealityTitle.textContent = `Você está vendo a rotina de ${baby}.`;
-  if (dataRealityText) dataRealityText.textContent = "A demonstração foi substituída pelos registros reais da família conectada neste aparelho.";
+  const journeyCard = document.querySelector("#accountJourneyCard");
+  if (journeyCard && authorized) journeyCard.hidden = true;
+  if (postAccessCard && authorized) postAccessCard.hidden = true;
+  if (dataRealityCard && authorized) dataRealityCard.hidden = true;
+  if (familyWelcomeCard && ready) familyWelcomeCard.hidden = true;
+  if (familyAccessCard) {
+    familyAccessCard.hidden = Boolean(ready && !familyAdmin && !appAdmin);
+  }
 }
 
 function updateFirstUseChecklist() {
@@ -1145,7 +1197,8 @@ function updateFirstUseChecklist() {
   const connected = isLoggedIn();
   const authorized = hasFamilyAccess();
   const appAdmin = isGlobalAppAdmin();
-  firstUseChecklistCard.hidden = appAdmin || !connected || !authorized;
+  const complete = isFirstUseChecklistComplete();
+  firstUseChecklistCard.hidden = appAdmin || !connected || !authorized || complete;
   if (firstUseChecklistCard.hidden) return;
 
   const identity = loadCurrentCaregiverIdentity();
@@ -1174,7 +1227,7 @@ function updatePostAccessExperience() {
   const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
   const roleLabel = authorized ? getRoleLabel(role) : "";
 
-  postAccessCard.hidden = appAdmin || !connected;
+  postAccessCard.hidden = appAdmin || !connected || authorized;
   if (postAccessCard.hidden) return;
 
   postAccessCard.dataset.state = authorized ? "accepted" : pendingCode ? "pending-invite" : "connected";
@@ -1281,8 +1334,8 @@ function updateAccountJourneyGuide() {
   const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
   const hint = card.querySelector("#accountJourneyHint");
 
-  card.hidden = appAdmin;
-  if (appAdmin) return;
+  card.hidden = appAdmin || authorized;
+  if (appAdmin || authorized) return;
 
   card.dataset.state = authorized ? "ready" : connected ? "connected" : "guest";
 
@@ -2401,13 +2454,11 @@ function buildFamilyReportDays(count = 7, anchorStart = getDayStart()) {
   return Array.from({ length: count }, (_, index) => {
     const start = anchorStart - (count - 1 - index) * day;
     const end = start + day;
-    const dayId = toDateInputValue(start);
-    const dayState = getFamilyDayState(dayId);
     return {
       start,
       end,
       label: getDayLabel(start),
-      events: (dayState.events || []).filter((event) => event.start >= start && event.start < end),
+      events: getFamilyEventsForWindow(start, end),
     };
   });
 }
@@ -4808,7 +4859,7 @@ function getDedupAwakeWindowStart(start = Date.now()) {
     .filter(Number.isFinite);
   const lastSleepEnd = sleepEnds.length ? Math.max(...sleepEnds) : null;
   const candidates = [activeStart, lastSleepEnd].filter(Number.isFinite);
-  return candidates.length ? Math.min(...candidates) : activeStart;
+  return candidates.length ? Math.max(...candidates) : activeStart;
 }
 
 function getAwakeEventInActiveWindow(start = Date.now(), excludeEventId = null) {
@@ -5097,6 +5148,7 @@ function renderAuthControls() {
   renderFamilyAccessPanel();
   updateAccountJourneyGuide();
   updatePostAccessExperience();
+  updateProfileReadyExperience();
   renderCaregiverIdentityPanel();
   renderAvatarCustomizer();
 }
@@ -6012,8 +6064,8 @@ function renderSummary() {
 
 function getSleepReportDays() {
   return buildFamilyReportDays(7).map((item) => {
-    const sleepEvents = item.events.filter((event) => isSleepEvent(event));
-    const sleepMs = sleepEvents.reduce((total, event) => total + Math.max(0, Math.min(event.end, item.end) - Math.max(event.start, item.start)), 0);
+    const sleepEvents = item.events.filter((event) => isSleepEvent(event) && eventOverlapsWindow(event, item.start, item.end));
+    const sleepMs = getSleepMsForRange(item.start, item.end);
     return { ...item, events: sleepEvents, sleepMs };
   });
 }
@@ -6497,8 +6549,8 @@ function renderTodayOverview() {
   if (todayOverviewSuggestion) {
     let suggestion = "Registre a primeira ação para o Ninou acompanhar o dia com você.";
     if (state.mode === "sleeping") suggestion = `${baby} está dormindo agora. O resumo será atualizado quando acordar.`;
-    else if (Number.isFinite(Number(state.activeStartedAt))) {
-      const awakeMs = now - Number(state.activeStartedAt);
+    else if (Number.isFinite(Number(effectiveAwakeStart))) {
+      const awakeMs = Math.max(0, now - Number(effectiveAwakeStart));
       const targetMs = wakeWindowMinutes * 60000;
       if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
       else suggestion = `Rotina em andamento. Próxima janela de sono estimada em ${formatShortDuration(Math.max(0, targetMs - awakeMs))}.`;
@@ -6579,8 +6631,9 @@ function getNotificationItems() {
     const elapsed = now - Number(latestDiaper.start);
     if (elapsed > 3 * hour) items.push({ icon: "🧷", title: "Fralda", text: `Última fralda registrada há ${formatShortDuration(elapsed)}.` });
   }
-  if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
-    const awake = now - Number(state.activeStartedAt);
+  const effectiveAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
+  if (state.mode === "awake" && Number.isFinite(Number(effectiveAwakeStart))) {
+    const awake = Math.max(0, now - Number(effectiveAwakeStart));
     if (awake > wakeWindowMinutes * 60000) items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
   }
   if (latestAny?.createdByName || latestAny?.createdByEmail) {
@@ -6841,6 +6894,7 @@ function renderAll() {
   renderTodayHomeSections();
   renderProductExperienceSections();
   renderFamilyAccessPanel();
+  updateProfileReadyExperience();
   renderCaregiverIdentityPanel();
 }
 

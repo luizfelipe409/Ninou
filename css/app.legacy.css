@@ -10966,7 +10966,7 @@ body:not(.global-admin-mode) .phone-shell {
   }
 }
 
-/* v75.56.7.12 — fluxo guiado de criação de conta e convites */
+/* v75.56.7.13 — fluxo guiado de criação de conta e convites */
 .account-journey-card,
 .admin-flow-guide {
   position: relative;
@@ -11282,7 +11282,7 @@ body.day-theme .admin-flow-actions button:not(:first-child) {
 }
 
 
-/* v75.56.7.12 — pós-cadastro inteligente e convites profissionais */
+/* v75.56.7.13 — pós-cadastro inteligente e convites profissionais */
 .post-access-card,
 .data-reality-card,
 .first-use-checklist-card,
@@ -11598,7 +11598,7 @@ body.day-theme .invite-result .invite-result-actions a {
   }
 }
 
-/* v75.56.7.12 — entrega premium: refinamento final de demo, perfil e confiança */
+/* v75.56.7.13 — entrega premium: refinamento final de demo, perfil e confiança */
 :root {
   --premium-final-radius: 30px;
   --premium-final-radius-sm: 22px;
@@ -11985,5 +11985,103 @@ body.guest-locked .screen.active:not([data-screen="profile"]) {
 
   .guest-theme-switch button {
     min-height: 44px;
+  }
+}
+
+
+/* v75.56.7.13 — perfil enxuto após configuração + clareza de tempos */
+.profile-ready-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 28px;
+  border: 1px solid rgba(201, 192, 255, 0.18);
+  background: linear-gradient(145deg, rgba(124,229,194,0.10), rgba(143,124,255,0.12)), rgba(34,29,76,0.72);
+  box-shadow: 0 18px 40px rgba(6, 8, 26, 0.18);
+}
+.profile-ready-head {
+  display: grid;
+  gap: 7px;
+}
+.profile-ready-head span {
+  width: max-content;
+  max-width: 100%;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(124,229,194,0.12);
+  color: #c9f8ea;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.profile-ready-head strong {
+  color: var(--ink);
+  font-size: clamp(1.25rem, 4vw, 1.55rem);
+  line-height: 1.08;
+}
+.profile-ready-head p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.42;
+}
+.profile-ready-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.profile-ready-grid article {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(201,192,255,0.12);
+  min-width: 0;
+}
+.profile-ready-grid span {
+  color: rgba(247,243,255,0.62);
+  font-size: .72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.profile-ready-grid strong {
+  color: var(--ink);
+  font-size: .9rem;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+body.day-theme .profile-ready-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(239,252,247,0.92));
+  border-color: rgba(45,111,94,.14);
+  box-shadow: 0 18px 36px rgba(116, 94, 145, 0.10);
+}
+body.day-theme .profile-ready-head span {
+  background: rgba(45,111,94,.08);
+  color: #2d6f5e;
+}
+body.day-theme .profile-ready-head strong,
+body.day-theme .profile-ready-grid strong {
+  color: #3d344a;
+}
+body.day-theme .profile-ready-head p,
+body.day-theme .profile-ready-grid span {
+  color: rgba(61,52,74,.64);
+}
+body.day-theme .profile-ready-grid article {
+  background: rgba(255,255,255,.72);
+  border-color: rgba(45,111,94,.10);
+}
+body.profile-daily-ready #premiumTrustCard,
+body.profile-daily-ready #accountJourneyCard,
+body.profile-daily-ready #postAccessCard,
+body.profile-daily-ready #dataRealityCard,
+body.profile-daily-ready #firstUseChecklistCard {
+  display: none !important;
+}
+@media (max-width: 520px) {
+  .profile-ready-grid {
+    grid-template-columns: 1fr;
   }
 }

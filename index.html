@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.56.7.12" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.7.13" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -477,6 +477,19 @@
           <div class="avatar-only-badge" id="profilePhotoButtonText">Coleção premium</div>
           <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
+
+        <section id="profileReadyCard" class="profile-ready-card" hidden aria-live="polite">
+          <div class="profile-ready-head">
+            <span id="profileReadyKicker">Conta pronta</span>
+            <strong id="profileReadyTitle">Perfil familiar configurado.</strong>
+            <p id="profileReadyText">A entrada já está concluída. Mantivemos aqui apenas o que ajuda no uso diário.</p>
+          </div>
+          <div class="profile-ready-grid" aria-label="Resumo da conta familiar">
+            <article><span>Família</span><strong id="profileReadyFamily">Conectada</strong></article>
+            <article><span>Acesso</span><strong id="profileReadyRole">Responsável</strong></article>
+            <article><span>Aparelho</span><strong id="profileReadyDevice">Identificado</strong></article>
+          </div>
+        </section>
 
         <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome" aria-label="Boas-vindas ao Ninou">
           <div class="guest-welcome-top">
@@ -1214,6 +1227,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.56.7.12"></script>
+    <script type="module" src="./app.js?v=75.56.7.13"></script>
   </body>
 </html>
