@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.56.7.8" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.7.12" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -490,7 +490,6 @@
             <div>
               <button type="button" data-theme-choice="light">☀ Claro</button>
               <button type="button" data-theme-choice="dark">🌙 Escuro</button>
-              <button type="button" data-theme-choice="auto">✨ Auto</button>
             </div>
           </div>
 
@@ -504,6 +503,132 @@
           <div class="guest-welcome-actions">
             <button id="guestWelcomeLoginButton" type="button">Entrar</button>
             <button id="guestWelcomeInviteButton" type="button">Tenho convite</button>
+          </div>
+        </section>
+
+        <section id="premiumTrustCard" class="premium-trust-card" aria-label="Diferenciais de confiança do Ninou">
+          <span>Entrega premium</span>
+          <strong>Uma entrada clara, bonita e segura para cada família.</strong>
+          <p>O usuário entende quando está vendo uma demonstração, como aceitar convite e quando passa a visualizar dados reais do bebê.</p>
+          <div class="premium-trust-grid" aria-label="Pontos de confiança">
+            <article><b>01</b><strong>Demo identificada</strong><small>Dados fictícios sempre sinalizados.</small></article>
+            <article><b>02</b><strong>Acesso por convite</strong><small>Conta conectada à família correta.</small></article>
+            <article><b>03</b><strong>Uso familiar</strong><small>Nome e vínculo em cada aparelho.</small></article>
+          </div>
+        </section>
+
+        <section id="accountJourneyCard" class="account-journey-card" aria-label="Passo a passo para começar no Ninou">
+          <div class="journey-head">
+            <span>Comece em 4 passos</span>
+            <strong>Do convite ao primeiro registro, sem confusão.</strong>
+            <p id="accountJourneyHint">O admin cria o convite, você entra com seu e-mail e o Ninou conecta sua conta à família certa.</p>
+          </div>
+          <ol class="journey-steps" aria-label="Fluxo de acesso do usuário">
+            <li data-journey-step="invite">
+              <i>1</i>
+              <div>
+                <strong>Recebi o convite</strong>
+                <span>Código ou link enviado pelo administrador da família.</span>
+              </div>
+            </li>
+            <li data-journey-step="account">
+              <i>2</i>
+              <div>
+                <strong>Criei minha conta</strong>
+                <span>Use o mesmo e-mail que recebeu o convite.</span>
+              </div>
+            </li>
+            <li data-journey-step="family">
+              <i>3</i>
+              <div>
+                <strong>Conectei à família</strong>
+                <span>O app valida o convite e libera a rotina correta.</span>
+              </div>
+            </li>
+            <li data-journey-step="record">
+              <i>4</i>
+              <div>
+                <strong>Comecei a registrar</strong>
+                <span>Sono, mamadas, fraldas, medicamentos e dados do bebê.</span>
+              </div>
+            </li>
+          </ol>
+          <div class="journey-actions">
+            <button type="button" data-journey-action="login">Entrar agora</button>
+            <button type="button" data-journey-action="create">Criar conta</button>
+            <button type="button" data-journey-action="invite">Tenho convite</button>
+          </div>
+        </section>
+
+        <section id="postAccessCard" class="post-access-card" hidden aria-live="polite">
+          <div class="post-access-hero">
+            <span id="postAccessKicker">Conta criada</span>
+            <strong id="postAccessTitle">Agora vamos conectar você à família.</strong>
+            <p id="postAccessText">O Ninou verifica se existe convite pendente e orienta o próximo passo para liberar os dados reais.</p>
+          </div>
+          <div class="post-access-grid" aria-label="Status da conexão">
+            <article data-post-status="account">
+              <i>✓</i>
+              <div>
+                <strong>Conta</strong>
+                <span id="postAccessAccountStatus">Aguardando login</span>
+              </div>
+            </article>
+            <article data-post-status="invite">
+              <i>•</i>
+              <div>
+                <strong>Convite</strong>
+                <span id="postAccessInviteStatus">Aguardando código</span>
+              </div>
+            </article>
+            <article data-post-status="family">
+              <i>•</i>
+              <div>
+                <strong>Família</strong>
+                <span id="postAccessFamilyStatus">Ainda não conectada</span>
+              </div>
+            </article>
+          </div>
+          <div class="post-access-actions">
+            <button type="button" data-post-access-action="invite">Conectar convite</button>
+            <button type="button" data-post-access-action="profile">Configurar meu perfil</button>
+            <button type="button" data-post-access-action="start">Começar a acompanhar</button>
+          </div>
+        </section>
+
+        <section id="dataRealityCard" class="data-reality-card" aria-live="polite">
+          <span id="dataRealityKicker">Demonstração</span>
+          <strong id="dataRealityTitle">Você está vendo uma prévia do Ninou.</strong>
+          <p id="dataRealityText">Os cards e gráficos fora do Perfil usam dados fictícios até uma conta familiar ser conectada.</p>
+        </section>
+
+        <section id="firstUseChecklistCard" class="first-use-checklist-card" hidden aria-label="Primeira configuração guiada">
+          <div class="first-use-head">
+            <span>Primeiro uso</span>
+            <strong>Checklist para começar com segurança</strong>
+            <p>Finalize estes pontos para que os registros apareçam com o nome correto e a rotina fique clara para toda a família.</p>
+          </div>
+          <ol class="first-use-list">
+            <li data-first-use-step="identity">
+              <i>1</i>
+              <div><strong>Definir meu nome no app</strong><span>Ex.: Luiz, Maria, Papai ou Mamãe.</span></div>
+            </li>
+            <li data-first-use-step="relation">
+              <i>2</i>
+              <div><strong>Escolher meu vínculo</strong><span>Pai, mãe, avó, babá ou responsável.</span></div>
+            </li>
+            <li data-first-use-step="theme">
+              <i>3</i>
+              <div><strong>Confirmar tema</strong><span>Claro ou escuro, conforme preferência.</span></div>
+            </li>
+            <li data-first-use-step="routine">
+              <i>4</i>
+              <div><strong>Conhecer os registros</strong><span>Sono, mamadas, fraldas, medicamentos e diário.</span></div>
+            </li>
+          </ol>
+          <div class="first-use-actions">
+            <button type="button" data-post-access-action="profile">Configurar identificação</button>
+            <button type="button" data-post-access-action="start">Ver rotina</button>
           </div>
         </section>
         <section class="settings-list">
@@ -571,11 +696,10 @@
           <article class="appearance-profile-block">
             <span>Aparência</span>
             <strong>Tema do app</strong>
-            <p>Escolha se o Ninou muda sozinho conforme o horário ou se fica sempre claro/escuro.</p>
+            <p>Escolha entre tema claro e escuro para a experiência inicial e para o uso diário.</p>
             <label>
               Modo de visual
               <select id="themeModeInput">
-                <option value="auto">Automático — dia/noite</option>
                 <option value="light">Claro</option>
                 <option value="dark">Escuro</option>
               </select>
@@ -679,6 +803,36 @@
                   <p>Gerencie sua conta, famílias, membros, convites, migrações e diagnósticos com dados familiares carregados apenas sob demanda.</p>
                 </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
+              </section>
+
+              <section id="adminFlowGuide" class="admin-flow-guide admin-clean-section" aria-label="Fluxo recomendado para o admin">
+                <div class="admin-invite-header">
+                  <strong>Fluxo recomendado do admin</strong>
+                  <em>Uma jornada clara para criar a família, convidar a pessoa certa e acompanhar a liberação do acesso.</em>
+                </div>
+                <ol class="admin-flow-steps">
+                  <li>
+                    <i>1</i>
+                    <div><strong>Criar ou selecionar família</strong><span>Defina a família/cliente antes de gerar qualquer convite.</span></div>
+                  </li>
+                  <li>
+                    <i>2</i>
+                    <div><strong>Gerar convite pelo e-mail correto</strong><span>O convidado deve usar o mesmo e-mail ao criar a conta.</span></div>
+                  </li>
+                  <li>
+                    <i>3</i>
+                    <div><strong>Enviar código ou link</strong><span>Compartilhe por WhatsApp, e-mail ou mensagem direta.</span></div>
+                  </li>
+                  <li>
+                    <i>4</i>
+                    <div><strong>Acompanhar aceitação</strong><span>Depois de aceito, a pessoa aparece como membro da família.</span></div>
+                  </li>
+                </ol>
+                <div class="admin-flow-actions">
+                  <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="invite">Gerar convite</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="members">Ver membros</button>
+                </div>
               </section>
 
               <section class="admin-stats-card admin-clean-section" aria-live="polite">
@@ -820,6 +974,11 @@
                 </div>
                 <button id="createInviteButton" type="button">Gerar convite</button>
                 <div id="inviteResult" class="invite-result" hidden></div>
+                <div id="adminInviteMessagePreview" class="invite-message-preview" aria-label="Mensagem sugerida para convite">
+                  <span>Mensagem pronta para WhatsApp</span>
+                  <p>Você foi convidado para acompanhar a rotina do bebê no Ninou. Crie sua conta com o mesmo e-mail do convite e use o código/link enviado pelo administrador.</p>
+                  <small>Depois de gerar o convite, o Ninou monta a mensagem com link, código e permissão.</small>
+                </div>
               </section>
 
               <section class="admin-clean-section admin-list-section">
@@ -1055,6 +1214,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.56.7.8"></script>
+    <script type="module" src="./app.js?v=75.56.7.12"></script>
   </body>
 </html>

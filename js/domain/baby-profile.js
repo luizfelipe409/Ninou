@@ -3,7 +3,7 @@ import { readJson, readString, writeJson, writeString } from "../storage/local-s
 import { loadLocalWeights, normalizeWeights, persistLocalWeights } from "./weights.js";
 
 export const defaultWakeWindowMinutes = 70;
-export const profileThemeModes = Object.freeze(["auto", "light", "dark"]);
+export const profileThemeModes = Object.freeze(["light", "dark"]);
 
 export const defaultBabyAvatar = Object.freeze({
   face: "3d-soft",
@@ -30,7 +30,7 @@ export function normalizeBabyAvatar(avatar = {}) {
 }
 
 export function normalizeThemeMode(value) {
-  return profileThemeModes.includes(value) ? value : "auto";
+  return profileThemeModes.includes(value) ? value : "dark";
 }
 
 export function getDefaultBabyProfile() {
@@ -38,7 +38,7 @@ export function getDefaultBabyProfile() {
     name: "",
     article: "do",
     birthDate: "",
-    themeMode: normalizeThemeMode(readString(storageKeys.themeMode, "auto")),
+    themeMode: normalizeThemeMode(readString(storageKeys.themeMode, "dark")),
     avatar: normalizeBabyAvatar(),
     avatarConfigured: false,
     weights: loadLocalWeights(),
@@ -46,7 +46,7 @@ export function getDefaultBabyProfile() {
 }
 
 export function normalizeBabyProfile(profile = {}) {
-  const themeMode = normalizeThemeMode(profile.themeMode || readString(storageKeys.themeMode, "auto"));
+  const themeMode = normalizeThemeMode(profile.themeMode || readString(storageKeys.themeMode, "dark"));
   const avatar = normalizeBabyAvatar(profile.avatar || profile.babyAvatar || profile.babyAvatarConfig);
   const explicitConfigured = typeof profile.avatarConfigured === "boolean" ? profile.avatarConfigured : null;
   const inferredConfigured = JSON.stringify(avatar) !== JSON.stringify(defaultBabyAvatar);
@@ -93,7 +93,7 @@ export function hasProfileContent(profile = {}, _photo = "", windowMinutes = def
     normalizedProfile.name.trim() ||
       normalizedProfile.birthDate ||
       normalizedProfile.article === "da" ||
-      normalizedProfile.themeMode !== "auto" ||
+      normalizedProfile.themeMode !== "dark" ||
       normalizedProfile.avatarConfigured ||
       normalizedProfile.weights.length > 0 ||
       windowMinutes !== defaultWakeWindowMinutes,

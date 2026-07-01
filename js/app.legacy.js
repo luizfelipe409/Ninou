@@ -128,6 +128,18 @@ const inviteAcceptBox = document.querySelector(".invite-accept-box");
 const guestWelcomeCard = document.querySelector("#guestWelcomeCard");
 const guestWelcomeLoginButton = document.querySelector("#guestWelcomeLoginButton");
 const guestWelcomeInviteButton = document.querySelector("#guestWelcomeInviteButton");
+const postAccessCard = document.querySelector("#postAccessCard");
+const postAccessKicker = document.querySelector("#postAccessKicker");
+const postAccessTitle = document.querySelector("#postAccessTitle");
+const postAccessText = document.querySelector("#postAccessText");
+const postAccessAccountStatus = document.querySelector("#postAccessAccountStatus");
+const postAccessInviteStatus = document.querySelector("#postAccessInviteStatus");
+const postAccessFamilyStatus = document.querySelector("#postAccessFamilyStatus");
+const dataRealityCard = document.querySelector("#dataRealityCard");
+const dataRealityKicker = document.querySelector("#dataRealityKicker");
+const dataRealityTitle = document.querySelector("#dataRealityTitle");
+const dataRealityText = document.querySelector("#dataRealityText");
+const firstUseChecklistCard = document.querySelector("#firstUseChecklistCard");
 const guestOnboardingModal = document.querySelector("#guestOnboardingModal");
 const guestModalCloseButton = document.querySelector("#guestModalCloseButton");
 const guestModalLoginButton = document.querySelector("#guestModalLoginButton");
@@ -364,6 +376,7 @@ let firebaseServicesPromise = null;
 let cloudUser = null;
 let familyAccess = loadFamilyAccess();
 let pendingInviteCode = getInitialInviteCode();
+let accessFlowNotice = "";
 let recentInvites = [];
 let adminStatsRequestId = 0;
 let selectedAdminFamilyId = loadSelectedAdminFamilyId();
@@ -618,21 +631,21 @@ function applyGuestInteractionLock() {
   }
   if (guestWelcomeCard) guestWelcomeCard.hidden = !locked;
   renderGuestPremiumContent();
+  updateAccountJourneyGuide();
 }
 
 
 const guestThemeOptions = Object.freeze([
   { mode: "light", label: "Claro", icon: "☀" },
   { mode: "dark", label: "Escuro", icon: "🌙" },
-  { mode: "auto", label: "Auto", icon: "✨" },
 ]);
 
-function normalizeGuestThemeMode(mode = "auto") {
-  return guestThemeOptions.some((option) => option.mode === mode) ? mode : "auto";
+function normalizeGuestThemeMode(mode = "dark") {
+  return guestThemeOptions.some((option) => option.mode === mode) ? mode : "dark";
 }
 
 function getActiveGuestThemeMode() {
-  return normalizeGuestThemeMode(themeModeInput?.value || babyProfile?.themeMode || localStorage.getItem(storageKeys.themeMode) || "auto");
+  return normalizeGuestThemeMode(themeModeInput?.value || babyProfile?.themeMode || localStorage.getItem(storageKeys.themeMode) || "dark");
 }
 
 function renderGuestThemeButtons() {
@@ -644,7 +657,7 @@ function renderGuestThemeButtons() {
   });
 }
 
-function setGuestThemeChoice(mode = "auto") {
+function setGuestThemeChoice(mode = "dark") {
   const safeMode = normalizeGuestThemeMode(mode);
   if (themeModeInput) themeModeInput.value = safeMode;
   babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: safeMode });
@@ -1033,6 +1046,12 @@ function getGuestPremiumCardMarkup(screenKey) {
       </section>
     </div>
 
+    <div class="guest-premium-proof" aria-label="Confirmações da demonstração">
+      <span>Dados fictícios</span>
+      <span>Fluxo por convite</span>
+      <span>Claro ou escuro</span>
+    </div>
+
     <p class="guest-store-cta">${escapeHtml(item.cta)}</p>
 
     <div class="guest-premium-actions">
@@ -1067,6 +1086,238 @@ function renderGuestPremiumContent() {
   activeScreen.prepend(card);
 }
 
+
+
+function setPostStatusState(key, state = "pending") {
+  const item = postAccessCard?.querySelector(`[data-post-status="${key}"]`);
+  if (!item) return;
+  item.dataset.state = state;
+  item.classList.toggle("done", state === "done");
+  item.classList.toggle("current", state === "current");
+  item.classList.toggle("pending", state === "pending");
+  const indicator = item.querySelector("i");
+  if (indicator) indicator.textContent = state === "done" ? "✓" : state === "current" ? "•" : "–";
+}
+
+function setFirstUseStepState(step, state = "pending") {
+  const item = firstUseChecklistCard?.querySelector(`[data-first-use-step="${step}"]`);
+  if (!item) return;
+  item.dataset.state = state;
+  item.classList.toggle("done", state === "done");
+  item.classList.toggle("current", state === "current");
+  item.classList.toggle("pending", state === "pending");
+}
+
+function updateDataRealityCard() {
+  if (!dataRealityCard) return;
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const baby = getBabyDisplayName();
+
+  dataRealityCard.hidden = appAdmin && !window.__ninouAdminFamilyDataOpen;
+
+  if (!connected) {
+    dataRealityCard.dataset.mode = "demo";
+    if (dataRealityKicker) dataRealityKicker.textContent = "Demonstração";
+    if (dataRealityTitle) dataRealityTitle.textContent = "Você está vendo uma prévia do Ninou.";
+    if (dataRealityText) dataRealityText.textContent = "As telas de Hoje, Diário, Dados e Sons usam exemplos fictícios até uma conta familiar ser conectada.";
+    return;
+  }
+
+  if (!authorized) {
+    dataRealityCard.dataset.mode = "pending";
+    if (dataRealityKicker) dataRealityKicker.textContent = "Conta conectada";
+    if (dataRealityTitle) dataRealityTitle.textContent = "Falta conectar uma família.";
+    if (dataRealityText) dataRealityText.textContent = "Use o código de convite recebido do administrador para liberar os dados reais da rotina.";
+    return;
+  }
+
+  dataRealityCard.dataset.mode = "real";
+  if (dataRealityKicker) dataRealityKicker.textContent = "Dados reais";
+  if (dataRealityTitle) dataRealityTitle.textContent = `Você está vendo a rotina de ${baby}.`;
+  if (dataRealityText) dataRealityText.textContent = "A demonstração foi substituída pelos registros reais da família conectada neste aparelho.";
+}
+
+function updateFirstUseChecklist() {
+  if (!firstUseChecklistCard) return;
+
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  firstUseChecklistCard.hidden = appAdmin || !connected || !authorized;
+  if (firstUseChecklistCard.hidden) return;
+
+  const identity = loadCurrentCaregiverIdentity();
+  const hasName = Boolean(String(identity.name || "").trim() || String(caregiverNameInput?.value || "").trim());
+  const hasRelation = Boolean(String(identity.relation || "").trim() || String(caregiverRelationInput?.value || "").trim());
+  const hasTheme = ["light", "dark"].includes(String(themeModeInput?.value || babyProfile?.themeMode || "").trim());
+  const hasRoutine = Array.isArray(state?.events) && state.events.length > 0;
+
+  setFirstUseStepState("identity", hasName ? "done" : "current");
+  setFirstUseStepState("relation", hasRelation ? "done" : hasName ? "current" : "pending");
+  setFirstUseStepState("theme", hasTheme ? "done" : "current");
+  setFirstUseStepState("routine", hasRoutine ? "done" : "current");
+}
+
+function updatePostAccessExperience() {
+  updateDataRealityCard();
+  updateFirstUseChecklist();
+
+  if (!postAccessCard) return;
+
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
+  const baby = getBabyDisplayName();
+  const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
+  const roleLabel = authorized ? getRoleLabel(role) : "";
+
+  postAccessCard.hidden = appAdmin || !connected;
+  if (postAccessCard.hidden) return;
+
+  postAccessCard.dataset.state = authorized ? "accepted" : pendingCode ? "pending-invite" : "connected";
+
+  if (authorized) {
+    if (postAccessKicker) postAccessKicker.textContent = accessFlowNotice === "invite-accepted" ? "Convite aceito" : "Família conectada";
+    if (postAccessTitle) postAccessTitle.textContent = `Você entrou na família de ${baby}.`;
+    if (postAccessText) postAccessText.textContent = `Seu acesso: ${roleLabel}. Agora você pode começar a acompanhar a rotina real conforme sua permissão.`;
+    if (postAccessAccountStatus) postAccessAccountStatus.textContent = "Conta conectada";
+    if (postAccessInviteStatus) postAccessInviteStatus.textContent = familyAccess?.inviteCode ? `Convite ${familyAccess.inviteCode}` : "Acesso validado";
+    if (postAccessFamilyStatus) postAccessFamilyStatus.textContent = `Família de ${baby}`;
+    setPostStatusState("account", "done");
+    setPostStatusState("invite", "done");
+    setPostStatusState("family", "done");
+  } else {
+    if (postAccessKicker) postAccessKicker.textContent = accessFlowNotice === "created" ? "Conta criada" : "Conta conectada";
+    if (postAccessTitle) postAccessTitle.textContent = pendingCode ? "Convite detectado. Falta confirmar." : "Agora vamos conectar você à família.";
+    if (postAccessText) postAccessText.textContent = pendingCode
+      ? "Cole ou confirme o código recebido para liberar a família vinculada ao seu e-mail."
+      : "Se você recebeu convite, use o código enviado pelo administrador. Se não recebeu, peça um convite para acessar a rotina real.";
+    if (postAccessAccountStatus) postAccessAccountStatus.textContent = cloudUser?.email || "Conta conectada";
+    if (postAccessInviteStatus) postAccessInviteStatus.textContent = pendingCode ? `Código ${pendingCode}` : "Aguardando convite";
+    if (postAccessFamilyStatus) postAccessFamilyStatus.textContent = "Ainda não liberada";
+    setPostStatusState("account", "done");
+    setPostStatusState("invite", pendingCode ? "current" : "pending");
+    setPostStatusState("family", "pending");
+  }
+
+  postAccessCard.querySelectorAll("[data-post-access-action]").forEach((button) => {
+    const action = button.dataset.postAccessAction || "";
+    if (action === "invite") {
+      button.hidden = authorized;
+      button.textContent = pendingCode ? "Confirmar convite" : "Conectar convite";
+    }
+    if (action === "profile") {
+      button.hidden = !authorized;
+    }
+    if (action === "start") {
+      button.hidden = !authorized;
+    }
+  });
+}
+
+function buildProfessionalInviteMessage({ familyLabel = "família", baby = getBabyDisplayName(), code = "", link = "", roleLabel = "Acesso familiar" } = {}) {
+  return [
+    `Você foi convidado para acompanhar a rotina de ${baby} no Ninou.`,
+    "",
+    `Família: ${familyLabel}`,
+    `Permissão: ${roleLabel}`,
+    code ? `Código do convite: ${code}` : "",
+    link ? `Link de acesso: ${link}` : "",
+    "",
+    "Crie sua conta com o mesmo e-mail que recebeu este convite. Assim o Ninou conecta você à família certa com segurança."
+  ].filter(Boolean).join("\n");
+}
+
+function getWhatsAppShareUrl(message = "") {
+  return `https://wa.me/?text=${encodeURIComponent(message)}`;
+}
+
+function renderInviteResultWithMessage({ title = "Convite pronto", familyLabel = "", email = "", role = "responsavel", code = "", link = "" } = {}) {
+  if (!inviteResult) return;
+  const roleLabel = getRoleLabel(role);
+  const message = buildProfessionalInviteMessage({ familyLabel, code, link, roleLabel });
+  const whatsappUrl = getWhatsAppShareUrl(message);
+  inviteResult.innerHTML = `
+    <strong>${escapeHtml(title)}</strong>
+    ${familyLabel ? `<span>Família: ${escapeHtml(familyLabel)}</span>` : ""}
+    ${code ? `<span>Código: ${escapeHtml(code)}</span>` : ""}
+    ${email ? `<span>Envie para: ${escapeHtml(email)}</span>` : ""}
+    <div class="invite-result-actions">
+      ${link ? `<button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>` : ""}
+      <button type="button" data-copy-invite="${escapeHtml(message)}">Copiar mensagem</button>
+      <a href="${escapeHtml(whatsappUrl)}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
+    </div>
+  `;
+  const preview = document.querySelector("#adminInviteMessagePreview");
+  if (preview) {
+    preview.innerHTML = `
+      <span>Mensagem pronta para WhatsApp</span>
+      <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
+      <small>Copie a mensagem ou envie pelo WhatsApp. O convidado precisa usar o mesmo e-mail informado.</small>
+    `;
+  }
+}
+
+
+function setJourneyStepState(card, step, state) {
+  const item = card?.querySelector(`[data-journey-step="${step}"]`);
+  if (!item) return;
+  item.dataset.state = state;
+  item.classList.toggle("done", state === "done");
+  item.classList.toggle("current", state === "current");
+  item.classList.toggle("pending", state === "pending");
+}
+
+function updateAccountJourneyGuide() {
+  const card = document.querySelector("#accountJourneyCard");
+  if (!card) return;
+
+  const appAdmin = isGlobalAppAdmin();
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
+  const hint = card.querySelector("#accountJourneyHint");
+
+  card.hidden = appAdmin;
+  if (appAdmin) return;
+
+  card.dataset.state = authorized ? "ready" : connected ? "connected" : "guest";
+
+  setJourneyStepState(card, "invite", authorized || pendingCode ? "done" : "current");
+  setJourneyStepState(card, "account", connected ? "done" : pendingCode ? "current" : "pending");
+  setJourneyStepState(card, "family", authorized ? "done" : connected ? "current" : "pending");
+  setJourneyStepState(card, "record", authorized ? "current" : "pending");
+
+  if (hint) {
+    hint.textContent = authorized
+      ? "Acesso familiar liberado. Agora este aparelho pode registrar e acompanhar a rotina conforme sua permissão."
+      : connected
+        ? (pendingCode
+          ? "Convite detectado. Cole ou confirme o código para conectar esta conta à família certa."
+          : "Conta criada. Agora use o código de convite enviado pelo administrador para liberar a família.")
+        : (pendingCode
+          ? "Convite salvo neste aparelho. Crie sua conta ou entre usando o mesmo e-mail convidado pelo admin."
+          : "O admin gera o convite; depois você entra ou cria conta com o mesmo e-mail para liberar a rotina familiar.");
+  }
+
+  card.querySelectorAll("[data-journey-action]").forEach((button) => {
+    const action = button.dataset.journeyAction || "login";
+    if (action === "invite") {
+      button.textContent = connected ? "Inserir convite" : "Tenho convite";
+      button.hidden = authorized;
+    }
+    if (action === "create") button.hidden = connected;
+    if (action === "login") {
+      button.hidden = false;
+      button.textContent = connected ? (authorized ? "Ver rotina" : "Conta conectada") : "Entrar agora";
+      button.disabled = connected && !authorized;
+    }
+  });
+}
+
 function closeGuestLoginModal() {
   if (guestOnboardingModal) guestOnboardingModal.hidden = true;
 }
@@ -1084,15 +1335,19 @@ function focusProfileAccess(mode = "login") {
   showScreen("profile");
 
   const wantsInvite = mode === "invite";
+  const wantsCreate = mode === "create";
   if (loginHelper) {
     loginHelper.textContent = wantsInvite
-      ? "Entre ou crie sua conta para usar o convite. Depois cole o código recebido pelo administrador."
-      : "Entre para salvar a rotina com segurança e acompanhar o bebê em família.";
+      ? "Entre ou crie sua conta com o mesmo e-mail do convite. Depois cole o código recebido pelo administrador."
+      : wantsCreate
+        ? "Informe seu e-mail, crie uma senha e toque em Criar conta. Se você recebeu convite, use o mesmo e-mail indicado pelo admin."
+        : "Entre para salvar a rotina com segurança e acompanhar o bebê em família.";
   }
 
   window.setTimeout(() => {
     const loginCard = loginHelper?.closest(".login-card");
-    const target = wantsInvite && isLoggedIn() ? inviteAcceptBox : loginCard;
+    const journeyCard = document.querySelector("#accountJourneyCard");
+    const target = wantsInvite && isLoggedIn() ? inviteAcceptBox : (journeyCard || loginCard);
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
     if (wantsInvite && isLoggedIn()) {
       inviteCodeInput?.focus();
@@ -1664,7 +1919,7 @@ function resetVisibleContextForGuest() {
   selectedDiaryDay = null;
   autoSelectedLatestFamilyDay = false;
   wakeWindowMinutes = 70;
-  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
   currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
@@ -1682,7 +1937,7 @@ function prepareAdminPanelContext(user = cloudUser) {
   autoSelectedLatestFamilyDay = false;
   window.__ninouAdminFamilyDataOpen = false;
   wakeWindowMinutes = 70;
-  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
   currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
@@ -1919,6 +2174,7 @@ function clearPendingInviteCode() {
   pendingInviteCode = "";
   try { localStorage.removeItem(storageKeys.pendingInvite); } catch {}
   if (inviteCodeInput) inviteCodeInput.value = "";
+  try { updateAccountJourneyGuide(); } catch {}
 }
 
 function resetMigrationSearchState() {
@@ -4336,11 +4592,14 @@ async function createFamilyInvite() {
       const existingStatus = existing.status || "pending";
       if (existingStatus === "accepted" || existingStatus === "active") {
         if (inviteResult) {
-          inviteResult.innerHTML = `
-            <strong>Convite já aceito</strong>
-            <span>${escapeHtml(email)} já está autorizado na família selecionada.</span>
-            <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link novamente</button>
-          `;
+          renderInviteResultWithMessage({
+            title: "Convite já aceito",
+            familyLabel,
+            email,
+            role: existing.role || role,
+            code,
+            link,
+          });
         }
         recentInvites.unshift({ code, email, role: existing.role || role, link });
         renderInviteList();
@@ -4377,13 +4636,14 @@ async function createFamilyInvite() {
     renderInviteList();
     refreshAdminStats({ silent: true });
     if (inviteResult) {
-      inviteResult.innerHTML = `
-        <strong>Convite pronto</strong>
-        <span>Família: ${escapeHtml(familyLabel)}</span>
-        <span>Código: ${escapeHtml(code)}</span>
-        <span>Envie para: ${escapeHtml(email)}</span>
-        <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>
-      `;
+      renderInviteResultWithMessage({
+        title: "Convite pronto",
+        familyLabel,
+        email,
+        role,
+        code,
+        link,
+      });
     }
     if (adminInviteEmail) adminInviteEmail.value = "";
   } catch (error) {
@@ -4491,6 +4751,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
       console.warn("Convite aceito, mas o espelho da família não foi atualizado:", mirrorError);
     }
 
+    accessFlowNotice = "invite-accepted";
     pendingInviteCode = "";
     localStorage.removeItem(storageKeys.pendingInvite);
     if (inviteCodeInput) inviteCodeInput.value = "";
@@ -4834,6 +5095,8 @@ function renderAuthControls() {
   });
   updateGuestWhatsappButton();
   renderFamilyAccessPanel();
+  updateAccountJourneyGuide();
+  updatePostAccessExperience();
   renderCaregiverIdentityPanel();
   renderAvatarCustomizer();
 }
@@ -5206,6 +5469,7 @@ async function initFirebaseAuthState() {
     cloudUser = user;
 
     if (!user) {
+      accessFlowNotice = "";
       unsubscribeCloudListeners();
       clearLocalAccountData();
       setSyncStatus("offline");
@@ -5293,6 +5557,7 @@ async function signInAccount() {
     createAccountButton.disabled = true;
 
     await services.signInWithEmailAndPassword(services.auth, credentials.email, credentials.password);
+    accessFlowNotice = "signed-in";
     localStorage.setItem(storageKeys.email, credentials.email);
   } catch (error) {
     console.error("Erro ao entrar:", error);
@@ -5325,6 +5590,7 @@ async function createAccount() {
     createAccountButton.disabled = true;
 
     await services.createUserWithEmailAndPassword(services.auth, credentials.email, credentials.password);
+    accessFlowNotice = "created";
     localStorage.setItem(storageKeys.email, credentials.email);
   } catch (error) {
     console.error("Erro ao criar conta:", error);
@@ -7525,11 +7791,43 @@ if (guestOnboardingModal) {
   });
 }
 document.addEventListener("click", (event) => {
+  const postAction = event.target.closest("[data-post-access-action]");
+  if (postAction) {
+    event.preventDefault();
+    event.stopPropagation();
+    const action = postAction.dataset.postAccessAction || "profile";
+    if (action === "invite") {
+      focusProfileAccess("invite");
+      return;
+    }
+    if (action === "start") {
+      showScreen("today");
+      return;
+    }
+    const target = caregiverIdentityCard || document.querySelector("#accountJourneyCard");
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    caregiverNameInput?.focus();
+    return;
+  }
+
   const themeAction = event.target.closest("[data-theme-choice]");
   if (themeAction) {
     event.preventDefault();
     event.stopPropagation();
-    setGuestThemeChoice(themeAction.dataset.themeChoice || "auto");
+    setGuestThemeChoice(themeAction.dataset.themeChoice || "dark");
+    return;
+  }
+
+  const journeyAction = event.target.closest("[data-journey-action]");
+  if (journeyAction) {
+    event.preventDefault();
+    event.stopPropagation();
+    const action = journeyAction.dataset.journeyAction || "login";
+    if (action === "login" && isLoggedIn() && hasFamilyAccess()) {
+      showScreen("today");
+      return;
+    }
+    focusProfileAccess(action === "invite" ? "invite" : action === "create" ? "create" : "login");
     return;
   }
 
