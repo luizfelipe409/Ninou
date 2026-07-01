@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.56.7.13" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.7.14" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -230,12 +230,20 @@
           </div>
         </section>
 
-        <section class="weekly-overview-card" aria-label="Histórico semanal rápido">
-          <div class="drawer-section-title">
-            <span>Resumo</span>
-            <strong>Últimos 7 dias</strong>
+        <section class="weekly-overview-card summary-premium-card" aria-label="Resumo da rotina por período">
+          <div class="summary-range-head">
+            <div>
+              <span>Resumo</span>
+              <strong id="summaryRangeLabel">Últimos 7 dias</strong>
+            </div>
+            <div class="summary-range-control" role="group" aria-label="Escolher período do resumo">
+              <button type="button" data-summary-range="day">Diário</button>
+              <button type="button" data-summary-range="3d">3 dias</button>
+              <button type="button" data-summary-range="7d" class="active">7 dias</button>
+            </div>
           </div>
           <div id="weeklyOverview" class="weekly-overview"></div>
+          <p id="summaryRangeHint" class="summary-range-hint">Resumo acumulado dos últimos 7 dias, com sono, mamadas, fraldas e medicamentos.</p>
         </section>
 
         <section class="day-story-card" aria-label="Como foi o dia do bebê">
@@ -1227,6 +1235,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.56.7.13"></script>
+    <script type="module" src="./app.js?v=75.56.7.14"></script>
   </body>
 </html>

@@ -252,6 +252,9 @@ const routineProgressStatus = document.querySelector("#routineProgressStatus");
 const dailyRhythm = document.querySelector("#dailyRhythm");
 const intelligentTimeline = document.querySelector("#intelligentTimeline");
 const weeklyOverview = document.querySelector("#weeklyOverview");
+const summaryRangeButtons = document.querySelectorAll("[data-summary-range]");
+const summaryRangeLabel = document.querySelector("#summaryRangeLabel");
+const summaryRangeHint = document.querySelector("#summaryRangeHint");
 const dayStoryText = document.querySelector("#dayStoryText");
 const trendKpis = document.querySelector("#trendKpis");
 const bottleAmountRange = document.querySelector("#bottleAmountRange");
@@ -405,6 +408,14 @@ let liveTickMinute = -1;
 let breastTimerState = createBreastTimerState();
 let state = loadLocalDayState();
 let loadedStateDayId = getCurrentDayId();
+const SUMMARY_RANGE_KEY = "ninou.summaryRangeMode";
+const summaryRangeOptions = Object.freeze({
+  day: { days: 1, label: "Diário", hint: "Resumo do dia selecionado, focado no que aconteceu hoje." },
+  "3d": { days: 3, label: "Últimos 3 dias", hint: "Resumo curto dos últimos 3 dias para perceber mudanças recentes." },
+  "7d": { days: 7, label: "Últimos 7 dias", hint: "Resumo acumulado dos últimos 7 dias, com sono, mamadas, fraldas e medicamentos." },
+});
+let summaryRangeMode = normalizeSummaryRangeMode(localStorage.getItem(SUMMARY_RANGE_KEY) || "7d");
+let intelligentTimelineLimit = 7;
 
 let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 let avatarEditorForceOpen = false;
@@ -6189,6 +6200,44 @@ function renderSupplementalReports() {
   );
 }
 
+
+
+function normalizeSummaryRangeMode(value) {
+  return Object.prototype.hasOwnProperty.call(summaryRangeOptions, value) ? value : "7d";
+}
+
+function getSummaryRangeOption() {
+  return summaryRangeOptions[normalizeSummaryRangeMode(summaryRangeMode)] || summaryRangeOptions["7d"];
+}
+
+function renderSummaryRangeControls() {
+  const option = getSummaryRangeOption();
+  summaryRangeButtons.forEach((button) => {
+    const isActive = button.dataset.summaryRange === summaryRangeMode;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+  if (summaryRangeLabel) summaryRangeLabel.textContent = option.label;
+  if (summaryRangeHint) summaryRangeHint.textContent = option.hint;
+}
+
+function setSummaryRangeMode(mode) {
+  const nextMode = normalizeSummaryRangeMode(mode);
+  if (summaryRangeMode === nextMode) return;
+  summaryRangeMode = nextMode;
+  try { localStorage.setItem(SUMMARY_RANGE_KEY, nextMode); } catch {}
+  renderIntelligentHomeSections();
+}
+
+function expandIntelligentTimeline() {
+  intelligentTimelineLimit += 7;
+  renderIntelligentHomeSections();
+}
+
+function resetIntelligentTimelineLimit() {
+  intelligentTimelineLimit = 7;
+}
+
 function renderTodayLastEvents() {
   renderTodayLastEventsPanel({
     container: todayLastEvents,
@@ -6265,13 +6314,18 @@ function renderIntelligentHomeSections() {
     dayMs: day,
     formatShortDuration,
     formatTime,
-    limit: 48,
+    limit: intelligentTimelineLimit,
+    batchSize: 7,
   });
+  const summaryRange = getSummaryRangeOption();
+  renderSummaryRangeControls();
   renderWeeklyOverview({
     container: weeklyOverview,
     state: recentFamilyState,
     todayStart,
     dayMs: day,
+    periodDays: summaryRange.days,
+    periodLabel: summaryRange.label,
     getSleepMsForRange,
     countFeeding: countFeedingEvents,
     countDiaper: countDiaperEvents,
@@ -7779,6 +7833,18 @@ bindBottomNavigation(navButtons, showScreen);
 bindSyncPillNavigation(syncPill, showScreen);
 
 bindShortcutNavigation(shortcutButtons, showScreen);
+
+summaryRangeButtons.forEach((button) => {
+  button.addEventListener("click", () => setSummaryRangeMode(button.dataset.summaryRange));
+});
+
+if (intelligentTimeline) {
+  intelligentTimeline.addEventListener("click", (event) => {
+    const moreButton = event.target.closest("[data-intelligent-timeline-more]");
+    if (!moreButton) return;
+    expandIntelligentTimeline();
+  });
+}
 
 diaryFilterButtons.forEach((button) => {
   button.addEventListener("click", () => setDiaryFilter(button.dataset.diaryFilter));
