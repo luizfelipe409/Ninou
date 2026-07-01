@@ -3,7 +3,7 @@ import { readJson, readString, writeJson, writeString } from "../storage/local-s
 import { loadLocalWeights, normalizeWeights, persistLocalWeights } from "./weights.js";
 
 export const defaultWakeWindowMinutes = 70;
-export const profileThemeModes = Object.freeze(["light", "dark"]);
+export const profileThemeModes = Object.freeze(["light", "dark", "auto"]);
 
 export const defaultBabyAvatar = Object.freeze({
   face: "3d-soft",

@@ -312,7 +312,7 @@ function getSelectedFamilyIdForAdminOrAccess() {
 function getAdminSelectedFamilyLabel(stats = null) {
   const selectedId = getActiveAdminFamilyId();
   const family = Array.isArray(stats?.families) ? stats.families.find((item) => item.id === selectedId) : null;
-  return family?.name || stats?.familyName || babyProfile?.name || "Família selecionada";
+  return family?.name || stats?.familyName || "Família selecionada";
 }
 
 function getAdminAccountPhotoKey(user = cloudUser) {
@@ -624,7 +624,7 @@ function renderAvatarEditorVisibility() {
   if (editBabyAvatarButton) {
     editBabyAvatarButton.hidden = !canEditAvatar;
     editBabyAvatarButton.disabled = !canEditAvatar;
-    editBabyAvatarButton.textContent = visible ? "Fechar coleção premium" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
+    editBabyAvatarButton.textContent = visible ? "Fechar avatares" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
   }
 }
 
@@ -707,14 +707,14 @@ function getGuestThemeSwitchMarkup() {
 
 const guestPremiumContent = {
   today: {
-    kicker: "Preview App Store",
+    kicker: "Conheça o Ninou",
     title: "A rotina do bebê em tempo real",
     text: "Uma demonstração realista de como a família acompanha sono, mamadas, fraldas e medicamentos em poucos toques.",
-    accent: "Hoje • demonstração",
-    liveTitle: "Francisco acordado",
+    accent: "Hoje • exemplo",
+    liveTitle: "Bebê acordado",
     liveValue: "44 min",
     liveHint: "desde 12:35, após a última soneca",
-    cta: "Entre para transformar este preview em rotina real da família.",
+    cta: "Entre para começar a rotina real da família.",
     metrics: [
       { label: "Sono hoje", value: "3h05", note: "1 soneca concluída" },
       { label: "Mamadas", value: "4", note: "420 ml + peito" },
@@ -761,7 +761,7 @@ const guestPremiumContent = {
     kicker: "Histórico por data",
     title: "Diário completo e organizado",
     text: "O usuário entende como cada registro entra no histórico, com horários, detalhes, observações e separação correta por dia.",
-    accent: "30/06 • exemplo",
+    accent: "Data exemplo",
     liveTitle: "Dia completo",
     liveValue: "11 registros",
     liveHint: "madrugada, manhã, tarde e noite separados",
@@ -773,7 +773,7 @@ const guestPremiumContent = {
       { label: "Observações", value: "2", note: "anotações da família" },
     ],
     barsTitle: "Registros por período",
-    barsSubtitle: "distribuição fictícia",
+    barsSubtitle: "distribuição exemplo",
     bars: [
       { label: "Madr.", value: "2", height: 36 },
       { label: "Manhã", value: "6", height: 88 },
@@ -816,10 +816,10 @@ const guestPremiumContent = {
     liveTitle: "Sono médio",
     liveValue: "14h20",
     liveHint: "exemplo de tendência semanal",
-    cta: "Entre para trocar estes dados fictícios pelos gráficos reais do bebê.",
+    cta: "Entre para visualizar os gráficos reais do bebê.",
     metrics: [
-      { label: "Mamadas", value: "8/dia", note: "média fictícia" },
-      { label: "Fraldas", value: "6/dia", note: "média fictícia" },
+      { label: "Mamadas", value: "8/dia", note: "média exemplo" },
+      { label: "Fraldas", value: "6/dia", note: "média exemplo" },
       { label: "Peso", value: "+420 g", note: "evolução exemplo" },
       { label: "Regularidade", value: "82%", note: "padrão semanal" },
     ],
@@ -835,7 +835,7 @@ const guestPremiumContent = {
       { label: "Dom", value: "15h10", height: 90 },
     ],
     lineTitle: "Peso do bebê",
-    lineSubtitle: "linha fictícia de crescimento",
+    lineSubtitle: "linha de exemplo de crescimento",
     line: [
       { label: "1ª", value: 3.18 },
       { label: "2ª", value: 3.32 },
@@ -1608,8 +1608,11 @@ function getFallbackActorNameFromEmail(email = getCurrentActorEmail()) {
 function getCurrentActorProfile() {
   const email = getCurrentActorEmail();
   const localIdentity = loadCurrentCaregiverIdentity();
-  const displayName = String(localIdentity.name || "").trim();
-  const relationshipLabel = String(localIdentity.relationshipLabel || getCaregiverRelationLabel(localIdentity.relation) || "").trim();
+  const storedName = String(localIdentity.name || "").trim();
+  const storedRelationshipLabel = String(localIdentity.relationshipLabel || getCaregiverRelationLabel(localIdentity.relation) || "").trim();
+  const isPrimaryAdmin = isGlobalAdminEmail(email);
+  const displayName = storedName || (isPrimaryAdmin ? "Luiz Felipe" : "");
+  const relationshipLabel = storedRelationshipLabel || (isPrimaryAdmin ? "Pai" : "");
   const label = displayName || relationshipLabel || getFallbackActorNameFromEmail(email);
   const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
   return {
@@ -1749,15 +1752,18 @@ function renderCaregiverIdentityPanel() {
   caregiverIdentityCard.hidden = !logged;
   if (!logged) return;
   const identity = loadCurrentCaregiverIdentity();
-  if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || "";
-  if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || "";
+  const isPrimaryAdmin = isGlobalAppAdmin();
+  if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || (isPrimaryAdmin ? "Luiz Felipe" : "");
+  if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || (isPrimaryAdmin ? "pai" : "");
   if (saveCaregiverIdentityButton) {
     saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
   }
   if (caregiverIdentityStatus) {
     caregiverIdentityStatus.textContent = identity.label
-      ? `Próximos registros feitos neste celular aparecerão como ${identity.label}. Você pode editar nome e vínculo neste aparelho quando precisar.`
-      : "Defina como este celular deve aparecer nos próximos registros.";
+      ? `Próximos registros feitos neste aparelho aparecerão como ${identity.label}. Isso não altera permissões de Admin, família ou convite.`
+      : (isPrimaryAdmin
+        ? "Sugestão inicial deste aparelho: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
+        : "Defina como os registros feitos neste aparelho devem aparecer no diário da família.");
   }
 }
 
@@ -2830,10 +2836,7 @@ function normalizeLegacyProfileData(...sources) {
   const article = firstDefined(rawProfile.article, rawProfile.artigo, merged.article, "do");
   const birthDate = firstDefined(rawProfile.birthDate, rawProfile.birth, rawProfile.birthday, rawProfile.nascimento, rawProfile.diaNascimento, merged.birthDate, "");
   const profile = normalizeBabyProfile({ name, article, birthDate });
-  if (!profile.name || profile.name === "Bebê") {
-    const email = normalizeEmail(merged.email || "");
-    if (email.includes("francisco")) profile.name = "Francisco";
-  }
+  // Não deduzimos o nome do bebê pelo e-mail. O nome exibido deve vir do perfil familiar confirmado.
   return profile;
 }
 
@@ -3199,7 +3202,7 @@ async function scanLegacySourceByManualEmail() {
   if (!isFamilyAdmin()) return null;
   const email = normalizeMigrationEmail(adminMigrationEmailInput?.value || "");
   if (!email || !email.includes("@")) {
-    if (adminMigrationStatus) adminMigrationStatus.textContent = "Digite o e-mail antigo que aparece no Firebase, por exemplo francisco@gmail.com.";
+    if (adminMigrationStatus) adminMigrationStatus.textContent = "Digite o e-mail antigo confirmado pela família.";
     return null;
   }
 
@@ -3308,13 +3311,11 @@ function getMigrationContextPriority(context = {}) {
   const isEmailSearch = discoveries.includes("email") || Boolean(context.manualEmail);
   const isExactEmailSearch = context.manualEmail && normalizeEmail(context.manualEmail) === email;
 
-  // A v75.18 prioriza busca manual por e-mail/UID e fontes associadas ao Francisco.
-  // Isso evita que dados de teste com foto/perfil tenham score maior e sejam migrados por engano.
+  // A busca manual por e-mail/UID sempre tem prioridade. Não damos preferência por nomes específicos,
+  // para evitar expor ou puxar uma criança padrão no painel de produção.
   return (isExactEmailSearch ? 130000 : 0)
     + (isEmailSearch ? 120000 : 0)
     + (isManual ? 100000 : 0)
-    + (email.includes("francisco") ? 20000 : 0)
-    + (name.includes("francisco") ? 10000 : 0)
     + (Number(context.score) || 0);
 }
 
@@ -3387,7 +3388,7 @@ function renderFamilyMigrationPanel(options = {}) {
 
   if (lastMigrationResult && !options.forceList) {
     const result = lastMigrationResult;
-    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família selecionada. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
+    adminMigrationStatus.textContent = `Dados antigos revisados: ${result.events} registros em ${result.days} dia(s) foram copiados para a família selecionada. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
     adminMigrationSources.innerHTML = `
       <li class="admin-migration-source is-best">
         <div>
@@ -3402,7 +3403,7 @@ function renderFamilyMigrationPanel(options = {}) {
   }
 
   if (!isFamilyAdmin()) {
-    adminMigrationStatus.textContent = "Entre como admin para revisar e migrar dados antigos.";
+    adminMigrationStatus.textContent = "Entre como admin para revisar dados antigos.";
     adminMigrationSources.innerHTML = "<li>Nenhuma conta em análise.</li>";
     restoreFamilyDataButton.hidden = true;
     renderMigrationChecklist(null);
@@ -3413,15 +3414,15 @@ function renderFamilyMigrationPanel(options = {}) {
   const best = contexts[0] || null;
 
   if (legacyCloudScanState === "idle" && !best) {
-    adminMigrationStatus.textContent = "Nenhuma busca iniciada. Para migrar dados antigos, informe o e-mail antigo ou o UID do Firebase. O painel admin não varre todos os clientes automaticamente.";
-    adminMigrationSources.innerHTML = "<li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>";
+    adminMigrationStatus.textContent = "Nenhuma busca iniciada. Para recuperar dados antigos, informe um e-mail ou UID confirmado. O painel não mostra origens automaticamente.";
+    adminMigrationSources.innerHTML = "<li>Busque apenas uma origem confirmada por e-mail ou UID.</li>";
     restoreFamilyDataButton.hidden = true;
     renderMigrationChecklist(null);
     return;
   }
 
   if (legacyCloudScanState === "loading") {
-    adminMigrationStatus.textContent = "Buscando dados antigos no Firebase e neste aparelho...";
+    adminMigrationStatus.textContent = "Buscando a origem confirmada...";
     adminMigrationSources.innerHTML = contexts.length
       ? contexts.slice(0, 4).map((context, index) => `
         <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
@@ -3580,7 +3581,7 @@ async function uploadMigrationContextToFamily(context) {
     ownerUid: cloudUser.uid,
     ownerEmail: cloudUser.email || "",
     title: normalizedProfile.name || "Família selecionada",
-    customerLabel: "Cliente / família cadastrada",
+    customerLabel: "Família cadastrada",
     latestMigratedDayId: Object.keys(context.dayStates || {}).filter(isDateId).sort().at(-1) || "",
     migratedDayIds: Object.keys(context.dayStates || {}).filter(isDateId).sort(),
     updatedAt: services.serverTimestamp(),
@@ -3717,7 +3718,7 @@ async function autoSeedFamilyFromLocalCache() {
 }
 
 function getFamilyDisplayName(stats = null) {
-  const raw = stats?.familyName || stats?.profileName || babyProfile?.name || "Francisco";
+  const raw = stats?.familyName || stats?.profileName || babyProfile?.name || "Família";
   return escapeHtml(raw || "Família");
 }
 
@@ -3748,9 +3749,45 @@ function getKnownUserStatusLabel(user = {}) {
   return "Sem vínculo com a família selecionada";
 }
 
+function getKnownUserQualityScore(user = {}) {
+  const sources = Array.isArray(user.sources) ? user.sources : [];
+  return (user.isMember ? 1000 : 0)
+    + (user.hasFamilyAccess ? 500 : 0)
+    + (user.hasPendingInvite ? 220 : 0)
+    + (sources.includes("users") ? 120 : 0)
+    + (sources.includes("member") ? 100 : 0)
+    + (user.uid ? 40 : 0)
+    + (user.email ? 20 : 0)
+    - (sources.includes("profile") && !sources.includes("users") ? 10 : 0);
+}
+
+function getCleanKnownUsersForAdmin(users = []) {
+  const byEmail = new Map();
+
+  (Array.isArray(users) ? users : []).forEach((user) => {
+    const email = normalizeEmail(user?.email || "");
+    if (!email || !email.includes("@")) return;
+
+    const current = byEmail.get(email);
+    const candidate = { ...user, email };
+    if (!current || getKnownUserQualityScore(candidate) > getKnownUserQualityScore(current)) {
+      byEmail.set(email, candidate);
+    }
+  });
+
+  return Array.from(byEmail.values()).sort((a, b) =>
+    Number(Boolean(b.isMember)) - Number(Boolean(a.isMember))
+    || Number(Boolean(b.hasFamilyAccess)) - Number(Boolean(a.hasFamilyAccess))
+    || String(a.email).localeCompare(String(b.email))
+  );
+}
+
 function scrollAdminSection(sectionId = "") {
   const target = document.getElementById(sectionId);
   if (!target) return;
+  if (target.tagName === "DETAILS") target.open = true;
+  const parentDetails = target.closest?.("details");
+  if (parentDetails) parentDetails.open = true;
   target.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -3809,17 +3846,22 @@ function renderKnownUsersList(stats = null) {
   if (!adminKnownUsersList) return;
 
   if (!isGlobalAppAdmin()) {
-    adminKnownUsersList.innerHTML = "<li>Entre como admin para localizar usuários cadastrados.</li>";
+    adminKnownUsersList.innerHTML = "<li>Entre como admin para revisar contas autorizadas.</li>";
     return;
   }
 
-  const users = Array.isArray(stats?.knownUsers) ? stats.knownUsers : [];
+  const allUsers = Array.isArray(stats?.knownUsers) ? stats.knownUsers : [];
+  const users = getCleanKnownUsersForAdmin(allUsers);
+  const hiddenCount = Math.max(0, allUsers.length - users.length);
+
   if (!users.length) {
-    adminKnownUsersList.innerHTML = "<li>Nenhum usuário adicional encontrado no Firestore. Usuários sem documento em users/{uid} só aparecem após criarem perfil, acesso ou convite.</li>";
+    adminKnownUsersList.innerHTML = hiddenCount
+      ? `<li>${pluralize(hiddenCount, "item técnico oculto", "itens técnicos ocultos")} por estar sem e-mail válido ou duplicado. Nenhuma conta precisa de ação agora.</li>`
+      : "<li>Nenhuma conta com e-mail válido para revisão no momento.</li>";
     return;
   }
 
-  adminKnownUsersList.innerHTML = users.slice(0, 24).map((user) => {
+  const rows = users.slice(0, 18).map((user) => {
     const email = escapeHtml(user.email || "E-mail não identificado");
     const uid = escapeHtml(user.uid || "");
     const source = escapeHtml(getKnownUserSourceLabel(user));
@@ -3827,7 +3869,7 @@ function renderKnownUsersList(stats = null) {
     const canLink = Boolean(user.uid && !user.isMember && !user.isAppAdmin);
     const safeEmailAttr = escapeHtml(user.email || "");
     const safeUidAttr = escapeHtml(user.uid || "");
-    const primaryLine = user.uid ? `UID: ${uid}` : "Sem UID disponível no painel";
+    const primaryLine = user.uid ? `Identificador interno disponível` : "Sem identificador interno disponível";
     const linkButton = canLink
       ? `<button type="button" data-link-known-user="${safeUidAttr}" data-link-known-email="${safeEmailAttr}">Autorizar como cuidador</button>`
       : "";
@@ -3835,7 +3877,7 @@ function renderKnownUsersList(stats = null) {
       ? `<button type="button" data-fill-invite-email="${safeEmailAttr}">Convidar</button>`
       : "";
     const migrateButton = user.email && !user.isAppAdmin
-      ? `<button type="button" data-fill-migration-email="${safeEmailAttr}">Migrar dados</button>`
+      ? `<button type="button" data-fill-migration-email="${safeEmailAttr}">Revisar dados antigos</button>`
       : "";
     const createFamilyButtonMarkup = user.email && !user.hasFamilyAccess && !user.isAppAdmin
       ? `<button type="button" data-fill-new-family-responsible="${safeEmailAttr}">Criar família</button>`
@@ -3844,16 +3886,22 @@ function renderKnownUsersList(stats = null) {
 
     return `
       <li class="admin-access-item admin-known-user-item ${user.isMember ? "is-member" : ""}">
-        <img class="admin-avatar" src="${getCaregiverAvatarDataUrl(user.email || user.uid || "Usuário", user.uid || user.email || "known", "known")}" alt="" />
+        <img class="admin-avatar" src="${getCaregiverAvatarDataUrl(user.email || user.uid || "Conta", user.uid || user.email || "known", "known")}" alt="" />
         <div>
           <strong>${email}</strong>
           <span>${status} • ${source}</span>
           <small>${escapeHtml(primaryLine)}</small>
         </div>
-        ${actions ? `<div class="admin-access-actions">${actions}</div>` : `<small>Já aparece em membros desta família.</small>`}
+        ${actions ? `<div class="admin-access-actions">${actions}</div>` : `<small>Sem ação necessária.</small>`}
       </li>
     `;
   }).join("");
+
+  const note = hiddenCount
+    ? `<li class="admin-clean-note">${pluralize(hiddenCount, "item incompleto/duplicado foi oculto", "itens incompletos/duplicados foram ocultos")} para preservar uma visão limpa antes da divulgação.</li>`
+    : "";
+
+  adminKnownUsersList.innerHTML = rows + note;
 }
 
 function renderAdminClients(stats = null) {
@@ -3864,8 +3912,8 @@ function renderAdminClients(stats = null) {
     ? stats.families
     : [{
         id: selectedId,
-        name: stats?.familyName || "Francisco",
-        subtitle: "Cliente / família cadastrada",
+        name: stats?.familyName || "Família selecionada",
+        subtitle: "Família cadastrada",
         membersCount: stats?.membersCount ?? 0,
         pendingInvitesCount: stats?.pendingInvitesCount ?? 0,
       }];
@@ -3887,8 +3935,7 @@ function renderAdminClients(stats = null) {
             <img class="admin-avatar family-avatar" src="${getCaregiverAvatarDataUrl(family.name || "Família", family.id || "family", "family")}" alt="" />
             <div>
               <strong>${escapeHtml(family.name || "Família sem nome")}</strong>
-              <span>${escapeHtml(family.subtitle || "Cliente / família cadastrada")} • ${escapeHtml(membersLabel)} • ${escapeHtml(pendingLabel)}</span>
-              <span class="admin-client-id">ID: ${escapeHtml(family.id)}</span>
+              <span>${escapeHtml(family.subtitle || "Família cadastrada")} • ${escapeHtml(membersLabel)} • ${escapeHtml(pendingLabel)}</span>
             </div>
             <div class="admin-access-actions">
               <small>${isSelected ? (previewOpen ? "Aberta no modo admin" : "Selecionada") : "Fechada"}</small>
@@ -4008,7 +4055,7 @@ function renderAdminStats(stats = null) {
   setText(adminLastMigrationStatus, lastMigrationResult ? "Concluída" : "Sem migração");
   setText(
     adminStatsHint,
-    `${pluralize(stats.familiesCount ?? 0, "família cadastrada", "famílias cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "usuário encontrado", "usuários encontrados")} no Firestore.`,
+    `${pluralize(stats.familiesCount ?? 0, "família cadastrada", "famílias cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "conta válida para revisão", "contas válidas para revisão")}.`,
   );
   renderAdminClients(stats);
   renderAdminAccessLists(stats);
@@ -4159,21 +4206,21 @@ async function refreshAdminStats(options = {}) {
 
     const familyData = familySnap.exists?.() ? (familySnap.data() || {}) : {};
     const familyProfileData = familyProfileSnap.exists?.() ? (familyProfileSnap.data() || {}) : {};
-    const familyName = familyProfileData.name || familyData.name || familyData.title || "Francisco";
+    const familyName = familyProfileData.name || familyData.name || familyData.title || "Família selecionada";
     const familySummaries = [];
     familiesSnapshot.forEach((familyDoc) => {
       const data = familyDoc.data() || {};
       const profile = familyDoc.id === familyId ? familyProfileData : (familyProfileById.get(familyDoc.id) || {});
       familySummaries.push({
         id: familyDoc.id,
-        name: profile.name || data.name || data.title || (familyDoc.id === APP_ADMIN_FAMILY_ID ? "Francisco" : `Família ${familyDoc.id.slice(0, 8)}`),
-        subtitle: data.customerLabel || data.subtitle || "Cliente / família cadastrada",
+        name: profile.name || data.name || data.title || (familyDoc.id === APP_ADMIN_FAMILY_ID ? "Família principal" : `Família ${familyDoc.id.slice(0, 8)}`),
+        subtitle: data.customerLabel || data.subtitle || "Família cadastrada",
         membersCount: familyDoc.id === familyId ? members.filter((member) => !member.isAdmin).length : (Number.isFinite(Number(data.membersCount)) ? Number(data.membersCount) : null),
         pendingInvitesCount: familyDoc.id === familyId ? pendingInvites.length : (Number.isFinite(Number(data.pendingInvitesCount)) ? Number(data.pendingInvitesCount) : null),
       });
     });
     if (!familySummaries.some((family) => family.id === familyId)) {
-      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Cliente / família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
+      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
     }
     familySummaries.sort((a, b) => Number(b.id === familyId) - Number(a.id === familyId) || String(a.name).localeCompare(String(b.name)));
 
@@ -4189,7 +4236,7 @@ async function refreshAdminStats(options = {}) {
       membersCount: visibleMembers.length,
       pendingInvitesCount: pendingInvites.length,
       acceptedInvitesCount: acceptedEmails.size,
-      knownUsersCount: knownUsers.length,
+      knownUsersCount: getCleanKnownUsersForAdmin(knownUsers).length,
     };
     if (requestId === adminStatsRequestId) renderAdminStats(stats);
     return stats;
@@ -4423,11 +4470,11 @@ async function activatePersonalFamily() {
     const familyPayload = {
       supportAdminUid: cloudUser.uid,
       supportAdminEmail: cloudUser.email || "",
-      customerLabel: "Cliente / família cadastrada",
+      customerLabel: "Família cadastrada",
       createdAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
     };
-    if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = "Francisco";
+    if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = familyPayload.title || "Família principal";
     await services.setDoc(services.doc(services.db, "families", access.familyId), familyPayload, { merge: true });
     // O admin tem acesso global por regra, não precisa virar membro da família.
     // Isso evita que clientes pareçam "família do admin".
@@ -4537,7 +4584,7 @@ async function createAdminClientFamily() {
       name: familyName,
       babyName,
       babyArticle,
-      customerLabel: "Cliente / família cadastrada",
+      customerLabel: "Família cadastrada",
       status: "active",
       supportAdminUid: cloudUser.uid,
       supportAdminEmail: cloudUser.email || "",
@@ -5010,7 +5057,7 @@ function renderBabyIdentity() {
   } else {
     applyAvatarPreview(babyProfile.avatar || pendingBabyAvatar);
     if (profilePhoto) profilePhoto.src = getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Coleção premium";
+    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatares do bebê";
   }
   updateBodyModeClasses();
 }
@@ -5539,7 +5586,7 @@ async function initFirebaseAuthState() {
       loginEmail.value = "";
       loginPassword.value = "";
       renderAuthControls();
-      loginHelper.textContent = "Entre com sua conta. Novos usuários acessam por convite do administrador do app.";
+      loginHelper.textContent = "Entre com sua conta. Novas pessoas acessam por convite da família.";
       return;
     }
 

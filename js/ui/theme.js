@@ -9,6 +9,11 @@ export function resolveThemeMode({ themeModeInput, profile = {}, storageKey = st
 export function shouldUseDayTheme(mode = "dark", date = new Date()) {
   const safeMode = normalizeThemeMode(mode);
   const hourValue = date.getHours();
+
+  if (safeMode === "auto") {
+    return hourValue >= 6 && hourValue < 18;
+  }
+
   return safeMode === "light";
 }
 

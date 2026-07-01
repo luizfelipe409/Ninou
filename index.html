@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#f8f6fc" />
     <meta name="description" content="Diário de sono, mamadas, fraldas e rotina do bebê." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-revisão-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.56.7.14" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.7.16" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -129,7 +129,7 @@
         </section>
 
         <!-- v75.37: painel admin limpo, profissional e focado em convites/usuários.
-             O status principal fica no card central e a ação fica no botão principal. -->
+             O revisão principal fica no card central e a ação fica no botão principal. -->
 
         <div class="quick-actions-heading">
           <span>Atalhos principais</span>
@@ -482,7 +482,7 @@
           <span id="profileBabyName">Bebê</span>
           <strong id="profileBabyAge">Preencha o nascimento</strong>
           
-          <div class="avatar-only-badge" id="profilePhotoButtonText">Coleção premium</div>
+          <div class="avatar-only-badge" id="profilePhotoButtonText">Avatares do bebê</div>
           <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
 
@@ -501,7 +501,7 @@
 
         <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome" aria-label="Boas-vindas ao Ninou">
           <div class="guest-welcome-top">
-            <span>Preview App Store</span>
+            <span>Bem-vindo ao Ninou</span>
             <strong>O diário inteligente do bebê, pronto para a família.</strong>
             <p>Conheça uma experiência completa com rotina em tempo real, histórico por data, gráficos realistas, sons de descanso e acesso familiar.</p>
           </div>
@@ -528,11 +528,11 @@
         </section>
 
         <section id="premiumTrustCard" class="premium-trust-card" aria-label="Diferenciais de confiança do Ninou">
-          <span>Entrega premium</span>
-          <strong>Uma entrada clara, bonita e segura para cada família.</strong>
-          <p>O usuário entende quando está vendo uma demonstração, como aceitar convite e quando passa a visualizar dados reais do bebê.</p>
+          <span>Segurança e acesso familiar</span>
+          <strong>Uma entrada clara e segura para cada família.</strong>
+          <p>Cada pessoa sabe quando está conhecendo o app, quando aceita um convite e quando passa a visualizar dados reais da família.</p>
           <div class="premium-trust-grid" aria-label="Pontos de confiança">
-            <article><b>01</b><strong>Demo identificada</strong><small>Dados fictícios sempre sinalizados.</small></article>
+            <article><b>01</b><strong>Demonstração identificada</strong><small>Exemplos sinalizados, sem misturar com dados reais.</small></article>
             <article><b>02</b><strong>Acesso por convite</strong><small>Conta conectada à família correta.</small></article>
             <article><b>03</b><strong>Uso familiar</strong><small>Nome e vínculo em cada aparelho.</small></article>
           </div>
@@ -540,9 +540,9 @@
 
         <section id="accountJourneyCard" class="account-journey-card" aria-label="Passo a passo para começar no Ninou">
           <div class="journey-head">
-            <span>Comece em 4 passos</span>
+            <span>Primeiros passos</span>
             <strong>Do convite ao primeiro registro, sem confusão.</strong>
-            <p id="accountJourneyHint">O admin cria o convite, você entra com seu e-mail e o Ninou conecta sua conta à família certa.</p>
+            <p id="accountJourneyHint">A família envia o convite, você entra com o mesmo e-mail e o Ninou libera a rotina correta.</p>
           </div>
           <ol class="journey-steps" aria-label="Fluxo de acesso do usuário">
             <li data-journey-step="invite">
@@ -588,21 +588,21 @@
             <p id="postAccessText">O Ninou verifica se existe convite pendente e orienta o próximo passo para liberar os dados reais.</p>
           </div>
           <div class="post-access-grid" aria-label="Status da conexão">
-            <article data-post-status="account">
+            <article data-post-revisão="account">
               <i>✓</i>
               <div>
                 <strong>Conta</strong>
                 <span id="postAccessAccountStatus">Aguardando login</span>
               </div>
             </article>
-            <article data-post-status="invite">
+            <article data-post-revisão="invite">
               <i>•</i>
               <div>
                 <strong>Convite</strong>
                 <span id="postAccessInviteStatus">Aguardando código</span>
               </div>
             </article>
-            <article data-post-status="family">
+            <article data-post-revisão="family">
               <i>•</i>
               <div>
                 <strong>Família</strong>
@@ -623,10 +623,10 @@
           <p id="dataRealityText">Os cards e gráficos fora do Perfil usam dados fictícios até uma conta familiar ser conectada.</p>
         </section>
 
-        <section id="firstUseChecklistCard" class="first-use-checklist-card" hidden aria-label="Primeira configuração guiada">
+        <section id="firstUseVerificaçãoCard" class="first-use-checklist-card" hidden aria-label="Primeira configuração guiada">
           <div class="first-use-head">
             <span>Primeiro uso</span>
-            <strong>Checklist para começar com segurança</strong>
+            <strong>Verificação para começar com segurança</strong>
             <p>Finalize estes pontos para que os registros apareçam com o nome correto e a rotina fique clara para toda a família.</p>
           </div>
           <ol class="first-use-list">
@@ -676,8 +676,8 @@
             <div class="avatar-test-header avatar-minimal-header">
               <div class="avatar-copy-column compact-copy">
                 <span>Avatar do bebê</span>
-                <strong>Coleção premium</strong>
-                <div class="premium-inline-badges compact-badges" aria-label="Benefícios da coleção premium">
+                <strong>Avatares do bebê</strong>
+                <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do bebê">
                   <span>12 opções</span>
                   <span>Privado</span>
                 </div>
@@ -717,12 +717,13 @@
           <article class="appearance-profile-block">
             <span>Aparência</span>
             <strong>Tema do app</strong>
-            <p>Escolha entre tema claro e escuro para a experiência inicial e para o uso diário.</p>
+            <p id="themeModeHelper">Escolha claro, escuro ou automático. No modo automático, o Ninou fica claro durante o dia e escuro à noite.</p>
             <label>
               Modo de visual
               <select id="themeModeInput">
                 <option value="light">Claro</option>
                 <option value="dark">Escuro</option>
+                <option value="auto">Automático — claro de dia, escuro à noite</option>
               </select>
             </label>
           </article>
@@ -771,15 +772,15 @@
           </article>
 
           <article class="caregiver-profile-block" id="caregiverIdentityCard">
-            <span>Configuração deste aparelho</span>
-            <strong>Identificação neste celular</strong>
-            <p>Escolha como seu nome e vínculo aparecerão nos registros feitos por este celular. Essa informação fica salva neste aparelho; assim, mesmo usando a mesma conta da família, cada cuidador aparece com o próprio nome.</p>
+            <span>Registros deste aparelho</span>
+            <strong>Como meus registros aparecem</strong>
+            <p>Essa configuração não altera sua permissão de Admin. Ela serve apenas para identificar os registros feitos neste aparelho no diário da família.</p>
             <label>
-              Seu nome no app
+              Nome exibido nos registros
               <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />
             </label>
             <label>
-              Seu vínculo com o bebê
+              Vínculo exibido nos registros
               <select id="caregiverRelationInput">
                 <option value="">Escolher depois</option>
                 <option value="pai">Pai</option>
@@ -791,8 +792,8 @@
                 <option value="outro">Familiar</option>
               </select>
             </label>
-            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar identificação</button>
-            <p id="caregiverIdentityStatus" class="form-status">Usaremos essa identificação nos próximos registros.</p>
+            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar como vou aparecer</button>
+            <p id="caregiverIdentityStatus" class="form-status">Admin é permissão do sistema. Pai, mãe ou cuidador é apenas como seus registros aparecem.</p>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Acesso familiar</span>
@@ -820,16 +821,16 @@
               <section class="admin-clean-hero" aria-live="polite">
                 <div>
                   <span>Admin do app</span>
-                  <strong>Painel admin</strong>
-                  <p>Gerencie sua conta, famílias, membros, convites, migrações e diagnósticos com dados familiares carregados apenas sob demanda.</p>
+                  <strong>Painel de administração</strong>
+                  <p>Gerencie famílias, membros e convites de forma objetiva. Informações técnicas ficam recolhidas para não expor dados sem necessidade.</p>
                 </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
               </section>
 
-              <section id="adminFlowGuide" class="admin-flow-guide admin-clean-section" aria-label="Fluxo recomendado para o admin">
+              <section id="adminFlowGuide" class="admin-flow-guide admin-clean-section" aria-label="Organização do acesso familiar">
                 <div class="admin-invite-header">
-                  <strong>Fluxo recomendado do admin</strong>
-                  <em>Uma jornada clara para criar a família, convidar a pessoa certa e acompanhar a liberação do acesso.</em>
+                  <strong>Organização do acesso familiar</strong>
+                  <em>Use esta área apenas quando precisar criar família, enviar convite ou revisar acessos.</em>
                 </div>
                 <ol class="admin-flow-steps">
                   <li>
@@ -865,14 +866,14 @@
                 </div>
                 <div class="admin-stats-grid admin-health-grid">
                   <article>
-                    <span>Famílias</span>
+                    <span>Famílias cadastradas</span>
                     <strong id="adminFamiliesCount">--</strong>
                     <small>clientes cadastrados</small>
                   </article>
                   <article>
-                    <span>Usuários</span>
+                    <span>Contas</span>
                     <strong id="adminKnownUsersStat">--</strong>
-                    <small>encontrados no banco</small>
+                    <small>com e-mail válido</small>
                   </article>
                   <article>
                     <span>Convites pendentes</span>
@@ -880,18 +881,18 @@
                     <small>família selecionada</small>
                   </article>
                   <article>
-                    <span>Última migração</span>
+                    <span>Dados antigos</span>
                     <strong id="adminLastMigrationStatus">--</strong>
-                    <small>status</small>
+                    <small>revisão</small>
                   </article>
                 </div>
-                <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar os usuários autorizados.</p>
+                <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar famílias, membros e convites.</p>
               </section>
 
               <section id="adminCreateFamilySection" class="admin-clean-section admin-create-family-card">
                 <div class="admin-invite-header">
-                  <strong>Criar família/cliente</strong>
-                  <em>Use quando uma pessoa vai acessar o Ninou pela primeira vez e ainda não pertence a nenhuma família.</em>
+                  <strong>Criar família</strong>
+                  <em>Use para preparar o acesso de uma nova família antes de enviar convites.</em>
                 </div>
                 <div class="admin-form-grid admin-create-family-grid">
                   <label>
@@ -914,15 +915,15 @@
                     <input id="adminNewResponsibleEmailInput" type="email" placeholder="responsavel@email.com" autocomplete="off" />
                   </label>
                 </div>
-                <p class="admin-section-note">Ao criar, o painel seleciona a nova família. Se houver e-mail, um convite de responsável é gerado para essa família.</p>
-                <button id="adminCreateClientFamilyButton" type="button">Criar família/cliente</button>
+                <p class="admin-section-note">Após criar, selecione a família e envie convites somente para os e-mails autorizados.</p>
+                <button id="adminCreateClientFamilyButton" type="button">Criar família</button>
                 <div id="adminCreateFamilyResult" class="invite-result admin-create-family-result" hidden></div>
               </section>
 
               <section class="admin-clean-section admin-family-client-card">
                 <div class="admin-invite-header">
-                  <strong>Famílias</strong>
-                  <em>Selecione uma família para visualizar, convidar, migrar ou dar suporte. O admin não vira membro.</em>
+                  <strong>Famílias cadastradas</strong>
+                  <em>Selecione uma família apenas quando precisar convidar membros, revisar acesso ou prestar suporte.</em>
                 </div>
                 <ul id="adminClientsList" class="admin-access-list admin-clients-list">
                   <li>Atualize o painel para ver as famílias disponíveis.</li>
@@ -933,43 +934,44 @@
                   <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
                   <button class="secondary-login" type="button" data-admin-scroll="members">Gerenciar membros</button>
                   <button class="secondary-login" type="button" data-admin-scroll="invite">Criar convite</button>
-                  <button class="secondary-login" type="button" data-admin-scroll="migration">Migrar dados</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="migration">Revisar migração</button>
                 </div>
               </section>
 
-              <section id="adminMigrationSection" class="admin-clean-section admin-migration-card">
+              <details id="adminMigrationSection" class="admin-clean-section admin-migration-card admin-maintenance-section">
+                <summary>Revisão técnica de dados antigos</summary>
                 <div class="admin-invite-header">
-                  <strong>Migração de dados</strong>
-                  <em>Copie dados antigos para a família selecionada. A origem só é carregada quando você busca por e-mail ou UID.</em>
+                  <strong>Revisão de dados antigos</strong>
+                  <em>Área técnica recolhida. Use somente para recuperar dados antigos de uma conta específica, após confirmar a família correta.</em>
                 </div>
-                <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID para migrar uma origem específica.</p>
+                <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID somente quando precisar recuperar uma origem específica.</p>
                 <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
-                  <li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>
+                  <li>Busque por e-mail ou UID para carregar somente a origem confirmada.</li>
                 </ul>
                 <div id="adminMigrationChecklist" class="admin-migration-checklist" aria-live="polite">
-                  <span>Checklist</span>
+                  <span>Verificação</span>
                   <ul>
                     <li><strong>Aguardando busca</strong><small>O diagnóstico aparece antes e depois da migração.</small></li>
                   </ul>
                 </div>
                 <div class="admin-manual-migration">
                   <label>
-                    E-mail da conta antiga
-                    <input id="adminMigrationEmailInput" type="email" placeholder="Ex.: francisco@gmail.com" autocomplete="off" />
+                    E-mail antigo confirmado
+                    <input id="adminMigrationEmailInput" type="email" placeholder="Ex.: responsavel@email.com" autocomplete="off" />
                   </label>
                   <button id="scanLegacyEmailButton" class="secondary-login" type="button">Buscar por e-mail</button>
-                  <small>Use primeiro esta opção quando souber o e-mail antigo. Ela prioriza exatamente essa conta na migração.</small>
+                  <small>Use esta opção apenas quando o e-mail antigo foi confirmado com a família.</small>
                 </div>
                 <div class="admin-manual-migration">
                   <label>
-                    UID da conta antiga, se souber
+                    UID antigo, se necessário
                     <input id="adminMigrationUidInput" type="text" placeholder="Cole o UID antigo do Firebase" autocomplete="off" />
                   </label>
                   <button id="scanLegacyUidButton" class="secondary-login" type="button">Buscar por UID</button>
-                  <small>Use quando os dados aparecem em users/{uid}/activities, mas a busca por e-mail não encontra.</small>
+                  <small>Use somente quando a busca por e-mail não encontrar a origem correta.</small>
                 </div>
                 <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
-              </section>
+              </details>
 
               <section id="adminInviteSection" class="admin-clean-section admin-create-invite-card">
                 <div class="admin-invite-header">
@@ -1032,15 +1034,16 @@
                 </ul>
               </section>
 
-              <section class="admin-clean-section admin-list-section admin-users-section">
+              <details class="admin-clean-section admin-list-section admin-users-section admin-maintenance-section">
+                <summary>Revisão técnica de contas</summary>
                 <div class="admin-invite-header">
-                  <strong>Usuários encontrados no banco</strong>
-                  <em>Contas localizadas no Firestore. Crie uma família para usuários novos ou vincule a uma família existente.</em>
+                  <strong>Contas para revisão</strong>
+                  <em>Lista técnica com contas válidas por e-mail. Itens incompletos ou duplicados ficam ocultos para manter o painel limpo.</em>
                 </div>
                 <ul id="adminKnownUsersList" class="admin-access-list">
-                  <li>Atualize o painel para localizar usuários cadastrados.</li>
+                  <li>Atualize o painel para revisar contas com e-mail válido.</li>
                 </ul>
-              </section>
+              </details>
 
               <div class="invite-list-box admin-local-invites" hidden>
                 <span>Convites recentes neste aparelho</span>
@@ -1097,7 +1100,7 @@
 
             <div class="export-personal-message">
               <label for="whatsappMessageInput">Mensagem personalizada</label>
-              <textarea id="whatsappMessageInput" rows="4" placeholder="Ex.: Oi, segue o resumo da rotina do Francisco para acompanhar a consulta."></textarea>
+              <textarea id="whatsappMessageInput" rows="4" placeholder="Ex.: Oi, segue o resumo da rotina do bebê para acompanhar a consulta."></textarea>
               <small>O resumo do Ninou será incluído abaixo da sua mensagem.</small>
             </div>
 
@@ -1235,6 +1238,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.56.7.14"></script>
+    <script type="module" src="./app.js?v=75.56.7.16"></script>
   </body>
 </html>

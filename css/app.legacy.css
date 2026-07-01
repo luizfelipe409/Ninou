@@ -10966,7 +10966,7 @@ body:not(.global-admin-mode) .phone-shell {
   }
 }
 
-/* v75.56.7.14 — fluxo guiado de criação de conta e convites */
+/* v75.56.7.16 — fluxo guiado de criação de conta e convites */
 .account-journey-card,
 .admin-flow-guide {
   position: relative;
@@ -11282,7 +11282,7 @@ body.day-theme .admin-flow-actions button:not(:first-child) {
 }
 
 
-/* v75.56.7.14 — pós-cadastro inteligente e convites profissionais */
+/* v75.56.7.16 — pós-cadastro inteligente e convites profissionais */
 .post-access-card,
 .data-reality-card,
 .first-use-checklist-card,
@@ -11598,7 +11598,7 @@ body.day-theme .invite-result .invite-result-actions a {
   }
 }
 
-/* v75.56.7.14 — entrega premium: refinamento final de demo, perfil e confiança */
+/* v75.56.7.16 — entrega premium: refinamento final de demo, perfil e confiança */
 :root {
   --premium-final-radius: 30px;
   --premium-final-radius-sm: 22px;
@@ -11989,7 +11989,7 @@ body.guest-locked .screen.active:not([data-screen="profile"]) {
 }
 
 
-/* v75.56.7.14 — perfil enxuto após configuração + clareza de tempos */
+/* v75.56.7.16 — perfil enxuto após configuração + clareza de tempos */
 .profile-ready-card {
   display: grid;
   gap: 16px;
@@ -12087,7 +12087,7 @@ body.profile-daily-ready #firstUseChecklistCard {
 }
 
 
-/* v75.56.7.14 — entrega premium: avatares mais nítidos, resumo por período e timeline progressiva */
+/* v75.56.7.16 — entrega premium: avatares mais nítidos, resumo por período e timeline progressiva */
 .summary-premium-card {
   position: relative;
   overflow: hidden;
@@ -12409,4 +12409,290 @@ body.day-theme .avatar-compact-card .avatar-choice.selected {
   .weekly-overview article em {
     justify-self: start;
   }
+}
+
+
+/* v75.56.7.16 — polimento de produção: textos limpos, admin recolhido e espaçamento consistente */
+:root {
+  --ninou-page-gap: 16px;
+  --ninou-card-gap: 14px;
+  --ninou-card-padding: 18px;
+  --ninou-section-radius: 26px;
+}
+
+.screen.active,
+.screen[data-screen="today"],
+.screen[data-screen="diary"],
+.screen[data-screen="trends"],
+.screen[data-screen="sounds"],
+.screen[data-screen="profile"] {
+  gap: var(--ninou-page-gap);
+  padding-bottom: max(104px, calc(92px + env(safe-area-inset-bottom, 0px))) !important;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.live-assistant-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.last-card,
+.chart-card,
+.day-summary-card,
+.growth-card,
+.audit-card,
+.notification-center-card,
+.sound-note,
+.sound-option,
+.profile-card,
+.baby-profile-card,
+.appearance-profile-block,
+.weight-profile-block,
+.login-card,
+.caregiver-profile-block,
+.admin-access-card,
+.wake-window-card,
+.export-card,
+.admin-clean-section,
+.profile-ready-card,
+.account-journey-card,
+.premium-trust-card,
+.guest-welcome-card {
+  border-radius: var(--ninou-section-radius);
+}
+
+.settings-list,
+.report-stack,
+.sound-grid,
+.today-last-events,
+.intelligent-timeline-card,
+.admin-clean-panel {
+  gap: var(--ninou-page-gap) !important;
+}
+
+.settings-list article,
+.profile-ready-card,
+.account-journey-card,
+.premium-trust-card,
+.guest-welcome-card,
+.admin-clean-section,
+.admin-access-card,
+.caregiver-profile-block,
+.wake-window-card,
+.export-card,
+.login-card,
+.baby-profile-card,
+.appearance-profile-block,
+.weight-profile-block {
+  padding: var(--ninou-card-padding);
+}
+
+.drawer-section-title,
+.today-overview-head,
+.chart-title,
+.section-title,
+.admin-invite-header,
+.profile-ready-head,
+.journey-head {
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.drawer-section-title strong,
+.today-overview-head strong,
+.chart-title strong,
+.section-title strong,
+.admin-invite-header strong,
+.profile-ready-head strong,
+.journey-head strong {
+  line-height: 1.15;
+}
+
+.drawer-section-title span,
+.today-overview-head span,
+.chart-title span,
+.section-title span,
+.admin-invite-header em,
+.profile-ready-head p,
+.journey-head p,
+.settings-list p {
+  line-height: 1.42;
+}
+
+.profile-card #profileBabyName,
+.profile-card #profileBabyAge,
+.avatar-only-badge {
+  color: var(--ink);
+}
+
+body:not(.day-theme) .profile-card #profileBabyName,
+body:not(.day-theme) .profile-card #profileBabyAge,
+body:not(.day-theme) .avatar-only-badge {
+  color: #f8f4ff !important;
+}
+
+.avatar-compact-card .avatar-picker-section {
+  padding: 16px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(250, 247, 255, 0.92), rgba(243, 239, 252, 0.78));
+  border: 1px solid rgba(178, 160, 230, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-picker-section {
+  background:
+    linear-gradient(180deg, rgba(82, 68, 145, 0.26), rgba(255,255,255,0.045));
+  border-color: rgba(201, 192, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.avatar-compact-card .avatar-picker-section > strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-compact-card .avatar-picker-section > strong::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #9c7cf4, #7ce5c2);
+  box-shadow: 0 0 0 4px rgba(156, 124, 244, 0.12);
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.94), rgba(255,255,255,0.62) 42%, rgba(247,243,255,0.96));
+  border: 1px solid rgba(179, 164, 224, 0.42);
+  box-shadow: 0 10px 26px rgba(80, 56, 132, 0.075);
+}
+
+body:not(.day-theme) .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  background:
+    radial-gradient(circle at top, rgba(140, 116, 218, 0.28), rgba(255,255,255,0.07) 48%, rgba(255,255,255,0.035));
+  border-color: rgba(201, 192, 255, 0.18);
+  box-shadow: 0 14px 32px rgba(5, 6, 24, 0.22);
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice.selected {
+  border-color: rgba(124, 229, 194, 0.82);
+  box-shadow:
+    0 0 0 3px rgba(124, 229, 194, 0.14),
+    0 18px 34px rgba(90, 63, 147, 0.16);
+}
+
+.admin-maintenance-section {
+  overflow: hidden;
+}
+
+.admin-maintenance-section > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  color: var(--ink);
+  font-weight: 900;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(201,192,255,0.12);
+}
+
+.admin-maintenance-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-maintenance-section > summary::after {
+  content: "Abrir";
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #7ce5c2;
+  background: rgba(124,229,194,0.10);
+  font-size: .78rem;
+}
+
+.admin-maintenance-section[open] > summary::after {
+  content: "Recolher";
+}
+
+.admin-maintenance-section > summary + * {
+  margin-top: 14px;
+}
+
+.admin-clean-note {
+  color: rgba(247, 243, 255, 0.68);
+  font-size: .9rem;
+  line-height: 1.4;
+}
+
+body.day-theme .admin-clean-note {
+  color: rgba(61, 52, 74, 0.62);
+}
+
+.admin-client-id {
+  display: none !important;
+}
+
+.reset-card,
+.danger-zone,
+#resetDataButton {
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 430px) {
+  :root {
+    --ninou-page-gap: 14px;
+    --ninou-card-gap: 12px;
+    --ninou-card-padding: 16px;
+    --ninou-section-radius: 24px;
+  }
+
+  .phone-shell {
+    padding-inline: 14px;
+  }
+
+  .screen.active,
+  .screen[data-screen="today"],
+  .screen[data-screen="diary"],
+  .screen[data-screen="trends"],
+  .screen[data-screen="sounds"],
+  .screen[data-screen="profile"] {
+    padding-bottom: max(96px, calc(84px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+}
+
+
+/* v75.56.7.16 — clareza entre Admin x identificação dos registros + tema automático */
+.caregiver-profile-block {
+  position: relative;
+}
+
+.caregiver-profile-block > strong,
+.appearance-profile-block > strong {
+  letter-spacing: -0.02em;
+}
+
+.caregiver-profile-block .form-status,
+.appearance-profile-block p {
+  line-height: 1.42;
+}
+
+#themeModeInput option[value="auto"] {
+  font-weight: 850;
+}
+
+body:not(.day-theme) .caregiver-profile-block .form-status,
+body:not(.day-theme) .appearance-profile-block p {
+  color: rgba(232, 224, 255, 0.76);
+}
+
+body.day-theme .caregiver-profile-block .form-status,
+body.day-theme .appearance-profile-block p {
+  color: rgba(63, 49, 92, 0.68);
 }
