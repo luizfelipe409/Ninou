@@ -1,5 +1,5 @@
-/* Ninou v75.56.7.16 - corrige 24h, diário completo e madrugada. */
-@import url("./css/app.legacy.css?v=75.56.7.16");
+/* Ninou v75.57.4 - espaçamento premium e revisão visual fina. */
+@import url("./css/app.legacy.css?v=75.57.4");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -277,4 +277,441 @@ body.day-theme .profile-family-stack .ghost-link {
 }
 body.day-theme .ninou-modal-card > p {
   color: rgba(25,20,51,.68);
+}
+
+
+/* Ninou v75.57.4 — revisão minuciosa de espaçamento, cards e mobile */
+:root {
+  --ninou-screen-gap-polished: 16px;
+  --ninou-card-gap-polished: 14px;
+  --ninou-card-padding-polished: 18px;
+  --ninou-card-radius-polished: 28px;
+  --ninou-card-inner-radius-polished: 18px;
+  --ninou-touch-target-polished: 46px;
+}
+
+.phone-shell {
+  padding: 18px 16px max(112px, calc(96px + env(safe-area-inset-bottom, 0px)));
+}
+
+.screen.active {
+  gap: var(--ninou-screen-gap-polished) !important;
+}
+
+.screen[data-screen="today"],
+.screen[data-screen="diary"],
+.screen[data-screen="trends"],
+.screen[data-screen="sounds"],
+.screen[data-screen="profile"] {
+  gap: var(--ninou-screen-gap-polished) !important;
+}
+
+.screen[data-screen] > * {
+  min-width: 0;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.chart-card,
+.sound-player-card,
+.sound-note,
+.profile-card,
+.baby-profile-card,
+.avatar-compact-card,
+.login-card,
+.privacy-note-card,
+.admin-access-card,
+.wake-window-card,
+.export-card,
+.danger-card,
+.profile-ready-card,
+.guest-welcome-card,
+.premium-trust-card,
+.account-journey-card,
+.post-access-card,
+.data-reality-card,
+.first-use-checklist-card,
+.admin-clean-section {
+  border-radius: var(--ninou-card-radius-polished) !important;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.chart-card,
+.sound-player-card,
+.sound-note,
+.profile-card,
+.baby-profile-card,
+.login-card,
+.privacy-note-card,
+.admin-access-card,
+.wake-window-card,
+.export-card,
+.danger-card,
+.profile-ready-card,
+.guest-welcome-card,
+.premium-trust-card,
+.account-journey-card,
+.post-access-card,
+.data-reality-card,
+.first-use-checklist-card,
+.admin-clean-section {
+  padding: var(--ninou-card-padding-polished) !important;
+}
+
+.drawer-section-title,
+.today-overview-head,
+.chart-title,
+.section-title,
+.profile-card-head,
+.admin-invite-header,
+.profile-ready-head,
+.journey-head {
+  gap: 10px !important;
+  margin-bottom: 0 !important;
+}
+
+.drawer-section-title > div,
+.today-overview-head > div,
+.chart-title > div,
+.section-title > div,
+.profile-card-head > div,
+.admin-invite-header > div,
+.profile-ready-head > div,
+.journey-head > div {
+  min-width: 0;
+}
+
+.drawer-section-title strong,
+.today-overview-head strong,
+.chart-title strong,
+.section-title strong,
+.profile-card-head strong,
+.admin-invite-header strong,
+.profile-ready-head strong,
+.journey-head strong {
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.drawer-section-title span,
+.today-overview-head span,
+.chart-title span,
+.section-title span,
+.profile-card-head span,
+.section-helper,
+.chart-helper,
+.profile-family-card > p,
+.ninou-modal-card > p,
+.day-notes-actions small,
+.form-status {
+  line-height: 1.42;
+}
+
+.summary-grid,
+.today-overview-grid,
+.daily-rhythm,
+.weekly-overview,
+.today-last-events,
+.notification-center-list,
+.timeline,
+.settings-list,
+.sound-grid,
+.report-stack,
+.profile-ready-grid,
+.premium-trust-grid,
+.post-access-grid,
+.admin-clean-panel {
+  gap: var(--ninou-card-gap-polished) !important;
+}
+
+/* Perfil familiar */
+.profile-family-stack {
+  gap: var(--ninou-card-gap-polished) !important;
+  margin: 16px 0 max(116px, calc(96px + env(safe-area-inset-bottom, 0px))) !important;
+}
+
+.profile-family-card {
+  display: grid;
+  gap: 13px;
+  padding: var(--ninou-card-padding-polished) !important;
+  border-radius: var(--ninou-card-radius-polished) !important;
+  overflow: hidden;
+}
+
+.profile-family-card > p,
+.profile-family-card .form-status {
+  margin: 0 !important;
+}
+
+.profile-card-head {
+  align-items: flex-start !important;
+  justify-content: space-between;
+}
+
+.profile-card-head span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.profile-card-head strong,
+.profile-soft-row strong,
+.active-invite-box strong {
+  letter-spacing: -0.02em;
+}
+
+.profile-soft-row,
+.profile-setting-line,
+.profile-toggle-line {
+  min-height: 48px;
+  margin-top: 0 !important;
+  padding: 12px 14px !important;
+  border-radius: var(--ninou-card-inner-radius-polished) !important;
+}
+
+.profile-setting-line {
+  gap: 8px !important;
+}
+
+.profile-setting-line input,
+.profile-setting-line select,
+.profile-setting-line textarea {
+  min-height: 46px;
+  border-radius: 15px !important;
+}
+
+.caregiver-avatar-mini {
+  width: 50px;
+  height: 50px;
+  border-radius: 18px;
+}
+
+.profile-actions-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px !important;
+  margin-top: 0 !important;
+}
+
+.profile-actions-row button,
+.profile-primary-button,
+.profile-secondary-button,
+.profile-family-stack .ghost-link,
+.secondary-login,
+.export-actions button,
+.login-actions button,
+.danger-card button {
+  min-height: var(--ninou-touch-target-polished) !important;
+  border-radius: 16px !important;
+  padding-inline: 14px !important;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.profile-family-stack .ghost-link {
+  min-height: 38px !important;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.active-invite-box {
+  margin-top: 0 !important;
+  padding: 14px !important;
+  border-radius: 20px !important;
+}
+
+.active-invite-box strong {
+  margin-top: 5px;
+}
+
+/* Diário e notas */
+.screen[data-screen="diary"] .date-filter,
+.screen[data-screen="diary"] .chips-shell,
+.screen[data-screen="diary"] .timeline,
+.day-notes-card,
+.audit-card {
+  margin-top: 0 !important;
+}
+
+.day-notes-card {
+  display: grid;
+  gap: 13px;
+}
+
+.day-notes-card textarea {
+  min-height: 108px !important;
+  margin-top: 0 !important;
+  border-radius: 18px !important;
+  line-height: 1.42 !important;
+  padding: 13px 14px !important;
+}
+
+.day-notes-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px !important;
+  margin-top: 0 !important;
+}
+
+.timeline .event-card,
+.event-card {
+  border-radius: 24px !important;
+  padding: 15px !important;
+  gap: 13px !important;
+}
+
+.event-card strong,
+.event-card span,
+.event-card p {
+  overflow-wrap: anywhere;
+}
+
+/* Modais */
+.ninou-modal {
+  padding: 14px 14px max(14px, env(safe-area-inset-bottom, 0px));
+}
+
+.ninou-modal-card {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 430px);
+  max-height: min(86vh, 720px);
+  overflow: auto;
+  padding: 20px !important;
+  border-radius: 30px !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ninou-modal-card label,
+.caregiver-avatar-grid {
+  margin-top: 0 !important;
+}
+
+.caregiver-avatar-grid {
+  gap: 10px !important;
+}
+
+.caregiver-avatar-grid button {
+  min-height: 60px;
+  border-radius: 18px !important;
+}
+
+/* Navegação e telas pequenas */
+.bottom-nav {
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  width: min(calc(100% - 28px), 402px);
+}
+
+@media (max-width: 430px) {
+  :root {
+    --ninou-screen-gap-polished: 14px;
+    --ninou-card-gap-polished: 12px;
+    --ninou-card-padding-polished: 16px;
+    --ninou-card-radius-polished: 24px;
+    --ninou-card-inner-radius-polished: 16px;
+  }
+
+  .phone-shell {
+    padding: 16px 14px max(106px, calc(88px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+
+  .profile-card {
+    padding: 20px 16px !important;
+  }
+
+  .profile-card-head {
+    gap: 12px !important;
+  }
+
+  .profile-family-card {
+    gap: 12px;
+  }
+
+  .profile-actions-row,
+  .day-notes-actions,
+  .login-actions,
+  .export-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-family-stack .ghost-link {
+    min-height: 36px !important;
+    padding-inline: 12px !important;
+  }
+
+  .profile-soft-row,
+  .profile-toggle-line {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px !important;
+  }
+
+  .caregiver-avatar-mini {
+    width: 46px;
+    height: 46px;
+  }
+
+  .ninou-modal {
+    padding: 10px 10px max(10px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .ninou-modal-card {
+    padding: 18px !important;
+    border-radius: 26px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .phone-shell {
+    padding-inline: 12px !important;
+  }
+
+  .profile-family-card,
+  .today-overview-card,
+  .smart-insight-card,
+  .day-notes-card,
+  .chart-card,
+  .profile-card {
+    padding: 15px !important;
+  }
+
+  .profile-card-head {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .profile-family-stack .ghost-link {
+    width: 100%;
+  }
 }

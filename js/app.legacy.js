@@ -436,7 +436,7 @@ let orbitRenderSignature = "";
 let timelineRenderSignature = "";
 let liveTickMinute = -1;
 let breastTimerState = createBreastTimerState();
-let state = loadLocalDayState();
+let state = loadLocalDayState(getCurrentDayId());
 let loadedStateDayId = getCurrentDayId();
 const SUMMARY_RANGE_KEY = "ninou.summaryRangeMode";
 const summaryRangeOptions = Object.freeze({
@@ -1999,16 +1999,69 @@ function normalizeDayState(dayState = {}) {
   return normalizeRoutineDayState(dayState);
 }
 
-function loadLocalDayState() {
-  try {
-    return normalizeDayState(JSON.parse(localStorage.getItem(storageKeys.dayState) || "{}"));
-  } catch {
-    return createEmptyDayState();
-  }
+function getLocalDayStateStorageKey(dayId = getCurrentDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  return `${storageKeys.dayState}.${safeDayId}`;
 }
 
-function saveLocalDayState() {
-  localStorage.setItem(storageKeys.dayState, JSON.stringify(normalizeDayState(state)));
+function dayStateBelongsToDay(dayState = {}, dayId = getCurrentDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  if (dayState?.dayId === safeDayId || dayState?.date === safeDayId) return true;
+
+  const events = Array.isArray(dayState?.events) ? dayState.events : [];
+  if (!events.length) return false;
+
+  return events.some((event = {}) => {
+    const start = Number(event.start);
+    return Number.isFinite(start) && toDateInputValue(start) === safeDayId;
+  });
+}
+
+function loadLocalDayState(dayId = getCurrentDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+
+  try {
+    const dailyValue = localStorage.getItem(getLocalDayStateStorageKey(safeDayId));
+    if (dailyValue !== null && typeof dailyValue !== "undefined") {
+      return normalizeDayState(JSON.parse(dailyValue || "{}"));
+    }
+  } catch {
+    // Se o cache por dia estiver inválido, cai para o fluxo seguro abaixo.
+  }
+
+  try {
+    const legacyValue = localStorage.getItem(storageKeys.dayState);
+    if (!legacyValue) return createEmptyDayState();
+
+    const legacyState = JSON.parse(legacyValue || "{}");
+    if (dayStateBelongsToDay(legacyState, safeDayId)) {
+      const normalized = normalizeDayState(legacyState);
+      localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify({
+        ...normalized,
+        dayId: safeDayId,
+      }));
+      return normalized;
+    }
+  } catch {
+    // Cache legado inválido ou de outro dia. Ignora para não repetir observações.
+  }
+
+  return createEmptyDayState();
+}
+
+function saveLocalDayState(dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const normalized = normalizeDayState(state);
+  const payload = {
+    ...normalized,
+    dayId: safeDayId,
+    clientUpdatedAt: Date.now(),
+  };
+
+  localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
+
+  // Mantém compatibilidade com versões antigas, mas agora com marcador do dia.
+  localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
   persistVisibleContextForCurrentOwner();
 }
 
@@ -2089,7 +2142,7 @@ function restoreVisibleContextForOwner(email = "") {
   currentProfilePhoto = "";
   localStorage.removeItem(storageKeys.photo);
   profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
-  state = loadLocalDayState();
+  state = loadLocalDayState(getSelectedDayId());
   setVisibleDataOwnerEmail(ownerEmail);
   return restoredAny;
 }
@@ -2436,7 +2489,7 @@ function ensureTodaySelectedForRoutineWrite() {
     return;
   }
 
-  state = loadLocalDayState();
+  state = loadLocalDayState(getCurrentDayId());
   renderAll();
 }
 
@@ -2717,7 +2770,7 @@ function syncSelectedDayIntoFamilyCache() {
   const dayId = getSelectedDayId();
   if (!isDateId(dayId)) return;
 
-  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
+  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || loadLocalDayState(dayId));
   const selectedState = loadedStateDayId === dayId ? normalizeDayState(state) : cachedState;
   const selectedHasVisibleContent = dayStateHasVisibleContent(selectedState);
   const cachedHasVisibleContent = dayStateHasVisibleContent(cachedState);
@@ -2734,7 +2787,7 @@ function syncSelectedDayIntoFamilyCache() {
 
 function getFamilyDayState(dayId) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
   if (safeDayId === getSelectedDayId() && loadedStateDayId === safeDayId) {
     const selectedState = normalizeDayState(state);
     return dayStateHasVisibleContent(selectedState) || !dayStateHasVisibleContent(cachedState)
@@ -3776,7 +3829,17 @@ function applyMigrationContextToCurrentView(context) {
   const latestDayId = dayIds.at(-1);
   const visibleDayId = (context.dayStates || {})[todayId] ? todayId : latestDayId;
   const currentDayState = (context.dayStates || {})[visibleDayId] || createEmptyDayState();
-  localStorage.setItem(storageKeys.dayState, JSON.stringify(currentDayState));
+  const currentDayPayload = { ...normalizeDayState(currentDayState), dayId: visibleDayId || todayId, clientUpdatedAt: Date.now() };
+  localStorage.setItem(storageKeys.dayState, JSON.stringify(currentDayPayload));
+  if (visibleDayId) localStorage.setItem(getLocalDayStateStorageKey(visibleDayId), JSON.stringify(currentDayPayload));
+  Object.entries(context.dayStates || {}).forEach(([dayId, dayState]) => {
+    if (!isDateId(dayId)) return;
+    localStorage.setItem(getLocalDayStateStorageKey(dayId), JSON.stringify({
+      ...normalizeDayState(dayState),
+      dayId,
+      clientUpdatedAt: Date.now(),
+    }));
+  });
   familyDayStatesCache = {
     ...familyDayStatesCache,
     ...Object.fromEntries(Object.entries(context.dayStates || {}).filter(([dayId]) => isDateId(dayId)).map(([dayId, dayState]) => [dayId, normalizeDayState(dayState)])),
@@ -3793,7 +3856,7 @@ function applyMigrationContextToCurrentView(context) {
   currentProfilePhoto = "";
   localStorage.removeItem(storageKeys.photo);
   profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || Date.now();
-  state = loadLocalDayState();
+  state = loadLocalDayState(visibleDayId || getSelectedDayId());
   setVisibleDataOwnerEmail(normalizeEmail(cloudUser?.email || familyAccess?.email || GLOBAL_APP_ADMIN_EMAIL));
   persistVisibleContextForCurrentOwner();
   refreshVisibleContextUi();
@@ -5184,7 +5247,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 function saveDayState() {
   loadedStateDayId = getSelectedDayId();
   state.events = dedupeEventsByDisplayKey(state.events || []);
-  saveLocalDayState();
+  saveLocalDayState(loadedStateDayId);
   syncSelectedDayIntoFamilyCache();
   scheduleDayCloudSave();
 }
@@ -5634,7 +5697,7 @@ function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
   try {
     const daySource = data.state && typeof data.state === "object" ? data.state : data;
     const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
-    const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+    const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
     const currentSelectedState = loadedStateDayId === safeDayId ? normalizeDayState(state) : cachedState;
     const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
       ? currentSelectedState
@@ -5750,7 +5813,7 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
   const selectedDayId = getSelectedDayId();
   const sourceState = safeDayId === selectedDayId && loadedStateDayId === safeDayId
     ? normalizeDayState(state)
-    : normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+    : normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
 
   const hasDeletedEvents = getDeletedEventIdsFromState(sourceState).size > 0;
   if (!dayStateHasVisibleContent(sourceState) && !hasDeletedEvents) return;
@@ -5828,7 +5891,7 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
 
   dayUnsubscribe = firebaseServices.onSnapshot(dayRef, async (snapshot) => {
     if (!snapshot.exists()) {
-      const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
+      const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
       if (dayStateHasVisibleContent(cachedState)) {
         if (safeDayId === getSelectedDayId()) {
           state = cachedState;
@@ -7414,7 +7477,7 @@ async function setDiaryDate(value) {
   }
 
   const selectedDayId = getSelectedDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[selectedDayId] || createEmptyDayState());
+  const cachedState = normalizeDayState(familyDayStatesCache[selectedDayId] || loadLocalDayState(selectedDayId));
   state = cachedState;
   loadedStateDayId = selectedDayId;
   saveLocalDayState();
