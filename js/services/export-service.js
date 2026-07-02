@@ -11,17 +11,11 @@ export function buildExportEvents(events = [], getEventConfig) {
       detail: event.detail || "",
       notes: event.notes || "",
       createdAt: event.createdAt || "",
-      createdByUid: event.createdByUid || "",
       createdByEmail: event.createdByEmail || "",
       createdByName: event.createdByName || "",
-      createdByRelationship: event.createdByRelationship || "",
-      authorName: event.authorName || "",
-      responsibleName: event.responsibleName || "",
       updatedAt: event.updatedAt || "",
-      updatedByUid: event.updatedByUid || "",
       updatedByEmail: event.updatedByEmail || "",
       updatedByName: event.updatedByName || "",
-      updatedByRelationship: event.updatedByRelationship || "",
       lastAction: event.lastAction || "",
     }));
 }

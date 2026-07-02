@@ -194,57 +194,24 @@ export function getRoutineStartForRange(events = [], state = {}, windowStart, wi
   return Math.min(...candidates);
 }
 
-
-function normalizeSleepIntervals(events = [], state = {}, windowStart, windowEnd, isSleepEvent, now = Date.now()) {
-  const intervals = [];
-  const addInterval = (start, end) => {
-    const safeStart = Number(start);
-    const safeEnd = Number(end);
-    if (!Number.isFinite(safeStart) || !Number.isFinite(safeEnd) || safeEnd <= safeStart) return;
-    const boundedStart = Math.max(safeStart, windowStart);
-    const boundedEnd = Math.min(safeEnd, windowEnd);
-    if (boundedEnd > boundedStart) intervals.push([boundedStart, boundedEnd]);
-  };
-
-  (Array.isArray(events) ? events : [])
-    .filter((event) => isSleepEvent?.(event))
-    .forEach((event) => addInterval(event.start, event.end));
+export function getSleepMsForRange(events = [], state = {}, windowStart, windowEnd, isSleepEvent, now = Date.now()) {
+  const completedSleepMs = events
+    .filter(isSleepEvent)
+    .reduce((total, event) => total + getOverlapDuration(event.start, event.end, windowStart, windowEnd), 0);
 
   if (isSleeping(state)) {
-    addInterval(state.activeStartedAt, Math.min(now, windowEnd));
+    return completedSleepMs + getOverlapDuration(state.activeStartedAt, now, windowStart, windowEnd);
   }
 
-  intervals.sort((a, b) => a[0] - b[0]);
-
-  const merged = [];
-  intervals.forEach(([start, end]) => {
-    const last = merged[merged.length - 1];
-    if (!last || start > last[1] + 1000) {
-      merged.push([start, end]);
-      return;
-    }
-    last[1] = Math.max(last[1], end);
-  });
-
-  return merged;
-}
-
-function getSleepIntervalMs(events = [], state = {}, windowStart, windowEnd, isSleepEvent, now = Date.now()) {
-  return normalizeSleepIntervals(events, state, windowStart, windowEnd, isSleepEvent, now)
-    .reduce((total, [start, end]) => total + Math.max(0, end - start), 0);
-}
-
-export function getSleepMsForRange(events = [], state = {}, windowStart, windowEnd, isSleepEvent, now = Date.now()) {
-  return getSleepIntervalMs(events, state, windowStart, windowEnd, isSleepEvent, now);
+  return completedSleepMs;
 }
 
 export function getAwakeMsForRange(events = [], state = {}, windowStart, windowEnd, isSleepEvent, now = Date.now()) {
-  const safeWindowEnd = Math.min(Number(windowEnd), Number.isFinite(Number(now)) ? Number(now) : Number(windowEnd));
-  const routineStart = getRoutineStartForRange(events, state, windowStart, safeWindowEnd);
+  const routineStart = getRoutineStartForRange(events, state, windowStart, windowEnd);
   if (routineStart === null) return 0;
 
-  const sleepMs = getSleepMsForRange(events, state, routineStart, safeWindowEnd, isSleepEvent, now);
-  return Math.max(0, safeWindowEnd - routineStart - sleepMs);
+  const sleepMs = getSleepMsForRange(events, state, windowStart, windowEnd, isSleepEvent, now);
+  return Math.max(0, windowEnd - routineStart - sleepMs);
 }
 
 export function getSleepWindowDayMs() {

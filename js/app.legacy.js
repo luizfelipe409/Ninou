@@ -89,23 +89,9 @@ const profileBabyAge = document.querySelector("#profileBabyAge");
 const babyNameInput = document.querySelector("#babyNameInput");
 const babyArticleInput = document.querySelector("#babyArticleInput");
 const babyBirthInput = document.querySelector("#babyBirthInput");
-const profilePhoto = document.querySelector("#profilePhoto");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profilePhotoButtonText = document.querySelector("#profilePhotoButtonText");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
-const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
-const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
-const editBabyAvatarButton = document.querySelector("#editBabyAvatarButton");
-const avatarIconOptions = document.querySelector("#avatarIconOptions");
-const avatarHairColorOptions = document.querySelector("#avatarHairColorOptions");
-const avatarSkinOptions = document.querySelector("#avatarSkinOptions");
-const avatarColorOptions = document.querySelector("#avatarColorOptions");
-const avatarBackgroundOptions = document.querySelector("#avatarBackgroundOptions");
-const avatarAccessoryOptions = document.querySelector("#avatarAccessoryOptions");
-const avatarTabs = document.querySelectorAll("[data-avatar-jump]");
-const saveBabyAvatarButton = document.querySelector("#saveBabyAvatarButton");
-const skipBabyAvatarButton = document.querySelector("#skipBabyAvatarButton");
-const babyAvatarStatus = document.querySelector("#babyAvatarStatus");
 const loginEmail = document.querySelector("#loginEmail");
 const loginPassword = document.querySelector("#loginPassword");
 const loginButton = document.querySelector("#loginButton");
@@ -117,7 +103,6 @@ const caregiverRelationInput = document.querySelector("#caregiverRelationInput")
 const saveCaregiverIdentityButton = document.querySelector("#saveCaregiverIdentityButton");
 const caregiverIdentityStatus = document.querySelector("#caregiverIdentityStatus");
 const familyAccessCard = document.querySelector("#familyAccessCard");
-const familyAccessKicker = document.querySelector("#familyAccessCard > span");
 const familyAccessTitle = document.querySelector("#familyAccessTitle");
 const familyAccessText = document.querySelector("#familyAccessText");
 const familyAccessBadge = document.querySelector("#familyAccessBadge");
@@ -125,33 +110,6 @@ const createFamilyButton = document.querySelector("#createFamilyButton");
 const inviteCodeInput = document.querySelector("#inviteCodeInput");
 const acceptInviteButton = document.querySelector("#acceptInviteButton");
 const inviteAcceptBox = document.querySelector(".invite-accept-box");
-const guestWelcomeCard = document.querySelector("#guestWelcomeCard");
-const guestWelcomeLoginButton = document.querySelector("#guestWelcomeLoginButton");
-const guestWelcomeInviteButton = document.querySelector("#guestWelcomeInviteButton");
-const postAccessCard = document.querySelector("#postAccessCard");
-const postAccessKicker = document.querySelector("#postAccessKicker");
-const postAccessTitle = document.querySelector("#postAccessTitle");
-const postAccessText = document.querySelector("#postAccessText");
-const postAccessAccountStatus = document.querySelector("#postAccessAccountStatus");
-const postAccessInviteStatus = document.querySelector("#postAccessInviteStatus");
-const postAccessFamilyStatus = document.querySelector("#postAccessFamilyStatus");
-const dataRealityCard = document.querySelector("#dataRealityCard");
-const dataRealityKicker = document.querySelector("#dataRealityKicker");
-const dataRealityTitle = document.querySelector("#dataRealityTitle");
-const dataRealityText = document.querySelector("#dataRealityText");
-const firstUseChecklistCard = document.querySelector("#firstUseChecklistCard");
-const premiumTrustCard = document.querySelector("#premiumTrustCard");
-const profileReadyCard = document.querySelector("#profileReadyCard");
-const profileReadyKicker = document.querySelector("#profileReadyKicker");
-const profileReadyTitle = document.querySelector("#profileReadyTitle");
-const profileReadyText = document.querySelector("#profileReadyText");
-const profileReadyFamily = document.querySelector("#profileReadyFamily");
-const profileReadyRole = document.querySelector("#profileReadyRole");
-const profileReadyDevice = document.querySelector("#profileReadyDevice");
-const guestOnboardingModal = document.querySelector("#guestOnboardingModal");
-const guestModalCloseButton = document.querySelector("#guestModalCloseButton");
-const guestModalLoginButton = document.querySelector("#guestModalLoginButton");
-const guestModalInviteButton = document.querySelector("#guestModalInviteButton");
 const adminInvitePanel = document.querySelector("#adminInvitePanel");
 const adminInviteEmail = document.querySelector("#adminInviteEmail");
 const adminInviteRole = document.querySelector("#adminInviteRole");
@@ -197,7 +155,6 @@ const trendGrowthWeight = document.querySelector("#trendGrowthWeight");
 const trendGrowthHint = document.querySelector("#trendGrowthHint");
 const trendWeightSparkline = document.querySelector("#trendWeightSparkline");
 const growthHistoryMini = document.querySelector("#growthHistoryMini");
-const auditCard = document.querySelector(".audit-card");
 const auditTrailList = document.querySelector("#auditTrailList");
 const dayNotesTextarea = document.querySelector("#dayNotesTextarea");
 const saveDayNotesButton = document.querySelector("#saveDayNotesButton");
@@ -252,9 +209,6 @@ const routineProgressStatus = document.querySelector("#routineProgressStatus");
 const dailyRhythm = document.querySelector("#dailyRhythm");
 const intelligentTimeline = document.querySelector("#intelligentTimeline");
 const weeklyOverview = document.querySelector("#weeklyOverview");
-const summaryRangeButtons = document.querySelectorAll("[data-summary-range]");
-const summaryRangeLabel = document.querySelector("#summaryRangeLabel");
-const summaryRangeHint = document.querySelector("#summaryRangeHint");
 const dayStoryText = document.querySelector("#dayStoryText");
 const trendKpis = document.querySelector("#trendKpis");
 const bottleAmountRange = document.querySelector("#bottleAmountRange");
@@ -312,7 +266,7 @@ function getSelectedFamilyIdForAdminOrAccess() {
 function getAdminSelectedFamilyLabel(stats = null) {
   const selectedId = getActiveAdminFamilyId();
   const family = Array.isArray(stats?.families) ? stats.families.find((item) => item.id === selectedId) : null;
-  return family?.name || stats?.familyName || "Família selecionada";
+  return family?.name || stats?.familyName || babyProfile?.name || "Família selecionada";
 }
 
 function getAdminAccountPhotoKey(user = cloudUser) {
@@ -333,9 +287,15 @@ function loadAdminAccountPhoto(user = cloudUser) {
   }
 }
 
-function setAdminAccountPhoto(_dataUrl = "", user = cloudUser) {
-  adminAccountPhoto = getCaregiverAvatarDataUrl(getAdminAccountLabel(), user?.email || GLOBAL_APP_ADMIN_EMAIL, "admin");
-  try { localStorage.removeItem(getAdminAccountPhotoKey(user)); } catch {}
+function setAdminAccountPhoto(dataUrl = "", user = cloudUser) {
+  adminAccountPhoto = dataUrl || "";
+  try {
+    const key = getAdminAccountPhotoKey(user);
+    if (adminAccountPhoto) localStorage.setItem(key, adminAccountPhoto);
+    else localStorage.removeItem(key);
+  } catch {
+    // A foto pessoal segue visível na sessão mesmo se o cache local estiver indisponível.
+  }
 }
 
 function isAdminPanelOnlyContext() {
@@ -353,22 +313,6 @@ function normalizeInviteRole(value = "responsavel") {
   return role === "admin" ? "responsavel" : role;
 }
 
-// v75.56.2.1.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
-try {
-  if (!localStorage.getItem(storageKeys.email)) {
-    [
-      storageKeys.profile,
-      storageKeys.profileVersion,
-      storageKeys.dayState,
-      storageKeys.wakeWindow,
-      storageKeys.weights,
-      storageKeys.photo,
-      storageKeys.access,
-      storageKeys.dataOwnerEmail,
-    ].forEach((key) => localStorage.removeItem(key));
-  }
-} catch {}
-
 let currentSheetType = "sono";
 let currentEditingEventId = null;
 let currentDiaryFilter = "all";
@@ -379,7 +323,7 @@ let familyDayStatesCache = {};
 let familyDayIdsCacheAt = 0;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
-let currentProfilePhoto = "";
+let currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
 let adminAccountPhoto = "";
 let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
 let firebaseServices = null;
@@ -387,7 +331,6 @@ let firebaseServicesPromise = null;
 let cloudUser = null;
 let familyAccess = loadFamilyAccess();
 let pendingInviteCode = getInitialInviteCode();
-let accessFlowNotice = "";
 let recentInvites = [];
 let adminStatsRequestId = 0;
 let selectedAdminFamilyId = loadSelectedAdminFamilyId();
@@ -407,1129 +350,6 @@ let timelineRenderSignature = "";
 let liveTickMinute = -1;
 let breastTimerState = createBreastTimerState();
 let state = loadLocalDayState();
-let loadedStateDayId = getCurrentDayId();
-const SUMMARY_RANGE_KEY = "ninou.summaryRangeMode";
-const summaryRangeOptions = Object.freeze({
-  day: { days: 1, label: "Diário", hint: "Resumo do dia selecionado, focado no que aconteceu hoje." },
-  "3d": { days: 3, label: "Últimos 3 dias", hint: "Resumo curto dos últimos 3 dias para perceber mudanças recentes." },
-  "7d": { days: 7, label: "Últimos 7 dias", hint: "Resumo acumulado dos últimos 7 dias, com sono, mamadas, fraldas e medicamentos." },
-});
-let summaryRangeMode = normalizeSummaryRangeMode(localStorage.getItem(SUMMARY_RANGE_KEY) || "7d");
-let intelligentTimelineLimit = 7;
-
-let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
-let avatarEditorForceOpen = false;
-
-const babyAvatarHairOptions = Object.freeze([
-  { id: "avatar-01", label: "Bebê lilás", src: "./icons/baby-avatars/avatar-01.png" },
-  { id: "avatar-02", label: "Menino castanho", src: "./icons/baby-avatars/avatar-02.png" },
-  { id: "avatar-03", label: "Menina com laço", src: "./icons/baby-avatars/avatar-03.png" },
-  { id: "avatar-04", label: "Menino cacheado", src: "./icons/baby-avatars/avatar-04.png" },
-  { id: "avatar-05", label: "Menino ondulado", src: "./icons/baby-avatars/avatar-05.png" },
-  { id: "avatar-06", label: "Menina loira", src: "./icons/baby-avatars/avatar-06.png" },
-  { id: "avatar-07", label: "Bebê cacheadinho", src: "./icons/baby-avatars/avatar-07.png" },
-  { id: "avatar-08", label: "Bebê ruivinho", src: "./icons/baby-avatars/avatar-08.png" },
-  { id: "avatar-09", label: "Bebê com touca", src: "./icons/baby-avatars/avatar-09.png" },
-  { id: "avatar-10", label: "Menina com tiara", src: "./icons/baby-avatars/avatar-10.png" },
-  { id: "avatar-11", label: "Menino raspadinho", src: "./icons/baby-avatars/avatar-11.png" },
-  { id: "avatar-12", label: "Menino cabelo preto", src: "./icons/baby-avatars/avatar-12.png" },
-]);
-
-const babyAvatarHairColorOptions = Object.freeze([
-  { id: "ebano", label: "Ébano", value: "#2a1e1a", shadow: "#170f0d", highlight: "#5b463f" },
-  { id: "espresso", label: "Espresso", value: "#3a241b", shadow: "#21140f", highlight: "#765241" },
-  { id: "castanho-escuro", label: "Castanho escuro", value: "#4b3021", shadow: "#2d1a12", highlight: "#8b634c" },
-  { id: "castanho-medio", label: "Castanho médio", value: "#6a4730", shadow: "#4a2e1d", highlight: "#a97c59" },
-  { id: "castanho-mel", label: "Castanho mel", value: "#8a623e", shadow: "#644326", highlight: "#c99963" },
-  { id: "loiro-escuro", label: "Loiro escuro", value: "#ad8749", shadow: "#89652f", highlight: "#e3bf76" },
-  { id: "loiro-claro", label: "Loiro claro", value: "#d7b26d", shadow: "#b28b45", highlight: "#f4d995" },
-  { id: "ruivo-cobre", label: "Ruivo cobre", value: "#a84b2a", shadow: "#783018", highlight: "#d88454" },
-]);
-
-const babyAvatarSkinOptions = Object.freeze([
-  { id: "marfim", label: "Marfim", value: "#f8d9c2", shade: "#edc0a5", blush: "#efa5a8", nose: "#cf9071", lip: "#c86474" },
-  { id: "pessego", label: "Pêssego", value: "#f1c6a8", shade: "#dfaa8b", blush: "#e89295", nose: "#bd7b5c", lip: "#b85d69" },
-  { id: "dourado", label: "Dourado", value: "#d9a07a", shade: "#c2825c", blush: "#d77f80", nose: "#a86947", lip: "#9f535e" },
-  { id: "caramelo", label: "Caramelo", value: "#b97e58", shade: "#98603d", blush: "#c16f70", nose: "#7b4d30", lip: "#854852" },
-  { id: "castanho", label: "Castanho", value: "#8a5b3d", shade: "#6e442c", blush: "#a45e61", nose: "#58351f", lip: "#6d3d44" },
-  { id: "ebano-pele", label: "Ébano", value: "#5a3828", shade: "#442719", blush: "#824c54", nose: "#321d13", lip: "#54313a" },
-]);
-
-const babyAvatarBackgroundOptions = Object.freeze([
-  { id: "lavanda", label: "Lavanda", value: "#e9e1ff", text: "#3b2a73", accent: "#f7f2ff" },
-  { id: "rosa-nevoa", label: "Rosa névoa", value: "#f9dfe8", text: "#7c4165", accent: "#fff4f7" },
-  { id: "menta", label: "Menta", value: "#ddf3ea", text: "#17644e", accent: "#f4fffb" },
-  { id: "pessego-fundo", label: "Pêssego", value: "#ffe7d6", text: "#7b3b20", accent: "#fff7ef" },
-  { id: "azul-neblina", label: "Azul", value: "#ddeeff", text: "#225d78", accent: "#f5fbff" },
-  { id: "amarelo-creme", label: "Amarelo", value: "#fff0c9", text: "#6f4b02", accent: "#fffaf0" },
-  { id: "salvia", label: "Sálvia", value: "#e6eddb", text: "#4b633d", accent: "#f9fcf5" },
-  { id: "areia", label: "Areia", value: "#f3e7e1", text: "#7a5a3a", accent: "#fff8f3" },
-]);
-
-const legacyAvatarHairMap = Object.freeze({
-  "bebe-curlinho": "avatar-01",
-  "menina-laco": "avatar-03",
-  "menino-franja": "avatar-02",
-  "menina-faixa": "avatar-10",
-  "menino-cacheado": "avatar-04",
-  "menina-bob": "avatar-10",
-  "menino-topete": "avatar-05",
-  "topetinho": "avatar-05",
-  "quase-sem-cabelo": "avatar-01",
-  "onduladinho-curto": "avatar-05",
-  "duas-chuquinhas": "avatar-06",
-  "franjinha-delicada": "avatar-03",
-  "cachinhos-curtos": "avatar-07",
-  "ondinha-lateral": "avatar-05",
-  "cacheado-curto": "avatar-07",
-  "bob-bebe": "avatar-10",
-  "faixinha-baby": "avatar-10",
-  "laco-delicado": "avatar-03",
-});
-
-const legacyAvatarHairColorMap = Object.freeze({
-  preto: "ebano",
-  "castanho-claro": "castanho-mel",
-  loiro: "loiro-claro",
-  ruivo: "ruivo-cobre",
-});
-
-const legacyAvatarSkinMap = Object.freeze({
-  "pele-clara": "marfim",
-  "pele-clara-rosada": "pessego",
-  "pele-media-clara": "dourado",
-  "pele-media": "caramelo",
-  "pele-media-escura": "castanho",
-  "pele-escura": "ebano-pele",
-});
-
-const legacyAvatarBackgroundMap = Object.freeze({
-  lilas: "lavanda",
-  rosa: "rosa-nevoa",
-  creme: "areia",
-  azul: "azul-neblina",
-  amarelo: "amarelo-creme",
-  pessego: "pessego-fundo",
-});
-
-function getAvatarBackgroundOption(avatar = {}) {
-  return babyAvatarBackgroundOptions.find((item) => item.id === avatar.background) || babyAvatarBackgroundOptions[0];
-}
-
-function getAvatarHairOption(avatar = {}) {
-  return babyAvatarHairOptions.find((item) => item.id === avatar.hair) || babyAvatarHairOptions[0];
-}
-
-function getAvatarHairColorOption(avatar = {}) {
-  return babyAvatarHairColorOptions.find((item) => item.id === avatar.hairColor) || babyAvatarHairColorOptions[4];
-}
-
-function getAvatarSkinOption(avatar = {}) {
-  return babyAvatarSkinOptions.find((item) => item.id === avatar.skin) || babyAvatarSkinOptions[0];
-}
-
-function getAvatarOption(options, id, fallbackIndex = 0) {
-  return options.find((item) => item.id === id) || options[fallbackIndex];
-}
-
-function normalizeAvatarDraft(avatar = {}) {
-  const presetId = legacyAvatarHairMap[avatar.hair] || legacyAvatarHairMap[avatar.icon] || avatar.hair || avatar.icon || "avatar-01";
-  return {
-    hair: getAvatarOption(babyAvatarHairOptions, presetId, 0).id,
-    hairColor: "castanho-mel",
-    skin: "marfim",
-    background: "lavanda",
-  };
-}
-
-function escapeSvgText(value = "") {
-  return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-function buildAvatarBackgroundMarkup(avatar = {}) {
-  const palette = getAvatarBackgroundOption(avatar);
-  return `
-    <circle cx="50" cy="52" r="12" fill="white" opacity=".42"/>
-    <circle cx="148" cy="58" r="9" fill="white" opacity=".3"/>
-    <circle cx="146" cy="148" r="15" fill="${palette.accent}" opacity=".88"/>
-    <circle cx="58" cy="147" r="8" fill="white" opacity=".22"/>
-    <ellipse cx="100" cy="155" rx="60" ry="18" fill="white" opacity=".09"/>
-    <path d="M38 132c18 19 42 29 73 29 24 0 44-5 60-16" fill="none" stroke="white" stroke-opacity=".2" stroke-width="5" stroke-linecap="round"/>
-  `;
-}
-
-function getAvatarOutfitFill(backgroundId) {
-  const map = {
-    lavanda: { base: "#c7b8fb", shadow: "#9f88e4", highlight: "#f6f2ff" },
-    "rosa-nevoa": { base: "#f3c3d1", shadow: "#db9aad", highlight: "#fff2f6" },
-    menta: { base: "#bde4d4", shadow: "#8dbda8", highlight: "#f2fcf7" },
-    "pessego-fundo": { base: "#f5c5a5", shadow: "#de9a73", highlight: "#fff3eb" },
-    "azul-neblina": { base: "#bbd6f2", shadow: "#8fafcf", highlight: "#f2f8ff" },
-    "amarelo-creme": { base: "#f6dd92", shadow: "#e0b95d", highlight: "#fff8e5" },
-    salvia: { base: "#c8d9b7", shadow: "#9fb389", highlight: "#f6fbf1" },
-    areia: { base: "#e6d4c5", shadow: "#c8ab98", highlight: "#fff8f3" },
-  };
-  return map[backgroundId] || map.lavanda;
-}
-
-function hairLockPath(d, color, opacity = 1, width = 8) {
-  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}"/>`;
-}
-
-function getAvatarHairMarkup(hair, tone) {
-  const base = tone.value;
-  const shadow = tone.shadow;
-  const hi = tone.highlight;
-  const styles = {
-    "topetinho-suave": `
-      <path d="M52 104C54 84 63 66 79 54C92 45 109 43 124 48C140 54 151 67 154 88C139 78 121 74 100 74C79 74 62 80 52 104Z" fill="${shadow}" opacity=".94"/>
-      <path d="M56 101C59 85 67 72 80 61C92 53 107 51 121 55C134 59 144 69 148 83C135 76 119 73 100 73C82 73 68 77 56 101Z" fill="${base}"/>
-      <path d="M77 58C85 51 94 48 104 48C116 48 126 52 133 60C125 58 116 57 104 57C93 57 85 58 77 58Z" fill="${hi}" opacity=".42"/>
-      <path d="M93 60C97 56 101 55 105 56C109 57 113 60 117 64C112 64 108 65 103 65C98 65 94 64 88 64C89 62 91 61 93 60Z" fill="${base}" opacity=".98"/>
-      ${hairLockPath("M75 63C84 60 92 59 100 59C108 59 117 60 125 64", hi, .62, 3.4)}
-      ${hairLockPath("M66 76C76 72 87 70 100 70C113 70 124 72 134 76", hi, .30, 2.6)}
-      ${hairLockPath("M60 89C72 84 85 82 100 82C115 82 128 84 140 89", shadow, .12, 2.4)}
-    `,
-    "franjinha-natural": `
-      <path d="M52 104C54 84 63 66 79 54C94 45 111 45 126 50C140 55 149 68 152 88C139 77 121 72 100 72C79 72 62 78 52 104Z" fill="${shadow}" opacity=".94"/>
-      <path d="M56 101C59 85 67 73 80 63C92 55 107 53 121 57C133 61 142 70 146 82C134 75 118 71 100 71C83 71 68 76 56 101Z" fill="${base}"/>
-      <path d="M67 73C73 77 79 82 86 86C90 89 95 91 100 91C105 91 110 89 114 86C121 82 127 77 133 73C125 69 115 67 100 67C85 67 75 69 67 73Z" fill="${base}"/>
-      <path d="M75 67C82 63 90 61 100 61C110 61 118 63 125 67" fill="none" stroke="${hi}" stroke-width="3.3" stroke-linecap="round" opacity=".58"/>
-      <path d="M70 77C76 81 82 85 88 88" fill="none" stroke="${shadow}" stroke-width="2" stroke-linecap="round" opacity=".22"/>
-      <path d="M130 77C124 81 118 85 112 88" fill="none" stroke="${shadow}" stroke-width="2" stroke-linecap="round" opacity=".22"/>
-      <path d="M91 86C94 89 97 90 100 90C103 90 106 89 109 86" fill="none" stroke="${hi}" stroke-width="2.2" stroke-linecap="round" opacity=".24"/>
-    `,
-    "cachinhos-fofos": `
-      <path d="M51 104C54 84 63 67 78 55C92 45 109 43 124 48C141 54 152 68 155 89C140 79 122 74 100 74C78 74 61 79 51 104Z" fill="${shadow}" opacity=".94"/>
-      <circle cx="67" cy="84" r="10.5" fill="${base}"/><circle cx="80" cy="69" r="11" fill="${base}"/><circle cx="96" cy="61" r="12" fill="${base}"/><circle cx="114" cy="61" r="12" fill="${base}"/><circle cx="130" cy="69" r="11" fill="${base}"/><circle cx="143" cy="84" r="10.5" fill="${base}"/><circle cx="84" cy="86" r="9.4" fill="${base}"/><circle cx="100" cy="82" r="10.4" fill="${base}"/><circle cx="116" cy="86" r="9.4" fill="${base}"/>
-      <path d="M71 93C79 86 88 82 100 82C112 82 121 86 129 93" fill="${base}" opacity=".98"/>
-      ${hairLockPath("M77 70C82 66 88 63 95 62", hi, .42, 2.8)}
-      ${hairLockPath("M105 62C112 63 118 66 123 70", hi, .42, 2.8)}
-      ${hairLockPath("M88 88C92 85 96 84 100 84C104 84 108 85 112 88", hi, .20, 2.2)}
-    `,
-  };
-  return styles[hair.style] || styles["topetinho-suave"];
-}
-
-function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
-  const normalized = normalizeAvatarDraft(avatar);
-  const preset = getAvatarHairOption(normalized);
-  return preset.src || babyAvatarHairOptions[0].src;
-}
-
-function renderAvatarEditorVisibility() {
-  const canEditAvatar = canUsePrivateFeatures();
-  const visible = canEditAvatar && (avatarEditorForceOpen || !babyProfile.avatarConfigured);
-  if (babyAvatarCard) babyAvatarCard.hidden = !visible;
-  if (editBabyAvatarButton) {
-    editBabyAvatarButton.hidden = !canEditAvatar;
-    editBabyAvatarButton.disabled = !canEditAvatar;
-    editBabyAvatarButton.textContent = visible ? "Fechar avatares" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
-  }
-}
-
-function applyGuestInteractionLock() {
-  const locked = !isLoggedIn();
-  document.body.classList.toggle("guest-locked", locked);
-  const disabledElements = [
-    babyNameInput, babyArticleInput, babyBirthInput,
-    babyWeightInput, babyWeightDateInput, saveBabyWeightButton,
-    caregiverNameInput, caregiverRelationInput, saveCaregiverIdentityButton,
-    saveBabyAvatarButton, skipBabyAvatarButton,
-    inviteCodeInput, acceptInviteButton,
-  ];
-  disabledElements.forEach((element) => {
-    if (!element) return;
-    element.disabled = locked;
-    element.setAttribute("aria-disabled", locked ? "true" : "false");
-  });
-  if (locked) {
-    avatarEditorForceOpen = false;
-    if (babyAvatarCard) babyAvatarCard.hidden = true;
-    if (editBabyAvatarButton) editBabyAvatarButton.hidden = true;
-  }
-  if (guestWelcomeCard) guestWelcomeCard.hidden = !locked;
-  renderGuestPremiumContent();
-  updateAccountJourneyGuide();
-}
-
-
-const guestThemeOptions = Object.freeze([
-  { mode: "light", label: "Claro", icon: "☀" },
-  { mode: "dark", label: "Escuro", icon: "🌙" },
-]);
-
-function normalizeGuestThemeMode(mode = "dark") {
-  return guestThemeOptions.some((option) => option.mode === mode) ? mode : "dark";
-}
-
-function getActiveGuestThemeMode() {
-  return normalizeGuestThemeMode(themeModeInput?.value || babyProfile?.themeMode || localStorage.getItem(storageKeys.themeMode) || "dark");
-}
-
-function renderGuestThemeButtons() {
-  const mode = getActiveGuestThemeMode();
-  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
-    const active = normalizeGuestThemeMode(button.dataset.themeChoice || "auto") === mode;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-}
-
-function setGuestThemeChoice(mode = "dark") {
-  const safeMode = normalizeGuestThemeMode(mode);
-  if (themeModeInput) themeModeInput.value = safeMode;
-  babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: safeMode });
-
-  try {
-    localStorage.setItem(storageKeys.themeMode, safeMode);
-  } catch {}
-
-  updateTheme();
-  renderGuestThemeButtons();
-}
-
-function getGuestThemeSwitchMarkup() {
-  const buttons = guestThemeOptions.map((option) => `
-    <button type="button" data-theme-choice="${option.mode}">
-      <span>${option.icon}</span>
-      <strong>${option.label}</strong>
-    </button>
-  `).join("");
-
-  return `
-    <div class="guest-theme-switch" aria-label="Escolha o tema inicial">
-      <span>Tema inicial</span>
-      <div>${buttons}</div>
-    </div>
-  `;
-}
-
-const guestPremiumContent = {
-  today: {
-    kicker: "Conheça o Ninou",
-    title: "A rotina do bebê em tempo real",
-    text: "Uma demonstração realista de como a família acompanha sono, mamadas, fraldas e medicamentos em poucos toques.",
-    accent: "Hoje • exemplo",
-    liveTitle: "Bebê acordado",
-    liveValue: "44 min",
-    liveHint: "desde 12:35, após a última soneca",
-    cta: "Entre para começar a rotina real da família.",
-    metrics: [
-      { label: "Sono hoje", value: "3h05", note: "1 soneca concluída" },
-      { label: "Mamadas", value: "4", note: "420 ml + peito" },
-      { label: "Fraldas", value: "3", note: "2 xixi · 1 mista" },
-      { label: "Próxima dica", value: "14:10", note: "janela de sono" },
-    ],
-    barsTitle: "Ritmo do dia",
-    barsSubtitle: "sono, alimentação e cuidados",
-    bars: [
-      { label: "06h", value: "Sono", height: 72 },
-      { label: "08h", value: "Acordou", height: 32 },
-      { label: "10h", value: "Soneca", height: 88 },
-      { label: "12h", value: "Mamou", height: 52 },
-      { label: "14h", value: "Dica", height: 64 },
-    ],
-    lineTitle: "Tempo acordado",
-    lineSubtitle: "exemplo ao longo do dia",
-    line: [
-      { label: "07h", value: 0 },
-      { label: "08h", value: 38 },
-      { label: "09h", value: 92 },
-      { label: "10h", value: 15 },
-      { label: "12h", value: 0 },
-      { label: "13h", value: 44 },
-    ],
-    distribution: [
-      { label: "Sono", value: 46 },
-      { label: "Mamada", value: 28 },
-      { label: "Fralda", value: 16 },
-      { label: "Outros", value: 10 },
-    ],
-    timeline: [
-      { time: "07:41", title: "Acordou", detail: "começo do dia" },
-      { time: "09:30", title: "Soneca", detail: "3h05 de sono" },
-      { time: "12:42", title: "Mamadeira", detail: "120 ml" },
-    ],
-    features: [
-      "Tempo acordado recalculado automaticamente",
-      "Últimos cuidados sempre visíveis",
-      "Sugestões leves sem poluir a rotina",
-    ],
-  },
-  diary: {
-    kicker: "Histórico por data",
-    title: "Diário completo e organizado",
-    text: "O usuário entende como cada registro entra no histórico, com horários, detalhes, observações e separação correta por dia.",
-    accent: "Data exemplo",
-    liveTitle: "Dia completo",
-    liveValue: "11 registros",
-    liveHint: "madrugada, manhã, tarde e noite separados",
-    cta: "Entre para consultar, editar e compartilhar o histórico real.",
-    metrics: [
-      { label: "Sono", value: "3h05", note: "concluído" },
-      { label: "Mamadas", value: "5", note: "peito e mamadeira" },
-      { label: "Fraldas", value: "4", note: "com detalhes" },
-      { label: "Observações", value: "2", note: "anotações da família" },
-    ],
-    barsTitle: "Registros por período",
-    barsSubtitle: "distribuição exemplo",
-    bars: [
-      { label: "Madr.", value: "2", height: 36 },
-      { label: "Manhã", value: "6", height: 88 },
-      { label: "Tarde", value: "3", height: 58 },
-      { label: "Noite", value: "1", height: 28 },
-    ],
-    lineTitle: "Volume de registros",
-    lineSubtitle: "exemplo dos últimos dias",
-    line: [
-      { label: "24", value: 8 },
-      { label: "25", value: 10 },
-      { label: "26", value: 9 },
-      { label: "27", value: 12 },
-      { label: "28", value: 11 },
-      { label: "29", value: 13 },
-      { label: "30", value: 11 },
-    ],
-    distribution: [
-      { label: "Sono", value: 30 },
-      { label: "Mamada", value: 34 },
-      { label: "Fralda", value: 24 },
-      { label: "Medic.", value: 12 },
-    ],
-    timeline: [
-      { time: "03:18", title: "Amamentação", detail: "lado esquerdo" },
-      { time: "07:41", title: "Acordou", detail: "registrado pela mãe" },
-      { time: "12:35", title: "Fim da soneca", detail: "tempo acordado correto" },
-    ],
-    features: [
-      "Cada dia recomeça à meia-noite",
-      "Edição de registros com segurança",
-      "Histórico pronto para relatório",
-    ],
-  },
-  trends: {
-    kicker: "Dados inteligentes",
-    title: "Gráficos que explicam a rotina",
-    text: "A demo mostra como sono, mamadas, fraldas e crescimento ficam claros depois dos primeiros dias de uso.",
-    accent: "Últimos 7 dias",
-    liveTitle: "Sono médio",
-    liveValue: "14h20",
-    liveHint: "exemplo de tendência semanal",
-    cta: "Entre para visualizar os gráficos reais do bebê.",
-    metrics: [
-      { label: "Mamadas", value: "8/dia", note: "média exemplo" },
-      { label: "Fraldas", value: "6/dia", note: "média exemplo" },
-      { label: "Peso", value: "+420 g", note: "evolução exemplo" },
-      { label: "Regularidade", value: "82%", note: "padrão semanal" },
-    ],
-    barsTitle: "Sono nos últimos dias",
-    barsSubtitle: "exemplo de evolução",
-    bars: [
-      { label: "Seg", value: "13h", height: 62 },
-      { label: "Ter", value: "14h", height: 72 },
-      { label: "Qua", value: "13h40", height: 68 },
-      { label: "Qui", value: "15h", height: 88 },
-      { label: "Sex", value: "14h20", height: 78 },
-      { label: "Sáb", value: "14h50", height: 84 },
-      { label: "Dom", value: "15h10", height: 90 },
-    ],
-    lineTitle: "Peso do bebê",
-    lineSubtitle: "linha de exemplo de crescimento",
-    line: [
-      { label: "1ª", value: 3.18 },
-      { label: "2ª", value: 3.32 },
-      { label: "3ª", value: 3.48 },
-      { label: "4ª", value: 3.61 },
-      { label: "5ª", value: 3.82 },
-    ],
-    distribution: [
-      { label: "Sono", value: 44 },
-      { label: "Acordado", value: 36 },
-      { label: "Mamadas", value: 12 },
-      { label: "Cuidados", value: 8 },
-    ],
-    timeline: [
-      { time: "Peso", title: "3,82 kg", detail: "evolução semanal" },
-      { time: "Sono", title: "mais regular", detail: "padrão noturno" },
-      { time: "Fraldas", title: "dentro da média", detail: "acompanhamento diário" },
-    ],
-    features: [
-      "Sono por dia e por período",
-      "Mamadas, fraldas e medicamentos",
-      "Evolução de peso sem complexidade",
-    ],
-  },
-  sounds: {
-    kicker: "Ritual de descanso",
-    title: "Sons com contexto de rotina",
-    text: "A tela de sons também vira uma experiência guiada, mostrando como o áudio pode apoiar a hora de dormir.",
-    accent: "Pré-sono • exemplo",
-    liveTitle: "Som favorito",
-    liveValue: "Útero",
-    liveHint: "sessão de 28 min em volume baixo",
-    cta: "Entre para usar os sons junto com a rotina real da família.",
-    metrics: [
-      { label: "Sessão", value: "28 min", note: "até relaxar" },
-      { label: "Volume", value: "Baixo", note: "ambiente calmo" },
-      { label: "Rotina", value: "Noite", note: "pré-sono" },
-      { label: "Uso", value: "4x", note: "última semana" },
-    ],
-    barsTitle: "Uso dos sons",
-    barsSubtitle: "últimos descansos fictícios",
-    bars: [
-      { label: "Útero", value: "42min", height: 88 },
-      { label: "Relaxar", value: "25min", height: 58 },
-      { label: "Ritmo", value: "18min", height: 42 },
-    ],
-    lineTitle: "Tempo para relaxar",
-    lineSubtitle: "tendência fictícia",
-    line: [
-      { label: "Seg", value: 34 },
-      { label: "Ter", value: 31 },
-      { label: "Qua", value: 29 },
-      { label: "Qui", value: 28 },
-      { label: "Sex", value: 24 },
-    ],
-    distribution: [
-      { label: "Útero", value: 52 },
-      { label: "Relaxar", value: 30 },
-      { label: "Ritmo", value: 18 },
-    ],
-    timeline: [
-      { time: "20:10", title: "Som do útero", detail: "preparar o berço" },
-      { time: "20:32", title: "Relaxar", detail: "volume baixo" },
-      { time: "20:45", title: "Dormiu", detail: "rotina concluída" },
-    ],
-    features: [
-      "Sons simples para uso noturno",
-      "Timer com repetição controlada",
-      "Rotina de descanso mais previsível",
-    ],
-  },
-};
-
-function getGuestMetricMarkup(metric) {
-  return `
-    <article class="guest-store-metric">
-      <span>${escapeHtml(metric.label)}</span>
-      <strong>${escapeHtml(metric.value)}</strong>
-      <small>${escapeHtml(metric.note)}</small>
-    </article>
-  `;
-}
-
-function getGuestBarMarkup(bar) {
-  const height = Math.max(18, Math.min(96, Number(bar.height) || 40));
-  return `
-    <span class="guest-store-bar" style="--h:${height}%">
-      <i aria-hidden="true"></i>
-      <b>${escapeHtml(bar.label)}</b>
-      <em>${escapeHtml(bar.value)}</em>
-    </span>
-  `;
-}
-
-function getGuestLineChartMarkup(points = []) {
-  const safePoints = Array.isArray(points) ? points : [];
-  const values = safePoints.map((point) => Number(point.value)).filter(Number.isFinite);
-  const min = values.length ? Math.min(...values) : 0;
-  const max = values.length ? Math.max(...values) : 1;
-  const range = Math.max(0.001, max - min);
-  const count = Math.max(1, safePoints.length - 1);
-
-  const coords = safePoints.map((point, index) => {
-    const x = 10 + (index / count) * 180;
-    const value = Number(point.value);
-    const normalized = Number.isFinite(value) ? (value - min) / range : 0.5;
-    const y = 82 - normalized * 58;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
-
-  const dots = safePoints.map((point, index) => {
-    const x = 10 + (index / count) * 180;
-    const value = Number(point.value);
-    const normalized = Number.isFinite(value) ? (value - min) / range : 0.5;
-    const y = 82 - normalized * 58;
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.8"></circle>`;
-  }).join("");
-
-  const labels = safePoints.map((point) => `<span>${escapeHtml(point.label)}</span>`).join("");
-
-  return `
-    <div class="guest-store-line">
-      <svg viewBox="0 0 200 96" role="img" aria-hidden="true" focusable="false">
-        <path d="M10 82H190M10 52H190M10 22H190"></path>
-        <polyline points="${coords}"></polyline>
-        ${dots}
-      </svg>
-      <div class="guest-store-line-labels">${labels}</div>
-    </div>
-  `;
-}
-
-function getGuestDistributionMarkup(items = []) {
-  return items.map((item, index) => {
-    const value = Math.max(0, Math.min(100, Number(item.value) || 0));
-    return `
-      <article class="guest-store-ring" style="--value:${value};--ring-index:${index}">
-        <i aria-hidden="true"></i>
-        <div>
-          <strong>${escapeHtml(String(value))}%</strong>
-          <span>${escapeHtml(item.label)}</span>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-function getGuestTimelineMarkup(row) {
-  return `
-    <article class="guest-store-row">
-      <time>${escapeHtml(row.time)}</time>
-      <div>
-        <strong>${escapeHtml(row.title)}</strong>
-        <span>${escapeHtml(row.detail)}</span>
-      </div>
-    </article>
-  `;
-}
-
-function getGuestFeatureMarkup(feature) {
-  return `<li><span aria-hidden="true">✓</span>${escapeHtml(feature)}</li>`;
-}
-
-function getGuestPremiumCardMarkup(screenKey) {
-  const item = guestPremiumContent[screenKey] || guestPremiumContent.today;
-  const metrics = item.metrics.map(getGuestMetricMarkup).join("");
-  const bars = item.bars.map(getGuestBarMarkup).join("");
-  const timeline = item.timeline.map(getGuestTimelineMarkup).join("");
-  const features = item.features.map(getGuestFeatureMarkup).join("");
-
-  return `
-    <div class="guest-store-layout">
-      <section class="guest-store-hero" aria-label="Apresentação do Ninou">
-        <span>${escapeHtml(item.kicker)}</span>
-        <strong>${escapeHtml(item.title)}</strong>
-        <p>${escapeHtml(item.text)}</p>
-        ${getGuestThemeSwitchMarkup()}
-        <ul class="guest-store-features">${features}</ul>
-      </section>
-
-      <section class="guest-store-preview" aria-label="Demonstração fictícia">
-        <div class="guest-preview-phone">
-          <div class="guest-preview-topline">
-            <span>${escapeHtml(item.accent)}</span>
-            <b>Dados fictícios</b>
-          </div>
-          <div class="guest-live-card">
-            <span>${escapeHtml(item.liveTitle)}</span>
-            <strong>${escapeHtml(item.liveValue)}</strong>
-            <p>${escapeHtml(item.liveHint)}</p>
-          </div>
-          <div class="guest-store-metrics">${metrics}</div>
-          <div class="guest-store-chart">
-            <div>
-              <span>${escapeHtml(item.barsTitle)}</span>
-              <strong>${escapeHtml(item.barsSubtitle)}</strong>
-            </div>
-            <div class="guest-store-bars">${bars}</div>
-          </div>
-        </div>
-
-        <div class="guest-store-analytics">
-          <article class="guest-store-analytic-card">
-            <div>
-              <span>${escapeHtml(item.lineTitle)}</span>
-              <strong>${escapeHtml(item.lineSubtitle)}</strong>
-            </div>
-            ${getGuestLineChartMarkup(item.line)}
-          </article>
-
-          <article class="guest-store-analytic-card">
-            <div>
-              <span>Composição</span>
-              <strong>leitura rápida</strong>
-            </div>
-            <div class="guest-store-rings">${getGuestDistributionMarkup(item.distribution)}</div>
-          </article>
-
-          <article class="guest-store-analytic-card guest-store-timeline-card">
-            <div>
-              <span>Linha do tempo</span>
-              <strong>exemplo realista</strong>
-            </div>
-            <div class="guest-store-timeline">${timeline}</div>
-          </article>
-        </div>
-      </section>
-    </div>
-
-    <div class="guest-premium-proof" aria-label="Confirmações da demonstração">
-      <span>Dados fictícios</span>
-      <span>Fluxo por convite</span>
-      <span>Claro ou escuro</span>
-    </div>
-
-    <p class="guest-store-cta">${escapeHtml(item.cta)}</p>
-
-    <div class="guest-premium-actions">
-      <button type="button" data-guest-action="login">Entrar agora</button>
-      <button type="button" data-guest-action="invite">Tenho convite</button>
-    </div>
-  `;
-}
-
-function removeGuestPremiumCards() {
-  document.querySelectorAll(".guest-premium-card").forEach((card) => card.remove());
-}
-
-function renderGuestPremiumContent() {
-  removeGuestPremiumCards();
-  if (isLoggedIn()) return;
-  const activeScreen = document.querySelector('.screen.active:not([data-screen="profile"])');
-  if (!activeScreen) return;
-  const key = activeScreen.dataset.screen || "today";
-  const card = document.createElement("section");
-  card.className = "guest-premium-card";
-  card.setAttribute("aria-label", "Prévia premium do Ninou");
-  card.innerHTML = getGuestPremiumCardMarkup(key);
-  renderGuestThemeButtons();
-  card.addEventListener("click", (event) => {
-    const guestAction = event.target.closest("[data-guest-action]");
-    if (!guestAction) return;
-    event.preventDefault();
-    event.stopPropagation();
-    focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
-  });
-  activeScreen.prepend(card);
-}
-
-
-
-function setPostStatusState(key, state = "pending") {
-  const item = postAccessCard?.querySelector(`[data-post-status="${key}"]`);
-  if (!item) return;
-  item.dataset.state = state;
-  item.classList.toggle("done", state === "done");
-  item.classList.toggle("current", state === "current");
-  item.classList.toggle("pending", state === "pending");
-  const indicator = item.querySelector("i");
-  if (indicator) indicator.textContent = state === "done" ? "✓" : state === "current" ? "•" : "–";
-}
-
-function setFirstUseStepState(step, state = "pending") {
-  const item = firstUseChecklistCard?.querySelector(`[data-first-use-step="${step}"]`);
-  if (!item) return;
-  item.dataset.state = state;
-  item.classList.toggle("done", state === "done");
-  item.classList.toggle("current", state === "current");
-  item.classList.toggle("pending", state === "pending");
-}
-
-function updateDataRealityCard() {
-  if (!dataRealityCard) return;
-  const connected = isLoggedIn();
-  const authorized = hasFamilyAccess();
-  const appAdmin = isGlobalAppAdmin();
-
-  if (authorized || (appAdmin && !window.__ninouAdminFamilyDataOpen)) {
-    dataRealityCard.hidden = true;
-    return;
-  }
-
-  dataRealityCard.hidden = false;
-
-  if (!connected) {
-    dataRealityCard.dataset.mode = "demo";
-    if (dataRealityKicker) dataRealityKicker.textContent = "Demonstração";
-    if (dataRealityTitle) dataRealityTitle.textContent = "Você está vendo uma prévia do Ninou.";
-    if (dataRealityText) dataRealityText.textContent = "As telas de Hoje, Diário, Dados e Sons usam exemplos fictícios até uma conta familiar ser conectada.";
-    return;
-  }
-
-  dataRealityCard.dataset.mode = "pending";
-  if (dataRealityKicker) dataRealityKicker.textContent = "Conta conectada";
-  if (dataRealityTitle) dataRealityTitle.textContent = "Falta conectar uma família.";
-  if (dataRealityText) dataRealityText.textContent = "Use o código de convite recebido do administrador para liberar os dados reais da rotina.";
-}
-
-function isFirstUseChecklistComplete() {
-  if (!hasFamilyAccess()) return false;
-  const identity = loadCurrentCaregiverIdentity();
-  const hasName = Boolean(String(identity.name || "").trim() || String(caregiverNameInput?.value || "").trim());
-  const hasRelation = Boolean(String(identity.relation || "").trim() || String(caregiverRelationInput?.value || "").trim());
-  const hasTheme = ["light", "dark"].includes(String(themeModeInput?.value || babyProfile?.themeMode || "").trim());
-  return hasName && hasRelation && hasTheme;
-}
-
-function isProfileReadyForDailyUse() {
-  return Boolean(hasFamilyAccess() && !isGlobalAppAdmin() && isFirstUseChecklistComplete());
-}
-
-function updateProfileReadyExperience() {
-  const connected = isLoggedIn();
-  const authorized = hasFamilyAccess();
-  const appAdmin = isGlobalAppAdmin();
-  const ready = isProfileReadyForDailyUse();
-  const familyAdmin = isFamilyAdmin();
-  const baby = getBabyDisplayName();
-  const identity = loadCurrentCaregiverIdentity();
-  const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
-
-  document.body.classList.toggle("profile-daily-ready", ready);
-
-  if (premiumTrustCard) premiumTrustCard.hidden = connected;
-  if (profileReadyCard) {
-    profileReadyCard.hidden = !ready;
-    if (ready) {
-      if (profileReadyKicker) profileReadyKicker.textContent = "Conta pronta";
-      if (profileReadyTitle) profileReadyTitle.textContent = `Perfil de ${baby} configurado.`;
-      if (profileReadyText) profileReadyText.textContent = "O fluxo inicial foi concluído. Esta tela agora mostra somente itens úteis para o uso diário e ajustes pontuais.";
-      if (profileReadyFamily) profileReadyFamily.textContent = `Família de ${baby}`;
-      if (profileReadyRole) profileReadyRole.textContent = getRoleLabel(role);
-      if (profileReadyDevice) profileReadyDevice.textContent = identity.name ? `${identity.name}${identity.relationshipLabel ? ` • ${identity.relationshipLabel}` : ""}` : "Identificado";
-    }
-  }
-
-  const journeyCard = document.querySelector("#accountJourneyCard");
-  if (journeyCard && authorized) journeyCard.hidden = true;
-  if (postAccessCard && authorized) postAccessCard.hidden = true;
-  if (dataRealityCard && authorized) dataRealityCard.hidden = true;
-  if (familyWelcomeCard && ready) familyWelcomeCard.hidden = true;
-  if (familyAccessCard) {
-    familyAccessCard.hidden = Boolean(ready && !familyAdmin && !appAdmin);
-  }
-}
-
-function updateFirstUseChecklist() {
-  if (!firstUseChecklistCard) return;
-
-  const connected = isLoggedIn();
-  const authorized = hasFamilyAccess();
-  const appAdmin = isGlobalAppAdmin();
-  const complete = isFirstUseChecklistComplete();
-  firstUseChecklistCard.hidden = appAdmin || !connected || !authorized || complete;
-  if (firstUseChecklistCard.hidden) return;
-
-  const identity = loadCurrentCaregiverIdentity();
-  const hasName = Boolean(String(identity.name || "").trim() || String(caregiverNameInput?.value || "").trim());
-  const hasRelation = Boolean(String(identity.relation || "").trim() || String(caregiverRelationInput?.value || "").trim());
-  const hasTheme = ["light", "dark"].includes(String(themeModeInput?.value || babyProfile?.themeMode || "").trim());
-  const hasRoutine = Array.isArray(state?.events) && state.events.length > 0;
-
-  setFirstUseStepState("identity", hasName ? "done" : "current");
-  setFirstUseStepState("relation", hasRelation ? "done" : hasName ? "current" : "pending");
-  setFirstUseStepState("theme", hasTheme ? "done" : "current");
-  setFirstUseStepState("routine", hasRoutine ? "done" : "current");
-}
-
-function updatePostAccessExperience() {
-  updateDataRealityCard();
-  updateFirstUseChecklist();
-
-  if (!postAccessCard) return;
-
-  const connected = isLoggedIn();
-  const authorized = hasFamilyAccess();
-  const appAdmin = isGlobalAppAdmin();
-  const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
-  const baby = getBabyDisplayName();
-  const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
-  const roleLabel = authorized ? getRoleLabel(role) : "";
-
-  postAccessCard.hidden = appAdmin || !connected || authorized;
-  if (postAccessCard.hidden) return;
-
-  postAccessCard.dataset.state = authorized ? "accepted" : pendingCode ? "pending-invite" : "connected";
-
-  if (authorized) {
-    if (postAccessKicker) postAccessKicker.textContent = accessFlowNotice === "invite-accepted" ? "Convite aceito" : "Família conectada";
-    if (postAccessTitle) postAccessTitle.textContent = `Você entrou na família de ${baby}.`;
-    if (postAccessText) postAccessText.textContent = `Seu acesso: ${roleLabel}. Agora você pode começar a acompanhar a rotina real conforme sua permissão.`;
-    if (postAccessAccountStatus) postAccessAccountStatus.textContent = "Conta conectada";
-    if (postAccessInviteStatus) postAccessInviteStatus.textContent = familyAccess?.inviteCode ? `Convite ${familyAccess.inviteCode}` : "Acesso validado";
-    if (postAccessFamilyStatus) postAccessFamilyStatus.textContent = `Família de ${baby}`;
-    setPostStatusState("account", "done");
-    setPostStatusState("invite", "done");
-    setPostStatusState("family", "done");
-  } else {
-    if (postAccessKicker) postAccessKicker.textContent = accessFlowNotice === "created" ? "Conta criada" : "Conta conectada";
-    if (postAccessTitle) postAccessTitle.textContent = pendingCode ? "Convite detectado. Falta confirmar." : "Agora vamos conectar você à família.";
-    if (postAccessText) postAccessText.textContent = pendingCode
-      ? "Cole ou confirme o código recebido para liberar a família vinculada ao seu e-mail."
-      : "Se você recebeu convite, use o código enviado pelo administrador. Se não recebeu, peça um convite para acessar a rotina real.";
-    if (postAccessAccountStatus) postAccessAccountStatus.textContent = cloudUser?.email || "Conta conectada";
-    if (postAccessInviteStatus) postAccessInviteStatus.textContent = pendingCode ? `Código ${pendingCode}` : "Aguardando convite";
-    if (postAccessFamilyStatus) postAccessFamilyStatus.textContent = "Ainda não liberada";
-    setPostStatusState("account", "done");
-    setPostStatusState("invite", pendingCode ? "current" : "pending");
-    setPostStatusState("family", "pending");
-  }
-
-  postAccessCard.querySelectorAll("[data-post-access-action]").forEach((button) => {
-    const action = button.dataset.postAccessAction || "";
-    if (action === "invite") {
-      button.hidden = authorized;
-      button.textContent = pendingCode ? "Confirmar convite" : "Conectar convite";
-    }
-    if (action === "profile") {
-      button.hidden = !authorized;
-    }
-    if (action === "start") {
-      button.hidden = !authorized;
-    }
-  });
-}
-
-function buildProfessionalInviteMessage({ familyLabel = "família", baby = getBabyDisplayName(), code = "", link = "", roleLabel = "Acesso familiar" } = {}) {
-  return [
-    `Você foi convidado para acompanhar a rotina de ${baby} no Ninou.`,
-    "",
-    `Família: ${familyLabel}`,
-    `Permissão: ${roleLabel}`,
-    code ? `Código do convite: ${code}` : "",
-    link ? `Link de acesso: ${link}` : "",
-    "",
-    "Crie sua conta com o mesmo e-mail que recebeu este convite. Assim o Ninou conecta você à família certa com segurança."
-  ].filter(Boolean).join("\n");
-}
-
-function getWhatsAppShareUrl(message = "") {
-  return `https://wa.me/?text=${encodeURIComponent(message)}`;
-}
-
-function renderInviteResultWithMessage({ title = "Convite pronto", familyLabel = "", email = "", role = "responsavel", code = "", link = "" } = {}) {
-  if (!inviteResult) return;
-  const roleLabel = getRoleLabel(role);
-  const message = buildProfessionalInviteMessage({ familyLabel, code, link, roleLabel });
-  const whatsappUrl = getWhatsAppShareUrl(message);
-  inviteResult.innerHTML = `
-    <strong>${escapeHtml(title)}</strong>
-    ${familyLabel ? `<span>Família: ${escapeHtml(familyLabel)}</span>` : ""}
-    ${code ? `<span>Código: ${escapeHtml(code)}</span>` : ""}
-    ${email ? `<span>Envie para: ${escapeHtml(email)}</span>` : ""}
-    <div class="invite-result-actions">
-      ${link ? `<button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>` : ""}
-      <button type="button" data-copy-invite="${escapeHtml(message)}">Copiar mensagem</button>
-      <a href="${escapeHtml(whatsappUrl)}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
-    </div>
-  `;
-  const preview = document.querySelector("#adminInviteMessagePreview");
-  if (preview) {
-    preview.innerHTML = `
-      <span>Mensagem pronta para WhatsApp</span>
-      <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
-      <small>Copie a mensagem ou envie pelo WhatsApp. O convidado precisa usar o mesmo e-mail informado.</small>
-    `;
-  }
-}
-
-
-function setJourneyStepState(card, step, state) {
-  const item = card?.querySelector(`[data-journey-step="${step}"]`);
-  if (!item) return;
-  item.dataset.state = state;
-  item.classList.toggle("done", state === "done");
-  item.classList.toggle("current", state === "current");
-  item.classList.toggle("pending", state === "pending");
-}
-
-function updateAccountJourneyGuide() {
-  const card = document.querySelector("#accountJourneyCard");
-  if (!card) return;
-
-  const appAdmin = isGlobalAppAdmin();
-  const connected = isLoggedIn();
-  const authorized = hasFamilyAccess();
-  const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
-  const hint = card.querySelector("#accountJourneyHint");
-
-  card.hidden = appAdmin || authorized;
-  if (appAdmin || authorized) return;
-
-  card.dataset.state = authorized ? "ready" : connected ? "connected" : "guest";
-
-  setJourneyStepState(card, "invite", authorized || pendingCode ? "done" : "current");
-  setJourneyStepState(card, "account", connected ? "done" : pendingCode ? "current" : "pending");
-  setJourneyStepState(card, "family", authorized ? "done" : connected ? "current" : "pending");
-  setJourneyStepState(card, "record", authorized ? "current" : "pending");
-
-  if (hint) {
-    hint.textContent = authorized
-      ? "Acesso familiar liberado. Agora este aparelho pode registrar e acompanhar a rotina conforme sua permissão."
-      : connected
-        ? (pendingCode
-          ? "Convite detectado. Cole ou confirme o código para conectar esta conta à família certa."
-          : "Conta criada. Agora use o código de convite enviado pelo administrador para liberar a família.")
-        : (pendingCode
-          ? "Convite salvo neste aparelho. Crie sua conta ou entre usando o mesmo e-mail convidado pelo admin."
-          : "O admin gera o convite; depois você entra ou cria conta com o mesmo e-mail para liberar a rotina familiar.");
-  }
-
-  card.querySelectorAll("[data-journey-action]").forEach((button) => {
-    const action = button.dataset.journeyAction || "login";
-    if (action === "invite") {
-      button.textContent = connected ? "Inserir convite" : "Tenho convite";
-      button.hidden = authorized;
-    }
-    if (action === "create") button.hidden = connected;
-    if (action === "login") {
-      button.hidden = false;
-      button.textContent = connected ? (authorized ? "Ver rotina" : "Conta conectada") : "Entrar agora";
-      button.disabled = connected && !authorized;
-    }
-  });
-}
-
-function closeGuestLoginModal() {
-  if (guestOnboardingModal) guestOnboardingModal.hidden = true;
-}
-
-function openGuestLoginModal() {
-  if (isLoggedIn()) {
-    showScreen("profile");
-    return;
-  }
-  if (guestOnboardingModal) guestOnboardingModal.hidden = false;
-}
-
-function focusProfileAccess(mode = "login") {
-  closeGuestLoginModal();
-  showScreen("profile");
-
-  const wantsInvite = mode === "invite";
-  const wantsCreate = mode === "create";
-  if (loginHelper) {
-    loginHelper.textContent = wantsInvite
-      ? "Entre ou crie sua conta com o mesmo e-mail do convite. Depois cole o código recebido pelo administrador."
-      : wantsCreate
-        ? "Informe seu e-mail, crie uma senha e toque em Criar conta. Se você recebeu convite, use o mesmo e-mail indicado pelo admin."
-        : "Entre para salvar a rotina com segurança e acompanhar o bebê em família.";
-  }
-
-  window.setTimeout(() => {
-    const loginCard = loginHelper?.closest(".login-card");
-    const journeyCard = document.querySelector("#accountJourneyCard");
-    const target = wantsInvite && isLoggedIn() ? inviteAcceptBox : (journeyCard || loginCard);
-    target?.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (wantsInvite && isLoggedIn()) {
-      inviteCodeInput?.focus();
-    } else {
-      loginEmail?.focus();
-    }
-  }, 220);
-}
-
-function openAvatarEditor() {
-  avatarEditorForceOpen = true;
-  renderAvatarEditorVisibility();
-  renderAvatarCustomizer();
-  babyAvatarCard?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-}
-
-function closeAvatarEditor(statusText = "") {
-  avatarEditorForceOpen = false;
-  renderAvatarEditorVisibility();
-  if (statusText && babyAvatarStatus) babyAvatarStatus.textContent = statusText;
-}
-function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = "member") {
-  const base = `${label || "Responsável"}-${seed || "ninou"}-${variant}`;
-  let hash = 0;
-  for (let index = 0; index < base.length; index += 1) hash = ((hash << 5) - hash + base.charCodeAt(index)) | 0;
-  const palettes = [
-    ["#d9c8ff", "#3b2a73"],
-    ["#ffcad4", "#743244"],
-    ["#bdebd8", "#17644e"],
-    ["#ffd97a", "#6f4b02"],
-    ["#aee4f2", "#225d78"],
-    ["#ffc096", "#7b3b20"],
-  ];
-  const [bg, fg] = palettes[Math.abs(hash) % palettes.length];
-  const cleaned = String(label || seed || "R").trim();
-  const initial = escapeSvgText((cleaned.match(/[A-Za-zÀ-ÿ0-9]/)?.[0] || "R").toUpperCase());
-  const icon = variant === "admin" ? "★" : variant === "family" ? "♡" : variant === "known" ? "•" : "✓";
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><radialGradient id="g" cx="32%" cy="24%" r="85%"><stop offset="0" stop-color="#fffdf8" stop-opacity=".9"/><stop offset="1" stop-color="${bg}"/></radialGradient><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#2d2250" flood-opacity=".14"/></filter></defs><circle cx="80" cy="80" r="74" fill="url(#g)" filter="url(#s)"/><circle cx="80" cy="80" r="68" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="5"/><text x="80" y="90" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="64" font-weight="800" fill="${fg}">${initial}</text><circle cx="118" cy="42" r="19" fill="#fff8ef" opacity=".92"/><text x="118" y="48" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="${fg}">${escapeSvgText(icon)}</text></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-function renderAvatarOptionButton(container, options, type, avatar = pendingBabyAvatar) {
-  if (!container) return;
-  const selected = avatar[type];
-  const swatchTypes = new Set(["skin", "background", "hairColor"]);
-
-  container.innerHTML = options
-    .map((item) => {
-      const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || item.value || "#33224d"}"` : "";
-      const preview = type === "hair" ? `<img class="avatar-face-thumb avatar-preset-thumb" src="${item.src || getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" />` : "";
-      const content = swatchTypes.has(type)
-        ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>`
-        : `${preview}<small>${escapeHtml(item.label)}</small>`;
-
-      return `<button type="button" class="avatar-choice ${selected === item.id ? "selected" : ""}" data-avatar-type="${escapeHtml(type)}" data-avatar-value="${escapeHtml(item.id)}" aria-pressed="${selected === item.id ? "true" : "false"}"${style}>${content}</button>`;
-    })
-    .join("");
-}
-
-
-function applyAvatarPreview(avatar = pendingBabyAvatar) {
-  const src = getBabyAvatarDataUrl(avatar);
-  if (babyAvatarPreview) babyAvatarPreview.src = src;
-  if (!isGlobalAppAdmin() || window.__ninouAdminFamilyDataOpen) {
-    updateProfilePhoto(src);
-  }
-}
-
-function renderAvatarCustomizer() {
-  pendingBabyAvatar = normalizeAvatarDraft(pendingBabyAvatar?.hair ? pendingBabyAvatar : babyProfile.avatar || {});
-  renderAvatarOptionButton(avatarIconOptions, babyAvatarHairOptions, "hair", pendingBabyAvatar);
-  if (avatarHairColorOptions) {
-    avatarHairColorOptions.innerHTML = "";
-    avatarHairColorOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
-  }
-  if (avatarSkinOptions) {
-    avatarSkinOptions.innerHTML = "";
-    avatarSkinOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
-  }
-  if (avatarColorOptions) {
-    avatarColorOptions.innerHTML = "";
-    avatarColorOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
-  }
-  if (avatarIconOptions) {
-    avatarIconOptions.closest(".avatar-picker-section")?.removeAttribute("hidden");
-  }
-  if (avatarBackgroundOptions) avatarBackgroundOptions.innerHTML = "";
-  if (avatarAccessoryOptions) avatarAccessoryOptions.innerHTML = "";
-  applyAvatarPreview(pendingBabyAvatar);
-  renderAvatarEditorVisibility();
-}
-
-
-function updatePendingAvatar(type, value) {
-  pendingBabyAvatar = normalizeAvatarDraft({ ...pendingBabyAvatar, [type]: value });
-  renderAvatarCustomizer();
-  if (babyAvatarStatus) babyAvatarStatus.textContent = "Prévia atualizada. Toque em Salvar para aplicar.";
-}
-
-function saveBabyAvatarFromDraft() {
-  if (!requireLogin("salvar o avatar")) return;
-  babyProfile = normalizeBabyProfile({
-    ...babyProfile,
-    avatar: normalizeAvatarDraft(pendingBabyAvatar),
-    avatarConfigured: true,
-  });
-  currentProfilePhoto = "";
-  localStorage.removeItem(storageKeys.photo);
-  markProfileLocallyChanged();
-  saveBabyProfile();
-  renderAvatarCustomizer();
-  renderBabyIdentity();
-  scheduleProfileCloudSave();
-  closeAvatarEditor("Avatar salvo com sucesso.");
-  if (loginHelper) loginHelper.textContent = "Avatar salvo com sucesso.";
-}
-
-
 
 function createEmptyDayState() {
   return createEmptyRoutineDayState();
@@ -1595,96 +415,33 @@ function getCurrentActorEmail() {
   return normalizeEmail(cloudUser?.email || familyAccess?.email || "") || "este aparelho";
 }
 
-function getCurrentActorUid() {
-  return String(cloudUser?.uid || "").trim();
-}
-
-function getFallbackActorNameFromEmail(email = getCurrentActorEmail()) {
+function getCurrentActorName() {
+  const email = getCurrentActorEmail();
   if (!email || email === "este aparelho") return "este aparelho";
+
+  const localIdentity = loadCurrentCaregiverIdentity();
+  if (localIdentity.label) return localIdentity.label;
+
   if (isGlobalAdminEmail(email)) return "Admin";
   return email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function getCurrentActorProfile() {
-  const email = getCurrentActorEmail();
-  const localIdentity = loadCurrentCaregiverIdentity();
-  const storedName = String(localIdentity.name || "").trim();
-  const storedRelationshipLabel = String(localIdentity.relationshipLabel || getCaregiverRelationLabel(localIdentity.relation) || "").trim();
-  const isPrimaryAdmin = isGlobalAdminEmail(email);
-  const displayName = storedName || (isPrimaryAdmin ? "Luiz Felipe" : "");
-  const relationshipLabel = storedRelationshipLabel || (isPrimaryAdmin ? "Pai" : "");
-  const label = displayName || relationshipLabel || getFallbackActorNameFromEmail(email);
-  const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
-  return {
-    uid: getCurrentActorUid(),
-    email,
-    deviceId: getOrCreateCaregiverDeviceId(),
-    displayName,
-    relationshipLabel,
-    familyId: familyAccess?.familyId || "",
-    accessLevel: getRoleLabel(role),
-    label,
-  };
-}
-
-function getCurrentActorName() {
-  return getCurrentActorProfile().label;
-}
-
-function getCurrentActorRelationship() {
-  return getCurrentActorProfile().relationshipLabel;
-}
-
 const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
-const caregiverDeviceIdKey = "ninou.deviceId";
-
-/*
-  v75.56.2.1.1 — identificação por aparelho
-
-  A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
-  Por isso, a identificação do cuidador não pode ser salva na conta global.
-  Ela fica salva somente neste aparelho:
-  - celular do Felipe: Felipe / Pai
-  - celular da Maria: Maria / Mãe
-*/
-function getOrCreateCaregiverDeviceId() {
-  try {
-    const current = String(localStorage.getItem(caregiverDeviceIdKey) || "").trim();
-    if (current) return current;
-    const randomPart = (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-    const deviceId = `device-${String(randomPart).replace(/[^a-zA-Z0-9-]/g, "").slice(0, 48)}`;
-    localStorage.setItem(caregiverDeviceIdKey, deviceId);
-    return deviceId;
-  } catch {
-    return "device-local";
-  }
-}
 
 function getCurrentIdentityEmail() {
   return normalizeEmail(cloudUser?.email || familyAccess?.email || "");
 }
 
-function getCaregiverIdentityKey() {
-  return `${caregiverIdentityStoragePrefix}.${getOrCreateCaregiverDeviceId()}`;
-}
-
-function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
+function getCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
   return `${caregiverIdentityStoragePrefix}.${normalizeEmail(email || "local")}`;
-}
-
-function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
-  // v75.56.2.1.1: não limpamos a identificação local do aparelho ao trocar/logout de conta.
-  // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
 function getCaregiverRelationLabel(value = "") {
   const labels = {
     pai: "Pai",
     mae: "Mãe",
-    avo: "Avó",
-    avo_masculino: "Avô",
+    avo: "Avó/avô",
     cuidador: "Cuidador(a)",
-    baba: "Babá",
     responsavel: "Responsável",
     outro: "Familiar",
   };
@@ -1692,56 +449,33 @@ function getCaregiverRelationLabel(value = "") {
 }
 
 function loadCurrentCaregiverIdentity() {
+  const email = getCurrentIdentityEmail();
+  if (!email) return { name: "", relation: "", label: "" };
   try {
-    let data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey()) || "{}");
-
-    // Migração suave: se este aparelho tinha identidade antiga por e-mail, copia uma vez
-    // para a nova chave por dispositivo, sem depender da conta compartilhada.
-    if (!data.displayName && !data.name && !data.relationship && !data.relation) {
-      const legacyData = JSON.parse(localStorage.getItem(getLegacyCaregiverIdentityKey()) || "{}");
-      if (legacyData.displayName || legacyData.name || legacyData.relationship || legacyData.relation) {
-        data = legacyData;
-        localStorage.setItem(getCaregiverIdentityKey(), JSON.stringify({ ...legacyData, deviceId: getOrCreateCaregiverDeviceId() }));
-      }
-    }
-
-    const name = String(data.displayName || data.name || "").trim();
-    const relation = String(data.relationship || data.relation || "").trim();
-    const relationLabel = String(data.relationshipLabel || getCaregiverRelationLabel(relation) || "").trim();
+    const data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey(email)) || "{}");
+    const name = String(data.name || "").trim();
+    const relation = String(data.relation || "").trim();
+    const relationLabel = getCaregiverRelationLabel(relation);
     return {
       name,
       relation,
-      relationshipLabel: relationLabel,
       label: name || relationLabel,
-      deviceId: String(data.deviceId || getOrCreateCaregiverDeviceId()).trim(),
     };
   } catch {
-    return { name: "", relation: "", relationshipLabel: "", label: "", deviceId: getOrCreateCaregiverDeviceId() };
+    return { name: "", relation: "", label: "" };
   }
 }
 
-function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
+function saveCurrentCaregiverIdentity(name = "", relation = "") {
   const email = getCurrentIdentityEmail();
-  const cleanName = String(name || "").trim();
-  const cleanRelation = String(relation || "").trim();
-  const relationshipLabel = String(extras.relationshipLabel || getCaregiverRelationLabel(cleanRelation) || "").trim();
-  const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
+  if (!email) return false;
   const payload = {
-    uid: String(extras.uid || getCurrentActorUid() || "").trim(),
-    email,
-    deviceId: getOrCreateCaregiverDeviceId(),
-    displayName: cleanName,
-    name: cleanName,
-    relationship: cleanRelation,
-    relation: cleanRelation,
-    relationshipLabel,
-    familyId: extras.familyId || familyAccess?.familyId || "",
-    accessLevel: extras.accessLevel || getRoleLabel(role),
-    savedLocally: true,
-    updatedAt: extras.updatedAt || new Date().toISOString(),
+    name: String(name || "").trim(),
+    relation: String(relation || "").trim(),
+    updatedAt: new Date().toISOString(),
   };
   try {
-    localStorage.setItem(getCaregiverIdentityKey(), JSON.stringify(payload));
+    localStorage.setItem(getCaregiverIdentityKey(email), JSON.stringify(payload));
   } catch {}
   return true;
 }
@@ -1752,83 +486,61 @@ function renderCaregiverIdentityPanel() {
   caregiverIdentityCard.hidden = !logged;
   if (!logged) return;
   const identity = loadCurrentCaregiverIdentity();
-  const isPrimaryAdmin = isGlobalAppAdmin();
-  if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || (isPrimaryAdmin ? "Luiz Felipe" : "");
-  if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || (isPrimaryAdmin ? "pai" : "");
-  if (saveCaregiverIdentityButton) {
-    saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
-  }
+  if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || "";
+  if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || "";
   if (caregiverIdentityStatus) {
     caregiverIdentityStatus.textContent = identity.label
-      ? `Próximos registros feitos neste aparelho aparecerão como ${identity.label}. Isso não altera permissões de Admin, família ou convite.`
-      : (isPrimaryAdmin
-        ? "Sugestão inicial deste aparelho: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
-        : "Defina como os registros feitos neste aparelho devem aparecer no diário da família.");
+      ? `Próximos registros aparecerão como ${identity.label}.`
+      : "Defina como você quer aparecer nos próximos registros.";
   }
 }
 
 async function saveCaregiverIdentityFromForm() {
   const name = caregiverNameInput?.value || "";
   const relation = caregiverRelationInput?.value || "";
-
-  // v75.56.2.1.1: salva somente neste aparelho.
-  // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
-  // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
   saveCurrentCaregiverIdentity(name, relation);
   const identity = loadCurrentCaregiverIdentity();
-
-  if (saveCaregiverIdentityButton) {
-    saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
-  }
-
   if (caregiverIdentityStatus) caregiverIdentityStatus.textContent = identity.label
-    ? `Próximos registros feitos neste celular aparecerão como ${identity.label}.`
-    : "Identificação limpa neste aparelho. Usaremos o e-mail quando necessário.";
+    ? `Identificação salva: ${identity.label}.`
+    : "Identificação limpa. Usaremos o e-mail quando necessário.";
 
-  renderCaregiverIdentityPanel();
+  if (cloudUser && firebaseServices) {
+    try {
+      await firebaseServices.setDoc(firebaseServices.doc(firebaseServices.db, "users", cloudUser.uid, "account", "profile"), {
+        email: normalizeEmail(cloudUser.email || ""),
+        displayName: String(name || "").trim(),
+        relation: String(relation || "").trim(),
+        updatedAt: firebaseServices.serverTimestamp(),
+      }, { merge: true });
+    } catch (error) {
+      console.warn("Não foi possível salvar a identificação no perfil da conta:", error);
+    }
+  }
 }
 
 function getActorDisplayNameFromEvent(event = {}) {
+  const raw = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
+  const text = String(raw || "").trim();
+  if (!text) return "";
   const baby = String(getBabyDisplayName() || "").trim().toLowerCase();
-  const candidates = [
-    event.createdByName,
-    event.createdByRelationship,
-    event.authorName,
-    event.responsibleName,
-    event.updatedByName,
-    event.updatedByRelationship,
-  ];
-  for (const candidate of candidates) {
-    const text = String(candidate ?? "").trim();
-    if (!text || text === "undefined" || text === "null") continue;
-    if (baby && text.toLowerCase() === baby) continue;
-    return text;
-  }
-  const fallback = String(event.createdByEmail || event.updatedByEmail || "").trim();
-  if (!fallback || fallback === "undefined" || fallback === "null") return "Responsável";
-  if (baby && fallback.toLowerCase() === baby) return "Responsável";
-  return fallback;
+  if (baby && text.toLowerCase() === baby) return "Responsável";
+  return text;
 }
 
 function makeAuditEntry(action, event, at = new Date().toISOString()) {
   const config = event?.type ? getEventConfig(event.type) : { title: "Registro" };
-  const actor = getCurrentActorProfile();
   return {
     id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     action,
     title: config.title || "Registro",
     at,
-    byUid: actor.uid,
-    byEmail: actor.email,
-    byDeviceId: actor.deviceId,
-    byName: actor.displayName || actor.label,
-    byRelationship: actor.relationshipLabel,
+    byEmail: getCurrentActorEmail(),
+    byName: getCurrentActorName(),
     eventId: event?.id || "",
   };
 }
 
 function pushAuditEntry(action, event) {
-  if (action === "adicionou") return;
   state.auditLog = Array.isArray(state.auditLog) ? state.auditLog : [];
   state.auditLog.push(makeAuditEntry(action, event));
   state.auditLog = state.auditLog.slice(-60);
@@ -1836,15 +548,10 @@ function pushAuditEntry(action, event) {
 
 function makeEvent(type, start, end = start, detail = "", notes = "") {
   const nowIso = new Date().toISOString();
-  const actor = getCurrentActorProfile();
   return applyWakeWindowMetadata(createRoutineEvent(type, start, end, detail, notes, {
     createdAt: nowIso,
-    updatedAt: nowIso,
-    createdByUid: actor.uid,
-    createdByEmail: actor.email,
-    createdByDeviceId: actor.deviceId,
-    createdByName: actor.displayName,
-    createdByRelationship: actor.relationshipLabel,
+    createdByEmail: getCurrentActorEmail(),
+    createdByName: getCurrentActorName(),
     lastAction: "adicionou",
   }));
 }
@@ -1873,6 +580,7 @@ function saveLocalDayState() {
 const visibleContextKeys = [
   storageKeys.profile,
   storageKeys.profileVersion,
+  storageKeys.photo,
   storageKeys.dayState,
   storageKeys.wakeWindow,
   storageKeys.weights,
@@ -1944,8 +652,7 @@ function restoreVisibleContextForOwner(email = "") {
 
   wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
   babyProfile = loadBabyProfile();
-  currentProfilePhoto = "";
-  localStorage.removeItem(storageKeys.photo);
+  currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
   profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
   state = loadLocalDayState();
   setVisibleDataOwnerEmail(ownerEmail);
@@ -1953,7 +660,7 @@ function restoreVisibleContextForOwner(email = "") {
 }
 
 function refreshVisibleContextUi() {
-  updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
+  updateProfilePhoto(currentProfilePhoto || "./icons/icon-192.png");
   syncBabyProfileForm();
   if (wakeWindowInput) wakeWindowInput.value = String(wakeWindowMinutes);
   if (wakeWindowValue) wakeWindowValue.textContent = String(wakeWindowMinutes);
@@ -1989,11 +696,11 @@ function resetVisibleContextForGuest() {
   selectedDiaryDay = null;
   autoSelectedLatestFamilyDay = false;
   wakeWindowMinutes = 70;
-  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
   currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
-  updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
+  updateProfilePhoto("./icons/icon-192.png");
 }
 
 
@@ -2007,12 +714,12 @@ function prepareAdminPanelContext(user = cloudUser) {
   autoSelectedLatestFamilyDay = false;
   window.__ninouAdminFamilyDataOpen = false;
   wakeWindowMinutes = 70;
-  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "auto" });
   currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
-  setAdminAccountPhoto("", user);
-  updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
+  adminAccountPhoto = loadAdminAccountPhoto(user);
+  updateProfilePhoto("./icons/icon-192.png");
   refreshVisibleContextUi();
 }
 
@@ -2022,20 +729,16 @@ async function loadAdminAccountProfileFromCloud(user = cloudUser) {
     const services = await getFirebaseServices();
     const snapshot = await services.getDoc(services.doc(services.db, "users", user.uid, "account", "profile"));
     const data = snapshot.exists() ? snapshot.data() || {} : {};
-    setAdminAccountPhoto("", user);
-    if (data.displayName || data.relationship || data.relation || data.relationshipLabel) {
-      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relationship || data.relation || ""), {
-        uid: user.uid,
-        familyId: data.familyId || familyAccess?.familyId || "",
-        accessLevel: data.accessLevel || "",
-        relationshipLabel: data.relationshipLabel || "",
-      });
+    if (data.photo) setAdminAccountPhoto(String(data.photo), user);
+    else adminAccountPhoto = loadAdminAccountPhoto(user);
+    if (data.displayName || data.relation) {
+      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relation || ""));
     }
     renderBabyIdentity();
     return data;
   } catch (error) {
     console.warn("Não foi possível carregar o perfil pessoal do admin:", error);
-    setAdminAccountPhoto("", user);
+    adminAccountPhoto = loadAdminAccountPhoto(user);
     renderBabyIdentity();
     return null;
   }
@@ -2047,31 +750,31 @@ async function saveAdminAccountProfileToCloud() {
     const services = await getFirebaseServices();
     await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "account", "profile"), {
       email: normalizeEmail(cloudUser.email || GLOBAL_APP_ADMIN_EMAIL),
-      avatarType: "initials",
-      photo: "",
+      photo: adminAccountPhoto || "",
       updatedAt: services.serverTimestamp(),
     }, { merge: true });
     return true;
   } catch (error) {
-    console.warn("Não foi possível salvar o avatar pessoal do admin:", error);
+    console.warn("Não foi possível salvar a foto pessoal do admin:", error);
     return false;
   }
 }
 
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
-  /*
-    v75.56.2.1.1: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
-    mas cada aparelho deve registrar com o próprio nome.
-    Por isso, não carregamos displayName/relationship da nuvem para este campo,
-    para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
-  */
-  renderCaregiverIdentityPanel();
-  return {
-    source: "device",
-    deviceId: getOrCreateCaregiverDeviceId(),
-    email: normalizeEmail(user?.email || ""),
-  };
+  if (!user || !firebaseServices) return null;
+  try {
+    const snapshot = await firebaseServices.getDoc(firebaseServices.doc(firebaseServices.db, "users", user.uid, "account", "profile"));
+    const data = snapshot.exists() ? snapshot.data() || {} : {};
+    if (data.displayName || data.relation) {
+      saveCurrentCaregiverIdentity(String(data.displayName || ""), String(data.relation || ""));
+      renderCaregiverIdentityPanel();
+    }
+    return data;
+  } catch (error) {
+    console.warn("Não foi possível carregar a identificação da conta:", error);
+    return null;
+  }
 }
 
 function hasRoutineDayContent(dayState = state) {
@@ -2120,14 +823,11 @@ function requireLogin(actionText = "usar o Ninou") {
     return false;
   }
   setSyncStatus(isLoggedIn() ? "loading" : "offline", cloudUser?.email || "");
-  if (!isLoggedIn()) {
-    openGuestLoginModal();
-    if (loginHelper) loginHelper.textContent = `Entre para ${actionText}. Seus registros ficam salvos com segurança na família.`;
-    return false;
-  }
   showScreen("profile");
   if (loginHelper) {
-    loginHelper.textContent = `Sua conta precisa estar vinculada a uma família para ${actionText}. Use um convite do administrador do app.`;
+    loginHelper.textContent = isLoggedIn()
+      ? `Sua conta precisa estar vinculada a uma família para ${actionText}. Use um convite do administrador do app.`
+      : `Entre com uma conta autorizada para ${actionText}. Novos usuários entram por convite do administrador do app.`;
   }
   return false;
 }
@@ -2146,26 +846,6 @@ function ensureTodaySelectedForRoutineWrite() {
 
   state = loadLocalDayState();
   renderAll();
-}
-
-
-function ensureTodaySelectedForView() {
-  const todayId = getCurrentDayId();
-  if (getSelectedDayId() === todayId) return false;
-
-  syncSelectedDayIntoFamilyCache();
-  setSelectedDiaryDayById(todayId);
-  state = getFamilyDayState(todayId);
-  loadedStateDayId = todayId;
-  saveLocalDayState();
-  timelineRenderSignature = "";
-  orbitRenderSignature = "";
-
-  if (firebaseServices && cloudUser && hasFamilyAccess()) {
-    void subscribeToCloudDay(todayId, { allowAutoLatest: false });
-  }
-
-  return true;
 }
 
 function normalizeEmail(value = "") {
@@ -2244,7 +924,6 @@ function clearPendingInviteCode() {
   pendingInviteCode = "";
   try { localStorage.removeItem(storageKeys.pendingInvite); } catch {}
   if (inviteCodeInput) inviteCodeInput.value = "";
-  try { updateAccountJourneyGuide(); } catch {}
 }
 
 function resetMigrationSearchState() {
@@ -2370,100 +1049,36 @@ function getDayIdFromStart(startValue = getDayStart()) {
   return toDateInputValue(getDayStart(Number(startValue) || Date.now()));
 }
 
-function dayStateHasVisibleContent(dayState = {}) {
-  return hasRoutineDayContent(dayState) || Boolean(String(dayState?.dayNotes || "").trim());
-}
-
-function getEventWindowStart(event = {}) {
-  const start = Number(event.start);
-  return Number.isFinite(start) ? start : null;
-}
-
-function getEventWindowEnd(event = {}) {
-  const start = getEventWindowStart(event);
-  if (!Number.isFinite(start)) return null;
-  const end = Number(event.end);
-  return Number.isFinite(end) && end > start ? end : start;
-}
-
-function eventOverlapsWindow(event = {}, windowStart = getDayStart(), windowEnd = windowStart + day) {
-  const start = getEventWindowStart(event);
-  const end = getEventWindowEnd(event);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
-  return start < windowEnd && end >= windowStart;
-}
-
-function getEventDisplayDedupeKey(event = {}) {
-  const startMinute = Math.round((Number(event.start) || 0) / 60000);
-  const endMinute = Math.round((Number(event.end) || Number(event.start) || 0) / 60000);
-  const type = String(event.type || "").trim();
-  const detail = String(event.detail || "").trim().toLowerCase();
-  const notes = String(event.notes || "").trim().toLowerCase();
-  return [type, startMinute, endMinute, detail, notes].join("|");
-}
-
-function chooseRicherEventForDisplay(current = {}, candidate = {}) {
-  const currentScore = [current.createdByName, current.createdByRelationship, current.updatedAt, current.notes, current.detail].filter(Boolean).length;
-  const candidateScore = [candidate.createdByName, candidate.createdByRelationship, candidate.updatedAt, candidate.notes, candidate.detail].filter(Boolean).length;
-  return candidateScore >= currentScore ? candidate : current;
-}
-
-function dedupeEventsByDisplayKey(events = []) {
-  const byKey = new Map();
-  for (const event of Array.isArray(events) ? events : []) {
-    const normalized = normalizeEvent(event);
-    if (!normalized) continue;
-    const key = getEventDisplayDedupeKey(normalized);
-    const current = byKey.get(key);
-    byKey.set(key, current ? chooseRicherEventForDisplay(current, normalized) : normalized);
-  }
-  return [...byKey.values()].sort((a, b) => Number(a.start) - Number(b.start));
-}
-
 function syncSelectedDayIntoFamilyCache() {
   const dayId = getSelectedDayId();
   if (!isDateId(dayId)) return;
-
-  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
-  const selectedState = loadedStateDayId === dayId ? normalizeDayState(state) : cachedState;
-  const selectedHasVisibleContent = dayStateHasVisibleContent(selectedState);
-  const cachedHasVisibleContent = dayStateHasVisibleContent(cachedState);
-
   familyDayStatesCache = {
     ...familyDayStatesCache,
-    [dayId]: selectedHasVisibleContent || !cachedHasVisibleContent ? selectedState : cachedState,
+    [dayId]: normalizeDayState(state),
   };
-
-  if (selectedHasVisibleContent && !familyDayIdsCache.includes(dayId)) {
+  if (hasRoutineDayContent(state) && !familyDayIdsCache.includes(dayId)) {
     familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
   }
 }
 
 function getFamilyDayState(dayId) {
-  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
-  if (safeDayId === getSelectedDayId() && loadedStateDayId === safeDayId) {
-    const selectedState = normalizeDayState(state);
-    return dayStateHasVisibleContent(selectedState) || !dayStateHasVisibleContent(cachedState)
-      ? selectedState
-      : cachedState;
-  }
-  return cachedState;
+  if (dayId === getSelectedDayId()) return normalizeDayState(state);
+  return normalizeDayState(familyDayStatesCache[dayId] || createEmptyDayState());
 }
 
 function getFamilyEventsForWindow(windowStart, windowEnd) {
   syncSelectedDayIntoFamilyCache();
   const events = [];
-  const startDay = getDayStart(windowStart) - day;
+  const startDay = getDayStart(windowStart);
   const endDay = getDayStart(Math.max(windowStart, windowEnd - 1));
   for (let dayStart = startDay; dayStart <= endDay; dayStart += day) {
     const dayId = toDateInputValue(dayStart);
     const dayState = getFamilyDayState(dayId);
     (dayState.events || []).forEach((event) => {
-      if (eventOverlapsWindow(event, windowStart, windowEnd)) events.push(event);
+      if (event.start >= windowStart && event.start < windowEnd) events.push(event);
     });
   }
-  return dedupeEventsByDisplayKey(events);
+  return events.sort((a, b) => Number(a.start) - Number(b.start));
 }
 
 function buildFamilyReportDays(count = 7, anchorStart = getDayStart()) {
@@ -2471,11 +1086,13 @@ function buildFamilyReportDays(count = 7, anchorStart = getDayStart()) {
   return Array.from({ length: count }, (_, index) => {
     const start = anchorStart - (count - 1 - index) * day;
     const end = start + day;
+    const dayId = toDateInputValue(start);
+    const dayState = getFamilyDayState(dayId);
     return {
       start,
       end,
       label: getDayLabel(start),
-      events: getFamilyEventsForWindow(start, end),
+      events: (dayState.events || []).filter((event) => event.start >= start && event.start < end),
     };
   });
 }
@@ -2575,7 +1192,7 @@ function readCachedContextForOwner(email = "") {
   const getCachedValue = (key) => localStorage.getItem(getAccountCacheKey(ownerEmail, key));
   const profileRaw = getCachedValue(storageKeys.profile);
   const profile = normalizeBabyProfile(readJsonValue(profileRaw, {}));
-  const photo = "";
+  const photo = getCachedValue(storageKeys.photo) || "";
   const wakeWindow = Number(getCachedValue(storageKeys.wakeWindow)) || 70;
   const profileVersion = Number(getCachedValue(storageKeys.profileVersion)) || 0;
   const dayStateRaw = getCachedValue(storageKeys.dayState);
@@ -2590,6 +1207,7 @@ function readCachedContextForOwner(email = "") {
   if (!hasProfile && !hasDay && !hasWeights) return null;
 
   const score = (hasProfile ? 100 : 0)
+    + (photo ? 40 : 0)
     + Math.min(eventsCount, 30)
     + Math.min(weights.length * 5, 25)
     + Math.min(Math.floor(profileVersion / 1000000000000), 10);
@@ -2647,7 +1265,7 @@ function getContextBabyLabel(context) {
   const eventsCount = getContextEventsCount(context);
   const daysCount = getContextDaysCount(context);
   if (eventsCount) parts.push(`${eventsCount} registros${daysCount > 1 ? ` em ${daysCount} dias` : ""}`);
-
+  if (context.photo) parts.push("foto salva");
   if (context.weights?.length) parts.push(`${context.weights.length} pesos`);
   if (context.source === "cloud") parts.push("Firebase");
   return parts.length ? parts.join(" • ") : (context.source === "cloud" ? "dados encontrados no Firebase" : "perfil salvo neste aparelho");
@@ -2836,11 +1454,19 @@ function normalizeLegacyProfileData(...sources) {
   const article = firstDefined(rawProfile.article, rawProfile.artigo, merged.article, "do");
   const birthDate = firstDefined(rawProfile.birthDate, rawProfile.birth, rawProfile.birthday, rawProfile.nascimento, rawProfile.diaNascimento, merged.birthDate, "");
   const profile = normalizeBabyProfile({ name, article, birthDate });
-  // Não deduzimos o nome do bebê pelo e-mail. O nome exibido deve vir do perfil familiar confirmado.
+  if (!profile.name || profile.name === "Bebê") {
+    const email = normalizeEmail(merged.email || "");
+    if (email.includes("francisco")) profile.name = "Francisco";
+  }
   return profile;
 }
 
-function getLegacyPhoto(..._sources) {
+function getLegacyPhoto(...sources) {
+  for (const source of sources) {
+    if (!source || typeof source !== "object") continue;
+    const raw = firstDefined(source.photo, source.photoDataUrl, source.profilePhoto, source.profilePhotoUrl, source.babyPhoto, source.avatar, source.image, source.imageUrl, source.picture);
+    if (typeof raw === "string" && raw.length > 20) return raw;
+  }
   return "";
 }
 
@@ -3092,7 +1718,7 @@ async function buildLegacyCloudContextFromUser(services, userDoc) {
   });
 
   const profile = normalizeLegacyProfileData(rootData, profileData, accessData, { email });
-  const photo = "";
+  const photo = getLegacyPhoto(profileData, rootData);
   const wakeWindow = getLegacyWakeWindow(profileData, rootData);
   const weights = getLegacyWeights(
     profileData,
@@ -3108,6 +1734,7 @@ async function buildLegacyCloudContextFromUser(services, userDoc) {
   if (!hasProfile && !hasDay && !hasWeights) return null;
 
   const score = (hasProfile ? 100 : 0)
+    + (photo ? 50 : 0)
     + Math.min(eventsCount, 80)
     + Math.min(Object.keys(dayStates).length * 8, 40)
     + Math.min(weights.length * 5, 25);
@@ -3202,7 +1829,7 @@ async function scanLegacySourceByManualEmail() {
   if (!isFamilyAdmin()) return null;
   const email = normalizeMigrationEmail(adminMigrationEmailInput?.value || "");
   if (!email || !email.includes("@")) {
-    if (adminMigrationStatus) adminMigrationStatus.textContent = "Digite o e-mail antigo confirmado pela família.";
+    if (adminMigrationStatus) adminMigrationStatus.textContent = "Digite o e-mail antigo que aparece no Firebase, por exemplo francisco@gmail.com.";
     return null;
   }
 
@@ -3311,11 +1938,13 @@ function getMigrationContextPriority(context = {}) {
   const isEmailSearch = discoveries.includes("email") || Boolean(context.manualEmail);
   const isExactEmailSearch = context.manualEmail && normalizeEmail(context.manualEmail) === email;
 
-  // A busca manual por e-mail/UID sempre tem prioridade. Não damos preferência por nomes específicos,
-  // para evitar expor ou puxar uma criança padrão no painel de produção.
+  // A v75.18 prioriza busca manual por e-mail/UID e fontes associadas ao Francisco.
+  // Isso evita que dados de teste com foto/perfil tenham score maior e sejam migrados por engano.
   return (isExactEmailSearch ? 130000 : 0)
     + (isEmailSearch ? 120000 : 0)
     + (isManual ? 100000 : 0)
+    + (email.includes("francisco") ? 20000 : 0)
+    + (name.includes("francisco") ? 10000 : 0)
     + (Number(context.score) || 0);
 }
 
@@ -3368,7 +1997,7 @@ function renderMigrationChecklist(result = null, context = null) {
       <ul>
         ${getChecklistItemMarkup("Origem", context.email || context.uid || "Conta encontrada", true)}
         ${getChecklistItemMarkup("Registros", `${getContextEventsCount(context)} registro(s) em ${getContextDaysCount(context)} dia(s)`, getContextEventsCount(context) > 0)}
-        ${getChecklistItemMarkup("Avatar do bebê", "Fotos antigas serão ignoradas; use somente avatar", true)}
+        ${getChecklistItemMarkup("Foto do bebê", context.photo ? "Foto encontrada" : "Nenhuma foto encontrada nesta origem", Boolean(context.photo))}
         ${getChecklistItemMarkup("Pesos", `${weightsCount} peso(s) encontrado(s)`, weightsCount > 0)}
         ${getChecklistItemMarkup("Destino planejado", `families/${familyAccess?.familyId || APP_ADMIN_FAMILY_ID}`, true)}
       </ul>`;
@@ -3388,7 +2017,7 @@ function renderFamilyMigrationPanel(options = {}) {
 
   if (lastMigrationResult && !options.forceList) {
     const result = lastMigrationResult;
-    adminMigrationStatus.textContent = `Dados antigos revisados: ${result.events} registros em ${result.days} dia(s) foram copiados para a família selecionada. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
+    adminMigrationStatus.textContent = `Migração concluída: ${result.events} registros em ${result.days} dia(s) foram copiados para a família selecionada. ${result.linkedSourceAccount ? `A conta ${result.sourceEmail || result.sourceUid} também foi vinculada como responsável.` : "Os dados antigos continuam preservados."}`;
     adminMigrationSources.innerHTML = `
       <li class="admin-migration-source is-best">
         <div>
@@ -3403,7 +2032,7 @@ function renderFamilyMigrationPanel(options = {}) {
   }
 
   if (!isFamilyAdmin()) {
-    adminMigrationStatus.textContent = "Entre como admin para revisar dados antigos.";
+    adminMigrationStatus.textContent = "Entre como admin para revisar e migrar dados antigos.";
     adminMigrationSources.innerHTML = "<li>Nenhuma conta em análise.</li>";
     restoreFamilyDataButton.hidden = true;
     renderMigrationChecklist(null);
@@ -3414,15 +2043,15 @@ function renderFamilyMigrationPanel(options = {}) {
   const best = contexts[0] || null;
 
   if (legacyCloudScanState === "idle" && !best) {
-    adminMigrationStatus.textContent = "Nenhuma busca iniciada. Para recuperar dados antigos, informe um e-mail ou UID confirmado. O painel não mostra origens automaticamente.";
-    adminMigrationSources.innerHTML = "<li>Busque apenas uma origem confirmada por e-mail ou UID.</li>";
+    adminMigrationStatus.textContent = "Nenhuma busca iniciada. Para migrar dados antigos, informe o e-mail antigo ou o UID do Firebase. O painel admin não varre todos os clientes automaticamente.";
+    adminMigrationSources.innerHTML = "<li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>";
     restoreFamilyDataButton.hidden = true;
     renderMigrationChecklist(null);
     return;
   }
 
   if (legacyCloudScanState === "loading") {
-    adminMigrationStatus.textContent = "Buscando a origem confirmada...";
+    adminMigrationStatus.textContent = "Buscando dados antigos no Firebase e neste aparelho...";
     adminMigrationSources.innerHTML = contexts.length
       ? contexts.slice(0, 4).map((context, index) => `
         <li class="admin-migration-source${index === 0 ? " is-best" : ""}">
@@ -3473,7 +2102,8 @@ function applyMigrationContextToCurrentView(context) {
   const migratedWeights = normalizeWeights(context.weights || context.profile?.weights || []);
   const migratedProfile = normalizeBabyProfile({ ...(context.profile || createDefaultBabyProfile()), weights: migratedWeights });
   localStorage.setItem(storageKeys.profile, JSON.stringify(migratedProfile));
-  localStorage.removeItem(storageKeys.photo);
+  if (context.photo) localStorage.setItem(storageKeys.photo, context.photo);
+  else localStorage.removeItem(storageKeys.photo);
   localStorage.setItem(storageKeys.wakeWindow, String(context.wakeWindow || 70));
   localStorage.setItem(storageKeys.profileVersion, String(Date.now()));
   localStorage.setItem(storageKeys.weights, JSON.stringify(migratedWeights));
@@ -3497,8 +2127,7 @@ function applyMigrationContextToCurrentView(context) {
 
   wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
   babyProfile = loadBabyProfile();
-  currentProfilePhoto = "";
-  localStorage.removeItem(storageKeys.photo);
+  currentProfilePhoto = localStorage.getItem(storageKeys.photo) || "";
   profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || Date.now();
   state = loadLocalDayState();
   setVisibleDataOwnerEmail(normalizeEmail(cloudUser?.email || familyAccess?.email || GLOBAL_APP_ADMIN_EMAIL));
@@ -3581,7 +2210,7 @@ async function uploadMigrationContextToFamily(context) {
     ownerUid: cloudUser.uid,
     ownerEmail: cloudUser.email || "",
     title: normalizedProfile.name || "Família selecionada",
-    customerLabel: "Família cadastrada",
+    customerLabel: "Cliente / família cadastrada",
     latestMigratedDayId: Object.keys(context.dayStates || {}).filter(isDateId).sort().at(-1) || "",
     migratedDayIds: Object.keys(context.dayStates || {}).filter(isDateId).sort(),
     updatedAt: services.serverTimestamp(),
@@ -3589,12 +2218,13 @@ async function uploadMigrationContextToFamily(context) {
 
   const linkedSourceAccount = await linkMigrationSourceAccountToFamily(context, familyId, sourceLabel);
 
-  if (context.profile || normalizedWeights.length) {
+  if (context.profile || context.photo || normalizedWeights.length) {
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
       ...normalizedProfile,
       weights: normalizedWeights,
       wakeWindowMinutes: Number(context.wakeWindow) || 70,
       clientUpdatedAt: Date.now(),
+      ...(context.photo ? { photo: context.photo } : {}),
       migratedFrom: sourceLabel,
       migratedAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
@@ -3620,7 +2250,7 @@ async function uploadMigrationContextToFamily(context) {
     daysMigrated: dayEntries.length,
     eventsMigrated,
     weightsMigrated: normalizedWeights.length,
-    profileMigrated: Boolean(context.profile || normalizedWeights.length),
+    profileMigrated: Boolean(context.profile || context.photo || normalizedWeights.length),
     linkedSourceAccount,
     createdBy: cloudUser.uid,
     createdByEmail: cloudUser.email || "",
@@ -3640,7 +2270,7 @@ async function uploadMigrationContextToFamily(context) {
 }
 
 async function uploadCurrentContextToFamily() {
-  await saveProfileToCloud();
+  await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
   await saveDayToCloud();
 }
 
@@ -3718,7 +2348,7 @@ async function autoSeedFamilyFromLocalCache() {
 }
 
 function getFamilyDisplayName(stats = null) {
-  const raw = stats?.familyName || stats?.profileName || babyProfile?.name || "Família";
+  const raw = stats?.familyName || stats?.profileName || babyProfile?.name || "Francisco";
   return escapeHtml(raw || "Família");
 }
 
@@ -3749,45 +2379,9 @@ function getKnownUserStatusLabel(user = {}) {
   return "Sem vínculo com a família selecionada";
 }
 
-function getKnownUserQualityScore(user = {}) {
-  const sources = Array.isArray(user.sources) ? user.sources : [];
-  return (user.isMember ? 1000 : 0)
-    + (user.hasFamilyAccess ? 500 : 0)
-    + (user.hasPendingInvite ? 220 : 0)
-    + (sources.includes("users") ? 120 : 0)
-    + (sources.includes("member") ? 100 : 0)
-    + (user.uid ? 40 : 0)
-    + (user.email ? 20 : 0)
-    - (sources.includes("profile") && !sources.includes("users") ? 10 : 0);
-}
-
-function getCleanKnownUsersForAdmin(users = []) {
-  const byEmail = new Map();
-
-  (Array.isArray(users) ? users : []).forEach((user) => {
-    const email = normalizeEmail(user?.email || "");
-    if (!email || !email.includes("@")) return;
-
-    const current = byEmail.get(email);
-    const candidate = { ...user, email };
-    if (!current || getKnownUserQualityScore(candidate) > getKnownUserQualityScore(current)) {
-      byEmail.set(email, candidate);
-    }
-  });
-
-  return Array.from(byEmail.values()).sort((a, b) =>
-    Number(Boolean(b.isMember)) - Number(Boolean(a.isMember))
-    || Number(Boolean(b.hasFamilyAccess)) - Number(Boolean(a.hasFamilyAccess))
-    || String(a.email).localeCompare(String(b.email))
-  );
-}
-
 function scrollAdminSection(sectionId = "") {
   const target = document.getElementById(sectionId);
   if (!target) return;
-  if (target.tagName === "DETAILS") target.open = true;
-  const parentDetails = target.closest?.("details");
-  if (parentDetails) parentDetails.open = true;
   target.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -3846,22 +2440,17 @@ function renderKnownUsersList(stats = null) {
   if (!adminKnownUsersList) return;
 
   if (!isGlobalAppAdmin()) {
-    adminKnownUsersList.innerHTML = "<li>Entre como admin para revisar contas autorizadas.</li>";
+    adminKnownUsersList.innerHTML = "<li>Entre como admin para localizar usuários cadastrados.</li>";
     return;
   }
 
-  const allUsers = Array.isArray(stats?.knownUsers) ? stats.knownUsers : [];
-  const users = getCleanKnownUsersForAdmin(allUsers);
-  const hiddenCount = Math.max(0, allUsers.length - users.length);
-
+  const users = Array.isArray(stats?.knownUsers) ? stats.knownUsers : [];
   if (!users.length) {
-    adminKnownUsersList.innerHTML = hiddenCount
-      ? `<li>${pluralize(hiddenCount, "item técnico oculto", "itens técnicos ocultos")} por estar sem e-mail válido ou duplicado. Nenhuma conta precisa de ação agora.</li>`
-      : "<li>Nenhuma conta com e-mail válido para revisão no momento.</li>";
+    adminKnownUsersList.innerHTML = "<li>Nenhum usuário adicional encontrado no Firestore. Usuários sem documento em users/{uid} só aparecem após criarem perfil, acesso ou convite.</li>";
     return;
   }
 
-  const rows = users.slice(0, 18).map((user) => {
+  adminKnownUsersList.innerHTML = users.slice(0, 24).map((user) => {
     const email = escapeHtml(user.email || "E-mail não identificado");
     const uid = escapeHtml(user.uid || "");
     const source = escapeHtml(getKnownUserSourceLabel(user));
@@ -3869,7 +2458,7 @@ function renderKnownUsersList(stats = null) {
     const canLink = Boolean(user.uid && !user.isMember && !user.isAppAdmin);
     const safeEmailAttr = escapeHtml(user.email || "");
     const safeUidAttr = escapeHtml(user.uid || "");
-    const primaryLine = user.uid ? `Identificador interno disponível` : "Sem identificador interno disponível";
+    const primaryLine = user.uid ? `UID: ${uid}` : "Sem UID disponível no painel";
     const linkButton = canLink
       ? `<button type="button" data-link-known-user="${safeUidAttr}" data-link-known-email="${safeEmailAttr}">Autorizar como cuidador</button>`
       : "";
@@ -3877,7 +2466,7 @@ function renderKnownUsersList(stats = null) {
       ? `<button type="button" data-fill-invite-email="${safeEmailAttr}">Convidar</button>`
       : "";
     const migrateButton = user.email && !user.isAppAdmin
-      ? `<button type="button" data-fill-migration-email="${safeEmailAttr}">Revisar dados antigos</button>`
+      ? `<button type="button" data-fill-migration-email="${safeEmailAttr}">Migrar dados</button>`
       : "";
     const createFamilyButtonMarkup = user.email && !user.hasFamilyAccess && !user.isAppAdmin
       ? `<button type="button" data-fill-new-family-responsible="${safeEmailAttr}">Criar família</button>`
@@ -3886,22 +2475,15 @@ function renderKnownUsersList(stats = null) {
 
     return `
       <li class="admin-access-item admin-known-user-item ${user.isMember ? "is-member" : ""}">
-        <img class="admin-avatar" src="${getCaregiverAvatarDataUrl(user.email || user.uid || "Conta", user.uid || user.email || "known", "known")}" alt="" />
         <div>
           <strong>${email}</strong>
           <span>${status} • ${source}</span>
           <small>${escapeHtml(primaryLine)}</small>
         </div>
-        ${actions ? `<div class="admin-access-actions">${actions}</div>` : `<small>Sem ação necessária.</small>`}
+        ${actions ? `<div class="admin-access-actions">${actions}</div>` : `<small>Já aparece em membros desta família.</small>`}
       </li>
     `;
   }).join("");
-
-  const note = hiddenCount
-    ? `<li class="admin-clean-note">${pluralize(hiddenCount, "item incompleto/duplicado foi oculto", "itens incompletos/duplicados foram ocultos")} para preservar uma visão limpa antes da divulgação.</li>`
-    : "";
-
-  adminKnownUsersList.innerHTML = rows + note;
 }
 
 function renderAdminClients(stats = null) {
@@ -3912,8 +2494,8 @@ function renderAdminClients(stats = null) {
     ? stats.families
     : [{
         id: selectedId,
-        name: stats?.familyName || "Família selecionada",
-        subtitle: "Família cadastrada",
+        name: stats?.familyName || "Francisco",
+        subtitle: "Cliente / família cadastrada",
         membersCount: stats?.membersCount ?? 0,
         pendingInvitesCount: stats?.pendingInvitesCount ?? 0,
       }];
@@ -3932,10 +2514,10 @@ function renderAdminClients(stats = null) {
           : "convites sob consulta";
         return `
           <li class="admin-access-item admin-client-item ${isSelected ? "is-selected-family" : ""}">
-            <img class="admin-avatar family-avatar" src="${getCaregiverAvatarDataUrl(family.name || "Família", family.id || "family", "family")}" alt="" />
             <div>
               <strong>${escapeHtml(family.name || "Família sem nome")}</strong>
-              <span>${escapeHtml(family.subtitle || "Família cadastrada")} • ${escapeHtml(membersLabel)} • ${escapeHtml(pendingLabel)}</span>
+              <span>${escapeHtml(family.subtitle || "Cliente / família cadastrada")} • ${escapeHtml(membersLabel)} • ${escapeHtml(pendingLabel)}</span>
+              <span class="admin-client-id">ID: ${escapeHtml(family.id)}</span>
             </div>
             <div class="admin-access-actions">
               <small>${isSelected ? (previewOpen ? "Aberta no modo admin" : "Selecionada") : "Fechada"}</small>
@@ -3979,7 +2561,6 @@ function renderAdminSupportAccess(stats = null) {
   const selectedLabel = getAdminSelectedFamilyLabel(stats);
   list.innerHTML = `
     <li class="admin-access-item admin-support-item">
-      <img class="admin-avatar support-avatar" src="${getCaregiverAvatarDataUrl("Admin", cloudUser?.email || GLOBAL_APP_ADMIN_EMAIL, "admin")}" alt="" />
       <div>
         <strong>${escapeHtml(cloudUser?.email || GLOBAL_APP_ADMIN_EMAIL)}</strong>
         <span>Admin do app — acesso de suporte</span>
@@ -4000,7 +2581,6 @@ function renderAdminAccessLists(stats = null) {
         const link = escapeHtml(buildInviteLink(invite.code || ""));
         return `
           <li class="admin-access-item">
-            <img class="admin-avatar invite-avatar" src="${getCaregiverAvatarDataUrl(invite.email || code || "Convite", invite.email || code || "invite", "invite")}" alt="" />
             <div>
               <strong>${escapeHtml(invite.email || "Convite sem e-mail")}</strong>
               <span>${escapeHtml(getRoleLabel(invite.role))} • ${code}</span>
@@ -4023,7 +2603,6 @@ function renderAdminAccessLists(stats = null) {
     } else {
       adminMembersList.innerHTML = members.slice(0, 12).map((member) => `
         <li class="admin-access-item admin-member-item">
-          <img class="admin-avatar member-avatar" src="${getCaregiverAvatarDataUrl(member.email || "Membro", member.uid || member.email || "member", "member")}" alt="" />
           <div>
             <strong>${escapeHtml(member.email || "Usuário sem e-mail")}</strong>
             <span>${escapeHtml(getRoleLabel(member.role))}</span>
@@ -4055,7 +2634,7 @@ function renderAdminStats(stats = null) {
   setText(adminLastMigrationStatus, lastMigrationResult ? "Concluída" : "Sem migração");
   setText(
     adminStatsHint,
-    `${pluralize(stats.familiesCount ?? 0, "família cadastrada", "famílias cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "conta válida para revisão", "contas válidas para revisão")}.`,
+    `${pluralize(stats.familiesCount ?? 0, "família cadastrada", "famílias cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "usuário encontrado", "usuários encontrados")} no Firestore.`,
   );
   renderAdminClients(stats);
   renderAdminAccessLists(stats);
@@ -4206,21 +2785,21 @@ async function refreshAdminStats(options = {}) {
 
     const familyData = familySnap.exists?.() ? (familySnap.data() || {}) : {};
     const familyProfileData = familyProfileSnap.exists?.() ? (familyProfileSnap.data() || {}) : {};
-    const familyName = familyProfileData.name || familyData.name || familyData.title || "Família selecionada";
+    const familyName = familyProfileData.name || familyData.name || familyData.title || "Francisco";
     const familySummaries = [];
     familiesSnapshot.forEach((familyDoc) => {
       const data = familyDoc.data() || {};
       const profile = familyDoc.id === familyId ? familyProfileData : (familyProfileById.get(familyDoc.id) || {});
       familySummaries.push({
         id: familyDoc.id,
-        name: profile.name || data.name || data.title || (familyDoc.id === APP_ADMIN_FAMILY_ID ? "Família principal" : `Família ${familyDoc.id.slice(0, 8)}`),
-        subtitle: data.customerLabel || data.subtitle || "Família cadastrada",
+        name: profile.name || data.name || data.title || (familyDoc.id === APP_ADMIN_FAMILY_ID ? "Francisco" : `Família ${familyDoc.id.slice(0, 8)}`),
+        subtitle: data.customerLabel || data.subtitle || "Cliente / família cadastrada",
         membersCount: familyDoc.id === familyId ? members.filter((member) => !member.isAdmin).length : (Number.isFinite(Number(data.membersCount)) ? Number(data.membersCount) : null),
         pendingInvitesCount: familyDoc.id === familyId ? pendingInvites.length : (Number.isFinite(Number(data.pendingInvitesCount)) ? Number(data.pendingInvitesCount) : null),
       });
     });
     if (!familySummaries.some((family) => family.id === familyId)) {
-      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
+      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Cliente / família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
     }
     familySummaries.sort((a, b) => Number(b.id === familyId) - Number(a.id === familyId) || String(a.name).localeCompare(String(b.name)));
 
@@ -4236,7 +2815,7 @@ async function refreshAdminStats(options = {}) {
       membersCount: visibleMembers.length,
       pendingInvitesCount: pendingInvites.length,
       acceptedInvitesCount: acceptedEmails.size,
-      knownUsersCount: getCleanKnownUsersForAdmin(knownUsers).length,
+      knownUsersCount: knownUsers.length,
     };
     if (requestId === adminStatsRequestId) renderAdminStats(stats);
     return stats;
@@ -4274,35 +2853,27 @@ function renderFamilyAccessPanel() {
   const admin = isFamilyAdmin();
   const email = cloudUser?.email || familyAccess?.email || "";
   const effectiveRole = authorized ? getEffectiveRole(familyAccess.role, email) : "";
-  const roleLabel = authorized ? getRoleLabel(effectiveRole) : "";
-  const baby = getBabyDisplayName();
-
-  if (familyAccessKicker) {
-    familyAccessKicker.textContent = authorized
-      ? (appAdmin ? "Painel admin" : "Família conectada")
-      : "Acesso familiar";
-  }
 
   if (familyAccessTitle) {
     familyAccessTitle.textContent = authorized
       ? (appAdmin ? "Painel admin" : "Família conectada")
       : connected
-        ? "Conta sem acesso familiar"
+        ? "Conta aguardando convite"
         : "Convites e permissões";
   }
 
   if (familyAccessText) {
     familyAccessText.textContent = authorized
       ? (appAdmin
-        ? `${email} está conectado com acesso completo. Os registros são sincronizados no ambiente da família.`
-        : `Você acompanha a rotina de ${baby}. Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`)
+        ? `Você está conectado como admin. Os dados da família não são abertos automaticamente; o painel mostra apenas convites, membros e migração.`
+        : `${email} está conectado como ${getRoleLabel(effectiveRole)}. Os registros são sincronizados no ambiente da família.`)
       : connected
-        ? "Esta conta está conectada, mas ainda não encontramos acesso familiar. Aguarde a sincronização ou use um convite recebido."
+        ? "Esta conta ainda não possui convite. Peça um convite ao administrador do app ou entre com o e-mail convidado."
         : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou solicite acesso pelo WhatsApp.";
   }
 
   if (familyAccessBadge) {
-    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? "Sem acesso" : "Visitante";
+    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? "Sem convite" : "Visitante";
     familyAccessBadge.dataset.role = authorized ? effectiveRole : "offline";
   }
 
@@ -4347,6 +2918,8 @@ function renderFamilyAccessPanel() {
     const showWelcome = connected && authorized && !appAdmin;
     familyWelcomeCard.hidden = !showWelcome;
     if (showWelcome) {
+      const roleLabel = getRoleLabel(effectiveRole);
+      const baby = getBabyDisplayName();
       if (familyWelcomeTitle) familyWelcomeTitle.textContent = `Você acompanha a rotina de ${baby}.`;
       if (familyWelcomeText) familyWelcomeText.textContent = `Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`;
     }
@@ -4360,40 +2933,16 @@ async function readAccountAccessFromCloud(user = cloudUser) {
   const services = await getFirebaseServices();
   const accessRef = services.doc(services.db, "users", user.uid, "access", "ninou");
   const snapshot = await services.getDoc(accessRef);
-  if (snapshot.exists()) {
-    const data = snapshot.data() || {};
-    return saveFamilyAccess({
-      familyId: data.familyId,
-      role: data.role,
-      email: data.email || user.email || "",
-      ownerUid: data.ownerUid || "",
-      inviteCode: data.inviteCode || "",
-      acceptedAt: data.acceptedAt || data.createdAt || "",
-    });
-  }
-
-  // v75.56.2.1.1: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
-  const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
-  for (const familyId of [...new Set(candidateFamilies)]) {
-    try {
-      if (!String(familyId).startsWith("ninou-family-")) continue;
-      const memberRef = services.doc(services.db, "families", familyId, "members", user.uid);
-      const memberSnapshot = await services.getDoc(memberRef);
-      if (!memberSnapshot.exists()) continue;
-      const data = memberSnapshot.data() || {};
-      return saveFamilyAccess({
-        familyId,
-        role: data.role || "responsavel",
-        email: data.email || user.email || "",
-        ownerUid: data.ownerUid || data.familyId || familyId,
-        inviteCode: data.inviteCode || "",
-        acceptedAt: data.acceptedAt || data.joinedAt || data.createdAt || "",
-      });
-    } catch (error) {
-      console.warn("Não foi possível verificar membro da família:", familyId, error);
-    }
-  }
-  return null;
+  if (!snapshot.exists()) return null;
+  const data = snapshot.data() || {};
+  return saveFamilyAccess({
+    familyId: data.familyId,
+    role: data.role,
+    email: data.email || user.email || "",
+    ownerUid: data.ownerUid || "",
+    inviteCode: data.inviteCode || "",
+    acceptedAt: data.acceptedAt || data.createdAt || "",
+  });
 }
 
 async function saveAccountAccessToCloud(access, user = cloudUser) {
@@ -4423,30 +2972,6 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
     joinedAt: services.serverTimestamp(),
   }, { merge: true });
 
-  try {
-    const identity = loadCurrentCaregiverIdentity();
-    const profileRef = services.doc(services.db, "users", user.uid, "account", "profile");
-    const profileSnapshot = await services.getDoc(profileRef);
-    const accountPayload = {
-      uid: user.uid,
-      email: payload.email,
-      displayName: identity.name || "",
-      relationship: identity.relation || "",
-      relation: identity.relation || "",
-      relationshipLabel: identity.relationshipLabel || "",
-      familyId: payload.familyId,
-      accessLevel: getRoleLabel(payload.role),
-      updatedAt: services.serverTimestamp(),
-    };
-    if (!profileSnapshot.exists() || !profileSnapshot.data()?.createdAt) {
-      accountPayload.createdAt = services.serverTimestamp();
-    }
-    await services.setDoc(profileRef, accountPayload, { merge: true });
-    await services.setDoc(services.doc(services.db, "users", user.uid), accountPayload, { merge: true });
-  } catch (error) {
-    console.warn("Acesso salvo, mas o perfil mínimo da conta não foi atualizado:", error);
-  }
-
   return saveFamilyAccess({ ...payload, acceptedAt: new Date().toISOString() });
 }
 
@@ -4470,11 +2995,11 @@ async function activatePersonalFamily() {
     const familyPayload = {
       supportAdminUid: cloudUser.uid,
       supportAdminEmail: cloudUser.email || "",
-      customerLabel: "Família cadastrada",
+      customerLabel: "Cliente / família cadastrada",
       createdAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
     };
-    if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = familyPayload.title || "Família principal";
+    if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = "Francisco";
     await services.setDoc(services.doc(services.db, "families", access.familyId), familyPayload, { merge: true });
     // O admin tem acesso global por regra, não precisa virar membro da família.
     // Isso evita que clientes pareçam "família do admin".
@@ -4485,13 +3010,11 @@ async function activatePersonalFamily() {
     refreshAdminStats({ silent: true });
   } catch (error) {
     console.error("Erro ao ativar família principal no Firebase:", error);
-    // v75.56.2.1.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
-    // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
-    setSyncStatus("online", cloudUser.email || "");
+    setSyncStatus("offline", cloudUser.email || "");
     if (loginHelper) {
-      loginHelper.textContent = "Admin conectado. Se convites, famílias ou contagens não aparecerem, revise as regras do Firestore.";
+      loginHelper.textContent = "Admin liberado neste aparelho. Para gerar convites e sincronizar, revise as regras do Firestore.";
     }
-    setAdminStatsPlaceholder("Admin conectado. A contagem depende das regras do Firestore.");
+    setAdminStatsPlaceholder("Admin liberado. A contagem depende das regras do Firestore.");
   }
 
   renderAuthControls();
@@ -4584,7 +3107,7 @@ async function createAdminClientFamily() {
       name: familyName,
       babyName,
       babyArticle,
-      customerLabel: "Família cadastrada",
+      customerLabel: "Cliente / família cadastrada",
       status: "active",
       supportAdminUid: cloudUser.uid,
       supportAdminEmail: cloudUser.email || "",
@@ -4701,14 +3224,11 @@ async function createFamilyInvite() {
       const existingStatus = existing.status || "pending";
       if (existingStatus === "accepted" || existingStatus === "active") {
         if (inviteResult) {
-          renderInviteResultWithMessage({
-            title: "Convite já aceito",
-            familyLabel,
-            email,
-            role: existing.role || role,
-            code,
-            link,
-          });
+          inviteResult.innerHTML = `
+            <strong>Convite já aceito</strong>
+            <span>${escapeHtml(email)} já está autorizado na família selecionada.</span>
+            <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link novamente</button>
+          `;
         }
         recentInvites.unshift({ code, email, role: existing.role || role, link });
         renderInviteList();
@@ -4745,14 +3265,13 @@ async function createFamilyInvite() {
     renderInviteList();
     refreshAdminStats({ silent: true });
     if (inviteResult) {
-      renderInviteResultWithMessage({
-        title: "Convite pronto",
-        familyLabel,
-        email,
-        role,
-        code,
-        link,
-      });
+      inviteResult.innerHTML = `
+        <strong>Convite pronto</strong>
+        <span>Família: ${escapeHtml(familyLabel)}</span>
+        <span>Código: ${escapeHtml(code)}</span>
+        <span>Envie para: ${escapeHtml(email)}</span>
+        <button type="button" data-copy-invite="${escapeHtml(link)}">Copiar link</button>
+      `;
     }
     if (adminInviteEmail) adminInviteEmail.value = "";
   } catch (error) {
@@ -4860,14 +3379,13 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
       console.warn("Convite aceito, mas o espelho da família não foi atualizado:", mirrorError);
     }
 
-    accessFlowNotice = "invite-accepted";
     pendingInviteCode = "";
     localStorage.removeItem(storageKeys.pendingInvite);
     if (inviteCodeInput) inviteCodeInput.value = "";
     if (!options.silent && loginHelper) loginHelper.textContent = "Convite aceito. Rotina familiar conectada.";
     renderAuthControls();
     const cloudContentAfterInvite = await familyCloudHasContent();
-    if (!cloudContentAfterInvite.profile && hasProfileContent()) await saveProfileToCloud();
+    if (!cloudContentAfterInvite.profile && hasProfileContent()) await saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
     if (!cloudContentAfterInvite.day && hasRoutineDayContent()) await saveDayToCloud();
     await connectCurrentAccount();
     setSyncStatus("online", cloudUser.email || "");
@@ -4889,10 +3407,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 }
 
 function saveDayState() {
-  loadedStateDayId = getSelectedDayId();
-  state.events = dedupeEventsByDisplayKey(state.events || []);
   saveLocalDayState();
-  syncSelectedDayIntoFamilyCache();
   scheduleDayCloudSave();
 }
 
@@ -4900,55 +3415,12 @@ function formatEventMeta(event) {
   return formatRoutineEventMeta(event);
 }
 
-function getActiveAwakeWindowStart() {
-  if (state.mode !== "awake") return null;
-  const startedAt = Number(state.activeStartedAt);
-  return Number.isFinite(startedAt) ? startedAt : null;
-}
-
-function getDedupAwakeWindowStart(start = Date.now()) {
-  const activeStart = getActiveAwakeWindowStart();
-  if (!Number.isFinite(activeStart)) return null;
-
-  const safeStart = Number(start);
-  const sleepEnds = (state.events || [])
-    .filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start) && Number(event.end) <= Math.max(safeStart, activeStart) + 2 * 60000)
-    .map((event) => Number(event.end))
-    .filter(Number.isFinite);
-  const lastSleepEnd = sleepEnds.length ? Math.max(...sleepEnds) : null;
-  const candidates = [activeStart, lastSleepEnd].filter(Number.isFinite);
-  return candidates.length ? Math.max(...candidates) : activeStart;
-}
-
-function getAwakeEventInActiveWindow(start = Date.now(), excludeEventId = null) {
-  const windowBase = getDedupAwakeWindowStart(start);
-  if (!Number.isFinite(windowBase)) return null;
-
-  const safeStart = Number(start);
-  const windowStart = windowBase - 5 * 60000;
-  const windowEnd = Math.max(Date.now() + 2 * 60000, safeStart + 2 * 60000);
-  const candidateEvents = getFamilyEventsForWindow(windowStart, windowEnd);
-
-  return candidateEvents.find((event) => (
-    event?.id !== excludeEventId &&
-    event.type === "acordou" &&
-    Number(event.start) >= windowStart &&
-    Number(event.start) <= windowEnd
-  )) || null;
-}
-
-function addAwakeEvent(start = Date.now(), detail = "Acordou", notes = "", options = {}) {
+function addAwakeEvent(start = Date.now(), detail = "Acordou", notes = "") {
   state.events = Array.isArray(state.events) ? state.events : [];
-
-  const existingInActiveWindow = getAwakeEventInActiveWindow(start, options.excludeEventId || null);
-  if (existingInActiveWindow) return existingInActiveWindow;
-
   const alreadyExists = state.events.some((event) => (
-    event?.id !== options.excludeEventId &&
     event.type === "acordou" && Math.abs(Number(event.start) - Number(start)) < 60000
   ));
   if (alreadyExists) return null;
-
   const wakeEvent = makeEvent("acordou", start, start, detail || "Acordou", notes || "");
   state.events.push(wakeEvent);
   pushAuditEntry("adicionou", wakeEvent);
@@ -5009,14 +3481,14 @@ function getCloudProfileVersion(data = {}) {
 }
 
 
-function hasProfileContent(profile = babyProfile, _photo = "", windowMinutes = wakeWindowMinutes) {
-  return profileHasContent(profile, "", windowMinutes);
+function hasProfileContent(profile = babyProfile, photo = currentProfilePhoto, windowMinutes = wakeWindowMinutes) {
+  return profileHasContent(profile, photo, windowMinutes);
 }
 
 
 function hasCloudProfileContent(data = {}) {
   const profileSource = data.babyProfile && typeof data.babyProfile === "object" ? data.babyProfile : data;
-  const photoValue = "";
+  const photoValue = data.photo || data.photoDataUrl || "";
   const cloudWakeWindow = Number.isFinite(Number(data.wakeWindowMinutes)) ? Number(data.wakeWindowMinutes) : 70;
   const weights = normalizeWeights(data.weights || profileSource.weights || []);
   return hasProfileContent(profileSource, photoValue, cloudWakeWindow) || weights.length > 0;
@@ -5052,12 +3524,10 @@ function renderBabyIdentity() {
     if (babyAgeLine) babyAgeLine.textContent = "Convites, membros, migração e gestão de acessos";
     if (profileBabyName) profileBabyName.textContent = getAdminAccountLabel();
     if (profileBabyAge) profileBabyAge.textContent = "Perfil pessoal do administrador";
-    if (profilePhoto) profilePhoto.src = adminAccountPhoto || getCaregiverAvatarDataUrl(getAdminAccountLabel(), cloudUser?.email || GLOBAL_APP_ADMIN_EMAIL, "admin");
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatar do admin";
-  } else {
-    applyAvatarPreview(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhoto) profilePhoto.src = getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatares do bebê";
+    if (profilePhoto) profilePhoto.src = adminAccountPhoto || "./icons/icon-192.png";
+    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Trocar minha foto";
+  } else if (profilePhotoButtonText) {
+    profilePhotoButtonText.textContent = "Trocar foto";
   }
   updateBodyModeClasses();
 }
@@ -5194,8 +3664,7 @@ function renderAuthControls() {
   createAccountButton.classList.toggle("logout-button", connected);
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
-  document.body.classList.toggle("access-locked", !routineAuthorized);
-  applyGuestInteractionLock();
+  document.body.classList.toggle("access-locked", false);
   updateBodyModeClasses();
   openSheetButtons.forEach((button) => {
     const shouldHide = !routineAuthorized;
@@ -5204,11 +3673,7 @@ function renderAuthControls() {
   });
   updateGuestWhatsappButton();
   renderFamilyAccessPanel();
-  updateAccountJourneyGuide();
-  updatePostAccessExperience();
-  updateProfileReadyExperience();
   renderCaregiverIdentityPanel();
-  renderAvatarCustomizer();
 }
 
 function clearLocalAccountData() {
@@ -5280,10 +3745,9 @@ function getProfilePayload(options = {}) {
     updatedAt: firebaseServices.serverTimestamp(),
   };
 
-  payload.photo = "";
-  payload.photoDataUrl = "";
-  payload.babyPhoto = "";
-  payload.profilePhoto = "";
+  if (options.includePhoto) {
+    payload.photo = currentProfilePhoto || "";
+  }
 
   return payload;
 }
@@ -5296,14 +3760,14 @@ function applyCloudProfile(data = {}) {
   const cloudWeights = normalizeWeights(data.weights || profileSource.weights || []);
   const localWeights = normalizeWeights(babyProfile.weights || loadLocalWeights());
   const shouldAcceptCloudWeights = cloudWeights.length > 0 && localWeights.length === 0;
-  const shouldAcceptCloudPhoto = false;
+  const shouldAcceptCloudPhoto = Boolean((data.photo || data.photoDataUrl) && !currentProfilePhoto);
 
   if (!cloudHasContent && localHasContent) {
-    saveProfileToCloud();
+    saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
     return;
   }
 
-  if (localHasContent && profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt && !shouldAcceptCloudWeights) {
+  if (localHasContent && profileClientUpdatedAt && cloudProfileVersion < profileClientUpdatedAt && !shouldAcceptCloudWeights && !shouldAcceptCloudPhoto) {
     return;
   }
 
@@ -5312,8 +3776,10 @@ function applyCloudProfile(data = {}) {
     profileClientUpdatedAt = Math.max(cloudProfileVersion, profileClientUpdatedAt);
 
     babyProfile = normalizeBabyProfile({ ...profileSource, weights: cloudWeights.length ? cloudWeights : profileSource.weights });
-    pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || pendingBabyAvatar);
-    currentProfilePhoto = "";
+    if (Object.prototype.hasOwnProperty.call(data, "photo") || Object.prototype.hasOwnProperty.call(data, "photoDataUrl")) {
+      const photoValue = data.photo || data.photoDataUrl;
+      currentProfilePhoto = typeof photoValue === "string" ? photoValue : "";
+    }
 
     if (Number.isFinite(Number(data.wakeWindowMinutes))) {
       wakeWindowMinutes = Math.min(240, Math.max(20, Number(data.wakeWindowMinutes)));
@@ -5322,9 +3788,17 @@ function applyCloudProfile(data = {}) {
 
     saveBabyProfile();
 
-    localStorage.removeItem(storageKeys.photo);
-    applyAvatarPreview(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhoto) profilePhoto.src = getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar);
+    if (currentProfilePhoto) {
+      try {
+        localStorage.setItem(storageKeys.photo, currentProfilePhoto);
+      } catch {
+        // A foto continua visível mesmo se o navegador não permitir salvar localmente.
+      }
+      updateProfilePhoto(currentProfilePhoto);
+    } else {
+      localStorage.removeItem(storageKeys.photo);
+      updateProfilePhoto("./icons/icon-192.png");
+    }
 
     persistVisibleContextForCurrentOwner();
     syncBabyProfileForm();
@@ -5338,54 +3812,34 @@ function applyCloudProfile(data = {}) {
 
 function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
   applyingCloudState = true;
-  try {
-    const daySource = data.state && typeof data.state === "object" ? data.state : data;
-    const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
-    const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
-    const currentSelectedState = loadedStateDayId === safeDayId ? normalizeDayState(state) : cachedState;
-    const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
-      ? currentSelectedState
-      : cachedState;
-    const mergedState = mergeRoutineDayStatesForCloud(localState, daySource);
-
-    if (isDateId(safeDayId)) {
-      familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(mergedState) };
-      if (dayStateHasVisibleContent(mergedState) && !familyDayIdsCache.includes(safeDayId)) {
-        familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
-      }
+  const daySource = data.state && typeof data.state === "object" ? data.state : data;
+  state = normalizeDayState(daySource);
+  if (isDateId(dayId)) {
+    familyDayStatesCache = { ...familyDayStatesCache, [dayId]: normalizeDayState(state) };
+    if (hasRoutineDayContent(state) && !familyDayIdsCache.includes(dayId)) {
+      familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
       updateDiaryDateRangeFromFamilyDays();
     }
-
-    if (safeDayId === getSelectedDayId()) {
-      state = reconcileAwakeStateForDay(mergedState, safeDayId);
-      loadedStateDayId = safeDayId;
-      saveLocalDayState();
-      timelineRenderSignature = "";
-      orbitRenderSignature = "";
-      renderAll();
-    } else {
-      renderSupplementalReports();
-      renderTodayHomeSections();
-    }
-  } finally {
-    applyingCloudState = false;
   }
+  saveLocalDayState();
+  renderAll();
+  applyingCloudState = false;
 }
 
 function scheduleProfileCloudSave(options = {}) {
   if (applyingCloudState || !cloudUser || !firebaseServices) return;
-  pendingProfilePhotoSave = false;
+  if (options.includePhoto) pendingProfilePhotoSave = true;
 
   window.clearTimeout(profileCloudSaveTimer);
-  profileCloudSaveTimer = window.setTimeout(saveProfileToCloud, 600);
+  profileCloudSaveTimer = window.setTimeout(saveProfileToCloud, options.includePhoto ? 120 : 600);
 }
 
 async function saveProfileToCloud(options = {}) {
   const profileRef = getCloudProfileRef();
   if (!profileRef) return;
 
-  const includePhoto = false;
-  const payload = getProfilePayload();
+  const includePhoto = Boolean(options.includePhoto || pendingProfilePhotoSave);
+  const payload = getProfilePayload({ includePhoto });
   const savedProfileVersion = payload.clientUpdatedAt;
 
   try {
@@ -5411,92 +3865,24 @@ function scheduleDayCloudSave(dayId = getSelectedDayId()) {
   dayCloudSaveTimer = window.setTimeout(() => saveDayToCloud(safeDayId), 500);
 }
 
-function getDeletedEventIdsFromState(dayState = {}) {
-  return new Set(
-    (Array.isArray(dayState.deletedEventIds) ? dayState.deletedEventIds : [])
-      .filter((item) => typeof item === "string" && item.trim())
-      .map((item) => item.trim()),
-  );
-}
-
-function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}) {
-  const cloudSource = cloudData.state && typeof cloudData.state === "object" ? cloudData.state : cloudData;
-  const cloudState = normalizeDayState(cloudSource || {});
-  const currentState = normalizeDayState(localState || {});
-  const deletedEventIds = new Set([
-    ...getDeletedEventIdsFromState(cloudState),
-    ...getDeletedEventIdsFromState(currentState),
-  ]);
-  const eventsById = new Map();
-
-  for (const event of Array.isArray(cloudState.events) ? cloudState.events : []) {
-    const normalized = normalizeEvent(event);
-    if (normalized?.id && !deletedEventIds.has(normalized.id)) eventsById.set(normalized.id, normalized);
-  }
-
-  for (const event of Array.isArray(currentState.events) ? currentState.events : []) {
-    const normalized = normalizeEvent(event);
-    if (normalized?.id && !deletedEventIds.has(normalized.id)) eventsById.set(normalized.id, normalized);
-  }
-
-  return normalizeDayState({
-    ...cloudState,
-    ...currentState,
-    deletedEventIds: [...deletedEventIds].slice(-240),
-    events: sortEventsByStartDesc(dedupeEventsByDisplayKey([...eventsById.values()])),
-    notes: currentState.notes || cloudState.notes || "",
-    dayNotes: currentState.dayNotes || cloudState.dayNotes || "",
-  });
-}
-
 async function saveDayToCloud(dayId = getSelectedDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
-
-  const selectedDayId = getSelectedDayId();
-  const sourceState = safeDayId === selectedDayId && loadedStateDayId === safeDayId
-    ? normalizeDayState(state)
-    : normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
-
-  const hasDeletedEvents = getDeletedEventIdsFromState(sourceState).size > 0;
-  if (!dayStateHasVisibleContent(sourceState) && !hasDeletedEvents) return;
+  if (!hasRoutineDayContent()) return;
 
   try {
-    let dayPayload = sourceState;
-
-    try {
-      const currentSnapshot = await firebaseServices.getDoc(dayRef);
-      if (currentSnapshot.exists()) {
-        dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentSnapshot.data() || {});
-      }
-    } catch (mergeError) {
-      console.warn("Não foi possível mesclar rotina antes de salvar. Salvando estado local atual:", mergeError);
-    }
-
-    dayPayload = reconcileAwakeStateForDay(dayPayload, safeDayId);
-
     await firebaseServices.setDoc(
       dayRef,
       {
-        ...dayPayload,
+        ...normalizeDayState(state),
         updatedAt: firebaseServices.serverTimestamp(),
       },
       { merge: true },
     );
-
-    familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(dayPayload) };
-    if (dayStateHasVisibleContent(dayPayload) && !familyDayIdsCache.includes(safeDayId)) {
-      familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
-    }
+    familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(state) };
+    if (!familyDayIdsCache.includes(safeDayId)) familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
     updateDiaryDateRangeFromFamilyDays();
-
-    if (safeDayId === selectedDayId) {
-      state = dayPayload;
-      saveLocalDayState();
-      renderAll();
-    }
-
     setSyncStatus("online", cloudUser.email);
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
@@ -5514,7 +3900,7 @@ async function subscribeToCloudProfile() {
   profileUnsubscribe = firebaseServices.onSnapshot(profileRef, (snapshot) => {
     if (!snapshot.exists()) {
       if (hasProfileContent()) {
-        saveProfileToCloud();
+        saveProfileToCloud({ includePhoto: Boolean(currentProfilePhoto) });
       }
       return;
     }
@@ -5535,30 +3921,17 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
 
   dayUnsubscribe = firebaseServices.onSnapshot(dayRef, async (snapshot) => {
     if (!snapshot.exists()) {
-      const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || createEmptyDayState());
-      if (dayStateHasVisibleContent(cachedState)) {
-        if (safeDayId === getSelectedDayId()) {
-          state = cachedState;
-          loadedStateDayId = safeDayId;
-          saveLocalDayState();
-          renderAll();
-        }
-        return;
-      }
-
-      if (safeDayId === getCurrentDayId() && loadedStateDayId === safeDayId && hasRoutineDayContent()) {
+      if (safeDayId === getCurrentDayId() && hasRoutineDayContent()) {
         saveDayToCloud(safeDayId);
       } else if (options.allowAutoLatest !== false && safeDayId === getCurrentDayId()) {
         const switched = await maybeOpenLatestFamilyDayAfterEmptyToday(safeDayId);
-        if (!switched && safeDayId === getSelectedDayId()) {
+        if (!switched) {
           state = createEmptyDayState();
-          loadedStateDayId = safeDayId;
           saveLocalDayState();
           renderAll();
         }
-      } else if (safeDayId === getSelectedDayId()) {
+      } else {
         state = createEmptyDayState();
-        loadedStateDayId = safeDayId;
         saveLocalDayState();
         renderAll();
       }
@@ -5579,14 +3952,13 @@ async function initFirebaseAuthState() {
     cloudUser = user;
 
     if (!user) {
-      accessFlowNotice = "";
       unsubscribeCloudListeners();
       clearLocalAccountData();
       setSyncStatus("offline");
       loginEmail.value = "";
       loginPassword.value = "";
       renderAuthControls();
-      loginHelper.textContent = "Entre com sua conta. Novas pessoas acessam por convite da família.";
+      loginHelper.textContent = "Entre com sua conta. Novos usuários acessam por convite do administrador do app.";
       return;
     }
 
@@ -5608,7 +3980,6 @@ async function initFirebaseAuthState() {
         loginHelper.textContent = "Admin conectado. Preparando painel...";
         await activatePersonalFamily();
         await loadAdminAccountProfileFromCloud(user);
-        setSyncStatus("online", user.email || "");
         loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
         renderAuthControls();
         showScreen("profile");
@@ -5630,7 +4001,7 @@ async function initFirebaseAuthState() {
       }
 
       if (!hasFamilyAccess()) {
-        loginHelper.textContent = "Conta conectada, mas sem acesso familiar encontrado. Use um convite recebido ou peça ao administrador para verificar o membro da família.";
+        loginHelper.textContent = "Conta conectada. Aceite um convite do administrador do app.";
         setSyncStatus("offline", user.email || "");
         renderAuthControls();
         showScreen("profile");
@@ -5667,7 +4038,6 @@ async function signInAccount() {
     createAccountButton.disabled = true;
 
     await services.signInWithEmailAndPassword(services.auth, credentials.email, credentials.password);
-    accessFlowNotice = "signed-in";
     localStorage.setItem(storageKeys.email, credentials.email);
   } catch (error) {
     console.error("Erro ao entrar:", error);
@@ -5700,7 +4070,6 @@ async function createAccount() {
     createAccountButton.disabled = true;
 
     await services.createUserWithEmailAndPassword(services.auth, credentials.email, credentials.password);
-    accessFlowNotice = "created";
     localStorage.setItem(storageKeys.email, credentials.email);
   } catch (error) {
     console.error("Erro ao criar conta:", error);
@@ -5789,17 +4158,6 @@ function runActiveTimerAction() {
 }
 
 function renderCurrentState() {
-  reconcileCurrentAwakeStateFromEvents();
-  if (!canUsePrivateFeatures()) {
-    setHidden(wakeAction, true);
-    setHidden(startChoice, true);
-    setText(stateLabel, "Acesso necessário");
-    setText(stateClock, "--:--");
-    setText(stateHint, "Entre com login e senha ou solicite acesso para registrar a rotina.");
-    renderActiveTimerCard();
-    return;
-  }
-
   if (state.mode === "idle") {
     setHidden(wakeAction, true);
     setHidden(startChoice, false);
@@ -5812,13 +4170,7 @@ function renderCurrentState() {
 
   setHidden(wakeAction, false);
   setHidden(startChoice, true);
-  const elapsed = Date.now() - Number(state.activeStartedAt || Date.now());
-  if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 48 * hour) {
-    state = createEmptyDayState();
-    saveLocalDayState();
-    renderCurrentState();
-    return;
-  }
+  const elapsed = Date.now() - state.activeStartedAt;
   const sleeping = state.mode === "sleeping";
   const nightWakeActive = getActiveNightWakeEvent();
   setText(wakeActionLabel, sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca");
@@ -5942,18 +4294,14 @@ function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, l
 
 function renderOrbit() {
   const now = Date.now();
-  const orbitStart = getDayStart(now);
-  const orbitEnd = Math.min(now, orbitStart + day);
-  const dayEvents = getFamilyEventsForWindow(orbitStart, orbitEnd)
-    .filter((event) => eventOverlapsWindow(event, orbitStart, orbitEnd))
-    .sort((a, b) => Number(a.start) - Number(b.start));
-
-  const items = dayEvents
-    .slice(-48)
+  const dayAgo = now - 24 * hour;
+  const items = state.events
+    .filter((event) => event.start >= dayAgo)
+    .slice(-14)
     .map((event) => ({
       event,
       active: false,
-      position: eventPosition(Math.max(Number(event.start) || orbitStart, orbitStart)),
+      position: eventPosition(event.start),
     }));
 
   if (state.mode === "sleeping") {
@@ -5970,7 +4318,7 @@ function renderOrbit() {
     items.push({
       event: activeEvent,
       active: true,
-      position: eventPosition(Math.max(activeEvent.start, orbitStart)),
+      position: eventPosition(activeEvent.start),
     });
   }
 
@@ -5991,30 +4339,29 @@ function renderOrbit() {
   });
 }
 
-
 function renderTimeline() {
   const lastCard = document.querySelector(".last-card .event-card");
   if (!timeline) return;
 
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const selectedEnd = selectedStart + day;
-  const orderedEvents = sortEventsByStartDesc(getFamilyEventsForWindow(selectedStart, selectedEnd));
-  const dayEvents = orderedEvents.filter((event) => eventOverlapsWindow(event, selectedStart, selectedEnd));
+  const orderedEvents = sortEventsByStartDesc(state.events);
+  const dayEvents = getEventsForDay(orderedEvents, selectedStart, day);
   const visibleEvents = dayEvents.filter(matchesDiaryFilter);
-  const latest = getLatestEvent(dayEvents);
+  const latest = getLatestEvent(state.events);
   const nextSignature = getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, latest);
   if (nextSignature === timelineRenderSignature) return;
 
   timelineRenderSignature = nextSignature;
   timeline.innerHTML = "";
-  diaryDateTitle.textContent = selectedStart === getDayStart() ? "Diário de hoje" : formatDiaryDate(selectedStart);
+  diaryDateTitle.textContent = formatDiaryDate(selectedStart);
   diaryDateHint.textContent = selectedStart === getDayStart() ? "Hoje" : "Data selecionada";
 
   if (!visibleEvents.length) {
     timeline.append(createEmptyTimelineItem(getEventCardMarkup(null, { empty: true })));
   }
 
-  visibleEvents.forEach((event) => {
+  visibleEvents.slice(0, 8).forEach((event) => {
     const item = document.createElement("li");
     item.className = "event-card";
     item.innerHTML = getEventCardMarkup(event);
@@ -6122,8 +4469,8 @@ function renderSummary() {
 
 function getSleepReportDays() {
   return buildFamilyReportDays(7).map((item) => {
-    const sleepEvents = item.events.filter((event) => isSleepEvent(event) && eventOverlapsWindow(event, item.start, item.end));
-    const sleepMs = getSleepMsForRange(item.start, item.end);
+    const sleepEvents = item.events.filter((event) => isSleepEvent(event));
+    const sleepMs = sleepEvents.reduce((total, event) => total + Math.max(0, Math.min(event.end, item.end) - Math.max(event.start, item.start)), 0);
     return { ...item, events: sleepEvents, sleepMs };
   });
 }
@@ -6188,8 +4535,8 @@ function renderSleepReport() {
     routineStatus.textContent = "Em ajuste";
     routineHint.textContent = "Há alguma variação, mas já existe um padrão se formando.";
   } else {
-    routineStatus.textContent = "Horários variados";
-    routineHint.textContent = "As sonecas começaram em horários bem diferentes nos últimos registros.";
+    routineStatus.textContent = "Irregular";
+    routineHint.textContent = "Os horários ainda variam bastante; mais registros ajudam a orientar.";
   }
 }
 
@@ -6245,44 +4592,6 @@ function renderSupplementalReports() {
     reportDays,
     (item) => countMedicationEvents(item.events),
   );
-}
-
-
-
-function normalizeSummaryRangeMode(value) {
-  return Object.prototype.hasOwnProperty.call(summaryRangeOptions, value) ? value : "7d";
-}
-
-function getSummaryRangeOption() {
-  return summaryRangeOptions[normalizeSummaryRangeMode(summaryRangeMode)] || summaryRangeOptions["7d"];
-}
-
-function renderSummaryRangeControls() {
-  const option = getSummaryRangeOption();
-  summaryRangeButtons.forEach((button) => {
-    const isActive = button.dataset.summaryRange === summaryRangeMode;
-    button.classList.toggle("active", isActive);
-    button.setAttribute("aria-pressed", isActive ? "true" : "false");
-  });
-  if (summaryRangeLabel) summaryRangeLabel.textContent = option.label;
-  if (summaryRangeHint) summaryRangeHint.textContent = option.hint;
-}
-
-function setSummaryRangeMode(mode) {
-  const nextMode = normalizeSummaryRangeMode(mode);
-  if (summaryRangeMode === nextMode) return;
-  summaryRangeMode = nextMode;
-  try { localStorage.setItem(SUMMARY_RANGE_KEY, nextMode); } catch {}
-  renderIntelligentHomeSections();
-}
-
-function expandIntelligentTimeline() {
-  intelligentTimelineLimit += 7;
-  renderIntelligentHomeSections();
-}
-
-function resetIntelligentTimelineLimit() {
-  intelligentTimelineLimit = 7;
 }
 
 function renderTodayLastEvents() {
@@ -6347,32 +4656,19 @@ function renderIntelligentHomeSections() {
     countMedication: countMedicationEvents,
     formatShortDuration,
   });
-  const todayTimelineStart = todayStart;
-  const todayTimelineEnd = Math.min(now, todayStart + day);
-  const todayTimelineState = {
-    ...recentFamilyState,
-    events: getFamilyEventsForWindow(todayTimelineStart, todayTimelineEnd),
-  };
-
   renderIntelligentTimeline({
     container: intelligentTimeline,
-    state: todayTimelineState,
-    todayStart: todayTimelineStart,
+    state,
+    todayStart,
     dayMs: day,
     formatShortDuration,
     formatTime,
-    limit: intelligentTimelineLimit,
-    batchSize: 7,
   });
-  const summaryRange = getSummaryRangeOption();
-  renderSummaryRangeControls();
   renderWeeklyOverview({
     container: weeklyOverview,
     state: recentFamilyState,
     todayStart,
     dayMs: day,
-    periodDays: summaryRange.days,
-    periodLabel: summaryRange.label,
     getSleepMsForRange,
     countFeeding: countFeedingEvents,
     countDiaper: countDiaperEvents,
@@ -6528,89 +4824,6 @@ function getLatestSleepEvent(events = []) {
   return [...events].filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)).sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
 }
 
-function getDayStartFromId(dayId = getSelectedDayId()) {
-  if (!isDateId(dayId)) return getDayStart();
-  return getDayStart(new Date(`${dayId}T12:00:00`).getTime());
-}
-
-function getLatestAwakeBoundaryFromEvents(dayState = state, dayId = getSelectedDayId(), now = Date.now()) {
-  const dayStart = getDayStartFromId(dayId);
-  const dayEnd = dayStart + day;
-  const upperLimit = Math.min(dayEnd, now + 2 * 60000);
-  const events = Array.isArray(dayState?.events) ? dayState.events : [];
-  const candidates = [];
-
-  events.forEach((event) => {
-    const start = Number(event?.start);
-    const end = Number(event?.end);
-
-    if ((event?.type === "acordou" || event?.type === "despertar-noturno")
-      && Number.isFinite(start)
-      && start >= dayStart
-      && start <= upperLimit) {
-      candidates.push(start);
-    }
-
-    if (isSleepEvent(event)
-      && Number.isFinite(start)
-      && Number.isFinite(end)
-      && end > start
-      && end >= dayStart
-      && end <= upperLimit) {
-      candidates.push(end);
-    }
-  });
-
-  if (!candidates.length) return null;
-  return Math.max(...candidates);
-}
-
-function reconcileAwakeStateForDay(dayState = state, dayId = getSelectedDayId(), now = Date.now()) {
-  const nextState = normalizeDayState(dayState || createEmptyDayState());
-  if (nextState.mode === "sleeping") return nextState;
-
-  const boundary = getLatestAwakeBoundaryFromEvents(nextState, dayId, now);
-  if (!Number.isFinite(Number(boundary))) return nextState;
-
-  const currentStart = Number(nextState.activeStartedAt);
-  const shouldUpdate = nextState.mode !== "awake"
-    || !Number.isFinite(currentStart)
-    || Number(boundary) > currentStart + 60000;
-
-  if (!shouldUpdate) return nextState;
-
-  return normalizeDayState({
-    ...nextState,
-    mode: "awake",
-    activeStartedAt: Number(boundary),
-    activeType: "sono",
-    activeDetail: "",
-    activeNotes: "",
-  });
-}
-
-function reconcileCurrentAwakeStateFromEvents(options = {}) {
-  if (state?.mode === "sleeping") return false;
-  const beforeStart = Number(state?.activeStartedAt);
-  const beforeMode = state?.mode || "idle";
-  const nextState = reconcileAwakeStateForDay(state, getSelectedDayId(), Date.now());
-  const afterStart = Number(nextState?.activeStartedAt);
-  const changed = beforeMode !== nextState.mode
-    || (Number.isFinite(afterStart) && (!Number.isFinite(beforeStart) || Math.abs(afterStart - beforeStart) > 1000));
-
-  if (changed) {
-    state = nextState;
-    if (options.persist !== false) {
-      syncSelectedDayIntoFamilyCache();
-      saveLocalDayState();
-    }
-    timelineRenderSignature = "";
-    orbitRenderSignature = "";
-  }
-
-  return changed;
-}
-
 function getBottleAmountText(event) {
   const detail = String(event?.detail || "").trim();
   const ml = detail.match(/(\d+(?:[,.]\d+)?)\s*ml/i)?.[0] || "";
@@ -6626,11 +4839,10 @@ function renderTodayOverview() {
   const lastBottle = getLatestEventByTypes(events, ["mamadeira"]);
   const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
   const lastSleep = getLatestSleepEvent(events);
-  const effectiveAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
   const awakeText = state.mode === "sleeping"
     ? "Dormindo agora"
-    : Number.isFinite(Number(effectiveAwakeStart))
-      ? formatShortDuration(Math.max(0, now - Number(effectiveAwakeStart)))
+    : Number.isFinite(Number(state.activeStartedAt))
+      ? formatShortDuration(Math.max(0, now - Number(state.activeStartedAt)))
       : formatShortDuration(getAwakeMsForRange(todayStart, Math.min(todayStart + day, now)));
   const napText = lastSleep
     ? `${formatTime(lastSleep.start)}–${formatTime(lastSleep.end)}`
@@ -6650,8 +4862,8 @@ function renderTodayOverview() {
   if (todayOverviewSuggestion) {
     let suggestion = "Registre a primeira ação para o Ninou acompanhar o dia com você.";
     if (state.mode === "sleeping") suggestion = `${baby} está dormindo agora. O resumo será atualizado quando acordar.`;
-    else if (Number.isFinite(Number(effectiveAwakeStart))) {
-      const awakeMs = Math.max(0, now - Number(effectiveAwakeStart));
+    else if (Number.isFinite(Number(state.activeStartedAt))) {
+      const awakeMs = now - Number(state.activeStartedAt);
       const targetMs = wakeWindowMinutes * 60000;
       if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
       else suggestion = `Rotina em andamento. Próxima janela de sono estimada em ${formatShortDuration(Math.max(0, targetMs - awakeMs))}.`;
@@ -6672,9 +4884,8 @@ function renderGentleAlert() {
   let text = "O Ninou mostrará lembretes leves conforme os registros aparecerem.";
   let show = false;
 
-  const gentleAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
-  if (state.mode === "awake" && Number.isFinite(Number(gentleAwakeStart))) {
-    const awakeMs = now - Number(gentleAwakeStart);
+  if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
+    const awakeMs = now - Number(state.activeStartedAt);
     if (awakeMs >= wakeWindowMinutes * 60000 * 0.9) {
       title = `${baby} está acordado há ${formatShortDuration(awakeMs)}`;
       text = "Talvez seja um bom momento para observar sinais de sono com calma, sem pressa.";
@@ -6732,9 +4943,8 @@ function getNotificationItems() {
     const elapsed = now - Number(latestDiaper.start);
     if (elapsed > 3 * hour) items.push({ icon: "🧷", title: "Fralda", text: `Última fralda registrada há ${formatShortDuration(elapsed)}.` });
   }
-  const effectiveAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
-  if (state.mode === "awake" && Number.isFinite(Number(effectiveAwakeStart))) {
-    const awake = Math.max(0, now - Number(effectiveAwakeStart));
+  if (state.mode === "awake" && Number.isFinite(Number(state.activeStartedAt))) {
+    const awake = now - Number(state.activeStartedAt);
     if (awake > wakeWindowMinutes * 60000) items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
   }
   if (latestAny?.createdByName || latestAny?.createdByEmail) {
@@ -6771,7 +4981,7 @@ function renderDaySummaryCard() {
   const baby = getBabyDisplayName();
   if (daySummaryMoment) daySummaryMoment.textContent = new Date(now).getHours() >= 20 ? "Fechamento do dia" : "Resumo em tempo real";
   if (!events.length) {
-    daySummaryText.textContent = `Ainda não há registros hoje. Comece com sono, mamada, fralda ou medicamento para o Ninou montar um resumo acolhedor do dia.`;
+    daySummaryText.textContent = `Nenhum registro ainda. Quando ${baby} mamar, dormir ou trocar fralda, toque em um botão rápido para o Ninou montar o resumo automaticamente.`;
     return;
   }
   const latestTitle = latest ? getEventConfig(latest.type).title.toLowerCase() : "registro";
@@ -6884,20 +5094,15 @@ function renderGrowthPanels() {
 
 function renderAuditTrail() {
   if (!auditTrailList) return;
-  const items = (Array.isArray(state.auditLog) ? state.auditLog : [])
-    .filter((item) => item?.action && item.action !== "adicionou")
-    .slice(-8)
-    .reverse();
-  if (auditCard) auditCard.hidden = !items.length;
+  const items = (Array.isArray(state.auditLog) ? state.auditLog : []).slice(-8).reverse();
   if (!items.length) {
-    auditTrailList.innerHTML = "<li>Nenhum ajuste técnico registrado nesta data.</li>";
+    auditTrailList.innerHTML = "<li>Nenhuma alteração registrada nesta data.</li>";
     return;
   }
   auditTrailList.innerHTML = items.map((item) => {
-    const actor = getActorDisplayNameFromEvent({ createdByName: item.byName, createdByRelationship: item.byRelationship, createdByEmail: item.byEmail }) || "Responsável";
+    const actor = getActorDisplayNameFromEvent({ createdByName: item.byName, createdByEmail: item.byEmail }) || "este aparelho";
     const when = item.at ? formatTime(new Date(item.at).getTime()) : "--:--";
-    const action = item.action === "excluiu" ? "Excluído por" : "Editado por";
-    return `<li><strong>${escapeHtml(item.title || "Registro")}</strong><span>${escapeHtml(action)} ${escapeHtml(actor)} • ${escapeHtml(when)}</span></li>`;
+    return `<li><strong>${escapeHtml(item.title || "Registro")}</strong><span>${escapeHtml(item.action || "alterou")} por ${escapeHtml(actor)} • ${escapeHtml(when)}</span></li>`;
   }).join("");
 }
 
@@ -6931,7 +5136,6 @@ function renderProductExperienceSections() {
 }
 
 function saveBabyWeight() {
-  if (!requireLogin("registrar peso")) return;
   const weightForm = readWeightFormValue({ babyWeightInput, babyWeightDateInput });
   if (!weightForm.valid) {
     if (babyWeightInput) babyWeightInput.focus();
@@ -6983,7 +5187,6 @@ function updateTheme() {
 }
 
 function renderAll() {
-  reconcileCurrentAwakeStateFromEvents();
   updateTheme();
   renderBabyIdentity();
   renderCurrentState();
@@ -6995,25 +5198,15 @@ function renderAll() {
   renderTodayHomeSections();
   renderProductExperienceSections();
   renderFamilyAccessPanel();
-  updateProfileReadyExperience();
   renderCaregiverIdentityPanel();
 }
 
 function renderLiveTick() {
-  reconcileCurrentAwakeStateFromEvents();
   updateTheme();
 
-  if (!canUsePrivateFeatures()) return;
   if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return;
-  const liveElapsed = Date.now() - Number(state.activeStartedAt || Date.now());
-  if (!Number.isFinite(liveElapsed) || liveElapsed < 0 || liveElapsed > 48 * hour) {
-    state = createEmptyDayState();
-    saveLocalDayState();
-    renderAll();
-    return;
-  }
 
-  setText(stateClock, formatDuration(liveElapsed));
+  setText(stateClock, formatDuration(Date.now() - state.activeStartedAt));
   renderActiveTimerCard();
 
   const currentMinute = Math.floor(Date.now() / 60000);
@@ -7045,16 +5238,9 @@ function startSleep() {
 
 function startRoutine(mode) {
   if (!requireLogin("salvar a rotina")) return;
-  if (mode === "awake" && getActiveAwakeWindowStart()) {
-    renderAll();
-    return;
-  }
   const startedAt = Date.now();
   state = startRoutineTimer(state, mode, startedAt);
   if (mode === "awake") addAwakeEvent(startedAt, "Início da rotina");
-  reconcileCurrentAwakeStateFromEvents({ persist: false });
-  timelineRenderSignature = "";
-  orbitRenderSignature = "";
   saveDayState();
   renderAll();
 }
@@ -7071,30 +5257,9 @@ function showScreen(target) {
   // Visitantes podem navegar pelas telas para conhecer o Ninou.
   // O bloqueio acontece apenas nas ações que gravam/alteram dados via requireLogin().
   activeScreenName = target || activeScreenName;
-
-  if (activeScreenName === "today") {
-    ensureTodaySelectedForView();
-    if (firebaseServices && cloudUser && hasFamilyAccess()) {
-      void loadFamilyDayIds({ force: true }).then(() => {
-        orbitRenderSignature = "";
-        renderOrbit();
-        renderTodayHomeSections();
-        renderSupplementalReports();
-      });
-    }
-  }
-
-  if (activeScreenName === "diary" && firebaseServices && cloudUser && hasFamilyAccess()) {
-    void loadFamilyDayIds({ force: true }).then(() => {
-      timelineRenderSignature = "";
-      renderTimeline();
-    });
-  }
-
   updateScreenVisibility({ target, navButtons, screens });
   renderBabyIdentity();
   updateBodyModeClasses();
-  renderGuestPremiumContent();
 }
 
 function setDiaryFilter(filter) {
@@ -7111,24 +5276,10 @@ function setDiaryFilter(filter) {
 }
 
 async function setDiaryDate(value) {
-  syncSelectedDayIntoFamilyCache();
   setSelectedDiaryDayById(value || getCurrentDayId());
   timelineRenderSignature = "";
-  orbitRenderSignature = "";
-
   if (firebaseServices && cloudUser && hasFamilyAccess()) {
-    await loadFamilyDayIds({ force: false });
-  }
-
-  const selectedDayId = getSelectedDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[selectedDayId] || createEmptyDayState());
-  state = cachedState;
-  loadedStateDayId = selectedDayId;
-  saveLocalDayState();
-  renderAll();
-
-  if (firebaseServices && cloudUser && hasFamilyAccess()) {
-    await subscribeToCloudDay(selectedDayId, { allowAutoLatest: false });
+    await subscribeToCloudDay(getSelectedDayId(), { allowAutoLatest: false });
   } else {
     renderTimeline();
   }
@@ -7138,7 +5289,6 @@ function initDiaryDatePicker() {
   const today = getDayStart();
   const minDay = today - 30 * day;
   selectedDiaryDay = today;
-  loadedStateDayId = getSelectedDayId();
   diaryDateInput.min = toDateInputValue(minDay);
   diaryDateInput.max = toDateInputValue(today);
   diaryDateInput.value = toDateInputValue(today);
@@ -7149,7 +5299,6 @@ function resetDayData() {
   state = createEmptyDayState();
   currentDiaryFilter = "all";
   selectedDiaryDay = getDayStart();
-  loadedStateDayId = getSelectedDayId();
   diaryDateInput.value = toDateInputValue(selectedDiaryDay);
   diaryFilterButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.diaryFilter === "all");
@@ -7185,15 +5334,6 @@ function setSyncStatus(status = "offline", email = "") {
   if (status.includes?.("@") && !email) {
     email = status;
     status = "online";
-  }
-
-  // v75.56.2.1.1: o admin global não deve aparecer como "Off-line" depois do login.
-  // O painel administrativo depende da autenticação do admin e de regras globais;
-  // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
-  // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
-  if ((status === "offline" || status === "error") && cloudUser && isGlobalAppAdmin(cloudUser)) {
-    status = "online";
-    email = email || cloudUser.email || GLOBAL_APP_ADMIN_EMAIL;
   }
 
   const online = status === "online";
@@ -7380,26 +5520,6 @@ function saveManualEvent() {
   }
 
   const existingEvent = payload.editingEventId ? getEventById(payload.editingEventId) : null;
-  const payloadDayId = getDayIdFromStart(payload.start);
-  const selectedBeforeSaveId = getSelectedDayId();
-
-  if (!existingEvent && payloadDayId !== selectedBeforeSaveId) {
-    syncSelectedDayIntoFamilyCache();
-    setSelectedDiaryDayById(payloadDayId);
-    state = getFamilyDayState(payloadDayId);
-    loadedStateDayId = payloadDayId;
-    timelineRenderSignature = "";
-    orbitRenderSignature = "";
-  }
-
-  if (payload.type === "acordou") {
-    const duplicateWake = getAwakeEventInActiveWindow(payload.start, existingEvent?.id || null);
-    if (duplicateWake) {
-      window.alert("Já existe um registro de Acordou nesta janela acordada. Para corrigir o horário, edite o registro existente em vez de criar outro.");
-      return;
-    }
-  }
-
   const startsLiveSleep = shouldStartLiveSleepFromManualEvent(payload.type, payload.start, existingEvent);
   const startsLiveAwake = shouldStartLiveAwakeFromManualNightWake(payload.type, payload.start, existingEvent);
 
@@ -7407,7 +5527,6 @@ function saveManualEvent() {
     const wakeWindow = payload.type === "sono" || payload.type === "dormir"
       ? getWakeWindowForSleepStart(payload.start, existingEvent.id)
       : null;
-    const actor = getCurrentActorProfile();
     updateEventKeepingDuration(existingEvent, {
       type: payload.type,
       start: payload.start,
@@ -7417,11 +5536,8 @@ function saveManualEvent() {
       wakeWindowStartedAt: wakeWindow?.wakeWindowStartedAt,
       wakeWindowMs: wakeWindow?.wakeWindowMs,
       updatedAt: new Date().toISOString(),
-      updatedByUid: actor.uid,
-      updatedByEmail: actor.email,
-      updatedByDeviceId: actor.deviceId,
-      updatedByName: actor.displayName,
-      updatedByRelationship: actor.relationshipLabel,
+      updatedByEmail: getCurrentActorEmail(),
+      updatedByName: getCurrentActorName(),
       lastAction: "editou",
     });
     pushAuditEntry("editou", existingEvent);
@@ -7432,14 +5548,10 @@ function saveManualEvent() {
   } else if (payload.type === "acordou") {
     if (state.mode === "sleeping" && canUseManualTimeForLiveState(payload.start)) {
       state = finishActiveSleep(state, makeEvent, payload.start);
-    } else if (state.mode !== "awake" && canUseManualTimeForLiveState(payload.start)) {
+    } else if (canUseManualTimeForLiveState(payload.start)) {
       state = startRoutineTimer(state, "awake", payload.start);
     }
-    const addedWakeEvent = addAwakeEvent(payload.start, payload.detail || "Acordou", payload.notes);
-    if (!addedWakeEvent) {
-      window.alert("Não foi possível criar outro Acordou no mesmo minuto. Edite o registro existente se precisar ajustar o horário.");
-      return;
-    }
+    addAwakeEvent(payload.start, payload.detail || "Acordou", payload.notes);
   } else if (startsLiveAwake) {
     startLiveAwakeFromManualNightWake(payload.start, payload.detail, payload.notes);
   } else if (startsLiveSleep) {
@@ -7462,17 +5574,6 @@ function saveManualEvent() {
     defaultBottleAmount: 105,
   });
   closeSheet();
-
-  if (currentDiaryFilter !== "all") {
-    currentDiaryFilter = "all";
-    diaryFilterButtons.forEach((button) => {
-      button.classList.toggle("active", button.dataset.diaryFilter === "all");
-    });
-    window.setTimeout(updateDiaryChipsMoreButton, 220);
-  }
-
-  timelineRenderSignature = "";
-  orbitRenderSignature = "";
   saveDayState();
   renderAll();
 }
@@ -7490,56 +5591,19 @@ function deleteEvent(eventId) {
   if (!window.confirm(buildDeleteConfirmationText(event, { getEventConfig, formatTime }))) return;
 
   pushAuditEntry("excluiu", event);
-  state.deletedEventIds = [...new Set([...(state.deletedEventIds || []), event.id])].slice(-240);
   state.events = removeEventById(state.events, eventId);
-  timelineRenderSignature = "";
-  orbitRenderSignature = "";
   saveDayState();
   renderAll();
-
-  if (firebaseServices && cloudUser && hasFamilyAccess()) {
-    void saveDayToCloud(getSelectedDayId());
-  }
 }
 
 function getExportEvents() {
   return buildExportEvents(state.events, getEventConfig);
 }
 
-function getCustomExportRange(selectedDayId = getSelectedDayId()) {
-  const startText = exportStartDateInput?.value || selectedDayId;
-  const endText = exportEndDateInput?.value || selectedDayId;
-  const startDate = parseLocalDate(startText) || parseLocalDate(selectedDayId) || new Date();
-  const endDate = parseLocalDate(endText) || parseLocalDate(selectedDayId) || startDate;
-  const start = getDayStart(Math.min(startDate.getTime(), endDate.getTime()));
-  const end = getDayStart(Math.max(startDate.getTime(), endDate.getTime())) + day;
-  return {
-    start,
-    end,
-    startId: toDateInputValue(start),
-    endId: toDateInputValue(end - day),
-  };
-}
-
-function getEffectiveExportRangeMode(selectedDayId = getSelectedDayId()) {
-  const selectedMode = exportRangeSelect?.value || "day";
-  const startText = exportStartDateInput?.value || "";
-  const endText = exportEndDateInput?.value || "";
-  if (selectedMode === "day" && startText && endText && startText !== endText) return "custom";
-  return selectedMode;
-}
-
-function syncExportRangeModeFromDates() {
-  if (!exportRangeSelect || !exportStartDateInput || !exportEndDateInput) return;
-  if (exportStartDateInput.value && exportEndDateInput.value && exportStartDateInput.value !== exportEndDateInput.value) {
-    exportRangeSelect.value = "custom";
-  }
-}
-
 function getExportWindow() {
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const selectedDayId = toDateInputValue(selectedStart);
-  const mode = getEffectiveExportRangeMode(selectedDayId);
+  const mode = exportRangeSelect?.value || "day";
   let start = selectedStart;
   let end = selectedStart + day;
   let label = formatReportDate(selectedDayId);
@@ -7550,12 +5614,13 @@ function getExportWindow() {
     end = getDayStart() + day;
     label = `Últimos ${count} dias`;
   } else if (mode === "custom") {
-    const range = getCustomExportRange(selectedDayId);
-    start = range.start;
-    end = range.end;
-    label = range.startId === range.endId
-      ? formatReportDate(range.startId)
-      : `${formatReportDate(range.startId)} a ${formatReportDate(range.endId)}`;
+    const startText = exportStartDateInput?.value || selectedDayId;
+    const endText = exportEndDateInput?.value || selectedDayId;
+    const startDate = parseLocalDate(startText) || new Date(selectedStart);
+    const endDate = parseLocalDate(endText) || new Date(selectedStart);
+    start = getDayStart(Math.min(startDate.getTime(), endDate.getTime()));
+    end = getDayStart(Math.max(startDate.getTime(), endDate.getTime())) + day;
+    label = `${formatReportDate(toDateInputValue(start))} a ${formatReportDate(toDateInputValue(end - day))}`;
   }
 
   return { mode, start, end, label, dayId: selectedDayId };
@@ -7596,7 +5661,7 @@ function getExportPayload() {
     events: buildExportEvents(events, getEventConfig),
     summary: {
       text: daySummaryText?.textContent || "",
-      exportedFrom: "Ninou v75.31",
+      exportedFrom: "Ninou v75.38",
     },
   };
 }
@@ -7872,26 +5937,14 @@ function updateProfilePhoto(dataUrl) {
 }
 
 function resizeImage(file) {
-  // v75.56.2.1.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
-  return resizeProfileImage(file, { size: 120, quality: 0.5 });
+  // v75.37: foto menor para caber melhor no Firestore sem depender do Firebase Storage.
+  return resizeProfileImage(file, { size: 260, quality: 0.72 });
 }
 
 bindBottomNavigation(navButtons, showScreen);
 bindSyncPillNavigation(syncPill, showScreen);
 
 bindShortcutNavigation(shortcutButtons, showScreen);
-
-summaryRangeButtons.forEach((button) => {
-  button.addEventListener("click", () => setSummaryRangeMode(button.dataset.summaryRange));
-});
-
-if (intelligentTimeline) {
-  intelligentTimeline.addEventListener("click", (event) => {
-    const moreButton = event.target.closest("[data-intelligent-timeline-more]");
-    if (!moreButton) return;
-    expandIntelligentTimeline();
-  });
-}
 
 diaryFilterButtons.forEach((button) => {
   button.addEventListener("click", () => setDiaryFilter(button.dataset.diaryFilter));
@@ -7944,66 +5997,7 @@ if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("c
 if (prepareConsultButton) prepareConsultButton.addEventListener("click", prepareConsultMode);
 if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
 if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
-if (exportStartDateInput) exportStartDateInput.addEventListener("change", syncExportRangeModeFromDates);
-if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
-if (guestWelcomeLoginButton) guestWelcomeLoginButton.addEventListener("click", () => focusProfileAccess("login"));
-if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
-if (guestModalCloseButton) guestModalCloseButton.addEventListener("click", closeGuestLoginModal);
-if (guestModalLoginButton) guestModalLoginButton.addEventListener("click", () => focusProfileAccess("login"));
-if (guestModalInviteButton) guestModalInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
-if (guestOnboardingModal) {
-  guestOnboardingModal.addEventListener("click", (event) => {
-    if (event.target === guestOnboardingModal) closeGuestLoginModal();
-  });
-}
-document.addEventListener("click", (event) => {
-  const postAction = event.target.closest("[data-post-access-action]");
-  if (postAction) {
-    event.preventDefault();
-    event.stopPropagation();
-    const action = postAction.dataset.postAccessAction || "profile";
-    if (action === "invite") {
-      focusProfileAccess("invite");
-      return;
-    }
-    if (action === "start") {
-      showScreen("today");
-      return;
-    }
-    const target = caregiverIdentityCard || document.querySelector("#accountJourneyCard");
-    target?.scrollIntoView({ behavior: "smooth", block: "center" });
-    caregiverNameInput?.focus();
-    return;
-  }
-
-  const themeAction = event.target.closest("[data-theme-choice]");
-  if (themeAction) {
-    event.preventDefault();
-    event.stopPropagation();
-    setGuestThemeChoice(themeAction.dataset.themeChoice || "dark");
-    return;
-  }
-
-  const journeyAction = event.target.closest("[data-journey-action]");
-  if (journeyAction) {
-    event.preventDefault();
-    event.stopPropagation();
-    const action = journeyAction.dataset.journeyAction || "login";
-    if (action === "login" && isLoggedIn() && hasFamilyAccess()) {
-      showScreen("today");
-      return;
-    }
-    focusProfileAccess(action === "invite" ? "invite" : action === "create" ? "create" : "login");
-    return;
-  }
-
-  const guestAction = event.target.closest("[data-guest-action]");
-  if (!guestAction) return;
-  event.preventDefault();
-  event.stopPropagation();
-  focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
-}, true);
 
 wakeWindowInput.addEventListener("input", () => {
   const nextValue = Number(wakeWindowInput.value);
@@ -8035,7 +6029,6 @@ if (themeModeInput) {
     if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) {
       try { localStorage.setItem(storageKeys.themeMode, nextMode); } catch {}
       updateTheme();
-      renderGuestThemeButtons();
       return;
     }
 
@@ -8062,42 +6055,37 @@ if (weightHistoryList) {
   });
 }
 
-[avatarIconOptions, avatarHairColorOptions, avatarSkinOptions, avatarColorOptions].forEach((container) => {
-  container?.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-avatar-type][data-avatar-value]");
-    if (!button) return;
-    updatePendingAvatar(button.dataset.avatarType, button.dataset.avatarValue);
-  });
-});
+profilePhotoInput.addEventListener("change", async () => {
+  const file = profilePhotoInput.files?.[0];
+  if (!file) return;
 
-avatarTabs.forEach((button) => {
-  button.addEventListener("click", () => {
-    avatarTabs.forEach((item) => item.classList.toggle("active", item === button));
-    const section = document.querySelector(`[data-avatar-section="${button.dataset.avatarJump}"]`);
-    section?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-});
+  if (isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen) {
+    const dataUrl = await resizeImage(file);
+    setAdminAccountPhoto(dataUrl);
+    if (profilePhoto) profilePhoto.src = dataUrl;
+    await saveAdminAccountProfileToCloud();
+    if (loginHelper) loginHelper.textContent = "Foto pessoal do admin atualizada.";
+    profilePhotoInput.value = "";
+    return;
+  }
 
-if (editBabyAvatarButton) {
-  editBabyAvatarButton.addEventListener("click", () => {
-    if (babyAvatarCard?.hidden) {
-      openAvatarEditor();
-    } else {
-      closeAvatarEditor("Editor fechado.");
-    }
-  });
-}
+  if (!requireLogin("salvar a foto")) {
+    profilePhotoInput.value = "";
+    return;
+  }
 
-if (saveBabyAvatarButton) saveBabyAvatarButton.addEventListener("click", saveBabyAvatarFromDraft);
-if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
-  pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || {});
-  renderAvatarCustomizer();
-  closeAvatarEditor("Editor fechado.");
-});
-
-if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
+  const dataUrl = await resizeImage(file);
+  currentProfilePhoto = dataUrl;
+  markProfileLocallyChanged();
+  updateProfilePhoto(dataUrl);
+  try {
+    localStorage.setItem(storageKeys.photo, dataUrl);
+  } catch {
+    // A foto continua visível mesmo se o navegador não permitir salvar localmente.
+  }
+  persistVisibleContextForCurrentOwner();
+  scheduleProfileCloudSave({ includePhoto: true });
   profilePhotoInput.value = "";
-  if (loginHelper) loginHelper.textContent = "O Ninou agora usa somente avatars ilustrados prontos. Fotos antigas e novos uploads não são usados.";
 });
 
 loginButton.addEventListener("click", signInAccount);
@@ -8283,7 +6271,7 @@ function initSleepSounds() {
 }
 
 
-updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
+if (currentProfilePhoto) updateProfilePhoto(currentProfilePhoto);
 
 const savedEmail = localStorage.getItem(storageKeys.email);
 if (savedEmail) {
@@ -8311,7 +6299,7 @@ initFirebaseAuthState().catch((error) => {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js").then((registration) => {
       registration.update().catch(() => {});
     }).catch((error) => {
       console.warn("Service worker não registrado:", error);

@@ -112,13 +112,8 @@ export function getEventRenderSignature(event, options = {}) {
     event.detail,
     event.notes,
     Math.round(Number(event.wakeWindowMs) || 0),
-    event.createdByUid || "",
     event.createdByEmail || "",
-    event.createdByName || "",
-    event.createdByRelationship || "",
     event.updatedByEmail || "",
-    event.updatedByName || "",
-    event.updatedByRelationship || "",
     event.lastAction || "",
   ].join("|");
 }
@@ -133,45 +128,13 @@ export function getTimelineRenderSignature(selectedStart, selectedEnd, currentDi
   ].join("::");
 }
 
-function isMissingAuthorValue(value = "") {
-  const text = String(value ?? "").trim();
-  return !text || text === "undefined" || text === "null";
-}
-
-function sanitizeAuthorLabel(value = "", babyName = "") {
-  const text = String(value ?? "").trim();
-  if (isMissingAuthorValue(text)) return "";
-  if (babyName && text.toLowerCase() === babyName.toLowerCase()) return "";
-  return text;
-}
-
-function getEventAuthorLabel(event = {}) {
+function getSafeActorName(event = {}) {
+  const raw = event.updatedByName || event.createdByName || event.updatedByEmail || event.createdByEmail || "";
+  const text = String(raw || "").trim();
+  if (!text) return "";
   const babyName = String(globalThis.window?.__ninouCurrentBabyName || "").trim().toLowerCase();
-  const candidates = [
-    event.createdByName,
-    event.createdByRelationship,
-    event.authorName,
-    event.responsibleName,
-  ];
-  for (const candidate of candidates) {
-    const label = sanitizeAuthorLabel(candidate, babyName);
-    if (label) return label;
-  }
-  return "Responsável";
-}
-
-function getRoutineDetailLine(event, parts = {}) {
-  let primary = String(parts.primary || "").trim();
-  const secondary = String(parts.secondary || "").trim();
-  const startTime = formatTime(event.start);
-  const endTime = formatTime(event.end);
-  const range = `${startTime}–${endTime}`;
-
-  if (primary === startTime || primary === range) primary = "";
-  if (primary.startsWith(`${startTime} • `)) primary = primary.slice(`${startTime} • `.length);
-  if (primary.startsWith(`${range} • `)) primary = primary.slice(`${range} • `.length);
-
-  return [primary, secondary].filter(Boolean).join(" • ");
+  if (babyName && text.toLowerCase() === babyName) return "Responsável";
+  return text;
 }
 
 export function getEventCardMarkup(event, { empty = false } = {}) {
@@ -188,17 +151,18 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   const config = getEventConfig(event.type);
   const parts = getEventDisplayParts(event);
   const notes = event.notes && event.type !== "medicamento" ? `<p>${escapeHtml(event.notes)}</p>` : "";
-  const actorName = getEventAuthorLabel(event);
-  const registeredLine = `Registrado por ${actorName} • ${formatTime(event.start)}`;
-  const extraMeta = getRoutineDetailLine(event, parts);
+  const actorName = getSafeActorName(event);
+  const action = event.lastAction === "editou" ? "Editado por" : "Adicionado por";
+  const actor = actorName ? `<small class="event-audit-line">${escapeHtml(action)} ${escapeHtml(actorName)}</small>` : "";
   return `
     <i class="mark ${config.arcType}">${config.icon}</i>
     <div class="event-main">
       <div class="event-text">
         <strong>${escapeHtml(config.title)}</strong>
-        <span class="event-meta-primary">${escapeHtml(registeredLine)}</span>
-        ${extraMeta ? `<span class="event-meta-extra">${escapeHtml(extraMeta)}</span>` : ""}
+        <span class="event-meta-primary">${escapeHtml(parts.primary)}</span>
+        ${parts.secondary ? `<span class="event-meta-extra">${escapeHtml(parts.secondary)}</span>` : ""}
         ${notes}
+        ${actor}
       </div>
       <div class="event-actions">
         <button class="event-action-button edit" type="button" data-event-edit="${escapeHtml(event.id)}" aria-label="Editar ${escapeHtml(config.title)}">
