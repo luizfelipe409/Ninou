@@ -196,24 +196,58 @@ export function renderDailyRhythm({
   }
 }
 
-export function renderIntelligentTimeline({ container, state, todayStart, dayMs = DAY, formatShortDuration, formatTime, limit = 10 }) {
+function eventOverlapsIntelligenceWindow(event = {}, windowStart = 0, windowEnd = windowStart + DAY) {
+  const start = Number(event.start);
+  const rawEnd = Number(event.end);
+  const end = Number.isFinite(rawEnd) && rawEnd > start ? rawEnd : start;
+  return Number.isFinite(start) && start < windowEnd && end >= windowStart;
+}
+
+function dedupeIntelligenceEvents(events = []) {
+  const byKey = new Map();
+  for (const event of Array.isArray(events) ? events : []) {
+    const startMinute = Math.round((Number(event.start) || 0) / 60000);
+    const endMinute = Math.round((Number(event.end) || Number(event.start) || 0) / 60000);
+    const key = [event.type || "", startMinute, endMinute, String(event.detail || "").trim().toLowerCase(), String(event.notes || "").trim().toLowerCase()].join("|");
+    if (!byKey.has(key)) byKey.set(key, event);
+  }
+  return [...byKey.values()];
+}
+
+export function renderIntelligentTimeline({
+  container,
+  state,
+  todayStart,
+  dayMs = DAY,
+  formatShortDuration,
+  formatTime,
+  limit = 7,
+  batchSize = 7,
+}) {
   if (!container) return;
-  const events = sortEventsByStartAsc(getEventsForDay(state.events || [], todayStart, dayMs)).slice(-limit);
-  if (!events.length) {
-    container.innerHTML = `<article class="timeline-empty">A linha do tempo aparecerá assim que você registrar mamadas, sono, fraldas ou medicamentos.</article>`;
+  const windowEnd = todayStart + dayMs;
+  const orderedEvents = sortEventsByStartAsc(
+    dedupeIntelligenceEvents((state.events || []).filter((event) => eventOverlapsIntelligenceWindow(event, todayStart, windowEnd))),
+  ).reverse();
+  const safeLimit = Math.max(batchSize, Number(limit) || batchSize);
+  const visibleEvents = orderedEvents.slice(0, safeLimit);
+
+  if (!visibleEvents.length) {
+    container.innerHTML = `<article class="timeline-empty">Ainda não há registros suficientes. Comece com sono, mamada, fralda ou medicamento para montar a linha do tempo inteligente.</article>`;
     return;
   }
 
-  container.innerHTML = events.map((event) => {
+  const itemsMarkup = visibleEvents.map((event) => {
     const config = getEventConfig(event.type);
     const duration = event.end > event.start && (isSleepEvent(event) || event.type === "despertar-noturno")
       ? formatShortDuration(event.end - event.start)
       : "";
     const detail = cleanDetail(event);
     const subtitle = [duration, detail].filter(Boolean).join(" • ") || "Registro da rotina";
+    const timeLabel = eventTime(event, formatTime);
     return `
       <article class="intelligent-timeline-item ${isSleepEvent(event) ? "is-duration" : ""}">
-        <time>${escapeHtml(eventTime(event, formatTime))}</time>
+        <time>${escapeHtml(timeLabel)}</time>
         <i class="mark ${config.arcType}">${config.icon}</i>
         <div>
           <strong>${escapeHtml(config.title)}</strong>
@@ -222,6 +256,16 @@ export function renderIntelligentTimeline({ container, state, todayStart, dayMs 
       </article>
     `;
   }).join("");
+
+  const remaining = orderedEvents.length - visibleEvents.length;
+  const moreMarkup = remaining > 0
+    ? `<button class="timeline-show-more" type="button" data-intelligent-timeline-more>
+        <span>Mostrar mais registros</span>
+        <strong>+${Math.min(batchSize, remaining)}</strong>
+      </button>`
+    : `<div class="timeline-end-note">Você chegou ao início dos registros deste dia.</div>`;
+
+  container.innerHTML = `${itemsMarkup}${moreMarkup}`;
 }
 
 export function renderWeeklyOverview({
@@ -229,6 +273,8 @@ export function renderWeeklyOverview({
   state,
   todayStart,
   dayMs = DAY,
+  periodDays = 7,
+  periodLabel = "Últimos 7 dias",
   getSleepMsForRange,
   countFeeding = countFeedingEvents,
   countDiaper = countDiaperEvents,
@@ -236,28 +282,34 @@ export function renderWeeklyOverview({
   formatShortDuration,
 }) {
   if (!container) return;
-  const start = todayStart - 6 * dayMs;
+  const safeDays = Math.min(7, Math.max(1, Number(periodDays) || 7));
+  const start = todayStart - (safeDays - 1) * dayMs;
   const end = todayStart + dayMs;
-  const events = (state.events || []).filter((event) => event.start >= start && event.start < end);
-  const sleepMs = Array.from({ length: 7 }, (_, idx) => {
+  const events = (state.events || []).filter((event) => eventOverlapsIntelligenceWindow(event, start, end));
+
+  const sleepMs = Array.from({ length: safeDays }, (_, idx) => {
     const dStart = todayStart - idx * dayMs;
     return getSleepMsForRange(dStart, dStart + dayMs);
   }).reduce((total, value) => total + value, 0);
+
   const feeds = countFeeding(events);
   const diapers = countDiaper(events);
   const meds = countMedication(events);
+  const perDay = (value) => safeDays > 1 ? `${(value / safeDays).toFixed(1).replace(".", ",")}/dia` : "hoje";
   const maxValue = Math.max(sleepMs / HOUR, feeds, diapers, meds, 1);
   const rows = [
-    { label: "Sono", value: formatShortDuration(sleepMs), raw: sleepMs / HOUR },
-    { label: "Mamadas", value: String(feeds), raw: feeds },
-    { label: "Fraldas", value: String(diapers), raw: diapers },
-    { label: "Medicamentos", value: String(meds), raw: meds },
+    { label: "Sono", value: formatShortDuration(sleepMs), meta: safeDays > 1 ? `${formatShortDuration(sleepMs / safeDays)} por dia` : "total de hoje", raw: sleepMs / HOUR },
+    { label: "Mamadas", value: String(feeds), meta: perDay(feeds), raw: feeds },
+    { label: "Fraldas", value: String(diapers), meta: perDay(diapers), raw: diapers },
+    { label: "Medicamentos", value: String(meds), meta: safeDays > 1 ? `${meds} no período` : "hoje", raw: meds },
   ];
+
   container.innerHTML = rows.map((row) => `
     <article>
       <span>${escapeHtml(row.label)}</span>
       <i style="--p:${clampPercent((row.raw / maxValue) * 100)}"></i>
       <b>${escapeHtml(row.value)}</b>
+      <em>${escapeHtml(row.meta)}</em>
     </article>
   `).join("");
 }

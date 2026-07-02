@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-38-relatorio_peso_autoria";
+const CACHE_NAME = "ninou-v75-56-7-16-identidade-admin-tema-auto";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.38",
-  "/css/app.legacy.css?v=75.38",
-  "/app.js?v=75.38",
-  "/js/app.legacy.js?v=75.38",
+  "/styles.css?v=75.56.7.16",
+  "/css/app.legacy.css?v=75.56.7.16",
+  "/app.js?v=75.56.7.16",
+  "/js/app.legacy.js?v=75.56.7.16",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -49,9 +49,18 @@ const APP_SHELL = [
   "/icons/actions/fralda.png",
   "/icons/actions/mamadeira.png",
   "/icons/actions/soneca.png",
-  "/audio/som-utero.mp3",
-  "/audio/som-relaxar.mp3",
-  "/audio/ritmo-suave-bebe.mp3",
+  "/icons/baby-avatars/avatar-01.png",
+  "/icons/baby-avatars/avatar-02.png",
+  "/icons/baby-avatars/avatar-03.png",
+  "/icons/baby-avatars/avatar-04.png",
+  "/icons/baby-avatars/avatar-05.png",
+  "/icons/baby-avatars/avatar-06.png",
+  "/icons/baby-avatars/avatar-07.png",
+  "/icons/baby-avatars/avatar-08.png",
+  "/icons/baby-avatars/avatar-09.png",
+  "/icons/baby-avatars/avatar-10.png",
+  "/icons/baby-avatars/avatar-11.png",
+  "/icons/baby-avatars/avatar-12.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -73,7 +82,12 @@ self.addEventListener("fetch", (event) => {
 
   const request = event.request;
   const url = new URL(request.url);
-  const isAppFile = request.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith(".css") || url.pathname.endsWith(".js");
+  const isAppFile =
+    request.mode === "navigate" ||
+    url.pathname.endsWith(".html") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".js");
+  const isAudioFile = url.pathname.startsWith("/audio/") && url.pathname.endsWith(".mp3");
 
   if (isAppFile) {
     event.respondWith(
@@ -88,14 +102,39 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Áudios: não entram no cache inicial. O arquivo só é buscado quando o usuário abre/toca Sons.
+  // Requisições com Range são comuns em áudio; nesses casos, deixamos o navegador buscar direto.
+  if (isAudioFile) {
+    if (request.headers.has("range")) {
+      event.respondWith(fetch(request));
+      return;
+    }
+
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
+          if (response && response.ok && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        });
+      }),
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
-      return fetch(request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        return response;
-      }).catch(() => caches.match("/index.html"));
+      return fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match("/index.html"));
     }),
   );
 });

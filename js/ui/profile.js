@@ -62,7 +62,7 @@ export function syncBabyProfileFormPanel(profile = {}, elements = {}, options = 
     elements.babyBirthInput.value = profile.birthDate || "";
     elements.babyBirthInput.max = toDateInputValue();
   }
-  if (elements.themeModeInput) elements.themeModeInput.value = profile.themeMode || "auto";
+  if (elements.themeModeInput) elements.themeModeInput.value = profile.themeMode || "dark";
   options.renderWeightProfile?.();
 }
 

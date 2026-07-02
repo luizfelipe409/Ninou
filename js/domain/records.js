@@ -27,6 +27,7 @@ export function createEmptyDayState() {
     lastWakeWindowStartedAt: null,
     lastWakeWindowMs: null,
     events: [],
+    deletedEventIds: [],
     auditLog: [],
     dayNotes: "",
   };
@@ -72,11 +73,17 @@ export function normalizeEvent(event = {}) {
     detail: typeof event.detail === "string" ? event.detail : "",
     notes: typeof event.notes === "string" ? event.notes : "",
     createdAt: typeof event.createdAt === "string" ? event.createdAt : "",
+    createdByUid: typeof event.createdByUid === "string" ? event.createdByUid : "",
     createdByEmail: typeof event.createdByEmail === "string" ? event.createdByEmail : "",
     createdByName: typeof event.createdByName === "string" ? event.createdByName : "",
+    createdByRelationship: typeof event.createdByRelationship === "string" ? event.createdByRelationship : "",
+    authorName: typeof event.authorName === "string" ? event.authorName : "",
+    responsibleName: typeof event.responsibleName === "string" ? event.responsibleName : "",
     updatedAt: typeof event.updatedAt === "string" ? event.updatedAt : "",
+    updatedByUid: typeof event.updatedByUid === "string" ? event.updatedByUid : "",
     updatedByEmail: typeof event.updatedByEmail === "string" ? event.updatedByEmail : "",
     updatedByName: typeof event.updatedByName === "string" ? event.updatedByName : "",
+    updatedByRelationship: typeof event.updatedByRelationship === "string" ? event.updatedByRelationship : "",
     lastAction: typeof event.lastAction === "string" ? event.lastAction : "",
     ...(Number.isFinite(wakeWindowStartedAt) && Number.isFinite(wakeWindowMs) && wakeWindowMs > 0
       ? { wakeWindowStartedAt, wakeWindowMs }
@@ -103,14 +110,19 @@ export function normalizeDayState(dayState = {}) {
     lastWakeWindowStartedAt: Number.isFinite(lastWakeWindowStartedAt) ? lastWakeWindowStartedAt : null,
     lastWakeWindowMs: Number.isFinite(lastWakeWindowMs) && lastWakeWindowMs > 0 ? lastWakeWindowMs : null,
     events: Array.isArray(dayState.events) ? dayState.events.map(normalizeEvent).filter(Boolean) : [],
+    deletedEventIds: Array.isArray(dayState.deletedEventIds)
+      ? [...new Set(dayState.deletedEventIds.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()))].slice(-240)
+      : [],
     auditLog: Array.isArray(dayState.auditLog)
       ? dayState.auditLog.slice(-60).map((item = {}) => ({
           id: typeof item.id === "string" ? item.id : `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           action: typeof item.action === "string" ? item.action : "alterou",
           title: typeof item.title === "string" ? item.title : "Registro",
           at: typeof item.at === "string" ? item.at : "",
+          byUid: typeof item.byUid === "string" ? item.byUid : "",
           byEmail: typeof item.byEmail === "string" ? item.byEmail : "",
           byName: typeof item.byName === "string" ? item.byName : "",
+          byRelationship: typeof item.byRelationship === "string" ? item.byRelationship : "",
           eventId: typeof item.eventId === "string" ? item.eventId : "",
         }))
       : [],
@@ -167,8 +179,10 @@ export function updateEventKeepingDuration(event, updates = {}) {
     detail: updates.detail ?? event.detail ?? "",
     notes: updates.notes ?? event.notes ?? "",
     updatedAt: updates.updatedAt ?? event.updatedAt ?? "",
+    updatedByUid: updates.updatedByUid ?? event.updatedByUid ?? "",
     updatedByEmail: updates.updatedByEmail ?? event.updatedByEmail ?? "",
     updatedByName: updates.updatedByName ?? event.updatedByName ?? "",
+    updatedByRelationship: updates.updatedByRelationship ?? event.updatedByRelationship ?? "",
     lastAction: updates.lastAction ?? event.lastAction ?? "",
   });
 

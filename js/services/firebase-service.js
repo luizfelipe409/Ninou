@@ -14,6 +14,25 @@ export async function getFirebaseServices() {
     ])
       .then(([appModule, authModule, firestoreModule]) => {
         const app = appModule.initializeApp(firebaseConfig);
+        const db = (() => {
+          try {
+            if (
+              typeof firestoreModule.initializeFirestore === "function" &&
+              typeof firestoreModule.persistentLocalCache === "function"
+            ) {
+              const cacheOptions = typeof firestoreModule.persistentMultipleTabManager === "function"
+                ? { tabManager: firestoreModule.persistentMultipleTabManager() }
+                : null;
+              const localCache = cacheOptions
+                ? firestoreModule.persistentLocalCache(cacheOptions)
+                : firestoreModule.persistentLocalCache();
+              return firestoreModule.initializeFirestore(app, { localCache });
+            }
+          } catch (error) {
+            console.warn("Persistência offline do Firestore indisponível; usando cache padrão em memória.", error);
+          }
+          return firestoreModule.getFirestore(app);
+        })();
 
         firebaseServices = {
           auth: authModule.getAuth(app),
@@ -21,7 +40,7 @@ export async function getFirebaseServices() {
           signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
           signOut: authModule.signOut,
           onAuthStateChanged: authModule.onAuthStateChanged,
-          db: firestoreModule.getFirestore(app),
+          db,
           doc: firestoreModule.doc,
           collection: firestoreModule.collection,
           collectionGroup: firestoreModule.collectionGroup,
@@ -62,8 +81,8 @@ export function getFirebaseErrorMessage(error) {
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",
     "auth/network-request-failed": "Falha de conexão. Verifique a internet.",
     "permission-denied": "Sem permissão no banco. Revise convites, membros da família ou regras do Firestore.",
-    "resource-exhausted": "Não foi possível salvar. A foto ou os dados ficaram grandes demais para o Firestore.",
-    "invalid-argument": "Não foi possível salvar. Revise a foto ou os dados do perfil.",
+    "resource-exhausted": "Não foi possível salvar. Os dados ficaram grandes demais para o Firestore.",
+    "invalid-argument": "Não foi possível salvar. Revise os dados do perfil.",
     unavailable: "Firebase indisponível no momento. Tente novamente em alguns segundos.",
   };
 

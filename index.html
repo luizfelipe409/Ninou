@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ninou</title>
-    <meta name="theme-color" content="#101029" />
+    <meta name="theme-color" content="#f8f6fc" />
     <meta name="description" content="Diário de sono, mamadas, fraldas e rotina do bebê." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-revisão-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
@@ -19,13 +19,10 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="preload" as="audio" href="./audio/som-utero.mp3" />
-    <link rel="preload" as="audio" href="./audio/som-relaxar.mp3" />
-    <link rel="preload" as="audio" href="./audio/ritmo-suave-bebe.mp3" />
-    <link rel="stylesheet" href="./styles.css?v=75.37" />
+    <link rel="stylesheet" href="./styles.css?v=75.56.7.16" />
   </head>
   <body>
-    <main class="phone-shell" aria-label="Protótipo completo Ninou">
+    <main class="phone-shell premium-final-shell" aria-label="Ninou">
       <header class="app-header">
         <div class="identity">
           <img src="./icons/icon-192.png" alt="" />
@@ -57,6 +54,24 @@
           <span id="stateLabel">Rotina zerada</span>
           <strong id="stateClock">00:00:00</strong>
           <p id="stateHint">Escolha como começar o dia.</p>
+        </section>
+
+
+        <section class="main-action-area" aria-label="Ação principal">
+          <button id="wakeAction" class="primary-action" type="button" hidden>
+            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span id="wakeActionLabel">Acordou</span>
+          </button>
+          <div id="startChoice" class="start-choice">
+            <button type="button" data-start-mode="awake">
+              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Acordou</span>
+            </button>
+            <button type="button" data-start-mode="sleeping">
+              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Iniciar soneca</span>
+            </button>
+          </div>
         </section>
 
         <section class="today-overview-card" aria-label="Hoje com o bebê">
@@ -94,7 +109,13 @@
             <strong>Lembretes do Ninou</strong>
           </div>
           <ul id="notificationCenterList" class="notification-center-list">
-            <li>Os lembretes aparecem conforme a rotina for registrada.</li>
+            <li>
+              <i aria-hidden="true">🌿</i>
+              <div>
+                <strong>Rotina pronta</strong>
+                <span>Os lembretes aparecem conforme a rotina for registrada.</span>
+              </div>
+            </li>
           </ul>
         </section>
 
@@ -108,24 +129,7 @@
         </section>
 
         <!-- v75.37: painel admin limpo, profissional e focado em convites/usuários.
-             O status principal fica no card central e a ação fica no botão principal. -->
-
-        <section class="main-action-area" aria-label="Ação principal">
-          <button id="wakeAction" class="primary-action" type="button" hidden>
-            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-            <span id="wakeActionLabel">Acordou</span>
-          </button>
-          <div id="startChoice" class="start-choice">
-            <button type="button" data-start-mode="awake">
-              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Acordou</span>
-            </button>
-            <button type="button" data-start-mode="sleeping">
-              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Iniciar soneca</span>
-            </button>
-          </div>
-        </section>
+             O revisão principal fica no card central e a ação fica no botão principal. -->
 
         <div class="quick-actions-heading">
           <span>Atalhos principais</span>
@@ -226,12 +230,20 @@
           </div>
         </section>
 
-        <section class="weekly-overview-card" aria-label="Histórico semanal rápido">
-          <div class="drawer-section-title">
-            <span>Resumo</span>
-            <strong>Últimos 7 dias</strong>
+        <section class="weekly-overview-card summary-premium-card" aria-label="Resumo da rotina por período">
+          <div class="summary-range-head">
+            <div>
+              <span>Resumo</span>
+              <strong id="summaryRangeLabel">Últimos 7 dias</strong>
+            </div>
+            <div class="summary-range-control" role="group" aria-label="Escolher período do resumo">
+              <button type="button" data-summary-range="day">Diário</button>
+              <button type="button" data-summary-range="3d">3 dias</button>
+              <button type="button" data-summary-range="7d" class="active">7 dias</button>
+            </div>
           </div>
           <div id="weeklyOverview" class="weekly-overview"></div>
+          <p id="summaryRangeHint" class="summary-range-hint">Resumo acumulado dos últimos 7 dias, com sono, mamadas, fraldas e medicamentos.</p>
         </section>
 
         <section class="day-story-card" aria-label="Como foi o dia do bebê">
@@ -309,13 +321,13 @@
           </div>
         </section>
 
-        <section class="audit-card" aria-label="Histórico de alterações">
+        <section class="audit-card" aria-label="Ajustes técnicos dos registros">
           <div class="drawer-section-title">
-            <span>Histórico de alterações</span>
-            <strong>Últimas ações</strong>
+            <span>Ajustes dos registros</span>
+            <strong>Edições e exclusões</strong>
           </div>
           <ul id="auditTrailList" class="audit-list">
-            <li>Nenhuma alteração registrada nesta data.</li>
+            <li>Nenhum ajuste técnico registrado nesta data.</li>
           </ul>
         </section>
       </section>
@@ -469,11 +481,177 @@
           <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
           <span id="profileBabyName">Bebê</span>
           <strong id="profileBabyAge">Preencha o nascimento</strong>
-          <label class="photo-button">
-            <span id="profilePhotoButtonText">Trocar foto</span>
-            <input id="profilePhotoInput" type="file" accept="image/*" />
-          </label>
+          
+          <div class="avatar-only-badge" id="profilePhotoButtonText">Avatares do bebê</div>
+          <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
+
+        <section id="profileReadyCard" class="profile-ready-card" hidden aria-live="polite">
+          <div class="profile-ready-head">
+            <span id="profileReadyKicker">Conta pronta</span>
+            <strong id="profileReadyTitle">Perfil familiar configurado.</strong>
+            <p id="profileReadyText">A entrada já está concluída. Mantivemos aqui apenas o que ajuda no uso diário.</p>
+          </div>
+          <div class="profile-ready-grid" aria-label="Resumo da conta familiar">
+            <article><span>Família</span><strong id="profileReadyFamily">Conectada</strong></article>
+            <article><span>Acesso</span><strong id="profileReadyRole">Responsável</strong></article>
+            <article><span>Aparelho</span><strong id="profileReadyDevice">Identificado</strong></article>
+          </div>
+        </section>
+
+        <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome" aria-label="Boas-vindas ao Ninou">
+          <div class="guest-welcome-top">
+            <span>Bem-vindo ao Ninou</span>
+            <strong>O diário inteligente do bebê, pronto para a família.</strong>
+            <p>Conheça uma experiência completa com rotina em tempo real, histórico por data, gráficos realistas, sons de descanso e acesso familiar.</p>
+          </div>
+
+          <div class="guest-theme-switch" aria-label="Escolha o tema inicial">
+            <span>Tema inicial</span>
+            <div>
+              <button type="button" data-theme-choice="light">☀ Claro</button>
+              <button type="button" data-theme-choice="dark">🌙 Escuro</button>
+            </div>
+          </div>
+
+          <div class="guest-benefit-grid guest-store-benefits" aria-label="Recursos do Ninou">
+            <article><b>⏱</b><small>Rotina ao vivo</small></article>
+            <article><b>☰</b><small>Diário completo</small></article>
+            <article><b>▥</b><small>Gráficos reais</small></article>
+            <article><b>♪</b><small>Sons de descanso</small></article>
+          </div>
+
+          <div class="guest-welcome-actions">
+            <button id="guestWelcomeLoginButton" type="button">Entrar</button>
+            <button id="guestWelcomeInviteButton" type="button">Tenho convite</button>
+          </div>
+        </section>
+
+        <section id="premiumTrustCard" class="premium-trust-card" aria-label="Diferenciais de confiança do Ninou">
+          <span>Segurança e acesso familiar</span>
+          <strong>Uma entrada clara e segura para cada família.</strong>
+          <p>Cada pessoa sabe quando está conhecendo o app, quando aceita um convite e quando passa a visualizar dados reais da família.</p>
+          <div class="premium-trust-grid" aria-label="Pontos de confiança">
+            <article><b>01</b><strong>Demonstração identificada</strong><small>Exemplos sinalizados, sem misturar com dados reais.</small></article>
+            <article><b>02</b><strong>Acesso por convite</strong><small>Conta conectada à família correta.</small></article>
+            <article><b>03</b><strong>Uso familiar</strong><small>Nome e vínculo em cada aparelho.</small></article>
+          </div>
+        </section>
+
+        <section id="accountJourneyCard" class="account-journey-card" aria-label="Passo a passo para começar no Ninou">
+          <div class="journey-head">
+            <span>Primeiros passos</span>
+            <strong>Do convite ao primeiro registro, sem confusão.</strong>
+            <p id="accountJourneyHint">A família envia o convite, você entra com o mesmo e-mail e o Ninou libera a rotina correta.</p>
+          </div>
+          <ol class="journey-steps" aria-label="Fluxo de acesso do usuário">
+            <li data-journey-step="invite">
+              <i>1</i>
+              <div>
+                <strong>Recebi o convite</strong>
+                <span>Código ou link enviado pelo administrador da família.</span>
+              </div>
+            </li>
+            <li data-journey-step="account">
+              <i>2</i>
+              <div>
+                <strong>Criei minha conta</strong>
+                <span>Use o mesmo e-mail que recebeu o convite.</span>
+              </div>
+            </li>
+            <li data-journey-step="family">
+              <i>3</i>
+              <div>
+                <strong>Conectei à família</strong>
+                <span>O app valida o convite e libera a rotina correta.</span>
+              </div>
+            </li>
+            <li data-journey-step="record">
+              <i>4</i>
+              <div>
+                <strong>Comecei a registrar</strong>
+                <span>Sono, mamadas, fraldas, medicamentos e dados do bebê.</span>
+              </div>
+            </li>
+          </ol>
+          <div class="journey-actions">
+            <button type="button" data-journey-action="login">Entrar agora</button>
+            <button type="button" data-journey-action="create">Criar conta</button>
+            <button type="button" data-journey-action="invite">Tenho convite</button>
+          </div>
+        </section>
+
+        <section id="postAccessCard" class="post-access-card" hidden aria-live="polite">
+          <div class="post-access-hero">
+            <span id="postAccessKicker">Conta criada</span>
+            <strong id="postAccessTitle">Agora vamos conectar você à família.</strong>
+            <p id="postAccessText">O Ninou verifica se existe convite pendente e orienta o próximo passo para liberar os dados reais.</p>
+          </div>
+          <div class="post-access-grid" aria-label="Status da conexão">
+            <article data-post-revisão="account">
+              <i>✓</i>
+              <div>
+                <strong>Conta</strong>
+                <span id="postAccessAccountStatus">Aguardando login</span>
+              </div>
+            </article>
+            <article data-post-revisão="invite">
+              <i>•</i>
+              <div>
+                <strong>Convite</strong>
+                <span id="postAccessInviteStatus">Aguardando código</span>
+              </div>
+            </article>
+            <article data-post-revisão="family">
+              <i>•</i>
+              <div>
+                <strong>Família</strong>
+                <span id="postAccessFamilyStatus">Ainda não conectada</span>
+              </div>
+            </article>
+          </div>
+          <div class="post-access-actions">
+            <button type="button" data-post-access-action="invite">Conectar convite</button>
+            <button type="button" data-post-access-action="profile">Configurar meu perfil</button>
+            <button type="button" data-post-access-action="start">Começar a acompanhar</button>
+          </div>
+        </section>
+
+        <section id="dataRealityCard" class="data-reality-card" aria-live="polite">
+          <span id="dataRealityKicker">Demonstração</span>
+          <strong id="dataRealityTitle">Você está vendo uma prévia do Ninou.</strong>
+          <p id="dataRealityText">Os cards e gráficos fora do Perfil usam dados fictícios até uma conta familiar ser conectada.</p>
+        </section>
+
+        <section id="firstUseVerificaçãoCard" class="first-use-checklist-card" hidden aria-label="Primeira configuração guiada">
+          <div class="first-use-head">
+            <span>Primeiro uso</span>
+            <strong>Verificação para começar com segurança</strong>
+            <p>Finalize estes pontos para que os registros apareçam com o nome correto e a rotina fique clara para toda a família.</p>
+          </div>
+          <ol class="first-use-list">
+            <li data-first-use-step="identity">
+              <i>1</i>
+              <div><strong>Definir meu nome no app</strong><span>Ex.: Luiz, Maria, Papai ou Mamãe.</span></div>
+            </li>
+            <li data-first-use-step="relation">
+              <i>2</i>
+              <div><strong>Escolher meu vínculo</strong><span>Pai, mãe, avó, babá ou responsável.</span></div>
+            </li>
+            <li data-first-use-step="theme">
+              <i>3</i>
+              <div><strong>Confirmar tema</strong><span>Claro ou escuro, conforme preferência.</span></div>
+            </li>
+            <li data-first-use-step="routine">
+              <i>4</i>
+              <div><strong>Conhecer os registros</strong><span>Sono, mamadas, fraldas, medicamentos e diário.</span></div>
+            </li>
+          </ol>
+          <div class="first-use-actions">
+            <button type="button" data-post-access-action="profile">Configurar identificação</button>
+            <button type="button" data-post-access-action="start">Ver rotina</button>
+          </div>
+        </section>
         <section class="settings-list">
           <article class="baby-profile-card">
             <span>Perfil do bebê</span>
@@ -494,16 +672,58 @@
               <input id="babyBirthInput" type="date" />
             </label>
           </article>
+          <article class="avatar-test-card avatar-compact-card" id="babyAvatarTestCard">
+            <div class="avatar-test-header avatar-minimal-header">
+              <div class="avatar-copy-column compact-copy">
+                <span>Avatar do bebê</span>
+                <strong>Avatares do bebê</strong>
+                <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do bebê">
+                  <span>12 opções</span>
+                  <span>Privado</span>
+                </div>
+              </div>
+              <div class="avatar-preview-wrap avatar-preview-panel minimal-preview-panel">
+                <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
+                <div class="avatar-preview-caption minimal-caption">Prévia</div>
+              </div>
+            </div>
+            <section class="avatar-picker-section" data-avatar-section="hair">
+              <strong>Avatares disponíveis</strong>
+              <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="hair-color">
+              <strong hidden>Cor do cabelo</strong>
+              <div class="avatar-option-row" id="avatarHairColorOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="skin">
+              <strong hidden>Tom de pele</strong>
+              <div class="avatar-option-row" id="avatarSkinOptions"></div>
+            </section>
+            <section class="avatar-picker-section" data-avatar-section="background">
+              <strong hidden>Cor de fundo</strong>
+              <div class="avatar-option-row" id="avatarColorOptions"></div>
+            </section>
+            <div class="avatar-hidden-options" aria-hidden="true">
+              <div id="avatarBackgroundOptions"></div>
+              <div id="avatarAccessoryOptions"></div>
+            </div>
+            <div class="avatar-editor-actions">
+              <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">Salvar</button>
+              <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
+            </div>
+            <p id="babyAvatarStatus" class="form-status">Escolha um avatar e salve. Depois o editor fica oculto.</p>
+          </article>
+
           <article class="appearance-profile-block">
             <span>Aparência</span>
             <strong>Tema do app</strong>
-            <p>Escolha se o Ninou muda sozinho conforme o horário ou se fica sempre claro/escuro.</p>
+            <p id="themeModeHelper">Escolha claro, escuro ou automático. No modo automático, o Ninou fica claro durante o dia e escuro à noite.</p>
             <label>
               Modo de visual
               <select id="themeModeInput">
-                <option value="auto">Automático — dia/noite</option>
                 <option value="light">Claro</option>
                 <option value="dark">Escuro</option>
+                <option value="auto">Automático — claro de dia, escuro à noite</option>
               </select>
             </label>
           </article>
@@ -545,31 +765,38 @@
             </div>
           </article>
 
+          <article class="privacy-note-card">
+            <span>Privacidade</span>
+            <strong>Dados familiares e avatar sem foto real</strong>
+            <p>Os dados do bebê ficam vinculados à família autorizada. O Ninou usa avatares locais e não depende de armazenamento externo de foto real.</p>
+          </article>
+
           <article class="caregiver-profile-block" id="caregiverIdentityCard">
-            <span>Quem está registrando</span>
-            <strong>Identificação nos registros</strong>
-            <p>Use seu nome ou vínculo para o diário mostrar “Adicionado por Pai”, “Mãe” ou pelo seu nome, em vez do nome do bebê.</p>
+            <span>Registros deste aparelho</span>
+            <strong>Como meus registros aparecem</strong>
+            <p>Essa configuração não altera sua permissão de Admin. Ela serve apenas para identificar os registros feitos neste aparelho no diário da família.</p>
             <label>
-              Seu nome no app
+              Nome exibido nos registros
               <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />
             </label>
             <label>
-              Seu vínculo
+              Vínculo exibido nos registros
               <select id="caregiverRelationInput">
                 <option value="">Escolher depois</option>
                 <option value="pai">Pai</option>
                 <option value="mae">Mãe</option>
-                <option value="avo">Avó/avô</option>
-                <option value="cuidador">Cuidador(a)</option>
+                <option value="avo">Avó</option>
+                <option value="avo_masculino">Avô</option>
+                <option value="baba">Babá</option>
                 <option value="responsavel">Responsável</option>
                 <option value="outro">Familiar</option>
               </select>
             </label>
-            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar identificação</button>
-            <p id="caregiverIdentityStatus" class="form-status">Usaremos essa identificação nos próximos registros.</p>
+            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar como vou aparecer</button>
+            <p id="caregiverIdentityStatus" class="form-status">Admin é permissão do sistema. Pai, mãe ou cuidador é apenas como seus registros aparecem.</p>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
-            <span>Painel admin</span>
+            <span>Acesso familiar</span>
             <strong id="familyAccessTitle">Convites e permissões</strong>
             <p id="familyAccessText">Somente o administrador do app pode gerar convites. Pessoas convidadas acessam com e-mail e senha próprios.</p>
             <div class="access-status-row">
@@ -594,10 +821,40 @@
               <section class="admin-clean-hero" aria-live="polite">
                 <div>
                   <span>Admin do app</span>
-                  <strong>Painel admin</strong>
-                  <p>Gerencie sua conta, famílias, membros, convites, migrações e diagnósticos com dados familiares carregados apenas sob demanda.</p>
+                  <strong>Painel de administração</strong>
+                  <p>Gerencie famílias, membros e convites de forma objetiva. Informações técnicas ficam recolhidas para não expor dados sem necessidade.</p>
                 </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
+              </section>
+
+              <section id="adminFlowGuide" class="admin-flow-guide admin-clean-section" aria-label="Organização do acesso familiar">
+                <div class="admin-invite-header">
+                  <strong>Organização do acesso familiar</strong>
+                  <em>Use esta área apenas quando precisar criar família, enviar convite ou revisar acessos.</em>
+                </div>
+                <ol class="admin-flow-steps">
+                  <li>
+                    <i>1</i>
+                    <div><strong>Criar ou selecionar família</strong><span>Defina a família/cliente antes de gerar qualquer convite.</span></div>
+                  </li>
+                  <li>
+                    <i>2</i>
+                    <div><strong>Gerar convite pelo e-mail correto</strong><span>O convidado deve usar o mesmo e-mail ao criar a conta.</span></div>
+                  </li>
+                  <li>
+                    <i>3</i>
+                    <div><strong>Enviar código ou link</strong><span>Compartilhe por WhatsApp, e-mail ou mensagem direta.</span></div>
+                  </li>
+                  <li>
+                    <i>4</i>
+                    <div><strong>Acompanhar aceitação</strong><span>Depois de aceito, a pessoa aparece como membro da família.</span></div>
+                  </li>
+                </ol>
+                <div class="admin-flow-actions">
+                  <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="invite">Gerar convite</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="members">Ver membros</button>
+                </div>
               </section>
 
               <section class="admin-stats-card admin-clean-section" aria-live="polite">
@@ -609,14 +866,14 @@
                 </div>
                 <div class="admin-stats-grid admin-health-grid">
                   <article>
-                    <span>Famílias</span>
+                    <span>Famílias cadastradas</span>
                     <strong id="adminFamiliesCount">--</strong>
                     <small>clientes cadastrados</small>
                   </article>
                   <article>
-                    <span>Usuários</span>
+                    <span>Contas</span>
                     <strong id="adminKnownUsersStat">--</strong>
-                    <small>encontrados no banco</small>
+                    <small>com e-mail válido</small>
                   </article>
                   <article>
                     <span>Convites pendentes</span>
@@ -624,18 +881,18 @@
                     <small>família selecionada</small>
                   </article>
                   <article>
-                    <span>Última migração</span>
+                    <span>Dados antigos</span>
                     <strong id="adminLastMigrationStatus">--</strong>
-                    <small>status</small>
+                    <small>revisão</small>
                   </article>
                 </div>
-                <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar os usuários autorizados.</p>
+                <p id="adminStatsHint" class="admin-stats-hint">Entre como admin para visualizar famílias, membros e convites.</p>
               </section>
 
               <section id="adminCreateFamilySection" class="admin-clean-section admin-create-family-card">
                 <div class="admin-invite-header">
-                  <strong>Criar família/cliente</strong>
-                  <em>Use quando uma pessoa vai acessar o Ninou pela primeira vez e ainda não pertence a nenhuma família.</em>
+                  <strong>Criar família</strong>
+                  <em>Use para preparar o acesso de uma nova família antes de enviar convites.</em>
                 </div>
                 <div class="admin-form-grid admin-create-family-grid">
                   <label>
@@ -658,15 +915,15 @@
                     <input id="adminNewResponsibleEmailInput" type="email" placeholder="responsavel@email.com" autocomplete="off" />
                   </label>
                 </div>
-                <p class="admin-section-note">Ao criar, o painel seleciona a nova família. Se houver e-mail, um convite de responsável é gerado para essa família.</p>
-                <button id="adminCreateClientFamilyButton" type="button">Criar família/cliente</button>
+                <p class="admin-section-note">Após criar, selecione a família e envie convites somente para os e-mails autorizados.</p>
+                <button id="adminCreateClientFamilyButton" type="button">Criar família</button>
                 <div id="adminCreateFamilyResult" class="invite-result admin-create-family-result" hidden></div>
               </section>
 
               <section class="admin-clean-section admin-family-client-card">
                 <div class="admin-invite-header">
-                  <strong>Famílias</strong>
-                  <em>Selecione uma família para visualizar, convidar, migrar ou dar suporte. O admin não vira membro.</em>
+                  <strong>Famílias cadastradas</strong>
+                  <em>Selecione uma família apenas quando precisar convidar membros, revisar acesso ou prestar suporte.</em>
                 </div>
                 <ul id="adminClientsList" class="admin-access-list admin-clients-list">
                   <li>Atualize o painel para ver as famílias disponíveis.</li>
@@ -677,43 +934,44 @@
                   <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
                   <button class="secondary-login" type="button" data-admin-scroll="members">Gerenciar membros</button>
                   <button class="secondary-login" type="button" data-admin-scroll="invite">Criar convite</button>
-                  <button class="secondary-login" type="button" data-admin-scroll="migration">Migrar dados</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="migration">Revisar migração</button>
                 </div>
               </section>
 
-              <section id="adminMigrationSection" class="admin-clean-section admin-migration-card">
+              <details id="adminMigrationSection" class="admin-clean-section admin-migration-card admin-maintenance-section">
+                <summary>Revisão técnica de dados antigos</summary>
                 <div class="admin-invite-header">
-                  <strong>Migração de dados</strong>
-                  <em>Copie dados antigos para a família selecionada. A origem só é carregada quando você busca por e-mail ou UID.</em>
+                  <strong>Revisão de dados antigos</strong>
+                  <em>Área técnica recolhida. Use somente para recuperar dados antigos de uma conta específica, após confirmar a família correta.</em>
                 </div>
-                <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID para migrar uma origem específica.</p>
+                <p id="adminMigrationStatus" class="admin-migration-status">Nenhuma busca iniciada. Informe e-mail ou UID somente quando precisar recuperar uma origem específica.</p>
                 <ul id="adminMigrationSources" class="admin-access-list admin-migration-list">
-                  <li>Use Buscar por e-mail ou Buscar por UID para carregar somente a origem desejada.</li>
+                  <li>Busque por e-mail ou UID para carregar somente a origem confirmada.</li>
                 </ul>
                 <div id="adminMigrationChecklist" class="admin-migration-checklist" aria-live="polite">
-                  <span>Checklist</span>
+                  <span>Verificação</span>
                   <ul>
                     <li><strong>Aguardando busca</strong><small>O diagnóstico aparece antes e depois da migração.</small></li>
                   </ul>
                 </div>
                 <div class="admin-manual-migration">
                   <label>
-                    E-mail da conta antiga
-                    <input id="adminMigrationEmailInput" type="email" placeholder="Ex.: francisco@gmail.com" autocomplete="off" />
+                    E-mail antigo confirmado
+                    <input id="adminMigrationEmailInput" type="email" placeholder="Ex.: responsavel@email.com" autocomplete="off" />
                   </label>
                   <button id="scanLegacyEmailButton" class="secondary-login" type="button">Buscar por e-mail</button>
-                  <small>Use primeiro esta opção quando souber o e-mail antigo. Ela prioriza exatamente essa conta na migração.</small>
+                  <small>Use esta opção apenas quando o e-mail antigo foi confirmado com a família.</small>
                 </div>
                 <div class="admin-manual-migration">
                   <label>
-                    UID da conta antiga, se souber
+                    UID antigo, se necessário
                     <input id="adminMigrationUidInput" type="text" placeholder="Cole o UID antigo do Firebase" autocomplete="off" />
                   </label>
                   <button id="scanLegacyUidButton" class="secondary-login" type="button">Buscar por UID</button>
-                  <small>Use quando os dados aparecem em users/{uid}/activities, mas a busca por e-mail não encontra.</small>
+                  <small>Use somente quando a busca por e-mail não encontrar a origem correta.</small>
                 </div>
                 <button id="restoreFamilyDataButton" class="secondary-login" type="button" hidden>Migrar dados encontrados</button>
-              </section>
+              </details>
 
               <section id="adminInviteSection" class="admin-clean-section admin-create-invite-card">
                 <div class="admin-invite-header">
@@ -739,6 +997,11 @@
                 </div>
                 <button id="createInviteButton" type="button">Gerar convite</button>
                 <div id="inviteResult" class="invite-result" hidden></div>
+                <div id="adminInviteMessagePreview" class="invite-message-preview" aria-label="Mensagem sugerida para convite">
+                  <span>Mensagem pronta para WhatsApp</span>
+                  <p>Você foi convidado para acompanhar a rotina do bebê no Ninou. Crie sua conta com o mesmo e-mail do convite e use o código/link enviado pelo administrador.</p>
+                  <small>Depois de gerar o convite, o Ninou monta a mensagem com link, código e permissão.</small>
+                </div>
               </section>
 
               <section class="admin-clean-section admin-list-section">
@@ -771,15 +1034,16 @@
                 </ul>
               </section>
 
-              <section class="admin-clean-section admin-list-section admin-users-section">
+              <details class="admin-clean-section admin-list-section admin-users-section admin-maintenance-section">
+                <summary>Revisão técnica de contas</summary>
                 <div class="admin-invite-header">
-                  <strong>Usuários encontrados no banco</strong>
-                  <em>Contas localizadas no Firestore. Crie uma família para usuários novos ou vincule a uma família existente.</em>
+                  <strong>Contas para revisão</strong>
+                  <em>Lista técnica com contas válidas por e-mail. Itens incompletos ou duplicados ficam ocultos para manter o painel limpo.</em>
                 </div>
                 <ul id="adminKnownUsersList" class="admin-access-list">
-                  <li>Atualize o painel para localizar usuários cadastrados.</li>
+                  <li>Atualize o painel para revisar contas com e-mail válido.</li>
                 </ul>
-              </section>
+              </details>
 
               <div class="invite-list-box admin-local-invites" hidden>
                 <span>Convites recentes neste aparelho</span>
@@ -836,7 +1100,7 @@
 
             <div class="export-personal-message">
               <label for="whatsappMessageInput">Mensagem personalizada</label>
-              <textarea id="whatsappMessageInput" rows="4" placeholder="Ex.: Oi, segue o resumo da rotina do Francisco para acompanhar a consulta."></textarea>
+              <textarea id="whatsappMessageInput" rows="4" placeholder="Ex.: Oi, segue o resumo da rotina do bebê para acompanhar a consulta."></textarea>
               <small>O resumo do Ninou será incluído abaixo da sua mensagem.</small>
             </div>
 
@@ -859,13 +1123,26 @@
       <button class="fab icon-button-add" type="button" data-open-sheet="sono" aria-label="Novo registro"></button>
 
       <nav class="bottom-nav" aria-label="Menu principal">
-        <button class="active" type="button" data-target="today">⌂<span>Hoje</span></button>
-        <button type="button" data-target="diary">≡<span>Diário</span></button>
-        <button type="button" data-target="trends">▥<span>Dados</span></button>
-        <button type="button" data-target="sounds">♪<span>Sons</span></button>
-        <button type="button" data-target="profile">○<span>Perfil</span></button>
+        <button class="active" type="button" data-target="today"><span class="nav-symbol" aria-hidden="true">⌂</span><span>Hoje</span></button>
+        <button type="button" data-target="diary"><span class="nav-symbol" aria-hidden="true">☰</span><span>Diário</span></button>
+        <button type="button" data-target="trends"><span class="nav-symbol" aria-hidden="true">▥</span><span>Dados</span></button>
+        <button type="button" data-target="sounds"><span class="nav-symbol" aria-hidden="true">♪</span><span>Sons</span></button>
+        <button type="button" data-target="profile"><span class="nav-symbol" aria-hidden="true">○</span><span>Perfil</span></button>
       </nav>
     </main>
+
+    <section id="guestOnboardingModal" class="guest-login-modal" aria-label="Entrar no Ninou" hidden>
+      <div class="guest-login-dialog" role="dialog" aria-modal="true" aria-labelledby="guestLoginTitle">
+        <button id="guestModalCloseButton" class="guest-modal-close" type="button" aria-label="Fechar">×</button>
+        <span>Conta familiar</span>
+        <strong id="guestLoginTitle">Entre para salvar a rotina</strong>
+        <p>Os registros ficam seguros na família e podem ser acompanhados em mais de um celular.</p>
+        <div class="guest-modal-actions">
+          <button id="guestModalLoginButton" type="button">Entrar agora</button>
+          <button id="guestModalInviteButton" type="button">Usar convite</button>
+        </div>
+      </div>
+    </section>
 
     <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
     <section id="recordSheet" class="record-sheet" aria-label="Novo registro" hidden>
@@ -961,6 +1238,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.37"></script>
+    <script type="module" src="./app.js?v=75.56.7.16"></script>
   </body>
 </html>
