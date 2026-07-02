@@ -116,6 +116,9 @@ export function getEventRenderSignature(event, options = {}) {
     event.createdByEmail || "",
     event.createdByName || "",
     event.createdByRelationship || "",
+    event.caregiverName || "",
+    event.caregiverRelationship || "",
+    event.caregiverLabel || "",
     event.updatedByEmail || "",
     event.updatedByName || "",
     event.updatedByRelationship || "",
@@ -148,6 +151,9 @@ function sanitizeAuthorLabel(value = "", babyName = "") {
 function getEventAuthorLabel(event = {}) {
   const babyName = String(globalThis.window?.__ninouCurrentBabyName || "").trim().toLowerCase();
   const candidates = [
+    event.caregiverLabel,
+    [event.caregiverName, event.caregiverRelationship].filter(Boolean).join(" · "),
+    [event.createdByName, event.createdByRelationship].filter(Boolean).join(" · "),
     event.createdByName,
     event.createdByRelationship,
     event.authorName,

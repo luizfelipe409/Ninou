@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-56-7-16-identidade-admin-tema-auto";
+const CACHE_NAME = "ninou-v75-57-1-perfil-familiar-horario";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.56.7.16",
-  "/css/app.legacy.css?v=75.56.7.16",
-  "/app.js?v=75.56.7.16",
-  "/js/app.legacy.js?v=75.56.7.16",
+  "/styles.css?v=75.57.1",
+  "/css/app.legacy.css?v=75.57.1",
+  "/app.js?v=75.57.1",
+  "/js/app.legacy.js?v=75.57.1",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

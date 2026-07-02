@@ -1,3 +1,5 @@
+import { parseDateTimeInputValue } from "../utils/time.js";
+
 export function buildManualEventPayload({
   type,
   editingEventId,
@@ -7,8 +9,8 @@ export function buildManualEventPayload({
   getDetailValue,
   now = Date.now(),
 }) {
-  const start = dateInput?.value ? new Date(dateInput.value).getTime() : now;
-  const rawEnd = endInput?.value ? new Date(endInput.value).getTime() : null;
+  const start = dateInput?.value ? parseDateTimeInputValue(dateInput.value, now) : now;
+  const rawEnd = endInput?.value ? parseDateTimeInputValue(endInput.value, null) : null;
   const hasManualEnd = Number.isFinite(rawEnd);
 
   return {

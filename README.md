@@ -451,3 +451,15 @@ Correções aplicadas antes de publicação:
 - O tema **Automático** voltou ao seletor do Perfil: claro durante o dia e escuro à noite.
 - A escolha inicial da demonstração continua simples, com apenas **Claro** e **Escuro**.
 - Corrigidas classes visuais de status para manter a padronização do layout.
+
+
+## Ninou v75.57.1
+
+Pacote consolidado com Perfil Familiar + Convite de Cuidador e correção de horário cross-browser.
+
+- Versão/cache: `75.57.1`.
+- Fuso fixo do app: `America/Sao_Paulo`.
+- `datetime-local` agora é interpretado manualmente, evitando diferenças entre Chrome/Safari/iPhone.
+- Perfil inclui cards de bebê, cuidador neste aparelho, família, convite, configurações e suporte.
+- Registros novos carregam `caregiverName`, `caregiverRelationship`, `caregiverLabel`, `createdByUid` e `createdAtClient`.
+- Tema do Perfil foi reduzido para Claro/Escuro.

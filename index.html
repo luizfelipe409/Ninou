@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.56.7.16" />
+    <link rel="stylesheet" href="./styles.css?v=75.57.1" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -486,6 +486,167 @@
           <button id="editBabyAvatarButton" class="avatar-edit-trigger" type="button">Editar avatar</button>
         </div>
 
+        <section class="profile-family-stack" aria-label="Perfil familiar Ninou">
+          <article class="profile-family-card baby-card">
+            <div class="profile-card-head">
+              <div>
+                <span>Bebê</span>
+                <strong id="familyProfileBabyName">Francisco</strong>
+              </div>
+              <button class="ghost-link" type="button" data-profile-action="edit-baby">Editar bebê</button>
+            </div>
+            <p id="familyProfileBabyMeta">Nascimento não preenchido</p>
+            <div class="profile-soft-row">
+              <span>Janela de sono</span>
+              <strong id="familyWakeWindowLabel">70 min</strong>
+            </div>
+            <div class="profile-soft-row">
+              <span>Unidade de peso</span>
+              <strong id="familyWeightUnitLabel">kg</strong>
+            </div>
+          </article>
+
+          <article class="profile-family-card caregiver-card" id="caregiverIdentityCard">
+            <div class="profile-card-head">
+              <div>
+                <span>Cuidador neste aparelho</span>
+                <strong id="deviceCaregiverName">Não configurado</strong>
+              </div>
+              <div id="deviceCaregiverAvatar" class="caregiver-avatar-mini" aria-hidden="true">👤</div>
+            </div>
+            <p id="deviceCaregiverHint">As ações deste aparelho serão registradas com este cuidador.</p>
+            <button id="editCaregiverButton" class="profile-primary-button" type="button">Editar cuidador</button>
+            <p id="caregiverIdentityStatus" class="form-status">Pai, mãe ou cuidador é apenas como seus registros aparecem.</p>
+          </article>
+
+          <article class="profile-family-card family-card">
+            <div class="profile-card-head">
+              <div>
+                <span>Família Ninou</span>
+                <strong id="familyNameLabel">Família do Francisco</strong>
+              </div>
+            </div>
+            <div class="profile-soft-row">
+              <span>Conta familiar</span>
+              <strong id="familyAccountLabel">Conta não conectada</strong>
+            </div>
+            <div class="profile-soft-row">
+              <span>Tipo de acesso</span>
+              <strong id="familyAccessTypeLabel">Familiar</strong>
+            </div>
+          </article>
+
+          <article class="profile-family-card invite-card">
+            <div class="profile-card-head">
+              <div>
+                <span>Compartilhamento de acesso</span>
+                <strong>Convite de cuidador</strong>
+              </div>
+            </div>
+            <p>Compartilhe um código para outro cuidador acompanhar a rotina do Francisco.</p>
+            <div id="familyActiveInviteBox" class="active-invite-box" hidden>
+              <span>Código ativo</span>
+              <strong id="familyActiveInviteCode">—</strong>
+              <small id="familyActiveInviteHint">Expira em 7 dias</small>
+            </div>
+            <div class="profile-actions-row">
+              <button id="familyCreateInviteButton" class="profile-primary-button" type="button">Convidar cuidador</button>
+              <button id="familyJoinInviteButton" class="profile-secondary-button" type="button">Entrar com código</button>
+            </div>
+            <div class="profile-actions-row" id="familyInviteShareActions" hidden>
+              <button id="familyCopyInviteButton" class="profile-secondary-button" type="button">Copiar código</button>
+              <button id="familyShareInviteWhatsAppButton" class="profile-secondary-button" type="button">WhatsApp</button>
+            </div>
+          </article>
+
+          <article class="profile-family-card settings-card">
+            <div class="profile-card-head">
+              <div>
+                <span>Configurações</span>
+                <strong>Preferências</strong>
+              </div>
+            </div>
+            <div class="profile-soft-row">
+              <span>Tema</span>
+              <strong id="familyThemeLabel">Claro/Escuro</strong>
+            </div>
+            <div class="profile-soft-row">
+              <span>Notificações</span>
+              <strong id="familyNotificationLabel">Preferências salvas</strong>
+            </div>
+          </article>
+
+          <article class="profile-family-card support-card">
+            <div class="profile-card-head">
+              <div>
+                <span>Ajuda e suporte</span>
+                <strong>Fale com o Ninou</strong>
+              </div>
+            </div>
+            <div class="profile-actions-row">
+              <button id="supportSuggestionButton" class="profile-secondary-button" type="button">Enviar sugestão</button>
+              <button id="supportBugButton" class="profile-secondary-button" type="button">Reportar problema</button>
+            </div>
+          </article>
+        </section>
+
+        <div id="caregiverIdentityEditorModal" class="ninou-modal" hidden aria-hidden="true">
+          <div class="ninou-modal-backdrop" data-close-caregiver-modal></div>
+          <section class="ninou-modal-card" role="dialog" aria-modal="true" aria-labelledby="caregiverModalTitle">
+            <div class="profile-card-head">
+              <div>
+                <span>Identificação local</span>
+                <strong id="caregiverModalTitle">Editar cuidador</strong>
+              </div>
+              <button class="modal-close-button" type="button" data-close-caregiver-modal>×</button>
+            </div>
+            <label class="profile-setting-line">
+              Nome do cuidador
+              <input id="caregiverNameInput" type="text" placeholder="Ex.: Felipe" autocomplete="name" />
+            </label>
+            <label class="profile-setting-line">
+              Vínculo com o bebê
+              <select id="caregiverRelationInput">
+                <option value="pai">Pai</option>
+                <option value="mae">Mãe</option>
+                <option value="avo">Avó</option>
+                <option value="avo_masculino">Avô</option>
+                <option value="baba">Babá</option>
+                <option value="cuidador">Cuidador(a)</option>
+                <option value="responsavel">Responsável</option>
+                <option value="outro">Outro familiar</option>
+              </select>
+            </label>
+            <div class="profile-actions-row">
+              <button id="saveCaregiverIdentityButton" class="profile-primary-button" type="button">Salvar cuidador</button>
+              <button class="profile-secondary-button" type="button" data-close-caregiver-modal>Cancelar</button>
+            </div>
+          </section>
+        </div>
+
+        <div id="joinFamilyModal" class="ninou-modal" hidden aria-hidden="true">
+          <div class="ninou-modal-backdrop" data-close-join-modal></div>
+          <section class="ninou-modal-card" role="dialog" aria-modal="true" aria-labelledby="joinFamilyModalTitle">
+            <div class="profile-card-head">
+              <div>
+                <span>Compartilhamento</span>
+                <strong id="joinFamilyModalTitle">Entrar em uma família</strong>
+              </div>
+              <button class="modal-close-button" type="button" data-close-join-modal>×</button>
+            </div>
+            <p>Digite o código recebido para acompanhar a rotina do bebê.</p>
+            <label class="profile-setting-line">
+              Código do convite
+              <input id="joinInviteCodeInput" type="text" placeholder="FRA7K2B9" inputmode="text" autocomplete="one-time-code" />
+            </label>
+            <p id="joinInviteFeedback" class="modal-feedback" aria-live="polite"></p>
+            <div class="profile-actions-row">
+              <button id="confirmJoinInviteButton" class="profile-primary-button" type="button">Entrar na família</button>
+              <button class="profile-secondary-button" type="button" data-close-join-modal>Cancelar</button>
+            </div>
+          </section>
+        </div>
+
         <section id="profileReadyCard" class="profile-ready-card" hidden aria-live="polite">
           <div class="profile-ready-head">
             <span id="profileReadyKicker">Conta pronta</span>
@@ -717,13 +878,12 @@
           <article class="appearance-profile-block">
             <span>Aparência</span>
             <strong>Tema do app</strong>
-            <p id="themeModeHelper">Escolha claro, escuro ou automático. No modo automático, o Ninou fica claro durante o dia e escuro à noite.</p>
+            <p id="themeModeHelper">Escolha entre claro e escuro. O Ninou manterá sua preferência salva.</p>
             <label>
               Modo de visual
               <select id="themeModeInput">
                 <option value="light">Claro</option>
                 <option value="dark">Escuro</option>
-                <option value="auto">Automático — claro de dia, escuro à noite</option>
               </select>
             </label>
           </article>
@@ -769,31 +929,6 @@
             <span>Privacidade</span>
             <strong>Dados familiares e avatar sem foto real</strong>
             <p>Os dados do bebê ficam vinculados à família autorizada. O Ninou usa avatares locais e não depende de armazenamento externo de foto real.</p>
-          </article>
-
-          <article class="caregiver-profile-block" id="caregiverIdentityCard">
-            <span>Registros deste aparelho</span>
-            <strong>Como meus registros aparecem</strong>
-            <p>Essa configuração não altera sua permissão de Admin. Ela serve apenas para identificar os registros feitos neste aparelho no diário da família.</p>
-            <label>
-              Nome exibido nos registros
-              <input id="caregiverNameInput" type="text" placeholder="Ex.: Luiz, Maria, Papai" autocomplete="name" />
-            </label>
-            <label>
-              Vínculo exibido nos registros
-              <select id="caregiverRelationInput">
-                <option value="">Escolher depois</option>
-                <option value="pai">Pai</option>
-                <option value="mae">Mãe</option>
-                <option value="avo">Avó</option>
-                <option value="avo_masculino">Avô</option>
-                <option value="baba">Babá</option>
-                <option value="responsavel">Responsável</option>
-                <option value="outro">Familiar</option>
-              </select>
-            </label>
-            <button id="saveCaregiverIdentityButton" class="secondary-login" type="button">Salvar como vou aparecer</button>
-            <p id="caregiverIdentityStatus" class="form-status">Admin é permissão do sistema. Pai, mãe ou cuidador é apenas como seus registros aparecem.</p>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Acesso familiar</span>
@@ -1238,6 +1373,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.56.7.16"></script>
+    <script type="module" src="./app.js?v=75.57.1"></script>
   </body>
 </html>

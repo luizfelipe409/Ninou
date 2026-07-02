@@ -115,6 +115,34 @@ const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
 const caregiverNameInput = document.querySelector("#caregiverNameInput");
 const caregiverRelationInput = document.querySelector("#caregiverRelationInput");
 const saveCaregiverIdentityButton = document.querySelector("#saveCaregiverIdentityButton");
+const editCaregiverButton = document.querySelector("#editCaregiverButton");
+const caregiverIdentityEditorModal = document.querySelector("#caregiverIdentityEditorModal");
+const deviceCaregiverName = document.querySelector("#deviceCaregiverName");
+const deviceCaregiverAvatar = document.querySelector("#deviceCaregiverAvatar");
+const deviceCaregiverHint = document.querySelector("#deviceCaregiverHint");
+const familyProfileBabyName = document.querySelector("#familyProfileBabyName");
+const familyProfileBabyMeta = document.querySelector("#familyProfileBabyMeta");
+const familyWakeWindowLabel = document.querySelector("#familyWakeWindowLabel");
+const familyWeightUnitLabel = document.querySelector("#familyWeightUnitLabel");
+const familyNameLabel = document.querySelector("#familyNameLabel");
+const familyAccountLabel = document.querySelector("#familyAccountLabel");
+const familyAccessTypeLabel = document.querySelector("#familyAccessTypeLabel");
+const familyThemeLabel = document.querySelector("#familyThemeLabel");
+const familyNotificationLabel = document.querySelector("#familyNotificationLabel");
+const familyCreateInviteButton = document.querySelector("#familyCreateInviteButton");
+const familyJoinInviteButton = document.querySelector("#familyJoinInviteButton");
+const familyActiveInviteBox = document.querySelector("#familyActiveInviteBox");
+const familyActiveInviteCode = document.querySelector("#familyActiveInviteCode");
+const familyActiveInviteHint = document.querySelector("#familyActiveInviteHint");
+const familyInviteShareActions = document.querySelector("#familyInviteShareActions");
+const familyCopyInviteButton = document.querySelector("#familyCopyInviteButton");
+const familyShareInviteWhatsAppButton = document.querySelector("#familyShareInviteWhatsAppButton");
+const joinFamilyModal = document.querySelector("#joinFamilyModal");
+const joinInviteCodeInput = document.querySelector("#joinInviteCodeInput");
+const joinInviteFeedback = document.querySelector("#joinInviteFeedback");
+const confirmJoinInviteButton = document.querySelector("#confirmJoinInviteButton");
+const supportSuggestionButton = document.querySelector("#supportSuggestionButton");
+const supportBugButton = document.querySelector("#supportBugButton");
 const caregiverIdentityStatus = document.querySelector("#caregiverIdentityStatus");
 const familyAccessCard = document.querySelector("#familyAccessCard");
 const familyAccessKicker = document.querySelector("#familyAccessCard > span");
@@ -1613,7 +1641,7 @@ function getCurrentActorProfile() {
   const isPrimaryAdmin = isGlobalAdminEmail(email);
   const displayName = storedName || (isPrimaryAdmin ? "Luiz Felipe" : "");
   const relationshipLabel = storedRelationshipLabel || (isPrimaryAdmin ? "Pai" : "");
-  const label = displayName || relationshipLabel || getFallbackActorNameFromEmail(email);
+  const label = [displayName, relationshipLabel].filter(Boolean).join(" · ") || getFallbackActorNameFromEmail(email);
   const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
   return {
     uid: getCurrentActorUid(),
@@ -1746,6 +1774,54 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   return true;
 }
 
+function getCaregiverEmoji(relation = "") {
+  const value = String(relation || "").trim();
+  if (value === "pai") return "👨‍🍼";
+  if (value === "mae") return "👩‍🍼";
+  if (value === "avo" || value === "avo_masculino") return value === "avo" ? "👵" : "👴";
+  if (value === "baba" || value === "cuidador") return "🧑‍🍼";
+  return "👤";
+}
+
+function renderProfileFamilyCards() {
+  const identity = loadCurrentCaregiverIdentity();
+  const caregiverLabel = identity.label || "Não configurado";
+  const ageText = getBabyAgeText();
+  if (familyProfileBabyName) familyProfileBabyName.textContent = getBabyDisplayName() || "Francisco";
+  if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = ageText.profile || "Nascimento não preenchido";
+  if (familyWakeWindowLabel) familyWakeWindowLabel.textContent = `${wakeWindowMinutes || 70} min`;
+  if (familyWeightUnitLabel) familyWeightUnitLabel.textContent = "kg";
+  if (deviceCaregiverName) deviceCaregiverName.textContent = caregiverLabel;
+  if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = getCaregiverEmoji(identity.relation);
+  if (deviceCaregiverHint) {
+    deviceCaregiverHint.textContent = identity.label
+      ? `As ações deste aparelho serão registradas como ${identity.label}.`
+      : "Escolha quem está usando este aparelho para os registros ficarem corretos.";
+  }
+  if (familyNameLabel) familyNameLabel.textContent = "Família do Francisco";
+  if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || familyAccess?.email || "Conta não conectada";
+  if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = getRoleLabel(familyAccess?.role || "responsavel");
+  if (familyThemeLabel) familyThemeLabel.textContent = (themeModeInput?.value || babyProfile?.themeMode || "dark") === "light" ? "Claro" : "Escuro";
+  if (familyNotificationLabel) familyNotificationLabel.textContent = "Preferências salvas";
+  renderFamilyActiveInvite();
+}
+
+function openCaregiverEditor() {
+  renderCaregiverIdentityPanel();
+  if (caregiverIdentityEditorModal) {
+    caregiverIdentityEditorModal.hidden = false;
+    caregiverIdentityEditorModal.setAttribute("aria-hidden", "false");
+  }
+  setTimeout(() => caregiverNameInput?.focus(), 50);
+}
+
+function closeCaregiverEditor() {
+  if (caregiverIdentityEditorModal) {
+    caregiverIdentityEditorModal.hidden = true;
+    caregiverIdentityEditorModal.setAttribute("aria-hidden", "true");
+  }
+}
+
 function renderCaregiverIdentityPanel() {
   if (!caregiverIdentityCard) return;
   const logged = Boolean(cloudUser);
@@ -1756,15 +1832,16 @@ function renderCaregiverIdentityPanel() {
   if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || (isPrimaryAdmin ? "Luiz Felipe" : "");
   if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || (isPrimaryAdmin ? "pai" : "");
   if (saveCaregiverIdentityButton) {
-    saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar identificação";
+    saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar cuidador";
   }
   if (caregiverIdentityStatus) {
     caregiverIdentityStatus.textContent = identity.label
-      ? `Próximos registros feitos neste aparelho aparecerão como ${identity.label}. Isso não altera permissões de Admin, família ou convite.`
+      ? `Próximos registros feitos neste aparelho aparecerão como ${identity.label}.`
       : (isPrimaryAdmin
         ? "Sugestão inicial deste aparelho: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
         : "Defina como os registros feitos neste aparelho devem aparecer no diário da família.");
   }
+  renderProfileFamilyCards();
 }
 
 async function saveCaregiverIdentityFromForm() {
@@ -1786,15 +1863,20 @@ async function saveCaregiverIdentityFromForm() {
     : "Identificação limpa neste aparelho. Usaremos o e-mail quando necessário.";
 
   renderCaregiverIdentityPanel();
+  closeCaregiverEditor();
 }
 
 function getActorDisplayNameFromEvent(event = {}) {
   const baby = String(getBabyDisplayName() || "").trim().toLowerCase();
   const candidates = [
+    event.caregiverLabel,
+    [event.caregiverName, event.caregiverRelationship].filter(Boolean).join(" · "),
+    [event.createdByName, event.createdByRelationship].filter(Boolean).join(" · "),
     event.createdByName,
     event.createdByRelationship,
     event.authorName,
     event.responsibleName,
+    [event.updatedByName, event.updatedByRelationship].filter(Boolean).join(" · "),
     event.updatedByName,
     event.updatedByRelationship,
   ];
@@ -1843,8 +1925,12 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
     createdByUid: actor.uid,
     createdByEmail: actor.email,
     createdByDeviceId: actor.deviceId,
-    createdByName: actor.displayName,
+    createdByName: actor.displayName || actor.label,
     createdByRelationship: actor.relationshipLabel,
+    caregiverName: actor.displayName || actor.label,
+    caregiverRelationship: actor.relationshipLabel,
+    caregiverLabel: actor.label,
+    createdAtClient: Date.now(),
     lastAction: "adicionou",
   }));
 }
@@ -2072,6 +2158,149 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
     deviceId: getOrCreateCaregiverDeviceId(),
     email: normalizeEmail(user?.email || ""),
   };
+}
+
+const familyInviteStorageKey = "ninou.family.activeInvite.v75.57";
+let familyActiveInvite = loadFamilyActiveInvite();
+
+function loadFamilyActiveInvite() {
+  try {
+    return JSON.parse(localStorage.getItem(familyInviteStorageKey) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function saveFamilyActiveInvite(invite) {
+  familyActiveInvite = invite;
+  try {
+    if (invite) localStorage.setItem(familyInviteStorageKey, JSON.stringify(invite));
+    else localStorage.removeItem(familyInviteStorageKey);
+  } catch {}
+  renderFamilyActiveInvite();
+}
+
+function generateFamilyInviteCode() {
+  return Math.random().toString(36).replace(/[^a-z0-9]/gi, "").slice(2, 10).toUpperCase().padEnd(8, "7");
+}
+
+function getFamilyInviteMessage(code) {
+  return `Você foi convidado(a) para acompanhar a rotina do Francisco no Ninou.\nCódigo de convite: ${code}\nAcesse o Ninou, toque em Perfil > Entrar com código e informe este código.`;
+}
+
+function renderFamilyActiveInvite() {
+  const invite = familyActiveInvite;
+  const active = Boolean(invite?.code && (!invite.expiresAtClient || Number(invite.expiresAtClient) > Date.now()));
+  if (familyActiveInviteBox) familyActiveInviteBox.hidden = !active;
+  if (familyInviteShareActions) familyInviteShareActions.hidden = !active;
+  if (familyActiveInviteCode) familyActiveInviteCode.textContent = active ? invite.code : "—";
+  if (familyActiveInviteHint) familyActiveInviteHint.textContent = active ? "Expira em 7 dias" : "Nenhum convite ativo";
+}
+
+async function createFamilyCaregiverInvite() {
+  const code = generateFamilyInviteCode();
+  const now = Date.now();
+  const expiresAtClient = now + 7 * day;
+  const actor = getCurrentActorProfile();
+  const invite = {
+    code,
+    familyId: familyAccess?.familyId || "ninou-family-luizfelipe",
+    familyName: "Família do Francisco",
+    status: "active",
+    role: "cuidador",
+    createdByUid: cloudUser?.uid || null,
+    createdByName: actor.label || actor.email || "Cuidador",
+    createdAtClient: now,
+    expiresAtClient,
+  };
+  saveFamilyActiveInvite(invite);
+
+  try {
+    const services = await getFirebaseServices();
+    if (services?.db && cloudUser) {
+      await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), {
+        ...invite,
+        createdAt: services.serverTimestamp(),
+        expiresAt: services.Timestamp.fromMillis(expiresAtClient),
+      }, { merge: true });
+    }
+  } catch (error) {
+    console.warn("Convite salvo apenas localmente:", error);
+  }
+}
+
+async function copyFamilyInviteCode() {
+  if (!familyActiveInvite?.code) return;
+  try {
+    await navigator.clipboard.writeText(familyActiveInvite.code);
+  } catch {
+    window.prompt("Copie o código do convite:", familyActiveInvite.code);
+  }
+}
+
+function shareFamilyInviteOnWhatsApp() {
+  if (!familyActiveInvite?.code) return;
+  const url = `https://wa.me/?text=${encodeURIComponent(getFamilyInviteMessage(familyActiveInvite.code))}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function openJoinFamilyModal() {
+  if (joinInviteCodeInput) joinInviteCodeInput.value = "";
+  if (joinInviteFeedback) joinInviteFeedback.textContent = "";
+  if (joinFamilyModal) {
+    joinFamilyModal.hidden = false;
+    joinFamilyModal.setAttribute("aria-hidden", "false");
+  }
+  setTimeout(() => joinInviteCodeInput?.focus(), 50);
+}
+
+function closeJoinFamilyModal() {
+  if (joinFamilyModal) {
+    joinFamilyModal.hidden = true;
+    joinFamilyModal.setAttribute("aria-hidden", "true");
+  }
+}
+
+async function confirmJoinFamilyInvite() {
+  const code = String(joinInviteCodeInput?.value || "").trim().toUpperCase().replace(/\s/g, "");
+  if (!code) {
+    if (joinInviteFeedback) joinInviteFeedback.textContent = "Digite o código do convite.";
+    return;
+  }
+
+  try {
+    const services = await getFirebaseServices();
+    if (!services?.db || !cloudUser) throw new Error("Firebase indisponível");
+    const familyId = familyAccess?.familyId || "ninou-family-luizfelipe";
+    const inviteRef = services.doc(services.db, "families", familyId, "invitations", code);
+    const inviteSnap = await services.getDoc(inviteRef);
+    if (!inviteSnap.exists()) throw new Error("Convite não encontrado");
+    const invite = inviteSnap.data() || {};
+    if (invite.status && invite.status !== "active") throw new Error("Convite inativo");
+
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "access", "ninou"), {
+      familyId,
+      role: "cuidador",
+      joinedByInvite: code,
+      joinedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    if (joinInviteFeedback) joinInviteFeedback.textContent = "Convite aceito. Agora configure o cuidador deste aparelho.";
+    setTimeout(() => {
+      closeJoinFamilyModal();
+      openCaregiverEditor();
+    }, 700);
+  } catch (error) {
+    console.warn(error);
+    if (joinInviteFeedback) joinInviteFeedback.textContent = "Não foi possível validar o convite agora. Verifique a conexão ou as permissões do Firebase.";
+  }
+}
+
+function openSupportWhatsApp(kind = "suggestion") {
+  const text = kind === "bug"
+    ? "Olá! Gostaria de reportar um problema no app Ninou."
+    : "Olá! Gostaria de enviar uma sugestão para o app Ninou.";
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
 }
 
 function hasRoutineDayContent(dayState = state) {
@@ -2351,7 +2580,8 @@ function isDateId(value = "") {
 
 function setSelectedDiaryDayById(dayId = getCurrentDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  selectedDiaryDay = getDayStart(new Date(`${safeDayId}T12:00:00`).getTime());
+  const parsedDay = parseLocalDate(safeDayId);
+  selectedDiaryDay = getDayStart(parsedDay ? parsedDay.getTime() : Date.now());
   if (diaryDateInput) {
     diaryDateInput.value = safeDayId;
     if (!diaryDateInput.max || diaryDateInput.max < safeDayId) diaryDateInput.max = safeDayId;
@@ -7420,8 +7650,12 @@ function saveManualEvent() {
       updatedByUid: actor.uid,
       updatedByEmail: actor.email,
       updatedByDeviceId: actor.deviceId,
-      updatedByName: actor.displayName,
+      updatedByName: actor.displayName || actor.label,
       updatedByRelationship: actor.relationshipLabel,
+      caregiverName: actor.displayName || actor.label,
+      caregiverRelationship: actor.relationshipLabel,
+      caregiverLabel: actor.label,
+      updatedAtClient: Date.now(),
       lastAction: "editou",
     });
     pushAuditEntry("editou", existingEvent);
@@ -7941,6 +8175,22 @@ exportJsonButton.addEventListener("click", () => exportRoutine("json"));
 exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
 if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
 if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", saveCaregiverIdentityFromForm);
+if (editCaregiverButton) editCaregiverButton.addEventListener("click", openCaregiverEditor);
+document.querySelectorAll("[data-close-caregiver-modal]").forEach((button) => button.addEventListener("click", closeCaregiverEditor));
+if (caregiverIdentityEditorModal) caregiverIdentityEditorModal.addEventListener("click", (event) => {
+  if (event.target === caregiverIdentityEditorModal) closeCaregiverEditor();
+});
+if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click", createFamilyCaregiverInvite);
+if (familyCopyInviteButton) familyCopyInviteButton.addEventListener("click", copyFamilyInviteCode);
+if (familyShareInviteWhatsAppButton) familyShareInviteWhatsAppButton.addEventListener("click", shareFamilyInviteOnWhatsApp);
+if (familyJoinInviteButton) familyJoinInviteButton.addEventListener("click", openJoinFamilyModal);
+if (confirmJoinInviteButton) confirmJoinInviteButton.addEventListener("click", confirmJoinFamilyInvite);
+document.querySelectorAll("[data-close-join-modal]").forEach((button) => button.addEventListener("click", closeJoinFamilyModal));
+if (joinFamilyModal) joinFamilyModal.addEventListener("click", (event) => {
+  if (event.target === joinFamilyModal) closeJoinFamilyModal();
+});
+if (supportSuggestionButton) supportSuggestionButton.addEventListener("click", () => openSupportWhatsApp("suggestion"));
+if (supportBugButton) supportBugButton.addEventListener("click", () => openSupportWhatsApp("bug"));
 if (prepareConsultButton) prepareConsultButton.addEventListener("click", prepareConsultMode);
 if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
 if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
