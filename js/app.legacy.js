@@ -111,6 +111,7 @@ const loginPassword = document.querySelector("#loginPassword");
 const loginButton = document.querySelector("#loginButton");
 const createAccountButton = document.querySelector("#createAccountButton");
 const loginHelper = document.querySelector("#loginHelper");
+const profileFamilyStack = document.querySelector(".profile-family-stack");
 const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
 const caregiverNameInput = document.querySelector("#caregiverNameInput");
 const caregiverRelationInput = document.querySelector("#caregiverRelationInput");
@@ -127,6 +128,7 @@ const familyWeightUnitLabel = document.querySelector("#familyWeightUnitLabel");
 const familyNameLabel = document.querySelector("#familyNameLabel");
 const familyAccountLabel = document.querySelector("#familyAccountLabel");
 const familyAccessTypeLabel = document.querySelector("#familyAccessTypeLabel");
+const familyInviteDescription = document.querySelector("#familyInviteDescription");
 const familyThemeLabel = document.querySelector("#familyThemeLabel");
 const familyNotificationLabel = document.querySelector("#familyNotificationLabel");
 const familyCreateInviteButton = document.querySelector("#familyCreateInviteButton");
@@ -1783,11 +1785,59 @@ function getCaregiverEmoji(relation = "") {
   return "👤";
 }
 
+function getProfileFamilyBabyName() {
+  const cleanName = String(getBabyName() || "").trim();
+  return cleanName;
+}
+
+function getProfileFamilyDisplayName() {
+  const babyName = getProfileFamilyBabyName();
+  if (!babyName) return "Família Ninou";
+  const article = babyProfile?.article === "da" ? "da" : "do";
+  return `Família ${article} ${babyName}`;
+}
+
+function setProfileFamilyStackVisible(visible) {
+  if (!profileFamilyStack) return;
+  profileFamilyStack.hidden = !visible;
+  profileFamilyStack.setAttribute("aria-hidden", visible ? "false" : "true");
+}
+
+function resetProfileFamilyCardsForGuest() {
+  setProfileFamilyStackVisible(false);
+  if (familyProfileBabyName) familyProfileBabyName.textContent = "Bebê";
+  if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = "Entre para carregar o perfil familiar.";
+  if (familyWakeWindowLabel) familyWakeWindowLabel.textContent = "—";
+  if (familyWeightUnitLabel) familyWeightUnitLabel.textContent = "—";
+  if (deviceCaregiverName) deviceCaregiverName.textContent = "Não configurado";
+  if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = "👤";
+  if (deviceCaregiverHint) deviceCaregiverHint.textContent = "Entre em uma conta familiar para configurar o cuidador deste aparelho.";
+  if (familyNameLabel) familyNameLabel.textContent = "Família não conectada";
+  if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || "Conta não conectada";
+  if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = cloudUser ? "Aguardando convite" : "Visitante";
+  if (familyInviteDescription) familyInviteDescription.textContent = "Entre com uma conta familiar para gerar ou aceitar convites de cuidador.";
+  if (familyActiveInviteBox) familyActiveInviteBox.hidden = true;
+  if (familyInviteShareActions) familyInviteShareActions.hidden = true;
+  if (familyActiveInviteCode) familyActiveInviteCode.textContent = "—";
+  if (familyActiveInviteHint) familyActiveInviteHint.textContent = "Nenhum convite ativo";
+}
+
 function renderProfileFamilyCards() {
+  const familyReady = canUsePrivateFeatures();
+  if (!familyReady) {
+    resetProfileFamilyCardsForGuest();
+    return;
+  }
+
+  setProfileFamilyStackVisible(true);
   const identity = loadCurrentCaregiverIdentity();
   const caregiverLabel = identity.label || "Não configurado";
   const ageText = getBabyAgeText();
-  if (familyProfileBabyName) familyProfileBabyName.textContent = getBabyDisplayName() || "Francisco";
+  const babyName = getProfileFamilyBabyName();
+  const babyLabel = babyName || "Bebê";
+  const familyLabel = getProfileFamilyDisplayName();
+
+  if (familyProfileBabyName) familyProfileBabyName.textContent = babyLabel;
   if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = ageText.profile || "Nascimento não preenchido";
   if (familyWakeWindowLabel) familyWakeWindowLabel.textContent = `${wakeWindowMinutes || 70} min`;
   if (familyWeightUnitLabel) familyWeightUnitLabel.textContent = "kg";
@@ -1798,9 +1848,10 @@ function renderProfileFamilyCards() {
       ? `As ações deste aparelho serão registradas como ${identity.label}.`
       : "Escolha quem está usando este aparelho para os registros ficarem corretos.";
   }
-  if (familyNameLabel) familyNameLabel.textContent = "Família do Francisco";
+  if (familyNameLabel) familyNameLabel.textContent = familyLabel;
   if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || familyAccess?.email || "Conta não conectada";
   if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = getRoleLabel(familyAccess?.role || "responsavel");
+  if (familyInviteDescription) familyInviteDescription.textContent = `Compartilhe um código para outro cuidador acompanhar a rotina ${babyName ? `de ${babyName}` : "do bebê"}.`;
   if (familyThemeLabel) familyThemeLabel.textContent = (themeModeInput?.value || babyProfile?.themeMode || "dark") === "light" ? "Claro" : "Escuro";
   if (familyNotificationLabel) familyNotificationLabel.textContent = "Preferências salvas";
   renderFamilyActiveInvite();
@@ -1823,10 +1874,15 @@ function closeCaregiverEditor() {
 }
 
 function renderCaregiverIdentityPanel() {
-  if (!caregiverIdentityCard) return;
   const logged = Boolean(cloudUser);
-  caregiverIdentityCard.hidden = !logged;
-  if (!logged) return;
+  const familyReady = canUsePrivateFeatures();
+  setProfileFamilyStackVisible(familyReady);
+  if (!familyReady) {
+    resetProfileFamilyCardsForGuest();
+  }
+  if (!caregiverIdentityCard) return;
+  caregiverIdentityCard.hidden = !familyReady;
+  if (!familyReady) return;
   const identity = loadCurrentCaregiverIdentity();
   const isPrimaryAdmin = isGlobalAppAdmin();
   if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || (isPrimaryAdmin ? "Luiz Felipe" : "");
@@ -2185,7 +2241,9 @@ function generateFamilyInviteCode() {
 }
 
 function getFamilyInviteMessage(code) {
-  return `Você foi convidado(a) para acompanhar a rotina do Francisco no Ninou.\nCódigo de convite: ${code}\nAcesse o Ninou, toque em Perfil > Entrar com código e informe este código.`;
+  const babyName = getProfileFamilyBabyName();
+  const target = babyName ? `do ${babyName}` : "do bebê";
+  return `Você foi convidado(a) para acompanhar a rotina ${target} no Ninou.\nCódigo de convite: ${code}\nAcesse o Ninou, toque em Perfil > Entrar com código e informe este código.`;
 }
 
 function renderFamilyActiveInvite() {
@@ -2198,6 +2256,11 @@ function renderFamilyActiveInvite() {
 }
 
 async function createFamilyCaregiverInvite() {
+  if (!canUsePrivateFeatures()) {
+    if (loginHelper) loginHelper.textContent = "Entre em uma família para gerar convite de cuidador.";
+    resetProfileFamilyCardsForGuest();
+    return;
+  }
   const code = generateFamilyInviteCode();
   const now = Date.now();
   const expiresAtClient = now + 7 * day;
@@ -2205,7 +2268,7 @@ async function createFamilyCaregiverInvite() {
   const invite = {
     code,
     familyId: familyAccess?.familyId || "ninou-family-luizfelipe",
-    familyName: "Família do Francisco",
+    familyName: getProfileFamilyDisplayName(),
     status: "active",
     role: "cuidador",
     createdByUid: cloudUser?.uid || null,

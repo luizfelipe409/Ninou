@@ -1,6 +1,6 @@
-// Ninou v75.57.1 - Perfil Familiar + Convite de Cuidador + horário cross-browser
+// Ninou v75.57.2 - protege perfil familiar deslogado + horário cross-browser
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.57.1";
+const NINOU_APP_VERSION = "75.57.2";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
