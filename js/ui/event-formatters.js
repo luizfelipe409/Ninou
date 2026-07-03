@@ -19,7 +19,7 @@ function parseBreastfeedingDetail(detail = "") {
 }
 
 function getDisplayStartLabel(event) {
-  return event?.displayStartLabel || formatTime(event.start);
+  return event?.displayStartLabel || formatTime(event.eventTime || event.start);
 }
 
 function getDisplayRangeLabel(event) {
@@ -117,6 +117,8 @@ export function getEventRenderSignature(event, options = {}) {
   return [
     eventKey,
     event.type,
+    event.label || "",
+    Math.round(Number(event.eventTime) || Number(event.start) || 0),
     Math.round(event.start),
     endKey,
     event.detail,
@@ -124,14 +126,21 @@ export function getEventRenderSignature(event, options = {}) {
     Math.round(Number(event.wakeWindowMs) || 0),
     event.createdByUid || "",
     event.createdByEmail || "",
+    event.createdByDeviceId || "",
     event.createdByName || "",
     event.createdByRelationship || "",
     event.caregiverName || "",
+    event.caregiverRole || "",
     event.caregiverRelationship || "",
     event.caregiverLabel || "",
+    event.createdAt || "",
+    event.updatedAt || "",
     event.updatedByEmail || "",
+    event.updatedByDeviceId || "",
     event.updatedByName || "",
     event.updatedByRelationship || "",
+    event.babyId || "",
+    event.familyId || "",
     event.lastAction || "",
   ].join("|");
 }
@@ -151,6 +160,12 @@ function isMissingAuthorValue(value = "") {
   return !text || text === "undefined" || text === "null";
 }
 
+function formatNameRole(name = "", role = "") {
+  const cleanName = String(name || "").trim();
+  const cleanRole = String(role || "").trim();
+  return [cleanName, cleanRole].filter(Boolean).join("/");
+}
+
 function sanitizeAuthorLabel(value = "", babyName = "") {
   const text = String(value ?? "").trim();
   if (isMissingAuthorValue(text)) return "";
@@ -161,9 +176,9 @@ function sanitizeAuthorLabel(value = "", babyName = "") {
 function getEventAuthorLabel(event = {}) {
   const babyName = String(globalThis.window?.__ninouCurrentBabyName || "").trim().toLowerCase();
   const candidates = [
+    formatNameRole(event.caregiverName, event.caregiverRole || event.caregiverRelationship),
     event.caregiverLabel,
-    [event.caregiverName, event.caregiverRelationship].filter(Boolean).join(" · "),
-    [event.createdByName, event.createdByRelationship].filter(Boolean).join(" · "),
+    formatNameRole(event.createdByName, event.createdByRelationship),
     event.createdByName,
     event.createdByRelationship,
     event.authorName,

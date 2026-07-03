@@ -17,6 +17,44 @@ const TYPE_ALIASES = Object.freeze({
   acordou: "acordou",
 });
 
+function toMilliseconds(value) {
+  if (value === null || typeof value === "undefined" || value === "") return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value > 100000000000) return value;
+    if (value > 1000000000) return value * 1000;
+    return value;
+  }
+  if (value instanceof Date) return value.getTime();
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value === "object" && Number.isFinite(Number(value.seconds))) {
+    return Number(value.seconds) * 1000 + Math.floor(Number(value.nanoseconds || 0) / 1000000);
+  }
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function normalizeTimestampText(value) {
+  if (typeof value === "string") return value;
+  const timestamp = toMilliseconds(value);
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : "";
+}
+
+function firstTimestamp(...values) {
+  for (const value of values) {
+    const timestamp = toMilliseconds(value);
+    if (Number.isFinite(timestamp)) return timestamp;
+  }
+  return null;
+}
+
+export function getEventOrderTime(event = {}) {
+  const timestamp = firstTimestamp(event.eventTime, event.start, event.createdAtClient, event.createdAt);
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
 export function createEmptyDayState() {
   return {
     mode: "idle",
@@ -57,37 +95,54 @@ export function normalizeRecordType(rawType = "sono") {
 
 export function normalizeEvent(event = {}) {
   const type = normalizeRecordType(event.type);
-  const start = Number(event.start);
-  const end = Number(event.end);
+  const start = firstTimestamp(event.start, event.eventTime, event.createdAtClient, event.createdAt);
+  const end = firstTimestamp(event.end);
 
   if (!Number.isFinite(start)) return null;
 
   const wakeWindowStartedAt = Number(event.wakeWindowStartedAt);
   const wakeWindowMs = Number(event.wakeWindowMs);
+  const eventTime = firstTimestamp(event.eventTime, start);
+  const label = typeof event.label === "string" && event.label.trim()
+    ? event.label.trim()
+    : typeConfig[type]?.title || type;
+  const caregiverRole = typeof event.caregiverRole === "string" && event.caregiverRole.trim()
+    ? event.caregiverRole.trim()
+    : typeof event.caregiverRelationship === "string"
+      ? event.caregiverRelationship.trim()
+      : "";
 
   return {
     id: typeof event.id === "string" ? event.id : createEventId(type, start),
     type,
+    label,
+    eventTime,
     start,
     end: Number.isFinite(end) ? end : start,
     detail: typeof event.detail === "string" ? event.detail : "",
     notes: typeof event.notes === "string" ? event.notes : "",
-    createdAt: typeof event.createdAt === "string" ? event.createdAt : "",
+    createdAt: normalizeTimestampText(event.createdAt),
     createdByUid: typeof event.createdByUid === "string" ? event.createdByUid : "",
     createdByEmail: typeof event.createdByEmail === "string" ? event.createdByEmail : "",
+    createdByDeviceId: typeof event.createdByDeviceId === "string" ? event.createdByDeviceId : "",
     createdByName: typeof event.createdByName === "string" ? event.createdByName : "",
     createdByRelationship: typeof event.createdByRelationship === "string" ? event.createdByRelationship : "",
     caregiverName: typeof event.caregiverName === "string" ? event.caregiverName : "",
+    caregiverRole,
     caregiverRelationship: typeof event.caregiverRelationship === "string" ? event.caregiverRelationship : "",
     caregiverLabel: typeof event.caregiverLabel === "string" ? event.caregiverLabel : "",
     createdAtClient: Number.isFinite(Number(event.createdAtClient)) ? Number(event.createdAtClient) : null,
     authorName: typeof event.authorName === "string" ? event.authorName : "",
     responsibleName: typeof event.responsibleName === "string" ? event.responsibleName : "",
-    updatedAt: typeof event.updatedAt === "string" ? event.updatedAt : "",
+    updatedAt: normalizeTimestampText(event.updatedAt),
     updatedByUid: typeof event.updatedByUid === "string" ? event.updatedByUid : "",
     updatedByEmail: typeof event.updatedByEmail === "string" ? event.updatedByEmail : "",
+    updatedByDeviceId: typeof event.updatedByDeviceId === "string" ? event.updatedByDeviceId : "",
     updatedByName: typeof event.updatedByName === "string" ? event.updatedByName : "",
     updatedByRelationship: typeof event.updatedByRelationship === "string" ? event.updatedByRelationship : "",
+    updatedAtClient: Number.isFinite(Number(event.updatedAtClient)) ? Number(event.updatedAtClient) : null,
+    babyId: typeof event.babyId === "string" ? event.babyId : "",
+    familyId: typeof event.familyId === "string" ? event.familyId : "",
     lastAction: typeof event.lastAction === "string" ? event.lastAction : "",
     ...(Number.isFinite(wakeWindowStartedAt) && Number.isFinite(wakeWindowMs) && wakeWindowMs > 0
       ? { wakeWindowStartedAt, wakeWindowMs }
@@ -140,16 +195,19 @@ export function normalizeDayState(dayState = {}) {
 }
 
 export function sortEventsByStartDesc(events = []) {
-  return [...events].sort((a, b) => b.start - a.start);
+  return [...events].sort((a, b) => getEventOrderTime(b) - getEventOrderTime(a));
 }
 
 export function sortEventsByStartAsc(events = []) {
-  return [...events].sort((a, b) => a.start - b.start);
+  return [...events].sort((a, b) => getEventOrderTime(a) - getEventOrderTime(b));
 }
 
 export function getEventsForDay(events = [], selectedStart, dayMs = day) {
   const selectedEnd = selectedStart + dayMs;
-  return events.filter((event) => event.start >= selectedStart && event.start < selectedEnd);
+  return events.filter((event) => {
+    const eventTime = getEventOrderTime(event);
+    return eventTime >= selectedStart && eventTime < selectedEnd;
+  });
 }
 
 export function getLatestEvent(events = []) {
@@ -173,6 +231,7 @@ export function updateEventKeepingDuration(event, updates = {}) {
   if (!event) return null;
   const nextStart = Number(updates.start);
   const start = Number.isFinite(nextStart) ? nextStart : event.start;
+  const nextType = updates.type ?? event.type;
   const explicitEnd = Number(updates.end);
   const currentDuration = Math.max(0, Number(event.end) - Number(event.start));
   const end = Number.isFinite(explicitEnd)
@@ -182,7 +241,9 @@ export function updateEventKeepingDuration(event, updates = {}) {
       : start;
 
   Object.assign(event, {
-    type: updates.type ?? event.type,
+    type: nextType,
+    label: updates.label ?? typeConfig[nextType]?.title ?? event.label ?? nextType,
+    eventTime: Number.isFinite(Number(updates.eventTime)) ? Number(updates.eventTime) : start,
     start,
     end,
     detail: updates.detail ?? event.detail ?? "",
@@ -190,8 +251,16 @@ export function updateEventKeepingDuration(event, updates = {}) {
     updatedAt: updates.updatedAt ?? event.updatedAt ?? "",
     updatedByUid: updates.updatedByUid ?? event.updatedByUid ?? "",
     updatedByEmail: updates.updatedByEmail ?? event.updatedByEmail ?? "",
+    updatedByDeviceId: updates.updatedByDeviceId ?? event.updatedByDeviceId ?? "",
     updatedByName: updates.updatedByName ?? event.updatedByName ?? "",
     updatedByRelationship: updates.updatedByRelationship ?? event.updatedByRelationship ?? "",
+    updatedAtClient: updates.updatedAtClient ?? event.updatedAtClient ?? null,
+    caregiverName: updates.caregiverName ?? event.caregiverName ?? "",
+    caregiverRole: updates.caregiverRole ?? updates.caregiverRelationship ?? event.caregiverRole ?? event.caregiverRelationship ?? "",
+    caregiverRelationship: updates.caregiverRelationship ?? event.caregiverRelationship ?? "",
+    caregiverLabel: updates.caregiverLabel ?? event.caregiverLabel ?? "",
+    babyId: updates.babyId ?? event.babyId ?? "",
+    familyId: updates.familyId ?? event.familyId ?? "",
     lastAction: updates.lastAction ?? event.lastAction ?? "",
   });
 

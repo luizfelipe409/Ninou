@@ -23,7 +23,7 @@ export async function getFirebaseServices() {
         };
 
         /*
-          v75.60.1 — App Check não bloqueante:
+          v75.60.8 — App Check não bloqueante:
           o login não deve esperar o download/inicialização do módulo de App Check.
           Como o Firebase Console ainda está em modo Monitorando, o app pode abrir Auth/Firestore
           primeiro e inicializar App Check em paralelo. Só ative enforcement após validar que
@@ -31,7 +31,7 @@ export async function getFirebaseServices() {
         */
         const ensureBrowserProcessShim = () => {
           /*
-            v75.60.1 — correção App Check/reCAPTCHA Enterprise em PWA sem bundler.
+            v75.60.8 — correção App Check/reCAPTCHA Enterprise em PWA sem bundler.
             Algumas dependências do módulo CDN do App Check consultam `process.env`.
             Em navegador puro/iPhone/Safari, `process` não existe e gerava:
             ReferenceError: process is not defined.

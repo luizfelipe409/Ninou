@@ -1,5 +1,5 @@
 /* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.60.1");
+@import url("./css/app.legacy.css?v=75.60.8");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -46,8 +46,82 @@
   line-height: 1.2;
 }
 
+.profile-soft-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
 .profile-family-card > p {
   margin: 10px 0 0;
+}
+
+.profile-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 10px;
+}
+
+.baby-settings-card .profile-setting-line {
+  margin-top: 0;
+}
+
+.profile-number-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-number-field strong {
+  min-width: 72px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.caregiver-inline-dropdown {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.075);
+  overflow: hidden;
+}
+
+.caregiver-inline-dropdown summary {
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  list-style: none;
+}
+
+.caregiver-inline-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.caregiver-inline-dropdown summary span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.caregiver-inline-dropdown summary strong {
+  color: #fff;
+  font-size: 0.94rem;
+  overflow-wrap: anywhere;
+}
+
+.caregiver-inline-dropdown > p,
+.caregiver-inline-dropdown > .profile-edit-grid,
+.caregiver-inline-dropdown > .profile-actions-row {
+  margin: 0 12px 12px;
 }
 
 .profile-soft-row,
@@ -223,6 +297,8 @@ body.day-theme .profile-family-card {
 
 body.day-theme .profile-card-head strong,
 body.day-theme .profile-soft-row strong,
+body.day-theme .profile-number-field strong,
+body.day-theme .caregiver-inline-dropdown summary strong,
 body.day-theme .active-invite-box strong {
   color: #191433;
 }
@@ -230,8 +306,10 @@ body.day-theme .active-invite-box strong {
 body.day-theme .profile-card-head span,
 body.day-theme .profile-family-card > p,
 body.day-theme .profile-soft-row span,
+body.day-theme .caregiver-inline-dropdown summary span,
 body.day-theme .profile-setting-line,
 body.day-theme .profile-toggle-line span,
+body.day-theme .caregiver-inline-dropdown > p,
 body.day-theme .active-invite-box span,
 body.day-theme .active-invite-box small {
   color: rgba(25, 20, 51, 0.62);
@@ -240,6 +318,8 @@ body.day-theme .active-invite-box small {
 body.day-theme .profile-soft-row,
 body.day-theme .profile-setting-line,
 body.day-theme .profile-toggle-line,
+body.day-theme .profile-number-field strong,
+body.day-theme .caregiver-inline-dropdown,
 body.day-theme .profile-secondary-button {
   background: rgba(25, 20, 51, 0.055);
   color: #191433;
@@ -1109,7 +1189,6 @@ body.day-theme .day-notes-card .section-helper {
 }
 
 .profile-family-stack + .settings-list,
-.support-card + .settings-list,
 #profileReadyCard + #guestWelcomeCard,
 #firstUseChecklistCard + .settings-list {
   margin-top: 0 !important;
@@ -1144,6 +1223,12 @@ body.day-theme .day-notes-card .section-helper {
 .settings-list {
   margin: 0 !important;
   gap: 12px !important;
+}
+
+body.profile-daily-ready #profileReadyCard,
+body.profile-daily-ready #firstUseChecklistCard,
+body.profile-daily-ready #adminDiagnosticsCard {
+  display: none !important;
 }
 
 /* Reduz leve sobra final em telas curtas sem colar no menu. */
@@ -2132,7 +2217,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.1 — Login rápido + App Check não bloqueante */
+/* Ninou v75.60.8 — Login rápido + App Check não bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2193,7 +2278,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.1 — perfil logado sem duplicidade visual */
+/* Ninou v75.60.8 — perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2203,7 +2288,7 @@ body.family-ready #dataRealityCard {
 }
 
 body.family-ready .login-card {
-  border-style: dashed;
+  border-style: solid;
 }
 
 body.family-ready .login-card .login-fields,
@@ -2211,10 +2296,238 @@ body.family-ready .login-card #loginButton {
   display: none !important;
 }
 
-body.family-ready .login-card strong::after {
-  content: " — sessão ativa";
-  font-weight: 700;
-  opacity: .72;
+.account-sync-summary {
+  display: none;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+body.family-ready .account-sync-summary {
+  display: grid;
+}
+
+.account-sync-status {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.account-sync-status strong {
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.account-sync-status p {
+  margin: 0;
+  line-height: 1.42;
+}
+
+body.day-theme .account-sync-status {
+  background: rgba(25, 20, 51, 0.055);
+}
+
+/* v75.60.8 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
+.avatar-profile-actions {
+  margin-top: 0;
+}
+
+.baby-settings-card .avatar-edit-trigger {
+  position: static !important;
+  width: 100%;
+  min-height: 44px;
+  margin: 0 !important;
+  inset: auto !important;
+}
+
+.phone-shell,
+.screen,
+.screen > *,
+.profile-family-stack,
+.profile-family-card,
+.settings-list,
+.settings-list > *,
+.admin-clean-panel,
+.admin-clean-panel *,
+.admin-clean-section,
+.admin-access-card,
+.admin-access-list,
+.admin-access-list *,
+.admin-form-grid,
+.admin-stats-grid,
+.admin-health-grid,
+.admin-card-actions,
+.admin-flow-actions,
+.profile-edit-grid,
+.sync-detail-grid,
+.export-period-grid,
+.weight-input-row,
+.login-actions,
+.profile-actions-row {
+  min-width: 0 !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-card,
+.profile-family-card,
+.settings-list article,
+.admin-clean-section,
+.admin-clean-hero,
+.admin-access-card,
+.login-card,
+.export-card,
+.danger-card,
+.privacy-note-card,
+.weight-profile-block,
+.support-card {
+  overflow: hidden;
+}
+
+.profile-card *,
+.profile-family-card *,
+.settings-list article *,
+.admin-clean-panel *,
+.admin-access-card *,
+.bottom-nav *,
+.timeline *,
+.event-card *,
+.quick-actions *,
+.record-sheet *,
+.orbit-cluster-sheet * {
+  min-width: 0;
+}
+
+.profile-card span,
+.profile-card strong,
+.profile-card p,
+.profile-family-card span,
+.profile-family-card strong,
+.profile-family-card p,
+.settings-list article span,
+.settings-list article strong,
+.settings-list article p,
+.settings-list article small,
+.settings-list label,
+.admin-clean-panel span,
+.admin-clean-panel strong,
+.admin-clean-panel em,
+.admin-clean-panel p,
+.admin-clean-panel small,
+.admin-clean-panel li,
+.admin-access-card span,
+.admin-access-card strong,
+.admin-access-card p,
+.admin-access-card small,
+.event-text,
+.event-text *,
+.timeline *,
+.bottom-nav span {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+button,
+.profile-primary-button,
+.profile-secondary-button,
+.secondary-login,
+.admin-clean-panel button,
+.admin-card-actions button,
+.admin-flow-actions button,
+.export-actions button,
+.login-actions button,
+.quick-actions button,
+.record-types button,
+.bottom-nav button {
+  min-width: 0 !important;
+  max-width: 100%;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.12;
+}
+
+input,
+select,
+textarea {
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+.profile-edit-grid,
+.admin-form-grid,
+.admin-stats-grid,
+.admin-health-grid,
+.permission-guide,
+.sync-detail-grid,
+.export-period-grid,
+.weight-input-row {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 178px), 1fr)) !important;
+}
+
+.admin-clean-hero,
+.admin-stats-header,
+.admin-invite-header,
+.access-status-row,
+.admin-family-actions,
+.admin-card-actions,
+.admin-flow-actions {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)) !important;
+  gap: 10px !important;
+}
+
+.admin-clean-panel input,
+.admin-clean-panel select,
+.admin-clean-panel textarea,
+.settings-list input,
+.settings-list select,
+.settings-list textarea,
+.profile-setting-line input,
+.profile-setting-line select {
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 430px) {
+  .profile-number-field,
+  .caregiver-inline-dropdown summary,
+  .profile-card-head,
+  .account-sync-status,
+  .access-status-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .baby-settings-card .avatar-edit-trigger,
+  .profile-number-field strong,
+  .caregiver-avatar-mini {
+    width: 100%;
+  }
+
+  .profile-soft-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-soft-row strong {
+    text-align: left;
+  }
+}
+
+@media (min-width: 860px) {
+  body.global-admin-mode .phone-shell,
+  body.admin-family-preview .phone-shell {
+    width: min(1180px, calc(100vw - 32px)) !important;
+    max-width: min(1180px, calc(100vw - 32px)) !important;
+  }
+
+  body.global-admin-mode .screen[data-screen="profile"],
+  body.admin-family-preview .screen[data-screen="profile"] {
+    max-width: none !important;
+  }
 }
 
 body.auth-validating #guestWelcomeCard,
