@@ -1,4 +1,4 @@
-# Ninou v75.58 — Base multi-família + PWA confiável
+# Ninou v75.58.1 — Base multi-família + PWA confiável
 
 Esta versão foi criada em cima da v75.57.6.
 
@@ -19,7 +19,7 @@ Esta versão foi criada em cima da v75.57.6.
   - modo PWA/navegador;
   - quantidade de dias em cache local.
 - PWA/Service Worker melhorado:
-  - cache `ninou-v75-58-multifamilia-pwa`;
+  - cache `ninou-v75-58-1-1-multifamilia-pwa`;
   - `SKIP_WAITING` por mensagem;
   - aviso visual quando há atualização disponível;
   - `viewport-fit=cover` para melhor compatibilidade com iPhone.

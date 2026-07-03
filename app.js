@@ -1,6 +1,6 @@
-// Ninou v75.58 - base multi-família, diagnóstico e PWA confiável
+// Ninou v75.58.2 - correção estrutural de rotina, notas por dia e avatar
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.58";
+const NINOU_APP_VERSION = "75.58.2";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

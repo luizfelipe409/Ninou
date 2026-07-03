@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-58-multifamilia-pwa";
+const CACHE_NAME = "ninou-v75-58-2-rotina-notas-avatar";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.58",
-  "/css/app.legacy.css?v=75.58",
-  "/app.js?v=75.58",
-  "/js/app.legacy.js?v=75.58",
+  "/styles.css?v=75.58.2",
+  "/css/app.legacy.css?v=75.58.2",
+  "/app.js?v=75.58.2",
+  "/js/app.legacy.js?v=75.58.2",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

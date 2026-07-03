@@ -1,5 +1,5 @@
-/* Ninou v75.58 - revisão visual final de espaçamentos. */
-@import url("./css/app.legacy.css?v=75.58");
+/* Ninou v75.58.2 - rotina estável, notas por dia e avatar completo. */
+@import url("./css/app.legacy.css?v=75.58.2");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -280,7 +280,7 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* Ninou v75.58 — revisão minuciosa de espaçamento, cards e mobile */
+/* Ninou v75.58.2 — revisão minuciosa de espaçamento, cards e mobile */
 :root {
   --ninou-screen-gap-polished: 16px;
   --ninou-card-gap-polished: 14px;
@@ -716,7 +716,7 @@ body.day-theme .ninou-modal-card > p {
   }
 }
 
-/* Ninou v75.58 — revisão visual final após análise do vídeo
+/* Ninou v75.58.2 — revisão visual final após análise do vídeo
    Ajustes focados em consistência real no iPhone/Safari:
    - títulos dos cards em duas linhas quando o HTML não possui wrapper;
    - Observações do dia com hierarquia correta;
@@ -1072,7 +1072,7 @@ body.day-theme .day-notes-card .section-helper {
 }
 
 
-/* Ninou v75.58 — correção de respiro final e sequência de cards
+/* Ninou v75.58.2 — correção de respiro final e sequência de cards
    Corrige sobras no fim das páginas e remove o vão entre
    Ajuda e suporte e Perfil do bebê. */
 :root {
@@ -1167,7 +1167,7 @@ body.day-theme .day-notes-card .section-helper {
   }
 }
 
-/* Ninou v75.58 — base multi-família, diagnóstico e PWA confiável */
+/* Ninou v75.58.2 — base multi-família, diagnóstico e PWA confiável */
 :root {
   --ninou-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ninou-safe-top: env(safe-area-inset-top, 0px);

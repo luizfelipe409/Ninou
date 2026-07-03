@@ -315,7 +315,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.58";
+const NINOU_RUNTIME_VERSION = "75.58.2";
 const GLOBAL_APP_ADMIN_EMAIL = "luizfelipe.dasilva@gmail.com";
 const APP_ADMIN_FAMILY_ID = "ninou-family-luizfelipe";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
@@ -1527,21 +1527,14 @@ function applyAvatarPreview(avatar = pendingBabyAvatar) {
 function renderAvatarCustomizer() {
   pendingBabyAvatar = normalizeAvatarDraft(pendingBabyAvatar?.hair ? pendingBabyAvatar : babyProfile.avatar || {});
   renderAvatarOptionButton(avatarIconOptions, babyAvatarHairOptions, "hair", pendingBabyAvatar);
-  if (avatarHairColorOptions) {
-    avatarHairColorOptions.innerHTML = "";
-    avatarHairColorOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
-  }
-  if (avatarSkinOptions) {
-    avatarSkinOptions.innerHTML = "";
-    avatarSkinOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
-  }
-  if (avatarColorOptions) {
-    avatarColorOptions.innerHTML = "";
-    avatarColorOptions.closest(".avatar-picker-section")?.setAttribute("hidden", "hidden");
-  }
-  if (avatarIconOptions) {
-    avatarIconOptions.closest(".avatar-picker-section")?.removeAttribute("hidden");
-  }
+  renderAvatarOptionButton(avatarHairColorOptions, babyAvatarHairColorOptions, "hairColor", pendingBabyAvatar);
+  renderAvatarOptionButton(avatarSkinOptions, babyAvatarSkinOptions, "skin", pendingBabyAvatar);
+  renderAvatarOptionButton(avatarColorOptions, babyAvatarBackgroundOptions, "background", pendingBabyAvatar);
+
+  [avatarIconOptions, avatarHairColorOptions, avatarSkinOptions, avatarColorOptions].forEach((container) => {
+    container?.closest(".avatar-picker-section")?.removeAttribute("hidden");
+  });
+
   if (avatarBackgroundOptions) avatarBackgroundOptions.innerHTML = "";
   if (avatarAccessoryOptions) avatarAccessoryOptions.innerHTML = "";
   applyAvatarPreview(pendingBabyAvatar);
@@ -2043,14 +2036,23 @@ function getLegacyLocalDayStateStorageKey(dayId = getCurrentDayId()) {
   return `${storageKeys.dayState}.${safeDayId}`;
 }
 
+function getExplicitDayIdFromState(dayState = {}) {
+  const candidates = [dayState?.dayId, dayState?.date, dayState?.id];
+  return candidates.find((value) => isDateId(value)) || "";
+}
+
 function dayStateBelongsToDay(dayState = {}, dayId = getCurrentDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  if (dayState?.dayId === safeDayId || dayState?.date === safeDayId) return true;
+  const explicitDayId = getExplicitDayIdFromState(dayState);
+
+  // v75.58.2: se o estado já tem marcador de dia, ele não pode ser reaproveitado em outro dia.
+  // Isso evita que Observações do dia 1 apareçam no dia 2/3 por cache legado.
+  if (explicitDayId) return explicitDayId === safeDayId;
 
   const events = Array.isArray(dayState?.events) ? dayState.events : [];
   if (!events.length) return false;
 
-  return events.some((event = {}) => {
+  return events.every((event = {}) => {
     const start = Number(event.start);
     return Number.isFinite(start) && toDateInputValue(start) === safeDayId;
   });
@@ -2062,7 +2064,7 @@ function loadLocalDayState(dayId = getCurrentDayId()) {
   try {
     const scopedValue = localStorage.getItem(getLocalDayStateStorageKey(safeDayId));
     if (scopedValue !== null && typeof scopedValue !== "undefined") {
-      return normalizeDayState(JSON.parse(scopedValue || "{}"));
+      return sanitizeDayStateForDay(JSON.parse(scopedValue || "{}"), safeDayId);
     }
   } catch {
     // Se o cache por família+dia estiver inválido, cai para os fluxos seguros abaixo.
@@ -2071,49 +2073,40 @@ function loadLocalDayState(dayId = getCurrentDayId()) {
   try {
     const legacyDailyValue = localStorage.getItem(getLegacyLocalDayStateStorageKey(safeDayId));
     if (legacyDailyValue !== null && typeof legacyDailyValue !== "undefined") {
-      const legacyDailyState = normalizeDayState(JSON.parse(legacyDailyValue || "{}"));
+      const legacyDailyState = JSON.parse(legacyDailyValue || "{}");
       if (dayStateBelongsToDay(legacyDailyState, safeDayId) || !dayStateHasVisibleContent(legacyDailyState)) {
-        localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify({ ...legacyDailyState, dayId: safeDayId }));
-        return legacyDailyState;
+        const sanitized = sanitizeDayStateForDay(legacyDailyState, safeDayId);
+        localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(sanitized));
+        return sanitized;
       }
     }
   } catch {
     // Cache diário antigo inválido. Ignora para não repetir observações.
   }
 
-  try {
-    const legacyValue = localStorage.getItem(storageKeys.dayState);
-    if (!legacyValue) return createEmptyDayState();
-
-    const legacyState = JSON.parse(legacyValue || "{}");
-    if (dayStateBelongsToDay(legacyState, safeDayId)) {
-      const normalized = normalizeDayState(legacyState);
-      localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify({
-        ...normalized,
-        dayId: safeDayId,
-      }));
-      return normalized;
-    }
-  } catch {
-    // Cache legado inválido ou de outro dia. Ignora para não repetir observações.
-  }
-
-  return createEmptyDayState();
+  // v75.58.2: o cache genérico ninou.demo.dayState não é mais usado para abrir dias,
+  // porque ele era a origem de observações e registros herdados entre datas.
+  return sanitizeDayStateForDay(createEmptyDayState(), safeDayId);
 }
 
 function saveLocalDayState(dayId = getSelectedDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  const normalized = normalizeDayState(state);
+  const sanitized = sanitizeDayStateForDay(state, safeDayId, { preserveLive: true });
+  const now = Date.now();
   const payload = {
-    ...normalized,
+    ...sanitized,
     dayId: safeDayId,
-    clientUpdatedAt: Date.now(),
+    date: safeDayId,
+    dayNotesDayId: sanitized.dayNotes ? safeDayId : "",
+    dayNotesUpdatedAt: sanitized.dayNotes ? (sanitized.dayNotesUpdatedAt || now) : 0,
+    clientUpdatedAt: now,
   };
 
   localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
   localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
 
-  // Mantém compatibilidade com versões antigas, mas agora com marcador do dia.
+  // Compatibilidade apenas como espelho do dia atualmente carregado.
+  // O app não usa mais este cache genérico para abrir outros dias.
   localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
   persistVisibleContextForCurrentOwner();
 }
@@ -2823,6 +2816,146 @@ function dayStateHasVisibleContent(dayState = {}) {
   return hasRoutineDayContent(dayState) || Boolean(String(dayState?.dayNotes || "").trim());
 }
 
+function stripLiveStateFromHistoricalDay(dayState = {}, dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const normalized = normalizeDayState(dayState || createEmptyDayState());
+  if (safeDayId === getCurrentDayId()) return normalized;
+  return normalizeDayState({
+    ...normalized,
+    mode: "idle",
+    activeStartedAt: null,
+    activeType: "sono",
+    activeDetail: "",
+    activeNotes: "",
+  });
+}
+
+function normalizeDayNoteText(value = "") {
+  return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function getValidDayNotesForDay(sourceState = {}, dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const note = typeof sourceState?.dayNotes === "string" ? sourceState.dayNotes.trim() : "";
+  if (!note) return "";
+
+  const noteDayId = isDateId(sourceState?.dayNotesDayId) ? sourceState.dayNotesDayId : "";
+  if (noteDayId && noteDayId !== safeDayId) return "";
+
+  const explicitDayId = getExplicitDayIdFromState(sourceState);
+  if (explicitDayId && explicitDayId !== safeDayId) return "";
+
+  return note;
+}
+
+function sanitizeDayStateForDay(dayState = {}, dayId = getSelectedDayId(), options = {}) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const source = dayState && typeof dayState === "object" ? dayState : {};
+  const explicitDayId = getExplicitDayIdFromState(source);
+
+  if (explicitDayId && explicitDayId !== safeDayId) {
+    return normalizeDayState({
+      ...createEmptyDayState(),
+      dayId: safeDayId,
+      date: safeDayId,
+      clientUpdatedAt: Date.now(),
+    });
+  }
+
+  const dayStart = getDayStartFromId(safeDayId);
+  const dayEnd = dayStart + day;
+  const normalized = normalizeDayState(source);
+  const deletedIds = getDeletedEventIdsFromState(normalized);
+  const dayEvents = (Array.isArray(normalized.events) ? normalized.events : [])
+    .map(normalizeEvent)
+    .filter(Boolean)
+    .filter((event) => !deletedIds.has(event.id))
+    .filter((event) => eventOverlapsWindow(event, dayStart, dayEnd));
+
+  const validNote = getValidDayNotesForDay(source, safeDayId);
+  const next = normalizeDayState({
+    ...normalized,
+    dayId: safeDayId,
+    date: safeDayId,
+    events: dayEvents,
+    dayNotes: validNote,
+    dayNotesDayId: validNote ? safeDayId : "",
+    dayNotesUpdatedAt: validNote ? (Number(source.dayNotesUpdatedAt) || Number(source.clientUpdatedAt) || 0) : 0,
+  });
+
+  return options.preserveLive === true
+    ? next
+    : stripLiveStateFromHistoricalDay(next, safeDayId);
+}
+
+function sanitizeDayStateMapByDay(dayStates = {}) {
+  const result = {};
+  const firstLegacyNoteDayByText = new Map();
+  Object.keys(dayStates || {}).filter(isDateId).sort().forEach((dayId) => {
+    const rawState = dayStates[dayId] || {};
+    const hadExplicitNoteMarker = isDateId(rawState?.dayNotesDayId);
+    let normalized = sanitizeDayStateForDay(rawState, dayId);
+    const noteKey = normalizeDayNoteText(normalized.dayNotes);
+
+    // v75.58.2: notas antigas sem marcador, repetidas em vários dias, ficam apenas no primeiro dia.
+    if (noteKey && !hadExplicitNoteMarker) {
+      if (firstLegacyNoteDayByText.has(noteKey)) {
+        normalized = normalizeDayState({
+          ...normalized,
+          dayNotes: "",
+          dayNotesDayId: "",
+          dayNotesUpdatedAt: 0,
+        });
+      } else {
+        firstLegacyNoteDayByText.set(noteKey, dayId);
+        normalized = normalizeDayState({
+          ...normalized,
+          dayNotesDayId: dayId,
+          dayNotesUpdatedAt: normalized.dayNotesUpdatedAt || normalized.clientUpdatedAt || 0,
+        });
+      }
+    }
+
+    result[dayId] = normalized;
+  });
+  return result;
+}
+
+function rebuildRoutineModeAfterMutation(dayState = state, dayId = getSelectedDayId(), options = {}) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  let nextState = sanitizeDayStateForDay(dayState, safeDayId, { preserveLive: true });
+
+  if (safeDayId !== getCurrentDayId()) {
+    return stripLiveStateFromHistoricalDay(nextState, safeDayId);
+  }
+
+  const preserveSleeping = options.preserveSleeping !== false;
+  if (preserveSleeping && nextState.mode === "sleeping" && Number.isFinite(Number(nextState.activeStartedAt))) {
+    return nextState;
+  }
+
+  const boundary = getLatestAwakeBoundaryFromEvents(nextState, safeDayId, Date.now());
+  if (!Number.isFinite(Number(boundary))) {
+    return normalizeDayState({
+      ...nextState,
+      mode: "idle",
+      activeStartedAt: null,
+      activeType: "sono",
+      activeDetail: "",
+      activeNotes: "",
+    });
+  }
+
+  return normalizeDayState({
+    ...nextState,
+    mode: "awake",
+    activeStartedAt: Number(boundary),
+    activeType: "sono",
+    activeDetail: "",
+    activeNotes: "",
+  });
+}
+
 function getEventWindowStart(event = {}) {
   const start = Number(event.start);
   return Number.isFinite(start) ? start : null;
@@ -2873,27 +3006,33 @@ function syncSelectedDayIntoFamilyCache() {
   const dayId = getSelectedDayId();
   if (!isDateId(dayId)) return;
 
-  const cachedState = normalizeDayState(familyDayStatesCache[dayId] || loadLocalDayState(dayId));
-  const selectedState = loadedStateDayId === dayId ? normalizeDayState(state) : cachedState;
-  const selectedHasVisibleContent = dayStateHasVisibleContent(selectedState);
-  const cachedHasVisibleContent = dayStateHasVisibleContent(cachedState);
+  const cachedState = sanitizeDayStateForDay(familyDayStatesCache[dayId] || loadLocalDayState(dayId), dayId);
+  const selectedState = loadedStateDayId === dayId ? sanitizeDayStateForDay(state, dayId, { preserveLive: true }) : cachedState;
+  const selectedHasPersistentContent = dayStateHasPersistentContent(selectedState);
+  const cachedHasPersistentContent = dayStateHasPersistentContent(cachedState);
+  const selectedDeletedIds = getDeletedEventIdsFromState(selectedState);
+  const cachedDeletedIds = getDeletedEventIdsFromState(cachedState);
+  const selectedHasDeletionMarker = selectedDeletedIds.size > cachedDeletedIds.size;
 
   familyDayStatesCache = {
     ...familyDayStatesCache,
-    [dayId]: selectedHasVisibleContent || !cachedHasVisibleContent ? selectedState : cachedState,
+    [dayId]: selectedHasPersistentContent || selectedHasDeletionMarker || !cachedHasPersistentContent ? selectedState : cachedState,
   };
 
-  if (selectedHasVisibleContent && !familyDayIdsCache.includes(dayId)) {
+  if ((dayStateHasVisibleContent(selectedState) || selectedHasDeletionMarker) && !familyDayIdsCache.includes(dayId)) {
     familyDayIdsCache = [...familyDayIdsCache, dayId].filter(isDateId).sort();
   }
 }
 
 function getFamilyDayState(dayId) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
+  const cachedState = sanitizeDayStateForDay(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId), safeDayId);
   if (safeDayId === getSelectedDayId() && loadedStateDayId === safeDayId) {
-    const selectedState = normalizeDayState(state);
-    return dayStateHasVisibleContent(selectedState) || !dayStateHasVisibleContent(cachedState)
+    const selectedState = sanitizeDayStateForDay(state, safeDayId, { preserveLive: true });
+    const selectedDeletedIds = getDeletedEventIdsFromState(selectedState);
+    const cachedDeletedIds = getDeletedEventIdsFromState(cachedState);
+    const selectedHasDeletionMarker = selectedDeletedIds.size > cachedDeletedIds.size;
+    return dayStateHasPersistentContent(selectedState) || selectedHasDeletionMarker || !dayStateHasPersistentContent(cachedState)
       ? selectedState
       : cachedState;
   }
@@ -2908,7 +3047,7 @@ function getFamilyEventsForWindow(windowStart, windowEnd) {
   for (let dayStart = startDay; dayStart <= endDay; dayStart += day) {
     const dayId = toDateInputValue(dayStart);
     const dayState = getFamilyDayState(dayId);
-    (dayState.events || []).forEach((event) => {
+    getVisibleEventsFromState(dayState).forEach((event) => {
       if (eventOverlapsWindow(event, windowStart, windowEnd)) events.push(event);
     });
   }
@@ -4766,7 +4905,7 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.58: admin ativa a família principal; usuários novos podem criar a própria família.
+    // v75.58.1: admin ativa a família principal; usuários novos podem criar a própria família.
     createFamilyButton.hidden = !connected || authorized;
     createFamilyButton.textContent = appAdmin ? "Ativar família principal" : "Criar minha família";
   }
@@ -5462,10 +5601,12 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 
 function saveDayState() {
   loadedStateDayId = getSelectedDayId();
-  state.events = dedupeEventsByDisplayKey(state.events || []);
+  const deletedIds = getDeletedEventIdsFromState(state);
+  state.events = dedupeEventsByDisplayKey((state.events || []).filter((event) => !deletedIds.has(event?.id)));
+  state = sanitizeDayStateForDay(state, loadedStateDayId, { preserveLive: true });
   saveLocalDayState(loadedStateDayId);
   syncSelectedDayIntoFamilyCache();
-  scheduleDayCloudSave();
+  scheduleDayCloudSave(loadedStateDayId);
 }
 
 function formatEventMeta(event) {
@@ -5512,8 +5653,10 @@ function getAwakeEventInActiveWindow(start = Date.now(), excludeEventId = null) 
 function addAwakeEvent(start = Date.now(), detail = "Acordou", notes = "", options = {}) {
   state.events = Array.isArray(state.events) ? state.events : [];
 
-  const existingInActiveWindow = getAwakeEventInActiveWindow(start, options.excludeEventId || null);
-  if (existingInActiveWindow) return existingInActiveWindow;
+  if (options.checkActiveWindow !== false) {
+    const existingInActiveWindow = getAwakeEventInActiveWindow(start, options.excludeEventId || null);
+    if (existingInActiveWindow) return existingInActiveWindow;
+  }
 
   const alreadyExists = state.events.some((event) => (
     event?.id !== options.excludeEventId &&
@@ -5700,16 +5843,20 @@ async function loadFamilyDayIds(options = {}) {
       const id = docSnap.id;
       if (!isDateId(id)) return;
       const data = docSnap.data() || {};
-      const normalized = normalizeDayState(data.state && typeof data.state === "object" ? data.state : data);
+      const normalized = sanitizeDayStateForDay(data.state && typeof data.state === "object" ? data.state : data, id);
       states[id] = normalized;
-      if (hasRoutineDayContent(normalized)) ids.push(id);
+      if (hasRoutineDayContent(normalized) || String(normalized.dayNotes || "").trim()) ids.push(id);
     });
-    ids.sort();
-    familyDayIdsCache = ids;
-    familyDayStatesCache = states;
+    const sanitizedStates = sanitizeDayStateMapByDay(states);
+    const sanitizedIds = Object.entries(sanitizedStates)
+      .filter(([id, item]) => isDateId(id) && (hasRoutineDayContent(item) || String(item.dayNotes || "").trim() || getDeletedEventIdsFromState(item).size))
+      .map(([id]) => id)
+      .sort();
+    familyDayIdsCache = sanitizedIds;
+    familyDayStatesCache = sanitizedStates;
     familyDayIdsCacheAt = now;
-    updateDiaryDateRangeFromFamilyDays(ids);
-    return ids;
+    updateDiaryDateRangeFromFamilyDays(familyDayIdsCache);
+    return familyDayIdsCache;
   } catch (error) {
     console.warn("Não foi possível listar dias da família:", error);
     return familyDayIdsCache || [];
@@ -5913,25 +6060,27 @@ function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
   try {
     const daySource = data.state && typeof data.state === "object" ? data.state : data;
     const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
-    const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
-    const currentSelectedState = loadedStateDayId === safeDayId ? normalizeDayState(state) : cachedState;
+    const cachedState = sanitizeDayStateForDay(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId), safeDayId);
+    const currentSelectedState = loadedStateDayId === safeDayId ? sanitizeDayStateForDay(state, safeDayId, { preserveLive: true }) : cachedState;
     const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
       ? currentSelectedState
       : cachedState;
-    const mergedState = mergeRoutineDayStatesForCloud(localState, daySource);
+    let mergedState = mergeRoutineDayStatesForCloud(localState, daySource, safeDayId);
+    mergedState = rebuildRoutineModeAfterMutation(mergedState, safeDayId, { preserveSleeping: true });
 
     if (isDateId(safeDayId)) {
-      familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(mergedState) };
-      if (dayStateHasVisibleContent(mergedState) && !familyDayIdsCache.includes(safeDayId)) {
+      familyDayStatesCache = sanitizeDayStateMapByDay({ ...familyDayStatesCache, [safeDayId]: mergedState });
+      const cachedForDay = familyDayStatesCache[safeDayId] || mergedState;
+      if (dayStateHasVisibleContent(cachedForDay) && !familyDayIdsCache.includes(safeDayId)) {
         familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
       }
       updateDiaryDateRangeFromFamilyDays();
     }
 
     if (safeDayId === getSelectedDayId()) {
-      state = reconcileAwakeStateForDay(mergedState, safeDayId);
+      state = familyDayStatesCache[safeDayId] || mergedState;
       loadedStateDayId = safeDayId;
-      saveLocalDayState();
+      saveLocalDayState(safeDayId);
       timelineRenderSignature = "";
       orbitRenderSignature = "";
       renderAll();
@@ -5992,10 +6141,27 @@ function getDeletedEventIdsFromState(dayState = {}) {
   );
 }
 
-function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}) {
+
+function getVisibleEventsFromState(dayState = {}) {
+  const normalizedState = normalizeDayState(dayState || {});
+  const deletedEventIds = getDeletedEventIdsFromState(normalizedState);
+  return (Array.isArray(normalizedState.events) ? normalizedState.events : [])
+    .map(normalizeEvent)
+    .filter((event) => event?.id && !deletedEventIds.has(event.id));
+}
+
+function dayStateHasPersistentContent(dayState = {}) {
+  const normalizedState = normalizeDayState(dayState || {});
+  return dayStateHasVisibleContent(normalizedState)
+    || getDeletedEventIdsFromState(normalizedState).size > 0
+    || (Array.isArray(normalizedState.auditLog) && normalizedState.auditLog.length > 0);
+}
+
+function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}, dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
   const cloudSource = cloudData.state && typeof cloudData.state === "object" ? cloudData.state : cloudData;
-  const cloudState = normalizeDayState(cloudSource || {});
-  const currentState = normalizeDayState(localState || {});
+  const cloudState = sanitizeDayStateForDay(cloudSource || {}, safeDayId);
+  const currentState = sanitizeDayStateForDay(localState || {}, safeDayId, { preserveLive: true });
   const deletedEventIds = new Set([
     ...getDeletedEventIdsFromState(cloudState),
     ...getDeletedEventIdsFromState(currentState),
@@ -6012,14 +6178,22 @@ function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}) {
     if (normalized?.id && !deletedEventIds.has(normalized.id)) eventsById.set(normalized.id, normalized);
   }
 
-  return normalizeDayState({
+  const currentNotes = getValidDayNotesForDay(currentState, safeDayId);
+  const cloudNotes = getValidDayNotesForDay(cloudState, safeDayId);
+  const chosenNotes = currentNotes || cloudNotes || "";
+
+  return sanitizeDayStateForDay({
     ...cloudState,
     ...currentState,
+    dayId: safeDayId,
+    date: safeDayId,
     deletedEventIds: [...deletedEventIds].slice(-240),
     events: sortEventsByStartDesc(dedupeEventsByDisplayKey([...eventsById.values()])),
     notes: currentState.notes || cloudState.notes || "",
-    dayNotes: currentState.dayNotes || cloudState.dayNotes || "",
-  });
+    dayNotes: chosenNotes,
+    dayNotesDayId: chosenNotes ? safeDayId : "",
+    dayNotesUpdatedAt: chosenNotes ? Math.max(Number(currentState.dayNotesUpdatedAt) || 0, Number(cloudState.dayNotesUpdatedAt) || 0) : 0,
+  }, safeDayId, { preserveLive: true });
 }
 
 async function saveDayToCloud(dayId = getSelectedDayId()) {
@@ -6029,8 +6203,8 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
 
   const selectedDayId = getSelectedDayId();
   const sourceState = safeDayId === selectedDayId && loadedStateDayId === safeDayId
-    ? normalizeDayState(state)
-    : normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
+    ? sanitizeDayStateForDay(state, safeDayId, { preserveLive: true })
+    : sanitizeDayStateForDay(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId), safeDayId);
 
   const hasDeletedEvents = getDeletedEventIdsFromState(sourceState).size > 0;
   if (!dayStateHasVisibleContent(sourceState) && !hasDeletedEvents) return;
@@ -6041,13 +6215,13 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
     try {
       const currentSnapshot = await firebaseServices.getDoc(dayRef);
       if (currentSnapshot.exists()) {
-        dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentSnapshot.data() || {});
+        dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentSnapshot.data() || {}, safeDayId);
       }
     } catch (mergeError) {
       console.warn("Não foi possível mesclar rotina antes de salvar. Salvando estado local atual:", mergeError);
     }
 
-    dayPayload = reconcileAwakeStateForDay(dayPayload, safeDayId);
+    dayPayload = rebuildRoutineModeAfterMutation(dayPayload, safeDayId, { preserveSleeping: true });
 
     await firebaseServices.setDoc(
       dayRef,
@@ -6058,15 +6232,15 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
       { merge: true },
     );
 
-    familyDayStatesCache = { ...familyDayStatesCache, [safeDayId]: normalizeDayState(dayPayload) };
+    familyDayStatesCache = sanitizeDayStateMapByDay({ ...familyDayStatesCache, [safeDayId]: normalizeDayState(dayPayload) });
     if (dayStateHasVisibleContent(dayPayload) && !familyDayIdsCache.includes(safeDayId)) {
       familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
     }
     updateDiaryDateRangeFromFamilyDays();
 
     if (safeDayId === selectedDayId) {
-      state = dayPayload;
-      saveLocalDayState();
+      state = familyDayStatesCache[safeDayId] || dayPayload;
+      saveLocalDayState(safeDayId);
       renderAll();
     }
 
@@ -6109,7 +6283,7 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
 
   dayUnsubscribe = firebaseServices.onSnapshot(dayRef, async (snapshot) => {
     if (!snapshot.exists()) {
-      const cachedState = normalizeDayState(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId));
+      const cachedState = sanitizeDayStateForDay(familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId), safeDayId);
       if (dayStateHasVisibleContent(cachedState)) {
         if (safeDayId === getSelectedDayId()) {
           state = cachedState;
@@ -6370,6 +6544,16 @@ function renderCurrentState() {
     setText(stateLabel, "Acesso necessário");
     setText(stateClock, "--:--");
     setText(stateHint, "Entre com login e senha ou solicite acesso para registrar a rotina.");
+    renderActiveTimerCard();
+    return;
+  }
+
+  if (getSelectedDayId() !== getCurrentDayId()) {
+    setHidden(wakeAction, true);
+    setHidden(startChoice, true);
+    setText(stateLabel, "Data selecionada");
+    setText(stateClock, "--:--");
+    setText(stateHint, "Você está revisando um dia anterior. Use o botão + para incluir ou editar registros nessa data.");
     renderActiveTimerCard();
     return;
   }
@@ -7164,19 +7348,25 @@ function reconcileAwakeStateForDay(dayState = state, dayId = getSelectedDayId(),
 }
 
 function reconcileCurrentAwakeStateFromEvents(options = {}) {
-  if (state?.mode === "sleeping") return false;
-  const beforeStart = Number(state?.activeStartedAt);
-  const beforeMode = state?.mode || "idle";
-  const nextState = reconcileAwakeStateForDay(state, getSelectedDayId(), Date.now());
-  const afterStart = Number(nextState?.activeStartedAt);
-  const changed = beforeMode !== nextState.mode
-    || (Number.isFinite(afterStart) && (!Number.isFinite(beforeStart) || Math.abs(afterStart - beforeStart) > 1000));
+  const selectedDayId = getSelectedDayId();
+  if (selectedDayId !== getCurrentDayId()) {
+    const historical = stripLiveStateFromHistoricalDay(state, selectedDayId);
+    const changedHistorical = JSON.stringify(historical) !== JSON.stringify(normalizeDayState(state));
+    if (changedHistorical) state = historical;
+    return changedHistorical;
+  }
+
+  if (state?.mode === "sleeping" && options.force !== true) return false;
+
+  const before = JSON.stringify(normalizeDayState(state));
+  const nextState = rebuildRoutineModeAfterMutation(state, selectedDayId, { preserveSleeping: options.force !== true });
+  const changed = before !== JSON.stringify(normalizeDayState(nextState));
 
   if (changed) {
     state = nextState;
     if (options.persist !== false) {
       syncSelectedDayIntoFamilyCache();
-      saveLocalDayState();
+      saveLocalDayState(selectedDayId);
     }
     timelineRenderSignature = "";
     orbitRenderSignature = "";
@@ -7478,7 +7668,12 @@ function renderAuditTrail() {
 
 function renderDayNotesPanel() {
   if (!dayNotesTextarea) return;
-  const value = typeof state.dayNotes === "string" ? state.dayNotes : "";
+  const selectedDayId = getSelectedDayId();
+  const value = getValidDayNotesForDay(state, selectedDayId);
+  if (state.dayNotes !== value) {
+    state.dayNotes = value;
+    state.dayNotesDayId = value ? selectedDayId : "";
+  }
   if (document.activeElement !== dayNotesTextarea) {
     dayNotesTextarea.value = value;
   }
@@ -7489,7 +7684,11 @@ function renderDayNotesPanel() {
 
 function saveDayNotes() {
   if (!requireLogin("salvar observações do dia")) return;
+  const selectedDayId = getSelectedDayId();
   state.dayNotes = dayNotesTextarea?.value?.trim() || "";
+  state.dayNotesDayId = state.dayNotes ? selectedDayId : "";
+  state.dayNotesUpdatedAt = state.dayNotes ? Date.now() : 0;
+  state = sanitizeDayStateForDay(state, selectedDayId, { preserveLive: true });
   saveDayState();
   renderDayNotesPanel();
 }
@@ -7695,7 +7894,7 @@ async function setDiaryDate(value) {
   }
 
   const selectedDayId = getSelectedDayId();
-  const cachedState = normalizeDayState(familyDayStatesCache[selectedDayId] || loadLocalDayState(selectedDayId));
+  const cachedState = sanitizeDayStateForDay(familyDayStatesCache[selectedDayId] || loadLocalDayState(selectedDayId), selectedDayId);
   state = cachedState;
   loadedStateDayId = selectedDayId;
   saveLocalDayState();
@@ -8028,9 +8227,13 @@ function saveManualEvent() {
   }
 
   if (payload.type === "acordou") {
-    const duplicateWake = getAwakeEventInActiveWindow(payload.start, existingEvent?.id || null);
+    const duplicateWake = state.events.some((event) => (
+      event?.id !== (existingEvent?.id || null)
+      && event.type === "acordou"
+      && Math.abs(Number(event.start) - Number(payload.start)) < 60000
+    ));
     if (duplicateWake) {
-      window.alert("Já existe um registro de Acordou nesta janela acordada. Para corrigir o horário, edite o registro existente em vez de criar outro.");
+      window.alert("Já existe um registro de Acordou nesse mesmo minuto. Para corrigir, edite o registro existente.");
       return;
     }
   }
@@ -8064,6 +8267,7 @@ function saveManualEvent() {
       lastAction: "editou",
     });
     pushAuditEntry("editou", existingEvent);
+    state = rebuildRoutineModeAfterMutation(state, getSelectedDayId(), { preserveSleeping: false });
   } else if ((payload.type === "sono" || payload.type === "dormir" || payload.type === "despertar-noturno") && payload.hasManualEnd) {
     const newEvent = makeEvent(payload.type, payload.start, payload.end, payload.detail, payload.notes);
     state.events.push(newEvent);
@@ -8074,7 +8278,7 @@ function saveManualEvent() {
     } else if (state.mode !== "awake" && canUseManualTimeForLiveState(payload.start)) {
       state = startRoutineTimer(state, "awake", payload.start);
     }
-    const addedWakeEvent = addAwakeEvent(payload.start, payload.detail || "Acordou", payload.notes);
+    const addedWakeEvent = addAwakeEvent(payload.start, payload.detail || "Acordou", payload.notes, { checkActiveWindow: false });
     if (!addedWakeEvent) {
       window.alert("Não foi possível criar outro Acordou no mesmo minuto. Edite o registro existente se precisar ajustar o horário.");
       return;
@@ -8088,6 +8292,8 @@ function saveManualEvent() {
     state.events.push(newEvent);
     pushAuditEntry("adicionou", newEvent);
   }
+
+  state = rebuildRoutineModeAfterMutation(state, getSelectedDayId(), { preserveSleeping: true });
 
   clearRecordFormAfterSave({
     elements: {
@@ -8130,7 +8336,8 @@ function deleteEvent(eventId) {
 
   pushAuditEntry("excluiu", event);
   state.deletedEventIds = [...new Set([...(state.deletedEventIds || []), event.id])].slice(-240);
-  state.events = removeEventById(state.events, eventId);
+  state.events = removeEventById(state.events, eventId).filter((item) => !getDeletedEventIdsFromState(state).has(item.id));
+  state = rebuildRoutineModeAfterMutation(state, getSelectedDayId(), { preserveSleeping: false });
   timelineRenderSignature = "";
   orbitRenderSignature = "";
   saveDayState();
@@ -8700,11 +8907,14 @@ if (themeModeInput) {
   themeModeInput.addEventListener("change", () => {
     const nextMode = readThemeModeInput(themeModeInput);
     babyProfile = normalizeBabyProfile({ ...babyProfile, themeMode: nextMode });
+    if (themeModeInput) themeModeInput.value = nextMode;
+    try { localStorage.setItem(storageKeys.themeMode, nextMode); } catch {}
 
     if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) {
-      try { localStorage.setItem(storageKeys.themeMode, nextMode); } catch {}
+      saveBabyProfile();
       updateTheme();
       renderGuestThemeButtons();
+      renderProfileFamilyCards();
       return;
     }
 
@@ -8712,6 +8922,8 @@ if (themeModeInput) {
     saveBabyProfile();
     scheduleProfileCloudSave();
     updateTheme();
+    renderGuestThemeButtons();
+    renderProfileFamilyCards();
   });
 }
 

@@ -130,7 +130,12 @@ export function normalizeDayState(dayState = {}) {
           eventId: typeof item.eventId === "string" ? item.eventId : "",
         }))
       : [],
+    dayId: typeof dayState.dayId === "string" ? dayState.dayId : "",
+    date: typeof dayState.date === "string" ? dayState.date : "",
+    clientUpdatedAt: Number.isFinite(Number(dayState.clientUpdatedAt)) ? Number(dayState.clientUpdatedAt) : 0,
     dayNotes: typeof dayState.dayNotes === "string" ? dayState.dayNotes : "",
+    dayNotesDayId: typeof dayState.dayNotesDayId === "string" ? dayState.dayNotesDayId : "",
+    dayNotesUpdatedAt: Number.isFinite(Number(dayState.dayNotesUpdatedAt)) ? Number(dayState.dayNotesUpdatedAt) : 0,
   };
 }
 

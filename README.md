@@ -464,11 +464,29 @@ Pacote consolidado com Perfil Familiar + Convite de Cuidador e correção de hor
 - Registros novos carregam `caregiverName`, `caregiverRelationship`, `caregiverLabel`, `createdByUid` e `createdAtClient`.
 - Tema do Perfil foi reduzido para Claro/Escuro.
 
-## Ninou v75.58
+## Ninou v75.58.1
 
 - Base multi-família para criação de novas famílias por usuários autenticados.
 - Cache local de registros por família + data.
 - Card de sincronização com último salvamento.
 - Diagnóstico técnico para validar versão, familyId e PWA.
-- Service Worker/cache atualizado para v75.58.
+- Service Worker/cache atualizado para v75.58.1.
 - Regras Firestore em `FIRESTORE_RULES_V75_58.rules`.
+
+
+## v75.58.1 — Correção exclusão + Acordou
+
+- Corrige exclusão que podia reaparecer por cache/merge local.
+- Filtra registros marcados em `deletedEventIds` na timeline e relatórios.
+- Ajusta `Acordou` manual para bloquear apenas duplicidade no mesmo minuto.
+- Impede que o estado ao vivo interfira em dias anteriores.
+
+
+## v75.58.2 — Correção estrutural da rotina
+
+- Observações do dia agora são sanitizadas por `dayId`, com marcador `dayNotesDayId`.
+- O cache genérico `ninou.demo.dayState` não é mais usado para abrir outros dias.
+- Estados de dias anteriores não carregam cronômetro ao vivo de acordado/soneca.
+- Edição e exclusão recalculam a rotina do dia, evitando item voltar ou tempo acordado ficar preso.
+- A tela de avatar voltou a exibir opções de cabelo, cor do cabelo, tom de pele e fundo.
+- Service Worker/cache atualizado para v75.58.2.
