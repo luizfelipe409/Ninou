@@ -18,8 +18,18 @@ function parseBreastfeedingDetail(detail = "") {
   return { side, left, right, total, hasBoth, hasTimer: Boolean(left || right || total) };
 }
 
+function getDisplayStartLabel(event) {
+  return event?.displayStartLabel || formatTime(event.start);
+}
+
+function getDisplayRangeLabel(event) {
+  if (event?.displayRangeLabel) return event.displayRangeLabel;
+  const hasEnd = Number(event.end) > Number(event.start);
+  return hasEnd ? `${formatTime(event.start)}–${formatTime(event.end)}` : formatTime(event.start);
+}
+
 function formatBreastfeedingMeta(event) {
-  const time = formatTime(event.start);
+  const time = getDisplayStartLabel(event);
   const parsed = parseBreastfeedingDetail(event.detail);
   if (!parsed.hasTimer) {
     return {
@@ -40,7 +50,7 @@ function formatBreastfeedingMeta(event) {
 function formatSleepMeta(event) {
   const hasEnd = Number(event.end) > Number(event.start);
   const duration = hasEnd ? formatShortDuration(event.end - event.start) : "em andamento";
-  const timeText = hasEnd ? `${formatTime(event.start)}–${formatTime(event.end)}` : formatTime(event.start);
+  const timeText = hasEnd ? getDisplayRangeLabel(event) : getDisplayStartLabel(event);
   const detail = isPlaceholderDetail(event.detail) ? "" : String(event.detail || "").trim();
   const wakeWindow = Number(event.wakeWindowMs) > 0
     ? `Acordado ${formatShortDuration(Number(event.wakeWindowMs))} antes`
@@ -57,9 +67,9 @@ function formatBottleMeta(event) {
   const ml = detail.match(/(\d+(?:[,.]\d+)?)\s*ml/i)?.[0] || "";
   const type = ml ? detail.replace(ml, "").replace(/[•-]/g, " ").trim() : detail;
   return {
-    primary: [ml || detail || "Mamadeira", formatTime(event.start)].filter(Boolean).join(" • "),
+    primary: [ml || detail || "Mamadeira", getDisplayStartLabel(event)].filter(Boolean).join(" • "),
     secondary: ml && type ? type : "",
-    compact: [formatTime(event.start), detail].filter(Boolean).join(" • "),
+    compact: [getDisplayStartLabel(event), detail].filter(Boolean).join(" • "),
   };
 }
 
@@ -67,9 +77,9 @@ function formatMedicineMeta(event) {
   const detail = isPlaceholderDetail(event.detail) ? "Dose" : String(event.detail || "").trim();
   const notes = String(event.notes || "").trim();
   return {
-    primary: [formatTime(event.start), detail].filter(Boolean).join(" • "),
+    primary: [getDisplayStartLabel(event), detail].filter(Boolean).join(" • "),
     secondary: notes ? notes : "",
-    compact: [formatTime(event.start), detail].filter(Boolean).join(" • "),
+    compact: [getDisplayStartLabel(event), detail].filter(Boolean).join(" • "),
   };
 }
 
@@ -77,8 +87,8 @@ function formatGenericMeta(event) {
   const duration = event.end > event.start ? formatShortDuration(event.end - event.start) : "";
   const showRange = (isSleepEvent(event) || event.type === "despertar-noturno") && event.end > event.start;
   const timeText = showRange
-    ? `${formatTime(event.start)}–${formatTime(event.end)}`
-    : formatTime(event.start);
+    ? getDisplayRangeLabel(event)
+    : getDisplayStartLabel(event);
   const detail = isPlaceholderDetail(event.detail) ? "" : String(event.detail || "").trim();
   return {
     primary: [timeText, detail].filter(Boolean).join(" • "),
@@ -169,9 +179,8 @@ function getEventAuthorLabel(event = {}) {
 function getRoutineDetailLine(event, parts = {}) {
   let primary = String(parts.primary || "").trim();
   const secondary = String(parts.secondary || "").trim();
-  const startTime = formatTime(event.start);
-  const endTime = formatTime(event.end);
-  const range = `${startTime}–${endTime}`;
+  const startTime = getDisplayStartLabel(event);
+  const range = getDisplayRangeLabel(event);
 
   if (primary === startTime || primary === range) primary = "";
   if (primary.startsWith(`${startTime} • `)) primary = primary.slice(`${startTime} • `.length);
@@ -195,7 +204,7 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   const parts = getEventDisplayParts(event);
   const notes = event.notes && event.type !== "medicamento" ? `<p>${escapeHtml(event.notes)}</p>` : "";
   const actorName = getEventAuthorLabel(event);
-  const registeredLine = `Registrado por ${actorName} • ${formatTime(event.start)}`;
+  const registeredLine = `Registrado por ${actorName} • ${getDisplayStartLabel(event)}`;
   const extraMeta = getRoutineDetailLine(event, parts);
   return `
     <i class="mark ${config.arcType}">${config.icon}</i>

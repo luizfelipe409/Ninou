@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.58.2" />
+    <link rel="stylesheet" href="./styles.css?v=75.59.1" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -322,7 +322,7 @@
             <strong>Notas da família</strong>
           </div>
           <p class="section-helper">Registre percepções importantes para pais, cuidadores ou pediatra, sem substituir orientação médica.</p>
-          <textarea id="dayNotesTextarea" rows="4" placeholder="Ex.: Dormiu melhor após o banho, teve mais cólica pela manhã, aceitou menos mamadeira à noite."></textarea>
+          <textarea id="dayNotesTextarea" rows="4" maxlength="1200" placeholder="Ex.: Dormiu melhor após o banho, teve mais cólica pela manhã, aceitou menos mamadeira à noite."></textarea>
           <div class="day-notes-actions">
             <small id="dayNotesStatus">Nenhuma observação salva neste dia.</small>
             <button id="saveDayNotesButton" class="secondary-login" type="button">Salvar observação</button>
@@ -934,10 +934,14 @@
             </div>
           </article>
 
-          <article class="privacy-note-card">
+          <article class="privacy-note-card security-device-card">
             <span>Privacidade</span>
             <strong>Dados familiares e avatar sem foto real</strong>
             <p>Os dados do bebê ficam vinculados à família autorizada. O Ninou usa avatares locais e não depende de armazenamento externo de foto real.</p>
+            <div class="security-actions-row">
+              <button id="clearDeviceDataButton" class="secondary-login danger-soft-button" type="button">Sair e limpar dados deste aparelho</button>
+            </div>
+            <small id="clearDeviceDataStatus" class="security-device-status">Use em celulares compartilhados ou ao trocar de família.</small>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Acesso familiar</span>
@@ -1216,13 +1220,14 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.58.2</strong>
-            <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA e sincronização.</p>
+            <strong id="diagnosticsVersionLabel">Ninou v75.59.1</strong>
+            <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
               <div><span>FamilyId</span><strong id="diagnosticsFamilyLabel">—</strong></div>
               <div><span>PWA</span><strong id="diagnosticsPwaLabel">—</strong></div>
               <div><span>Cache local</span><strong id="diagnosticsCacheLabel">—</strong></div>
+              <div><span>App Check</span><strong id="diagnosticsAppCheckLabel">Pendente</strong></div>
             </div>
           </article>
           <article class="export-card">
@@ -1397,6 +1402,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.58.2"></script>
+    <script type="module" src="./app.js?v=75.59.1"></script>
   </body>
 </html>

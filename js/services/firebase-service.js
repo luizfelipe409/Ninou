@@ -1,4 +1,4 @@
-import { firebaseConfig, firebaseSdkVersion } from "../config/constants.js";
+import { appCheckConfig, firebaseConfig, firebaseSdkVersion } from "../config/constants.js";
 
 let firebaseServices = null;
 let firebaseServicesPromise = null;
@@ -11,9 +11,46 @@ export async function getFirebaseServices() {
       import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`),
       import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`),
       import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`),
+      import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-check.js`).catch((error) => {
+        console.warn("Firebase App Check indisponível neste carregamento.", error);
+        return null;
+      }),
     ])
-      .then(([appModule, authModule, firestoreModule]) => {
+      .then(([appModule, authModule, firestoreModule, appCheckModule]) => {
         const app = appModule.initializeApp(firebaseConfig);
+
+        const appCheckStatus = {
+          enabled: false,
+          configured: false,
+          provider: appCheckConfig?.provider || "none",
+          reason: "site-key-pending",
+        };
+
+        try {
+          const siteKey = String(appCheckConfig?.siteKey || "").trim();
+          const hasRealSiteKey = Boolean(siteKey)
+            && !siteKey.includes("COLE_A_SITE_KEY")
+            && siteKey.length >= 20;
+
+          if (appCheckConfig?.enabled && appCheckModule && hasRealSiteKey) {
+            const Provider = appCheckModule.ReCaptchaEnterpriseProvider || appCheckModule.ReCaptchaV3Provider;
+            if (typeof Provider === "function" && typeof appCheckModule.initializeAppCheck === "function") {
+              const appCheck = appCheckModule.initializeAppCheck(app, {
+                provider: new Provider(siteKey),
+                isTokenAutoRefreshEnabled: true,
+              });
+              appCheckStatus.enabled = true;
+              appCheckStatus.configured = true;
+              appCheckStatus.reason = "active";
+              appCheckStatus.instance = appCheck;
+            } else {
+              appCheckStatus.reason = "provider-unavailable";
+            }
+          }
+        } catch (error) {
+          appCheckStatus.reason = "init-error";
+          console.warn("Não foi possível iniciar o App Check. O app continuará sem enforcement local.", error);
+        }
         const db = (() => {
           try {
             if (
@@ -36,6 +73,7 @@ export async function getFirebaseServices() {
 
         firebaseServices = {
           auth: authModule.getAuth(app),
+          appCheckStatus,
           createUserWithEmailAndPassword: authModule.createUserWithEmailAndPassword,
           signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
           signOut: authModule.signOut,

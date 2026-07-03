@@ -1,5 +1,5 @@
-/* Ninou v75.58.2 - rotina estável, notas por dia e avatar completo. */
-@import url("./css/app.legacy.css?v=75.58.2");
+/* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.59.1");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -280,7 +280,7 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* Ninou v75.58.2 — revisão minuciosa de espaçamento, cards e mobile */
+/* Ninou v75.58.3 — revisão minuciosa de espaçamento, cards e mobile */
 :root {
   --ninou-screen-gap-polished: 16px;
   --ninou-card-gap-polished: 14px;
@@ -716,7 +716,7 @@ body.day-theme .ninou-modal-card > p {
   }
 }
 
-/* Ninou v75.58.2 — revisão visual final após análise do vídeo
+/* Ninou v75.58.3 — revisão visual final após análise do vídeo
    Ajustes focados em consistência real no iPhone/Safari:
    - títulos dos cards em duas linhas quando o HTML não possui wrapper;
    - Observações do dia com hierarquia correta;
@@ -1072,7 +1072,7 @@ body.day-theme .day-notes-card .section-helper {
 }
 
 
-/* Ninou v75.58.2 — correção de respiro final e sequência de cards
+/* Ninou v75.58.3 — correção de respiro final e sequência de cards
    Corrige sobras no fim das páginas e remove o vão entre
    Ajuda e suporte e Perfil do bebê. */
 :root {
@@ -1167,7 +1167,7 @@ body.day-theme .day-notes-card .section-helper {
   }
 }
 
-/* Ninou v75.58.2 — base multi-família, diagnóstico e PWA confiável */
+/* Ninou v75.58.3 — base multi-família, diagnóstico e PWA confiável */
 :root {
   --ninou-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ninou-safe-top: env(safe-area-inset-top, 0px);
@@ -1285,4 +1285,848 @@ body {
   .diagnostics-grid {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* Ninou v75.59.1 — segurança multi-família
+   Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
+   Android compacto, telas médias, tablets e desktop. Esta camada não altera
+   lógica do app; apenas tipografia, grids, botões, cards, modais e navegação. */
+:root {
+  --ninou-responsive-page-x: clamp(12px, 3.7vw, 20px);
+  --ninou-responsive-card-pad: clamp(14px, 3.9vw, 20px);
+  --ninou-responsive-card-gap: clamp(10px, 3vw, 14px);
+  --ninou-responsive-radius: clamp(20px, 6vw, 28px);
+  --ninou-responsive-title: clamp(1rem, 4.6vw, 1.28rem);
+  --ninou-responsive-body: clamp(.84rem, 3.55vw, .96rem);
+  --ninou-responsive-small: clamp(.70rem, 3.05vw, .82rem);
+  --ninou-responsive-button: clamp(.78rem, 3.35vw, .92rem);
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.phone-shell,
+.screen,
+.screen[data-screen],
+.app-header,
+.app-update-notice,
+.admin-preview-banner,
+section,
+article,
+form,
+label,
+ul,
+ol,
+li,
+div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Texto: não quebra palavra no meio sem necessidade e não estoura o card. */
+body,
+button,
+input,
+select,
+textarea,
+strong,
+span,
+p,
+small,
+label,
+li,
+h1,
+h2,
+h3 {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+.phone-shell {
+  width: min(100%, 520px) !important;
+  margin-inline: auto !important;
+  padding-left: var(--ninou-responsive-page-x) !important;
+  padding-right: var(--ninou-responsive-page-x) !important;
+}
+
+.screen[data-screen] {
+  width: 100%;
+  gap: var(--ninou-responsive-card-gap) !important;
+}
+
+.screen[data-screen] > * {
+  width: 100%;
+}
+
+/* Cabeçalho: evita que nome, título ou pill de status empurrem a tela. */
+.app-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+.identity {
+  min-width: 0;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.identity div,
+.identity strong,
+.identity span {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.identity strong,
+#diaryTitle {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap !important;
+}
+
+.sync-pill,
+.app-update-notice button,
+.admin-preview-banner button {
+  flex: 0 0 auto;
+  white-space: nowrap !important;
+}
+
+/* Cards e títulos principais. */
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.last-card,
+.today-last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.chart-card,
+.sound-player-card,
+.sound-note,
+.profile-card,
+.baby-profile-card,
+.avatar-compact-card,
+.login-card,
+.privacy-note-card,
+.admin-access-card,
+.wake-window-card,
+.export-card,
+.danger-card,
+.profile-ready-card,
+.guest-welcome-card,
+.premium-trust-card,
+.account-journey-card,
+.post-access-card,
+.data-reality-card,
+.first-use-checklist-card,
+.profile-family-card,
+.sync-health-card,
+.admin-diagnostics-card,
+.settings-list article,
+.admin-clean-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden;
+  padding: var(--ninou-responsive-card-pad) !important;
+  border-radius: var(--ninou-responsive-radius) !important;
+}
+
+.drawer-section-title,
+.section-title,
+.chart-title,
+.today-overview-head,
+.profile-card-head,
+.profile-ready-head,
+.journey-head,
+.admin-invite-header,
+.breast-timer-head,
+.quick-actions-heading {
+  min-width: 0;
+  max-width: 100%;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start !important;
+  gap: 8px 10px !important;
+}
+
+.drawer-section-title > div,
+.section-title > div,
+.chart-title > div,
+.today-overview-head > div,
+.profile-card-head > div,
+.profile-ready-head > div,
+.journey-head > div,
+.admin-invite-header > div,
+.breast-timer-head > div,
+.quick-actions-heading > div {
+  min-width: 0;
+}
+
+.drawer-section-title span,
+.section-title span,
+.chart-title span,
+.today-overview-head span,
+.profile-card-head span,
+.profile-ready-head span,
+.journey-head span,
+.admin-invite-header span,
+.quick-actions-heading span {
+  font-size: var(--ninou-responsive-small) !important;
+  line-height: 1.15 !important;
+  white-space: normal !important;
+}
+
+.drawer-section-title strong,
+.section-title strong,
+.chart-title strong,
+.today-overview-head strong,
+.profile-card-head strong,
+.profile-ready-head strong,
+.journey-head strong,
+.admin-invite-header strong,
+.quick-actions-heading strong {
+  font-size: var(--ninou-responsive-title) !important;
+  line-height: 1.13 !important;
+  max-width: 100%;
+  text-wrap: balance;
+}
+
+.section-helper,
+.chart-helper,
+.profile-family-card > p,
+.settings-list article > p,
+.timeline-empty p,
+.day-notes-actions small,
+.form-status,
+.guest-welcome-card p,
+.account-journey-card p,
+.post-access-card p,
+.first-use-checklist-card p,
+.privacy-note-card p,
+.sync-detail-grid strong,
+.diagnostics-grid strong {
+  font-size: var(--ninou-responsive-body) !important;
+  line-height: 1.42 !important;
+  max-width: 100%;
+}
+
+/* Grids: sempre cabem no card e descem para uma coluna quando necessário. */
+.summary-grid,
+.today-overview-grid,
+.daily-rhythm,
+.weekly-overview,
+.today-last-events,
+.notification-center-list,
+.report-stack,
+.profile-ready-grid,
+.premium-trust-grid,
+.post-access-grid,
+.sync-detail-grid,
+.diagnostics-grid,
+.admin-clean-panel,
+.settings-list,
+.sound-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: var(--ninou-responsive-card-gap) !important;
+  width: 100%;
+}
+
+.today-overview-grid > *,
+.summary-grid > *,
+.daily-rhythm > *,
+.weekly-overview > *,
+.today-last-events > *,
+.notification-center-list > *,
+.report-stack > *,
+.profile-ready-grid > *,
+.premium-trust-grid > *,
+.post-access-grid > *,
+.sync-detail-grid > *,
+.diagnostics-grid > *,
+.admin-clean-panel > *,
+.settings-list > *,
+.sound-grid > * {
+  min-width: 0;
+}
+
+/* Ações rápidas: texto de ação não deve quebrar no meio ou vazar. */
+.quick-actions,
+.start-choice {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(9px, 2.8vw, 12px) !important;
+}
+
+.quick-actions button,
+.start-choice button,
+.record-types button,
+.sound-option,
+.guest-welcome-actions button,
+.journey-actions button,
+.post-access-actions button,
+.first-use-actions button,
+.admin-flow-actions button,
+.admin-card-actions button,
+.profile-actions-row button,
+.export-actions button,
+.login-actions button,
+.avatar-editor-actions button,
+.guest-modal-actions button,
+.save-button,
+.secondary-login,
+.profile-primary-button,
+.profile-secondary-button {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  font-size: var(--ninou-responsive-button) !important;
+  line-height: 1.16 !important;
+  text-align: center;
+}
+
+.quick-actions button > span:last-child,
+.start-choice button > span:last-child,
+.record-types button > span:last-child,
+.sound-option strong,
+.bottom-nav button span:last-child {
+  min-width: 0;
+  max-width: 100%;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.12 !important;
+}
+
+/* Formulários, data, chips e campos. */
+.date-filter,
+.record-form label,
+.settings-list label,
+.profile-setting-line,
+.profile-soft-row,
+.profile-toggle-line,
+.export-period-grid label,
+.amount-field,
+.select-label {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.screen[data-screen="diary"] .chips-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.screen[data-screen="diary"] .chips {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 1px;
+}
+
+.screen[data-screen="diary"] .chips::-webkit-scrollbar {
+  display: none;
+}
+
+.screen[data-screen="diary"] .chips button {
+  flex: 0 0 auto;
+  white-space: nowrap !important;
+  font-size: clamp(.76rem, 3.15vw, .88rem) !important;
+  padding-inline: clamp(11px, 3.2vw, 16px) !important;
+}
+
+/* Timeline e edição/exclusão: textos longos ficam dentro do card. */
+.timeline,
+.intelligent-timeline {
+  width: 100%;
+  max-width: 100%;
+}
+
+.timeline .event-card,
+.event-card,
+.intelligent-timeline article {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden;
+}
+
+.timeline .event-main,
+.timeline .event-text,
+.event-main,
+.event-text {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.timeline .event-text strong,
+.timeline .event-text span,
+.timeline .event-text p,
+.event-text strong,
+.event-text span,
+.event-text p {
+  max-width: 100%;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+.timeline .event-actions,
+.event-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: 8px !important;
+}
+
+.timeline .event-action-button,
+.event-action-button {
+  min-width: 0 !important;
+  width: 100%;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Observações do dia: mantém hierarquia e impede herança visual de largura. */
+.day-notes-card .drawer-section-title {
+  grid-template-columns: 1fr !important;
+}
+
+.day-notes-card textarea {
+  width: 100% !important;
+  resize: vertical;
+}
+
+.day-notes-actions {
+  grid-template-columns: minmax(0, 1fr) minmax(128px, auto) !important;
+}
+
+/* Perfil, família e botões com textos maiores. */
+.profile-family-stack,
+.profile-family-card,
+.profile-actions-row,
+.guest-welcome-actions,
+.journey-actions,
+.post-access-actions,
+.first-use-actions,
+.admin-flow-actions,
+.admin-card-actions,
+.export-actions,
+.login-actions,
+.avatar-editor-actions,
+.guest-modal-actions {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.profile-actions-row,
+.export-actions,
+.login-actions,
+.guest-modal-actions,
+.avatar-editor-actions {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 136px), 1fr));
+}
+
+.guest-welcome-actions,
+.journey-actions,
+.post-access-actions,
+.first-use-actions,
+.admin-flow-actions,
+.admin-card-actions {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
+  gap: 10px !important;
+}
+
+.profile-soft-row,
+.profile-setting-line,
+.profile-toggle-line,
+.active-invite-box,
+.sync-detail-grid div,
+.diagnostics-grid div {
+  overflow: hidden;
+}
+
+.profile-soft-row strong,
+.profile-setting-line strong,
+.profile-toggle-line strong,
+.active-invite-box strong,
+.sync-detail-grid strong,
+.diagnostics-grid strong {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Avatar e cards com nomes/opções grandes. */
+.avatar-option-grid,
+.avatar-compact-card .avatar-option-grid.icon-grid,
+.caregiver-avatar-grid,
+.theme-choice,
+.breast-side-grid,
+.export-period-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 124px), 1fr));
+  gap: 10px !important;
+}
+
+.avatar-choice,
+.caregiver-avatar-grid button,
+.theme-choice button,
+.breast-side-grid button {
+  min-width: 0 !important;
+  overflow: hidden;
+}
+
+.avatar-choice small,
+.caregiver-avatar-grid span,
+.theme-choice button,
+.breast-side-grid small {
+  max-width: 100%;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+/* Sheet de registro: suporta telas baixas/estreitas sem cortar texto. */
+.record-sheet,
+.orbit-cluster-sheet,
+.guest-login-dialog,
+.ninou-modal-card {
+  width: min(100%, 520px) !important;
+  max-width: calc(100vw - (var(--ninou-responsive-page-x) * 2)) !important;
+}
+
+.record-sheet,
+.orbit-cluster-sheet {
+  max-height: min(88vh, 760px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.record-types {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+  gap: 9px !important;
+}
+
+.record-types button {
+  min-height: 72px;
+}
+
+.record-form {
+  min-width: 0;
+}
+
+.record-form label,
+.record-form .select-label {
+  display: grid;
+  gap: 7px;
+}
+
+/* Barra inferior: nunca deixa rótulo quebrar nem sair da bolha. */
+.bottom-nav {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(2px, 1.6vw, 6px) !important;
+  width: min(calc(100% - 24px), 420px) !important;
+  padding: clamp(7px, 2.5vw, 10px) !important;
+}
+
+.bottom-nav button {
+  min-width: 0 !important;
+  overflow: hidden;
+  padding-inline: 2px !important;
+}
+
+.bottom-nav span:last-child {
+  display: block;
+  width: 100%;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: clamp(.63rem, 2.8vw, .74rem) !important;
+}
+
+.nav-symbol {
+  font-size: clamp(.92rem, 4vw, 1.08rem) !important;
+}
+
+/* Telas médias/tablet: app fica mais elegante sem esticar demais. */
+@media (min-width: 521px) {
+  .phone-shell {
+    max-width: 520px !important;
+  }
+
+  .record-sheet,
+  .orbit-cluster-sheet,
+  .guest-login-dialog,
+  .ninou-modal-card {
+    max-width: 500px !important;
+  }
+}
+
+/* Mobile comum. */
+@media (max-width: 430px) {
+  :root {
+    --ninou-responsive-page-x: 14px;
+    --ninou-responsive-card-pad: 16px;
+    --ninou-responsive-card-gap: 11px;
+  }
+
+  .app-update-notice,
+  .admin-preview-banner {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    align-items: stretch !important;
+  }
+
+  .app-update-notice button,
+  .admin-preview-banner button {
+    width: 100%;
+  }
+
+  .today-overview-head,
+  .section-title,
+  .chart-title,
+  .drawer-section-title,
+  .profile-card-head,
+  .quick-actions-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .profile-card-head,
+  .profile-ready-head,
+  .journey-head,
+  .admin-invite-header {
+    grid-template-columns: 1fr !important;
+  }
+
+  .day-notes-actions,
+  .timeline .event-actions,
+  .event-actions,
+  .profile-actions-row,
+  .export-actions,
+  .login-actions,
+  .guest-modal-actions,
+  .avatar-editor-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .timeline .event-action-button,
+  .event-action-button {
+    white-space: normal !important;
+  }
+
+  .sync-detail-grid,
+  .diagnostics-grid,
+  .summary-grid,
+  .today-overview-grid,
+  .daily-rhythm,
+  .weekly-overview,
+  .today-last-events,
+  .notification-center-list,
+  .report-stack,
+  .profile-ready-grid,
+  .premium-trust-grid,
+  .post-access-grid,
+  .settings-list,
+  .sound-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* iPhone SE / Android compacto. */
+@media (max-width: 375px) {
+  :root {
+    --ninou-responsive-page-x: 12px;
+    --ninou-responsive-card-pad: 14px;
+    --ninou-responsive-card-gap: 10px;
+    --ninou-responsive-title: clamp(.96rem, 4.85vw, 1.1rem);
+    --ninou-responsive-body: clamp(.80rem, 3.75vw, .9rem);
+    --ninou-responsive-button: clamp(.74rem, 3.45vw, .84rem);
+  }
+
+  .app-header {
+    gap: 8px !important;
+  }
+
+  .identity img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .sync-pill {
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .quick-actions,
+  .start-choice {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .quick-actions button,
+  .start-choice button {
+    min-height: 62px !important;
+    padding-inline: 9px !important;
+  }
+
+  .quick-actions .action-icon,
+  .start-choice .action-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .record-types {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .record-types button > span:last-child {
+    font-size: .74rem !important;
+  }
+
+  .bottom-nav {
+    width: min(calc(100% - 18px), 410px) !important;
+  }
+
+  .bottom-nav span:last-child {
+    font-size: .62rem !important;
+  }
+}
+
+/* Muito estreito: prioriza não quebrar layout. */
+@media (max-width: 340px) {
+  :root {
+    --ninou-responsive-page-x: 10px;
+    --ninou-responsive-card-pad: 13px;
+  }
+
+  .phone-shell {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .quick-actions button,
+  .start-choice button {
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+  }
+
+  .quick-actions .action-icon,
+  .start-choice .action-icon {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .record-types {
+    grid-template-columns: 1fr !important;
+  }
+
+  .bottom-nav span:last-child {
+    font-size: .58rem !important;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Telas baixas: sheets e modais ficam roláveis sem cortar controles finais. */
+@media (max-height: 700px) {
+  .record-sheet,
+  .orbit-cluster-sheet,
+  .guest-login-dialog,
+  .ninou-modal-card {
+    max-height: calc(100dvh - 24px) !important;
+    overflow-y: auto !important;
+  }
+
+  .record-types button {
+    min-height: 62px;
+  }
+}
+
+/* Ninou v75.59.1 — segurança no aparelho */
+.security-device-card {
+  gap: 12px !important;
+}
+
+.security-actions-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.danger-soft-button {
+  border-color: rgba(255, 120, 120, 0.42) !important;
+  color: #ffd6d6 !important;
+  background: rgba(255, 120, 120, 0.10) !important;
+}
+
+body.day-theme .danger-soft-button {
+  color: #8a2f2f !important;
+  background: rgba(255, 120, 120, 0.14) !important;
+  border-color: rgba(180, 70, 70, 0.25) !important;
+}
+
+.security-device-status {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
 }

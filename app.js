@@ -1,6 +1,6 @@
-// Ninou v75.58.2 - correção estrutural de rotina, notas por dia e avatar
+// Ninou v75.59.1 - App Check + endurecimento final
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.58.2";
+const NINOU_APP_VERSION = "75.59.1";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

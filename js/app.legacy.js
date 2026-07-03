@@ -110,6 +110,8 @@ const loginEmail = document.querySelector("#loginEmail");
 const loginPassword = document.querySelector("#loginPassword");
 const loginButton = document.querySelector("#loginButton");
 const createAccountButton = document.querySelector("#createAccountButton");
+const clearDeviceDataButton = document.querySelector("#clearDeviceDataButton");
+const clearDeviceDataStatus = document.querySelector("#clearDeviceDataStatus");
 const loginHelper = document.querySelector("#loginHelper");
 const profileFamilyStack = document.querySelector(".profile-family-stack");
 const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
@@ -269,6 +271,7 @@ const diagnosticsUserLabel = document.querySelector("#diagnosticsUserLabel");
 const diagnosticsFamilyLabel = document.querySelector("#diagnosticsFamilyLabel");
 const diagnosticsPwaLabel = document.querySelector("#diagnosticsPwaLabel");
 const diagnosticsCacheLabel = document.querySelector("#diagnosticsCacheLabel");
+const diagnosticsAppCheckLabel = document.querySelector("#diagnosticsAppCheckLabel");
 const appUpdateNotice = document.querySelector("#appUpdateNotice");
 const appUpdateButton = document.querySelector("#appUpdateButton");
 const wakeWindowInput = document.querySelector("#wakeWindowInput");
@@ -315,7 +318,10 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.58.2";
+const NINOU_RUNTIME_VERSION = "75.59";
+const INVITE_TTL_MS = 7 * day;
+const INVITE_MAX_USES = 1;
+const MAX_DAY_NOTES_LENGTH = 1200;
 const GLOBAL_APP_ADMIN_EMAIL = "luizfelipe.dasilva@gmail.com";
 const APP_ADMIN_FAMILY_ID = "ninou-family-luizfelipe";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
@@ -394,6 +400,72 @@ function getEffectiveRole(role = familyAccess?.role || "responsavel", email = cl
 function normalizeInviteRole(value = "responsavel") {
   const role = normalizeRole(value);
   return role === "admin" ? "responsavel" : role;
+}
+
+function limitText(value = "", maxLength = MAX_DAY_NOTES_LENGTH) {
+  const text = String(value || "").trim();
+  return text.length > maxLength ? text.slice(0, maxLength).trim() : text;
+}
+
+function normalizeSafeDayNotes(value = "") {
+  return limitText(value, MAX_DAY_NOTES_LENGTH);
+}
+
+function toMillisFromInviteDate(value) {
+  if (!value) return 0;
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  if (typeof value.toMillis === "function") return Number(value.toMillis()) || 0;
+  if (Number.isFinite(Number(value.seconds))) return Number(value.seconds) * 1000;
+  return 0;
+}
+
+function getInviteExpiryMillis(invite = {}) {
+  return toMillisFromInviteDate(invite.expiresAtClient || invite.expiresAt || invite.expireAt);
+}
+
+function isInviteExpired(invite = {}, now = Date.now()) {
+  const expiresAt = getInviteExpiryMillis(invite);
+  return Boolean(expiresAt && expiresAt <= now);
+}
+
+function isInviteUsable(invite = {}, now = Date.now()) {
+  const status = String(invite.status || "").toLowerCase();
+  const useCount = Number(invite.useCount || 0);
+  const maxUses = Number(invite.maxUses || INVITE_MAX_USES);
+  return ["active", "pending"].includes(status)
+    && !isInviteExpired(invite, now)
+    && (!Number.isFinite(maxUses) || maxUses <= 0 || useCount < maxUses);
+}
+
+function getInviteExpiryPayload(services, now = Date.now()) {
+  const expiresAtClient = now + INVITE_TTL_MS;
+  return {
+    expiresAtClient,
+    expiresAt: services?.Timestamp?.fromMillis ? services.Timestamp.fromMillis(expiresAtClient) : new Date(expiresAtClient),
+  };
+}
+
+function getMinimalGlobalInvitePayload(invite = {}) {
+  const payload = {
+    code: normalizeInviteCode(invite.code || ""),
+    familyId: String(invite.familyId || ""),
+    role: normalizeInviteRole(invite.role || "cuidador"),
+    status: String(invite.status || "active"),
+    maxUses: Number(invite.maxUses || INVITE_MAX_USES),
+    useCount: Number(invite.useCount || 0),
+  };
+  if (invite.email) payload.email = normalizeEmail(invite.email);
+  if (invite.createdByUid || invite.createdBy) payload.createdByUid = String(invite.createdByUid || invite.createdBy || "");
+  if (invite.createdByEmail) payload.createdByEmail = normalizeEmail(invite.createdByEmail);
+  if (invite.expiresAt) payload.expiresAt = invite.expiresAt;
+  if (invite.expiresAtClient) payload.expiresAtClient = Number(invite.expiresAtClient) || 0;
+  if (invite.createdAt) payload.createdAt = invite.createdAt;
+  if (invite.updatedAt) payload.updatedAt = invite.updatedAt;
+  return payload;
 }
 
 // v75.56.2.1.1: ao abrir sem sessão conhecida, não reaproveita dados familiares da última conta.
@@ -2045,7 +2117,7 @@ function dayStateBelongsToDay(dayState = {}, dayId = getCurrentDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const explicitDayId = getExplicitDayIdFromState(dayState);
 
-  // v75.58.2: se o estado já tem marcador de dia, ele não pode ser reaproveitado em outro dia.
+  // v75.58.3: se o estado já tem marcador de dia, ele não pode ser reaproveitado em outro dia.
   // Isso evita que Observações do dia 1 apareçam no dia 2/3 por cache legado.
   if (explicitDayId) return explicitDayId === safeDayId;
 
@@ -2084,7 +2156,7 @@ function loadLocalDayState(dayId = getCurrentDayId()) {
     // Cache diário antigo inválido. Ignora para não repetir observações.
   }
 
-  // v75.58.2: o cache genérico ninou.demo.dayState não é mais usado para abrir dias,
+  // v75.58.3: o cache genérico ninou.demo.dayState não é mais usado para abrir dias,
   // porque ele era a origem de observações e registros herdados entre datas.
   return sanitizeDayStateForDay(createEmptyDayState(), safeDayId);
 }
@@ -2336,7 +2408,7 @@ function saveFamilyActiveInvite(invite) {
 }
 
 function generateFamilyInviteCode() {
-  return Math.random().toString(36).replace(/[^a-z0-9]/gi, "").slice(2, 10).toUpperCase().padEnd(8, "7");
+  return createInviteCode();
 }
 
 function getFamilyInviteMessage(code) {
@@ -2362,31 +2434,40 @@ async function createFamilyCaregiverInvite() {
   }
   const code = generateFamilyInviteCode();
   const now = Date.now();
-  const expiresAtClient = now + 7 * day;
+  const expiry = getInviteExpiryPayload(null, now);
   const actor = getCurrentActorProfile();
   const invite = {
     code,
-    familyId: familyAccess?.familyId || "ninou-family-luizfelipe",
+    familyId: familyAccess?.familyId || APP_ADMIN_FAMILY_ID,
     familyName: getProfileFamilyDisplayName(),
     status: "active",
     role: "cuidador",
+    maxUses: INVITE_MAX_USES,
+    useCount: 0,
     createdByUid: cloudUser?.uid || null,
     createdByName: actor.label || actor.email || "Cuidador",
     createdAtClient: now,
-    expiresAtClient,
+    expiresAtClient: expiry.expiresAtClient,
   };
   saveFamilyActiveInvite(invite);
 
   try {
     const services = await getFirebaseServices();
     if (services?.db && cloudUser) {
-      const cloudInvitePayload = {
+      const cloudExpiry = getInviteExpiryPayload(services, now);
+      const familyInvitePayload = {
         ...invite,
+        ...cloudExpiry,
         createdAt: services.serverTimestamp(),
-        expiresAt: services.Timestamp.fromMillis(expiresAtClient),
+        updatedAt: services.serverTimestamp(),
       };
-      await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), cloudInvitePayload, { merge: true });
-      await services.setDoc(services.doc(services.db, "invites", code), cloudInvitePayload, { merge: true });
+      const globalInvitePayload = {
+        ...getMinimalGlobalInvitePayload({ ...invite, ...cloudExpiry }),
+        createdAt: services.serverTimestamp(),
+        updatedAt: services.serverTimestamp(),
+      };
+      await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), familyInvitePayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "invites", code), globalInvitePayload, { merge: true });
     }
   } catch (error) {
     console.warn("Convite salvo apenas localmente:", error);
@@ -2426,7 +2507,7 @@ function closeJoinFamilyModal() {
 }
 
 async function confirmJoinFamilyInvite() {
-  const code = String(joinInviteCodeInput?.value || "").trim().toUpperCase().replace(/\s/g, "");
+  const code = normalizeInviteCode(joinInviteCodeInput?.value || "");
   if (!code) {
     if (joinInviteFeedback) joinInviteFeedback.textContent = "Digite o código do convite.";
     return;
@@ -2455,15 +2536,19 @@ async function confirmJoinFamilyInvite() {
     const inviteSnap = await services.getDoc(inviteRef);
     if (inviteSnap.exists()) invite = { ...(invite || {}), ...(inviteSnap.data() || {}) };
     if (!inviteSnap.exists() && !invite) throw new Error("Convite não encontrado");
-    if (invite.status && invite.status !== "active") throw new Error("Convite inativo");
     if (invite.familyId && invite.familyId !== familyId) familyId = invite.familyId;
+    if (!isInviteUsable({ ...invite, familyId })) throw new Error(isInviteExpired(invite) ? "Convite expirado" : "Convite inativo ou já utilizado");
+
+    const inviteEmail = normalizeEmail(invite.email || "");
+    const userEmail = normalizeEmail(cloudUser.email || "");
+    if (inviteEmail && inviteEmail !== userEmail) throw new Error(`Este convite foi criado para ${inviteEmail}.`);
 
     const role = normalizeInviteRole(invite.role || "cuidador");
     const accessPayload = {
       familyId,
       role,
-      email: normalizeEmail(cloudUser.email || ""),
-      ownerUid: invite.ownerUid || invite.createdByUid || "",
+      email: userEmail,
+      ownerUid: invite.ownerUid || invite.createdByUid || invite.createdBy || "",
       inviteCode: code,
       joinedByInvite: code,
     };
@@ -2478,6 +2563,7 @@ async function confirmJoinFamilyInvite() {
     await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "access", "ninou"), {
       ...accessPayload,
       joinedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
     }, { merge: true });
 
     await services.setDoc(services.doc(services.db, "families", familyId, "members", cloudUser.uid), {
@@ -2485,15 +2571,30 @@ async function confirmJoinFamilyInvite() {
       ...accessPayload,
       status: "active",
       joinedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
     }, { merge: true });
 
-    await services.setDoc(inviteRef, {
+    const acceptedPayload = {
+      status: "accepted",
+      useCount: Number(invite.useCount || 0) + 1,
+      acceptedByUid: cloudUser.uid,
+      acceptedByEmail: userEmail,
+      acceptedAt: services.serverTimestamp(),
       lastAcceptedByUid: cloudUser.uid,
-      lastAcceptedByEmail: normalizeEmail(cloudUser.email || ""),
+      lastAcceptedByEmail: userEmail,
       lastAcceptedAt: services.serverTimestamp(),
-    }, { merge: true });
+      updatedAt: services.serverTimestamp(),
+    };
+
+    await services.setDoc(inviteRef, acceptedPayload, { merge: true });
+    try {
+      await services.setDoc(services.doc(services.db, "invites", code), acceptedPayload, { merge: true });
+    } catch (globalUpdateError) {
+      console.warn("Convite aceito, mas o espelho global não foi atualizado:", globalUpdateError);
+    }
 
     saveFamilyAccess({ ...accessPayload, acceptedAt: new Date().toISOString() });
+    clearPendingInviteCode();
     await connectCurrentAccount();
     setSyncStatus("online", cloudUser.email || "");
 
@@ -2504,7 +2605,7 @@ async function confirmJoinFamilyInvite() {
     }, 700);
   } catch (error) {
     console.warn(error);
-    if (joinInviteFeedback) joinInviteFeedback.textContent = "Não foi possível validar o convite agora. Verifique o código, a conexão ou as regras do Firebase.";
+    if (joinInviteFeedback) joinInviteFeedback.textContent = error?.message || "Não foi possível validar o convite agora. Verifique o código, a conexão ou as regras do Firebase.";
   }
 }
 
@@ -2696,13 +2797,14 @@ function resetMigrationSearchState() {
 }
 
 function createInviteCode() {
-  const bytes = new Uint8Array(6);
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(12);
   if (window.crypto?.getRandomValues) {
     window.crypto.getRandomValues(bytes);
   } else {
     for (let index = 0; index < bytes.length; index += 1) bytes[index] = Math.floor(Math.random() * 256);
   }
-  const token = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+  const token = Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
   return `NINOU-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}`;
 }
 
@@ -2722,9 +2824,9 @@ function stableInviteToken(input = "") {
   return `${hashA.toString(16).padStart(8, "0")}${hashB.toString(16).padStart(8, "0")}`.toUpperCase();
 }
 
-function createInviteCodeForEmail(email = "", familyId = APP_ADMIN_FAMILY_ID) {
-  const token = stableInviteToken(`${normalizeEmail(email)}|${familyId}|ninou`);
-  return `NINOU-${token.slice(0, 4)}-${token.slice(4, 8)}-${token.slice(8, 12)}`;
+function createInviteCodeForEmail(_email = "", _familyId = APP_ADMIN_FAMILY_ID) {
+  // v75.59: convite não é mais determinístico por e-mail/família. Código aleatório evita previsibilidade.
+  return createInviteCode();
 }
 
 function slugifyFamilyText(value = "familia") {
@@ -2834,6 +2936,18 @@ function normalizeDayNoteText(value = "") {
   return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+function isRepeatedDayNoteFromEarlierDay(note = "", dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const noteKey = normalizeDayNoteText(note);
+  if (!noteKey) return false;
+
+  return Object.entries(familyDayStatesCache || {}).some(([otherDayId, otherState]) => {
+    if (!isDateId(otherDayId) || otherDayId >= safeDayId) return false;
+    const otherNote = typeof otherState?.dayNotes === "string" ? otherState.dayNotes.trim() : "";
+    return normalizeDayNoteText(otherNote) === noteKey;
+  });
+}
+
 function getValidDayNotesForDay(sourceState = {}, dayId = getSelectedDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const note = typeof sourceState?.dayNotes === "string" ? sourceState.dayNotes.trim() : "";
@@ -2844,6 +2958,10 @@ function getValidDayNotesForDay(sourceState = {}, dayId = getSelectedDayId()) {
 
   const explicitDayId = getExplicitDayIdFromState(sourceState);
   if (explicitDayId && explicitDayId !== safeDayId) return "";
+
+  // v75.58.3: evita que uma observação herdada por cache/sincronização apareça em dias seguintes.
+  // Se o mesmo texto já existe em um dia anterior da mesma família, mantemos no primeiro dia.
+  if (isRepeatedDayNoteFromEarlierDay(note, safeDayId)) return "";
 
   return note;
 }
@@ -2893,12 +3011,12 @@ function sanitizeDayStateMapByDay(dayStates = {}) {
   const firstLegacyNoteDayByText = new Map();
   Object.keys(dayStates || {}).filter(isDateId).sort().forEach((dayId) => {
     const rawState = dayStates[dayId] || {};
-    const hadExplicitNoteMarker = isDateId(rawState?.dayNotesDayId);
     let normalized = sanitizeDayStateForDay(rawState, dayId);
     const noteKey = normalizeDayNoteText(normalized.dayNotes);
 
-    // v75.58.2: notas antigas sem marcador, repetidas em vários dias, ficam apenas no primeiro dia.
-    if (noteKey && !hadExplicitNoteMarker) {
+    // v75.58.3: se a mesma observação apareceu em vários dias por herança de cache/nuvem,
+    // preserva somente o primeiro dia e limpa os seguintes.
+    if (noteKey) {
       if (firstLegacyNoteDayByText.has(noteKey)) {
         normalized = normalizeDayState({
           ...normalized,
@@ -5313,18 +5431,25 @@ async function createAdminClientFamily() {
       const role = "responsavel";
       const code = createInviteCodeForEmail(responsibleEmail, familyId);
       const link = buildInviteLink(code);
+      const now = Date.now();
+      const expiry = getInviteExpiryPayload(services, now);
       const payload = {
         code,
         familyId,
         email: responsibleEmail,
         role,
         status: "pending",
+        maxUses: INVITE_MAX_USES,
+        useCount: 0,
+        expiresAt: expiry.expiresAt,
+        expiresAtClient: expiry.expiresAtClient,
         createdBy: cloudUser.uid,
+        createdByUid: cloudUser.uid,
         createdByEmail: cloudUser.email || "",
         createdAt: services.serverTimestamp(),
         updatedAt: services.serverTimestamp(),
       };
-      await services.setDoc(services.doc(services.db, "invites", code), payload, { merge: true });
+      await services.setDoc(services.doc(services.db, "invites", code), getMinimalGlobalInvitePayload(payload), { merge: true });
       await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
       await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), {
         ...payload,
@@ -5422,13 +5547,20 @@ async function createFamilyInvite() {
       }
     }
 
+    const now = Date.now();
+    const expiry = getInviteExpiryPayload(services, now);
     const payload = {
       code,
       familyId,
       email,
       role,
       status: "pending",
+      maxUses: INVITE_MAX_USES,
+      useCount: 0,
+      expiresAt: expiry.expiresAt,
+      expiresAtClient: expiry.expiresAtClient,
       createdBy: cloudUser.uid,
+      createdByUid: cloudUser.uid,
       createdByEmail: cloudUser.email || "",
       updatedAt: services.serverTimestamp(),
     };
@@ -5437,7 +5569,7 @@ async function createFamilyInvite() {
       payload.createdAt = services.serverTimestamp();
     }
 
-    await services.setDoc(inviteRef, payload, { merge: true });
+    await services.setDoc(inviteRef, getMinimalGlobalInvitePayload(payload), { merge: true });
     await cleanupDuplicatePendingInvites(services, email, familyId, code);
 
     try {
@@ -5468,7 +5600,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.12 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.59 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -5521,8 +5653,10 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     const inviteEmail = normalizeEmail(invite.email || "");
     const userEmail = normalizeEmail(cloudUser.email || "");
 
-    if (invite.status && invite.status !== "pending" && invite.status !== "active") {
-      if (!options.silent && loginHelper) loginHelper.textContent = "Este convite já foi usado ou cancelado.";
+    if (!isInviteUsable(invite)) {
+      if (!options.silent && loginHelper) loginHelper.textContent = isInviteExpired(invite)
+        ? "Este convite expirou. Peça um novo código."
+        : "Este convite já foi usado ou cancelado.";
       return false;
     }
 
@@ -5548,6 +5682,8 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     await saveAccountAccessToCloud(access);
     await services.setDoc(inviteRef, {
       status: "accepted",
+      useCount: Number(invite.useCount || 0) + 1,
+      acceptedByUid: cloudUser.uid,
       acceptedBy: cloudUser.uid,
       acceptedByEmail: userEmail,
       acceptedAt: services.serverTimestamp(),
@@ -5556,10 +5692,9 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 
     try {
       const acceptedInvitePayload = {
-        ...invite,
-        ...access,
-        code,
         status: "accepted",
+        useCount: Number(invite.useCount || 0) + 1,
+        acceptedByUid: cloudUser.uid,
         acceptedBy: cloudUser.uid,
         acceptedByEmail: userEmail,
         acceptedAt: services.serverTimestamp(),
@@ -5589,7 +5724,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.12 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.59 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -5944,6 +6079,81 @@ function clearLocalAccountData() {
   if (loginPassword) loginPassword.value = "";
   renderAuthControls();
   renderAll();
+}
+
+async function clearNinouCachesFromDevice() {
+  try {
+    const keys = [];
+    for (let index = 0; index < localStorage.length; index += 1) {
+      const key = localStorage.key(index);
+      if (key && key.startsWith("ninou.")) keys.push(key);
+    }
+    keys.forEach((key) => localStorage.removeItem(key));
+  } catch (error) {
+    console.warn("Não foi possível limpar todo o localStorage do Ninou:", error);
+  }
+
+  try {
+    if (window.caches?.keys) {
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.filter((key) => key.includes("ninou")).map((key) => caches.delete(key)));
+    }
+  } catch (error) {
+    console.warn("Não foi possível limpar o cache do PWA:", error);
+  }
+
+  try {
+    if (window.indexedDB?.databases) {
+      const databases = await indexedDB.databases();
+      await Promise.all(
+        databases
+          .map((database) => database?.name)
+          .filter((name) => name && (name.toLowerCase().includes("ninou") || name.toLowerCase().includes("firebase") || name.toLowerCase().includes("firestore")))
+          .map((name) => new Promise((resolve) => {
+            const request = indexedDB.deleteDatabase(name);
+            request.onsuccess = request.onerror = request.onblocked = () => resolve();
+          })),
+      );
+    }
+  } catch (error) {
+    console.warn("Não foi possível limpar todos os bancos locais do Firebase/Ninou:", error);
+  }
+}
+
+async function signOutAndClearDeviceData() {
+  const confirmed = window.confirm("Sair e limpar os dados do Ninou salvos neste aparelho? Os dados sincronizados na nuvem da família não serão apagados.");
+  if (!confirmed) return;
+
+  if (clearDeviceDataButton) clearDeviceDataButton.disabled = true;
+  if (clearDeviceDataStatus) clearDeviceDataStatus.textContent = "Limpando dados locais...";
+
+  try {
+    const services = await getFirebaseServices().catch(() => null);
+    if (services?.auth && cloudUser) {
+      try { await services.signOut(services.auth); } catch (error) { console.warn("Não foi possível desconectar antes da limpeza local:", error); }
+    }
+    unsubscribeCloudListeners();
+    cloudUser = null;
+    await clearNinouCachesFromDevice();
+    resetVisibleContextForGuest();
+    saveFamilyAccess(null);
+    clearPendingInviteCode();
+    window.__ninouAdminFamilyDataOpen = false;
+    resetMigrationSearchState();
+    pendingProfilePhotoSave = false;
+    if (loginEmail) loginEmail.value = "";
+    if (loginPassword) loginPassword.value = "";
+    setSyncStatus("offline");
+    renderAuthControls();
+    renderAll();
+    if (loginHelper) loginHelper.textContent = "Dados locais limpos neste aparelho.";
+    if (clearDeviceDataStatus) clearDeviceDataStatus.textContent = "Dados locais limpos. Entre novamente para sincronizar.";
+  } catch (error) {
+    console.error("Erro ao limpar dados locais:", error);
+    if (clearDeviceDataStatus) clearDeviceDataStatus.textContent = "Não foi possível limpar tudo agora. Tente novamente.";
+  } finally {
+    if (clearDeviceDataButton) clearDeviceDataButton.disabled = false;
+  }
 }
 
 async function openAdminFamilyPreview(familyId = getActiveAdminFamilyId()) {
@@ -6588,8 +6798,8 @@ function renderCurrentState() {
 }
 
 function eventPosition(timestamp) {
-  const date = new Date(timestamp);
-  const minutes = date.getHours() * 60 + date.getMinutes();
+  const [hourValue, minuteValue] = String(formatTime(timestamp)).split(":").map(Number);
+  const minutes = (Number.isFinite(hourValue) ? hourValue : 0) * 60 + (Number.isFinite(minuteValue) ? minuteValue : 0);
   const progress = minutes / 1440;
   const startAngle = 142;
   const arcSize = 256;
@@ -6750,6 +6960,35 @@ function renderOrbit() {
 }
 
 
+function getShortDatePrefixForSelectedDay(eventDayId, selectedDayId) {
+  if (!isDateId(eventDayId) || !isDateId(selectedDayId) || eventDayId === selectedDayId) return "";
+  const eventStart = getDayStartFromId(eventDayId);
+  const selectedStart = getDayStartFromId(selectedDayId);
+  const diffDays = Math.round((eventStart - selectedStart) / day);
+  if (diffDays === -1) return "Ontem";
+  if (diffDays === 1) return "Amanhã";
+  const [, month, dateValue] = eventDayId.split("-");
+  return `${dateValue}/${month}`;
+}
+
+function getTimeLabelForSelectedDay(timestamp, selectedDayId) {
+  const dayId = toDateInputValue(timestamp);
+  const prefix = getShortDatePrefixForSelectedDay(dayId, selectedDayId);
+  return [prefix, formatTime(timestamp)].filter(Boolean).join(" ");
+}
+
+function decorateEventForSelectedDay(event = {}, selectedStart = selectedDiaryDay ?? getDayStart()) {
+  const selectedDayId = toDateInputValue(selectedStart);
+  const startLabel = getTimeLabelForSelectedDay(Number(event.start), selectedDayId);
+  const hasEnd = Number(event.end) > Number(event.start);
+  const endLabel = hasEnd ? getTimeLabelForSelectedDay(Number(event.end), selectedDayId) : startLabel;
+  return {
+    ...event,
+    displayStartLabel: startLabel,
+    displayRangeLabel: hasEnd ? `${startLabel}–${endLabel}` : startLabel,
+  };
+}
+
 function renderTimeline() {
   const lastCard = document.querySelector(".last-card .event-card");
   if (!timeline) return;
@@ -6775,7 +7014,7 @@ function renderTimeline() {
   visibleEvents.forEach((event) => {
     const item = document.createElement("li");
     item.className = "event-card";
-    item.innerHTML = getEventCardMarkup(event);
+    item.innerHTML = getEventCardMarkup(decorateEventForSelectedDay(event, selectedStart));
     timeline.append(item);
   });
 
@@ -6784,22 +7023,25 @@ function renderTimeline() {
     return;
   }
   if (lastCard) {
-    const latestConfig = getEventConfig(latest.type);
+    const latestForDay = decorateEventForSelectedDay(latest, selectedStart);
+    const latestConfig = getEventConfig(latestForDay.type);
     lastCard.innerHTML = `
       <i class="mark ${latestConfig.arcType}">${latestConfig.icon}</i>
       <div>
         <strong>${escapeHtml(latestConfig.title)}</strong>
-        <span>${escapeHtml(formatEventMeta(latest))}</span>
-        ${latest.notes ? `<p>${escapeHtml(latest.notes)}</p>` : ""}
+        <span>${escapeHtml(formatEventMeta(latestForDay))}</span>
+        ${latestForDay.notes ? `<p>${escapeHtml(latestForDay.notes)}</p>` : ""}
       </div>
     `;
   }
 }
 
 function openOrbitCluster(events) {
+  const selectedStart = selectedDiaryDay ?? getDayStart();
   const orderedEvents = [...events].sort((a, b) => a.start - b.start);
   orbitClusterTitle.textContent = `${orderedEvents.length} registros próximos`;
-  orbitClusterList.innerHTML = orderedEvents.map((event) => {
+  orbitClusterList.innerHTML = orderedEvents.map((rawEvent) => {
+    const event = decorateEventForSelectedDay(rawEvent, selectedStart);
     const config = getEventConfig(event.type);
     const notes = event.notes ? `<p>${escapeHtml(event.notes)}</p>` : "";
 
@@ -7288,7 +7530,8 @@ function getLatestSleepEvent(events = []) {
 
 function getDayStartFromId(dayId = getSelectedDayId()) {
   if (!isDateId(dayId)) return getDayStart();
-  return getDayStart(new Date(`${dayId}T12:00:00`).getTime());
+  const parsedDate = parseLocalDate(dayId);
+  return getDayStart(parsedDate ? parsedDate.getTime() : Date.now());
 }
 
 function getLatestAwakeBoundaryFromEvents(dayState = state, dayId = getSelectedDayId(), now = Date.now()) {
@@ -7669,7 +7912,7 @@ function renderAuditTrail() {
 function renderDayNotesPanel() {
   if (!dayNotesTextarea) return;
   const selectedDayId = getSelectedDayId();
-  const value = getValidDayNotesForDay(state, selectedDayId);
+  const value = normalizeSafeDayNotes(getValidDayNotesForDay(state, selectedDayId));
   if (state.dayNotes !== value) {
     state.dayNotes = value;
     state.dayNotesDayId = value ? selectedDayId : "";
@@ -7678,14 +7921,16 @@ function renderDayNotesPanel() {
     dayNotesTextarea.value = value;
   }
   if (dayNotesStatus) {
-    dayNotesStatus.textContent = value.trim() ? "Observação salva neste dia." : "Nenhuma observação salva neste dia.";
+    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - value.length);
+    dayNotesStatus.textContent = value.trim() ? `Observação salva neste dia. ${remaining} caracteres restantes.` : "Nenhuma observação salva neste dia.";
   }
 }
 
 function saveDayNotes() {
   if (!requireLogin("salvar observações do dia")) return;
   const selectedDayId = getSelectedDayId();
-  state.dayNotes = dayNotesTextarea?.value?.trim() || "";
+  state.dayNotes = normalizeSafeDayNotes(dayNotesTextarea?.value || "");
+  if (dayNotesTextarea) dayNotesTextarea.value = state.dayNotes;
   state.dayNotesDayId = state.dayNotes ? selectedDayId : "";
   state.dayNotesUpdatedAt = state.dayNotes ? Date.now() : 0;
   state = sanitizeDayStateForDay(state, selectedDayId, { preserveLive: true });
@@ -8002,7 +8247,7 @@ function renderAdminDiagnostics() {
 
   const familyId = familyAccess?.familyId || (isGlobalAppAdmin() ? getActiveAdminFamilyId() : "");
   if (diagnosticsVersionLabel) diagnosticsVersionLabel.textContent = `Ninou v${NINOU_RUNTIME_VERSION}`;
-  if (diagnosticsSummary) diagnosticsSummary.textContent = "Use este quadro para conferir se a conta, a família, o cache e o PWA estão apontando para o lugar certo.";
+  if (diagnosticsSummary) diagnosticsSummary.textContent = "Use este quadro para conferir se a conta, a família, o cache, o PWA e o App Check estão apontando para o lugar certo.";
   if (diagnosticsUserLabel) diagnosticsUserLabel.textContent = cloudUser?.email || "sem login";
   if (diagnosticsFamilyLabel) {
     diagnosticsFamilyLabel.textContent = familyId || "não selecionada";
@@ -8010,6 +8255,17 @@ function renderAdminDiagnostics() {
   }
   if (diagnosticsPwaLabel) diagnosticsPwaLabel.textContent = window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone ? "instalado" : "navegador";
   if (diagnosticsCacheLabel) diagnosticsCacheLabel.textContent = `${countFamilyScopedDayCaches()} dia(s) locais`;
+  if (diagnosticsAppCheckLabel) {
+    const status = firebaseServices?.appCheckStatus;
+    diagnosticsAppCheckLabel.textContent = status?.configured
+      ? "ativo"
+      : status?.reason === "init-error"
+        ? "erro"
+        : "pendente";
+    diagnosticsAppCheckLabel.title = status?.configured
+      ? "App Check inicializado no cliente."
+      : "Cole a Site Key do reCAPTCHA Enterprise em js/config/constants.js antes de ativar enforcement.";
+  }
 }
 
 function setSyncStatus(status = "offline", email = "") {
@@ -8983,6 +9239,7 @@ if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
 
 loginButton.addEventListener("click", signInAccount);
 createAccountButton.addEventListener("click", createAccount);
+if (clearDeviceDataButton) clearDeviceDataButton.addEventListener("click", signOutAndClearDeviceData);
 if (createFamilyButton) {
   createFamilyButton.addEventListener("click", () => {
     activatePersonalFamily().catch((error) => {
