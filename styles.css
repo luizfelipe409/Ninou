@@ -1,5 +1,5 @@
 /* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.60.10");
+@import url("./css/app.legacy.css?v=75.60.11");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -25,19 +25,6 @@
   gap: 14px;
 }
 
-.profile-card-symbol {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.1);
-  color: #7ce5c2;
-  font-weight: 900;
-}
-
 .profile-card-head span,
 .profile-family-card > p,
 .profile-soft-row span,
@@ -59,15 +46,10 @@
   line-height: 1.2;
 }
 
-.profile-card-head .profile-card-symbol,
 .caregiver-inline-dropdown .setting-icon,
 .profile-setting-line .setting-icon {
   color: #7ce5c2;
   font-size: 0.72rem;
-}
-
-.profile-card-head .profile-card-symbol {
-  font-size: 1rem;
 }
 
 .profile-soft-row strong {
@@ -415,7 +397,6 @@ body.day-theme .profile-family-card {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-body.day-theme .profile-card-symbol,
 body.day-theme .setting-icon {
   border-color: rgba(47, 128, 103, 0.14);
   background: rgba(47, 128, 103, 0.09);
@@ -2358,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.10 — Login rápido + App Check não bloqueante */
+/* Ninou v75.60.11 — Login rápido + App Check não bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2419,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.10 — perfil logado sem duplicidade visual */
+/* Ninou v75.60.11 — perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2476,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.60.10 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.60.11 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2721,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.60.10 — perfil não usa colunas quando o app está dentro de painel estreito */
+/* v75.60.11 — perfil não usa colunas quando o app está dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2761,6 +2742,144 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
 .screen[data-screen="profile"] #syncStatusText,
 .screen[data-screen="profile"] #syncFamilyLabel {
   overflow-wrap: anywhere !important;
+}
+
+/* v75.60.11 - contraste e respiro do perfil em claro/escuro */
+.screen[data-screen="profile"] {
+  gap: clamp(12px, 2.4vw, 16px) !important;
+}
+
+.screen[data-screen="profile"] .profile-family-stack,
+.screen[data-screen="profile"] .settings-list,
+.screen[data-screen="profile"] .account-sync-summary,
+.screen[data-screen="profile"] .profile-edit-grid {
+  gap: clamp(10px, 2.2vw, 14px) !important;
+}
+
+.screen[data-screen="profile"] .profile-family-card,
+.screen[data-screen="profile"] .settings-list article,
+.screen[data-screen="profile"] .login-card,
+.screen[data-screen="profile"] .weight-profile-block {
+  padding: clamp(15px, 3.4vw, 18px) !important;
+}
+
+.screen[data-screen="profile"] .profile-card-head {
+  align-items: flex-start;
+  gap: 8px 12px !important;
+}
+
+.screen[data-screen="profile"] .profile-card-head > div,
+.screen[data-screen="profile"] .account-sync-status,
+.screen[data-screen="profile"] .sync-detail-grid div {
+  min-width: 0;
+}
+
+.screen[data-screen="profile"] .profile-family-card > p,
+.screen[data-screen="profile"] .settings-list article > p,
+.screen[data-screen="profile"] .account-sync-status p {
+  line-height: 1.45 !important;
+}
+
+.screen[data-screen="profile"] .profile-setting-line,
+.screen[data-screen="profile"] .profile-soft-row,
+.screen[data-screen="profile"] .profile-toggle-line,
+.screen[data-screen="profile"] .caregiver-inline-dropdown summary {
+  gap: 9px !important;
+}
+
+body:not(.day-theme) .sync-detail-grid div,
+body:not(.day-theme) .diagnostics-grid div {
+  border-color: rgba(201, 192, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.105) !important;
+}
+
+body:not(.day-theme) .sync-detail-grid span,
+body:not(.day-theme) .diagnostics-grid span {
+  color: rgba(255, 255, 255, 0.74) !important;
+}
+
+body:not(.day-theme) .sync-detail-grid strong,
+body:not(.day-theme) .diagnostics-grid strong {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+body:not(.day-theme) .account-sync-status {
+  border-color: rgba(124, 229, 194, 0.22) !important;
+  background: linear-gradient(145deg, rgba(124, 229, 194, 0.15), rgba(255, 255, 255, 0.08)) !important;
+}
+
+body:not(.day-theme) .account-sync-status p {
+  color: rgba(255, 255, 255, 0.76) !important;
+}
+
+body.day-theme .profile-family-card,
+body.day-theme .settings-list article,
+body.day-theme .login-card,
+body.day-theme .weight-profile-block,
+body.day-theme .support-card,
+body.day-theme .danger-card,
+body.day-theme .privacy-note-card,
+body.day-theme .export-card,
+body.day-theme .admin-clean-section,
+body.day-theme .admin-access-card {
+  border-color: rgba(47, 60, 103, 0.12) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 16px 34px rgba(72, 60, 112, 0.11) !important;
+}
+
+body.day-theme .baby-settings-card,
+body.day-theme .family-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(238, 248, 244, 0.9)) !important;
+}
+
+body.day-theme .profile-setting-line,
+body.day-theme .profile-soft-row,
+body.day-theme .profile-toggle-line,
+body.day-theme .caregiver-inline-dropdown,
+body.day-theme .sync-detail-grid div,
+body.day-theme .diagnostics-grid div,
+body.day-theme .account-sync-status,
+body.day-theme .admin-form-grid label {
+  border-color: rgba(47, 60, 103, 0.12) !important;
+  background: rgba(248, 247, 252, 0.9) !important;
+}
+
+body.day-theme .profile-setting-line input,
+body.day-theme .profile-setting-line select,
+body.day-theme .profile-setting-line textarea,
+body.day-theme .settings-list input,
+body.day-theme .settings-list select,
+body.day-theme .settings-list textarea,
+body.day-theme .admin-clean-panel input,
+body.day-theme .admin-clean-panel select,
+body.day-theme .admin-clean-panel textarea,
+body.day-theme .record-form input,
+body.day-theme .record-form select,
+body.day-theme .record-form textarea,
+body.day-theme .login-card input {
+  border: 1px solid rgba(47, 60, 103, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  color: #191433 !important;
+}
+
+body.day-theme .sync-detail-grid span,
+body.day-theme .diagnostics-grid span,
+body.day-theme .profile-card-head span,
+body.day-theme .profile-family-card > p,
+body.day-theme .profile-soft-row span,
+body.day-theme .profile-setting-line,
+body.day-theme .profile-toggle-line span,
+body.day-theme .account-sync-status p {
+  color: rgba(25, 20, 51, 0.68) !important;
+}
+
+body.day-theme .sync-detail-grid strong,
+body.day-theme .diagnostics-grid strong,
+body.day-theme .account-sync-status strong,
+body.day-theme .profile-card-head strong,
+body.day-theme .profile-soft-row strong,
+body.day-theme .profile-setting-line strong {
+  color: #191433 !important;
 }
 
 @media (min-width: 860px) {
