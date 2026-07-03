@@ -24,7 +24,7 @@ export const firebaseConfig = Object.freeze({
 
 export const firebaseSdkVersion = "10.12.4";
 
-// v75.60.8 — App Check seguro
+// v75.60.10 — App Check seguro
 // IMPORTANTE: substitua o placeholder abaixo pela Site Key do reCAPTCHA Enterprise
 // criada no mesmo projeto Firebase/Google Cloud: ninou-3c936.
 // Enquanto a chave estiver vazia ou como placeholder, o app continua funcionando,
