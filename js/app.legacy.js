@@ -12,7 +12,7 @@ import { getFirebaseServices as loadFirebaseServices, getFirebaseErrorMessage as
 import { getDefaultBabyProfile as createDefaultBabyProfile, getCloudProfileVersion as readCloudProfileVersion, hasProfileContent as profileHasContent, loadBabyProfile as loadStoredBabyProfile, normalizeBabyProfile as normalizeStoredBabyProfile, saveBabyProfile as persistBabyProfile } from "./domain/baby-profile.js";
 import { loadLocalWeights as loadStoredWeights, normalizeWeights as normalizeStoredWeights, persistLocalWeights as persistStoredWeights, removeWeightById, upsertWeight } from "./domain/weights.js";
 import { buildExportEvents } from "./services/export-service.js";
-import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventsForDay, getLatestEvent, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartDesc, updateEventKeepingDuration } from "./domain/records.js";
+import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventOrderTime, getEventsForDay, getLatestEvent, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, updateEventKeepingDuration } from "./domain/records.js";
 import { formatEventMeta as formatRoutineEventMeta, getEventCardMarkup, getEventRenderSignature as buildEventRenderSignature, getMiniEventMarkup, getTimelineRenderSignature as buildTimelineSignature } from "./ui/event-formatters.js";
 import { renderHomeSummary as renderHomeSummaryPanel, renderTodayLastEvents as renderTodayLastEventsPanel } from "./ui/home.js";
 import { renderDailyRhythm, renderDayStory, renderIntelligentTimeline, renderLiveAssistant, renderSmartInsight, renderTrendKpis, renderWeeklyOverview } from "./ui/intelligence.js";
@@ -91,7 +91,6 @@ const babyArticleInput = document.querySelector("#babyArticleInput");
 const babyBirthInput = document.querySelector("#babyBirthInput");
 const profilePhoto = document.querySelector("#profilePhoto");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
-const profilePhotoButtonText = document.querySelector("#profilePhotoButtonText");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
 const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
@@ -119,21 +118,14 @@ const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
 const caregiverNameInput = document.querySelector("#caregiverNameInput");
 const caregiverRelationInput = document.querySelector("#caregiverRelationInput");
 const saveCaregiverIdentityButton = document.querySelector("#saveCaregiverIdentityButton");
-const editCaregiverButton = document.querySelector("#editCaregiverButton");
-const caregiverIdentityEditorModal = document.querySelector("#caregiverIdentityEditorModal");
 const deviceCaregiverName = document.querySelector("#deviceCaregiverName");
 const deviceCaregiverAvatar = document.querySelector("#deviceCaregiverAvatar");
 const deviceCaregiverHint = document.querySelector("#deviceCaregiverHint");
-const familyProfileBabyName = document.querySelector("#familyProfileBabyName");
 const familyProfileBabyMeta = document.querySelector("#familyProfileBabyMeta");
-const familyWakeWindowLabel = document.querySelector("#familyWakeWindowLabel");
-const familyWeightUnitLabel = document.querySelector("#familyWeightUnitLabel");
 const familyNameLabel = document.querySelector("#familyNameLabel");
 const familyAccountLabel = document.querySelector("#familyAccountLabel");
 const familyAccessTypeLabel = document.querySelector("#familyAccessTypeLabel");
 const familyInviteDescription = document.querySelector("#familyInviteDescription");
-const familyThemeLabel = document.querySelector("#familyThemeLabel");
-const familyNotificationLabel = document.querySelector("#familyNotificationLabel");
 const familyCreateInviteButton = document.querySelector("#familyCreateInviteButton");
 const familyJoinInviteButton = document.querySelector("#familyJoinInviteButton");
 const familyActiveInviteBox = document.querySelector("#familyActiveInviteBox");
@@ -319,7 +311,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.60.1";
+const NINOU_RUNTIME_VERSION = "75.60.8";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -1284,12 +1276,35 @@ function updateDataRealityCard() {
   if (dataRealityText) dataRealityText.textContent = "Use o código de convite recebido do administrador para liberar os dados reais da rotina.";
 }
 
+function getFirstUseChecklistState() {
+  const identity = loadCurrentCaregiverIdentity();
+  const renderedCaregiver = String(deviceCaregiverName?.textContent || "").trim();
+  const hasRenderedCaregiver = Boolean(renderedCaregiver && renderedCaregiver !== "Não configurado");
+  const hasName = Boolean(
+    String(identity.name || "").trim()
+      || String(caregiverNameInput?.value || "").trim()
+      || hasRenderedCaregiver,
+  );
+  const hasRelation = Boolean(
+    String(identity.relation || "").trim()
+      || String(identity.relationshipLabel || "").trim()
+      || String(caregiverRelationInput?.value || "").trim(),
+  );
+  const themeValue = String(
+    themeModeInput?.value
+      || babyProfile?.themeMode
+      || localStorage.getItem(storageKeys.themeMode)
+      || "dark",
+  ).trim();
+  const hasTheme = Boolean(themeValue);
+  const hasRoutine = Array.isArray(state?.events) && state.events.length > 0;
+
+  return { hasName, hasRelation, hasTheme, hasRoutine };
+}
+
 function isFirstUseChecklistComplete() {
   if (!hasFamilyAccess()) return false;
-  const identity = loadCurrentCaregiverIdentity();
-  const hasName = Boolean(String(identity.name || "").trim() || String(caregiverNameInput?.value || "").trim());
-  const hasRelation = Boolean(String(identity.relation || "").trim() || String(caregiverRelationInput?.value || "").trim());
-  const hasTheme = ["light", "dark"].includes(String(themeModeInput?.value || babyProfile?.themeMode || "").trim());
+  const { hasName, hasRelation, hasTheme } = getFirstUseChecklistState();
   return hasName && hasRelation && hasTheme;
 }
 
@@ -1311,7 +1326,7 @@ function updateProfileReadyExperience() {
 
   if (premiumTrustCard) premiumTrustCard.hidden = connected;
   if (profileReadyCard) {
-    profileReadyCard.hidden = !ready;
+    profileReadyCard.hidden = true;
     if (ready) {
       if (profileReadyKicker) profileReadyKicker.textContent = "Conta pronta";
       if (profileReadyTitle) profileReadyTitle.textContent = `Perfil de ${baby} configurado.`;
@@ -1356,7 +1371,7 @@ function normalizeLoggedProfileCards() {
     const kicker = loginCard.querySelector("span");
     const title = loginCard.querySelector("strong");
     if (connected && authorized) {
-      if (kicker) kicker.textContent = "Conta conectada";
+      if (kicker) kicker.textContent = "Conta e sincronização";
       if (title) title.textContent = cloudUser?.email || "Sessão ativa";
     } else {
       if (kicker) kicker.textContent = "Acesso familiar";
@@ -1375,11 +1390,7 @@ function updateFirstUseChecklist() {
   firstUseChecklistCard.hidden = appAdmin || !connected || !authorized || complete;
   if (firstUseChecklistCard.hidden) return;
 
-  const identity = loadCurrentCaregiverIdentity();
-  const hasName = Boolean(String(identity.name || "").trim() || String(caregiverNameInput?.value || "").trim());
-  const hasRelation = Boolean(String(identity.relation || "").trim() || String(caregiverRelationInput?.value || "").trim());
-  const hasTheme = ["light", "dark"].includes(String(themeModeInput?.value || babyProfile?.themeMode || "").trim());
-  const hasRoutine = Array.isArray(state?.events) && state.events.length > 0;
+  const { hasName, hasRelation, hasTheme, hasRoutine } = getFirstUseChecklistState();
 
   setFirstUseStepState("identity", hasName ? "done" : "current");
   setFirstUseStepState("relation", hasRelation ? "done" : hasName ? "current" : "pending");
@@ -1791,6 +1802,40 @@ function getCurrentActorRelationship() {
   return getCurrentActorProfile().relationshipLabel;
 }
 
+function getActiveBabyId() {
+  return String(
+    babyProfile?.babyId ||
+    babyProfile?.id ||
+    familyAccess?.babyId ||
+    familyAccess?.familyId ||
+    getActiveFamilyId() ||
+    "",
+  ).trim();
+}
+
+function formatCaregiverNameRole(name = "", role = "") {
+  const cleanName = String(name || "").trim();
+  const cleanRole = String(role || "").trim();
+  return [cleanName, cleanRole].filter(Boolean).join("/");
+}
+
+function getStandardEventFields(type, eventTime = Date.now(), actor = getCurrentActorProfile()) {
+  const safeType = normalizeEvent({ type, start: eventTime })?.type || type;
+  const label = getEventConfig(safeType).title || safeType;
+  const familyId = actor.familyId || getActiveFamilyId() || "";
+  return {
+    type: safeType,
+    label,
+    eventTime: Number(eventTime),
+    caregiverName: actor.displayName || actor.label,
+    caregiverRole: actor.relationshipLabel,
+    caregiverRelationship: actor.relationshipLabel,
+    caregiverLabel: formatCaregiverNameRole(actor.displayName || actor.label, actor.relationshipLabel) || actor.label,
+    babyId: getActiveBabyId() || familyId,
+    familyId,
+  };
+}
+
 const caregiverIdentityStoragePrefix = "ninou.caregiverIdentity";
 const caregiverDeviceIdKey = "ninou.deviceId";
 
@@ -1931,10 +1976,7 @@ function setProfileFamilyStackVisible(visible) {
 
 function resetProfileFamilyCardsForGuest() {
   setProfileFamilyStackVisible(false);
-  if (familyProfileBabyName) familyProfileBabyName.textContent = "Bebê";
   if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = "Entre para carregar o perfil familiar.";
-  if (familyWakeWindowLabel) familyWakeWindowLabel.textContent = "—";
-  if (familyWeightUnitLabel) familyWeightUnitLabel.textContent = "—";
   if (deviceCaregiverName) deviceCaregiverName.textContent = "Não configurado";
   if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = "👤";
   if (deviceCaregiverHint) deviceCaregiverHint.textContent = "Entre em uma conta familiar para configurar o cuidador deste aparelho.";
@@ -1948,6 +1990,90 @@ function resetProfileFamilyCardsForGuest() {
   if (familyActiveInviteHint) familyActiveInviteHint.textContent = "Nenhum convite ativo";
 }
 
+function isSleepBoundaryEvent(event = {}) {
+  if (isSleepEvent(event)) return true;
+  const text = [event.type, event.label, event.detail].filter(Boolean).join(" ").toLowerCase();
+  if (/acord|wake|despert/.test(text)) return false;
+  return /sono|soneca|dormiu|dormir|hora de dormir|bedtime|sleep|nap/.test(text);
+}
+
+function formatAwakeDuration(ms = 0) {
+  const minutes = Math.max(0, Math.round(Number(ms) / 60000));
+  if (minutes < 60) return `${minutes} min`;
+  const hoursValue = Math.floor(minutes / 60);
+  const minutesValue = minutes % 60;
+  return minutesValue ? `${hoursValue}h ${minutesValue}min` : `${hoursValue}h`;
+}
+
+function getProfileActorLabel(event = {}) {
+  const baby = String(getBabyDisplayName() || "").trim().toLowerCase();
+  const caregiverName = String(event.caregiverName || "").trim();
+  const directCaregiver = formatCaregiverNameRole(event.caregiverName, event.caregiverRole || event.caregiverRelationship);
+  const actor = caregiverName && baby && caregiverName.toLowerCase() === baby
+    ? getActorDisplayNameFromEvent(event)
+    : directCaregiver || getActorDisplayNameFromEvent(event);
+  return String(actor || "Responsável").replace(/\s*·\s*/g, "/");
+}
+
+function getTodayAwakeCalculation(now = Date.now(), sourceEvents = null) {
+  const todayStart = getDayStart(now);
+  const todayEnd = todayStart + day;
+  const upperLimit = Math.min(todayEnd, now + 2 * 60000);
+  const events = (Array.isArray(sourceEvents) ? sourceEvents : getFamilyEventsForWindow(todayStart, todayEnd))
+    .map(normalizeEvent)
+    .filter(Boolean)
+    .filter((event) => eventOverlapsWindow(event, todayStart, todayEnd))
+    .filter((event) => getEventOrderTime(event) >= todayStart && getEventOrderTime(event) <= upperLimit);
+
+  const wakeEvent = sortEventsByStartDesc(events)
+    .find((event) => event.type === "acordou" && getEventOrderTime(event) >= todayStart && getEventOrderTime(event) <= upperLimit);
+
+  if (!wakeEvent) {
+    return {
+      hasWake: false,
+      isOpen: false,
+      wakeEvent: null,
+      wakeAt: null,
+      endEvent: null,
+      endAt: null,
+      durationMs: null,
+      sinceLabel: "Ainda não registrado",
+      durationLabel: "—",
+      lastActionLabel: "Ainda não registrado",
+    };
+  }
+
+  const wakeAt = getEventOrderTime(wakeEvent);
+  const nextSleepEvent = sortEventsByStartAsc(events)
+    .find((event) => isSleepBoundaryEvent(event) && getEventOrderTime(event) > wakeAt && getEventOrderTime(event) <= upperLimit);
+
+  const currentDayState = getFamilyDayState(getCurrentDayId());
+  const activeSleepStart = currentDayState?.mode === "sleeping" ? Number(currentDayState.activeStartedAt) : null;
+  const activeSleepBoundary = Number.isFinite(activeSleepStart) && activeSleepStart > wakeAt && activeSleepStart <= upperLimit
+    ? activeSleepStart
+    : null;
+  const nextSleepAt = nextSleepEvent ? getEventOrderTime(nextSleepEvent) : null;
+  const endAt = Number.isFinite(activeSleepBoundary) && (!Number.isFinite(nextSleepAt) || activeSleepBoundary < nextSleepAt)
+    ? activeSleepBoundary
+    : Number.isFinite(nextSleepAt)
+      ? nextSleepAt
+      : now;
+  const durationMs = Math.max(0, endAt - wakeAt);
+
+  return {
+    hasWake: true,
+    isOpen: !Number.isFinite(nextSleepAt) && !Number.isFinite(activeSleepBoundary),
+    wakeEvent,
+    wakeAt,
+    endEvent: nextSleepEvent || null,
+    endAt,
+    durationMs,
+    sinceLabel: formatTime(wakeAt),
+    durationLabel: formatAwakeDuration(durationMs),
+    lastActionLabel: `${getEventConfig(wakeEvent.type).title} — registrado por ${getProfileActorLabel(wakeEvent)}`,
+  };
+}
+
 function renderProfileFamilyCards() {
   const familyReady = canUsePrivateFeatures();
   if (!familyReady) {
@@ -1958,15 +2084,10 @@ function renderProfileFamilyCards() {
   setProfileFamilyStackVisible(true);
   const identity = loadCurrentCaregiverIdentity();
   const caregiverLabel = identity.label || "Não configurado";
-  const ageText = getBabyAgeText();
   const babyName = getProfileFamilyBabyName();
-  const babyLabel = babyName || "Bebê";
   const familyLabel = getProfileFamilyDisplayName();
 
-  if (familyProfileBabyName) familyProfileBabyName.textContent = babyLabel;
-  if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = ageText.profile || "Nascimento não preenchido";
-  if (familyWakeWindowLabel) familyWakeWindowLabel.textContent = `${wakeWindowMinutes || 70} min`;
-  if (familyWeightUnitLabel) familyWeightUnitLabel.textContent = "kg";
+  if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = `Ajustes usados no diário ${babyName ? `de ${babyName}` : "do bebê"}.`;
   if (deviceCaregiverName) deviceCaregiverName.textContent = caregiverLabel;
   if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = getCaregiverEmoji(identity.relation);
   if (deviceCaregiverHint) {
@@ -1978,24 +2099,25 @@ function renderProfileFamilyCards() {
   if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || familyAccess?.email || "Conta não conectada";
   if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = getRoleLabel(familyAccess?.role || "responsavel");
   if (familyInviteDescription) familyInviteDescription.textContent = `Compartilhe um código para outro cuidador acompanhar a rotina ${babyName ? `de ${babyName}` : "do bebê"}.`;
-  if (familyThemeLabel) familyThemeLabel.textContent = (themeModeInput?.value || babyProfile?.themeMode || "dark") === "light" ? "Claro" : "Escuro";
-  if (familyNotificationLabel) familyNotificationLabel.textContent = "Preferências salvas";
   renderFamilyActiveInvite();
 }
 
 function openCaregiverEditor() {
+  showScreen("profile");
   renderCaregiverIdentityPanel();
-  if (caregiverIdentityEditorModal) {
-    caregiverIdentityEditorModal.hidden = false;
-    caregiverIdentityEditorModal.setAttribute("aria-hidden", "false");
+  if (caregiverIdentityCard) {
+    caregiverIdentityCard.hidden = false;
+    caregiverIdentityCard.open = true;
   }
-  setTimeout(() => caregiverNameInput?.focus(), 50);
+  setTimeout(() => {
+    caregiverIdentityCard?.scrollIntoView({ behavior: "smooth", block: "center" });
+    caregiverNameInput?.focus();
+  }, 50);
 }
 
 function closeCaregiverEditor() {
-  if (caregiverIdentityEditorModal) {
-    caregiverIdentityEditorModal.hidden = true;
-    caregiverIdentityEditorModal.setAttribute("aria-hidden", "true");
+  if (caregiverIdentityCard) {
+    caregiverIdentityCard.open = false;
   }
 }
 
@@ -2051,14 +2173,14 @@ async function saveCaregiverIdentityFromForm() {
 function getActorDisplayNameFromEvent(event = {}) {
   const baby = String(getBabyDisplayName() || "").trim().toLowerCase();
   const candidates = [
+    formatCaregiverNameRole(event.caregiverName, event.caregiverRole || event.caregiverRelationship),
     event.caregiverLabel,
-    [event.caregiverName, event.caregiverRelationship].filter(Boolean).join(" · "),
-    [event.createdByName, event.createdByRelationship].filter(Boolean).join(" · "),
+    formatCaregiverNameRole(event.createdByName, event.createdByRelationship),
     event.createdByName,
     event.createdByRelationship,
     event.authorName,
     event.responsibleName,
-    [event.updatedByName, event.updatedByRelationship].filter(Boolean).join(" · "),
+    formatCaregiverNameRole(event.updatedByName, event.updatedByRelationship),
     event.updatedByName,
     event.updatedByRelationship,
   ];
@@ -2101,7 +2223,9 @@ function pushAuditEntry(action, event) {
 function makeEvent(type, start, end = start, detail = "", notes = "") {
   const nowIso = new Date().toISOString();
   const actor = getCurrentActorProfile();
+  const standardFields = getStandardEventFields(type, start, actor);
   return applyWakeWindowMetadata(createRoutineEvent(type, start, end, detail, notes, {
+    ...standardFields,
     createdAt: nowIso,
     updatedAt: nowIso,
     createdByUid: actor.uid,
@@ -2109,9 +2233,6 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
     createdByDeviceId: actor.deviceId,
     createdByName: actor.displayName || actor.label,
     createdByRelationship: actor.relationshipLabel,
-    caregiverName: actor.displayName || actor.label,
-    caregiverRelationship: actor.relationshipLabel,
-    caregiverLabel: actor.label,
     createdAtClient: Date.now(),
     lastAction: "adicionou",
   }));
@@ -3158,7 +3279,8 @@ function eventOverlapsWindow(event = {}, windowStart = getDayStart(), windowEnd 
 }
 
 function getEventDisplayDedupeKey(event = {}) {
-  const startMinute = Math.round((Number(event.start) || 0) / 60000);
+  const eventTime = getEventOrderTime(event) || Number(event.start) || 0;
+  const startMinute = Math.round(eventTime / 60000);
   const endMinute = Math.round((Number(event.end) || Number(event.start) || 0) / 60000);
   const type = String(event.type || "").trim();
   const detail = String(event.detail || "").trim().toLowerCase();
@@ -3167,8 +3289,8 @@ function getEventDisplayDedupeKey(event = {}) {
 }
 
 function chooseRicherEventForDisplay(current = {}, candidate = {}) {
-  const currentScore = [current.createdByName, current.createdByRelationship, current.updatedAt, current.notes, current.detail].filter(Boolean).length;
-  const candidateScore = [candidate.createdByName, candidate.createdByRelationship, candidate.updatedAt, candidate.notes, candidate.detail].filter(Boolean).length;
+  const currentScore = [current.label, current.eventTime, current.caregiverName, current.caregiverRole, current.createdByName, current.createdByRelationship, current.updatedAt, current.notes, current.detail].filter(Boolean).length;
+  const candidateScore = [candidate.label, candidate.eventTime, candidate.caregiverName, candidate.caregiverRole, candidate.createdByName, candidate.createdByRelationship, candidate.updatedAt, candidate.notes, candidate.detail].filter(Boolean).length;
   return candidateScore >= currentScore ? candidate : current;
 }
 
@@ -3523,6 +3645,7 @@ function normalizeLegacyActivityDocument(source = {}, id = "") {
   }
 
   const start = findTimestampFromObject(source, [
+    "eventTime",
     "start",
     "startedAt",
     "startAt",
@@ -3547,10 +3670,19 @@ function normalizeLegacyActivityDocument(source = {}, id = "") {
   const event = normalizeEvent({
     id: typeof id === "string" && id ? `legacy-${id}` : undefined,
     type,
+    label: typeof source.label === "string" ? source.label : getEventConfig(type).title,
+    eventTime: findTimestampFromObject(source, ["eventTime"]) || start,
     start,
     end,
     detail: normalizeLegacyDetail(source, type),
     notes: normalizeLegacyNotes(source),
+    createdAt: source.createdAt || "",
+    updatedAt: source.updatedAt || "",
+    caregiverName: source.caregiverName || "",
+    caregiverRole: source.caregiverRole || source.caregiverRelationship || "",
+    caregiverRelationship: source.caregiverRelationship || "",
+    babyId: source.babyId || "",
+    familyId: source.familyId || "",
     wakeWindowStartedAt: toMilliseconds(source.wakeWindowStartedAt),
     wakeWindowMs: Number(source.wakeWindowMs || source.wakeWindowMilliseconds || 0),
   });
@@ -5967,11 +6099,9 @@ function renderBabyIdentity() {
     if (profileBabyName) profileBabyName.textContent = getAdminAccountLabel();
     if (profileBabyAge) profileBabyAge.textContent = "Perfil pessoal do administrador";
     if (profilePhoto) profilePhoto.src = adminAccountPhoto || getCaregiverAvatarDataUrl(getAdminAccountLabel(), cloudUser?.email || GLOBAL_APP_ADMIN_EMAIL, "admin");
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatar do admin";
   } else {
     applyAvatarPreview(babyProfile.avatar || pendingBabyAvatar);
     if (profilePhoto) profilePhoto.src = getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar);
-    if (profilePhotoButtonText) profilePhotoButtonText.textContent = "Avatares do bebê";
   }
   updateBodyModeClasses();
 }
@@ -6262,7 +6392,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.60.1 — login rápido, mas consistente:
+    v75.60.8 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;
@@ -6377,8 +6507,8 @@ function applyCloudProfile(data = {}) {
 
     persistVisibleContextForCurrentOwner();
     syncBabyProfileForm();
-    wakeWindowInput.value = String(wakeWindowMinutes);
-    wakeWindowValue.textContent = String(wakeWindowMinutes);
+    if (wakeWindowInput) wakeWindowInput.value = String(wakeWindowMinutes);
+    if (wakeWindowValue) wakeWindowValue.textContent = String(wakeWindowMinutes);
     renderAll();
   } finally {
     applyingCloudState = false;
@@ -6541,23 +6671,32 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
 
   try {
     let dayPayload = sourceState;
+    let shouldSetCreatedAt = false;
 
     try {
       const currentSnapshot = await firebaseServices.getDoc(dayRef);
       if (currentSnapshot.exists()) {
-        dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentSnapshot.data() || {}, safeDayId);
+        const currentData = currentSnapshot.data() || {};
+        shouldSetCreatedAt = !currentData.createdAt;
+        dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentData, safeDayId);
+      } else {
+        shouldSetCreatedAt = true;
       }
     } catch (mergeError) {
       console.warn("Não foi possível mesclar rotina antes de salvar. Salvando estado local atual:", mergeError);
     }
 
     dayPayload = rebuildRoutineModeAfterMutation(dayPayload, safeDayId, { preserveSleeping: true });
+    const cloudTimestamps = {
+      updatedAt: firebaseServices.serverTimestamp(),
+    };
+    if (shouldSetCreatedAt) cloudTimestamps.createdAt = firebaseServices.serverTimestamp();
 
     await firebaseServices.setDoc(
       dayRef,
       {
         ...dayPayload,
-        updatedAt: firebaseServices.serverTimestamp(),
+        ...cloudTimestamps,
       },
       { merge: true },
     );
@@ -7119,7 +7258,8 @@ function getTimeLabelForSelectedDay(timestamp, selectedDayId) {
 
 function decorateEventForSelectedDay(event = {}, selectedStart = selectedDiaryDay ?? getDayStart()) {
   const selectedDayId = toDateInputValue(selectedStart);
-  const startLabel = getTimeLabelForSelectedDay(Number(event.start), selectedDayId);
+  const displayTime = getEventOrderTime(event) || Number(event.start);
+  const startLabel = getTimeLabelForSelectedDay(displayTime, selectedDayId);
   const hasEnd = Number(event.end) > Number(event.start);
   const endLabel = hasEnd ? getTimeLabelForSelectedDay(Number(event.end), selectedDayId) : startLabel;
   return {
@@ -7258,6 +7398,11 @@ function renderSummary() {
     formatShortDuration,
     formatTime,
   });
+
+  if (summaryValues[1]) {
+    const awakeInfo = getTodayAwakeCalculation(now);
+    setText(summaryValues[1], awakeInfo.hasWake ? awakeInfo.durationLabel : "—");
+  }
 }
 
 function getSleepReportDays() {
@@ -7661,11 +7806,11 @@ function getBabyDisplayName() {
 
 function getLatestEventByTypes(events = [], types = []) {
   const typeSet = new Set(types);
-  return [...events].filter((event) => typeSet.has(event.type)).sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
+  return sortEventsByStartDesc(events.filter((event) => typeSet.has(event.type)))[0] || null;
 }
 
 function getLatestSleepEvent(events = []) {
-  return [...events].filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)).sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
+  return sortEventsByStartDesc(events.filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)))[0] || null;
 }
 
 function getDayStartFromId(dayId = getSelectedDayId()) {
@@ -7773,12 +7918,8 @@ function renderTodayOverview() {
   const lastBottle = getLatestEventByTypes(events, ["mamadeira"]);
   const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
   const lastSleep = getLatestSleepEvent(events);
-  const effectiveAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
-  const awakeText = state.mode === "sleeping"
-    ? "Dormindo agora"
-    : Number.isFinite(Number(effectiveAwakeStart))
-      ? formatShortDuration(Math.max(0, now - Number(effectiveAwakeStart)))
-      : formatShortDuration(getAwakeMsForRange(todayStart, Math.min(todayStart + day, now)));
+  const awakeInfo = getTodayAwakeCalculation(now, events);
+  const awakeText = awakeInfo.hasWake ? awakeInfo.durationLabel : "—";
   const napText = lastSleep
     ? `${formatTime(lastSleep.start)}–${formatTime(lastSleep.end)}`
     : "Sem registro";
@@ -7797,8 +7938,8 @@ function renderTodayOverview() {
   if (todayOverviewSuggestion) {
     let suggestion = "Registre a primeira ação para o Ninou acompanhar o dia com você.";
     if (state.mode === "sleeping") suggestion = `${baby} está dormindo agora. O resumo será atualizado quando acordar.`;
-    else if (Number.isFinite(Number(effectiveAwakeStart))) {
-      const awakeMs = Math.max(0, now - Number(effectiveAwakeStart));
+    else if (awakeInfo.hasWake && awakeInfo.isOpen) {
+      const awakeMs = Math.max(0, Number(awakeInfo.durationMs) || 0);
       const targetMs = wakeWindowMinutes * 60000;
       if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
       else suggestion = `Rotina em andamento. Próxima janela de sono estimada em ${formatShortDuration(Math.max(0, targetMs - awakeMs))}.`;
@@ -7819,9 +7960,9 @@ function renderGentleAlert() {
   let text = "O Ninou mostrará lembretes leves conforme os registros aparecerem.";
   let show = false;
 
-  const gentleAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
-  if (state.mode === "awake" && Number.isFinite(Number(gentleAwakeStart))) {
-    const awakeMs = now - Number(gentleAwakeStart);
+  const awakeInfo = getTodayAwakeCalculation(now, events);
+  if (state.mode === "awake" && awakeInfo.hasWake && awakeInfo.isOpen) {
+    const awakeMs = Number(awakeInfo.durationMs) || 0;
     if (awakeMs >= wakeWindowMinutes * 60000 * 0.9) {
       title = `${baby} está acordado há ${formatShortDuration(awakeMs)}`;
       text = "Talvez seja um bom momento para observar sinais de sono com calma, sem pressa.";
@@ -7879,9 +8020,9 @@ function getNotificationItems() {
     const elapsed = now - Number(latestDiaper.start);
     if (elapsed > 3 * hour) items.push({ icon: "🧷", title: "Fralda", text: `Última fralda registrada há ${formatShortDuration(elapsed)}.` });
   }
-  const effectiveAwakeStart = getLatestAwakeBoundaryFromEvents({ ...state, events }, getCurrentDayId(), now) ?? Number(state.activeStartedAt);
-  if (state.mode === "awake" && Number.isFinite(Number(effectiveAwakeStart))) {
-    const awake = Math.max(0, now - Number(effectiveAwakeStart));
+  const awakeInfo = getTodayAwakeCalculation(now, events);
+  if (state.mode === "awake" && awakeInfo.hasWake && awakeInfo.isOpen) {
+    const awake = Math.max(0, Number(awakeInfo.durationMs) || 0);
     if (awake > wakeWindowMinutes * 60000) items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
   }
   if (latestAny?.createdByName || latestAny?.createdByEmail) {
@@ -8216,6 +8357,11 @@ function startRoutine(mode) {
   orbitRenderSignature = "";
   saveDayState();
   renderAll();
+
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    window.clearTimeout(dayCloudSaveTimer);
+    void saveDayToCloud(getSelectedDayId());
+  }
 }
 
 function updateDiaryChipsMoreButton() {
@@ -8327,8 +8473,8 @@ function updateWakeWindow(value, options = {}) {
 
   const nextValue = Math.min(240, Math.max(20, Number(value) || 70));
   wakeWindowMinutes = nextValue;
-  wakeWindowInput.value = String(nextValue);
-  wakeWindowValue.textContent = String(nextValue);
+  if (wakeWindowInput) wakeWindowInput.value = String(nextValue);
+  if (wakeWindowValue) wakeWindowValue.textContent = String(nextValue);
   if (!options.skipPersist) {
     markProfileLocallyChanged();
     localStorage.setItem(storageKeys.wakeWindow, String(nextValue));
@@ -8382,7 +8528,7 @@ function renderSyncDetails() {
 
 function renderAdminDiagnostics() {
   if (!adminDiagnosticsCard) return;
-  const show = Boolean(isGlobalAppAdmin() || familyAccess?.familyId);
+  const show = Boolean(isGlobalAppAdmin() || (familyAccess?.familyId && !isProfileReadyForDailyUse()));
   adminDiagnosticsCard.hidden = !show;
   if (!show) return;
 
@@ -8435,7 +8581,7 @@ function setSyncStatus(status = "offline", email = "") {
   syncStatusText.textContent = online
     ? (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen
       ? "Painel administrativo ativo. A rotina de uma família só deve ser aberta quando selecionada."
-      : `${email} está sincronizando a rotina familiar em tempo real.`)
+      : "Rotina familiar sincronizando em tempo real.")
     : loading
       ? "Conectando ao Firebase..."
       : error
@@ -8643,7 +8789,9 @@ function saveManualEvent() {
       ? getWakeWindowForSleepStart(payload.start, existingEvent.id)
       : null;
     const actor = getCurrentActorProfile();
+    const standardFields = getStandardEventFields(payload.type, payload.start, actor);
     updateEventKeepingDuration(existingEvent, {
+      ...standardFields,
       type: payload.type,
       start: payload.start,
       end: payload.hasManualEnd ? payload.end : undefined,
@@ -8657,9 +8805,6 @@ function saveManualEvent() {
       updatedByDeviceId: actor.deviceId,
       updatedByName: actor.displayName || actor.label,
       updatedByRelationship: actor.relationshipLabel,
-      caregiverName: actor.displayName || actor.label,
-      caregiverRelationship: actor.relationshipLabel,
-      caregiverLabel: actor.label,
       updatedAtClient: Date.now(),
       lastAction: "editou",
     });
@@ -8717,6 +8862,11 @@ function saveManualEvent() {
   orbitRenderSignature = "";
   saveDayState();
   renderAll();
+
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    window.clearTimeout(dayCloudSaveTimer);
+    void saveDayToCloud(getSelectedDayId());
+  }
 }
 
 function editEvent(eventId) {
@@ -9184,11 +9334,6 @@ exportJsonButton.addEventListener("click", () => exportRoutine("json"));
 exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
 if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
 if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", saveCaregiverIdentityFromForm);
-if (editCaregiverButton) editCaregiverButton.addEventListener("click", openCaregiverEditor);
-document.querySelectorAll("[data-close-caregiver-modal]").forEach((button) => button.addEventListener("click", closeCaregiverEditor));
-if (caregiverIdentityEditorModal) caregiverIdentityEditorModal.addEventListener("click", (event) => {
-  if (event.target === caregiverIdentityEditorModal) closeCaregiverEditor();
-});
 if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click", createFamilyCaregiverInvite);
 if (familyCopyInviteButton) familyCopyInviteButton.addEventListener("click", copyFamilyInviteCode);
 if (familyShareInviteWhatsAppButton) familyShareInviteWhatsAppButton.addEventListener("click", shareFamilyInviteOnWhatsApp);
@@ -9282,7 +9427,7 @@ wakeWindowInput.addEventListener("input", () => {
   const nextValue = Number(wakeWindowInput.value);
   if (nextValue >= 20 && nextValue <= 240) {
     wakeWindowMinutes = nextValue;
-    wakeWindowValue.textContent = String(nextValue);
+    if (wakeWindowValue) wakeWindowValue.textContent = String(nextValue);
     renderSummary();
   }
 });
