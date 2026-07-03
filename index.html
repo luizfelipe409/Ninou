@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.60.8" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.60.9" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.60.8" />
+    <link rel="stylesheet" href="./styles.css?v=75.60.9" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -499,6 +499,7 @@
                 <span>Bebê</span>
                 <strong>Ajustes do bebê</strong>
               </div>
+              <span class="profile-card-symbol" aria-hidden="true">⚙</span>
             </div>
             <p id="familyProfileBabyMeta">Nome, diário, nascimento, rotina, tema e cuidador deste aparelho.</p>
             <div class="profile-actions-row avatar-profile-actions">
@@ -506,29 +507,29 @@
             </div>
             <div class="profile-edit-grid">
               <label class="profile-setting-line">
-                Nome do bebê
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome do bebê</span>
                 <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
               </label>
               <label class="profile-setting-line">
-                Como mostrar no diário
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">☰</span>Como mostrar no diário</span>
                 <select id="babyArticleInput">
                   <option value="do">Diário do</option>
                   <option value="da">Diário da</option>
                 </select>
               </label>
               <label class="profile-setting-line">
-                Dia de nascimento
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">□</span>Dia de nascimento</span>
                 <input id="babyBirthInput" type="date" />
               </label>
               <label class="profile-setting-line">
-                Janela de despertar
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◷</span>Janela de despertar</span>
                 <div class="profile-number-field">
                   <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
                   <strong><span id="wakeWindowValue">70</span> min</strong>
                 </div>
               </label>
               <label class="profile-setting-line">
-                Preferência de tema
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◐</span>Preferência de tema</span>
                 <select id="themeModeInput">
                   <option value="auto">Automático</option>
                   <option value="light">Claro</option>
@@ -538,18 +539,20 @@
             </div>
             <details id="caregiverIdentityCard" class="caregiver-inline-dropdown">
               <summary>
-                <span>Editar cuidador</span>
-                <strong id="deviceCaregiverName">Não configurado</strong>
+                <div class="caregiver-summary-main">
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">◉</span>Editar cuidador</span>
+                  <strong id="deviceCaregiverName">Não configurado</strong>
+                </div>
                 <div id="deviceCaregiverAvatar" class="caregiver-avatar-mini" aria-hidden="true">👤</div>
               </summary>
               <p id="deviceCaregiverHint">As ações deste aparelho serão registradas com este cuidador.</p>
               <div class="profile-edit-grid">
                 <label class="profile-setting-line">
-                  Nome do cuidador
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome do cuidador</span>
                   <input id="caregiverNameInput" type="text" placeholder="Ex.: Felipe" autocomplete="name" />
                 </label>
                 <label class="profile-setting-line">
-                  Vínculo com o bebê
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">⌄</span>Vínculo com o bebê</span>
                   <select id="caregiverRelationInput">
                     <option value="pai">Pai</option>
                     <option value="mae">Mãe</option>
@@ -572,8 +575,8 @@
           <article class="profile-family-card avatar-test-card avatar-compact-card" id="babyAvatarTestCard">
             <div class="avatar-test-header avatar-minimal-header">
               <div class="avatar-copy-column compact-copy">
-                <span>Avatar do bebê</span>
-                <strong>Avatares do bebê</strong>
+                <span>Avatar</span>
+                <strong>Escolha um avatar</strong>
                 <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do bebê">
                   <span>12 opções</span>
                   <span>Privado</span>
@@ -588,22 +591,6 @@
               <strong>Avatares disponíveis</strong>
               <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
             </section>
-            <section class="avatar-picker-section" data-avatar-section="hair-color">
-              <strong hidden>Cor do cabelo</strong>
-              <div class="avatar-option-row" id="avatarHairColorOptions"></div>
-            </section>
-            <section class="avatar-picker-section" data-avatar-section="skin">
-              <strong hidden>Tom de pele</strong>
-              <div class="avatar-option-row" id="avatarSkinOptions"></div>
-            </section>
-            <section class="avatar-picker-section" data-avatar-section="background">
-              <strong hidden>Cor de fundo</strong>
-              <div class="avatar-option-row" id="avatarColorOptions"></div>
-            </section>
-            <div class="avatar-hidden-options" aria-hidden="true">
-              <div id="avatarBackgroundOptions"></div>
-              <div id="avatarAccessoryOptions"></div>
-            </div>
             <div class="avatar-editor-actions">
               <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">Salvar</button>
               <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
@@ -1161,7 +1148,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.60.8</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.60.9</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1355,6 +1342,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.60.8"></script>
+    <script type="module" src="./app.js?v=75.60.9"></script>
   </body>
 </html>

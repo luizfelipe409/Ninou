@@ -1,5 +1,5 @@
 /* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.60.8");
+@import url("./css/app.legacy.css?v=75.60.9");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -25,6 +25,19 @@
   gap: 14px;
 }
 
+.profile-card-symbol {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.1);
+  color: #7ce5c2;
+  font-weight: 900;
+}
+
 .profile-card-head span,
 .profile-family-card > p,
 .profile-soft-row span,
@@ -44,6 +57,17 @@
   color: #fff;
   font-size: 1rem;
   line-height: 1.2;
+}
+
+.profile-card-head .profile-card-symbol,
+.caregiver-inline-dropdown .setting-icon,
+.profile-setting-line .setting-icon {
+  color: #7ce5c2;
+  font-size: 0.72rem;
+}
+
+.profile-card-head .profile-card-symbol {
+  font-size: 1rem;
 }
 
 .profile-soft-row strong {
@@ -88,18 +112,46 @@
 
 .caregiver-inline-dropdown {
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(124, 229, 194, 0.18);
+  background: linear-gradient(145deg, rgba(124, 229, 194, 0.11), rgba(255, 255, 255, 0.065));
   overflow: hidden;
 }
 
 .caregiver-inline-dropdown summary {
+  position: relative;
   cursor: pointer;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  padding: 12px;
+  min-height: 64px;
+  padding: 12px 44px 12px 12px;
   list-style: none;
+}
+
+.caregiver-inline-dropdown summary::after,
+details > summary::after {
+  content: "";
+  position: absolute;
+  right: 17px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-62%) rotate(45deg);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+details[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.caregiver-summary-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
 .caregiver-inline-dropdown summary::-webkit-details-marker {
@@ -144,6 +196,29 @@
   justify-content: center;
 }
 
+.setting-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: inherit;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.setting-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: rgba(124, 229, 194, 0.14);
+  color: #7ce5c2;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
 .profile-setting-line input,
 .profile-setting-line select {
   width: 100%;
@@ -155,6 +230,37 @@
   color: #16122d;
   background: rgba(255, 255, 255, 0.94);
   font-weight: 700;
+}
+
+select {
+  --ninou-select-arrow: rgba(255, 255, 255, 0.78);
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  padding-right: 46px !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ninou-select-arrow) 50%),
+    linear-gradient(135deg, var(--ninou-select-arrow) 50%, transparent 50%) !important;
+  background-position:
+    calc(100% - 19px) 50%,
+    calc(100% - 13px) 50% !important;
+  background-size: 7px 7px, 7px 7px !important;
+  background-repeat: no-repeat !important;
+}
+
+.profile-setting-line select,
+.settings-list select,
+.admin-clean-panel select,
+.export-card select {
+  --ninou-select-arrow: rgba(25, 20, 51, 0.76);
+}
+
+.select-label select {
+  background-image: none !important;
+}
+
+details > summary {
+  position: relative;
+  padding-right: 44px;
 }
 
 .profile-toggle-line input {
@@ -293,6 +399,41 @@ body.day-theme .profile-family-card {
   border-color: rgba(16, 16, 41, 0.08);
   background: rgba(255,255,255,.78);
   box-shadow: 0 16px 34px rgba(82, 67, 132, 0.12);
+}
+
+.baby-settings-card {
+  border-color: rgba(124, 229, 194, 0.18);
+  background: linear-gradient(160deg, rgba(124, 229, 194, 0.12), rgba(255, 255, 255, 0.06));
+}
+
+.family-card {
+  border-color: rgba(124, 229, 194, 0.2);
+  background: linear-gradient(160deg, rgba(124, 229, 194, 0.13), rgba(255, 255, 255, 0.06));
+}
+
+.family-card .profile-soft-row {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.day-theme .profile-card-symbol,
+body.day-theme .setting-icon {
+  border-color: rgba(47, 128, 103, 0.14);
+  background: rgba(47, 128, 103, 0.09);
+  color: #2f8067;
+}
+
+body.day-theme .baby-settings-card,
+body.day-theme .family-card {
+  border-color: rgba(47, 128, 103, 0.14);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(240, 249, 245, 0.86));
+  box-shadow: 0 16px 34px rgba(58, 90, 82, 0.1);
+}
+
+body.day-theme .family-card .profile-soft-row,
+body.day-theme .sync-detail-grid div,
+body.day-theme .account-sync-status {
+  border-color: rgba(47, 128, 103, 0.12);
+  background: rgba(255, 255, 255, 0.82);
 }
 
 body.day-theme .profile-card-head strong,
@@ -2217,7 +2358,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.8 — Login rápido + App Check não bloqueante */
+/* Ninou v75.60.9 — Login rápido + App Check não bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2278,7 +2419,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.8 — perfil logado sem duplicidade visual */
+/* Ninou v75.60.9 — perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2311,7 +2452,8 @@ body.family-ready .account-sync-summary {
   gap: 4px;
   padding: 12px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(124, 229, 194, 0.14);
+  background: linear-gradient(145deg, rgba(124, 229, 194, 0.1), rgba(255, 255, 255, 0.06));
 }
 
 .account-sync-status strong {
@@ -2325,11 +2467,16 @@ body.family-ready .account-sync-summary {
   line-height: 1.42;
 }
 
-body.day-theme .account-sync-status {
-  background: rgba(25, 20, 51, 0.055);
+.sync-detail-grid div {
+  border-color: rgba(124, 229, 194, 0.14);
+  background: rgba(255, 255, 255, 0.075);
 }
 
-/* v75.60.8 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
+body.day-theme .account-sync-status {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* v75.60.9 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2340,6 +2487,35 @@ body.day-theme .account-sync-status {
   min-height: 44px;
   margin: 0 !important;
   inset: auto !important;
+}
+
+body[data-active-screen="profile"] .fab {
+  display: none !important;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr)) !important;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  min-height: 138px !important;
+  display: grid !important;
+  grid-template-rows: minmax(72px, 1fr) auto;
+  align-items: center !important;
+  justify-items: center !important;
+  gap: 9px !important;
+  padding: 12px 10px !important;
+  border-radius: 18px !important;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-face-thumb {
+  width: 72px !important;
+  height: 72px !important;
+  object-fit: contain;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice small {
+  text-align: center;
 }
 
 .phone-shell,
