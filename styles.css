@@ -1,5 +1,5 @@
 /* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.60.9");
+@import url("./css/app.legacy.css?v=75.60.10");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -2358,7 +2358,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.9 — Login rápido + App Check não bloqueante */
+/* Ninou v75.60.10 — Login rápido + App Check não bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2419,7 +2419,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.9 — perfil logado sem duplicidade visual */
+/* Ninou v75.60.10 — perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2476,7 +2476,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.60.9 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.60.10 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2719,4 +2719,53 @@ body.sync-bootstrap .screen[data-screen="today"] .timeline,
 body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   opacity: .35;
   pointer-events: none;
+}
+
+/* v75.60.10 — perfil não usa colunas quando o app está dentro de painel estreito */
+.screen[data-screen="profile"] .settings-list {
+  grid-template-columns: 1fr !important;
+}
+
+.screen[data-screen="profile"] .settings-list > *,
+.screen[data-screen="profile"] .login-card,
+.screen[data-screen="profile"] .weight-profile-block {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.screen[data-screen="profile"] .account-sync-summary,
+.screen[data-screen="profile"] .sync-detail-grid {
+  grid-template-columns: 1fr !important;
+}
+
+.screen[data-screen="profile"] .weight-history-list li {
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: stretch !important;
+}
+
+.screen[data-screen="profile"] .weight-history-list strong,
+.screen[data-screen="profile"] .weight-history-list span {
+  display: block;
+  width: 100%;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  text-align: left;
+}
+
+.screen[data-screen="profile"] .weight-history-list button {
+  width: 100%;
+}
+
+.screen[data-screen="profile"] .login-card > strong,
+.screen[data-screen="profile"] #syncStatusText,
+.screen[data-screen="profile"] #syncFamilyLabel {
+  overflow-wrap: anywhere !important;
+}
+
+@media (min-width: 860px) {
+  body.global-admin-mode .screen[data-screen="profile"] .settings-list,
+  body.admin-family-preview .screen[data-screen="profile"] .settings-list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+  }
 }
