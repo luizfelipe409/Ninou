@@ -113,6 +113,7 @@ const createAccountButton = document.querySelector("#createAccountButton");
 const clearDeviceDataButton = document.querySelector("#clearDeviceDataButton");
 const clearDeviceDataStatus = document.querySelector("#clearDeviceDataStatus");
 const loginHelper = document.querySelector("#loginHelper");
+const loginCard = document.querySelector(".login-card");
 const profileFamilyStack = document.querySelector(".profile-family-stack");
 const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
 const caregiverNameInput = document.querySelector("#caregiverNameInput");
@@ -318,7 +319,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.59.2";
+const NINOU_RUNTIME_VERSION = "75.60.0";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -500,6 +501,9 @@ let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVers
 let firebaseServices = null;
 let firebaseServicesPromise = null;
 let cloudUser = null;
+let authAccessLoading = false;
+let authFlowRunId = 0;
+let familyBootstrapReady = false;
 let familyAccess = loadFamilyAccess();
 let pendingInviteCode = getInitialInviteCode();
 let accessFlowNotice = "";
@@ -744,9 +748,19 @@ function renderAvatarEditorVisibility() {
   }
 }
 
+function setAuthAccessLoading(value, message = "Validando acesso familiar...") {
+  authAccessLoading = Boolean(value);
+  document.body.classList.toggle("auth-validating", authAccessLoading);
+  document.body.classList.toggle("sync-bootstrap", authAccessLoading && Boolean(cloudUser));
+  if (authAccessLoading && loginHelper) loginHelper.textContent = message;
+  renderAuthControls();
+}
+
 function applyGuestInteractionLock() {
   const locked = !isLoggedIn();
   document.body.classList.toggle("guest-locked", locked);
+  document.body.classList.toggle("auth-validating", authAccessLoading);
+  document.body.classList.toggle("sync-bootstrap", authAccessLoading && Boolean(cloudUser));
   const disabledElements = [
     babyNameInput, babyArticleInput, babyBirthInput,
     babyWeightInput, babyWeightDateInput, saveBabyWeightButton,
@@ -1315,6 +1329,39 @@ function updateProfileReadyExperience() {
   if (familyWelcomeCard && ready) familyWelcomeCard.hidden = true;
   if (familyAccessCard) {
     familyAccessCard.hidden = Boolean(ready && !familyAdmin && !appAdmin);
+  }
+
+  normalizeLoggedProfileCards();
+}
+
+function normalizeLoggedProfileCards() {
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const ready = Boolean(authorized && !authAccessLoading && (!appAdmin || Boolean(window.__ninouAdminFamilyDataOpen)));
+
+  document.body.classList.toggle("family-ready", ready);
+
+  if (ready) {
+    if (guestWelcomeCard) guestWelcomeCard.hidden = true;
+    if (premiumTrustCard) premiumTrustCard.hidden = true;
+    const journeyCard = document.querySelector("#accountJourneyCard");
+    if (journeyCard) journeyCard.hidden = true;
+    if (postAccessCard) postAccessCard.hidden = true;
+    if (dataRealityCard) dataRealityCard.hidden = true;
+  }
+
+  if (loginCard) {
+    loginCard.dataset.state = connected ? (authorized ? "family-ready" : "connected") : "guest";
+    const kicker = loginCard.querySelector("span");
+    const title = loginCard.querySelector("strong");
+    if (connected && authorized) {
+      if (kicker) kicker.textContent = "Conta conectada";
+      if (title) title.textContent = cloudUser?.email || "Sessão ativa";
+    } else {
+      if (kicker) kicker.textContent = "Acesso familiar";
+      if (title) title.textContent = "Entrar no Ninou";
+    }
   }
 }
 
@@ -2276,6 +2323,8 @@ function refreshVisibleContextUi() {
 }
 
 function prepareVisibleContextForAccount(user = cloudUser) {
+  familyBootstrapReady = false;
+  document.body.classList.remove("family-ready");
   const email = normalizeEmail(user?.email || "");
   if (!email) return;
 
@@ -2307,6 +2356,8 @@ function prepareVisibleContextForAccount(user = cloudUser) {
 }
 
 function resetVisibleContextForGuest() {
+  familyBootstrapReady = false;
+  document.body.classList.remove("family-ready", "sync-bootstrap");
   const previousOwner = getVisibleDataOwnerEmail();
   if (previousOwner) saveCurrentVisibleContextForOwner(previousOwner);
   clearGenericVisibleContext();
@@ -6054,11 +6105,13 @@ function renderAuthControls() {
   const connected = isLoggedIn();
   const authorized = hasFamilyAccess();
   const appAdmin = isGlobalAppAdmin();
-  const routineAuthorized = authorized && (!appAdmin || Boolean(window.__ninouAdminFamilyDataOpen));
+  const routineAuthorized = authorized && !authAccessLoading && (!appAdmin || Boolean(window.__ninouAdminFamilyDataOpen));
+  document.body.classList.toggle("family-bootstrap-ready", Boolean(familyBootstrapReady && authorized));
   loginButton.textContent = connected ? "Conectado" : "Entrar";
-  loginButton.disabled = connected;
+  loginButton.disabled = connected || authAccessLoading;
   createAccountButton.textContent = connected ? "Sair" : "Criar conta";
   createAccountButton.classList.toggle("logout-button", connected);
+  createAccountButton.disabled = authAccessLoading && !connected;
   loginEmail.disabled = connected;
   loginPassword.disabled = connected;
   document.body.classList.toggle("access-locked", !routineAuthorized);
@@ -6074,6 +6127,7 @@ function renderAuthControls() {
   updateAccountJourneyGuide();
   updatePostAccessExperience();
   updateProfileReadyExperience();
+  normalizeLoggedProfileCards();
   renderCaregiverIdentityPanel();
   renderAvatarCustomizer();
 }
@@ -6208,14 +6262,53 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.59.2 — login mais rápido:
-    não bloquear a conclusão do login aguardando a leitura de todos os documentos de dias.
-    Primeiro conecta perfil + dia selecionado; a lista histórica de dias carrega em segundo plano.
+    v75.60.0 — login rápido, mas consistente:
+    1) lê apenas perfil + dia atual/selecionado uma vez;
+    2) só depois libera a tela familiar;
+    3) assina snapshots em tempo real;
+    4) histórico carrega em segundo plano.
+    Isso evita aparecer rotina antiga/demonstração enquanto a família correta ainda está sendo validada.
   */
   resetFamilyDayCache();
   autoSelectedLatestFamilyDay = false;
+
+  const selectedDayId = getSelectedDayId();
+  const profileRef = getCloudProfileRef();
+  const dayRef = getCloudDayRef(selectedDayId);
+
+  const [profileSnapshot, daySnapshot] = await Promise.all([
+    profileRef ? firebaseServices.getDoc(profileRef).catch((error) => {
+      console.warn("Perfil será carregado pelo snapshot:", error);
+      return null;
+    }) : Promise.resolve(null),
+    dayRef ? firebaseServices.getDoc(dayRef).catch((error) => {
+      console.warn("Dia atual será carregado pelo snapshot:", error);
+      return null;
+    }) : Promise.resolve(null),
+  ]);
+
+  if (profileSnapshot?.exists?.()) {
+    applyCloudProfile(profileSnapshot.data() || {});
+  }
+
+  if (daySnapshot?.exists?.()) {
+    applyCloudDay(daySnapshot.data() || {}, selectedDayId);
+  } else {
+    state = createEmptyDayState();
+    loadedStateDayId = selectedDayId;
+    familyDayStatesCache = sanitizeDayStateMapByDay({ ...familyDayStatesCache, [selectedDayId]: state });
+    timelineRenderSignature = "";
+    orbitRenderSignature = "";
+    renderAll();
+  }
+
   await subscribeToCloudProfile();
-  await subscribeToCloudDay(getSelectedDayId());
+  await subscribeToCloudDay(selectedDayId, { allowAutoLatest: false });
+
+  familyBootstrapReady = true;
+  document.body.classList.remove("sync-bootstrap");
+  normalizeLoggedProfileCards();
+  renderAuthControls();
 
   void loadFamilyDayIds({ force: true })
     .then(() => {
@@ -6561,12 +6654,14 @@ async function initFirebaseAuthState() {
   const services = await getFirebaseServices();
 
   services.onAuthStateChanged(services.auth, async (user) => {
+    const authRunId = ++authFlowRunId;
     cloudUser = user;
 
     if (!user) {
       accessFlowNotice = "";
       unsubscribeCloudListeners();
       clearLocalAccountData();
+      setAuthAccessLoading(false);
       setSyncStatus("offline");
       loginEmail.value = "";
       loginPassword.value = "";
@@ -6580,8 +6675,10 @@ async function initFirebaseAuthState() {
     loginEmail.value = user.email || "";
 
     setSyncStatus("loading", user.email || "");
-    renderAuthControls();
-    loginHelper.textContent = "Verificando acesso familiar...";
+    setAuthAccessLoading(true, "Validando conta e família...");
+    showScreen("profile");
+
+    const isCurrentAuthRun = () => authRunId === authFlowRunId && cloudUser?.uid === user.uid;
 
     try {
       if (isGlobalAppAdmin(user)) {
@@ -6592,7 +6689,10 @@ async function initFirebaseAuthState() {
         renderAuthControls();
         loginHelper.textContent = "Admin conectado. Preparando painel...";
         await activatePersonalFamily();
+        if (!isCurrentAuthRun()) return;
         await loadAdminAccountProfileFromCloud(user);
+        if (!isCurrentAuthRun()) return;
+        setAuthAccessLoading(false);
         setSyncStatus("online", user.email || "");
         loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
         renderAuthControls();
@@ -6603,18 +6703,22 @@ async function initFirebaseAuthState() {
       let restoredAccess = null;
       try {
         restoredAccess = await readAccountAccessFromCloud(user);
+        if (!isCurrentAuthRun()) return;
       } catch (error) {
         console.error("Erro ao ler acesso familiar:", error);
         restoredAccess = null;
       }
       if (!restoredAccess) saveFamilyAccess(null);
       await loadCurrentAccountIdentityFromCloud(user);
+      if (!isCurrentAuthRun()) return;
 
       if (pendingInviteCode) {
         await acceptFamilyInvite(pendingInviteCode, { silent: true });
+        if (!isCurrentAuthRun()) return;
       }
 
       if (!hasFamilyAccess()) {
+        setAuthAccessLoading(false);
         loginHelper.textContent = "Conta conectada, mas sem acesso familiar encontrado. Use um convite recebido ou peça ao administrador para verificar o membro da família.";
         setSyncStatus("offline", user.email || "");
         renderAuthControls();
@@ -6623,12 +6727,17 @@ async function initFirebaseAuthState() {
       }
 
       await connectCurrentAccount();
+      if (!isCurrentAuthRun()) return;
+      setAuthAccessLoading(false);
       setSyncStatus("online", user.email || "");
       loginHelper.textContent = `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
       renderAuthControls();
       renderAll();
     } catch (error) {
       console.error("Erro ao conectar família:", error);
+      familyBootstrapReady = false;
+      document.body.classList.remove("family-ready", "sync-bootstrap");
+      setAuthAccessLoading(false);
       setSyncStatus("offline", user.email || "");
       loginHelper.textContent = "Conta conectada, mas a sincronização ainda precisa das regras corretas do Firestore.";
       renderAuthControls();
@@ -6646,6 +6755,7 @@ async function signInAccount() {
   if (!credentials) return;
 
   try {
+    setAuthAccessLoading(true, "Entrando com segurança...");
     const services = await getFirebaseServices();
 
     loginHelper.textContent = "Entrando...";
@@ -6656,6 +6766,7 @@ async function signInAccount() {
     accessFlowNotice = "signed-in";
     localStorage.setItem(storageKeys.email, credentials.email);
   } catch (error) {
+    setAuthAccessLoading(false);
     console.error("Erro ao entrar:", error);
     loginHelper.textContent = getFirebaseErrorMessage(error);
   } finally {
@@ -6698,6 +6809,7 @@ async function createAccount() {
 }
 
 async function signOutAccount() {
+  authFlowRunId += 1;
   try {
     const services = await getFirebaseServices();
     loginHelper.textContent = "Saindo...";
@@ -8042,6 +8154,7 @@ function renderAll() {
   renderProductExperienceSections();
   renderFamilyAccessPanel();
   updateProfileReadyExperience();
+  normalizeLoggedProfileCards();
   renderCaregiverIdentityPanel();
 }
 
@@ -8120,7 +8233,7 @@ function showScreen(target) {
 
   if (activeScreenName === "today") {
     ensureTodaySelectedForView();
-    if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    if (!authAccessLoading && firebaseServices && cloudUser && hasFamilyAccess()) {
       void loadFamilyDayIds({ force: true }).then(() => {
         orbitRenderSignature = "";
         renderOrbit();
@@ -8130,7 +8243,7 @@ function showScreen(target) {
     }
   }
 
-  if (activeScreenName === "diary" && firebaseServices && cloudUser && hasFamilyAccess()) {
+  if (activeScreenName === "diary" && !authAccessLoading && firebaseServices && cloudUser && hasFamilyAccess()) {
     void loadFamilyDayIds({ force: true }).then(() => {
       timelineRenderSignature = "";
       renderTimeline();

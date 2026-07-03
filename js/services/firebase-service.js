@@ -11,46 +11,58 @@ export async function getFirebaseServices() {
       import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app.js`),
       import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth.js`),
       import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore.js`),
-      import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-check.js`).catch((error) => {
-        console.warn("Firebase App Check indisponível neste carregamento.", error);
-        return null;
-      }),
     ])
-      .then(([appModule, authModule, firestoreModule, appCheckModule]) => {
+      .then(([appModule, authModule, firestoreModule]) => {
         const app = appModule.initializeApp(firebaseConfig);
 
         const appCheckStatus = {
-          enabled: false,
+          enabled: Boolean(appCheckConfig?.enabled),
           configured: false,
           provider: appCheckConfig?.provider || "none",
-          reason: "site-key-pending",
+          reason: "scheduled",
         };
 
-        try {
+        /*
+          v75.60.0 — App Check não bloqueante:
+          o login não deve esperar o download/inicialização do módulo de App Check.
+          Como o Firebase Console ainda está em modo Monitorando, o app pode abrir Auth/Firestore
+          primeiro e inicializar App Check em paralelo. Só ative enforcement após validar que
+          appCheckStatus ficou "active" no diagnóstico.
+        */
+        const startAppCheckInBackground = () => {
           const siteKey = String(appCheckConfig?.siteKey || "").trim();
           const hasRealSiteKey = Boolean(siteKey)
             && !siteKey.includes("COLE_A_SITE_KEY")
             && siteKey.length >= 20;
 
-          if (appCheckConfig?.enabled && appCheckModule && hasRealSiteKey) {
-            const Provider = appCheckModule.ReCaptchaEnterpriseProvider || appCheckModule.ReCaptchaV3Provider;
-            if (typeof Provider === "function" && typeof appCheckModule.initializeAppCheck === "function") {
-              const appCheck = appCheckModule.initializeAppCheck(app, {
-                provider: new Provider(siteKey),
-                isTokenAutoRefreshEnabled: true,
-              });
-              appCheckStatus.enabled = true;
-              appCheckStatus.configured = true;
-              appCheckStatus.reason = "active";
-              appCheckStatus.instance = appCheck;
-            } else {
-              appCheckStatus.reason = "provider-unavailable";
-            }
+          if (!appCheckConfig?.enabled || !hasRealSiteKey) {
+            appCheckStatus.enabled = false;
+            appCheckStatus.reason = "site-key-pending";
+            return;
           }
-        } catch (error) {
-          appCheckStatus.reason = "init-error";
-          console.warn("Não foi possível iniciar o App Check. O app continuará sem enforcement local.", error);
-        }
+
+          import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-check.js`)
+            .then((appCheckModule) => {
+              const Provider = appCheckModule.ReCaptchaEnterpriseProvider || appCheckModule.ReCaptchaV3Provider;
+              if (typeof Provider === "function" && typeof appCheckModule.initializeAppCheck === "function") {
+                const appCheck = appCheckModule.initializeAppCheck(app, {
+                  provider: new Provider(siteKey),
+                  isTokenAutoRefreshEnabled: true,
+                });
+                appCheckStatus.enabled = true;
+                appCheckStatus.configured = true;
+                appCheckStatus.reason = "active";
+                appCheckStatus.instance = appCheck;
+              } else {
+                appCheckStatus.reason = "provider-unavailable";
+              }
+            })
+            .catch((error) => {
+              appCheckStatus.reason = "init-error";
+              console.warn("Firebase App Check indisponível neste carregamento. O app continuará em modo monitorado.", error);
+            });
+        };
+
         const db = (() => {
           try {
             /*
@@ -72,6 +84,8 @@ export async function getFirebaseServices() {
           }
           return firestoreModule.getFirestore(app);
         })();
+
+        startAppCheckInBackground();
 
         firebaseServices = {
           auth: authModule.getAuth(app),

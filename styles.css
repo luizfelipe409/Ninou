@@ -1,5 +1,5 @@
 /* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.59.1");
+@import url("./css/app.legacy.css?v=75.60.0");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -1111,7 +1111,7 @@ body.day-theme .day-notes-card .section-helper {
 .profile-family-stack + .settings-list,
 .support-card + .settings-list,
 #profileReadyCard + #guestWelcomeCard,
-#firstUseVerificaçãoCard + .settings-list {
+#firstUseChecklistCard + .settings-list {
   margin-top: 0 !important;
 }
 
@@ -2129,4 +2129,105 @@ body.day-theme .danger-soft-button {
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.35;
+}
+
+
+/* Ninou v75.60.0 — Login rápido + App Check não bloqueante */
+body.auth-validating .bottom-nav button:not([data-target="profile"]),
+body.auth-validating .fab,
+body.auth-validating .main-action-area,
+body.auth-validating #guestWhatsappButton {
+  pointer-events: none !important;
+  opacity: .42 !important;
+}
+
+body.auth-validating .screen.active:not([data-screen="profile"]) {
+  position: relative;
+  min-height: 430px;
+  isolation: isolate;
+}
+
+body.auth-validating .screen.active:not([data-screen="profile"]) > * {
+  filter: blur(3px) saturate(.85);
+  opacity: .40;
+  pointer-events: none !important;
+}
+
+body.auth-validating .screen.active:not([data-screen="profile"])::after {
+  content: "Validando acesso familiar\A\ACarregando somente os dados confirmados da sua família. Isso evita informações antigas durante o login.";
+  position: sticky;
+  top: 18px;
+  z-index: 20;
+  width: min(100%, 380px);
+  justify-self: center;
+  display: block;
+  padding: 22px 20px;
+  border-radius: 28px;
+  border: 1px solid rgba(201, 192, 255, .28);
+  background: rgba(18, 16, 48, .90);
+  color: #f7f3ff;
+  box-shadow: 0 22px 54px rgba(5, 6, 24, .34);
+  white-space: pre-line;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+body.day-theme.auth-validating .screen.active:not([data-screen="profile"])::after {
+  background: rgba(255, 248, 238, .94);
+  color: #302454;
+  border-color: rgba(122, 88, 146, .18);
+}
+
+body.auth-validating #caregiverIdentityCard,
+body.auth-validating #familyAccessCard,
+body.auth-validating .baby-profile-card,
+body.auth-validating .weight-profile-block,
+body.auth-validating .appearance-profile-block,
+body.auth-validating #babyAvatarTestCard,
+body.auth-validating #editBabyAvatarButton {
+  display: none !important;
+}
+
+body.auth-validating .login-card {
+  display: grid !important;
+}
+
+
+/* Ninou v75.60.0 — perfil logado sem duplicidade visual */
+body.family-ready #guestWelcomeCard,
+body.family-ready #premiumTrustCard,
+body.family-ready #accountJourneyCard,
+body.family-ready #postAccessCard,
+body.family-ready #dataRealityCard {
+  display: none !important;
+}
+
+body.family-ready .login-card {
+  border-style: dashed;
+}
+
+body.family-ready .login-card .login-fields,
+body.family-ready .login-card #loginButton {
+  display: none !important;
+}
+
+body.family-ready .login-card strong::after {
+  content: " — sessão ativa";
+  font-weight: 700;
+  opacity: .72;
+}
+
+body.auth-validating #guestWelcomeCard,
+body.auth-validating #premiumTrustCard,
+body.auth-validating #accountJourneyCard,
+body.auth-validating #postAccessCard,
+body.auth-validating #dataRealityCard,
+body.auth-validating #firstUseChecklistCard {
+  display: none !important;
+}
+
+body.sync-bootstrap .screen[data-screen="today"] .timeline,
+body.sync-bootstrap .screen[data-screen="diary"] .timeline {
+  opacity: .35;
+  pointer-events: none;
 }

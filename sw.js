@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-59-2-login-estavel";
+const CACHE_NAME = "ninou-v75-60-0-login-sync-estavel";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.59.2",
-  "/css/app.legacy.css?v=75.59.2",
-  "/app.js?v=75.59.2",
-  "/js/app.legacy.js?v=75.59.2",
+  "/styles.css?v=75.60.0",
+  "/css/app.legacy.css?v=75.60.0",
+  "/app.js?v=75.60.0",
+  "/js/app.legacy.js?v=75.60.0",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -94,6 +94,12 @@ self.addEventListener("fetch", (event) => {
     url.pathname.endsWith(".css") ||
     url.pathname.endsWith(".js");
   const isAudioFile = url.pathname.startsWith("/audio/") && url.pathname.endsWith(".mp3");
+  const isFirebaseOrGoogleApi = /(^|\.)googleapis\.com$/.test(url.hostname) || /(^|\.)firebaseio\.com$/.test(url.hostname) || /(^|\.)gstatic\.com$/.test(url.hostname);
+
+  if (isFirebaseOrGoogleApi) {
+    event.respondWith(fetch(request));
+    return;
+  }
 
   if (isAppFile) {
     event.respondWith(
