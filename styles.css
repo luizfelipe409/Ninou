@@ -1,5 +1,5 @@
 /* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.60.0");
+@import url("./css/app.legacy.css?v=75.60.1");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -2132,7 +2132,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.0 — Login rápido + App Check não bloqueante */
+/* Ninou v75.60.1 — Login rápido + App Check não bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2193,7 +2193,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.0 — perfil logado sem duplicidade visual */
+/* Ninou v75.60.1 — perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,

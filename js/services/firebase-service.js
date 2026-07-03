@@ -23,12 +23,36 @@ export async function getFirebaseServices() {
         };
 
         /*
-          v75.60.0 — App Check não bloqueante:
+          v75.60.1 — App Check não bloqueante:
           o login não deve esperar o download/inicialização do módulo de App Check.
           Como o Firebase Console ainda está em modo Monitorando, o app pode abrir Auth/Firestore
           primeiro e inicializar App Check em paralelo. Só ative enforcement após validar que
           appCheckStatus ficou "active" no diagnóstico.
         */
+        const ensureBrowserProcessShim = () => {
+          /*
+            v75.60.1 — correção App Check/reCAPTCHA Enterprise em PWA sem bundler.
+            Algumas dependências do módulo CDN do App Check consultam `process.env`.
+            Em navegador puro/iPhone/Safari, `process` não existe e gerava:
+            ReferenceError: process is not defined.
+            O shim abaixo é mínimo, não expõe segredo e evita que a falha do App Check
+            prejudique login/Auth/Firestore enquanto o Firebase está em modo Monitorando.
+          */
+          try {
+            if (typeof globalThis.process === "undefined") {
+              Object.defineProperty(globalThis, "process", {
+                value: { env: {} },
+                configurable: true,
+                writable: true,
+              });
+            } else if (!globalThis.process.env) {
+              globalThis.process.env = {};
+            }
+          } catch (_) {
+            // Se o navegador bloquear a definição, o App Check apenas ficará em monitoramento pendente.
+          }
+        };
+
         const startAppCheckInBackground = () => {
           const siteKey = String(appCheckConfig?.siteKey || "").trim();
           const hasRealSiteKey = Boolean(siteKey)
@@ -41,7 +65,14 @@ export async function getFirebaseServices() {
             return;
           }
 
-          import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-check.js`)
+          ensureBrowserProcessShim();
+          appCheckStatus.reason = "loading";
+
+          const timeout = new Promise((resolve) => {
+            window.setTimeout(() => resolve(null), 6500);
+          });
+
+          const loadAppCheck = import(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-check.js`)
             .then((appCheckModule) => {
               const Provider = appCheckModule.ReCaptchaEnterpriseProvider || appCheckModule.ReCaptchaV3Provider;
               if (typeof Provider === "function" && typeof appCheckModule.initializeAppCheck === "function") {
@@ -53,13 +84,21 @@ export async function getFirebaseServices() {
                 appCheckStatus.configured = true;
                 appCheckStatus.reason = "active";
                 appCheckStatus.instance = appCheck;
-              } else {
-                appCheckStatus.reason = "provider-unavailable";
+                return appCheck;
+              }
+              appCheckStatus.reason = "provider-unavailable";
+              return null;
+            });
+
+          Promise.race([loadAppCheck, timeout])
+            .then((result) => {
+              if (!result && appCheckStatus.reason === "loading") {
+                appCheckStatus.reason = "timeout-monitoring";
               }
             })
             .catch((error) => {
-              appCheckStatus.reason = "init-error";
-              console.warn("Firebase App Check indisponível neste carregamento. O app continuará em modo monitorado.", error);
+              appCheckStatus.reason = "init-error-monitoring";
+              console.warn("Firebase App Check não foi inicializado neste carregamento. O app continuará em modo monitorado.", error);
             });
         };
 
@@ -85,7 +124,10 @@ export async function getFirebaseServices() {
           return firestoreModule.getFirestore(app);
         })();
 
-        startAppCheckInBackground();
+        // Não bloqueia Auth/Firestore. O App Check entra alguns instantes depois do app responder ao usuário.
+        if (typeof window !== "undefined") {
+          window.setTimeout(startAppCheckInBackground, 1800);
+        }
 
         firebaseServices = {
           auth: authModule.getAuth(app),
@@ -133,7 +175,7 @@ export function getFirebaseErrorMessage(error) {
     "auth/invalid-credential": "E-mail ou senha incorretos.",
     "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",
-    "auth/network-request-failed": "Falha de conexão. Verifique a internet.",
+    "auth/network-request-failed": "Não foi possível concluir o login agora. Atualize a página e tente novamente. Se persistir, limpe o PWA/cache do Ninou.",
     "permission-denied": "Sem permissão no banco. Revise convites, membros da família ou regras do Firestore.",
     "resource-exhausted": "Não foi possível salvar. Os dados ficaram grandes demais para o Firestore.",
     "invalid-argument": "Não foi possível salvar. Revise os dados do perfil.",
