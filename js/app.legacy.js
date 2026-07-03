@@ -318,7 +318,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.59";
+const NINOU_RUNTIME_VERSION = "75.59.2";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -2284,13 +2284,26 @@ function prepareVisibleContextForAccount(user = cloudUser) {
     saveCurrentVisibleContextForOwner(previousOwner);
   }
 
-  if (previousOwner !== email) {
-    restoreVisibleContextForOwner(email);
-    saveFamilyAccess(null);
-    refreshVisibleContextUi();
-  } else {
-    setVisibleDataOwnerEmail(email);
-  }
+  /*
+    v75.59.2 — Login sem dados fantasma:
+    antes o app restaurava o cache local da última sessão assim que o Auth confirmava o usuário.
+    Isso deixava a tela mostrar rotina/perfil antigos enquanto o Firestore ainda carregava, causando
+    "informações inconsistentes". Agora a visualização fica limpa até a família/perfil/dia reais chegarem.
+  */
+  clearGenericVisibleContext();
+  setVisibleDataOwnerEmail(email);
+  saveFamilyAccess(null);
+  resetFamilyDayCache();
+  selectedDiaryDay = getDayStart();
+  autoSelectedLatestFamilyDay = false;
+  wakeWindowMinutes = 70;
+  babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
+  currentProfilePhoto = "";
+  profileClientUpdatedAt = 0;
+  state = createEmptyDayState();
+  loadedStateDayId = getCurrentDayId();
+  updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
+  refreshVisibleContextUi();
 }
 
 function resetVisibleContextForGuest() {
@@ -6194,11 +6207,25 @@ async function returnToAdminPanel() {
 }
 
 async function connectCurrentAccount() {
+  /*
+    v75.59.2 — login mais rápido:
+    não bloquear a conclusão do login aguardando a leitura de todos os documentos de dias.
+    Primeiro conecta perfil + dia selecionado; a lista histórica de dias carrega em segundo plano.
+  */
   resetFamilyDayCache();
   autoSelectedLatestFamilyDay = false;
   await subscribeToCloudProfile();
-  await loadFamilyDayIds({ force: true });
   await subscribeToCloudDay(getSelectedDayId());
+
+  void loadFamilyDayIds({ force: true })
+    .then(() => {
+      updateDiaryDateRangeFromFamilyDays();
+      renderSyncDetails();
+      renderAdminDiagnostics();
+    })
+    .catch((error) => {
+      console.warn("A lista histórica de dias será carregada depois:", error);
+    });
 }
 
 function getProfilePayload(options = {}) {
@@ -6599,6 +6626,7 @@ async function initFirebaseAuthState() {
       setSyncStatus("online", user.email || "");
       loginHelper.textContent = `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
       renderAuthControls();
+      renderAll();
     } catch (error) {
       console.error("Erro ao conectar família:", error);
       setSyncStatus("offline", user.email || "");

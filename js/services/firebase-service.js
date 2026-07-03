@@ -53,20 +53,22 @@ export async function getFirebaseServices() {
         }
         const db = (() => {
           try {
+            /*
+              v75.59.2 — evitar dados fantasma e login lento:
+              o Firestore não precisa manter cache persistente em IndexedDB porque o Ninou já tem
+              cache local próprio por família + dia. O cache persistente podia exibir dados antigos
+              imediatamente após o login e atrasar a troca de contexto entre contas/famílias.
+            */
             if (
               typeof firestoreModule.initializeFirestore === "function" &&
-              typeof firestoreModule.persistentLocalCache === "function"
+              typeof firestoreModule.memoryLocalCache === "function"
             ) {
-              const cacheOptions = typeof firestoreModule.persistentMultipleTabManager === "function"
-                ? { tabManager: firestoreModule.persistentMultipleTabManager() }
-                : null;
-              const localCache = cacheOptions
-                ? firestoreModule.persistentLocalCache(cacheOptions)
-                : firestoreModule.persistentLocalCache();
-              return firestoreModule.initializeFirestore(app, { localCache });
+              return firestoreModule.initializeFirestore(app, {
+                localCache: firestoreModule.memoryLocalCache(),
+              });
             }
           } catch (error) {
-            console.warn("Persistência offline do Firestore indisponível; usando cache padrão em memória.", error);
+            console.warn("Cache em memória do Firestore indisponível; usando configuração padrão.", error);
           }
           return firestoreModule.getFirestore(app);
         })();
