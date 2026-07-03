@@ -1,5 +1,5 @@
-/* Ninou v75.57.4 - espaçamento premium e revisão visual fina. */
-@import url("./css/app.legacy.css?v=75.57.4");
+/* Ninou v75.58 - revisão visual final de espaçamentos. */
+@import url("./css/app.legacy.css?v=75.58");
 
 
 /* Ninou v75.57 — Perfil Familiar + Convite */
@@ -280,7 +280,7 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* Ninou v75.57.4 — revisão minuciosa de espaçamento, cards e mobile */
+/* Ninou v75.58 — revisão minuciosa de espaçamento, cards e mobile */
 :root {
   --ninou-screen-gap-polished: 16px;
   --ninou-card-gap-polished: 14px;
@@ -713,5 +713,576 @@ body.day-theme .ninou-modal-card > p {
 
   .profile-family-stack .ghost-link {
     width: 100%;
+  }
+}
+
+/* Ninou v75.58 — revisão visual final após análise do vídeo
+   Ajustes focados em consistência real no iPhone/Safari:
+   - títulos dos cards em duas linhas quando o HTML não possui wrapper;
+   - Observações do dia com hierarquia correta;
+   - respiro uniforme entre texto, campo e botões;
+   - prevenção de botões/cards colados ou assimétricos em todas as telas. */
+:root {
+  --ninou-v755-section-gap: 14px;
+  --ninou-v755-card-pad: 18px;
+  --ninou-v755-card-radius: 26px;
+  --ninou-v755-inner-gap: 12px;
+  --ninou-v755-field-radius: 20px;
+}
+
+.phone-shell {
+  padding-top: max(18px, env(safe-area-inset-top, 0px)) !important;
+}
+
+.screen[data-screen="today"],
+.screen[data-screen="diary"],
+.screen[data-screen="trends"],
+.screen[data-screen="sounds"],
+.screen[data-screen="profile"] {
+  gap: var(--ninou-v755-section-gap) !important;
+}
+
+.screen[data-screen] > section,
+.screen[data-screen] > article,
+.screen[data-screen] > div,
+.screen[data-screen] > label,
+.screen[data-screen] > ol,
+.screen[data-screen] > ul {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.last-card,
+.today-last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.chart-card,
+.sound-player-card,
+.sound-note,
+.profile-card,
+.baby-profile-card,
+.avatar-compact-card,
+.login-card,
+.privacy-note-card,
+.admin-access-card,
+.wake-window-card,
+.export-card,
+.danger-card,
+.profile-ready-card,
+.guest-welcome-card,
+.premium-trust-card,
+.account-journey-card,
+.post-access-card,
+.data-reality-card,
+.first-use-checklist-card,
+.profile-family-card,
+.settings-list article,
+.admin-clean-section {
+  padding: var(--ninou-v755-card-pad) !important;
+  border-radius: var(--ninou-v755-card-radius) !important;
+  box-sizing: border-box;
+}
+
+/* Títulos de seção: mantém alinhamento quando há ação à direita,
+   mas evita que cards textuais fiquem com título e subtítulo espremidos. */
+.drawer-section-title,
+.section-title,
+.chart-title,
+.today-overview-head,
+.profile-card-head {
+  column-gap: 12px !important;
+  row-gap: 5px !important;
+}
+
+.drawer-section-title span,
+.section-title span,
+.chart-title span,
+.today-overview-head span,
+.profile-card-head span {
+  letter-spacing: .075em;
+}
+
+.drawer-section-title strong,
+.section-title strong,
+.chart-title strong,
+.today-overview-head strong,
+.profile-card-head strong {
+  line-height: 1.14 !important;
+}
+
+/* Observações do dia: o vídeo mostrava "Observações do dia" à esquerda
+   e "Notas da família" à direita. Aqui a hierarquia fica correta:
+   kicker em cima, título abaixo, igual aos demais cards premium. */
+.day-notes-card {
+  display: grid !important;
+  gap: 12px !important;
+  margin-top: 0 !important;
+}
+
+.day-notes-card .drawer-section-title {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: start !important;
+  align-items: start !important;
+  gap: 4px !important;
+  margin: 0 !important;
+}
+
+.day-notes-card .drawer-section-title span {
+  margin: 0 !important;
+  font-size: .72rem !important;
+  line-height: 1.15 !important;
+  text-transform: uppercase;
+  color: rgba(245, 238, 255, .58);
+}
+
+.day-notes-card .drawer-section-title strong {
+  margin: 0 !important;
+  font-size: 1.08rem !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.02em;
+}
+
+.day-notes-card .section-helper {
+  margin: 0 !important;
+  max-width: 32rem;
+  line-height: 1.42 !important;
+  color: rgba(245, 238, 255, .64);
+}
+
+.day-notes-card textarea {
+  display: block;
+  width: 100%;
+  min-height: 112px !important;
+  margin: 0 !important;
+  padding: 14px 15px !important;
+  border-radius: var(--ninou-v755-field-radius) !important;
+  line-height: 1.42 !important;
+  box-sizing: border-box;
+}
+
+.day-notes-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+}
+
+.day-notes-actions small {
+  display: block;
+  min-height: 1.25em;
+  line-height: 1.36 !important;
+}
+
+.day-notes-actions button {
+  width: 100% !important;
+  min-height: 48px !important;
+  border-radius: 18px !important;
+}
+
+/* Diário: cards de eventos com melhor respiro e botões alinhados. */
+.timeline {
+  gap: 13px !important;
+}
+
+.timeline .event-card,
+.event-card {
+  padding: 16px !important;
+  border-radius: 25px !important;
+}
+
+.timeline .event-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px !important;
+  width: 100%;
+}
+
+.timeline .event-action-button {
+  min-height: 40px !important;
+  border-radius: 999px !important;
+  justify-content: center;
+}
+
+/* Cards de perfil e família: evita aparência de blocos colados. */
+.profile-family-stack,
+.settings-list,
+.report-stack,
+.sound-grid,
+.today-last-events,
+.notification-center-list,
+.weekly-overview,
+.daily-rhythm,
+.summary-grid,
+.today-overview-grid {
+  gap: 13px !important;
+}
+
+.profile-family-card {
+  gap: 12px !important;
+}
+
+.profile-family-card > p,
+.profile-family-card .section-helper,
+.profile-family-card .form-status {
+  margin: 0 !important;
+}
+
+.profile-soft-row,
+.profile-setting-line,
+.profile-toggle-line,
+.active-invite-box,
+.date-filter,
+.settings-list label,
+.export-period-grid label {
+  border-radius: 18px !important;
+  box-sizing: border-box;
+}
+
+.profile-actions-row,
+.export-actions,
+.login-actions {
+  gap: 10px !important;
+}
+
+.profile-actions-row button,
+.export-actions button,
+.login-actions button,
+.secondary-login,
+.profile-primary-button,
+.profile-secondary-button {
+  min-height: 48px !important;
+}
+
+/* Relatórios/Dados: charts e barras com respiro entre blocos. */
+.chart-card,
+.weekly-overview-card,
+.five-day-actions-card,
+.growth-card,
+.routine-progress-card {
+  display: grid;
+  gap: 12px;
+}
+
+.chart-card > *,
+.weekly-overview-card > *,
+.five-day-actions-card > *,
+.growth-card > *,
+.routine-progress-card > * {
+  min-width: 0;
+}
+
+/* Sons: lista e cards com mesmo padrão dos demais. */
+.sound-player-card,
+.sound-note {
+  display: grid;
+  gap: 12px;
+}
+
+/* Botão flutuante: preserva distância da barra inferior sem cobrir leitura. */
+.fab,
+.add-button,
+button[aria-label="Adicionar registro"] {
+  margin-bottom: 2px;
+}
+
+body.day-theme .day-notes-card .drawer-section-title span,
+body.day-theme .day-notes-card .section-helper {
+  color: rgba(61, 52, 74, .62) !important;
+}
+
+@media (max-width: 430px) {
+  :root {
+    --ninou-v755-section-gap: 13px;
+    --ninou-v755-card-pad: 16px;
+    --ninou-v755-card-radius: 24px;
+    --ninou-v755-inner-gap: 10px;
+    --ninou-v755-field-radius: 18px;
+  }
+
+  .phone-shell {
+    padding-inline: 14px !important;
+  }
+
+  .day-notes-card {
+    gap: 11px !important;
+  }
+
+  .day-notes-card .drawer-section-title strong {
+    font-size: 1.04rem !important;
+  }
+
+  .day-notes-card textarea {
+    min-height: 110px !important;
+  }
+
+  .timeline .event-actions,
+  .profile-actions-row,
+  .export-actions,
+  .login-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .phone-shell {
+    padding-inline: 12px !important;
+  }
+
+  .today-overview-card,
+  .smart-insight-card,
+  .gentle-alert-card,
+  .notification-center-card,
+  .live-assistant-card,
+  .next-card,
+  .day-summary-card,
+  .growth-card,
+  .routine-progress-card,
+  .intelligent-timeline-card,
+  .weekly-overview-card,
+  .day-story-card,
+  .last-card,
+  .today-last-card,
+  .five-day-actions-card,
+  .day-notes-card,
+  .audit-card,
+  .chart-card,
+  .sound-player-card,
+  .sound-note,
+  .profile-card,
+  .baby-profile-card,
+  .profile-family-card,
+  .settings-list article {
+    padding: 15px !important;
+  }
+}
+
+
+/* Ninou v75.58 — correção de respiro final e sequência de cards
+   Corrige sobras no fim das páginas e remove o vão entre
+   Ajuda e suporte e Perfil do bebê. */
+:root {
+  --ninou-bottom-readable-space: 88px;
+  --ninou-screen-gap-polished: 12px;
+  --ninou-v755-section-gap: 12px;
+}
+
+/* Mantém espaço suficiente para a barra inferior sem criar rodapé gigante. */
+.phone-shell {
+  padding-bottom: max(var(--ninou-bottom-readable-space), calc(72px + env(safe-area-inset-bottom, 0px))) !important;
+}
+
+/* O espaçamento entre blocos deve vir do gap da tela, não de margens soltas. */
+.screen[data-screen] {
+  row-gap: 12px !important;
+}
+
+.screen[data-screen] > section,
+.screen[data-screen] > article,
+.screen[data-screen] > div,
+.screen[data-screen] > label,
+.screen[data-screen] > ol,
+.screen[data-screen] > ul {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* O bloco familiar não pode empurrar o próximo bloco do perfil. */
+.profile-family-stack {
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 12px !important;
+}
+
+.profile-family-stack + .settings-list,
+.support-card + .settings-list,
+#profileReadyCard + #guestWelcomeCard,
+#firstUseVerificaçãoCard + .settings-list {
+  margin-top: 0 !important;
+}
+
+/* Evita espaços fantasmas de cards ocultos em fluxos de login/convite. */
+[hidden] {
+  display: none !important;
+}
+
+.screen[data-screen] > :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Perfil: sequência mais compacta e consistente entre a central familiar e os dados do bebê. */
+.screen[data-screen="profile"] {
+  gap: 12px !important;
+}
+
+.screen[data-screen="profile"] .profile-card,
+.screen[data-screen="profile"] .profile-family-card,
+.screen[data-screen="profile"] .baby-profile-card,
+.screen[data-screen="profile"] .avatar-compact-card,
+.screen[data-screen="profile"] .wake-window-card,
+.screen[data-screen="profile"] .export-card,
+.screen[data-screen="profile"] .danger-card,
+.screen[data-screen="profile"] .privacy-note-card,
+.screen[data-screen="profile"] .login-card {
+  margin: 0 !important;
+}
+
+.settings-list {
+  margin: 0 !important;
+  gap: 12px !important;
+}
+
+/* Reduz leve sobra final em telas curtas sem colar no menu. */
+@media (max-width: 430px) {
+  :root {
+    --ninou-bottom-readable-space: 82px;
+  }
+
+  .phone-shell {
+    padding-bottom: max(var(--ninou-bottom-readable-space), calc(66px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+
+  .screen[data-screen],
+  .screen[data-screen="profile"] {
+    row-gap: 11px !important;
+  }
+
+  .profile-family-stack,
+  .settings-list {
+    gap: 11px !important;
+  }
+}
+
+/* Ninou v75.58 — base multi-família, diagnóstico e PWA confiável */
+:root {
+  --ninou-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ninou-safe-top: env(safe-area-inset-top, 0px);
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+.phone-shell {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding-top: max(0px, var(--ninou-safe-top));
+}
+
+.app-update-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 16px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(116, 91, 217, .16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 14px 34px rgba(58, 45, 100, .08);
+}
+
+.app-update-notice[hidden] {
+  display: none !important;
+}
+
+.app-update-notice span,
+.sync-detail-grid span,
+.diagnostics-grid span {
+  display: block;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(67, 54, 106, .58);
+}
+
+.app-update-notice strong {
+  display: block;
+  margin-top: 2px;
+  font-size: .88rem;
+  color: #3f3564;
+}
+
+.app-update-notice button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #745bd9;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(116, 91, 217, .24);
+}
+
+.sync-health-card,
+.admin-diagnostics-card {
+  overflow: hidden;
+}
+
+.sync-detail-grid,
+.diagnostics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sync-detail-grid div,
+.diagnostics-grid div {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(130, 112, 180, .12);
+  border-radius: 16px;
+  background: rgba(248, 246, 252, .72);
+}
+
+.sync-detail-grid strong,
+.diagnostics-grid strong {
+  display: block;
+  margin-top: 4px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .86rem;
+  color: #3f3564;
+}
+
+.admin-diagnostics-card {
+  border-style: dashed !important;
+}
+
+.guest-welcome-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 430px) {
+  .app-update-notice {
+    margin-inline: 12px;
+    align-items: flex-start;
+  }
+
+  .guest-welcome-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .sync-detail-grid,
+  .diagnostics-grid {
+    grid-template-columns: 1fr;
   }
 }

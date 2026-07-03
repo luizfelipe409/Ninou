@@ -158,6 +158,7 @@ const inviteAcceptBox = document.querySelector(".invite-accept-box");
 const guestWelcomeCard = document.querySelector("#guestWelcomeCard");
 const guestWelcomeLoginButton = document.querySelector("#guestWelcomeLoginButton");
 const guestWelcomeInviteButton = document.querySelector("#guestWelcomeInviteButton");
+const guestWelcomeCreateFamilyButton = document.querySelector("#guestWelcomeCreateFamilyButton");
 const postAccessCard = document.querySelector("#postAccessCard");
 const postAccessKicker = document.querySelector("#postAccessKicker");
 const postAccessTitle = document.querySelector("#postAccessTitle");
@@ -259,6 +260,17 @@ const prepareConsultButton = document.querySelector("#prepareConsultButton");
 const syncPill = document.querySelector(".sync-pill");
 const syncStatusTitle = document.querySelector("#syncStatusTitle");
 const syncStatusText = document.querySelector("#syncStatusText");
+const syncFamilyLabel = document.querySelector("#syncFamilyLabel");
+const syncLastSavedLabel = document.querySelector("#syncLastSavedLabel");
+const adminDiagnosticsCard = document.querySelector("#adminDiagnosticsCard");
+const diagnosticsVersionLabel = document.querySelector("#diagnosticsVersionLabel");
+const diagnosticsSummary = document.querySelector("#diagnosticsSummary");
+const diagnosticsUserLabel = document.querySelector("#diagnosticsUserLabel");
+const diagnosticsFamilyLabel = document.querySelector("#diagnosticsFamilyLabel");
+const diagnosticsPwaLabel = document.querySelector("#diagnosticsPwaLabel");
+const diagnosticsCacheLabel = document.querySelector("#diagnosticsCacheLabel");
+const appUpdateNotice = document.querySelector("#appUpdateNotice");
+const appUpdateButton = document.querySelector("#appUpdateButton");
 const wakeWindowInput = document.querySelector("#wakeWindowInput");
 const wakeWindowValue = document.querySelector("#wakeWindowValue");
 const sleepAverage = document.querySelector("#sleepAverage");
@@ -303,6 +315,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
+const NINOU_RUNTIME_VERSION = "75.58";
 const GLOBAL_APP_ADMIN_EMAIL = "luizfelipe.dasilva@gmail.com";
 const APP_ADMIN_FAMILY_ID = "ninou-family-luizfelipe";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
@@ -428,6 +441,7 @@ let legacyCloudScanState = "idle";
 let legacyCloudScanError = "";
 let profileUnsubscribe = null;
 let dayUnsubscribe = null;
+const lastCloudSyncStorageKey = "ninou.sync.lastCloudSaveAt";
 let profileCloudSaveTimer = null;
 let dayCloudSaveTimer = null;
 let applyingCloudState = false;
@@ -1999,7 +2013,32 @@ function normalizeDayState(dayState = {}) {
   return normalizeRoutineDayState(dayState);
 }
 
-function getLocalDayStateStorageKey(dayId = getCurrentDayId()) {
+function sanitizeLocalStorageSegment(value = "") {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9@._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "guest";
+}
+
+function getActiveFamilyCacheScope() {
+  const familyId = familyAccess?.familyId || "";
+  if (familyId) return `family.${familyId}`;
+
+  const ownerEmail = getVisibleDataOwnerEmail?.() || normalizeEmail(cloudUser?.email || localStorage.getItem(storageKeys.email) || "");
+  if (ownerEmail) return `account.${ownerEmail}`;
+
+  return "guest.local";
+}
+
+function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const scope = sanitizeLocalStorageSegment(familyId ? `family.${familyId}` : getActiveFamilyCacheScope());
+  return `${storageKeys.dayState}.${scope}.${safeDayId}`;
+}
+
+function getLegacyLocalDayStateStorageKey(dayId = getCurrentDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   return `${storageKeys.dayState}.${safeDayId}`;
 }
@@ -2021,12 +2060,25 @@ function loadLocalDayState(dayId = getCurrentDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
 
   try {
-    const dailyValue = localStorage.getItem(getLocalDayStateStorageKey(safeDayId));
-    if (dailyValue !== null && typeof dailyValue !== "undefined") {
-      return normalizeDayState(JSON.parse(dailyValue || "{}"));
+    const scopedValue = localStorage.getItem(getLocalDayStateStorageKey(safeDayId));
+    if (scopedValue !== null && typeof scopedValue !== "undefined") {
+      return normalizeDayState(JSON.parse(scopedValue || "{}"));
     }
   } catch {
-    // Se o cache por dia estiver inválido, cai para o fluxo seguro abaixo.
+    // Se o cache por família+dia estiver inválido, cai para os fluxos seguros abaixo.
+  }
+
+  try {
+    const legacyDailyValue = localStorage.getItem(getLegacyLocalDayStateStorageKey(safeDayId));
+    if (legacyDailyValue !== null && typeof legacyDailyValue !== "undefined") {
+      const legacyDailyState = normalizeDayState(JSON.parse(legacyDailyValue || "{}"));
+      if (dayStateBelongsToDay(legacyDailyState, safeDayId) || !dayStateHasVisibleContent(legacyDailyState)) {
+        localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify({ ...legacyDailyState, dayId: safeDayId }));
+        return legacyDailyState;
+      }
+    }
+  } catch {
+    // Cache diário antigo inválido. Ignora para não repetir observações.
   }
 
   try {
@@ -2059,6 +2111,7 @@ function saveLocalDayState(dayId = getSelectedDayId()) {
   };
 
   localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
+  localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
 
   // Mantém compatibilidade com versões antigas, mas agora com marcador do dia.
   localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
@@ -2334,11 +2387,13 @@ async function createFamilyCaregiverInvite() {
   try {
     const services = await getFirebaseServices();
     if (services?.db && cloudUser) {
-      await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), {
+      const cloudInvitePayload = {
         ...invite,
         createdAt: services.serverTimestamp(),
         expiresAt: services.Timestamp.fromMillis(expiresAtClient),
-      }, { merge: true });
+      };
+      await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), cloudInvitePayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "invites", code), cloudInvitePayload, { merge: true });
     }
   } catch (error) {
     console.warn("Convite salvo apenas localmente:", error);
@@ -2387,19 +2442,67 @@ async function confirmJoinFamilyInvite() {
   try {
     const services = await getFirebaseServices();
     if (!services?.db || !cloudUser) throw new Error("Firebase indisponível");
-    const familyId = familyAccess?.familyId || "ninou-family-luizfelipe";
+
+    let invite = null;
+    let familyId = "";
+
+    try {
+      const globalInviteSnap = await services.getDoc(services.doc(services.db, "invites", code));
+      if (globalInviteSnap.exists()) {
+        invite = globalInviteSnap.data() || {};
+        familyId = String(invite.familyId || "");
+      }
+    } catch (error) {
+      console.warn("Convite global não disponível. Tentando família conhecida.", error);
+    }
+
+    if (!familyId) familyId = familyAccess?.familyId || APP_ADMIN_FAMILY_ID;
+
     const inviteRef = services.doc(services.db, "families", familyId, "invitations", code);
     const inviteSnap = await services.getDoc(inviteRef);
-    if (!inviteSnap.exists()) throw new Error("Convite não encontrado");
-    const invite = inviteSnap.data() || {};
+    if (inviteSnap.exists()) invite = { ...(invite || {}), ...(inviteSnap.data() || {}) };
+    if (!inviteSnap.exists() && !invite) throw new Error("Convite não encontrado");
     if (invite.status && invite.status !== "active") throw new Error("Convite inativo");
+    if (invite.familyId && invite.familyId !== familyId) familyId = invite.familyId;
+
+    const role = normalizeInviteRole(invite.role || "cuidador");
+    const accessPayload = {
+      familyId,
+      role,
+      email: normalizeEmail(cloudUser.email || ""),
+      ownerUid: invite.ownerUid || invite.createdByUid || "",
+      inviteCode: code,
+      joinedByInvite: code,
+    };
+
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "families", familyId), {
+      ...accessPayload,
+      status: "active",
+      joinedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
 
     await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "access", "ninou"), {
-      familyId,
-      role: "cuidador",
-      joinedByInvite: code,
+      ...accessPayload,
       joinedAt: services.serverTimestamp(),
     }, { merge: true });
+
+    await services.setDoc(services.doc(services.db, "families", familyId, "members", cloudUser.uid), {
+      uid: cloudUser.uid,
+      ...accessPayload,
+      status: "active",
+      joinedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    await services.setDoc(inviteRef, {
+      lastAcceptedByUid: cloudUser.uid,
+      lastAcceptedByEmail: normalizeEmail(cloudUser.email || ""),
+      lastAcceptedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    saveFamilyAccess({ ...accessPayload, acceptedAt: new Date().toISOString() });
+    await connectCurrentAccount();
+    setSyncStatus("online", cloudUser.email || "");
 
     if (joinInviteFeedback) joinInviteFeedback.textContent = "Convite aceito. Agora configure o cuidador deste aparelho.";
     setTimeout(() => {
@@ -2408,7 +2511,7 @@ async function confirmJoinFamilyInvite() {
     }, 700);
   } catch (error) {
     console.warn(error);
-    if (joinInviteFeedback) joinInviteFeedback.textContent = "Não foi possível validar o convite agora. Verifique a conexão ou as permissões do Firebase.";
+    if (joinInviteFeedback) joinInviteFeedback.textContent = "Não foi possível validar o convite agora. Verifique o código, a conexão ou as regras do Firebase.";
   }
 }
 
@@ -4663,9 +4766,9 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // Botão aparece somente quando o admin ainda precisa ativar a família pela primeira vez.
-    createFamilyButton.hidden = !connected || !appAdmin || authorized;
-    createFamilyButton.textContent = "Ativar família principal";
+    // v75.58: admin ativa a família principal; usuários novos podem criar a própria família.
+    createFamilyButton.hidden = !connected || authorized;
+    createFamilyButton.textContent = appAdmin ? "Ativar família principal" : "Criar minha família";
   }
 
   if (inviteAcceptBox) {
@@ -4709,11 +4812,36 @@ function renderFamilyAccessPanel() {
   }
 
   renderInviteList();
+  renderSyncDetails();
+  renderAdminDiagnostics();
 }
 
 async function readAccountAccessFromCloud(user = cloudUser) {
   if (!user) return null;
   const services = await getFirebaseServices();
+
+  try {
+    const familyAccessSnapshot = await services.getDocs(services.collection(services.db, "users", user.uid, "families"));
+    let selectedAccess = null;
+    familyAccessSnapshot.forEach((docSnap) => {
+      if (selectedAccess) return;
+      const data = docSnap.data() || {};
+      const familyId = data.familyId || docSnap.id;
+      if (!familyId || data.status === "inactive" || data.status === "revoked") return;
+      selectedAccess = {
+        familyId,
+        role: data.role || "responsavel",
+        email: data.email || user.email || "",
+        ownerUid: data.ownerUid || data.owner || "",
+        inviteCode: data.inviteCode || data.joinedByInvite || "",
+        acceptedAt: data.acceptedAt || data.joinedAt || data.createdAt || "",
+      };
+    });
+    if (selectedAccess) return saveFamilyAccess(selectedAccess);
+  } catch (error) {
+    console.warn("Não foi possível ler famílias do usuário:", error);
+  }
+
   const accessRef = services.doc(services.db, "users", user.uid, "access", "ninou");
   const snapshot = await services.getDoc(accessRef);
   if (snapshot.exists()) {
@@ -4771,6 +4899,12 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
 
   const services = await getFirebaseServices();
   payload.updatedAt = services.serverTimestamp();
+  await services.setDoc(services.doc(services.db, "users", user.uid, "families", access.familyId), {
+    ...payload,
+    familyId: access.familyId,
+    status: "active",
+    linkedAt: services.serverTimestamp(),
+  }, { merge: true });
   await services.setDoc(services.doc(services.db, "users", user.uid, "access", "ninou"), payload, { merge: true });
   await services.setDoc(services.doc(services.db, "families", access.familyId, "members", user.uid), {
     ...payload,
@@ -4812,46 +4946,118 @@ async function activatePersonalFamily() {
     return null;
   }
 
-  if (!isGlobalAppAdmin()) {
-    if (loginHelper) loginHelper.textContent = "Apenas o e-mail administrador do app pode ativar a família principal.";
-    return null;
-  }
+  const services = await getFirebaseServices();
 
-  const access = buildGlobalAdminAccess(cloudUser, getActiveAdminFamilyId());
-  saveFamilyAccess(access);
-  renderAuthControls();
+  if (isGlobalAppAdmin()) {
+    const access = buildGlobalAdminAccess(cloudUser, getActiveAdminFamilyId());
+    saveFamilyAccess(access);
+    renderAuthControls();
+
+    try {
+      const familyPayload = {
+        supportAdminUid: cloudUser.uid,
+        supportAdminEmail: cloudUser.email || "",
+        customerLabel: "Família cadastrada",
+        createdAt: services.serverTimestamp(),
+        updatedAt: services.serverTimestamp(),
+      };
+      if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = familyPayload.title || "Família principal";
+      await services.setDoc(services.doc(services.db, "families", access.familyId), familyPayload, { merge: true });
+      setSyncStatus("online", cloudUser.email || "");
+      if (loginHelper) loginHelper.textContent = "Admin do app conectado. Você já pode gerar convites no Perfil.";
+      refreshAdminStats({ silent: true });
+    } catch (error) {
+      console.error("Erro ao ativar família principal no Firebase:", error);
+      setSyncStatus("online", cloudUser.email || "");
+      if (loginHelper) loginHelper.textContent = "Admin conectado. Se convites, famílias ou contagens não aparecerem, revise as regras do Firestore.";
+      setAdminStatsPlaceholder("Admin conectado. A contagem depende das regras do Firestore.");
+    }
+
+    renderAuthControls();
+    return familyAccess;
+  }
 
   try {
-    const services = await getFirebaseServices();
-    const familyPayload = {
-      supportAdminUid: cloudUser.uid,
-      supportAdminEmail: cloudUser.email || "",
-      customerLabel: "Família cadastrada",
+    const email = normalizeEmail(cloudUser.email || "");
+    const emailName = email.split("@")[0] || "familia";
+    const babyName = String(babyNameInput?.value || babyProfile?.name || "").trim();
+    const familyName = babyName ? `Família do ${babyName}` : `Família de ${emailName}`;
+    const familyId = createFamilyIdFromNames(familyName, babyName || emailName);
+    const nowIso = new Date().toISOString();
+    const access = {
+      familyId,
+      role: "responsavel",
+      email,
+      ownerUid: cloudUser.uid,
+      acceptedAt: nowIso,
+    };
+
+    if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
+
+    await services.setDoc(services.doc(services.db, "families", familyId), {
+      familyId,
+      title: familyName,
+      ownerUid: cloudUser.uid,
+      ownerEmail: email,
+      status: "active",
+      appVersion: NINOU_RUNTIME_VERSION,
       createdAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
-    };
-    if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = familyPayload.title || "Família principal";
-    await services.setDoc(services.doc(services.db, "families", access.familyId), familyPayload, { merge: true });
-    // O admin tem acesso global por regra, não precisa virar membro da família.
-    // Isso evita que clientes pareçam "família do admin".
-    // Admin não abre nem grava dados da família automaticamente.
-    // Isso evita vazar dados de um bebê/cliente no painel administrativo.
-    setSyncStatus("online", cloudUser.email || "");
-    if (loginHelper) loginHelper.textContent = "Admin do app conectado. Você já pode gerar convites no Perfil.";
-    refreshAdminStats({ silent: true });
-  } catch (error) {
-    console.error("Erro ao ativar família principal no Firebase:", error);
-    // v75.56.2.1.1: manter admin conectado mesmo se uma gravação auxiliar no Firestore falhar.
-    // As regras podem bloquear criação/edição de família, mas o admin global continua autenticado.
-    setSyncStatus("online", cloudUser.email || "");
-    if (loginHelper) {
-      loginHelper.textContent = "Admin conectado. Se convites, famílias ou contagens não aparecerem, revise as regras do Firestore.";
-    }
-    setAdminStatsPlaceholder("Admin conectado. A contagem depende das regras do Firestore.");
-  }
+    }, { merge: true });
 
-  renderAuthControls();
-  return familyAccess;
+    const profilePayload = {
+      ...getProfilePayload(),
+      familyId,
+      ownerUid: cloudUser.uid,
+      updatedAt: services.serverTimestamp(),
+    };
+    await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), profilePayload, { merge: true });
+
+    await services.setDoc(services.doc(services.db, "families", familyId, "members", cloudUser.uid), {
+      uid: cloudUser.uid,
+      familyId,
+      role: "responsavel",
+      email,
+      ownerUid: cloudUser.uid,
+      status: "active",
+      joinedAt: services.serverTimestamp(),
+      createdAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "families", familyId), {
+      familyId,
+      role: "responsavel",
+      email,
+      ownerUid: cloudUser.uid,
+      status: "active",
+      linkedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "access", "ninou"), {
+      familyId,
+      role: "responsavel",
+      email,
+      ownerUid: cloudUser.uid,
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    saveFamilyAccess(access);
+    setVisibleDataOwnerEmail(email);
+    await connectCurrentAccount();
+    setSyncStatus("online", email);
+    markCloudSynced();
+    if (loginHelper) loginHelper.textContent = "Família criada. Agora você já pode registrar a rotina e convidar cuidadores.";
+    renderAuthControls();
+    showScreen("profile");
+    return familyAccess;
+  } catch (error) {
+    console.error("Erro ao criar família do usuário:", error);
+    setSyncStatus("error", cloudUser.email || "");
+    if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    renderAuthControls();
+    return null;
+  }
 }
 
 async function cancelFamilyInvite(codeValue = "") {
@@ -4981,6 +5187,10 @@ async function createAdminClientFamily() {
       };
       await services.setDoc(services.doc(services.db, "invites", code), payload, { merge: true });
       await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), {
+        ...payload,
+        status: "active",
+      }, { merge: true });
       recentInvites.unshift({ code, email: responsibleEmail, role, link });
       renderInviteList();
       inviteMarkup = `
@@ -5093,6 +5303,10 @@ async function createFamilyInvite() {
 
     try {
       await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), {
+        ...payload,
+        status: "active",
+      }, { merge: true });
     } catch (mirrorError) {
       console.warn("Convite criado na coleção principal, mas não foi espelhado na família:", mirrorError);
     }
@@ -5202,7 +5416,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     }, { merge: true });
 
     try {
-      await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), {
+      const acceptedInvitePayload = {
         ...invite,
         ...access,
         code,
@@ -5211,7 +5425,9 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
         acceptedByEmail: userEmail,
         acceptedAt: services.serverTimestamp(),
         updatedAt: services.serverTimestamp(),
-      }, { merge: true });
+      };
+      await services.setDoc(services.doc(services.db, "families", access.familyId, "invites", code), acceptedInvitePayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", access.familyId, "invitations", code), acceptedInvitePayload, { merge: true });
     } catch (mirrorError) {
       console.warn("Convite aceito, mas o espelho da família não foi atualizado:", mirrorError);
     }
@@ -5749,6 +5965,7 @@ async function saveProfileToCloud(options = {}) {
     if (includePhoto) pendingProfilePhotoSave = false;
     if (savedProfileVersion === profileClientUpdatedAt) {
       setSyncStatus("online", cloudUser.email);
+      markCloudSynced();
     }
   } catch (error) {
     console.error("Erro ao salvar perfil:", error);
@@ -5854,6 +6071,7 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
     }
 
     setSyncStatus("online", cloudUser.email);
+    markCloudSynced();
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
     setSyncStatus("offline", cloudUser.email);
@@ -7537,6 +7755,64 @@ function updateWakeWindow(value, options = {}) {
   }
 }
 
+function getLastCloudSyncAt() {
+  try { return Number(localStorage.getItem(lastCloudSyncStorageKey)) || 0; } catch { return 0; }
+}
+
+function formatSyncMoment(timestamp = getLastCloudSyncAt()) {
+  if (!timestamp) return "—";
+  const diff = Math.max(0, Date.now() - Number(timestamp));
+  if (diff < 60_000) return "agora";
+  if (diff < 60 * 60_000) return `${Math.floor(diff / 60_000)} min atrás`;
+  return formatTime(timestamp);
+}
+
+function markCloudSynced() {
+  try { localStorage.setItem(lastCloudSyncStorageKey, String(Date.now())); } catch {}
+  renderSyncDetails();
+}
+
+function countFamilyScopedDayCaches() {
+  try {
+    const scope = sanitizeLocalStorageSegment(getActiveFamilyCacheScope());
+    const prefix = `${storageKeys.dayState}.${scope}.`;
+    return Object.keys(localStorage).filter((key) => key.startsWith(prefix)).length;
+  } catch {
+    return 0;
+  }
+}
+
+function renderSyncDetails() {
+  if (syncFamilyLabel) {
+    const label = familyAccess?.familyId
+      ? (getProfileFamilyDisplayName?.() || familyAccess.familyId)
+      : isLoggedIn()
+        ? "Conta sem família"
+        : "Não conectada";
+    syncFamilyLabel.textContent = label;
+    syncFamilyLabel.title = familyAccess?.familyId || "";
+  }
+  if (syncLastSavedLabel) syncLastSavedLabel.textContent = formatSyncMoment();
+}
+
+function renderAdminDiagnostics() {
+  if (!adminDiagnosticsCard) return;
+  const show = Boolean(isGlobalAppAdmin() || familyAccess?.familyId);
+  adminDiagnosticsCard.hidden = !show;
+  if (!show) return;
+
+  const familyId = familyAccess?.familyId || (isGlobalAppAdmin() ? getActiveAdminFamilyId() : "");
+  if (diagnosticsVersionLabel) diagnosticsVersionLabel.textContent = `Ninou v${NINOU_RUNTIME_VERSION}`;
+  if (diagnosticsSummary) diagnosticsSummary.textContent = "Use este quadro para conferir se a conta, a família, o cache e o PWA estão apontando para o lugar certo.";
+  if (diagnosticsUserLabel) diagnosticsUserLabel.textContent = cloudUser?.email || "sem login";
+  if (diagnosticsFamilyLabel) {
+    diagnosticsFamilyLabel.textContent = familyId || "não selecionada";
+    diagnosticsFamilyLabel.title = familyId || "";
+  }
+  if (diagnosticsPwaLabel) diagnosticsPwaLabel.textContent = window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone ? "instalado" : "navegador";
+  if (diagnosticsCacheLabel) diagnosticsCacheLabel.textContent = `${countFamilyScopedDayCaches()} dia(s) locais`;
+}
+
 function setSyncStatus(status = "offline", email = "") {
   if (status.includes?.("@") && !email) {
     email = status;
@@ -7569,6 +7845,9 @@ function setSyncStatus(status = "offline", email = "") {
       : error
         ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
         : "Os dados ficam salvos neste aparelho. Entre para sincronizar entre celulares.";
+
+  renderSyncDetails();
+  renderAdminDiagnostics();
 }
 
 function getLoginCredentials(actionText) {
@@ -8325,6 +8604,20 @@ if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExport
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
 if (guestWelcomeLoginButton) guestWelcomeLoginButton.addEventListener("click", () => focusProfileAccess("login"));
 if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
+if (guestWelcomeCreateFamilyButton) {
+  guestWelcomeCreateFamilyButton.addEventListener("click", () => {
+    focusProfileAccess("login");
+    if (!isLoggedIn()) {
+      if (loginHelper) loginHelper.textContent = "Crie sua conta e depois toque em Criar minha família.";
+      loginEmail?.focus();
+      return;
+    }
+    activatePersonalFamily().catch((error) => {
+      console.error("Erro ao criar família:", error);
+      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    });
+  });
+}
 if (guestModalCloseButton) guestModalCloseButton.addEventListener("click", closeGuestLoginModal);
 if (guestModalLoginButton) guestModalLoginButton.addEventListener("click", () => focusProfileAccess("login"));
 if (guestModalInviteButton) guestModalInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
@@ -8685,10 +8978,39 @@ initFirebaseAuthState().catch((error) => {
   loginHelper.textContent = "O app abriu em modo local. Verifique Firebase quando quiser sincronizar.";
 });
 
+function showAppUpdateNotice(registration) {
+  if (!appUpdateNotice || !appUpdateButton) return;
+  appUpdateNotice.hidden = false;
+  appUpdateButton.onclick = () => {
+    const waiting = registration?.waiting;
+    if (waiting) waiting.postMessage({ type: "SKIP_WAITING" });
+    window.location.reload();
+  };
+}
+
 if ("serviceWorker" in navigator) {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
+
+      if (registration.waiting) showAppUpdateNotice(registration);
+
+      registration.addEventListener("updatefound", () => {
+        const newWorker = registration.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            showAppUpdateNotice(registration);
+          }
+        });
+      });
     }).catch((error) => {
       console.warn("Service worker não registrado:", error);
     });

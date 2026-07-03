@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-57-4-espacamento-premium";
+const CACHE_NAME = "ninou-v75-58-multifamilia-pwa";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.57.4",
-  "/css/app.legacy.css?v=75.57.4",
-  "/app.js?v=75.57.4",
-  "/js/app.legacy.js?v=75.57.4",
+  "/styles.css?v=75.58",
+  "/css/app.legacy.css?v=75.58",
+  "/app.js?v=75.58",
+  "/js/app.legacy.js?v=75.58",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -62,6 +62,12 @@ const APP_SHELL = [
   "/icons/baby-avatars/avatar-11.png",
   "/icons/baby-avatars/avatar-12.png",
 ];
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));

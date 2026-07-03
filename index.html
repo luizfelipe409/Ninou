@@ -2,12 +2,12 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Ninou</title>
     <meta name="theme-color" content="#f8f6fc" />
     <meta name="description" content="Diário de sono, mamadas, fraldas e rotina do bebê." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-revisão-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
@@ -19,7 +19,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.57.4" />
+    <link rel="stylesheet" href="./styles.css?v=75.58" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -33,6 +33,14 @@
         </div>
         <button class="sync-pill offline" type="button" aria-label="Status da sincronização">Off-line</button>
       </header>
+
+      <section id="appUpdateNotice" class="app-update-notice" hidden aria-live="polite">
+        <div>
+          <span>Atualização disponível</span>
+          <strong>Há uma nova versão do Ninou pronta para carregar.</strong>
+        </div>
+        <button id="appUpdateButton" type="button">Atualizar</button>
+      </section>
 
       <section id="adminPreviewBanner" class="admin-preview-banner" hidden>
         <div>
@@ -685,6 +693,7 @@
           <div class="guest-welcome-actions">
             <button id="guestWelcomeLoginButton" type="button">Entrar</button>
             <button id="guestWelcomeInviteButton" type="button">Tenho convite</button>
+            <button id="guestWelcomeCreateFamilyButton" type="button">Criar família</button>
           </div>
         </section>
 
@@ -1196,10 +1205,25 @@
               <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
             </label>
           </article>
-          <article>
+          <article class="sync-health-card">
             <span>Sincronização</span>
             <strong id="syncStatusTitle">Sincronização off-line</strong>
             <p id="syncStatusText">Entre com e-mail e senha para ativar a sincronização entre aparelhos.</p>
+            <div class="sync-detail-grid" aria-label="Detalhes da sincronização">
+              <div><span>Família</span><strong id="syncFamilyLabel">Não conectada</strong></div>
+              <div><span>Último salvamento</span><strong id="syncLastSavedLabel">—</strong></div>
+            </div>
+          </article>
+          <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
+            <span>Diagnóstico</span>
+            <strong id="diagnosticsVersionLabel">Ninou v75.58</strong>
+            <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA e sincronização.</p>
+            <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
+              <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
+              <div><span>FamilyId</span><strong id="diagnosticsFamilyLabel">—</strong></div>
+              <div><span>PWA</span><strong id="diagnosticsPwaLabel">—</strong></div>
+              <div><span>Cache local</span><strong id="diagnosticsCacheLabel">—</strong></div>
+            </div>
           </article>
           <article class="export-card">
             <span>Backup e compartilhamento</span>
@@ -1373,6 +1397,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.57.4"></script>
+    <script type="module" src="./app.js?v=75.58"></script>
   </body>
 </html>

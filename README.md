@@ -463,3 +463,12 @@ Pacote consolidado com Perfil Familiar + Convite de Cuidador e correção de hor
 - Perfil inclui cards de bebê, cuidador neste aparelho, família, convite, configurações e suporte.
 - Registros novos carregam `caregiverName`, `caregiverRelationship`, `caregiverLabel`, `createdByUid` e `createdAtClient`.
 - Tema do Perfil foi reduzido para Claro/Escuro.
+
+## Ninou v75.58
+
+- Base multi-família para criação de novas famílias por usuários autenticados.
+- Cache local de registros por família + data.
+- Card de sincronização com último salvamento.
+- Diagnóstico técnico para validar versão, familyId e PWA.
+- Service Worker/cache atualizado para v75.58.
+- Regras Firestore em `FIRESTORE_RULES_V75_58.rules`.
