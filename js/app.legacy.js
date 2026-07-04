@@ -306,7 +306,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.60.11";
+const NINOU_RUNTIME_VERSION = "75.63.0";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -1400,7 +1400,7 @@ function updateAccountJourneyGuide() {
           : "Conta criada. Agora use o código de convite enviado pelo administrador para liberar a família.")
         : (pendingCode
           ? "Convite salvo neste aparelho. Crie sua conta ou entre usando o mesmo e-mail convidado pelo admin."
-          : "O admin gera o convite; depois você entra ou cria conta com o mesmo e-mail para liberar a rotina familiar.");
+          : "O admin gera o convite; depois você entra ou cria conta com o mesmo e-mail para liberar a diário familiar.");
   }
 
   card.querySelectorAll("[data-journey-action]").forEach((button) => {
@@ -4297,7 +4297,7 @@ async function familyCloudHasContent() {
       dayContent = daySnap.exists() && hasRoutineDayContent(normalizeDayState(daySource));
     }
   } catch (error) {
-    console.warn("Não foi possível verificar rotina familiar:", error);
+    console.warn("Não foi possível verificar diário familiar:", error);
   }
 
   return { profile, day: dayContent };
@@ -4716,7 +4716,7 @@ function renderAdminClients(stats = null) {
     const selectedLabel = getAdminSelectedFamilyLabel(stats);
     adminSelectedFamilyHint.textContent = previewOpen
       ? `Você está visualizando a rotina de ${selectedLabel} como administrador. Use Voltar ao painel para sair da visualização familiar.`
-      : `Família selecionada: ${selectedLabel}. A rotina só abre quando você tocar em Abrir rotina.`;
+      : `Família selecionada: ${selectedLabel}. O diário só abre quando você tocar em Abrir diário.`;
   }
 
   if (adminOpenFamilyButton) {
@@ -6245,7 +6245,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.60.11 — login rápido, mas consistente:
+    v75.63.0 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;

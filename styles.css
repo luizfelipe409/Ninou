@@ -1,8 +1,8 @@
-/* Ninou v75.59.1 - segurança multi-família para múltiplos tamanhos de tela. */
+/* Ninou v75.59.1 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
 @import url("./css/app.legacy.css?v=75.60.11");
 
 
-/* Ninou v75.57 — Perfil Familiar + Convite */
+/* Ninou v75.57 â€” Perfil Familiar + Convite */
 .profile-family-stack {
   display: grid;
   gap: 14px;
@@ -452,7 +452,7 @@ body.day-theme .ninou-modal-card {
 }
 
 
-/* Ninou v75.57.1 — ajustes de integração */
+/* Ninou v75.57.1 â€” ajustes de integraÃ§Ã£o */
 .profile-family-stack .form-status {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.66);
@@ -482,7 +482,7 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* Ninou v75.58.3 — revisão minuciosa de espaçamento, cards e mobile */
+/* Ninou v75.58.3 â€” revisÃ£o minuciosa de espaÃ§amento, cards e mobile */
 :root {
   --ninou-screen-gap-polished: 16px;
   --ninou-card-gap-polished: 14px;
@@ -756,7 +756,7 @@ body.day-theme .ninou-modal-card > p {
   margin-top: 5px;
 }
 
-/* Diário e notas */
+/* DiÃ¡rio e notas */
 .screen[data-screen="diary"] .date-filter,
 .screen[data-screen="diary"] .chips-shell,
 .screen[data-screen="diary"] .timeline,
@@ -829,7 +829,7 @@ body.day-theme .ninou-modal-card > p {
   border-radius: 18px !important;
 }
 
-/* Navegação e telas pequenas */
+/* NavegaÃ§Ã£o e telas pequenas */
 .bottom-nav {
   bottom: max(12px, env(safe-area-inset-bottom, 0px));
   width: min(calc(100% - 28px), 402px);
@@ -918,12 +918,12 @@ body.day-theme .ninou-modal-card > p {
   }
 }
 
-/* Ninou v75.58.3 — revisão visual final após análise do vídeo
-   Ajustes focados em consistência real no iPhone/Safari:
-   - títulos dos cards em duas linhas quando o HTML não possui wrapper;
-   - Observações do dia com hierarquia correta;
-   - respiro uniforme entre texto, campo e botões;
-   - prevenção de botões/cards colados ou assimétricos em todas as telas. */
+/* Ninou v75.58.3 â€” revisÃ£o visual final apÃ³s anÃ¡lise do vÃ­deo
+   Ajustes focados em consistÃªncia real no iPhone/Safari:
+   - tÃ­tulos dos cards em duas linhas quando o HTML nÃ£o possui wrapper;
+   - ObservaÃ§Ãµes do dia com hierarquia correta;
+   - respiro uniforme entre texto, campo e botÃµes;
+   - prevenÃ§Ã£o de botÃµes/cards colados ou assimÃ©tricos em todas as telas. */
 :root {
   --ninou-v755-section-gap: 14px;
   --ninou-v755-card-pad: 18px;
@@ -998,8 +998,8 @@ body.day-theme .ninou-modal-card > p {
   box-sizing: border-box;
 }
 
-/* Títulos de seção: mantém alinhamento quando há ação à direita,
-   mas evita que cards textuais fiquem com título e subtítulo espremidos. */
+/* TÃ­tulos de seÃ§Ã£o: mantÃ©m alinhamento quando hÃ¡ aÃ§Ã£o Ã  direita,
+   mas evita que cards textuais fiquem com tÃ­tulo e subtÃ­tulo espremidos. */
 .drawer-section-title,
 .section-title,
 .chart-title,
@@ -1025,9 +1025,9 @@ body.day-theme .ninou-modal-card > p {
   line-height: 1.14 !important;
 }
 
-/* Observações do dia: o vídeo mostrava "Observações do dia" à esquerda
-   e "Notas da família" à direita. Aqui a hierarquia fica correta:
-   kicker em cima, título abaixo, igual aos demais cards premium. */
+/* ObservaÃ§Ãµes do dia: o vÃ­deo mostrava "ObservaÃ§Ãµes do dia" Ã  esquerda
+   e "Notas da famÃ­lia" Ã  direita. Aqui a hierarquia fica correta:
+   kicker em cima, tÃ­tulo abaixo, igual aos demais cards premium. */
 .day-notes-card {
   display: grid !important;
   gap: 12px !important;
@@ -1096,7 +1096,7 @@ body.day-theme .ninou-modal-card > p {
   border-radius: 18px !important;
 }
 
-/* Diário: cards de eventos com melhor respiro e botões alinhados. */
+/* DiÃ¡rio: cards de eventos com melhor respiro e botÃµes alinhados. */
 .timeline {
   gap: 13px !important;
 }
@@ -1120,7 +1120,7 @@ body.day-theme .ninou-modal-card > p {
   justify-content: center;
 }
 
-/* Cards de perfil e família: evita aparência de blocos colados. */
+/* Cards de perfil e famÃ­lia: evita aparÃªncia de blocos colados. */
 .profile-family-stack,
 .settings-list,
 .report-stack,
@@ -1170,7 +1170,7 @@ body.day-theme .ninou-modal-card > p {
   min-height: 48px !important;
 }
 
-/* Relatórios/Dados: charts e barras com respiro entre blocos. */
+/* RelatÃ³rios/Dados: charts e barras com respiro entre blocos. */
 .chart-card,
 .weekly-overview-card,
 .five-day-actions-card,
@@ -1188,14 +1188,14 @@ body.day-theme .ninou-modal-card > p {
   min-width: 0;
 }
 
-/* Sons: lista e cards com mesmo padrão dos demais. */
+/* Sons: lista e cards com mesmo padrÃ£o dos demais. */
 .sound-player-card,
 .sound-note {
   display: grid;
   gap: 12px;
 }
 
-/* Botão flutuante: preserva distância da barra inferior sem cobrir leitura. */
+/* BotÃ£o flutuante: preserva distÃ¢ncia da barra inferior sem cobrir leitura. */
 .fab,
 .add-button,
 button[aria-label="Adicionar registro"] {
@@ -1274,21 +1274,21 @@ body.day-theme .day-notes-card .section-helper {
 }
 
 
-/* Ninou v75.58.3 — correção de respiro final e sequência de cards
-   Corrige sobras no fim das páginas e remove o vão entre
-   Ajuda e suporte e Perfil do bebê. */
+/* Ninou v75.58.3 â€” correÃ§Ã£o de respiro final e sequÃªncia de cards
+   Corrige sobras no fim das pÃ¡ginas e remove o vÃ£o entre
+   Ajuda e suporte e Perfil do bebÃª. */
 :root {
   --ninou-bottom-readable-space: 88px;
   --ninou-screen-gap-polished: 12px;
   --ninou-v755-section-gap: 12px;
 }
 
-/* Mantém espaço suficiente para a barra inferior sem criar rodapé gigante. */
+/* MantÃ©m espaÃ§o suficiente para a barra inferior sem criar rodapÃ© gigante. */
 .phone-shell {
   padding-bottom: max(var(--ninou-bottom-readable-space), calc(72px + env(safe-area-inset-bottom, 0px))) !important;
 }
 
-/* O espaçamento entre blocos deve vir do gap da tela, não de margens soltas. */
+/* O espaÃ§amento entre blocos deve vir do gap da tela, nÃ£o de margens soltas. */
 .screen[data-screen] {
   row-gap: 12px !important;
 }
@@ -1303,7 +1303,7 @@ body.day-theme .day-notes-card .section-helper {
   margin-bottom: 0 !important;
 }
 
-/* O bloco familiar não pode empurrar o próximo bloco do perfil. */
+/* O bloco familiar nÃ£o pode empurrar o prÃ³ximo bloco do perfil. */
 .profile-family-stack {
   margin: 0 !important;
   padding: 0 !important;
@@ -1316,7 +1316,7 @@ body.day-theme .day-notes-card .section-helper {
   margin-top: 0 !important;
 }
 
-/* Evita espaços fantasmas de cards ocultos em fluxos de login/convite. */
+/* Evita espaÃ§os fantasmas de cards ocultos em fluxos de login/convite. */
 [hidden] {
   display: none !important;
 }
@@ -1325,7 +1325,7 @@ body.day-theme .day-notes-card .section-helper {
   margin-bottom: 0 !important;
 }
 
-/* Perfil: sequência mais compacta e consistente entre a central familiar e os dados do bebê. */
+/* Perfil: sequÃªncia mais compacta e consistente entre a central familiar e os dados do bebÃª. */
 .screen[data-screen="profile"] {
   gap: 12px !important;
 }
@@ -1374,7 +1374,7 @@ body.profile-daily-ready #adminDiagnosticsCard {
   }
 }
 
-/* Ninou v75.58.3 — base multi-família, diagnóstico e PWA confiável */
+/* Ninou v75.58.3 â€” base multi-famÃ­lia, diagnÃ³stico e PWA confiÃ¡vel */
 :root {
   --ninou-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ninou-safe-top: env(safe-area-inset-top, 0px);
@@ -1495,10 +1495,10 @@ body {
 }
 
 
-/* Ninou v75.59.1 — segurança multi-família
+/* Ninou v75.59.1 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
-   Android compacto, telas médias, tablets e desktop. Esta camada não altera
-   lógica do app; apenas tipografia, grids, botões, cards, modais e navegação. */
+   Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
+   lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
 :root {
   --ninou-responsive-page-x: clamp(12px, 3.7vw, 20px);
   --ninou-responsive-card-pad: clamp(14px, 3.9vw, 20px);
@@ -1543,7 +1543,7 @@ div {
   max-width: 100%;
 }
 
-/* Texto: não quebra palavra no meio sem necessidade e não estoura o card. */
+/* Texto: nÃ£o quebra palavra no meio sem necessidade e nÃ£o estoura o card. */
 body,
 button,
 input,
@@ -1598,7 +1598,7 @@ canvas {
   width: 100%;
 }
 
-/* Cabeçalho: evita que nome, título ou pill de status empurrem a tela. */
+/* CabeÃ§alho: evita que nome, tÃ­tulo ou pill de status empurrem a tela. */
 .app-header {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1635,7 +1635,7 @@ canvas {
   white-space: nowrap !important;
 }
 
-/* Cards e títulos principais. */
+/* Cards e tÃ­tulos principais. */
 .today-overview-card,
 .smart-insight-card,
 .gentle-alert-card,
@@ -1764,7 +1764,7 @@ canvas {
   max-width: 100%;
 }
 
-/* Grids: sempre cabem no card e descem para uma coluna quando necessário. */
+/* Grids: sempre cabem no card e descem para uma coluna quando necessÃ¡rio. */
 .summary-grid,
 .today-overview-grid,
 .daily-rhythm,
@@ -1804,7 +1804,7 @@ canvas {
   min-width: 0;
 }
 
-/* Ações rápidas: texto de ação não deve quebrar no meio ou vazar. */
+/* AÃ§Ãµes rÃ¡pidas: texto de aÃ§Ã£o nÃ£o deve quebrar no meio ou vazar. */
 .quick-actions,
 .start-choice {
   display: grid !important;
@@ -1850,7 +1850,7 @@ canvas {
   line-height: 1.12 !important;
 }
 
-/* Formulários, data, chips e campos. */
+/* FormulÃ¡rios, data, chips e campos. */
 .date-filter,
 .record-form label,
 .settings-list label,
@@ -1900,7 +1900,7 @@ textarea {
   padding-inline: clamp(11px, 3.2vw, 16px) !important;
 }
 
-/* Timeline e edição/exclusão: textos longos ficam dentro do card. */
+/* Timeline e ediÃ§Ã£o/exclusÃ£o: textos longos ficam dentro do card. */
 .timeline,
 .intelligent-timeline {
   width: 100%;
@@ -1951,7 +1951,7 @@ textarea {
   text-overflow: ellipsis;
 }
 
-/* Observações do dia: mantém hierarquia e impede herança visual de largura. */
+/* ObservaÃ§Ãµes do dia: mantÃ©m hierarquia e impede heranÃ§a visual de largura. */
 .day-notes-card .drawer-section-title {
   grid-template-columns: 1fr !important;
 }
@@ -1965,7 +1965,7 @@ textarea {
   grid-template-columns: minmax(0, 1fr) minmax(128px, auto) !important;
 }
 
-/* Perfil, família e botões com textos maiores. */
+/* Perfil, famÃ­lia e botÃµes com textos maiores. */
 .profile-family-stack,
 .profile-family-card,
 .profile-actions-row,
@@ -2023,7 +2023,7 @@ textarea {
   text-overflow: clip !important;
 }
 
-/* Avatar e cards com nomes/opções grandes. */
+/* Avatar e cards com nomes/opÃ§Ãµes grandes. */
 .avatar-option-grid,
 .avatar-compact-card .avatar-option-grid.icon-grid,
 .caregiver-avatar-grid,
@@ -2088,7 +2088,7 @@ textarea {
   gap: 7px;
 }
 
-/* Barra inferior: nunca deixa rótulo quebrar nem sair da bolha. */
+/* Barra inferior: nunca deixa rÃ³tulo quebrar nem sair da bolha. */
 .bottom-nav {
   display: grid !important;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2116,7 +2116,7 @@ textarea {
   font-size: clamp(.92rem, 4vw, 1.08rem) !important;
 }
 
-/* Telas médias/tablet: app fica mais elegante sem esticar demais. */
+/* Telas mÃ©dias/tablet: app fica mais elegante sem esticar demais. */
 @media (min-width: 521px) {
   .phone-shell {
     max-width: 520px !important;
@@ -2260,7 +2260,7 @@ textarea {
   }
 }
 
-/* Muito estreito: prioriza não quebrar layout. */
+/* Muito estreito: prioriza nÃ£o quebrar layout. */
 @media (max-width: 340px) {
   :root {
     --ninou-responsive-page-x: 10px;
@@ -2293,7 +2293,7 @@ textarea {
   }
 }
 
-/* Telas baixas: sheets e modais ficam roláveis sem cortar controles finais. */
+/* Telas baixas: sheets e modais ficam rolÃ¡veis sem cortar controles finais. */
 @media (max-height: 700px) {
   .record-sheet,
   .orbit-cluster-sheet,
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.59.1 — segurança no aparelho */
+/* Ninou v75.59.1 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.11 — Login rápido + App Check não bloqueante */
+/* Ninou v75.60.11 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2361,7 +2361,7 @@ body.auth-validating .screen.active:not([data-screen="profile"]) > * {
 }
 
 body.auth-validating .screen.active:not([data-screen="profile"])::after {
-  content: "Validando acesso familiar\A\ACarregando somente os dados confirmados da sua família. Isso evita informações antigas durante o login.";
+  content: "Validando acesso familiar\A\ACarregando somente os dados confirmados da sua famÃ­lia. Isso evita informaÃ§Ãµes antigas durante o login.";
   position: sticky;
   top: 18px;
   z-index: 20;
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.11 — perfil logado sem duplicidade visual */
+/* Ninou v75.60.11 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.60.11 — revisão responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.60.11 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.60.11 — perfil não usa colunas quando o app está dentro de painel estreito */
+/* v75.60.11 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
