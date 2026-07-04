@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.64.1" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.65.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.64.1" />
+    <link rel="stylesheet" href="./styles.css?v=75.65.0" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -493,7 +493,7 @@
           <div class="profile-hero-copy">
             <span class="profile-hero-kicker">Perfil do diário</span>
             <strong id="profileBabyName">Bebê</strong>
-            <p id="profileBabyAge">Diário de cuidados</p>
+            <p id="profileBabyAge">Diário familiar de cuidados</p>
           </div>
         </div>
 
@@ -502,10 +502,10 @@
             <div class="profile-card-head">
               <div>
                 <span>Perfil</span>
-                <strong>Diário, cuidador e acesso familiar</strong>
+                <strong>Central do diário familiar</strong>
               </div>
             </div>
-            <p>Organize o nome exibido no diário, os dados principais, o cuidador deste aparelho e o compartilhamento da família — sem misturar com a rotina do dia.</p>
+            <p>Ajuste identidade, avatar, cuidador deste aparelho e acesso familiar em uma tela limpa, sem misturar com a rotina do dia.</p>
             <div class="profile-flow-pills" aria-label="Fluxo natural do perfil">
               <span>Diário</span>
               <span>Peso</span>
@@ -516,31 +516,36 @@
             </div>
           </article>
 
-          <article class="profile-family-card baby-card baby-settings-card profile-flow-card">
-            <div class="profile-card-head">
-              <div>
-                <span>1. Diário</span>
-                <strong>Dados principais</strong>
+          <article class="profile-family-card baby-card baby-settings-card profile-flow-card profile-dropdown-card">
+            <details class="profile-premium-details profile-compact-details premium-profile-accordion">
+              <summary>
+                <div>
+                  <span>1. Diário</span>
+                  <strong>Dados principais</strong>
+                  <p id="familyProfileBabyMeta">Nome exibido, forma do diário e nascimento.</p>
+                </div>
+                <i aria-hidden="true">⌄</i>
+              </summary>
+              <div class="profile-details-body">
+                <div class="profile-edit-grid">
+                  <label class="profile-setting-line">
+                    <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome exibido no diário</span>
+                    <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
+                  </label>
+                  <label class="profile-setting-line">
+                    <span class="setting-label"><span class="setting-icon" aria-hidden="true">☰</span>Como mostrar no diário</span>
+                    <select id="babyArticleInput">
+                      <option value="do">Diário do</option>
+                      <option value="da">Diário da</option>
+                    </select>
+                  </label>
+                  <label class="profile-setting-line">
+                    <span class="setting-label"><span class="setting-icon" aria-hidden="true">□</span>Data de nascimento</span>
+                    <input id="babyBirthInput" type="date" />
+                  </label>
+                </div>
               </div>
-            </div>
-            <p id="familyProfileBabyMeta">Nome exibido no diário, forma de exibição e data de nascimento.</p>
-            <div class="profile-edit-grid">
-              <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome exibido no diário</span>
-                <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
-              </label>
-              <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">☰</span>Como mostrar no diário</span>
-                <select id="babyArticleInput">
-                  <option value="do">Diário do</option>
-                  <option value="da">Diário da</option>
-                </select>
-              </label>
-              <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">□</span>Data de nascimento</span>
-                <input id="babyBirthInput" type="date" />
-              </label>
-            </div>
+            </details>
           </article>
 
           <article class="profile-family-card weight-profile-block profile-flow-card profile-weight-card profile-dropdown-card">
@@ -575,31 +580,38 @@
             </details>
           </article>
 
-          <article class="profile-family-card avatar-test-card avatar-compact-card profile-flow-card" id="babyAvatarTestCard">
-            <div class="avatar-test-header avatar-minimal-header">
-              <div class="avatar-copy-column compact-copy">
-                <span>3. Avatar</span>
-                <strong>Avatar do diário</strong>
-                <p class="profile-card-note">Escolha uma ilustração afetiva para representar este diário sem usar foto real.</p>
-                <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do bebê">
-                  <span>12 opções</span>
-                  <span>Privado</span>
+          <article class="profile-family-card avatar-test-card avatar-compact-card profile-flow-card premium-avatar-card" id="babyAvatarTestCard">
+            <details class="profile-premium-details avatar-premium-details" open>
+              <summary>
+                <div class="avatar-test-header avatar-minimal-header">
+                  <div class="avatar-copy-column compact-copy">
+                    <span>3. Avatar</span>
+                    <strong>Avatar do diário</strong>
+                    <p class="profile-card-note">Escolha uma ilustração afetiva para representar este diário sem usar foto real.</p>
+                    <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do bebê">
+                      <span>12 opções</span>
+                      <span>Privado</span>
+                    </div>
+                  </div>
+                  <div class="avatar-preview-wrap avatar-preview-panel minimal-preview-panel">
+                    <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
+                    <div class="avatar-preview-caption minimal-caption">Prévia</div>
+                  </div>
                 </div>
+                <i aria-hidden="true">⌄</i>
+              </summary>
+              <div class="profile-details-body avatar-details-body">
+                <section class="avatar-picker-section" data-avatar-section="hair">
+                  <strong>Avatares disponíveis</strong>
+                  <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
+                </section>
+                <div class="avatar-editor-actions">
+                  <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">Salvar avatar</button>
+                  <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
+                </div>
+                <p id="babyAvatarStatus" class="form-status">Depois de salvar, o editor fica oculto e volta somente pelo botão Editar avatar.</p>
               </div>
-              <div class="avatar-preview-wrap avatar-preview-panel minimal-preview-panel">
-                <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
-                <div class="avatar-preview-caption minimal-caption">Prévia</div>
-              </div>
-            </div>
-            <section class="avatar-picker-section" data-avatar-section="hair">
-              <strong>Avatares disponíveis</strong>
-              <div class="avatar-option-grid icon-grid" id="avatarIconOptions"></div>
-            </section>
-            <div class="avatar-editor-actions">
-              <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">Salvar avatar</button>
-              <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
-            </div>
-            <p id="babyAvatarStatus" class="form-status">Depois de salvar, o editor fica oculto e volta somente pelo botão Editar avatar.</p>
+            </details>
           </article>
 
           <div class="profile-actions-row avatar-profile-actions profile-avatar-return">
@@ -656,7 +668,7 @@
                 <strong id="familyNameLabel">Família não conectada</strong>
               </div>
             </div>
-            <p>Acompanhe conta conectada, backup/sincronização e convite de cuidadores autorizados no mesmo bloco.</p>
+            <p>Conta conectada, sincronização e convites de cuidadores ficam juntos para manter a tela objetiva.</p>
             <details class="profile-premium-details profile-compact-details">
               <summary>
                 <div>
@@ -711,7 +723,7 @@
                 <strong>Aparência do app</strong>
               </div>
             </div>
-            <p>Escolha apenas o tema visual. Outros ajustes ficam fora do Perfil para manter a tela limpa.</p>
+            <p>Ajuste somente a aparência. Outros recursos ficam fora do Perfil para preservar a tela limpa.</p>
             <details class="profile-premium-details profile-compact-details">
               <summary>
                 <div>
@@ -1205,7 +1217,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.64.1</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.65.0</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1399,6 +1411,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.64.1"></script>
+    <script type="module" src="./app.js?v=75.65.0"></script>
   </body>
 </html>
