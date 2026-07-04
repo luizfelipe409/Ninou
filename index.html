@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.72.2" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.72.3" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.72.2" />
+    <link rel="stylesheet" href="./styles.css?v=75.72.3" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -503,18 +503,18 @@
             <p id="familyProfileBabyMeta">Configure o nome que aparece no diário, a data de nascimento e os dados principais do bebê acompanhado.</p>
             <div class="profile-edit-grid">
               <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome exibido no diário</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Nome exibido no diário</span>
                 <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
               </label>
               <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">☰</span>Como mostrar no diário</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>Como mostrar no diário</span>
                 <select id="babyArticleInput">
                   <option value="do">Diário do</option>
                   <option value="da">Diário da</option>
                 </select>
               </label>
               <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">□</span>Data de nascimento</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Data de nascimento</span>
                 <input id="babyBirthInput" type="date" />
               </label>
             </div>
@@ -595,18 +595,18 @@
             <details id="caregiverIdentityCard" class="caregiver-inline-dropdown" open>
               <summary>
                 <div class="caregiver-summary-main">
-                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">◉</span>Você registra como</span>
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Você registra como</span>
                   <strong id="deviceCaregiverName">Não configurado</strong>
                 </div>
-                <div id="deviceCaregiverAvatar" class="caregiver-avatar-mini" aria-hidden="true">👤</div>
+                <div id="deviceCaregiverAvatar" class="caregiver-avatar-mini" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
               </summary>
               <div class="profile-edit-grid">
                 <label class="profile-setting-line">
-                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome do cuidador</span>
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Nome do cuidador</span>
                   <input id="caregiverNameInput" type="text" placeholder="Ex.: Felipe" autocomplete="name" />
                 </label>
                 <label class="profile-setting-line">
-                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">⌄</span>Vínculo com o bebê</span>
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>Vínculo com o bebê</span>
                   <select id="caregiverRelationInput">
                     <option value="pai">Pai</option>
                     <option value="mae">Mãe</option>
@@ -680,14 +680,14 @@
             <p>Escolha o tema visual do Ninou e mantenha a tela do perfil leve.</p>
             <div class="profile-edit-grid">
               <label class="profile-setting-line profile-hidden-technical-field" aria-hidden="true">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◷</span>Janela de despertar</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Janela de despertar</span>
                 <div class="profile-number-field">
                   <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
                   <strong><span id="wakeWindowValue">70</span> min</strong>
                 </div>
               </label>
               <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◐</span>Tema do app</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>Tema do app</span>
                 <select id="themeModeInput">
                   <option value="auto">Automático</option>
                   <option value="light">Claro suave</option>
@@ -1159,7 +1159,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.72.2</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.72.3</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1353,6 +1353,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.72.2"></script>
+    <script type="module" src="./app.js?v=75.72.3"></script>
   </body>
 </html>
