@@ -25,19 +25,6 @@
   gap: 14px;
 }
 
-.profile-card-symbol {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.1);
-  color: #7ce5c2;
-  font-weight: 900;
-}
-
 .profile-card-head span,
 .profile-family-card > p,
 .profile-soft-row span,
