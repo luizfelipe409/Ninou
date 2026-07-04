@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-62-0-profile-natural-flow";
+const CACHE_NAME = "ninou-v75-64-1-premium-profile-refinement";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.62.0",
-  "/css/app.legacy.css?v=75.62.0",
-  "/app.js?v=75.62.0",
-  "/js/app.legacy.js?v=75.62.0",
+  "/styles.css?v=75.64.1",
+  "/css/app.legacy.css?v=75.64.1",
+  "/app.js?v=75.64.1",
+  "/js/app.legacy.js?v=75.64.1",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
