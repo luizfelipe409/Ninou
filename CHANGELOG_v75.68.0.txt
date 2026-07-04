@@ -1,0 +1,16 @@
+Ninou v75.68.0 — Restauração visual refinada do Perfil
+
+Base visual restaurada a partir da v75.65.0, que tinha a paleta roxa/azul mais refinada, cards suaves e melhor contraste no Perfil.
+
+Mantém as correções funcionais recentes sem aplicar a camada visual que deixou a tela pesada:
+- cuidador com rótulo mais correto nos registros;
+- suporte a createdByName, createdByRole e createdByLabel;
+- peso aceitando vírgula/ponto e valores em kg;
+- normalização de pesos irreais em gramas;
+- avatar com editor recolhível;
+- cache atualizado para 75.68.0.
+
+Decisão de design:
+- não empilhar novas camadas de CSS sobre o Perfil;
+- preservar a estética refinada do vídeo antigo como base visual;
+- fazer futuras melhorias de forma cirúrgica, tela por tela.
