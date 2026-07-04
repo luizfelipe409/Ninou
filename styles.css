@@ -1,5 +1,5 @@
-/* Ninou v75.72.3 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.72.3");
+/* Ninou v75.72.4 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.72.4");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.72.3 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.72.4 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.72.3 â€” seguranÃ§a no aparelho */
+/* Ninou v75.72.4 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.72.3 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.72.4 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.72.3 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.72.4 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.72.3 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.72.4 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.72.3 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.72.4 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.72.3 - contraste e respiro do perfil em claro/escuro */
+/* v75.72.4 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.72.3 — Perfil com UX mais agradável + tema claro suave */
+/* v75.72.4 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.72.3 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.72.4 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.72.3 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.72.4 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.72.3 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.72.4 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,7 +3907,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.72.3 — retorno ao visual v75.63.0 Perfil do diário */
+/* v75.72.4 — retorno ao visual v75.63.0 Perfil do diário */
 .screen[data-screen="profile"] .profile-card {
   position: relative;
   overflow: hidden;
@@ -4036,7 +4036,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card:not(.profile-identit
 }
 
 
-/* v75.72.3 — Refinamento visual geral dos modais, sheets e controles
+/* v75.72.4 — Refinamento visual geral dos modais, sheets e controles
    Objetivo: preservar o visual afetivo da v75.63 e corrigir a sensação de modal/remendo. */
 :root {
   --ninou-modal-radius: 30px;
@@ -4451,7 +4451,7 @@ body.day-theme .bottom-nav {
 }
 
 
-/* v75.72.3 — correção da foto/avatar do perfil principal */
+/* v75.72.4 — correção da foto/avatar do perfil principal */
 .screen[data-screen="profile"] .profile-card {
   display: grid !important;
   justify-items: center !important;
@@ -4546,7 +4546,7 @@ body:not(.day-theme) .screen[data-screen="profile"] strong#profileBabyAge {
 }
 
 
-/* v75.72.3 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
+/* v75.72.4 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4632,4 +4632,247 @@ button,
 .profile-secondary-button:active,
 .profile-primary-button:active {
   transform: scale(0.985);
+}
+
+
+/* v75.72.4 — avatar em modal + cuidador com visual de imagem */
+.screen[data-screen="profile"] .profile-card::before {
+  display: none !important;
+  content: none !important;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.screen[data-screen="profile"] #profilePhoto {
+  width: 116px !important;
+  height: 116px !important;
+  padding: 4px !important;
+  border-radius: 36px !important;
+  background: linear-gradient(135deg, #7ce5c2, #ffd37a) !important;
+  border: 3px solid transparent !important;
+  box-shadow: 0 16px 34px rgba(66, 49, 107, 0.25), inset 0 0 0 4px #17132f !important;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+body.day-theme .screen[data-screen="profile"] #profilePhoto {
+  box-shadow: 0 16px 34px rgba(66, 49, 107, 0.12), inset 0 0 0 4px #ffffff !important;
+}
+
+.screen[data-screen="profile"] #profilePhoto:active {
+  transform: scale(0.95) !important;
+}
+
+.edit-avatar-badge {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  min-height: 34px;
+  background: linear-gradient(135deg, #7ce5c2, #ffd37a);
+  color: #16122d;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 850;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.30);
+  cursor: pointer;
+  white-space: nowrap;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.edit-avatar-badge svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.edit-avatar-badge:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+body.day-theme .edit-avatar-badge {
+  background: linear-gradient(135deg, #7a5cff, #a56cf5);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(122, 92, 255, 0.30);
+}
+
+.caregiver-avatar-mini {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(145deg, rgba(124,229,194,.34), rgba(255,211,122,.24)) !important;
+  font-size: 1.55rem !important;
+  line-height: 1 !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: inherit !important;
+}
+
+body.day-theme .caregiver-avatar-mini {
+  background: linear-gradient(145deg, rgba(47,128,103,0.15), rgba(47,128,103,0.05)) !important;
+}
+
+.ninou-modal[hidden] {
+  display: none !important;
+}
+
+.ninou-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: end center;
+  padding: 18px;
+}
+
+.ninou-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 5, 24, 0.56);
+  backdrop-filter: blur(12px) saturate(1.04);
+  -webkit-backdrop-filter: blur(12px) saturate(1.04);
+}
+
+.ninou-modal-card {
+  position: relative;
+  width: min(100%, 520px);
+  max-height: min(82vh, 680px);
+  overflow: auto;
+  border-radius: 32px 32px 26px 26px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(43, 34, 78, 0.98), rgba(24, 17, 50, 0.98));
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 -18px 50px rgba(4, 2, 16, 0.42);
+  color: #f7f3ff;
+}
+
+body.day-theme .ninou-modal-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,242,255,0.98));
+  border-color: rgba(95, 75, 135, 0.13);
+  box-shadow: 0 -18px 44px rgba(79, 61, 116, 0.16);
+  color: #2f2843;
+}
+
+.avatar-modal-open {
+  overflow: hidden;
+}
+
+.avatar-modal .avatar-test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.avatar-modal .avatar-copy-column span {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(236, 229, 255, 0.62);
+  font-size: .74rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.avatar-modal .avatar-copy-column strong {
+  display: block;
+  font-size: 1.35rem;
+  line-height: 1.05;
+  color: #ffffff;
+}
+
+.avatar-modal .avatar-copy-column p {
+  margin: 8px 0 0;
+  color: rgba(236, 229, 255, 0.68);
+  line-height: 1.35;
+  font-size: .92rem;
+}
+
+body.day-theme .avatar-modal .avatar-copy-column span,
+body.day-theme .avatar-modal .avatar-copy-column p {
+  color: rgba(63, 52, 88, 0.66);
+}
+
+body.day-theme .avatar-modal .avatar-copy-column strong {
+  color: #2f2843;
+}
+
+.avatar-modal .minimal-preview-panel {
+  width: 86px;
+  height: 86px;
+  min-height: 86px;
+  border-radius: 26px;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, rgba(124,229,194,.18), rgba(255,211,122,.12));
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+.avatar-modal .baby-avatar-preview {
+  width: 68px !important;
+  height: 68px !important;
+  border-radius: 20px !important;
+  object-fit: cover !important;
+}
+
+.avatar-modal .avatar-picker-section {
+  margin-top: 8px;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  max-height: 310px;
+  overflow: auto;
+  padding: 2px 2px 8px;
+}
+
+.avatar-modal .avatar-editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.avatar-modal #babyAvatarStatus {
+  margin: 12px 0 0;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .ninou-modal {
+    padding: 10px;
+  }
+  .ninou-modal-card {
+    border-radius: 30px 30px 24px 24px;
+    padding: 18px;
+    max-height: 84vh;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .avatar-modal .avatar-editor-actions {
+    grid-template-columns: 1fr;
+  }
 }

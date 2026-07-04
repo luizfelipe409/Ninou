@@ -94,6 +94,7 @@ const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
 const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
+const babyAvatarModalBackdrop = babyAvatarCard?.querySelector(".ninou-modal-backdrop");
 const babyAvatarDetails = babyAvatarCard?.querySelector(".avatar-premium-details");
 const editBabyAvatarButton = document.querySelector("#editBabyAvatarButton");
 const avatarIconOptions = document.querySelector("#avatarIconOptions");
@@ -307,7 +308,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.72.3";
+const NINOU_RUNTIME_VERSION = "75.72.4";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -592,19 +593,29 @@ function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
   return preset.src || babyAvatarHairOptions[0].src;
 }
 
+function setEditAvatarButtonLabel(editorOpen = false) {
+  if (!editBabyAvatarButton) return;
+  const label = editorOpen ? "Fechar" : (babyProfile.avatarConfigured ? "Editar" : "Escolher");
+  editBabyAvatarButton.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg><span>${label}</span>`;
+  editBabyAvatarButton.setAttribute("aria-label", `${label} avatar do diário`);
+}
+
 function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
-  const editorOpen = canEditAvatar && (avatarEditorForceOpen || !babyProfile.avatarConfigured);
+  const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.63 Perfil do diário: o card de seleção do avatar fica oculto
-  // depois de salvar e volta somente pelo botão Editar avatar.
-  if (babyAvatarCard) babyAvatarCard.hidden = !editorOpen;
+  // v75.72.4: a seleção de avatares virou modal, aberto apenas pelo badge Editar.
+  if (babyAvatarCard) {
+    babyAvatarCard.hidden = !editorOpen;
+    babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
+  }
+  document.body?.classList.toggle("avatar-modal-open", Boolean(editorOpen));
   if (babyAvatarDetails) babyAvatarDetails.open = editorOpen;
 
   if (editBabyAvatarButton) {
     editBabyAvatarButton.hidden = !canEditAvatar;
     editBabyAvatarButton.disabled = !canEditAvatar;
-    editBabyAvatarButton.textContent = editorOpen ? "Fechar edição" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
+    setEditAvatarButtonLabel(editorOpen);
   }
 }
 
@@ -1467,12 +1478,13 @@ function openAvatarEditor() {
   avatarEditorForceOpen = true;
   renderAvatarEditorVisibility();
   renderAvatarCustomizer();
-  babyAvatarCard?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  babyAvatarCard?.querySelector(".ninou-modal-card")?.focus?.();
 }
 
 function closeAvatarEditor(statusText = "") {
   avatarEditorForceOpen = false;
   renderAvatarEditorVisibility();
+  document.body?.classList.remove("avatar-modal-open");
   if (statusText && babyAvatarStatus) babyAvatarStatus.textContent = statusText;
 }
 function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = "member") {
@@ -3280,7 +3292,7 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // v75.72.3: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // v75.72.4: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
   // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = true;
@@ -6263,7 +6275,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.72.3 — login rápido, mas consistente:
+    v75.72.4 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;
@@ -9398,13 +9410,24 @@ avatarTabs.forEach((button) => {
 
 if (editBabyAvatarButton) {
   editBabyAvatarButton.addEventListener("click", () => {
-    if (!babyAvatarDetails?.open) {
+    const modalOpen = Boolean(babyAvatarCard && !babyAvatarCard.hidden);
+    if (!modalOpen) {
       openAvatarEditor();
     } else {
       closeAvatarEditor("Editor fechado.");
     }
   });
 }
+
+if (babyAvatarModalBackdrop) {
+  babyAvatarModalBackdrop.addEventListener("click", () => closeAvatarEditor("Editor fechado."));
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && babyAvatarCard && !babyAvatarCard.hidden) {
+    closeAvatarEditor("Editor fechado.");
+  }
+});
 
 if (babyAvatarDetails) {
   babyAvatarDetails.addEventListener("toggle", () => {
