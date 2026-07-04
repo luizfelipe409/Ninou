@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-71-0-restaura-visual-refinado";
+const CACHE_NAME = "ninou-v75-72-0-modais-sheets-premium";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.71.0",
-  "/css/app.legacy.css?v=75.71.0",
-  "/app.js?v=75.71.0",
-  "/js/app.legacy.js?v=75.71.0",
+  "/styles.css?v=75.72.0",
+  "/css/app.legacy.css?v=75.72.0",
+  "/app.js?v=75.72.0",
+  "/js/app.legacy.js?v=75.72.0",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

@@ -1,0 +1,9 @@
+Ninou v75.72.0 — Refinamento visual geral dos modais e sheets
+
+Alterações principais:
+- modais e bottom sheets com visual mais premium, menos pesado e mais coerente com a base v75.63;
+- sheet de novo registro com chips horizontais, campos mais suaves, botões maiores e melhor contraste;
+- modal de entrada/convite com fundo, borda, sombra e botões mais refinados;
+- botão flutuante Solicitar acesso removido da experiência visual principal;
+- barra inferior e FAB com menor interferência visual;
+- preservado o retorno visual do Perfil do diário e as correções funcionais recentes.
