@@ -1,0 +1,11 @@
+Ninou v75.72.7 — paridade visual do tema claro
+
+Alterações:
+- aplicado o mesmo refinamento dos menus de seleção também no tema claro;
+- removidos pseudo-elementos antigos que geravam X/triângulo nos selects no tema claro;
+- todos os selects com wrapper agora usam ícone SVG real de dropdown no tema claro;
+- campos de Perfil, Relatório, Preferências, Registros e Admin receberam aparência clara consistente;
+- botão Editar avatar mantido fora da foto principal e com visual adequado ao tema claro;
+- cuidador local mantido como avatar/emoji pequeno, sem bloco grande vazio;
+- modal de avatar refinado no tema claro;
+- cache/app atualizado para 75.72.7.

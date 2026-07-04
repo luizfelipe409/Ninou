@@ -1,4 +1,4 @@
-Ninou v75.72.6 — botão Editar avatar reposicionado e selects sinalizados
+Ninou v75.72.7 — botão Editar avatar reposicionado e selects sinalizados
 
 Alterações:
 - removido o botão Editar de cima da foto/avatar principal;
@@ -6,4 +6,4 @@ Alterações:
 - modal de avatar mantido com prévia, grade, Salvar e Fechar;
 - menus de seleção receberam chevron/ícone visual mais claro;
 - área do cuidador mantida como avatar/emoji pequeno, sem bloco vazio grande;
-- cache/app atualizado para 75.72.6.
+- cache/app atualizado para 75.72.7.
