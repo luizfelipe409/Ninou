@@ -1,0 +1,6 @@
+Ninou v75.72.1 — remoção do texto de ajuda do peso
+
+Alterações:
+- removido o texto "Use kg com vírgula ou ponto. Ex.: 4,250 kg." da seção de peso no Perfil;
+- mantida a estrutura da v75.72.0;
+- atualização de cache/app para 75.72.1.

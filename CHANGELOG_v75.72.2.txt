@@ -1,0 +1,9 @@
+Ninou v75.72.2 — correção da foto do perfil
+
+Alterações:
+- avatar/foto do perfil principal corrigido para ficar mais nítido e protagonista;
+- removida a sensação de foto apagada/desbotada no card do perfil;
+- melhorado o contraste do nome e da idade no card principal;
+- refinado o visual do topo do Perfil em tema claro e escuro;
+- mantida a remoção do texto auxiliar do peso;
+- atualização de cache/app para 75.72.2.
