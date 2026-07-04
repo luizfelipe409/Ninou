@@ -1,5 +1,5 @@
-/* Ninou v75.72.4 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.72.4");
+/* Ninou v75.72.5 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.72.5");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.72.4 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.72.5 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.72.4 â€” seguranÃ§a no aparelho */
+/* Ninou v75.72.5 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.72.4 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.72.5 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.72.4 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.72.5 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.72.4 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.72.5 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.72.4 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.72.5 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.72.4 - contraste e respiro do perfil em claro/escuro */
+/* v75.72.5 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.72.4 — Perfil com UX mais agradável + tema claro suave */
+/* v75.72.5 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.72.4 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.72.5 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.72.4 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.72.5 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.72.4 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.72.5 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,7 +3907,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.72.4 — retorno ao visual v75.63.0 Perfil do diário */
+/* v75.72.5 — retorno ao visual v75.63.0 Perfil do diário */
 .screen[data-screen="profile"] .profile-card {
   position: relative;
   overflow: hidden;
@@ -4036,7 +4036,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card:not(.profile-identit
 }
 
 
-/* v75.72.4 — Refinamento visual geral dos modais, sheets e controles
+/* v75.72.5 — Refinamento visual geral dos modais, sheets e controles
    Objetivo: preservar o visual afetivo da v75.63 e corrigir a sensação de modal/remendo. */
 :root {
   --ninou-modal-radius: 30px;
@@ -4451,7 +4451,7 @@ body.day-theme .bottom-nav {
 }
 
 
-/* v75.72.4 — correção da foto/avatar do perfil principal */
+/* v75.72.5 — correção da foto/avatar do perfil principal */
 .screen[data-screen="profile"] .profile-card {
   display: grid !important;
   justify-items: center !important;
@@ -4546,7 +4546,7 @@ body:not(.day-theme) .screen[data-screen="profile"] strong#profileBabyAge {
 }
 
 
-/* v75.72.4 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
+/* v75.72.5 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4635,7 +4635,7 @@ button,
 }
 
 
-/* v75.72.4 — avatar em modal + cuidador com visual de imagem */
+/* v75.72.5 — avatar em modal + cuidador com visual de imagem */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4874,5 +4874,124 @@ body.day-theme .avatar-modal .avatar-copy-column strong {
   }
   .avatar-modal .avatar-editor-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+
+/* v75.72.5 — botão Editar avatar fora da foto + seletores com chevron claro */
+.screen[data-screen="profile"] .avatar-wrapper {
+  margin-bottom: 6px !important;
+}
+.screen[data-screen="profile"] .avatar-edit-line {
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+.screen[data-screen="profile"] .avatar-inline-edit-button {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 16px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #17132f;
+  background: linear-gradient(135deg, #7ce5c2, #ffd37a);
+  box-shadow: 0 10px 22px rgba(124, 229, 194, 0.16), inset 0 1px 0 rgba(255,255,255,0.42);
+  -webkit-tap-highlight-color: transparent;
+}
+.screen[data-screen="profile"] .avatar-inline-edit-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.screen[data-screen="profile"] .avatar-inline-edit-button:active {
+  transform: scale(0.985);
+}
+body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button {
+  color: #ffffff;
+  background: linear-gradient(135deg, #7a5cff, #a56cf5);
+  box-shadow: 0 10px 22px rgba(122, 92, 255, 0.18), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+.screen[data-screen="profile"] .avatar-inline-edit-button[hidden] {
+  display: none !important;
+}
+
+/* O antigo badge não é mais usado no avatar principal. Mantemos oculto por segurança se restar algum cache antigo. */
+.screen[data-screen="profile"] .avatar-wrapper > .edit-avatar-badge {
+  display: none !important;
+}
+
+/* Selects com ícone/chevron visível depois das regras que usam background shorthand. */
+.screen[data-screen="profile"] select,
+.record-form select,
+.ninou-modal-card select,
+.guest-login-dialog select,
+.settings-list select,
+.admin-clean-panel select,
+.export-card select {
+  --ninou-select-arrow: rgba(124, 229, 194, 0.96);
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  padding-right: 48px !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ninou-select-arrow) 50%),
+    linear-gradient(135deg, var(--ninou-select-arrow) 50%, transparent 50%),
+    radial-gradient(circle at center, rgba(124,229,194,0.13) 0 56%, transparent 57%) !important;
+  background-position:
+    calc(100% - 24px) 50%,
+    calc(100% - 17px) 50%,
+    calc(100% - 20px) 50% !important;
+  background-size:
+    7px 7px,
+    7px 7px,
+    32px 32px !important;
+  background-repeat: no-repeat !important;
+}
+body.day-theme .screen[data-screen="profile"] select,
+body.day-theme .record-form select,
+body.day-theme .ninou-modal-card select,
+body.day-theme .guest-login-dialog select,
+body.day-theme .settings-list select,
+body.day-theme .admin-clean-panel select,
+body.day-theme .export-card select {
+  --ninou-select-arrow: rgba(94, 73, 160, 0.96);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ninou-select-arrow) 50%),
+    linear-gradient(135deg, var(--ninou-select-arrow) 50%, transparent 50%),
+    radial-gradient(circle at center, rgba(94, 73, 160, 0.10) 0 56%, transparent 57%) !important;
+}
+
+/* O card do cuidador mantém a aparência de imagem/emoji, sem virar quadrado vazio. */
+.screen[data-screen="profile"] .caregiver-avatar-mini {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(145deg, rgba(124,229,194,.34), rgba(255,211,122,.24)) !important;
+  font-size: 1.55rem !important;
+  line-height: 1 !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: inherit !important;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-avatar-mini {
+  background: linear-gradient(145deg, rgba(47,128,103,0.15), rgba(47,128,103,0.05)) !important;
+}
+@media (max-width: 420px) {
+  .screen[data-screen="profile"] .avatar-inline-edit-button {
+    min-height: 44px;
+    padding-inline: 10px;
+    font-size: 0.9rem;
   }
 }
