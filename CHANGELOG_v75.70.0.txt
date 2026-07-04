@@ -1,9 +1,0 @@
-Ninou v75.70.0 — Perfil restaurado para o estilo do vídeo
-
-Principais mudanças:
-- restauração do visual do Perfil inspirado no vídeo antigo enviado pelo usuário;
-- avatar do bebê novamente em destaque e centralizado no hero principal;
-- manutenção do card introdutório do Perfil, como na versão bonita do vídeo;
-- seção de Avatar com visual mais direto e botão Editar avatar integrado ao próprio card;
-- preservadas correções funcionais recentes, como peso em kg e cuidador local;
-- cache atualizado para 75.70.0.

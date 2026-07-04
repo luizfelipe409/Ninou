@@ -1,5 +1,5 @@
-/* Ninou v75.70.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.70.0");
+/* Ninou v75.71.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.71.0");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.70.0 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.71.0 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.70.0 â€” seguranÃ§a no aparelho */
+/* Ninou v75.71.0 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.70.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.71.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.70.0 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.71.0 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.70.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.71.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.70.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.71.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.70.0 - contraste e respiro do perfil em claro/escuro */
+/* v75.71.0 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.70.0 — Perfil com UX mais agradável + tema claro suave */
+/* v75.71.0 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.70.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.71.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.70.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.71.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.70.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.71.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,136 +3907,130 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.70.0 — restauração visual do perfil inspirada no vídeo antigo */
-body:not(.day-theme) .screen[data-screen="profile"] .profile-identity-hero {
+/* v75.71.0 — retorno ao visual v75.63.0 Perfil do diário */
+.screen[data-screen="profile"] .profile-card {
   position: relative;
-  grid-template-columns: 1fr !important;
+  overflow: hidden;
+  gap: 8px;
+  padding: 22px 18px;
+}
+.screen[data-screen="profile"] .profile-card::before {
+  content: "Perfil do diário";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin: 0 auto 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: rgba(245,238,255,.72);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+}
+body.day-theme .screen[data-screen="profile"] .profile-card::before {
+  color: rgba(87,70,108,.72);
+  background: rgba(255,255,255,.72);
+  border-color: rgba(102,76,133,.10);
+}
+.profile-diary-stack { gap: 16px; }
+.profile-diary-stack .profile-family-card {
+  border-radius: 28px;
+}
+.diary-profile-card,
+.profile-weight-card,
+.avatar-profile-card,
+.caregiver-profile-card,
+.profile-sharing-card,
+.preferences-profile-card {
+  background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+  border: 1px solid rgba(255,255,255,.11);
+}
+body.day-theme .diary-profile-card,
+body.day-theme .profile-weight-card,
+body.day-theme .avatar-profile-card,
+body.day-theme .caregiver-profile-card,
+body.day-theme .profile-sharing-card,
+body.day-theme .preferences-profile-card {
+  background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(246,239,255,.82));
+  border-color: rgba(105,80,134,.12);
+  box-shadow: 0 16px 38px rgba(116, 94, 145, 0.10);
+}
+.profile-diary-stack .profile-card-head span,
+.profile-diary-stack .weight-profile-header span {
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .72rem;
+  font-weight: 850;
+}
+.profile-diary-stack .profile-card-head strong,
+.profile-diary-stack .weight-profile-header strong {
+  font-size: 1.08rem;
+}
+.profile-diary-stack p,
+.profile-sync-copy {
+  line-height: 1.48;
+}
+.profile-weight-card .weight-profile-header {
+  margin-bottom: 14px;
+}
+.profile-weight-card .weight-history-card {
+  margin-top: 14px;
+}
+.profile-weight-history span { font-weight: 800; }
+.profile-sharing-card .profile-sync-copy {
+  margin: -4px 0 10px;
+  color: rgba(245,238,255,.66);
+  font-size: .88rem;
+}
+body.day-theme .profile-sharing-card .profile-sync-copy {
+  color: rgba(61,52,74,.66);
+}
+.profile-hidden-technical-field {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.caregiver-profile-card .caregiver-inline-dropdown[open] {
+  margin-top: 12px;
+}
+.avatar-profile-card .profile-actions-row,
+.profile-sharing-card .profile-actions-row,
+.caregiver-profile-card .profile-actions-row {
+  margin-top: 14px;
+}
+.screen[data-screen="profile"] .profile-card:not(.profile-identity-hero) {
+  display: grid !important;
   justify-items: center !important;
   text-align: center !important;
-  gap: 14px !important;
-  min-height: 0 !important;
-  padding: 26px 22px 28px !important;
-  border-radius: 34px !important;
-  background: linear-gradient(180deg, rgba(39, 26, 86, 0.98) 0%, rgba(18, 10, 49, 0.98) 100%) !important;
-  border: 1px solid rgba(126, 110, 201, 0.28) !important;
-  box-shadow: 0 22px 48px rgba(8, 4, 28, 0.34) !important;
-  overflow: hidden;
 }
-body:not(.day-theme) .screen[data-screen="profile"] .profile-identity-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 42% 0;
-  background: linear-gradient(180deg, rgba(65, 42, 140, 0.26) 0%, rgba(65, 42, 140, 0.02) 100%);
-  pointer-events: none;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-avatar-wrap {
-  justify-content: center !important;
-  margin-top: 10px;
-  padding: 16px;
-  border-radius: 34px;
-  background: radial-gradient(circle at 30% 30%, rgba(125, 255, 198, 0.22), rgba(125, 255, 198, 0.02) 52%), rgba(43, 31, 95, 0.82);
-  box-shadow: inset 0 0 0 1px rgba(125, 255, 198, 0.08), 0 14px 28px rgba(5, 3, 20, 0.3);
-  z-index: 1;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-avatar-wrap::after {
-  inset: -8px;
-  border-radius: 38px;
-  border: 1px solid rgba(134, 255, 204, 0.22);
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-avatar-wrap img {
-  width: 104px !important;
-  height: 104px !important;
+.screen[data-screen="profile"] .profile-card:not(.profile-identity-hero) img {
+  width: 96px !important;
+  height: 96px !important;
   border-radius: 28px !important;
-  box-shadow: 0 8px 24px rgba(10, 5, 30, 0.28);
+  object-fit: cover !important;
 }
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-copy {
-  justify-items: center;
-  text-align: center;
-  gap: 10px;
-  z-index: 1;
+.screen[data-screen="profile"] .profile-card:not(.profile-identity-hero) span#profileBabyName {
+  color: rgba(245,238,255,.72);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 900;
 }
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-kicker {
-  margin-top: 2px;
-  padding: 8px 16px;
-  background: rgba(44, 73, 106, 0.92) !important;
-  color: #eef8ff !important;
-  border: 1px solid rgba(116, 225, 197, 0.28);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+body.day-theme .screen[data-screen="profile"] .profile-card:not(.profile-identity-hero) span#profileBabyName {
+  color: rgba(74, 58, 105, .72);
 }
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-copy strong {
-  color: #ffffff !important;
-  font-size: clamp(1.95rem, 8vw, 2.65rem) !important;
-  letter-spacing: -0.05em;
+.screen[data-screen="profile"] .profile-card:not(.profile-identity-hero) strong#profileBabyAge {
+  font-size: clamp(1.35rem, 5vw, 2rem);
 }
-body:not(.day-theme) .screen[data-screen="profile"] .profile-hero-copy p {
-  color: rgba(231, 229, 255, 0.82) !important;
-  font-size: 1rem;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-intro-card {
-  background: linear-gradient(180deg, rgba(39, 26, 86, 0.88), rgba(19, 10, 52, 0.96)) !important;
-  border-color: rgba(126, 110, 201, 0.25) !important;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-intro-card .profile-card-head strong {
-  color: #f7f3ff !important;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-intro-card p {
-  color: rgba(230, 225, 255, 0.76) !important;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .profile-flow-pills span {
-  background: rgba(76, 63, 133, 0.58) !important;
-  color: #ece5ff !important;
-  border-color: rgba(255,255,255,0.08) !important;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .avatar-premium-details[open] .profile-details-body {
-  padding-top: 18px;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .avatar-preview-panel {
-  margin-inline: auto;
-  min-height: 250px;
-  display: grid;
-  place-items: center;
-  padding: 20px 16px 16px;
-  border-radius: 32px;
-  background: linear-gradient(180deg, rgba(78, 69, 107, 0.9), rgba(57, 48, 86, 0.88));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
-}
-body:not(.day-theme) .screen[data-screen="profile"] .avatar-preview-wrap {
-  justify-self: center;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .baby-avatar-preview {
-  width: 110px;
-  height: 110px;
-  border-radius: 30px;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .avatar-preview-caption {
-  margin-top: 14px;
-  font-size: 0.98rem;
-  color: rgba(240, 234, 255, 0.72);
-}
-body:not(.day-theme) .screen[data-screen="profile"] .avatar-option-grid.icon-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .avatar-cta-row {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-body:not(.day-theme) .screen[data-screen="profile"] .premium-avatar-edit-button {
-  min-width: 220px;
-  background: linear-gradient(135deg, rgba(86, 76, 146, 0.88), rgba(58, 47, 111, 0.94)) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(196, 187, 255, 0.16) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 12px 30px rgba(10, 6, 31, 0.22);
-}
-body:not(.day-theme) .screen[data-screen="profile"] .premium-avatar-edit-button:hover {
-  transform: translateY(-1px);
-}
-@media (max-width: 640px) {
-  body:not(.day-theme) .screen[data-screen="profile"] .avatar-option-grid.icon-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  body:not(.day-theme) .screen[data-screen="profile"] .profile-identity-hero {
-    padding: 24px 18px 26px !important;
-  }
+@media (max-width: 520px) {
+  .profile-diary-stack { gap: 14px; }
+  .profile-diary-stack .profile-family-card { border-radius: 24px; }
+  .profile-diary-stack .profile-edit-grid,
+  .profile-diary-stack .weight-input-row { gap: 10px; }
 }

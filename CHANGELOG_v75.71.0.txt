@@ -1,0 +1,9 @@
+Ninou v75.71.0 — Retorno ao visual v75.63.0 Perfil do diário
+
+O que foi restaurado:
+- estrutura visual do Perfil do diário inspirada na v75.63.0;
+- avatar e card principal mais simples, centralizados e afetivos;
+- fluxo do avatar com card direto “Avatar do diário” + botão Editar avatar;
+- remoção do visual numerado/administrativo da v75.68+;
+- cards: Diário de cuidados, Peso atual, Avatar do diário, Cuidador local, Família Ninou e Preferências;
+- manutenção das correções funcionais recentes: cuidador local, peso em kg com vírgula/ponto e WhatsApp sem duplicação.
