@@ -1,6 +1,6 @@
-// Ninou v75.60.10 - Login estável + App Check seguro
+// Ninou v75.63.0 - Login estável + App Check seguro
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.60.10";
+const NINOU_APP_VERSION = "75.63.0";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
