@@ -1,5 +1,5 @@
-/* Ninou v75.66.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.66.0");
+/* Ninou v75.67.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.67.0");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.66.0 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.67.0 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.66.0 â€” seguranÃ§a no aparelho */
+/* Ninou v75.67.0 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.66.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.67.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.66.0 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.67.0 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.66.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.67.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.66.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.67.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.66.0 - contraste e respiro do perfil em claro/escuro */
+/* v75.67.0 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.66.0 — Perfil com UX mais agradável + tema claro suave */
+/* v75.67.0 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.66.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.67.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.66.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.67.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.66.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.67.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,7 +3907,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.66.0 — Acabamento Premium Geral: dropdown, avatar, peso, WhatsApp e relatório */
+/* v75.67.0 — Acabamento Premium Geral: dropdown, avatar, peso, WhatsApp e relatório */
 .screen[data-screen="profile"] .profile-premium-details summary,
 .screen[data-screen="profile"] .caregiver-inline-dropdown summary {
   position: relative;
@@ -4100,4 +4100,103 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
     height: 32px;
     min-width: 32px;
   }
+}
+
+
+/* v75.67.0 — correção honesta pós-vídeo: menos poluição, avatar realmente premium e acesso sem bolha flutuante */
+#guestWhatsappButton,
+.guest-whatsapp-button {
+  display: none !important;
+}
+
+.premium-avatar-card {
+  overflow: hidden;
+}
+
+.premium-avatar-card[hidden] {
+  display: none !important;
+}
+
+.avatar-premium-details > summary {
+  cursor: pointer;
+  min-height: 112px;
+  border-radius: 26px;
+}
+
+.avatar-premium-details:not([open]) > summary {
+  padding-bottom: 0;
+}
+
+.avatar-premium-details:not([open]) .avatar-details-body {
+  display: none !important;
+}
+
+.avatar-premium-details > summary i,
+.profile-premium-details > summary i,
+.caregiver-inline-dropdown > summary::after {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  border-radius: 999px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: currentColor !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 8px 18px rgba(19, 12, 43, .14) !important;
+  transition: transform .2s ease, background .2s ease, border-color .2s ease !important;
+  font-style: normal !important;
+}
+
+.profile-premium-details[open] > summary i,
+.avatar-premium-details[open] > summary i {
+  transform: rotate(180deg);
+  background: rgba(116, 239, 180, .18) !important;
+  border-color: rgba(116, 239, 180, .32) !important;
+}
+
+.profile-avatar-return {
+  margin: -4px 0 10px !important;
+  justify-content: center !important;
+}
+
+.premium-avatar-edit-button {
+  width: min(100%, 260px) !important;
+  min-height: 44px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(117, 92, 214, .18) !important;
+  background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(241,236,255,.96)) !important;
+  color: #4d3786 !important;
+  box-shadow: 0 14px 28px rgba(63, 43, 110, .12) !important;
+  font-weight: 900 !important;
+}
+
+body:not(.day-theme) .premium-avatar-edit-button {
+  background: linear-gradient(135deg, rgba(64,45,112,.9), rgba(42,30,80,.9)) !important;
+  color: #fff7ff !important;
+  border-color: rgba(255,255,255,.14) !important;
+}
+
+.guest-preview-topline b,
+.guest-premium-proof span:first-child {
+  letter-spacing: .01em !important;
+}
+
+.guest-store-hero strong,
+.guest-store-analytic-card strong,
+.guest-live-card strong {
+  text-wrap: balance;
+}
+
+.guest-premium-card {
+  margin-bottom: 18px !important;
+}
+
+.report-page,
+.report-card,
+.report-section,
+.report-text,
+.report-table th,
+.report-table td {
+  overflow-wrap: anywhere !important;
 }

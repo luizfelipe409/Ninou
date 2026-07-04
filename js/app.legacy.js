@@ -94,6 +94,7 @@ const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
 const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
+const babyAvatarDetails = babyAvatarCard?.querySelector(".avatar-premium-details");
 const editBabyAvatarButton = document.querySelector("#editBabyAvatarButton");
 const avatarIconOptions = document.querySelector("#avatarIconOptions");
 const avatarTabs = document.querySelectorAll("[data-avatar-jump]");
@@ -306,7 +307,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.66.0";
+const NINOU_RUNTIME_VERSION = "75.67.0";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -593,12 +594,17 @@ function getBabyAvatarDataUrl(avatar = babyProfile.avatar) {
 
 function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
-  const visible = canEditAvatar && (avatarEditorForceOpen || !babyProfile.avatarConfigured);
-  if (babyAvatarCard) babyAvatarCard.hidden = !visible;
+  const editorOpen = canEditAvatar && (avatarEditorForceOpen || !babyProfile.avatarConfigured);
+
+  // O card do avatar deve permanecer como uma seção limpa do Perfil.
+  // Apenas as opções internas abrem/fecham; assim o botão não fica solto embaixo de Peso.
+  if (babyAvatarCard) babyAvatarCard.hidden = !canEditAvatar;
+  if (babyAvatarDetails) babyAvatarDetails.open = editorOpen;
+
   if (editBabyAvatarButton) {
     editBabyAvatarButton.hidden = !canEditAvatar;
     editBabyAvatarButton.disabled = !canEditAvatar;
-    editBabyAvatarButton.textContent = visible ? "Fechar avatares" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
+    editBabyAvatarButton.textContent = editorOpen ? "Fechar edição do avatar" : (babyProfile.avatarConfigured ? "Editar avatar" : "Escolher avatar");
   }
 }
 
@@ -693,8 +699,8 @@ const guestPremiumContent = {
   today: {
     kicker: "Conheça o Ninou",
     title: "A rotina do bebê em tempo real",
-    text: "Uma demonstração realista de como a família acompanha sono, mamadas, fraldas e medicamentos em poucos toques.",
-    accent: "Hoje • exemplo",
+    text: "Uma prévia limpa de como a família acompanha sono, mamadas, fraldas e medicamentos em poucos toques.",
+    accent: "Hoje • prévia",
     liveTitle: "Bebê acordado",
     liveValue: "44 min",
     liveHint: "desde 12:35, após a última soneca",
@@ -715,7 +721,7 @@ const guestPremiumContent = {
       { label: "14h", value: "Dica", height: 64 },
     ],
     lineTitle: "Tempo acordado",
-    lineSubtitle: "exemplo ao longo do dia",
+    lineSubtitle: "prévia ao longo do dia",
     line: [
       { label: "07h", value: 0 },
       { label: "08h", value: 38 },
@@ -745,7 +751,7 @@ const guestPremiumContent = {
     kicker: "Histórico por data",
     title: "Diário completo e organizado",
     text: "O usuário entende como cada registro entra no histórico, com horários, detalhes, observações e separação correta por dia.",
-    accent: "Data exemplo",
+    accent: "Data da prévia",
     liveTitle: "Dia completo",
     liveValue: "11 registros",
     liveHint: "madrugada, manhã, tarde e noite separados",
@@ -757,7 +763,7 @@ const guestPremiumContent = {
       { label: "Observações", value: "2", note: "anotações da família" },
     ],
     barsTitle: "Registros por período",
-    barsSubtitle: "distribuição exemplo",
+    barsSubtitle: "distribuição da prévia",
     bars: [
       { label: "Madr.", value: "2", height: 36 },
       { label: "Manhã", value: "6", height: 88 },
@@ -765,7 +771,7 @@ const guestPremiumContent = {
       { label: "Noite", value: "1", height: 28 },
     ],
     lineTitle: "Volume de registros",
-    lineSubtitle: "exemplo dos últimos dias",
+    lineSubtitle: "prévia dos últimos dias",
     line: [
       { label: "24", value: 8 },
       { label: "25", value: 10 },
@@ -799,16 +805,16 @@ const guestPremiumContent = {
     accent: "Últimos 7 dias",
     liveTitle: "Sono médio",
     liveValue: "14h20",
-    liveHint: "exemplo de tendência semanal",
+    liveHint: "tendência da prévia semanal",
     cta: "Entre para visualizar os gráficos reais do bebê.",
     metrics: [
-      { label: "Mamadas", value: "8/dia", note: "média exemplo" },
-      { label: "Fraldas", value: "6/dia", note: "média exemplo" },
-      { label: "Peso", value: "+420 g", note: "evolução exemplo" },
+      { label: "Mamadas", value: "8/dia", note: "média da prévia" },
+      { label: "Fraldas", value: "6/dia", note: "média da prévia" },
+      { label: "Peso", value: "+420 g", note: "evolução da prévia" },
       { label: "Regularidade", value: "82%", note: "padrão semanal" },
     ],
     barsTitle: "Sono nos últimos dias",
-    barsSubtitle: "exemplo de evolução",
+    barsSubtitle: "prévia de evolução",
     bars: [
       { label: "Seg", value: "13h", height: 62 },
       { label: "Ter", value: "14h", height: 72 },
@@ -819,7 +825,7 @@ const guestPremiumContent = {
       { label: "Dom", value: "15h10", height: 90 },
     ],
     lineTitle: "Peso do bebê",
-    lineSubtitle: "linha de exemplo de crescimento",
+    lineSubtitle: "linha de crescimento",
     line: [
       { label: "1ª", value: 3.18 },
       { label: "2ª", value: 3.32 },
@@ -848,7 +854,7 @@ const guestPremiumContent = {
     kicker: "Ritual de descanso",
     title: "Sons com contexto de rotina",
     text: "A tela de sons também vira uma experiência guiada, mostrando como o áudio pode apoiar a hora de dormir.",
-    accent: "Pré-sono • exemplo",
+    accent: "Pré-sono • prévia",
     liveTitle: "Som favorito",
     liveValue: "Útero",
     liveHint: "sessão de 28 min em volume baixo",
@@ -860,14 +866,14 @@ const guestPremiumContent = {
       { label: "Uso", value: "4x", note: "última semana" },
     ],
     barsTitle: "Uso dos sons",
-    barsSubtitle: "últimos descansos fictícios",
+    barsSubtitle: "últimos descansos",
     bars: [
       { label: "Útero", value: "42min", height: 88 },
       { label: "Relaxar", value: "25min", height: 58 },
       { label: "Ritmo", value: "18min", height: 42 },
     ],
     lineTitle: "Tempo para relaxar",
-    lineSubtitle: "tendência fictícia",
+    lineSubtitle: "tendência de relaxamento",
     line: [
       { label: "Seg", value: 34 },
       { label: "Ter", value: 31 },
@@ -1000,11 +1006,11 @@ function getGuestPremiumCardMarkup(screenKey) {
         <ul class="guest-store-features">${features}</ul>
       </section>
 
-      <section class="guest-store-preview" aria-label="Demonstração fictícia">
+      <section class="guest-store-preview" aria-label="Prévia do app">
         <div class="guest-preview-phone">
           <div class="guest-preview-topline">
             <span>${escapeHtml(item.accent)}</span>
-            <b>Dados fictícios</b>
+            <b>Prévia do app</b>
           </div>
           <div class="guest-live-card">
             <span>${escapeHtml(item.liveTitle)}</span>
@@ -1041,7 +1047,7 @@ function getGuestPremiumCardMarkup(screenKey) {
           <article class="guest-store-analytic-card guest-store-timeline-card">
             <div>
               <span>Linha do tempo</span>
-              <strong>exemplo realista</strong>
+              <strong>prévia organizada</strong>
             </div>
             <div class="guest-store-timeline">${timeline}</div>
           </article>
@@ -1049,8 +1055,8 @@ function getGuestPremiumCardMarkup(screenKey) {
       </section>
     </div>
 
-    <div class="guest-premium-proof" aria-label="Confirmações da demonstração">
-      <span>Dados fictícios</span>
+    <div class="guest-premium-proof" aria-label="Confirmações da prévia">
+      <span>Prévia do app</span>
       <span>Fluxo por convite</span>
       <span>Claro ou escuro</span>
     </div>
@@ -1128,7 +1134,7 @@ function updateDataRealityCard() {
     dataRealityCard.dataset.mode = "demo";
     if (dataRealityKicker) dataRealityKicker.textContent = "Demonstração";
     if (dataRealityTitle) dataRealityTitle.textContent = "Você está vendo uma prévia do Ninou.";
-    if (dataRealityText) dataRealityText.textContent = "As telas de Hoje, Diário, Dados e Sons usam exemplos fictícios até uma conta familiar ser conectada.";
+    if (dataRealityText) dataRealityText.textContent = "As telas de Hoje, Diário, Dados e Sons usam prévia visual até uma conta familiar ser conectada.";
     return;
   }
 
@@ -3274,12 +3280,11 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // O botão de WhatsApp é um contato público para visitantes ainda deslogados.
-  // Depois que há uma conta conectada, o fluxo correto passa a ser login/convite no Perfil.
-  const shouldShow = !isLoggedIn();
+  // v75.67.0: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
-  guestWhatsappButton.hidden = !shouldShow;
-  document.body.classList.toggle("guest-whatsapp-visible", shouldShow);
+  guestWhatsappButton.hidden = true;
+  document.body.classList.remove("guest-whatsapp-visible");
 }
 
 function setAdminStatsPlaceholder(message = "Entre como admin para visualizar o painel.") {
@@ -6263,7 +6268,7 @@ async function connectCurrentAccount() {
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;
     4) histórico carrega em segundo plano.
-    Isso evita aparecer rotina antiga/demonstração enquanto a família correta ainda está sendo validada.
+    Isso evita aparecer rotina antiga/prévia enquanto a família correta ainda está sendo validada.
   */
   resetFamilyDayCache();
   autoSelectedLatestFamilyDay = false;
@@ -9393,10 +9398,22 @@ avatarTabs.forEach((button) => {
 
 if (editBabyAvatarButton) {
   editBabyAvatarButton.addEventListener("click", () => {
-    if (babyAvatarCard?.hidden) {
+    if (!babyAvatarDetails?.open) {
       openAvatarEditor();
     } else {
       closeAvatarEditor("Editor fechado.");
+    }
+  });
+}
+
+if (babyAvatarDetails) {
+  babyAvatarDetails.addEventListener("toggle", () => {
+    if (babyAvatarDetails.open) {
+      avatarEditorForceOpen = true;
+      renderAvatarCustomizer();
+    } else {
+      avatarEditorForceOpen = false;
+      renderAvatarEditorVisibility();
     }
   });
 }
