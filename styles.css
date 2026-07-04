@@ -1,5 +1,5 @@
-/* Ninou v75.65.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.65.0");
+/* Ninou v75.66.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.66.0");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.65.0 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.66.0 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.65.0 â€” seguranÃ§a no aparelho */
+/* Ninou v75.66.0 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.65.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.66.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.65.0 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.66.0 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.65.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.66.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.65.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.66.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.65.0 - contraste e respiro do perfil em claro/escuro */
+/* v75.66.0 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.65.0 — Perfil com UX mais agradável + tema claro suave */
+/* v75.66.0 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.65.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.66.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.65.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.66.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.65.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.66.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3903,5 +3903,201 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
   }
   .screen[data-screen="profile"] .profile-premium-details summary {
     padding: 13px !important;
+  }
+}
+
+
+/* v75.66.0 — Acabamento Premium Geral: dropdown, avatar, peso, WhatsApp e relatório */
+.screen[data-screen="profile"] .profile-premium-details summary,
+.screen[data-screen="profile"] .caregiver-inline-dropdown summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-radius: 24px;
+  min-height: 72px;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.screen[data-screen="profile"] .profile-premium-details summary:hover,
+.screen[data-screen="profile"] .caregiver-inline-dropdown summary:hover {
+  transform: translateY(-1px);
+  border-color: rgba(116, 163, 255, .34);
+  box-shadow: 0 14px 34px rgba(54, 45, 93, .12);
+}
+
+.screen[data-screen="profile"] .profile-premium-details summary i,
+.screen[data-screen="profile"] .caregiver-inline-dropdown summary::after {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .72);
+  color: #6d5f95;
+  font-size: 18px;
+  font-style: normal;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(110, 92, 146, .12), 0 8px 18px rgba(67, 50, 94, .10);
+  transition: transform .2s ease, background .2s ease, color .2s ease;
+}
+
+.screen[data-screen="profile"] .caregiver-inline-dropdown summary::after {
+  content: "⌄";
+}
+
+.screen[data-screen="profile"] .profile-premium-details[open] summary i,
+.screen[data-screen="profile"] .caregiver-inline-dropdown[open] summary::after {
+  transform: rotate(180deg);
+  background: #e9f3ff;
+  color: #3477c9;
+}
+
+.caregiver-inline-dropdown.caregiver-configured:not([open]) {
+  background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(239,247,255,.72));
+}
+
+.caregiver-inline-dropdown.caregiver-configured:not([open]) #deviceCaregiverHint,
+.caregiver-inline-dropdown.caregiver-configured:not([open]) .profile-edit-grid,
+.caregiver-inline-dropdown.caregiver-configured:not([open]) .profile-actions-row,
+.caregiver-inline-dropdown.caregiver-configured:not([open]) #caregiverIdentityStatus {
+  display: none;
+}
+
+.caregiver-avatar-mini {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.72), 0 10px 26px rgba(54,45,93,.14);
+}
+
+.avatar-edit-trigger,
+.profile-secondary-button.avatar-edit-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  min-height: 42px;
+  padding: 10px 18px;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(54,45,93,.10);
+}
+
+.avatar-edit-trigger::after {
+  content: "⌄";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.68);
+  transition: transform .2s ease;
+}
+
+#babyAvatarTestCard:not([hidden]) + .profile-avatar-return .avatar-edit-trigger::after {
+  transform: rotate(180deg);
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice {
+  position: relative;
+  border-radius: 24px;
+  min-height: 122px;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(54, 45, 93, .12);
+}
+
+.avatar-compact-card .avatar-choice.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #e9f3ff;
+  color: #3477c9;
+  font-weight: 950;
+  box-shadow: 0 8px 18px rgba(52,119,201,.18);
+}
+
+.weight-input-row label {
+  position: relative;
+}
+
+#babyWeightInput {
+  padding-right: 54px;
+}
+
+#babyWeightInput + small {
+  display: block;
+  margin-top: 7px;
+  color: rgba(96, 86, 123, .78);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weight-input-row label:has(#babyWeightInput)::after {
+  content: "kg";
+  position: absolute;
+  right: 16px;
+  top: 45px;
+  color: rgba(96, 86, 123, .72);
+  font-size: 13px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.weight-sparkline svg {
+  overflow: visible;
+}
+
+.weight-sparkline .weight-grid-line {
+  stroke: currentColor;
+  stroke-opacity: .14;
+  stroke-dasharray: 4 5;
+}
+
+.weight-sparkline .weight-axis-label {
+  fill: currentColor;
+  opacity: .58;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.export-card,
+.profile-family-card,
+.profile-flow-card {
+  overflow-wrap: anywhere;
+}
+
+.export-personal-message input,
+.export-personal-message textarea,
+.profile-setting-line input,
+.profile-setting-line select {
+  border-radius: 18px;
+}
+
+@media (max-width: 640px) {
+  .screen[data-screen="profile"] .profile-premium-details summary,
+  .screen[data-screen="profile"] .caregiver-inline-dropdown summary {
+    min-height: 64px;
+    gap: 10px;
+  }
+
+  .screen[data-screen="profile"] .profile-premium-details summary i,
+  .screen[data-screen="profile"] .caregiver-inline-dropdown summary::after {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
   }
 }

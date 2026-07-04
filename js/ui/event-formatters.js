@@ -129,6 +129,8 @@ export function getEventRenderSignature(event, options = {}) {
     event.createdByDeviceId || "",
     event.createdByName || "",
     event.createdByRelationship || "",
+    event.createdByRole || "",
+    event.createdByLabel || "",
     event.caregiverName || "",
     event.caregiverRole || "",
     event.caregiverRelationship || "",
@@ -163,7 +165,7 @@ function isMissingAuthorValue(value = "") {
 function formatNameRole(name = "", role = "") {
   const cleanName = String(name || "").trim();
   const cleanRole = String(role || "").trim();
-  return [cleanName, cleanRole].filter(Boolean).join("/");
+  return [cleanName, cleanRole].filter(Boolean).join(" · ");
 }
 
 function sanitizeAuthorLabel(value = "", babyName = "") {
@@ -178,8 +180,10 @@ function getEventAuthorLabel(event = {}) {
   const candidates = [
     formatNameRole(event.caregiverName, event.caregiverRole || event.caregiverRelationship),
     event.caregiverLabel,
-    formatNameRole(event.createdByName, event.createdByRelationship),
+    event.createdByLabel,
+    formatNameRole(event.createdByName, event.createdByRole || event.createdByRelationship),
     event.createdByName,
+    event.createdByRole,
     event.createdByRelationship,
     event.authorName,
     event.responsibleName,

@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.65.0" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.66.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.65.0" />
+    <link rel="stylesheet" href="./styles.css?v=75.66.0" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -566,7 +566,8 @@
                   </label>
                   <label>
                     Peso em kg
-                    <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
+                    <input id="babyWeightInput" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 4,250" aria-describedby="babyWeightUnitHint" />
+                    <small id="babyWeightUnitHint">Use kg com vírgula ou ponto. Ex.: 4,250 kg.</small>
                   </label>
                 </div>
                 <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Salvar peso atual</button>
@@ -626,7 +627,7 @@
               </div>
             </div>
             <p>Defina como os registros feitos neste aparelho serão assinados no diário.</p>
-            <details id="caregiverIdentityCard" class="caregiver-inline-dropdown" open>
+            <details id="caregiverIdentityCard" class="caregiver-inline-dropdown">
               <summary>
                 <div class="caregiver-summary-main">
                   <span class="setting-label"><span class="setting-icon" aria-hidden="true">◉</span>Identificação atual</span>
@@ -1217,7 +1218,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.65.0</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.66.0</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1411,6 +1412,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.65.0"></script>
+    <script type="module" src="./app.js?v=75.66.0"></script>
   </body>
 </html>

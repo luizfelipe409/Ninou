@@ -94,12 +94,14 @@ export function renderWeightProfilePanel({ profile = {}, loadWeights, elements =
 }
 
 export function readWeightFormValue(elements = {}) {
-  const value = Number(String(elements.babyWeightInput?.value || "").replace(",", "."));
+  const raw = String(elements.babyWeightInput?.value || "").trim().replace(",", ".");
+  const parsed = Number(raw);
+  const value = Number.isFinite(parsed) && parsed > 40 ? parsed / 1000 : parsed;
   const date = elements.babyWeightDateInput?.value || toDateInputValue();
   return {
     value,
     date,
-    valid: Number.isFinite(value) && value > 0 && Boolean(date),
+    valid: Number.isFinite(value) && value > 0 && value <= 30 && Boolean(date),
   };
 }
 
@@ -107,7 +109,7 @@ export function hydrateWeightForm(item, elements = {}) {
   if (!item) return;
   if (elements.babyWeightDateInput) elements.babyWeightDateInput.value = item.date;
   if (elements.babyWeightInput) {
-    elements.babyWeightInput.value = String(item.value).replace(".", ",");
+    elements.babyWeightInput.value = Number(item.value).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
     elements.babyWeightInput.focus();
   }
 }

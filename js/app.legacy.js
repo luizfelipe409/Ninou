@@ -306,7 +306,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.65.0";
+const NINOU_RUNTIME_VERSION = "75.66.0";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -1669,7 +1669,7 @@ function getActiveBabyId() {
 function formatCaregiverNameRole(name = "", role = "") {
   const cleanName = String(name || "").trim();
   const cleanRole = String(role || "").trim();
-  return [cleanName, cleanRole].filter(Boolean).join("/");
+  return [cleanName, cleanRole].filter(Boolean).join(" · ");
 }
 
 function getStandardEventFields(type, eventTime = Date.now(), actor = getCurrentActorProfile()) {
@@ -1684,6 +1684,9 @@ function getStandardEventFields(type, eventTime = Date.now(), actor = getCurrent
     caregiverRole: actor.relationshipLabel,
     caregiverRelationship: actor.relationshipLabel,
     caregiverLabel: formatCaregiverNameRole(actor.displayName || actor.label, actor.relationshipLabel) || actor.label,
+    createdByName: actor.displayName || actor.label,
+    createdByRole: actor.relationshipLabel,
+    createdByLabel: formatCaregiverNameRole(actor.displayName || actor.label, actor.relationshipLabel) || actor.label,
     babyId: getActiveBabyId() || familyId,
     familyId,
   };
@@ -1960,6 +1963,7 @@ function openCaregiverEditor() {
   renderCaregiverIdentityPanel();
   if (caregiverIdentityCard) {
     caregiverIdentityCard.hidden = false;
+    caregiverIdentityCard.dataset.userOpened = "true";
     caregiverIdentityCard.open = true;
   }
   setTimeout(() => {
@@ -1971,6 +1975,7 @@ function openCaregiverEditor() {
 function closeCaregiverEditor() {
   if (caregiverIdentityCard) {
     caregiverIdentityCard.open = false;
+    delete caregiverIdentityCard.dataset.userOpened;
   }
 }
 
@@ -1986,6 +1991,10 @@ function renderCaregiverIdentityPanel() {
   if (!familyReady) return;
   const identity = loadCurrentCaregiverIdentity();
   const isPrimaryAdmin = isGlobalAppAdmin();
+  caregiverIdentityCard.classList.toggle("caregiver-configured", Boolean(identity.label));
+  if (identity.label && !caregiverIdentityCard.dataset.userOpened) {
+    caregiverIdentityCard.open = false;
+  }
   if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || (isPrimaryAdmin ? "Luiz Felipe" : "");
   if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || (isPrimaryAdmin ? "pai" : "");
   if (saveCaregiverIdentityButton) {
@@ -2028,8 +2037,10 @@ function getActorDisplayNameFromEvent(event = {}) {
   const candidates = [
     formatCaregiverNameRole(event.caregiverName, event.caregiverRole || event.caregiverRelationship),
     event.caregiverLabel,
-    formatCaregiverNameRole(event.createdByName, event.createdByRelationship),
+    event.createdByLabel,
+    formatCaregiverNameRole(event.createdByName, event.createdByRole || event.createdByRelationship),
     event.createdByName,
+    event.createdByRole,
     event.createdByRelationship,
     event.authorName,
     event.responsibleName,
@@ -2086,6 +2097,8 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
     createdByDeviceId: actor.deviceId,
     createdByName: actor.displayName || actor.label,
     createdByRelationship: actor.relationshipLabel,
+    createdByRole: actor.relationshipLabel,
+    createdByLabel: formatCaregiverNameRole(actor.displayName || actor.label, actor.relationshipLabel) || actor.label,
     createdAtClient: Date.now(),
     lastAction: "adicionou",
   }));
@@ -7941,8 +7954,19 @@ function getWeightKgValue(value) {
 function formatKg(value) {
   const kg = getWeightKgValue(value);
   if (kg === null) return "Sem peso";
-  const digits = kg < 10 ? 3 : 2;
-  return `${kg.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: 3 })} kg`;
+  return `${kg.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg`;
+}
+
+function parseWeightInputValue(value = "") {
+  const normalized = String(value || "").trim().replace(",", ".");
+  const parsed = Number(normalized);
+  if (!Number.isFinite(parsed)) return null;
+  return parsed > 40 ? parsed / 1000 : parsed;
+}
+
+function isValidBabyWeightValue(value = "") {
+  const kg = parseWeightInputValue(value);
+  return Number.isFinite(kg) && kg > 0 && kg <= 30;
 }
 
 function formatWeightDelta(diff) {
@@ -7966,17 +7990,26 @@ function renderSparkline(container, weights = []) {
   const values = normalized.map((item) => item.kg);
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const spread = Math.max(0.05, max - min);
-  const width = 138;
-  const height = 76;
+  const paddedMin = Math.max(0, min - 0.3);
+  const paddedMax = max + 0.3;
+  const spread = Math.max(0.15, paddedMax - paddedMin);
+  const width = 168;
+  const height = 92;
+  const chartLeft = 10;
+  const chartRight = width - 10;
+  const chartTop = 14;
+  const chartBottom = height - 22;
   const points = normalized.map((item, index) => {
-    const x = normalized.length === 1 ? width / 2 : (index / (normalized.length - 1)) * (width - 18) + 9;
-    const y = height - 12 - ((item.kg - min) / spread) * (height - 26);
+    const x = normalized.length === 1 ? width / 2 : chartLeft + (index / (normalized.length - 1)) * (chartRight - chartLeft);
+    const y = chartBottom - ((item.kg - paddedMin) / spread) * (chartBottom - chartTop);
     return { x, y, item };
   });
   const path = points.map((point, index) => `${index ? "L" : "M"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
-  const circles = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3.2"><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></circle>`).join("");
-  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso"><path d="${path}" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>${circles}</svg>`;
+  const areaPath = `${path} L${points[points.length - 1].x.toFixed(1)} ${chartBottom} L${points[0].x.toFixed(1)} ${chartBottom} Z`;
+  const circles = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3.8"><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></circle>`).join("");
+  const minLabel = escapeHtml(formatKg(paddedMin));
+  const maxLabel = escapeHtml(formatKg(paddedMax));
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso"><defs><linearGradient id="weightSoftFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".20"/><stop offset="1" stop-color="currentColor" stop-opacity=".02"/></linearGradient></defs><line x1="${chartLeft}" y1="${chartTop}" x2="${chartRight}" y2="${chartTop}" class="weight-grid-line"></line><line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" class="weight-grid-line"></line><path d="${areaPath}" fill="url(#weightSoftFill)"></path><path d="${path}" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>${circles}<text x="${chartLeft}" y="10" class="weight-axis-label">${maxLabel}</text><text x="${chartLeft}" y="${height - 4}" class="weight-axis-label">${minLabel}</text></svg>`;
 }
 
 function renderGrowthHistoryMini(weights = []) {
@@ -8966,7 +8999,7 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     :root{--ink:#30263f;--muted:#756985;--soft:#f8f2e9;--card:#fffaf3;--line:#e8d9ca;--sage:#1f6b57;--purple:#4b3a78;--accent:#8f7cff}
     *{box-sizing:border-box}
     body{margin:0;background:#f2eadf;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
-    .page{width:100%;max-width:820px;margin:0 auto;padding:24px}
+    .page{width:100%;max-width:794px;margin:0 auto;padding:32px;box-sizing:border-box;overflow-wrap:anywhere}
     .cover{padding:28px;border-radius:30px;background:linear-gradient(135deg,#fffaf3,#efe7ff);border:1px solid rgba(75,58,120,.12);box-shadow:0 18px 50px rgba(67,50,94,.12)}
     .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
     .brand span{font-size:13px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
@@ -8978,13 +9011,13 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     .cards article{padding:16px;border-radius:20px;background:var(--card);border:1px solid rgba(75,58,120,.10)}
     .cards span,.cards small{display:block;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
     .cards strong{display:block;margin:8px 0 4px;font-size:22px;color:var(--purple)}
-    section{margin-top:24px;padding:22px;border-radius:26px;background:#fffaf5;border:1px solid var(--line);break-inside:avoid}
+    section{margin-top:24px;padding:22px;border-radius:26px;background:#fffaf5;border:1px solid var(--line);break-inside:avoid;page-break-inside:avoid;overflow-wrap:anywhere}
     h2{font-size:22px;margin:0 0 12px;color:var(--purple)}
     .section-hint{margin:-4px 0 14px;color:var(--muted)}
     .table-wrap{width:100%;overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
     table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed;min-width:0}
-    th{background:#efe7ff;color:var(--purple);font-size:11px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px;word-break:break-word}
-    td{padding:11px 10px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9;word-break:break-word}
+    th{background:#efe7ff;color:var(--purple);font-size:11px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px;word-break:normal;overflow-wrap:anywhere}
+    td{padding:11px 10px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9;word-break:normal;overflow-wrap:anywhere}
     td small{display:block;color:var(--muted);margin-top:3px}
     .empty-cell{text-align:center;color:var(--muted);padding:22px}
     .growth-note{padding:14px 16px;border-radius:18px;background:#e9f7f1;color:var(--sage);font-weight:800;margin-bottom:12px}
@@ -9055,6 +9088,9 @@ function prepareConsultMode() {
 
 function exportRoutine(format) {
   if (!requireLogin("exportar a rotina")) return;
+  if (exportRoutineInProgress) return;
+  exportRoutineInProgress = true;
+  window.setTimeout(() => { exportRoutineInProgress = false; }, 1200);
   const payload = getExportPayload();
   const filenameBase = `ninou-${String(payload.period?.start || payload.day)}-${String(payload.period?.end || payload.day)}`;
 

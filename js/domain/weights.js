@@ -10,10 +10,11 @@ export function normalizeWeights(weights = []) {
 
   return weights
     .map((item) => {
-      const value = Number(String(item.value ?? item.weight ?? "").replace(",", "."));
+      const rawValue = Number(String(item.value ?? item.weight ?? "").replace(",", "."));
+      const value = Number.isFinite(rawValue) && rawValue > 40 ? rawValue / 1000 : rawValue;
       const date = typeof item.date === "string" ? item.date : "";
       const id = typeof item.id === "string" ? item.id : createWeightId(date);
-      if (!date || !Number.isFinite(value) || value <= 0) return null;
+      if (!date || !Number.isFinite(value) || value <= 0 || value > 30) return null;
       return { id, date, value };
     })
     .filter(Boolean)

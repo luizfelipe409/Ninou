@@ -127,6 +127,8 @@ export function normalizeEvent(event = {}) {
     createdByDeviceId: typeof event.createdByDeviceId === "string" ? event.createdByDeviceId : "",
     createdByName: typeof event.createdByName === "string" ? event.createdByName : "",
     createdByRelationship: typeof event.createdByRelationship === "string" ? event.createdByRelationship : "",
+    createdByRole: typeof event.createdByRole === "string" ? event.createdByRole : "",
+    createdByLabel: typeof event.createdByLabel === "string" ? event.createdByLabel : "",
     caregiverName: typeof event.caregiverName === "string" ? event.caregiverName : "",
     caregiverRole,
     caregiverRelationship: typeof event.caregiverRelationship === "string" ? event.caregiverRelationship : "",
