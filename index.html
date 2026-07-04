@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.60.10" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.62.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.60.10" />
+    <link rel="stylesheet" href="./styles.css?v=75.62.0" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -486,24 +486,46 @@
       </section>
 
       <section class="screen" data-screen="profile" aria-label="Perfil">
-        <div class="profile-card">
-          <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
-          <span id="profileBabyName">Bebê</span>
-          <strong id="profileBabyAge">Preencha o nascimento</strong>
+        <div class="profile-card profile-identity-hero" aria-label="Identidade do bebê">
+          <div class="profile-hero-avatar-wrap">
+            <img id="profilePhoto" src="./icons/icon-192.png" alt="" />
+          </div>
+          <div class="profile-hero-copy">
+            <span class="profile-hero-kicker">Perfil do bebê</span>
+            <strong id="profileBabyName">Bebê</strong>
+            <p id="profileBabyAge">Preencha o nascimento</p>
+          </div>
         </div>
 
-        <section class="profile-family-stack profile-diary-stack" aria-label="Perfil do diário Ninou">
-          <article class="profile-family-card baby-card diary-profile-card">
+        <section class="profile-family-stack profile-ux-stack" aria-label="Configurações do perfil Ninou">
+          <article class="profile-family-card profile-intro-card profile-flow-intro" aria-label="Organização do perfil">
             <div class="profile-card-head">
               <div>
-                <span>Perfil do diário</span>
-                <strong>Diário de cuidados</strong>
+                <span>Perfil</span>
+                <strong>Identidade, cuidadores e acesso familiar</strong>
               </div>
             </div>
-            <p id="familyProfileBabyMeta">Configure o nome que aparece no diário, a data de nascimento e os dados principais do bebê acompanhado.</p>
+            <p>Esta tela organiza somente quem é o bebê, quem usa este aparelho, o avatar, a conta familiar e as preferências do app.</p>
+            <div class="profile-flow-pills" aria-label="Fluxo natural do perfil">
+              <span>Bebê</span>
+              <span>Avatar</span>
+              <span>Cuidador</span>
+              <span>Família</span>
+              <span>Preferências</span>
+            </div>
+          </article>
+
+          <article class="profile-family-card baby-card baby-settings-card profile-flow-card">
+            <div class="profile-card-head">
+              <div>
+                <span>1. Bebê</span>
+                <strong>Dados principais</strong>
+              </div>
+            </div>
+            <p id="familyProfileBabyMeta">Nome, forma de exibição no diário e data de nascimento.</p>
             <div class="profile-edit-grid">
               <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome exibido no diário</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome do bebê</span>
                 <input id="babyNameInput" type="text" placeholder="Ex.: Francisco" autocomplete="off" />
               </label>
               <label class="profile-setting-line">
@@ -520,56 +542,19 @@
             </div>
           </article>
 
-          <article class="profile-family-card weight-profile-block profile-weight-card">
-            <div class="weight-profile-header">
-              <span>Peso atual</span>
-              <strong id="lastWeightValue">Nenhum peso cadastrado</strong>
-              <p id="lastWeightHint">Cadastre o peso mais recente do bebê acompanhado.</p>
-            </div>
-            <div class="weight-input-row">
-              <label>
-                Data da pesagem
-                <input id="babyWeightDateInput" type="date" />
-              </label>
-              <label>
-                Peso em kg
-                <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
-              </label>
-            </div>
-            <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Atualizar peso</button>
-            <div class="weight-history-card profile-weight-history">
-              <span>Últimas atualizações</span>
-              <ol id="weightHistoryList" class="weight-history-list">
-                <li>Nenhum peso cadastrado.</li>
-              </ol>
-            </div>
-          </article>
-
-          <article class="profile-family-card avatar-profile-card">
-            <div class="profile-card-head">
-              <div>
-                <span>Avatar do diário</span>
-                <strong>Ilustração do diário</strong>
-              </div>
-            </div>
-            <p>Escolha uma ilustração para representar este diário familiar. As opções só aparecem quando você tocar em editar.</p>
-            <div class="profile-actions-row avatar-profile-actions">
-              <button id="editBabyAvatarButton" class="profile-secondary-button avatar-edit-trigger" type="button">Editar avatar</button>
-            </div>
-          </article>
-
-          <article class="profile-family-card avatar-test-card avatar-compact-card" id="babyAvatarTestCard">
+          <article class="profile-family-card avatar-test-card avatar-compact-card profile-flow-card" id="babyAvatarTestCard">
             <div class="avatar-test-header avatar-minimal-header">
               <div class="avatar-copy-column compact-copy">
-                <span>Escolha do avatar</span>
-                <strong>Avatares disponíveis</strong>
-                <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do diário">
+                <span>2. Avatar</span>
+                <strong>Rostinho do bebê</strong>
+                <p class="profile-card-note">Escolha uma imagem afetiva sem precisar usar foto real.</p>
+                <div class="premium-inline-badges compact-badges" aria-label="Benefícios dos avatares do bebê">
                   <span>12 opções</span>
                   <span>Privado</span>
                 </div>
               </div>
               <div class="avatar-preview-wrap avatar-preview-panel minimal-preview-panel">
-                <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do diário" />
+                <img id="babyAvatarPreview" class="baby-avatar-preview" src="./icons/icon-192.png" alt="Prévia do avatar do bebê" />
                 <div class="avatar-preview-caption minimal-caption">Prévia</div>
               </div>
             </div>
@@ -581,25 +566,30 @@
               <button id="saveBabyAvatarButton" class="avatar-save-button" type="button">Salvar avatar</button>
               <button id="skipBabyAvatarButton" class="avatar-skip-button" type="button">Fechar</button>
             </div>
-            <p id="babyAvatarStatus" class="form-status">Escolha um avatar e salve. Depois o editor fica oculto.</p>
+            <p id="babyAvatarStatus" class="form-status">Depois de salvar, o editor fica oculto e volta somente pelo botão Editar avatar.</p>
           </article>
 
-          <article class="profile-family-card caregiver-profile-card">
+          <div class="profile-actions-row avatar-profile-actions profile-avatar-return">
+            <button id="editBabyAvatarButton" class="profile-secondary-button avatar-edit-trigger" type="button">Editar avatar</button>
+          </div>
+
+          <article class="profile-family-card caregiver-card profile-flow-card">
             <div class="profile-card-head">
               <div>
-                <span>Este aparelho</span>
+                <span>3. Este aparelho</span>
                 <strong>Cuidador local</strong>
               </div>
             </div>
-            <p id="deviceCaregiverHint">As ações feitas neste aparelho aparecem no diário com o nome e vínculo abaixo.</p>
+            <p>Defina como os registros feitos neste celular serão assinados no diário.</p>
             <details id="caregiverIdentityCard" class="caregiver-inline-dropdown" open>
               <summary>
                 <div class="caregiver-summary-main">
-                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">◉</span>Você registra como</span>
+                  <span class="setting-label"><span class="setting-icon" aria-hidden="true">◉</span>Identificação atual</span>
                   <strong id="deviceCaregiverName">Não configurado</strong>
                 </div>
                 <div id="deviceCaregiverAvatar" class="caregiver-avatar-mini" aria-hidden="true">👤</div>
               </summary>
+              <p id="deviceCaregiverHint">Exemplo: Felipe/Pai no celular do Felipe e Maria/Mãe no celular da Maria.</p>
               <div class="profile-edit-grid">
                 <label class="profile-setting-line">
                   <span class="setting-label"><span class="setting-icon" aria-hidden="true">Aa</span>Nome do cuidador</span>
@@ -620,94 +610,80 @@
                 </label>
               </div>
               <div class="profile-actions-row">
-                <button id="saveCaregiverIdentityButton" class="profile-primary-button" type="button">Salvar identificação</button>
+                <button id="saveCaregiverIdentityButton" class="profile-primary-button" type="button">Salvar cuidador</button>
               </div>
-              <p id="caregiverIdentityStatus" class="form-status">Pai, mãe ou cuidador é apenas como seus registros aparecem.</p>
+              <p id="caregiverIdentityStatus" class="form-status">Este nome identifica quem realizou cada registro no diário.</p>
             </details>
           </article>
 
-          <article class="profile-family-card family-card profile-sharing-card">
+          <article class="profile-family-card family-card profile-flow-card profile-access-card">
             <div class="profile-card-head">
               <div>
-                <span>Família e compartilhamento</span>
+                <span>4. Família e acesso</span>
                 <strong id="familyNameLabel">Família não conectada</strong>
               </div>
             </div>
-            <p id="familyInviteDescription">Conecte a conta familiar para manter o diário salvo, sincronizado e compartilhado com cuidadores autorizados.</p>
+            <p>Veja a conta conectada e convide cuidadores autorizados para a mesma família.</p>
             <div class="profile-soft-row">
               <span>Conta familiar</span>
               <strong id="familyAccountLabel">Conta não conectada</strong>
             </div>
             <div class="profile-soft-row">
-              <span>Sincronização e backup</span>
-              <strong id="profileSyncStatusLabel">Sincronização local</strong>
-            </div>
-            <p id="profileSyncStatusText" class="profile-sync-copy">Entre com e-mail e senha para ativar a sincronização entre aparelhos.</p>
-            <div class="profile-soft-row">
               <span>Tipo de acesso</span>
               <strong id="familyAccessTypeLabel">Familiar</strong>
             </div>
-            <div id="familyActiveInviteBox" class="active-invite-box" hidden>
-              <span>Código ativo</span>
-              <strong id="familyActiveInviteCode">—</strong>
-              <small id="familyActiveInviteHint">Expira em 7 dias</small>
-            </div>
-            <div class="profile-actions-row">
-              <button id="familyCreateInviteButton" class="profile-primary-button" type="button">Convidar cuidador</button>
-              <button id="familyJoinInviteButton" class="profile-secondary-button" type="button">Entrar com código</button>
-            </div>
-            <div class="profile-actions-row" id="familyInviteShareActions" hidden>
-              <button id="familyCopyInviteButton" class="profile-secondary-button" type="button">Copiar código</button>
-              <button id="familyShareInviteWhatsAppButton" class="profile-secondary-button" type="button">WhatsApp</button>
+            <div class="profile-invite-area">
+              <div class="profile-card-head profile-subhead">
+                <div>
+                  <span>Convites</span>
+                  <strong>Acesso de cuidador</strong>
+                </div>
+              </div>
+              <p id="familyInviteDescription">Entre com uma conta familiar para gerar ou aceitar convites de cuidador.</p>
+              <div id="familyActiveInviteBox" class="active-invite-box" hidden>
+                <span>Código ativo</span>
+                <strong id="familyActiveInviteCode">—</strong>
+                <small id="familyActiveInviteHint">Expira em 7 dias</small>
+              </div>
+              <div class="profile-actions-row">
+                <button id="familyCreateInviteButton" class="profile-primary-button" type="button">Convidar cuidador</button>
+                <button id="familyJoinInviteButton" class="profile-secondary-button" type="button">Entrar com código</button>
+              </div>
+              <div class="profile-actions-row" id="familyInviteShareActions" hidden>
+                <button id="familyCopyInviteButton" class="profile-secondary-button" type="button">Copiar código</button>
+                <button id="familyShareInviteWhatsAppButton" class="profile-secondary-button" type="button">WhatsApp</button>
+              </div>
             </div>
           </article>
 
-          <article class="profile-family-card preferences-profile-card">
+          <article class="profile-family-card preferences-card profile-flow-card">
             <div class="profile-card-head">
               <div>
-                <span>Preferências</span>
-                <strong>Aparência do app</strong>
+                <span>5. Preferências</span>
+                <strong>Conforto de uso</strong>
               </div>
             </div>
+            <p>Ajustes visuais e limites usados pelo app sem misturar com os registros do dia.</p>
             <div class="profile-edit-grid">
               <label class="profile-setting-line">
-                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◐</span>Tema</span>
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◷</span>Janela de despertar</span>
+                <div class="profile-number-field">
+                  <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
+                  <strong><span id="wakeWindowValue">70</span> min</strong>
+                </div>
+              </label>
+              <label class="profile-setting-line">
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true">◐</span>Tema do app</span>
                 <select id="themeModeInput">
                   <option value="auto">Automático</option>
-                  <option value="light">Claro</option>
+                  <option value="light">Claro suave</option>
                   <option value="dark">Escuro</option>
                 </select>
               </label>
             </div>
-            <div class="profile-hidden-technical-field" aria-hidden="true">
-              <input id="wakeWindowInput" type="number" min="20" max="240" step="5" value="70" />
-              <span id="wakeWindowValue">70</span>
-            </div>
           </article>
-        </section>
 
-        <div id="joinFamilyModal" class="ninou-modal" hidden aria-hidden="true">
-          <div class="ninou-modal-backdrop" data-close-join-modal></div>
-          <section class="ninou-modal-card" role="dialog" aria-modal="true" aria-labelledby="joinFamilyModalTitle">
-            <div class="profile-card-head">
-              <div>
-                <span>Compartilhamento</span>
-                <strong id="joinFamilyModalTitle">Entrar em uma família</strong>
-              </div>
-              <button class="modal-close-button" type="button" data-close-join-modal>×</button>
-            </div>
-            <p>Digite o código recebido para acompanhar a rotina do bebê.</p>
-            <label class="profile-setting-line">
-              Código do convite
-              <input id="joinInviteCodeInput" type="text" placeholder="FRA7K2B9" inputmode="text" autocomplete="one-time-code" />
-            </label>
-            <p id="joinInviteFeedback" class="modal-feedback" aria-live="polite"></p>
-            <div class="profile-actions-row">
-              <button id="confirmJoinInviteButton" class="profile-primary-button" type="button">Entrar na família</button>
-              <button class="profile-secondary-button" type="button" data-close-join-modal>Cancelar</button>
-            </div>
-          </section>
-        </div>
+        </section>
 
         <section id="profileReadyCard" class="profile-ready-card" hidden aria-live="polite">
           <div class="profile-ready-head">
@@ -877,6 +853,30 @@
           </div>
         </section>
         <section class="settings-list">
+          <article class="weight-profile-block">
+            <div class="weight-profile-header">
+              <span>Peso do bebê</span>
+              <strong id="lastWeightValue">Nenhum peso cadastrado</strong>
+              <p id="lastWeightHint">Cadastre o peso mais recente para acompanhar a evolução.</p>
+            </div>
+            <div class="weight-input-row">
+              <label>
+                Data da pesagem
+                <input id="babyWeightDateInput" type="date" />
+              </label>
+              <label>
+                Peso em kg
+                <input id="babyWeightInput" type="number" min="0.5" max="30" step="0.001" placeholder="Ex.: 3,250" inputmode="decimal" />
+              </label>
+            </div>
+            <button id="saveBabyWeightButton" class="secondary-login weight-save-button" type="button">Salvar peso</button>
+            <div class="weight-history-card">
+              <span>3 últimos pesos</span>
+              <ol id="weightHistoryList" class="weight-history-list">
+                <li>Nenhum peso cadastrado.</li>
+              </ol>
+            </div>
+          </article>
           <article class="login-card">
             <span>Acesso familiar</span>
             <strong>Entrar no Ninou</strong>
@@ -1170,7 +1170,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.63.0</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.62.0</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1364,6 +1364,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.60.10"></script>
+    <script type="module" src="./app.js?v=75.62.0"></script>
   </body>
 </html>

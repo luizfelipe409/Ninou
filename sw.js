@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-60-10-profile-single-column";
+const CACHE_NAME = "ninou-v75-62-0-profile-natural-flow";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.60.10",
-  "/css/app.legacy.css?v=75.60.10",
-  "/app.js?v=75.60.10",
-  "/js/app.legacy.js?v=75.60.10",
+  "/styles.css?v=75.62.0",
+  "/css/app.legacy.css?v=75.62.0",
+  "/app.js?v=75.62.0",
+  "/js/app.legacy.js?v=75.62.0",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

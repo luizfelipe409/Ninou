@@ -1,5 +1,5 @@
-/* Ninou v75.59.1 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.60.11");
+/* Ninou v75.62.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.62.0");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.59.1 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.62.0 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.59.1 â€” seguranÃ§a no aparelho */
+/* Ninou v75.62.0 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.60.11 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.62.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.60.11 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.62.0 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.60.11 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.62.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.60.11 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.62.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.60.11 - contraste e respiro do perfil em claro/escuro */
+/* v75.62.0 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2886,5 +2886,284 @@ body.day-theme .profile-setting-line strong {
   body.global-admin-mode .screen[data-screen="profile"] .settings-list,
   body.admin-family-preview .screen[data-screen="profile"] .settings-list {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+  }
+}
+
+/* v75.62.0 — Perfil com UX mais agradável + tema claro suave */
+.screen[data-screen="profile"] {
+  gap: 14px !important;
+}
+.screen[data-screen="profile"] .profile-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(122, 103, 171, 0.18) !important;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 222, 235, 0.72), transparent 34%),
+    radial-gradient(circle at 82% 10%, rgba(223, 214, 255, 0.78), transparent 30%),
+    linear-gradient(145deg, rgba(255, 252, 248, 0.94), rgba(244, 239, 255, 0.9)) !important;
+  box-shadow: 0 18px 48px rgba(77, 59, 125, 0.12) !important;
+}
+.screen[data-screen="profile"] .profile-card img {
+  width: 92px !important;
+  height: 92px !important;
+  border-radius: 30px !important;
+  padding: 7px !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 14px 28px rgba(74, 55, 118, 0.12) !important;
+}
+.profile-ux-stack {
+  gap: 13px !important;
+}
+.profile-intro-card {
+  background:
+    linear-gradient(135deg, rgba(255, 247, 240, 0.96), rgba(244, 239, 255, 0.92)) !important;
+  border: 1px solid rgba(132, 110, 190, 0.14) !important;
+}
+.profile-family-card {
+  border-radius: 26px !important;
+  padding: 17px !important;
+  border: 1px solid rgba(132, 110, 190, 0.14) !important;
+  box-shadow: 0 14px 34px rgba(76, 56, 118, 0.09) !important;
+}
+.profile-card-head strong {
+  letter-spacing: -0.02em !important;
+}
+.profile-card-head span {
+  font-weight: 850 !important;
+  letter-spacing: 0.02em !important;
+}
+.profile-setting-line,
+.profile-soft-row,
+.caregiver-inline-dropdown,
+.profile-number-field strong,
+.active-invite-box {
+  border-radius: 18px !important;
+}
+.profile-avatar-return {
+  margin: 0 2px 8px !important;
+}
+.profile-avatar-return .profile-secondary-button {
+  width: 100% !important;
+}
+.caregiver-card .caregiver-inline-dropdown[open] {
+  background: rgba(255, 255, 255, 0.58) !important;
+}
+.avatar-compact-card .avatar-preview-panel {
+  background: rgba(255, 255, 255, 0.62) !important;
+}
+
+body.day-theme {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 230, 237, 0.58), transparent 30%),
+    radial-gradient(circle at 90% 4%, rgba(228, 219, 255, 0.54), transparent 28%),
+    linear-gradient(180deg, #f7f0ea 0%, #f2edf8 54%, #f7f2ea 100%) !important;
+}
+body.day-theme .phone-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 244, 0.92), rgba(246, 240, 250, 0.94)) !important;
+}
+body.day-theme .screen,
+body.day-theme .bottom-sheet,
+body.day-theme .drawer-card {
+  background: transparent !important;
+}
+body.day-theme .profile-family-card,
+body.day-theme .summary-premium-card,
+body.day-theme .dashboard-card,
+body.day-theme .timeline-item,
+body.day-theme .day-notes-card,
+body.day-theme .weight-profile-block {
+  background: rgba(255, 252, 247, 0.82) !important;
+  border-color: rgba(127, 104, 176, 0.15) !important;
+  color: #2f2843 !important;
+}
+body.day-theme .profile-setting-line,
+body.day-theme .profile-soft-row,
+body.day-theme .caregiver-inline-dropdown,
+body.day-theme .profile-number-field strong,
+body.day-theme .active-invite-box,
+body.day-theme input,
+body.day-theme select,
+body.day-theme textarea {
+  background: rgba(250, 245, 239, 0.74) !important;
+  border-color: rgba(126, 102, 177, 0.16) !important;
+  color: #2f2843 !important;
+}
+body.day-theme .profile-card-head span,
+body.day-theme .profile-family-card > p,
+body.day-theme .profile-soft-row span,
+body.day-theme .form-status,
+body.day-theme .section-helper {
+  color: rgba(65, 54, 86, 0.72) !important;
+}
+body.day-theme .profile-card-head strong,
+body.day-theme .profile-soft-row strong,
+body.day-theme .caregiver-inline-dropdown summary strong,
+body.day-theme .profile-number-field strong {
+  color: #2f2843 !important;
+}
+body.day-theme .profile-primary-button,
+body.day-theme .avatar-save-button {
+  background: linear-gradient(135deg, #7a5cff, #a56cf5) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(122, 92, 255, 0.20) !important;
+}
+body.day-theme .profile-secondary-button,
+body.day-theme .avatar-skip-button {
+  background: rgba(255, 255, 255, 0.66) !important;
+  color: #4b3b78 !important;
+  border: 1px solid rgba(127, 104, 176, 0.18) !important;
+}
+@media (max-width: 520px) {
+  .screen[data-screen="profile"] .profile-card img {
+    width: 82px !important;
+    height: 82px !important;
+  }
+  .profile-family-card {
+    padding: 15px !important;
+    border-radius: 23px !important;
+  }
+}
+
+/* v75.62.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+.screen[data-screen="profile"] .profile-identity-hero {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 132px !important;
+  padding: 18px !important;
+}
+.profile-hero-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.profile-hero-avatar-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 34px;
+  border: 1px solid rgba(122, 92, 255, 0.14);
+  pointer-events: none;
+}
+.profile-hero-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+.profile-hero-kicker {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: rgba(122, 92, 255, 0.10);
+  color: #5d4b89 !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.02em;
+}
+.profile-hero-copy strong {
+  color: #2f2843 !important;
+  font-size: clamp(1.35rem, 5vw, 1.95rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.04em;
+}
+.profile-hero-copy p {
+  margin: 0;
+  color: rgba(65, 54, 86, 0.72) !important;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+.profile-flow-intro {
+  display: grid;
+  gap: 12px;
+}
+.profile-flow-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.profile-flow-pills span {
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(122, 92, 255, 0.10);
+  color: #5a487d !important;
+  font-size: 0.72rem !important;
+  font-weight: 850;
+}
+.profile-flow-card {
+  position: relative;
+}
+.profile-flow-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22px;
+  bottom: 22px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(122, 92, 255, 0.7), rgba(255, 178, 205, 0.68));
+  opacity: 0.65;
+}
+.profile-card-note {
+  margin: 6px 0 0 !important;
+  color: rgba(65, 54, 86, 0.68) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.35;
+}
+.profile-access-card .profile-soft-row + .profile-soft-row {
+  margin-top: 8px;
+}
+.profile-invite-area {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(127, 104, 176, 0.14);
+  display: grid;
+  gap: 10px;
+}
+.profile-subhead {
+  min-height: 0 !important;
+}
+.profile-subhead strong {
+  font-size: 0.94rem !important;
+}
+.profile-subhead span {
+  font-size: 0.7rem !important;
+}
+.profile-invite-area > p {
+  margin: 0;
+  color: rgba(65, 54, 86, 0.7) !important;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+body:not(.day-theme) .profile-hero-kicker,
+body:not(.day-theme) .profile-flow-pills span {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.84) !important;
+}
+body:not(.day-theme) .profile-hero-copy strong,
+body:not(.day-theme) .profile-hero-copy p,
+body:not(.day-theme) .profile-card-note,
+body:not(.day-theme) .profile-invite-area > p {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+body:not(.day-theme) .profile-invite-area {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+@media (max-width: 520px) {
+  .screen[data-screen="profile"] .profile-identity-hero {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    justify-items: center;
+    padding: 17px 15px !important;
+  }
+  .profile-hero-copy {
+    justify-items: center;
+  }
+  .profile-flow-pills {
+    justify-content: center;
+  }
+  .profile-flow-card::before {
+    top: 18px;
+    bottom: 18px;
   }
 }
