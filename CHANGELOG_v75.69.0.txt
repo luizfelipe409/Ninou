@@ -1,8 +1,0 @@
-Ninou v75.69.0 — Perfil mais limpo, sem card "Central do diário familiar"
-
-O que foi feito:
-- removido o card introdutório "Perfil / Central do diário familiar" do topo da tela de Perfil;
-- mantido o hero principal do bebê e os blocos funcionais logo abaixo;
-- preservado o avatar centralizado com fluxo direto para edição;
-- mantida a base visual refinada da v75.68.0;
-- atualização de cache/app para 75.69.0.
