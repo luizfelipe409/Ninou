@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.72.5" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.72.6" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.72.5" />
+    <link rel="stylesheet" href="./styles.css?v=75.72.6" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -510,10 +510,13 @@
               </label>
               <label class="profile-setting-line">
                 <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>Como mostrar no diário</span>
-                <select id="babyArticleInput">
+                <span class="select-control-wrap">
+                  <select id="babyArticleInput">
                   <option value="do">Diário do</option>
                   <option value="da">Diário da</option>
                 </select>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
               </label>
               <label class="profile-setting-line">
                 <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Data de nascimento</span>
@@ -577,6 +580,7 @@
                 </label>
                 <label class="profile-setting-line">
                   <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>Vínculo com o bebê</span>
+                  <span class="select-control-wrap">
                   <select id="caregiverRelationInput">
                     <option value="pai">Pai</option>
                     <option value="mae">Mãe</option>
@@ -587,6 +591,8 @@
                     <option value="responsavel">Responsável</option>
                     <option value="outro">Outro familiar</option>
                   </select>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
                 </label>
               </div>
               <div class="profile-actions-row">
@@ -658,11 +664,14 @@
               </label>
               <label class="profile-setting-line">
                 <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>Tema do app</span>
-                <select id="themeModeInput">
+                <span class="select-control-wrap">
+                  <select id="themeModeInput">
                   <option value="auto">Automático</option>
                   <option value="light">Claro suave</option>
                   <option value="dark">Escuro</option>
                 </select>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
               </label>
             </div>
           </article>
@@ -979,10 +988,13 @@
                   </label>
                   <label>
                     Como chamar no app
-                    <select id="adminNewBabyArticleInput">
+                    <span class="select-control-wrap">
+                  <select id="adminNewBabyArticleInput">
                       <option value="o">o bebê</option>
                       <option value="a">a bebê</option>
                     </select>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
                   </label>
                   <label>
                     E-mail do responsável, opcional
@@ -1058,11 +1070,14 @@
                 </label>
                 <label>
                   Permissão
+                  <span class="select-control-wrap">
                   <select id="adminInviteRole">
                     <option value="responsavel">Responsável — acesso completo</option>
                     <option value="cuidador">Cuidador — registra rotina</option>
                     <option value="visualizacao">Visualização — somente leitura</option>
                   </select>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
                 </label>
                 <div class="permission-guide" aria-label="Descrição das permissões">
                   <article><strong>Responsável</strong><span>Edita perfil, rotina, membros e convites.</span></article>
@@ -1129,7 +1144,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.72.5</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.72.6</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1145,14 +1160,17 @@
             <p>Gere um PDF mais bonito, baixe os dados ou envie um resumo personalizado pelo WhatsApp.</p>
 
             <div class="export-period-grid" aria-label="Período do relatório">
-              <label>
-                Período do relatório
-                <select id="exportRangeSelect">
+              <label class="export-period-field has-select-control">
+                <span class="setting-label"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Período do relatório</span>
+                <span class="select-control-wrap">
+                  <select id="exportRangeSelect">
                   <option value="day">Data aberta</option>
                   <option value="7">Últimos 7 dias</option>
                   <option value="30">Últimos 30 dias</option>
                   <option value="custom">Período personalizado</option>
                 </select>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
               </label>
               <label>
                 Início
@@ -1290,10 +1308,12 @@
         <div id="sleepDurationPreview" class="sleep-duration-preview" hidden aria-live="polite"></div>
         <label class="select-label">
           <span id="sheetDetailLabel">Detalhe</span>
-          <select id="sheetDetail">
+          <span class="select-control-wrap">
+                  <select id="sheetDetail">
             <option>Não se aplica</option>
           </select>
-          <span class="field-chevron select-chevron" aria-hidden="true"></span>
+                  <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
         </label>
         <section id="breastTimerPanel" class="breast-timer-panel" hidden aria-label="Timer da amamentação">
           <div class="breast-timer-head">
@@ -1352,6 +1372,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.72.5"></script>
+    <script type="module" src="./app.js?v=75.72.6"></script>
   </body>
 </html>

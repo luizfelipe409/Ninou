@@ -308,7 +308,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.72.5";
+const NINOU_RUNTIME_VERSION = "75.72.6";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -604,7 +604,7 @@ function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
   const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.72.5: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
+  // v75.72.6: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
   if (babyAvatarCard) {
     babyAvatarCard.hidden = !editorOpen;
     babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
@@ -1482,6 +1482,7 @@ function focusProfileAccess(mode = "login") {
 
 function openAvatarEditor() {
   avatarEditorForceOpen = true;
+  if (babyAvatarStatus) babyAvatarStatus.textContent = "Escolha um avatar e toque em Salvar para aplicar.";
   renderAvatarEditorVisibility();
   renderAvatarCustomizer();
   babyAvatarCard?.querySelector(".ninou-modal-card")?.focus?.();
@@ -3298,7 +3299,7 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // v75.72.5: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // v75.72.6: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
   // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = true;
@@ -6281,7 +6282,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.72.5 — login rápido, mas consistente:
+    v75.72.6 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;
@@ -9420,18 +9421,18 @@ if (editBabyAvatarButton) {
     if (!modalOpen) {
       openAvatarEditor();
     } else {
-      closeAvatarEditor("Editor fechado.");
+      closeAvatarEditor();
     }
   });
 }
 
 if (babyAvatarModalBackdrop) {
-  babyAvatarModalBackdrop.addEventListener("click", () => closeAvatarEditor("Editor fechado."));
+  babyAvatarModalBackdrop.addEventListener("click", () => closeAvatarEditor());
 }
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && babyAvatarCard && !babyAvatarCard.hidden) {
-    closeAvatarEditor("Editor fechado.");
+    closeAvatarEditor();
   }
 });
 
@@ -9451,7 +9452,7 @@ if (saveBabyAvatarButton) saveBabyAvatarButton.addEventListener("click", saveBab
 if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
   pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || {});
   renderAvatarCustomizer();
-  closeAvatarEditor("Editor fechado.");
+  closeAvatarEditor();
 });
 
 if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
