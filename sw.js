@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-73-0-avatar-edit-inline";
+const CACHE_NAME = "ninou-v75-73-8-scroll-hint";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.73.7",
-  "/css/app.legacy.css?v=75.73.7",
-  "/app.js?v=75.73.7",
-  "/js/app.legacy.js?v=75.73.7",
+  "/styles.css?v=75.73.8",
+  "/css/app.legacy.css?v=75.73.8",
+  "/app.js?v=75.73.8",
+  "/js/app.legacy.js?v=75.73.8",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

@@ -67,6 +67,8 @@ const sheetEndTimeInput = document.querySelector("#sheetEndTimeInput");
 const sleepDurationPreview = document.querySelector("#sleepDurationPreview");
 const sheetAmountInput = sheetAmountField.querySelector("input");
 const sheetNotesInput = document.querySelector(".record-form textarea");
+const recordForm = document.querySelector("#recordSheet .record-form");
+const recordScrollHint = document.querySelector("#recordScrollHint");
 const shortcutButtons = document.querySelectorAll("[data-target-shortcut]");
 const diaryFilterButtons = document.querySelectorAll("[data-diary-filter]");
 const diaryChips = document.querySelector('.screen[data-screen="diary"] .chips');
@@ -309,7 +311,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.73.7";
+const NINOU_RUNTIME_VERSION = "75.73.8";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -605,7 +607,7 @@ function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
   const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.73.7: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
+  // v75.73.8: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
   if (babyAvatarCard) {
     babyAvatarCard.hidden = !editorOpen;
     babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
@@ -3300,7 +3302,7 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // v75.73.7: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // v75.73.8: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
   // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = true;
@@ -6290,7 +6292,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.73.7 — login rápido, mas consistente:
+    v75.73.8 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;
@@ -8556,10 +8558,44 @@ function setSheetType(type) {
     defaultBottleAmount: 105,
   });
   updateSleepDurationPreview();
-  const recordForm = sheet?.querySelector?.(".record-form");
   if (recordForm && !sheet?.hidden) {
-    requestAnimationFrame(() => recordForm.scrollTo?.({ top: 0, behavior: "instant" }));
+    requestAnimationFrame(() => {
+      recordForm.scrollTo?.({ top: 0, behavior: "instant" });
+      scheduleRecordScrollHintUpdate();
+    });
   }
+}
+
+function updateRecordScrollHint() {
+  if (!sheet || !recordForm || !recordScrollHint || sheet.hidden) {
+    recordScrollHint?.setAttribute?.("aria-hidden", "true");
+    if (recordScrollHint) recordScrollHint.hidden = true;
+    sheet?.classList?.remove?.("record-has-more", "record-at-bottom");
+    return;
+  }
+
+  const maxScroll = Math.max(0, recordForm.scrollHeight - recordForm.clientHeight);
+  const canScroll = maxScroll > 10;
+  const atBottom = canScroll && recordForm.scrollTop >= maxScroll - 12;
+  const shouldShow = canScroll && !atBottom;
+
+  recordScrollHint.hidden = !shouldShow;
+  recordScrollHint.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+  sheet.classList.toggle("record-has-more", shouldShow);
+  sheet.classList.toggle("record-at-bottom", canScroll && atBottom);
+}
+
+function scheduleRecordScrollHintUpdate() {
+  requestAnimationFrame(() => {
+    updateRecordScrollHint();
+    requestAnimationFrame(updateRecordScrollHint);
+  });
+}
+
+function scrollRecordFormForward() {
+  if (!recordForm) return;
+  recordForm.scrollBy({ top: Math.max(140, Math.floor(recordForm.clientHeight * 0.42)), behavior: "smooth" });
+  scheduleRecordScrollHintUpdate();
 }
 
 function resetSheetState() {
@@ -8622,11 +8658,18 @@ function openSheet(type = "sono", eventId = null) {
     defaultBottleAmount: 105,
   });
   updateSleepDurationPreview();
-  const recordForm = sheet?.querySelector?.(".record-form");
-  requestAnimationFrame(() => recordForm?.scrollTo?.({ top: 0, behavior: "instant" }));
+  requestAnimationFrame(() => {
+    recordForm?.scrollTo?.({ top: 0, behavior: "instant" });
+    scheduleRecordScrollHintUpdate();
+  });
 }
 
 function closeSheet() {
+  sheet?.classList?.remove?.("record-has-more", "record-at-bottom");
+  if (recordScrollHint) {
+    recordScrollHint.hidden = true;
+    recordScrollHint.setAttribute("aria-hidden", "true");
+  }
   closeRecordSheetPanel({
     elements: {
       sheet,
@@ -9247,8 +9290,18 @@ openSheetButtons.forEach((button) => {
 });
 
 sheetTypeButtons.forEach((button) => {
-  button.addEventListener("click", () => setSheetType(button.dataset.sheetType));
+  button.addEventListener("click", () => {
+    setSheetType(button.dataset.sheetType);
+    scheduleRecordScrollHintUpdate();
+  });
 });
+
+if (recordForm) {
+  recordForm.addEventListener("scroll", updateRecordScrollHint, { passive: true });
+  recordForm.addEventListener("input", scheduleRecordScrollHintUpdate);
+}
+if (recordScrollHint) recordScrollHint.addEventListener("click", scrollRecordFormForward);
+window.addEventListener("resize", scheduleRecordScrollHintUpdate, { passive: true });
 
 closeSheetButton.addEventListener("click", closeSheet);
 closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);

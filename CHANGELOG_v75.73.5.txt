@@ -1,4 +1,4 @@
-Ninou v75.73.7 — fundo travado, respiro nos ícones e rolagem limpa
+Ninou v75.73.8 — fundo travado, respiro nos ícones e rolagem limpa
 
 Alterações:
 - travada a rolagem da tela de fundo quando o modal de ações está aberto;
@@ -7,4 +7,4 @@ Alterações:
 - mantido respiro inferior no texto de cada ação;
 - ocultadas as barras de rolagem visíveis do modal e da lista de ações, mantendo a rolagem ativa;
 - mantidas abas maiores para Amamentação e Medicamento;
-- atualização de cache/app para 75.73.7.
+- atualização de cache/app para 75.73.8.
