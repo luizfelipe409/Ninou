@@ -93,6 +93,7 @@ const profilePhoto = document.querySelector("#profilePhoto");
 const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
+const avatarModalHint = document.querySelector("#avatarModalHint");
 const babyAvatarCard = document.querySelector("#babyAvatarTestCard");
 const babyAvatarModalBackdrop = babyAvatarCard?.querySelector(".ninou-modal-backdrop");
 const babyAvatarDetails = babyAvatarCard?.querySelector(".avatar-premium-details");
@@ -308,7 +309,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.72.8";
+const NINOU_RUNTIME_VERSION = "75.73.1";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -530,16 +531,16 @@ let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 let avatarEditorForceOpen = false;
 
 const babyAvatarHairOptions = Object.freeze([
-  { id: "avatar-01", label: "Bebê lilás", src: "./icons/baby-avatars/avatar-01.png" },
-  { id: "avatar-02", label: "Menino castanho", src: "./icons/baby-avatars/avatar-02.png" },
-  { id: "avatar-03", label: "Menina de laço", src: "./icons/baby-avatars/avatar-03.png" },
-  { id: "avatar-04", label: "Menino cacheado", src: "./icons/baby-avatars/avatar-04.png" },
-  { id: "avatar-05", label: "Menino ondulado", src: "./icons/baby-avatars/avatar-05.png" },
-  { id: "avatar-06", label: "Menina loira", src: "./icons/baby-avatars/avatar-06.png" },
-  { id: "avatar-07", label: "Bebê cacheado", src: "./icons/baby-avatars/avatar-07.png" },
-  { id: "avatar-08", label: "Bebê ruivinho", src: "./icons/baby-avatars/avatar-08.png" },
-  { id: "avatar-09", label: "Com touca", src: "./icons/baby-avatars/avatar-09.png" },
-  { id: "avatar-10", label: "Com tiara", src: "./icons/baby-avatars/avatar-10.png" },
+  { id: "avatar-01", label: "Bebê clássico", src: "./icons/baby-avatars/avatar-01.png" },
+  { id: "avatar-02", label: "Castanho", src: "./icons/baby-avatars/avatar-02.png" },
+  { id: "avatar-03", label: "Laço", src: "./icons/baby-avatars/avatar-03.png" },
+  { id: "avatar-04", label: "Cacheado", src: "./icons/baby-avatars/avatar-04.png" },
+  { id: "avatar-05", label: "Ondulado", src: "./icons/baby-avatars/avatar-05.png" },
+  { id: "avatar-06", label: "Loirinha", src: "./icons/baby-avatars/avatar-06.png" },
+  { id: "avatar-07", label: "Cacheadinho", src: "./icons/baby-avatars/avatar-07.png" },
+  { id: "avatar-08", label: "Ruivinho", src: "./icons/baby-avatars/avatar-08.png" },
+  { id: "avatar-09", label: "Touca", src: "./icons/baby-avatars/avatar-09.png" },
+  { id: "avatar-10", label: "Tiara", src: "./icons/baby-avatars/avatar-10.png" },
   { id: "avatar-11", label: "Raspadinho", src: "./icons/baby-avatars/avatar-11.png" },
   { id: "avatar-12", label: "Cabelo preto", src: "./icons/baby-avatars/avatar-12.png" },
 ]);
@@ -604,7 +605,7 @@ function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
   const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.72.8: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
+  // v75.73.1: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
   if (babyAvatarCard) {
     babyAvatarCard.hidden = !editorOpen;
     babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
@@ -3299,7 +3300,7 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // v75.72.8: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // v75.73.1: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
   // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = true;
@@ -5983,6 +5984,13 @@ function renderBabyIdentity() {
     profileBabyAge,
   });
 
+  if (avatarModalHint) {
+    const babyName = getBabyName();
+    avatarModalHint.textContent = babyName
+      ? `Escolha uma ilustração para representar o diário de ${babyName}.`
+      : "Escolha uma ilustração para representar o diário do bebê.";
+  }
+
   if (isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen) {
     if (diaryTitle) diaryTitle.textContent = "Painel admin";
     if (babyAgeLine) babyAgeLine.textContent = "Convites, membros, migração e gestão de acessos";
@@ -6282,7 +6290,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.72.8 — login rápido, mas consistente:
+    v75.73.1 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;

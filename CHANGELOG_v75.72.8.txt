@@ -1,8 +1,8 @@
-Ninou v75.72.8 — nomes dos avatares corrigidos
+Ninou v75.72.9 — nomes dos avatares corrigidos
 
 Alterações:
 - corrigido o corte dos nomes em alguns avatares dentro do modal de escolha;
 - aumentada a altura dos cards dos avatares e melhorado o espaço do rótulo;
 - ajustado o tamanho da miniatura dos avatares no modal;
 - reduzidos e refinados alguns nomes longos para caberem melhor na grade;
-- atualização de cache/app para 75.72.8.
+- atualização de cache/app para 75.72.9.

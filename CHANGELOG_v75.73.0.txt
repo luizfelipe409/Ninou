@@ -1,0 +1,10 @@
+Ninou v75.73.1 — refinamento do perfil e do modal de avatar
+
+Alterações:
+- avatar de prévia do modal mais redondo e mais refinado;
+- avatar principal do Perfil aumentado, com card principal um pouco maior;
+- ajuste no nome do avatar "Bebê clássico" no lugar de nomes estranhos;
+- padronização visual das miniaturas dos avatares para ficarem na mesma altura;
+- melhoria da leitura dos nomes dos avatares dentro do modal;
+- preservado o título dinâmico do diário: mostra o nome do bebê quando preenchido e "Diário do bebê" quando vazio;
+- atualização de cache/app para 75.73.1.
