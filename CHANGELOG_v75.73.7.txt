@@ -1,0 +1,9 @@
+Ninou v75.73.7 — final natural do modal de ações
+
+Alterações:
+- botão Registrar foi retirado da área rolável do formulário e virou rodapé próprio do modal;
+- campo de Observações ganhou encerramento visual mais natural, sem parecer cortado;
+- removida a sombra/degradê inferior que passava por cima dos campos;
+- formulário interno continua rolável, mas o rodapé fica estável e legível;
+- preservado fundo travado, scrollbar oculta e respiro dos ícones;
+- atualização de cache/app para 75.73.7.

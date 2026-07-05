@@ -1,4 +1,4 @@
-Ninou v75.73.6 — correção do modal de ações após análise do vídeo
+Ninou v75.73.7 — correção do modal de ações após análise do vídeo
 
 Alterações:
 - corrigido o problema em que campos do modal de ações ficavam sobrepostos;
@@ -9,4 +9,4 @@ Alterações:
 - ao trocar o tipo de ação, o formulário volta ao topo sem mover o sheet inteiro;
 - rótulo da aba “Despertar noturno” foi encurtado para “Despertar” para evitar quebra feia;
 - reforço em quebras de texto para títulos e cards com nomes longos;
-- cache/versionamento atualizado para 75.73.6.
+- cache/versionamento atualizado para 75.73.7.
