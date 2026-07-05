@@ -1,4 +1,4 @@
-Ninou v75.73.8 — indicação de mais campos no modal de ações
+Ninou v75.73.9 — indicação de mais campos no modal de ações
 
 Alterações:
 - adicionado indicador discreto “Mais campos abaixo” quando o formulário da ação ainda possui conteúdo rolável;
@@ -7,4 +7,4 @@ Alterações:
 - mantido o botão Registrar fixo no rodapé;
 - adicionado fade sutil acima do rodapé para indicar continuidade sem exibir scrollbar;
 - mantida a scrollbar visualmente oculta;
-- atualização de cache/app para 75.73.8.
+- atualização de cache/app para 75.73.9.

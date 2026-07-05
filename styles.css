@@ -1,5 +1,5 @@
-/* Ninou v75.73.8 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.73.8");
+/* Ninou v75.73.9 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.73.9");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.73.8 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.73.9 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.73.8 â€” seguranÃ§a no aparelho */
+/* Ninou v75.73.9 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.73.8 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.73.9 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.73.8 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.73.9 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.73.8 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.73.9 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.73.8 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.73.9 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.73.8 - contraste e respiro do perfil em claro/escuro */
+/* v75.73.9 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.73.8 — Perfil com UX mais agradável + tema claro suave */
+/* v75.73.9 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.73.8 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.73.9 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.73.8 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.73.9 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.73.8 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.73.9 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,7 +3907,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.73.8 — retorno ao visual v75.63.0 Perfil do diário */
+/* v75.73.9 — retorno ao visual v75.63.0 Perfil do diário */
 .screen[data-screen="profile"] .profile-card {
   position: relative;
   overflow: hidden;
@@ -4036,7 +4036,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card:not(.profile-identit
 }
 
 
-/* v75.73.8 — Refinamento visual geral dos modais, sheets e controles
+/* v75.73.9 — Refinamento visual geral dos modais, sheets e controles
    Objetivo: preservar o visual afetivo da v75.63 e corrigir a sensação de modal/remendo. */
 :root {
   --ninou-modal-radius: 30px;
@@ -4451,7 +4451,7 @@ body.day-theme .bottom-nav {
 }
 
 
-/* v75.73.8 — correção da foto/avatar do perfil principal */
+/* v75.73.9 — correção da foto/avatar do perfil principal */
 .screen[data-screen="profile"] .profile-card {
   display: grid !important;
   justify-items: center !important;
@@ -4546,7 +4546,7 @@ body:not(.day-theme) .screen[data-screen="profile"] strong#profileBabyAge {
 }
 
 
-/* v75.73.8 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
+/* v75.73.9 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4635,7 +4635,7 @@ button,
 }
 
 
-/* v75.73.8 — avatar em modal + cuidador com visual de imagem */
+/* v75.73.9 — avatar em modal + cuidador com visual de imagem */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4878,7 +4878,7 @@ body.day-theme .avatar-modal .avatar-copy-column strong {
 }
 
 
-/* v75.73.8 — botão Editar avatar fora da foto + seletores com chevron claro */
+/* v75.73.9 — botão Editar avatar fora da foto + seletores com chevron claro */
 .screen[data-screen="profile"] .avatar-wrapper {
   margin-bottom: 6px !important;
 }
@@ -4997,7 +4997,7 @@ body.day-theme .screen[data-screen="profile"] .caregiver-avatar-mini {
 }
 
 
-/* v75.73.8 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
+/* v75.73.9 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
 .screen[data-screen="profile"] select,
 .record-form select,
 .ninou-modal-card select,
@@ -5118,7 +5118,7 @@ body.day-theme .select-control-icon {
 }
 
 
-/* v75.73.8 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
+/* v75.73.9 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
 body.day-theme .select-label::after,
 body.day-theme .date-filter::after,
 body.day-theme .field-chevron,
@@ -5251,7 +5251,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.8 — correção dos nomes cortados nos avatares */
+/* v75.73.9 — correção dos nomes cortados nos avatares */
 .avatar-modal .avatar-option-grid.icon-grid {
   align-items: start;
 }
@@ -5312,7 +5312,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.8 — avatar principal maior, prévia redonda e grade alinhada */
+/* v75.73.9 — avatar principal maior, prévia redonda e grade alinhada */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 250px !important;
   padding: 32px 22px 34px !important;
@@ -5432,7 +5432,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.8 — refinamento final do perfil e do modal de avatar */
+/* v75.73.9 — refinamento final do perfil e do modal de avatar */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 286px !important;
   padding: 36px 22px 38px !important;
@@ -5570,7 +5570,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.8 — acabamento premium do perfil, tema claro e modal de avatar */
+/* v75.73.9 — acabamento premium do perfil, tema claro e modal de avatar */
 .screen[data-screen="profile"] .profile-diary-stack {
   gap: 18px !important;
 }
@@ -5814,7 +5814,7 @@ body.day-theme #babyAvatarTestCard .minimal-preview-panel {
 }
 
 
-/* v75.73.8 — correção de quebras de texto e estabilidade do modal de ações */
+/* v75.73.9 — correção de quebras de texto e estabilidade do modal de ações */
 html,
 body {
   position: relative;
@@ -6104,7 +6104,7 @@ body.record-sheet-open {
 }
 
 
-/* v75.73.8 — correção real do sheet de ações e quebras de texto observadas no vídeo */
+/* v75.73.9 — correção real do sheet de ações e quebras de texto observadas no vídeo */
 .record-sheet,
 .orbit-cluster-sheet {
   height: min(88svh, 720px) !important;
@@ -6429,7 +6429,7 @@ body.day-theme .record-form .save-button::before {
 }
 
 
-/* v75.73.8 — botão Registrar legível e abas com mais respiro */
+/* v75.73.9 — botão Registrar legível e abas com mais respiro */
 .record-types {
   height: 112px !important;
   min-height: 112px !important;
@@ -6589,7 +6589,7 @@ body.day-theme .record-form .save-button {
 }
 
 
-/* v75.73.8 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
+/* v75.73.9 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
 html.record-sheet-open,
 body.record-sheet-open {
   overflow: hidden !important;
@@ -6692,7 +6692,7 @@ body.record-sheet-open::-webkit-scrollbar {
 }
 
 
-/* v75.73.8 — base do modal de ações mais natural */
+/* v75.73.9 — base do modal de ações mais natural */
 .record-sheet,
 .orbit-cluster-sheet {
   bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
@@ -6747,7 +6747,7 @@ body.day-theme .orbit-cluster-sheet::after {
 }
 
 
-/* v75.73.8 — final natural do formulário de ações: observações + Registrar sem corte */
+/* v75.73.9 — final natural do formulário de ações: observações + Registrar sem corte */
 .record-sheet,
 .orbit-cluster-sheet {
   grid-template-rows: 14px 62px 104px minmax(0, 1fr) auto !important;
@@ -6898,7 +6898,7 @@ body.day-theme .record-actions-footer .save-button {
 }
 
 
-/* v75.73.8 — indicação premium de conteúdo rolável no modal de ações */
+/* v75.73.9 — indicação premium de conteúdo rolável no modal de ações */
 .record-actions-footer {
   gap: 10px !important;
   padding-top: 8px !important;
@@ -6985,4 +6985,71 @@ body.day-theme .record-scroll-hint {
   .record-actions-footer {
     gap: 8px !important;
   }
+}
+
+
+/* v75.73.9 — indicador por ícone e padronização do dropdown da data do diário */
+.date-filter {
+  position: relative !important;
+}
+.date-filter #diaryDateInput {
+  padding-right: 54px !important;
+}
+.date-filter .diary-date-icon {
+  position: absolute !important;
+  right: 14px !important;
+  top: calc(50% + 12px) !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+}
+@media (max-width: 430px) {
+  .date-filter .diary-date-icon {
+    top: calc(50% + 11px) !important;
+  }
+}
+.record-scroll-hint {
+  justify-self: center !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  gap: 0 !important;
+  border: 1px solid rgba(124, 229, 194, 0.22) !important;
+  background: rgba(26, 19, 58, 0.88) !important;
+  color: rgba(255,255,255,0.94) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.94) !important;
+  box-shadow: 0 10px 22px rgba(8, 5, 24, 0.18), inset 0 1px 0 rgba(255,255,255,0.10) !important;
+}
+.record-scroll-hint-icon {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+}
+.record-scroll-hint svg,
+.record-scroll-hint-icon {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.6 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+body.day-theme .record-scroll-hint {
+  border-color: rgba(122, 92, 255, 0.16) !important;
+  background: rgba(255,255,255,0.88) !important;
+  color: #5f4a9d !important;
+  -webkit-text-fill-color: #5f4a9d !important;
+  box-shadow: 0 10px 22px rgba(104, 88, 150, 0.12), inset 0 1px 0 rgba(255,255,255,0.82) !important;
+}
+@keyframes recordHintFloatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+.record-scroll-hint {
+  animation: recordHintFloatIcon 1.35s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .record-scroll-hint { animation: none !important; }
 }
