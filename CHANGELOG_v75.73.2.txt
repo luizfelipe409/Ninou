@@ -1,4 +1,4 @@
-Ninou v75.73.4 — refino dos modais de ações e quebras de texto
+Ninou v75.73.5 — refino dos modais de ações e quebras de texto
 
 Alterações:
 - corrigidas quebras de texto em labels, botões, cards, timeline, perfil e modais;
@@ -9,4 +9,4 @@ Alterações:
 - adicionados role="dialog" e aria-modal nos sheets principais;
 - adicionado bloqueio visual/overscroll ao abrir o sheet para reduzir salto em iOS;
 - ajustes de fonte para evitar zoom no iOS ao focar campos;
-- cache/versionamento atualizado para 75.73.4.
+- cache/versionamento atualizado para 75.73.5.
