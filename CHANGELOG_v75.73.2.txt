@@ -1,0 +1,12 @@
+Ninou v75.73.2 — refino dos modais de ações e quebras de texto
+
+Alterações:
+- corrigidas quebras de texto em labels, botões, cards, timeline, perfil e modais;
+- modal de ações agora tem altura estável, evitando que o início do painel suba/desça ao trocar tipo de ação;
+- cabeçalho do modal de ações com altura previsível;
+- lista de tipos de ação padronizada em barra horizontal fixa;
+- formulário do registro passa a ser a área rolável interna, preservando o topo do sheet;
+- adicionados role="dialog" e aria-modal nos sheets principais;
+- adicionado bloqueio visual/overscroll ao abrir o sheet para reduzir salto em iOS;
+- ajustes de fonte para evitar zoom no iOS ao focar campos;
+- cache/versionamento atualizado para 75.73.2.

@@ -121,12 +121,17 @@ export function prepareRecordSheetForOpen({
 
   if (elements.sheet) elements.sheet.hidden = false;
   if (elements.backdrop) elements.backdrop.hidden = false;
+  document.body?.classList.add("record-sheet-open");
+  requestAnimationFrame(() => elements.sheet?.scrollTo?.({ top: 0, behavior: "instant" }));
 }
 
 export function closeRecordSheet({ elements, resetSheetState }) {
   if (elements.sheet) elements.sheet.hidden = true;
   if (elements.orbitClusterSheet?.hidden && elements.backdrop) {
     elements.backdrop.hidden = true;
+  }
+  if (elements.orbitClusterSheet?.hidden !== false) {
+    document.body?.classList.remove("record-sheet-open");
   }
   resetSheetState?.();
 }
