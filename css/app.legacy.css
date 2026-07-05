@@ -12698,7 +12698,7 @@ body.day-theme .appearance-profile-block p {
 }
 
 
-/* v75.73.3 — correção de quebras de texto e estabilidade do modal de ações */
+/* v75.73.4 — correção de quebras de texto e estabilidade do modal de ações */
 html,
 body {
   position: relative;
@@ -12988,7 +12988,7 @@ body.record-sheet-open {
 }
 
 
-/* v75.73.3 — correção real do sheet de ações e quebras de texto observadas no vídeo */
+/* v75.73.4 — correção real do sheet de ações e quebras de texto observadas no vídeo */
 .record-sheet,
 .orbit-cluster-sheet {
   height: min(88svh, 720px) !important;

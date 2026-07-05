@@ -1,0 +1,10 @@
+Ninou v75.73.4 — Registrar legível e abas com respiro
+
+Alterações:
+- botão Registrar deixa de ficar travado/flutuando sobre os campos do formulário;
+- texto do botão Registrar fica legível no modo escuro e no modo claro;
+- removido o degradê de cobertura que escondia o texto do botão;
+- abas do modal de ações ficaram mais largas e altas para mostrar melhor Amamentação e Medicamento;
+- mais espaçamento interno nos controles de amamentação, timer, lados e medicamento;
+- observações com mais altura e sem invasão pelo botão;
+- cache/versionamento atualizado para 75.73.4.
