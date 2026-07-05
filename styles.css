@@ -1,5 +1,5 @@
-/* Ninou v75.73.2 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.73.2");
+/* Ninou v75.73.3 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.73.3");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.73.2 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.73.3 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.73.2 â€” seguranÃ§a no aparelho */
+/* Ninou v75.73.3 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.73.2 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.73.3 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.73.2 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.73.3 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.73.2 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.73.3 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.73.2 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.73.3 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.73.2 - contraste e respiro do perfil em claro/escuro */
+/* v75.73.3 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.73.2 — Perfil com UX mais agradável + tema claro suave */
+/* v75.73.3 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.73.2 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.73.3 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.73.2 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.73.3 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.73.2 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.73.3 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,7 +3907,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.73.2 — retorno ao visual v75.63.0 Perfil do diário */
+/* v75.73.3 — retorno ao visual v75.63.0 Perfil do diário */
 .screen[data-screen="profile"] .profile-card {
   position: relative;
   overflow: hidden;
@@ -4036,7 +4036,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card:not(.profile-identit
 }
 
 
-/* v75.73.2 — Refinamento visual geral dos modais, sheets e controles
+/* v75.73.3 — Refinamento visual geral dos modais, sheets e controles
    Objetivo: preservar o visual afetivo da v75.63 e corrigir a sensação de modal/remendo. */
 :root {
   --ninou-modal-radius: 30px;
@@ -4451,7 +4451,7 @@ body.day-theme .bottom-nav {
 }
 
 
-/* v75.73.2 — correção da foto/avatar do perfil principal */
+/* v75.73.3 — correção da foto/avatar do perfil principal */
 .screen[data-screen="profile"] .profile-card {
   display: grid !important;
   justify-items: center !important;
@@ -4546,7 +4546,7 @@ body:not(.day-theme) .screen[data-screen="profile"] strong#profileBabyAge {
 }
 
 
-/* v75.73.2 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
+/* v75.73.3 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4635,7 +4635,7 @@ button,
 }
 
 
-/* v75.73.2 — avatar em modal + cuidador com visual de imagem */
+/* v75.73.3 — avatar em modal + cuidador com visual de imagem */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4878,7 +4878,7 @@ body.day-theme .avatar-modal .avatar-copy-column strong {
 }
 
 
-/* v75.73.2 — botão Editar avatar fora da foto + seletores com chevron claro */
+/* v75.73.3 — botão Editar avatar fora da foto + seletores com chevron claro */
 .screen[data-screen="profile"] .avatar-wrapper {
   margin-bottom: 6px !important;
 }
@@ -4997,7 +4997,7 @@ body.day-theme .screen[data-screen="profile"] .caregiver-avatar-mini {
 }
 
 
-/* v75.73.2 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
+/* v75.73.3 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
 .screen[data-screen="profile"] select,
 .record-form select,
 .ninou-modal-card select,
@@ -5118,7 +5118,7 @@ body.day-theme .select-control-icon {
 }
 
 
-/* v75.73.2 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
+/* v75.73.3 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
 body.day-theme .select-label::after,
 body.day-theme .date-filter::after,
 body.day-theme .field-chevron,
@@ -5251,7 +5251,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.2 — correção dos nomes cortados nos avatares */
+/* v75.73.3 — correção dos nomes cortados nos avatares */
 .avatar-modal .avatar-option-grid.icon-grid {
   align-items: start;
 }
@@ -5312,7 +5312,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.2 — avatar principal maior, prévia redonda e grade alinhada */
+/* v75.73.3 — avatar principal maior, prévia redonda e grade alinhada */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 250px !important;
   padding: 32px 22px 34px !important;
@@ -5432,7 +5432,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.2 — refinamento final do perfil e do modal de avatar */
+/* v75.73.3 — refinamento final do perfil e do modal de avatar */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 286px !important;
   padding: 36px 22px 38px !important;
@@ -5570,7 +5570,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.2 — acabamento premium do perfil, tema claro e modal de avatar */
+/* v75.73.3 — acabamento premium do perfil, tema claro e modal de avatar */
 .screen[data-screen="profile"] .profile-diary-stack {
   gap: 18px !important;
 }
@@ -5814,7 +5814,7 @@ body.day-theme #babyAvatarTestCard .minimal-preview-panel {
 }
 
 
-/* v75.73.2 — correção de quebras de texto e estabilidade do modal de ações */
+/* v75.73.3 — correção de quebras de texto e estabilidade do modal de ações */
 html,
 body {
   position: relative;
@@ -6100,5 +6100,330 @@ body.record-sheet-open {
   .record-types button {
     min-height: 72px !important;
     max-height: 76px !important;
+  }
+}
+
+
+/* v75.73.3 — correção real do sheet de ações e quebras de texto observadas no vídeo */
+.record-sheet,
+.orbit-cluster-sheet {
+  height: min(88svh, 720px) !important;
+  max-height: calc(100svh - max(10px, env(safe-area-inset-top, 0px))) !important;
+  min-height: min(650px, calc(100svh - max(10px, env(safe-area-inset-top, 0px)))) !important;
+  display: grid !important;
+  grid-template-rows: 14px 62px 94px minmax(0, 1fr) !important;
+  overflow: hidden !important;
+  align-content: stretch !important;
+}
+@supports not (height: 1svh) {
+  .record-sheet,
+  .orbit-cluster-sheet {
+    height: min(88dvh, 720px) !important;
+    max-height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px))) !important;
+  }
+}
+.record-sheet[hidden],
+.orbit-cluster-sheet[hidden],
+.record-form > [hidden],
+.record-form [hidden],
+#sheetEndTimeField[hidden],
+#sheetAmountField[hidden],
+#breastTimerPanel[hidden],
+#sleepDurationPreview[hidden] {
+  display: none !important;
+}
+.record-sheet .sheet-handle,
+.orbit-cluster-sheet .sheet-handle {
+  align-self: center !important;
+  margin: 0 auto !important;
+}
+.record-sheet .section-title,
+.orbit-cluster-sheet .section-title {
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.record-sheet .section-title strong,
+.orbit-cluster-sheet .section-title strong {
+  line-height: 1.1 !important;
+  max-height: 2.25em !important;
+}
+.record-types {
+  height: 94px !important;
+  min-height: 94px !important;
+  max-height: 94px !important;
+  padding: 4px 2px 10px !important;
+  margin: 0 -2px !important;
+  align-items: stretch !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+.record-types button {
+  width: 98px !important;
+  min-width: 98px !important;
+  max-width: 98px !important;
+  height: 80px !important;
+  min-height: 80px !important;
+  max-height: 80px !important;
+  grid-template-rows: 40px 26px !important;
+  padding: 9px 7px !important;
+  gap: 6px !important;
+  scroll-snap-align: start !important;
+}
+.record-types button > span:last-child {
+  font-size: .68rem !important;
+  line-height: 1.02 !important;
+  min-height: 2.04em !important;
+  max-height: 2.08em !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+.record-types .type-icon,
+.record-types .type-icon img,
+.record-types .type-icon svg {
+  width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
+}
+.record-form {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-content: stretch !important;
+  gap: 14px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 4px 4px max(104px, calc(env(safe-area-inset-bottom, 0px) + 104px)) !important;
+  margin: 0 -4px !important;
+  scroll-padding-top: 8px !important;
+  scroll-padding-bottom: 112px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+.record-form > * {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+.record-form label,
+.record-form .select-label,
+.record-form .amount-field,
+#sheetAmountField,
+#sheetEndTimeField {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: static !important;
+  overflow: visible !important;
+}
+.record-form label > span:first-child,
+.record-form .select-label > span:first-child,
+#sheetAmountField > span:first-child,
+#sheetStartLabel,
+#sheetEndLabel,
+#sheetDetailLabel {
+  display: block !important;
+  min-height: auto !important;
+  line-height: 1.12 !important;
+  font-size: .72rem !important;
+  letter-spacing: .045em !important;
+  text-transform: uppercase !important;
+  overflow: visible !important;
+}
+.record-form input:not([type="range"]),
+.record-form select,
+.record-form textarea,
+.record-form .select-control-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+.record-form input:not([type="range"]),
+.record-form select,
+.record-form .select-control-wrap select {
+  min-height: 54px !important;
+  height: 54px !important;
+  flex: 0 0 54px !important;
+}
+.record-form textarea {
+  min-height: 94px !important;
+  height: 94px !important;
+  flex: 0 0 94px !important;
+  resize: none !important;
+  line-height: 1.28 !important;
+}
+.select-control-wrap {
+  display: block !important;
+  position: relative !important;
+}
+.sleep-duration-preview:not([hidden]) {
+  display: block !important;
+  padding: 12px 14px !important;
+  min-height: auto !important;
+  line-height: 1.34 !important;
+  font-size: .82rem !important;
+  margin: 0 !important;
+}
+.breast-timer-panel:not([hidden]) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 14px !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+.breast-timer-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  min-height: auto !important;
+  height: auto !important;
+}
+.breast-timer-head > div {
+  display: grid !important;
+  gap: 3px !important;
+}
+.breast-timer-head button {
+  position: static !important;
+  min-width: 70px !important;
+  min-height: 42px !important;
+  padding: 8px 12px !important;
+}
+.breast-side-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+.breast-side-grid button {
+  min-height: 112px !important;
+  height: auto !important;
+  display: grid !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 6px !important;
+}
+.breast-timer-panel p {
+  margin: 0 !important;
+  line-height: 1.35 !important;
+}
+.amount-hidden-input {
+  display: none !important;
+}
+.milk-slider-card {
+  display: grid !important;
+  gap: 12px !important;
+  padding: 16px 14px !important;
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+#bottleAmountDisplay {
+  display: block !important;
+  line-height: 1.05 !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+.milk-range {
+  width: 100% !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+}
+.range-scale {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  font-size: .74rem !important;
+  line-height: 1.1 !important;
+}
+.record-form .save-button {
+  position: sticky !important;
+  bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 5 !important;
+  width: 100% !important;
+  flex: 0 0 56px !important;
+  min-height: 56px !important;
+  margin: 4px 0 0 !important;
+  box-shadow: 0 18px 34px rgba(10, 7, 28, .34), inset 0 1px 0 rgba(255,255,255,.56) !important;
+}
+.record-form .save-button::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -18px -4px -12px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(21, 15, 48, 0), rgba(21, 15, 48, .96) 52%);
+  pointer-events: none;
+}
+body.day-theme .record-form .save-button::before {
+  background: linear-gradient(180deg, rgba(255, 250, 244, 0), rgba(255, 250, 244, .96) 52%);
+}
+#liveAssistantTitle,
+#diaryTitle,
+.today-overview-head strong,
+.card-header strong,
+.profile-card strong,
+.profile-family-card strong,
+.timeline .event-text strong {
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+@media (max-width: 430px) {
+  .record-sheet,
+  .orbit-cluster-sheet {
+    height: min(89svh, 720px) !important;
+    width: min(calc(100vw - 12px), 430px) !important;
+    padding-inline: 14px !important;
+  }
+  .record-types button {
+    width: 94px !important;
+    min-width: 94px !important;
+    max-width: 94px !important;
+  }
+}
+@media (max-height: 740px) {
+  .record-sheet,
+  .orbit-cluster-sheet {
+    height: min(91svh, 680px) !important;
+    min-height: min(610px, calc(100svh - max(8px, env(safe-area-inset-top, 0px)))) !important;
+  }
+  .record-types {
+    height: 88px !important;
+    min-height: 88px !important;
+    max-height: 88px !important;
+  }
+  .record-types button {
+    height: 76px !important;
+    min-height: 76px !important;
+    max-height: 76px !important;
+  }
+  .record-form {
+    gap: 12px !important;
+  }
+  .record-form textarea {
+    min-height: 86px !important;
+    height: 86px !important;
+    flex-basis: 86px !important;
+  }
+  .breast-side-grid button {
+    min-height: 100px !important;
   }
 }

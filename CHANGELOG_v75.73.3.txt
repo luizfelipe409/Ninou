@@ -1,0 +1,12 @@
+Ninou v75.73.3 — correção do modal de ações após análise do vídeo
+
+Alterações:
+- corrigido o problema em que campos do modal de ações ficavam sobrepostos;
+- corrigido o botão Registrar invadindo Observações/Quantidade em Mamadeira e Amamentação;
+- corrigidos elementos hidden que podiam continuar ocupando espaço por causa de display com !important;
+- modal de ações agora tem grade fixa: puxador, cabeçalho, abas e formulário rolável;
+- formulário interno agora usa layout flex, com scroll próprio e topo estável;
+- ao trocar o tipo de ação, o formulário volta ao topo sem mover o sheet inteiro;
+- rótulo da aba “Despertar noturno” foi encurtado para “Despertar” para evitar quebra feia;
+- reforço em quebras de texto para títulos e cards com nomes longos;
+- cache/versionamento atualizado para 75.73.3.
