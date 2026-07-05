@@ -1,4 +1,4 @@
-Ninou v75.73.9 — acabamento premium de perfil e modal de avatar
+Ninou v75.74.0 — acabamento premium de perfil e modal de avatar
 
 Alterações:
 - refinamento final dos modais e do tema claro;
@@ -7,4 +7,4 @@ Alterações:
 - modal de escolha de avatar com acabamento mais elegante;
 - seleção de avatar com efeito de destaque: hover/elevação e estado selecionado “saltado”;
 - melhoria de sombras, bordas, fundos e leitura dos cartões no tema claro;
-- cache/versionamento atualizado para 75.73.9.
+- cache/versionamento atualizado para 75.74.0.

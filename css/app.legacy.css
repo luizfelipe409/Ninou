@@ -12698,7 +12698,7 @@ body.day-theme .appearance-profile-block p {
 }
 
 
-/* v75.73.9 — correção de quebras de texto e estabilidade do modal de ações */
+/* v75.74.0 — correção de quebras de texto e estabilidade do modal de ações */
 html,
 body {
   position: relative;
@@ -12988,7 +12988,7 @@ body.record-sheet-open {
 }
 
 
-/* v75.73.9 — correção real do sheet de ações e quebras de texto observadas no vídeo */
+/* v75.74.0 — correção real do sheet de ações e quebras de texto observadas no vídeo */
 .record-sheet,
 .orbit-cluster-sheet {
   height: min(88svh, 720px) !important;
@@ -13313,7 +13313,7 @@ body.day-theme .record-form .save-button::before {
 }
 
 
-/* v75.73.9 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
+/* v75.74.0 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
 html.record-sheet-open,
 body.record-sheet-open {
   overflow: hidden !important;

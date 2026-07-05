@@ -120,6 +120,7 @@ const caregiverRelationInput = document.querySelector("#caregiverRelationInput")
 const saveCaregiverIdentityButton = document.querySelector("#saveCaregiverIdentityButton");
 const deviceCaregiverName = document.querySelector("#deviceCaregiverName");
 const deviceCaregiverAvatar = document.querySelector("#deviceCaregiverAvatar");
+const deviceCaregiverRelationChip = document.querySelector("#deviceCaregiverRelationChip");
 const deviceCaregiverHint = document.querySelector("#deviceCaregiverHint");
 const familyProfileBabyMeta = document.querySelector("#familyProfileBabyMeta");
 const familyNameLabel = document.querySelector("#familyNameLabel");
@@ -311,7 +312,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.73.9";
+const NINOU_RUNTIME_VERSION = "75.74.0";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -607,7 +608,7 @@ function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
   const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.73.9: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
+  // v75.74.0: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
   if (babyAvatarCard) {
     babyAvatarCard.hidden = !editorOpen;
     babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
@@ -1863,6 +1864,7 @@ function resetProfileFamilyCardsForGuest() {
   if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = "Entre para carregar o perfil familiar.";
   if (deviceCaregiverName) deviceCaregiverName.textContent = "Não configurado";
   if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = "👤";
+  if (deviceCaregiverRelationChip) deviceCaregiverRelationChip.textContent = "Vínculo não definido";
   if (deviceCaregiverHint) deviceCaregiverHint.textContent = "Entre em uma conta familiar para configurar o cuidador deste aparelho.";
   if (familyNameLabel) familyNameLabel.textContent = "Família não conectada";
   if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || "Conta não conectada";
@@ -1974,9 +1976,12 @@ function renderProfileFamilyCards() {
   if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = `Ajustes usados no diário ${babyName ? `de ${babyName}` : "do bebê"}.`;
   if (deviceCaregiverName) deviceCaregiverName.textContent = caregiverLabel;
   if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = getCaregiverEmoji(identity.relation);
+  if (deviceCaregiverRelationChip) {
+    deviceCaregiverRelationChip.textContent = identity.relationshipLabel || "Vínculo não definido";
+  }
   if (deviceCaregiverHint) {
     deviceCaregiverHint.textContent = identity.label
-      ? `As ações deste aparelho serão registradas como ${identity.label}.`
+      ? `Registros feitos neste aparelho serão assinados como ${identity.label}.`
       : "Escolha quem está usando este aparelho para os registros ficarem corretos.";
   }
   if (familyNameLabel) familyNameLabel.textContent = familyLabel;
@@ -2030,10 +2035,10 @@ function renderCaregiverIdentityPanel() {
   }
   if (caregiverIdentityStatus) {
     caregiverIdentityStatus.textContent = identity.label
-      ? `Próximos registros feitos neste aparelho aparecerão como ${identity.label}.`
+      ? `Os próximos registros deste aparelho serão assinados como ${identity.label}.`
       : (isPrimaryAdmin
-        ? "Sugestão inicial deste aparelho: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
-        : "Defina como os registros feitos neste aparelho devem aparecer no diário da família.");
+        ? "Sugestão inicial: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
+        : "Defina o nome e o vínculo que aparecerão nos registros deste aparelho.");
   }
   renderProfileFamilyCards();
 }
@@ -2053,7 +2058,7 @@ async function saveCaregiverIdentityFromForm() {
   }
 
   if (caregiverIdentityStatus) caregiverIdentityStatus.textContent = identity.label
-    ? `Próximos registros feitos neste celular aparecerão como ${identity.label}.`
+    ? `Os próximos registros deste aparelho serão assinados como ${identity.label}.`
     : "Identificação limpa neste aparelho. Usaremos o e-mail quando necessário.";
 
   renderCaregiverIdentityPanel();
@@ -3302,7 +3307,7 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // v75.73.9: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // v75.74.0: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
   // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = true;
@@ -6292,7 +6297,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.73.9 — login rápido, mas consistente:
+    v75.74.0 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;

@@ -1,5 +1,5 @@
-/* Ninou v75.73.9 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.73.9");
+/* Ninou v75.74.0 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
+@import url("./css/app.legacy.css?v=75.74.0");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -1495,7 +1495,7 @@ body {
 }
 
 
-/* Ninou v75.73.9 â€” seguranÃ§a multi-famÃ­lia
+/* Ninou v75.74.0 â€” seguranÃ§a multi-famÃ­lia
    Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
    Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
    lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
@@ -2308,7 +2308,7 @@ textarea {
   }
 }
 
-/* Ninou v75.73.9 â€” seguranÃ§a no aparelho */
+/* Ninou v75.74.0 â€” seguranÃ§a no aparelho */
 .security-device-card {
   gap: 12px !important;
 }
@@ -2339,7 +2339,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.73.9 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+/* Ninou v75.74.0 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
 body.auth-validating .bottom-nav button:not([data-target="profile"]),
 body.auth-validating .fab,
 body.auth-validating .main-action-area,
@@ -2400,7 +2400,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.73.9 â€” perfil logado sem duplicidade visual */
+/* Ninou v75.74.0 â€” perfil logado sem duplicidade visual */
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -2457,7 +2457,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.73.9 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+/* v75.74.0 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
 .avatar-profile-actions {
   margin-top: 0;
 }
@@ -2702,7 +2702,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.73.9 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+/* v75.74.0 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -2744,7 +2744,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.73.9 - contraste e respiro do perfil em claro/escuro */
+/* v75.74.0 - contraste e respiro do perfil em claro/escuro */
 .screen[data-screen="profile"] {
   gap: clamp(12px, 2.4vw, 16px) !important;
 }
@@ -2889,7 +2889,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.73.9 — Perfil com UX mais agradável + tema claro suave */
+/* v75.74.0 — Perfil com UX mais agradável + tema claro suave */
 .screen[data-screen="profile"] {
   gap: 14px !important;
 }
@@ -3025,7 +3025,7 @@ body.day-theme .avatar-skip-button {
   }
 }
 
-/* v75.73.9 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+/* v75.74.0 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
 .screen[data-screen="profile"] .profile-identity-hero {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) !important;
@@ -3168,7 +3168,7 @@ body:not(.day-theme) .profile-invite-area {
   }
 }
 
-/* v75.73.9 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+/* v75.74.0 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
 :root {
   --ninou-profile-radius: 28px;
   --ninou-profile-radius-inner: 20px;
@@ -3510,7 +3510,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-premium-details sum
   }
 }
 
-/* v75.73.9 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+/* v75.74.0 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
 :root {
   --ninou-video-premium-bg: #120d24;
   --ninou-video-premium-card: rgba(35, 27, 61, 0.86);
@@ -3907,7 +3907,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.73.9 — retorno ao visual v75.63.0 Perfil do diário */
+/* v75.74.0 — retorno ao visual v75.63.0 Perfil do diário */
 .screen[data-screen="profile"] .profile-card {
   position: relative;
   overflow: hidden;
@@ -4036,7 +4036,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card:not(.profile-identit
 }
 
 
-/* v75.73.9 — Refinamento visual geral dos modais, sheets e controles
+/* v75.74.0 — Refinamento visual geral dos modais, sheets e controles
    Objetivo: preservar o visual afetivo da v75.63 e corrigir a sensação de modal/remendo. */
 :root {
   --ninou-modal-radius: 30px;
@@ -4451,7 +4451,7 @@ body.day-theme .bottom-nav {
 }
 
 
-/* v75.73.9 — correção da foto/avatar do perfil principal */
+/* v75.74.0 — correção da foto/avatar do perfil principal */
 .screen[data-screen="profile"] .profile-card {
   display: grid !important;
   justify-items: center !important;
@@ -4546,7 +4546,7 @@ body:not(.day-theme) .screen[data-screen="profile"] strong#profileBabyAge {
 }
 
 
-/* v75.73.9 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
+/* v75.74.0 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4635,7 +4635,7 @@ button,
 }
 
 
-/* v75.73.9 — avatar em modal + cuidador com visual de imagem */
+/* v75.74.0 — avatar em modal + cuidador com visual de imagem */
 .screen[data-screen="profile"] .profile-card::before {
   display: none !important;
   content: none !important;
@@ -4878,7 +4878,7 @@ body.day-theme .avatar-modal .avatar-copy-column strong {
 }
 
 
-/* v75.73.9 — botão Editar avatar fora da foto + seletores com chevron claro */
+/* v75.74.0 — botão Editar avatar fora da foto + seletores com chevron claro */
 .screen[data-screen="profile"] .avatar-wrapper {
   margin-bottom: 6px !important;
 }
@@ -4997,7 +4997,7 @@ body.day-theme .screen[data-screen="profile"] .caregiver-avatar-mini {
 }
 
 
-/* v75.73.9 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
+/* v75.74.0 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
 .screen[data-screen="profile"] select,
 .record-form select,
 .ninou-modal-card select,
@@ -5118,7 +5118,7 @@ body.day-theme .select-control-icon {
 }
 
 
-/* v75.73.9 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
+/* v75.74.0 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
 body.day-theme .select-label::after,
 body.day-theme .date-filter::after,
 body.day-theme .field-chevron,
@@ -5251,7 +5251,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.9 — correção dos nomes cortados nos avatares */
+/* v75.74.0 — correção dos nomes cortados nos avatares */
 .avatar-modal .avatar-option-grid.icon-grid {
   align-items: start;
 }
@@ -5312,7 +5312,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.9 — avatar principal maior, prévia redonda e grade alinhada */
+/* v75.74.0 — avatar principal maior, prévia redonda e grade alinhada */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 250px !important;
   padding: 32px 22px 34px !important;
@@ -5432,7 +5432,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.9 — refinamento final do perfil e do modal de avatar */
+/* v75.74.0 — refinamento final do perfil e do modal de avatar */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 286px !important;
   padding: 36px 22px 38px !important;
@@ -5570,7 +5570,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.73.9 — acabamento premium do perfil, tema claro e modal de avatar */
+/* v75.74.0 — acabamento premium do perfil, tema claro e modal de avatar */
 .screen[data-screen="profile"] .profile-diary-stack {
   gap: 18px !important;
 }
@@ -5814,7 +5814,7 @@ body.day-theme #babyAvatarTestCard .minimal-preview-panel {
 }
 
 
-/* v75.73.9 — correção de quebras de texto e estabilidade do modal de ações */
+/* v75.74.0 — correção de quebras de texto e estabilidade do modal de ações */
 html,
 body {
   position: relative;
@@ -6104,7 +6104,7 @@ body.record-sheet-open {
 }
 
 
-/* v75.73.9 — correção real do sheet de ações e quebras de texto observadas no vídeo */
+/* v75.74.0 — correção real do sheet de ações e quebras de texto observadas no vídeo */
 .record-sheet,
 .orbit-cluster-sheet {
   height: min(88svh, 720px) !important;
@@ -6429,7 +6429,7 @@ body.day-theme .record-form .save-button::before {
 }
 
 
-/* v75.73.9 — botão Registrar legível e abas com mais respiro */
+/* v75.74.0 — botão Registrar legível e abas com mais respiro */
 .record-types {
   height: 112px !important;
   min-height: 112px !important;
@@ -6589,7 +6589,7 @@ body.day-theme .record-form .save-button {
 }
 
 
-/* v75.73.9 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
+/* v75.74.0 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
 html.record-sheet-open,
 body.record-sheet-open {
   overflow: hidden !important;
@@ -6692,7 +6692,7 @@ body.record-sheet-open::-webkit-scrollbar {
 }
 
 
-/* v75.73.9 — base do modal de ações mais natural */
+/* v75.74.0 — base do modal de ações mais natural */
 .record-sheet,
 .orbit-cluster-sheet {
   bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
@@ -6747,7 +6747,7 @@ body.day-theme .orbit-cluster-sheet::after {
 }
 
 
-/* v75.73.9 — final natural do formulário de ações: observações + Registrar sem corte */
+/* v75.74.0 — final natural do formulário de ações: observações + Registrar sem corte */
 .record-sheet,
 .orbit-cluster-sheet {
   grid-template-rows: 14px 62px 104px minmax(0, 1fr) auto !important;
@@ -6898,7 +6898,7 @@ body.day-theme .record-actions-footer .save-button {
 }
 
 
-/* v75.73.9 — indicação premium de conteúdo rolável no modal de ações */
+/* v75.74.0 — indicação premium de conteúdo rolável no modal de ações */
 .record-actions-footer {
   gap: 10px !important;
   padding-top: 8px !important;
@@ -6988,7 +6988,7 @@ body.day-theme .record-scroll-hint {
 }
 
 
-/* v75.73.9 — indicador por ícone e padronização do dropdown da data do diário */
+/* v75.74.0 — indicador por ícone e padronização do dropdown da data do diário */
 .date-filter {
   position: relative !important;
 }
@@ -7052,4 +7052,289 @@ body.day-theme .record-scroll-hint {
 }
 @media (prefers-reduced-motion: reduce) {
   .record-scroll-hint { animation: none !important; }
+}
+
+
+/* v75.74.0 — tratamento especial do card Cuidador local */
+.screen[data-screen="profile"] .caregiver-device-card {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 34px !important;
+  padding: 26px 20px 22px !important;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(124, 229, 194, .20), transparent 32%),
+    radial-gradient(circle at 90% 18%, rgba(255, 211, 122, .12), transparent 34%),
+    linear-gradient(145deg, rgba(43, 33, 82, .98), rgba(29, 22, 57, .98)) !important;
+  border: 1px solid rgba(201, 192, 255, .18) !important;
+  box-shadow: 0 24px 52px rgba(7, 4, 24, .22), inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+.screen[data-screen="profile"] .caregiver-device-card::before {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -82px;
+  top: -88px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(124,229,194,.18), transparent 68%);
+  pointer-events: none;
+}
+.caregiver-card-top {
+  position: relative;
+  z-index: 1;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin-bottom: 8px !important;
+}
+.caregiver-card-head {
+  margin: 0 !important;
+}
+.caregiver-device-badge {
+  flex: 0 0 auto;
+  max-width: 42%;
+  padding: 8px 10px;
+  border-radius: 999px;
+  color: rgba(124, 229, 194, .96);
+  background: rgba(124, 229, 194, .10);
+  border: 1px solid rgba(124, 229, 194, .18);
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  line-height: 1.08;
+  text-align: center;
+}
+.caregiver-card-copy {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 18px !important;
+  max-width: 95%;
+  color: rgba(240, 236, 255, .72) !important;
+  line-height: 1.42 !important;
+}
+.screen[data-screen="profile"] .caregiver-identity-pass {
+  position: relative !important;
+  z-index: 1 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+.screen[data-screen="profile"] .caregiver-identity-pass summary {
+  display: grid !important;
+  grid-template-columns: 74px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+  min-height: 116px !important;
+  padding: 18px 58px 18px 16px !important;
+  border-radius: 30px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.052)) !important;
+  border: 1px solid rgba(201, 192, 255, .20) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 14px 28px rgba(7, 4, 24, .14) !important;
+}
+.screen[data-screen="profile"] .caregiver-identity-pass summary::after {
+  right: 18px !important;
+  top: 50% !important;
+  width: 30px !important;
+  height: 30px !important;
+  border: 1px solid rgba(124, 229, 194, .20) !important;
+  border-radius: 13px !important;
+  background: rgba(124, 229, 194, .10) !important;
+  transform: translateY(-50%) !important;
+  opacity: 1 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.screen[data-screen="profile"] .caregiver-identity-pass summary::before {
+  content: "";
+  position: absolute;
+  right: 29px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  z-index: 2;
+  border-right: 2px solid rgba(124, 229, 194, .98);
+  border-bottom: 2px solid rgba(124, 229, 194, .98);
+  transform: translateY(-64%) rotate(45deg);
+  pointer-events: none;
+}
+.screen[data-screen="profile"] .caregiver-identity-pass[open] summary::before {
+  transform: translateY(-28%) rotate(-135deg);
+}
+.caregiver-avatar-mini {
+  width: 70px !important;
+  height: 70px !important;
+  border-radius: 24px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 2.05rem !important;
+  background: linear-gradient(145deg, #8f82ff, #69d5be) !important;
+  color: #fff !important;
+  box-shadow: 0 16px 30px rgba(83, 65, 176, .28), inset 0 1px 0 rgba(255,255,255,.32) !important;
+}
+.caregiver-summary-main {
+  display: grid !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+}
+.caregiver-summary-kicker {
+  color: rgba(240,236,255,.58) !important;
+  font-size: .76rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+  line-height: 1.1 !important;
+}
+.caregiver-summary-main strong {
+  color: rgba(255,255,255,.96) !important;
+  font-size: clamp(1.42rem, 6vw, 2rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.035em !important;
+  overflow-wrap: anywhere !important;
+}
+.caregiver-relation-chip {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #1c533f;
+  background: linear-gradient(135deg, rgba(124,229,194,.95), rgba(255,211,122,.88));
+  font-size: .75rem;
+  font-weight: 950;
+  letter-spacing: -.01em;
+  line-height: 1;
+}
+.caregiver-editor-panel {
+  display: grid !important;
+  gap: 14px !important;
+  padding: 16px 0 0 !important;
+}
+.caregiver-editor-panel .profile-edit-grid {
+  gap: 12px !important;
+}
+.screen[data-screen="profile"] .caregiver-device-card .profile-setting-line {
+  padding: 15px !important;
+  border-radius: 24px !important;
+  background: rgba(255,255,255,.055) !important;
+  border: 1px solid rgba(201,192,255,.15) !important;
+  box-shadow: none !important;
+}
+.screen[data-screen="profile"] .caregiver-device-card .profile-setting-line input,
+.screen[data-screen="profile"] .caregiver-device-card .profile-setting-line select {
+  min-height: 54px !important;
+  border-radius: 19px !important;
+  background: rgba(19, 14, 43, .62) !important;
+  border-color: rgba(201,192,255,.15) !important;
+}
+.screen[data-screen="profile"] .caregiver-device-card .profile-actions-row {
+  margin-top: 2px !important;
+}
+.screen[data-screen="profile"] .caregiver-device-card .profile-primary-button {
+  min-height: 58px !important;
+  border-radius: 22px !important;
+}
+.caregiver-identity-note {
+  position: relative !important;
+  margin: 2px 0 0 !important;
+  padding: 14px 16px 14px 42px !important;
+  border-radius: 22px !important;
+  color: rgba(240,236,255,.74) !important;
+  background: rgba(124,229,194,.075) !important;
+  border: 1px solid rgba(124,229,194,.13) !important;
+  line-height: 1.36 !important;
+}
+.caregiver-identity-note::before {
+  content: "✓";
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #1c533f;
+  background: rgba(124,229,194,.88);
+  font-size: .72rem;
+  font-weight: 950;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-device-card {
+  background:
+    radial-gradient(circle at 16% 8%, rgba(124, 229, 194, .26), transparent 34%),
+    radial-gradient(circle at 90% 16%, rgba(122, 92, 255, .12), transparent 34%),
+    linear-gradient(145deg, rgba(255,255,255,.96), rgba(247,244,255,.96)) !important;
+  border-color: rgba(122, 92, 255, .12) !important;
+  box-shadow: 0 20px 46px rgba(104, 88, 150, .12), inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+body.day-theme .caregiver-device-badge {
+  color: #4f3e92;
+  background: rgba(122, 92, 255, .08);
+  border-color: rgba(122, 92, 255, .14);
+}
+body.day-theme .caregiver-card-copy {
+  color: rgba(58, 46, 96, .68) !important;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary {
+  background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(250,247,255,.78)) !important;
+  border-color: rgba(122, 92, 255, .13) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 12px 26px rgba(104, 88, 150, .08) !important;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary::after {
+  border-color: rgba(122, 92, 255, .16) !important;
+  background: rgba(122, 92, 255, .08) !important;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary::before {
+  border-color: #5f4a9d !important;
+}
+body.day-theme .caregiver-summary-kicker {
+  color: rgba(92, 74, 140, .58) !important;
+}
+body.day-theme .caregiver-summary-main strong {
+  color: #2d2450 !important;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-device-card .profile-setting-line {
+  background: rgba(255,255,255,.72) !important;
+  border-color: rgba(122, 92, 255, .11) !important;
+}
+body.day-theme .screen[data-screen="profile"] .caregiver-device-card .profile-setting-line input,
+body.day-theme .screen[data-screen="profile"] .caregiver-device-card .profile-setting-line select {
+  background: rgba(255,255,255,.88) !important;
+  border-color: rgba(122, 92, 255, .14) !important;
+}
+body.day-theme .caregiver-identity-note {
+  color: rgba(58,46,96,.68) !important;
+  background: rgba(124,229,194,.14) !important;
+  border-color: rgba(47,128,103,.12) !important;
+}
+@media (max-width: 430px) {
+  .screen[data-screen="profile"] .caregiver-device-card {
+    padding: 24px 18px 20px !important;
+    border-radius: 32px !important;
+  }
+  .caregiver-card-top {
+    display: grid !important;
+  }
+  .caregiver-device-badge {
+    justify-self: start;
+    max-width: 100%;
+  }
+  .screen[data-screen="profile"] .caregiver-identity-pass summary {
+    grid-template-columns: 64px minmax(0, 1fr) !important;
+    min-height: 108px !important;
+    padding: 16px 54px 16px 14px !important;
+    border-radius: 28px !important;
+  }
+  .caregiver-avatar-mini {
+    width: 62px !important;
+    height: 62px !important;
+    border-radius: 22px !important;
+    font-size: 1.85rem !important;
+  }
+  .caregiver-summary-main strong {
+    font-size: clamp(1.3rem, 7vw, 1.76rem) !important;
+  }
 }
