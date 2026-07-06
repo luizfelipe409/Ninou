@@ -1,5 +1,5 @@
 /* Ninou v75.74.1 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.74.1");
+@import url("./css/app.legacy.css?v=75.74.3");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -7352,4 +7352,235 @@ body.day-theme .caregiver-relation-chip,
 body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary .caregiver-relation-chip {
   color: #171126 !important;
   -webkit-text-fill-color: #171126 !important;
+}
+
+/* v75.74.3 — refinamento do modal de avatar, alinhamento e fundo travado */
+html.avatar-modal-open,
+body.avatar-modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+body.avatar-modal-open {
+  position: fixed !important;
+  inset: var(--avatar-modal-scroll-y, 0px) 0 auto 0 !important;
+  width: 100% !important;
+  min-height: 100dvh !important;
+  touch-action: none !important;
+}
+
+.avatar-modal .avatar-test-header,
+#babyAvatarTestCard .avatar-test-header {
+  align-items: center !important;
+  gap: 18px !important;
+  margin-bottom: 14px !important;
+}
+
+.avatar-modal .minimal-preview-panel,
+#babyAvatarTestCard .minimal-preview-panel {
+  width: 116px !important;
+  height: 116px !important;
+  min-height: 116px !important;
+  flex: 0 0 116px !important;
+  border-radius: 999px !important;
+  padding: 10px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.96), rgba(255,255,255,.76) 46%, transparent 47%),
+    linear-gradient(145deg, rgba(124,229,194,.26), rgba(255,211,122,.18)) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  box-shadow: 0 18px 34px rgba(33, 25, 62, .18), inset 0 1px 0 rgba(255,255,255,.55) !important;
+}
+
+.avatar-modal .baby-avatar-preview,
+#babyAvatarTestCard .baby-avatar-preview {
+  width: 92px !important;
+  height: 92px !important;
+  display: block !important;
+  border-radius: 999px !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  filter: drop-shadow(0 8px 16px rgba(49, 35, 91, .12));
+}
+
+.avatar-modal .avatar-picker-section,
+#babyAvatarTestCard .avatar-picker-section {
+  margin-top: 4px !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid {
+  align-items: start !important;
+  gap: 14px !important;
+  padding: 14px 6px 12px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid::-webkit-scrollbar,
+#babyAvatarTestCard .avatar-option-grid.icon-grid::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice,
+body.day-theme .avatar-modal .avatar-option-grid .avatar-choice,
+body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
+  min-height: 182px !important;
+  padding: 14px 10px 16px !important;
+  display: grid !important;
+  grid-template-rows: 98px minmax(2.8em, auto) !important;
+  gap: 12px !important;
+  align-content: start !important;
+  justify-items: center !important;
+  border-radius: 28px !important;
+  overflow: visible !important;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease !important;
+}
+
+.avatar-modal .avatar-face-wrap,
+#babyAvatarTestCard .avatar-face-wrap {
+  width: 96px !important;
+  height: 96px !important;
+  border-radius: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(245,242,255,.78)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 8px 18px rgba(44, 30, 88, .10) !important;
+}
+body:not(.day-theme) .avatar-modal .avatar-face-wrap,
+body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
+  background: linear-gradient(180deg, rgba(54,43,96,.92), rgba(38,30,70,.92)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 24px rgba(7, 5, 22, .24) !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb {
+  width: 88px !important;
+  height: 88px !important;
+  display: block !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice small {
+  width: 100% !important;
+  min-height: 2.9em !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1.12 !important;
+  font-size: .84rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+  hyphens: none !important;
+  text-wrap: balance !important;
+}
+
+@media (hover: hover) {
+  .avatar-modal .avatar-option-grid.icon-grid .avatar-choice:hover,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice:hover {
+    transform: translateY(-3px) scale(1.012) !important;
+  }
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice:active,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice:active {
+  transform: translateY(-1px) scale(.995) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] {
+  transform: translateY(-4px) scale(1.018) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected .avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] .avatar-face-wrap {
+  box-shadow: 0 12px 28px rgba(124,229,194,.20), 0 0 0 3px rgba(124,229,194,.16) !important;
+}
+
+body.day-theme .avatar-modal .minimal-preview-panel,
+body.day-theme #babyAvatarTestCard .minimal-preview-panel {
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.98), rgba(255,255,255,.84) 46%, transparent 47%),
+    linear-gradient(145deg, rgba(124,229,194,.22), rgba(255,211,122,.18)) !important;
+  box-shadow: 0 16px 32px rgba(86, 71, 130, .12), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+body.day-theme .avatar-modal .avatar-face-wrap,
+body.day-theme #babyAvatarTestCard .avatar-face-wrap {
+  background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,246,255,.92)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 8px 18px rgba(60, 48, 100, .08) !important;
+}
+
+@media (max-width: 520px) {
+  .avatar-modal .minimal-preview-panel,
+  #babyAvatarTestCard .minimal-preview-panel {
+    width: 108px !important;
+    height: 108px !important;
+    min-height: 108px !important;
+    flex-basis: 108px !important;
+  }
+  .avatar-modal .baby-avatar-preview,
+  #babyAvatarTestCard .baby-avatar-preview {
+    width: 88px !important;
+    height: 88px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    padding-top: 12px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 176px !important;
+    padding: 12px 8px 14px !important;
+    grid-template-rows: 92px minmax(2.8em, auto) !important;
+  }
+  .avatar-modal .avatar-face-wrap,
+  #babyAvatarTestCard .avatar-face-wrap {
+    width: 90px !important;
+    height: 90px !important;
+    border-radius: 28px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb {
+    width: 82px !important;
+    height: 82px !important;
+  }
+}
+
+
+/* v75.74.3 — estabilidade final do modal de avatar após verificação cuidadosa */
+.avatar-modal,
+#babyAvatarTestCard {
+  overscroll-behavior: none !important;
+}
+.avatar-modal .ninou-modal-card,
+#babyAvatarTestCard .ninou-modal-card {
+  overflow: hidden !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid {
+  scroll-padding-top: 18px !important;
+  scroll-padding-bottom: 20px !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] {
+  z-index: 2 !important;
 }

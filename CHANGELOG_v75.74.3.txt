@@ -1,0 +1,7 @@
+Ninou v75.74.3 — verificação cuidadosa do modal de avatar
+
+- Corrigido detalhe do bloqueio de rolagem do fundo no modal de avatar: ao trocar avatar várias vezes, o app não recalcula mais a posição da tela de fundo.
+- Mantida a posição original da página ao fechar o modal.
+- Reforçado o ocultamento de scrollbars no modal de avatar.
+- Adicionado scroll-padding na grade para o item selecionado não parecer cortado no topo/fim.
+- Mantido o preview circular maior e o alinhamento uniforme das miniaturas.

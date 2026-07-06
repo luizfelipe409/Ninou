@@ -1,11 +1,11 @@
-const CACHE_NAME = "ninou-v75-73-8-scroll-hint";
+const CACHE_NAME = "ninou-v75-74-3-avatar-modal-estavel";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.74.1",
-  "/css/app.legacy.css?v=75.74.1",
-  "/app.js?v=75.74.1",
-  "/js/app.legacy.js?v=75.74.1",
+  "/styles.css?v=75.74.3",
+  "/css/app.legacy.css?v=75.74.3",
+  "/app.js?v=75.74.3",
+  "/js/app.legacy.js?v=75.74.3",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

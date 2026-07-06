@@ -312,7 +312,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.74.1";
+const NINOU_RUNTIME_VERSION = "75.74.3";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -532,6 +532,8 @@ let intelligentTimelineLimit = 7;
 
 let pendingBabyAvatar = { ...(babyProfile.avatar || {}) };
 let avatarEditorForceOpen = false;
+let avatarModalScrollRestoreY = 0;
+let avatarModalScrollLocked = false;
 
 const babyAvatarHairOptions = Object.freeze([
   { id: "avatar-01", label: "Bebê clássico", src: "./icons/baby-avatars/avatar-01.png" },
@@ -613,7 +615,7 @@ function renderAvatarEditorVisibility() {
     babyAvatarCard.hidden = !editorOpen;
     babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
   }
-  document.body?.classList.toggle("avatar-modal-open", Boolean(editorOpen));
+  syncAvatarModalScrollLock(editorOpen);
   if (babyAvatarDetails) babyAvatarDetails.open = editorOpen;
 
   if (editBabyAvatarButton) {
@@ -1484,6 +1486,31 @@ function focusProfileAccess(mode = "login") {
   }, 220);
 }
 
+function syncAvatarModalScrollLock(locked) {
+  const shouldLock = Boolean(locked);
+  if (shouldLock === avatarModalScrollLocked) {
+    return;
+  }
+
+  avatarModalScrollLocked = shouldLock;
+  document.documentElement?.classList.toggle("avatar-modal-open", shouldLock);
+  document.body?.classList.toggle("avatar-modal-open", shouldLock);
+
+  if (shouldLock) {
+    avatarModalScrollRestoreY = window.scrollY || window.pageYOffset || 0;
+    document.documentElement?.style.setProperty("--avatar-modal-scroll-y", `${-avatarModalScrollRestoreY}px`);
+    document.body?.style.setProperty("--avatar-modal-scroll-y", `${-avatarModalScrollRestoreY}px`);
+    return;
+  }
+
+  const restoreY = Math.max(0, Number(avatarModalScrollRestoreY) || 0);
+  document.documentElement?.style.removeProperty("--avatar-modal-scroll-y");
+  document.body?.style.removeProperty("--avatar-modal-scroll-y");
+  window.requestAnimationFrame(() => {
+    window.scrollTo(0, restoreY);
+  });
+}
+
 function openAvatarEditor() {
   avatarEditorForceOpen = true;
   if (babyAvatarStatus) babyAvatarStatus.textContent = "Escolha um avatar e toque em Salvar para aplicar.";
@@ -1495,7 +1522,6 @@ function openAvatarEditor() {
 function closeAvatarEditor(statusText = "") {
   avatarEditorForceOpen = false;
   renderAvatarEditorVisibility();
-  document.body?.classList.remove("avatar-modal-open");
   if (statusText && babyAvatarStatus) babyAvatarStatus.textContent = statusText;
 }
 function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = "member") {
@@ -1526,7 +1552,7 @@ function renderAvatarOptionButton(container, options, type, avatar = pendingBaby
   container.innerHTML = options
     .map((item) => {
       const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || item.value || "#33224d"}"` : "";
-      const preview = type === "hair" ? `<img class="avatar-face-thumb avatar-preset-thumb" src="${item.src || getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" />` : "";
+      const preview = type === "hair" ? `<span class="avatar-face-wrap" aria-hidden="true"><img class="avatar-face-thumb avatar-preset-thumb" src="${item.src || getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" /></span>` : "";
       const content = swatchTypes.has(type)
         ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>`
         : `${preview}<small>${escapeHtml(item.label)}</small>`;
