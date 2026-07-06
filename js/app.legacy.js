@@ -6018,10 +6018,11 @@ function renderBabyIdentity() {
   });
 
   if (avatarModalHint) {
-    const babyName = getBabyName();
-    avatarModalHint.textContent = babyName
-      ? `Escolha uma ilustração para representar o diário de ${babyName}.`
-      : "Escolha uma ilustração para representar o diário do bebê.";
+    const babyName = (getBabyName() || "").trim();
+    const hasShortName = babyName && babyName.length <= 16;
+    avatarModalHint.textContent = hasShortName
+      ? `Escolha o avatar de ${babyName}.`
+      : "Escolha o avatar do diário.";
   }
 
   if (isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen) {

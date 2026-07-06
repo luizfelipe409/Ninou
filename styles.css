@@ -7584,3 +7584,160 @@ body.day-theme #babyAvatarTestCard .avatar-face-wrap {
 #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] {
   z-index: 2 !important;
 }
+
+
+/* v75.74.5 — refinamento atento da apresentação dos avatares */
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
+  min-height: 314px !important;
+  padding: 40px 24px 42px !important;
+  gap: 18px !important;
+}
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
+  width: 168px !important;
+  height: 168px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  padding: 6px !important;
+  background: linear-gradient(145deg, rgba(124,229,194,.96), rgba(255,211,122,.92)) !important;
+  box-shadow: 0 22px 54px rgba(34, 24, 76, .22), inset 0 0 0 1px rgba(255,255,255,.58) !important;
+}
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] #profilePhoto {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,.92) !important;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.92) !important;
+  object-fit: cover !important;
+  object-position: center 44% !important;
+  transform: scale(1.11) !important;
+}
+body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
+  box-shadow: 0 18px 42px rgba(73, 56, 125, .12), inset 0 0 0 1px rgba(255,255,255,.78) !important;
+}
+body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] #profilePhoto {
+  background: rgba(255,255,255,.98) !important;
+}
+
+.avatar-modal .avatar-copy-column p,
+#babyAvatarTestCard .avatar-copy-column p,
+#avatarModalHint {
+  max-width: 19ch !important;
+  line-height: 1.28 !important;
+}
+
+.avatar-modal .minimal-preview-panel,
+#babyAvatarTestCard .minimal-preview-panel {
+  width: 118px !important;
+  height: 118px !important;
+  min-height: 118px !important;
+  flex: 0 0 118px !important;
+  border-radius: 999px !important;
+  padding: 6px !important;
+  overflow: hidden !important;
+  background: linear-gradient(145deg, rgba(124,229,194,.22), rgba(255,211,122,.16)) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  box-shadow: 0 16px 34px rgba(28, 21, 60, .16), inset 0 1px 0 rgba(255,255,255,.48) !important;
+}
+body.day-theme .avatar-modal .minimal-preview-panel,
+body.day-theme #babyAvatarTestCard .minimal-preview-panel {
+  background: linear-gradient(145deg, rgba(124,229,194,.18), rgba(255,211,122,.14)) !important;
+  border-color: rgba(73, 56, 125, .08) !important;
+}
+.avatar-modal .baby-avatar-preview,
+#babyAvatarTestCard .baby-avatar-preview {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  border-radius: 999px !important;
+  object-fit: cover !important;
+  object-position: center 44% !important;
+  transform: scale(1.08) !important;
+  filter: none !important;
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.94) !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid {
+  padding: 14px 4px 12px !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice,
+body.day-theme .avatar-modal .avatar-option-grid .avatar-choice,
+body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
+  min-height: 184px !important;
+  padding: 14px 10px 16px !important;
+  grid-template-rows: 100px minmax(2.8em, auto) !important;
+  align-content: start !important;
+}
+.avatar-modal .avatar-face-wrap,
+#babyAvatarTestCard .avatar-face-wrap {
+  width: 96px !important;
+  height: 96px !important;
+  border-radius: 999px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  padding: 4px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(247,244,255,.88)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 8px 18px rgba(44, 30, 88, .08) !important;
+}
+body:not(.day-theme) .avatar-modal .avatar-face-wrap,
+body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
+  background: linear-gradient(180deg, rgba(56,45,99,.92), rgba(39,31,72,.92)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 24px rgba(7, 5, 22, .22) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  border-radius: 999px !important;
+  object-fit: cover !important;
+  object-position: center 44% !important;
+  transform: scale(1.05) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice small {
+  width: 100% !important;
+  min-height: 2.95em !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1.14 !important;
+  padding: 0 2px !important;
+  text-wrap: balance !important;
+}
+
+@media (max-width: 520px) {
+  .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
+    min-height: 296px !important;
+    padding: 36px 20px 38px !important;
+  }
+  .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
+    width: 152px !important;
+    height: 152px !important;
+  }
+  .avatar-modal .minimal-preview-panel,
+  #babyAvatarTestCard .minimal-preview-panel {
+    width: 108px !important;
+    height: 108px !important;
+    min-height: 108px !important;
+    flex-basis: 108px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice {
+    min-height: 176px !important;
+    grid-template-rows: 94px minmax(2.9em, auto) !important;
+  }
+  .avatar-modal .avatar-face-wrap,
+  #babyAvatarTestCard .avatar-face-wrap {
+    width: 90px !important;
+    height: 90px !important;
+  }
+}

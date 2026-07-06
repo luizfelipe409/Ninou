@@ -1,0 +1,11 @@
+Ninou v75.74.5 — refinamento atento da apresentação dos avatares
+
+Ajustes realizados:
+- aumentei a presença do avatar principal no topo do perfil;
+- reduzi o excesso visual de moldura para valorizar mais o rostinho;
+- deixei a foto principal e a prévia do modal com linguagem mais coerente entre si;
+- simplifiquei a bolha da prévia do modal para um círculo mais limpo e elegante;
+- normalizei o enquadramento dos avatares com object-position e escala consistentes;
+- padronizei melhor o recorte visual dos avatares nos cards de escolha;
+- mantive os nomes dos avatares com equilíbrio e sem exagerar nas quebras;
+- encurtei o texto de apoio do modal para evitar que nomes longos quebrem feio.
