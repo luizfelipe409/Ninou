@@ -1,4 +1,4 @@
-Ninou v75.74.8 — avatar do perfil alinhado com a prévia
+Ninou v75.75.0 — avatar do perfil alinhado com a prévia
 
 - deixei o avatar principal do perfil com a mesma linguagem visual da prévia do modal;
 - usei a mesma bolha circular, mesma moldura e mesma leitura visual;

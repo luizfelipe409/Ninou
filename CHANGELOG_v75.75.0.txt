@@ -1,0 +1,7 @@
+Ninou v75.75.0 — sincronização pendente e regras Firestore
+
+- quando o registro salva localmente, mas o Firestore recusa/falha, o app não derruba mais para “Off-line” como se o registro tivesse sido perdido;
+- novo estado visual “Pendente”: salvo neste aparelho e aguardando sincronização;
+- tentativa automática de reenviar dados quando a conexão volta ou após alguns segundos;
+- mensagens mais claras para falha de permissão/regras do Firestore;
+- incluído arquivo firestore.rules atualizado para permitir profile/days aos membros da família.

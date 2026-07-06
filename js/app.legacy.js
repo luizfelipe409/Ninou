@@ -513,7 +513,9 @@ let dayUnsubscribe = null;
 const lastCloudSyncStorageKey = "ninou.sync.lastCloudSaveAt";
 let profileCloudSaveTimer = null;
 let dayCloudSaveTimer = null;
+let pendingCloudRetryTimer = null;
 let applyingCloudState = false;
+const pendingCloudSyncStorageKey = "ninou.sync.pendingCloudReason";
 let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
@@ -4532,7 +4534,7 @@ Os dados antigos não serão apagados.`);
   } catch (error) {
     console.error("Erro ao migrar dados para a família:", error);
     if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
-    setSyncStatus("offline", cloudUser?.email || "");
+    markCloudSyncPending(error);
     return false;
   } finally {
     if (restoreFamilyDataButton) {
@@ -6511,8 +6513,7 @@ async function saveProfileToCloud(options = {}) {
   } catch (error) {
     console.error("Erro ao salvar perfil:", error);
     if (savedProfileVersion === profileClientUpdatedAt) {
-      setSyncStatus("offline", cloudUser.email);
-      loginHelper.textContent = "Dados preservados neste aparelho. A sincronização será retomada após ajustar conexão ou regras do Firestore.";
+      markCloudSyncPending(error);
     }
   }
 }
@@ -6588,7 +6589,7 @@ function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}, dayId
   }, safeDayId, { preserveLive: true });
 }
 
-async function saveDayToCloud(dayId = getSelectedDayId()) {
+async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
@@ -6649,8 +6650,7 @@ async function saveDayToCloud(dayId = getSelectedDayId()) {
     markCloudSynced();
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
-    setSyncStatus("offline", cloudUser.email);
-    loginHelper.textContent = "Dados preservados neste aparelho. A sincronização será retomada após ajustar conexão ou regras do Firestore.";
+    markCloudSyncPending(error);
   }
 }
 
@@ -6671,7 +6671,7 @@ async function subscribeToCloudProfile() {
     applyCloudProfile(snapshot.data());
   }, (error) => {
     console.error("Erro ao ler perfil:", error);
-    setSyncStatus("offline", cloudUser?.email || "");
+    markCloudSyncPending(error);
   });
 }
 
@@ -6717,7 +6717,7 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
     applyCloudDay(snapshot.data(), safeDayId);
   }, (error) => {
     console.error("Erro ao ler rotina:", error);
-    setSyncStatus("offline", cloudUser?.email || "");
+    markCloudSyncPending(error);
   });
 }
 
@@ -8439,6 +8439,62 @@ function updateWakeWindow(value, options = {}) {
   }
 }
 
+function getCloudSyncErrorKind(error = {}) {
+  const code = String(error?.code || error?.name || "").toLowerCase();
+  const message = String(error?.message || "").toLowerCase();
+  if (code.includes("permission-denied") || message.includes("permission")) return "permission";
+  if (code.includes("unavailable") || message.includes("network") || message.includes("offline")) return "network";
+  return "sync";
+}
+
+function getCloudSyncPendingMessage(error = {}) {
+  const kind = getCloudSyncErrorKind(error);
+  if (kind === "permission") {
+    return "Salvo neste aparelho • aguardando ajuste das regras do Firestore.";
+  }
+  if (kind === "network") {
+    return "Salvo neste aparelho • aguardando conexão para sincronizar.";
+  }
+  return "Salvo neste aparelho • aguardando sincronização.";
+}
+
+function persistPendingCloudSync(reason = "pending") {
+  try {
+    localStorage.setItem(pendingCloudSyncStorageKey, JSON.stringify({ reason, at: Date.now() }));
+  } catch {}
+}
+
+function clearPendingCloudSync() {
+  try { localStorage.removeItem(pendingCloudSyncStorageKey); } catch {}
+  if (pendingCloudRetryTimer) {
+    window.clearTimeout(pendingCloudRetryTimer);
+    pendingCloudRetryTimer = null;
+  }
+}
+
+function schedulePendingCloudRetry() {
+  if (pendingCloudRetryTimer || !cloudUser || !firebaseServices || !hasFamilyAccess()) return;
+  pendingCloudRetryTimer = window.setTimeout(async () => {
+    pendingCloudRetryTimer = null;
+    if (!cloudUser || !firebaseServices || !hasFamilyAccess()) return;
+    try {
+      await saveProfileToCloud({ silentRetry: true });
+      await saveDayToCloud(getSelectedDayId(), { silentRetry: true });
+    } catch (error) {
+      console.warn("Nova tentativa de sincronização adiada:", error);
+      schedulePendingCloudRetry();
+    }
+  }, 12_000);
+}
+
+function markCloudSyncPending(error = {}, fallback = "Salvo neste aparelho • aguardando sincronização.") {
+  const message = getCloudSyncPendingMessage(error) || fallback;
+  persistPendingCloudSync(message);
+  setSyncStatus("pending", cloudUser?.email || "", message);
+  if (loginHelper) loginHelper.textContent = message;
+  schedulePendingCloudRetry();
+}
+
 function getLastCloudSyncAt() {
   try { return Number(localStorage.getItem(lastCloudSyncStorageKey)) || 0; } catch { return 0; }
 }
@@ -8452,6 +8508,7 @@ function formatSyncMoment(timestamp = getLastCloudSyncAt()) {
 }
 
 function markCloudSynced() {
+  clearPendingCloudSync();
   try { localStorage.setItem(lastCloudSyncStorageKey, String(Date.now())); } catch {}
   renderSyncDetails();
 }
@@ -8508,7 +8565,7 @@ function renderAdminDiagnostics() {
   }
 }
 
-function setSyncStatus(status = "offline", email = "") {
+function setSyncStatus(status = "offline", email = "", detail = "") {
   if (status.includes?.("@") && !email) {
     email = status;
     status = "online";
@@ -8526,20 +8583,32 @@ function setSyncStatus(status = "offline", email = "") {
   const online = status === "online";
   const loading = status === "loading";
   const error = status === "error";
+  const pending = status === "pending";
 
-  syncPill.textContent = online ? "Online" : loading ? "Conectando" : error ? "Erro" : "Off-line";
+  syncPill.textContent = online ? "Online" : loading ? "Conectando" : pending ? "Pendente" : error ? "Erro" : "Off-line";
   syncPill.classList.toggle("online", online);
-  syncPill.classList.toggle("offline", !online);
-  syncStatusTitle.textContent = online ? "Sincronização ativa" : loading ? "Conectando" : error ? "Erro na sincronização" : "Sincronização off-line";
+  syncPill.classList.toggle("offline", !online && !pending);
+  syncPill.classList.toggle("pending", pending);
+  syncStatusTitle.textContent = online
+    ? "Sincronização ativa"
+    : loading
+      ? "Conectando"
+      : pending
+        ? "Aguardando sincronização"
+        : error
+          ? "Erro na sincronização"
+          : "Sincronização off-line";
   syncStatusText.textContent = online
     ? (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen
       ? "Painel administrativo ativo. A rotina de uma família só deve ser aberta quando selecionada."
       : "Rotina familiar sincronizando em tempo real.")
     : loading
       ? "Conectando ao Firebase..."
-      : error
-        ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
-        : "Os dados ficam salvos neste aparelho. Entre para sincronizar entre celulares.";
+      : pending
+        ? (detail || "Registro salvo neste aparelho. O Ninou tenta sincronizar novamente em instantes.")
+        : error
+          ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
+          : "Os dados ficam salvos neste aparelho. Entre para sincronizar entre celulares.";
 
   renderSyncDetails();
   renderAdminDiagnostics();
@@ -9273,6 +9342,13 @@ function resizeImage(file) {
 }
 
 bindBottomNavigation(navButtons, showScreen);
+window.addEventListener("online", () => {
+  if (cloudUser && firebaseServices && hasFamilyAccess()) {
+    setSyncStatus("pending", cloudUser.email || "", "Conexão voltou. Tentando sincronizar os registros salvos neste aparelho.");
+    schedulePendingCloudRetry();
+  }
+});
+
 bindSyncPillNavigation(syncPill, showScreen);
 
 bindShortcutNavigation(shortcutButtons, showScreen);

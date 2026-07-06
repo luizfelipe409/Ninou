@@ -1,0 +1,126 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userEmail() {
+      return isSignedIn() && request.auth.token.email != null
+        ? request.auth.token.email.lower()
+        : "";
+    }
+
+    function isGlobalAdmin() {
+      return isSignedIn()
+        && userEmail() == "luizfelipe.dasilva@gmail.com";
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isFamilyMember(familyId) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid));
+    }
+
+    function isFamilyAdmin(familyId) {
+      return isGlobalAdmin()
+        || (
+          isSignedIn()
+          && exists(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid))
+          && get(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid)).data.role in ["admin", "owner", "responsavel", "pai", "mae"]
+        );
+    }
+
+    function hasUserFamilyLink(familyId) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/families/$(familyId));
+    }
+
+    function canUseFamily(familyId) {
+      return isGlobalAdmin() || isFamilyMember(familyId) || hasUserFamilyLink(familyId);
+    }
+
+    match /families/{familyId} {
+      allow read: if canUseFamily(familyId);
+      allow create, update: if isGlobalAdmin() || isSignedIn();
+      allow delete: if isGlobalAdmin();
+
+      match /profile/{profileId} {
+        allow read, write: if canUseFamily(familyId);
+      }
+
+      match /days/{dayId} {
+        allow read, write: if canUseFamily(familyId);
+      }
+
+      match /members/{memberId} {
+        allow read: if canUseFamily(familyId);
+        allow create, update: if isGlobalAdmin() || isSelf(memberId) || isFamilyAdmin(familyId);
+        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+      }
+
+      match /invites/{inviteId} {
+        allow read: if isGlobalAdmin() || isFamilyAdmin(familyId);
+        allow create, update, delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+      }
+
+      match /invitations/{inviteId} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn();
+        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+      }
+
+      match /migrations/{migrationId} {
+        allow read, write: if isGlobalAdmin() || isFamilyAdmin(familyId);
+      }
+
+      match /{document=**} {
+        allow read, write: if isGlobalAdmin();
+      }
+    }
+
+    match /users/{userId} {
+      allow read, write: if isSelf(userId) || isGlobalAdmin();
+
+      match /families/{familyId} {
+        allow read, write: if isSelf(userId) || isGlobalAdmin();
+      }
+
+      match /access/{docId} {
+        allow read, write: if isSelf(userId) || isGlobalAdmin();
+      }
+
+      match /account/{docId} {
+        allow read, write: if isSelf(userId) || isGlobalAdmin();
+      }
+
+      match /days/{dayId} {
+        allow read, write: if isSelf(userId) || isGlobalAdmin();
+      }
+
+      match /profile/{docId} {
+        allow read, write: if isSelf(userId) || isGlobalAdmin();
+      }
+
+      match /{document=**} {
+        allow read, write: if isSelf(userId) || isGlobalAdmin();
+      }
+    }
+
+    match /invites/{inviteId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isGlobalAdmin();
+    }
+
+    // Migração/diagnóstico legado: permitido apenas ao admin global.
+    match /{document=**} {
+      allow read, write: if isGlobalAdmin();
+    }
+  }
+}
