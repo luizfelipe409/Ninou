@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-74-7-avatar-igual-previa";
+const CACHE_NAME = "ninou-v75-74-8-avatar-perfil-maior";
 const APP_SHELL = [
   "/",
   "/index.html",
