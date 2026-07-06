@@ -1,6 +1,6 @@
-// Ninou v75.74.4 - Avatar modal refinado e estável
+// Ninou v75.75.4 - Criar família idempotente e sem duplicidade
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.74.4";
+const NINOU_APP_VERSION = "75.75.4";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

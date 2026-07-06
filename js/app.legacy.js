@@ -312,7 +312,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.74.4";
+const NINOU_RUNTIME_VERSION = "75.75.4";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -495,6 +495,7 @@ let firebaseServices = null;
 let firebaseServicesPromise = null;
 let cloudUser = null;
 let authAccessLoading = false;
+let personalFamilyActivationInFlight = false;
 let authFlowRunId = 0;
 let familyBootstrapReady = false;
 let familyAccess = loadFamilyAccess();
@@ -2960,6 +2961,17 @@ function createFamilyIdFromNames(familyName = "", babyName = "") {
   return `family-${base}-${token}`;
 }
 
+function createStablePersonalFamilyId(user = cloudUser, familyName = "", babyName = "") {
+  const email = normalizeEmail(user?.email || "");
+  const emailName = email.split("@")[0] || "familia";
+  const base = slugifyFamilyText(babyName || familyName || emailName || "familia");
+  const stableOwnerKey = String(user?.uid || email || base || "familia");
+  const token = stableInviteToken(`personal-family|${stableOwnerKey}|${email}`)
+    .slice(0, 6)
+    .toLowerCase();
+  return `family-${base}-${token}`;
+}
+
 function buildInviteLink(code) {
   const url = new URL(window.location.href);
   url.search = "";
@@ -5147,7 +5159,10 @@ function renderFamilyAccessPanel() {
   if (createFamilyButton) {
     // v75.58.1: admin ativa a família principal; usuários novos podem criar a própria família.
     createFamilyButton.hidden = !connected || authorized;
-    createFamilyButton.textContent = appAdmin ? "Ativar família principal" : "Criar minha família";
+    createFamilyButton.disabled = personalFamilyActivationInFlight;
+    createFamilyButton.textContent = personalFamilyActivationInFlight
+      ? (appAdmin ? "Ativando..." : "Criando...")
+      : (appAdmin ? "Ativar família principal" : "Criar minha família");
   }
 
   if (inviteAcceptBox) {
@@ -5320,6 +5335,23 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
 }
 
 async function activatePersonalFamily() {
+  if (personalFamilyActivationInFlight) {
+    if (loginHelper) loginHelper.textContent = "A criação da família já está em andamento. Aguarde alguns segundos.";
+    return familyAccess;
+  }
+
+  personalFamilyActivationInFlight = true;
+  renderAuthControls();
+
+  try {
+    return await activatePersonalFamilyInternal();
+  } finally {
+    personalFamilyActivationInFlight = false;
+    renderAuthControls();
+  }
+}
+
+async function activatePersonalFamilyInternal() {
   if (!cloudUser) {
     if (loginHelper) loginHelper.textContent = "Entre antes de ativar sua família.";
     return null;
@@ -5359,9 +5391,22 @@ async function activatePersonalFamily() {
   try {
     const email = normalizeEmail(cloudUser.email || "");
     const emailName = email.split("@")[0] || "familia";
+
+    const existingAccess = await readAccountAccessFromCloud(cloudUser);
+    if (existingAccess?.familyId) {
+      saveFamilyAccess(existingAccess);
+      setVisibleDataOwnerEmail(email);
+      await connectCurrentAccount();
+      setSyncStatus("online", email);
+      markCloudSynced();
+      if (loginHelper) loginHelper.textContent = "Família já existente encontrada. O acesso foi reutilizado, sem criar duplicidade.";
+      showScreen("profile");
+      return familyAccess;
+    }
+
     const babyName = String(babyNameInput?.value || babyProfile?.name || "").trim();
     const familyName = babyName ? `Família do ${babyName}` : `Família de ${emailName}`;
-    const familyId = createFamilyIdFromNames(familyName, babyName || emailName);
+    const familyId = createStablePersonalFamilyId(cloudUser, familyName, babyName || emailName);
     const nowIso = new Date().toISOString();
     const access = {
       familyId,
@@ -5373,16 +5418,23 @@ async function activatePersonalFamily() {
 
     if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
 
-    await services.setDoc(services.doc(services.db, "families", familyId), {
+    const familyRef = services.doc(services.db, "families", familyId);
+    const familySnapshot = await services.getDoc(familyRef);
+    const familyPayload = {
       familyId,
       title: familyName,
       ownerUid: cloudUser.uid,
       ownerEmail: email,
       status: "active",
       appVersion: NINOU_RUNTIME_VERSION,
-      createdAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
-    }, { merge: true });
+    };
+    if (!familySnapshot.exists()) familyPayload.createdAt = services.serverTimestamp();
+    await services.setDoc(familyRef, familyPayload, { merge: true });
+
+    // Primeiro cria o vínculo/membro. Assim as regras de Firestore liberam os subdocumentos da família
+    // e cliques repetidos reescrevem o mesmo ID estável, em vez de gerar novas famílias.
+    await saveAccountAccessToCloud(access, cloudUser);
 
     const profilePayload = {
       ...getProfilePayload(),
@@ -5392,42 +5444,12 @@ async function activatePersonalFamily() {
     };
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), profilePayload, { merge: true });
 
-    await services.setDoc(services.doc(services.db, "families", familyId, "members", cloudUser.uid), {
-      uid: cloudUser.uid,
-      familyId,
-      role: "responsavel",
-      email,
-      ownerUid: cloudUser.uid,
-      status: "active",
-      joinedAt: services.serverTimestamp(),
-      createdAt: services.serverTimestamp(),
-    }, { merge: true });
-
-    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "families", familyId), {
-      familyId,
-      role: "responsavel",
-      email,
-      ownerUid: cloudUser.uid,
-      status: "active",
-      linkedAt: services.serverTimestamp(),
-      updatedAt: services.serverTimestamp(),
-    }, { merge: true });
-
-    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "access", "ninou"), {
-      familyId,
-      role: "responsavel",
-      email,
-      ownerUid: cloudUser.uid,
-      updatedAt: services.serverTimestamp(),
-    }, { merge: true });
-
     saveFamilyAccess(access);
     setVisibleDataOwnerEmail(email);
     await connectCurrentAccount();
     setSyncStatus("online", email);
     markCloudSynced();
     if (loginHelper) loginHelper.textContent = "Família criada. Agora você já pode registrar a rotina e convidar cuidadores.";
-    renderAuthControls();
     showScreen("profile");
     return familyAccess;
   } catch (error) {
@@ -9646,6 +9668,7 @@ createAccountButton.addEventListener("click", createAccount);
 if (clearDeviceDataButton) clearDeviceDataButton.addEventListener("click", signOutAndClearDeviceData);
 if (createFamilyButton) {
   createFamilyButton.addEventListener("click", () => {
+    if (personalFamilyActivationInFlight) return;
     activatePersonalFamily().catch((error) => {
       console.error("Erro ao ativar família:", error);
       if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
