@@ -1,5 +1,5 @@
 /* Ninou v75.74.1 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.74.3");
+@import url("./css/app.legacy.css?v=75.74.4");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -7354,7 +7354,7 @@ body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary .
   -webkit-text-fill-color: #171126 !important;
 }
 
-/* v75.74.3 — refinamento do modal de avatar, alinhamento e fundo travado */
+/* v75.74.4 — refinamento do modal de avatar, alinhamento e fundo travado */
 html.avatar-modal-open,
 body.avatar-modal-open {
   overflow: hidden !important;
@@ -7564,7 +7564,7 @@ body.day-theme #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.74.3 — estabilidade final do modal de avatar após verificação cuidadosa */
+/* v75.74.4 — estabilidade final do modal de avatar após verificação cuidadosa */
 .avatar-modal,
 #babyAvatarTestCard {
   overscroll-behavior: none !important;

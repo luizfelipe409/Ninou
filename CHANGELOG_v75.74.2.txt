@@ -1,4 +1,4 @@
-Ninou v75.74.3 — refinamento do modal de avatar
+Ninou v75.74.4 — refinamento do modal de avatar
 
 - Prévia do avatar maior e totalmente redonda.
 - Fundo da tela travado corretamente enquanto o modal de avatar estiver aberto.

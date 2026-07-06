@@ -1,4 +1,4 @@
-Ninou v75.74.3 — verificação cuidadosa do modal de avatar
+Ninou v75.74.4 — verificação cuidadosa do modal de avatar
 
 - Corrigido detalhe do bloqueio de rolagem do fundo no modal de avatar: ao trocar avatar várias vezes, o app não recalcula mais a posição da tela de fundo.
 - Mantida a posição original da página ao fechar o modal.
