@@ -7586,7 +7586,7 @@ body.day-theme #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.74.5 — refinamento atento da apresentação dos avatares */
+/* v75.74.6 — refinamento atento da apresentação dos avatares */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 314px !important;
   padding: 40px 24px 42px !important;
@@ -7739,5 +7739,69 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
   #babyAvatarTestCard .avatar-face-wrap {
     width: 90px !important;
     height: 90px !important;
+  }
+}
+
+
+/* v75.74.6 — equilíbrio fino do nome e do avatar principal */
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
+  min-height: 292px !important;
+  padding: 34px 22px 38px !important;
+  gap: 14px !important;
+}
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
+  width: 142px !important;
+  height: 142px !important;
+  padding: 5px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(145deg, rgba(124,229,194,.90), rgba(255,211,122,.84)) !important;
+  box-shadow: 0 16px 36px rgba(34, 24, 76, .16), inset 0 0 0 1px rgba(255,255,255,.54) !important;
+}
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] #profilePhoto {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.96) !important;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.94) !important;
+  object-fit: cover !important;
+  object-position: center 44% !important;
+  transform: scale(1.15) !important;
+}
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] span#profileBabyName {
+  max-width: 10.5ch !important;
+  margin-top: 2px !important;
+  font-size: clamp(2.3rem, 8.2vw, 3.18rem) !important;
+  line-height: .96 !important;
+  letter-spacing: -0.055em !important;
+  text-align: center !important;
+  text-wrap: balance !important;
+}
+.screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] strong#profileBabyAge {
+  font-size: clamp(1.18rem, 4.3vw, 1.58rem) !important;
+  line-height: 1.12 !important;
+}
+body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
+  box-shadow: 0 14px 30px rgba(73, 56, 125, .10), inset 0 0 0 1px rgba(255,255,255,.76) !important;
+}
+body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] #profilePhoto {
+  background: rgba(255,255,255,.99) !important;
+}
+@media (max-width: 520px) {
+  .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
+    min-height: 276px !important;
+    padding: 30px 18px 34px !important;
+    gap: 12px !important;
+  }
+  .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
+    width: 130px !important;
+    height: 130px !important;
+  }
+  .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] span#profileBabyName {
+    font-size: clamp(2.06rem, 7.6vw, 2.72rem) !important;
+    max-width: 10ch !important;
+  }
+  .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] strong#profileBabyAge {
+    font-size: clamp(1.08rem, 4vw, 1.34rem) !important;
   }
 }

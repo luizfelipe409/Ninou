@@ -1,4 +1,4 @@
-Ninou v75.74.5 — refinamento atento da apresentação dos avatares
+Ninou v75.74.6 — refinamento atento da apresentação dos avatares
 
 Ajustes realizados:
 - aumentei a presença do avatar principal no topo do perfil;
