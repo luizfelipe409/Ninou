@@ -6957,11 +6957,17 @@ function runActiveTimerAction() {
   renderAll();
 }
 
+function syncStartChoiceVisibility(visible) {
+  setHidden(startChoice, !visible);
+  startChoice?.classList.toggle("is-visible", Boolean(visible));
+  startChoice?.setAttribute("aria-hidden", visible ? "false" : "true");
+}
+
 function renderCurrentState() {
   reconcileCurrentAwakeStateFromEvents();
   if (!canUsePrivateFeatures()) {
     setHidden(wakeAction, true);
-    setHidden(startChoice, true);
+    syncStartChoiceVisibility(false);
     setText(stateLabel, "Acesso necessário");
     setText(stateClock, "--:--");
     setText(stateHint, "Entre com login e senha ou solicite acesso para registrar a rotina.");
@@ -6971,7 +6977,7 @@ function renderCurrentState() {
 
   if (getSelectedDayId() !== getCurrentDayId()) {
     setHidden(wakeAction, true);
-    setHidden(startChoice, true);
+    syncStartChoiceVisibility(false);
     setText(stateLabel, "Data selecionada");
     setText(stateClock, "--:--");
     setText(stateHint, "Você está revisando um dia anterior. Use o botão + para incluir ou editar registros nessa data.");
@@ -6981,7 +6987,7 @@ function renderCurrentState() {
 
   if (state.mode === "idle") {
     setHidden(wakeAction, true);
-    setHidden(startChoice, false);
+    syncStartChoiceVisibility(true);
     setText(stateLabel, "Rotina zerada");
     setText(stateClock, "00:00:00");
     setText(stateHint, `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`);
@@ -6990,7 +6996,7 @@ function renderCurrentState() {
   }
 
   setHidden(wakeAction, false);
-  setHidden(startChoice, true);
+  syncStartChoiceVisibility(false);
   const elapsed = Date.now() - Number(state.activeStartedAt || Date.now());
   if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 48 * hour) {
     state = createEmptyDayState();

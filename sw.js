@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-0-sync-pendente";
+const CACHE_NAME = "ninou-v75-75-2-atalhos-soneca-sync";
 const APP_SHELL = [
   "/",
   "/index.html",

@@ -7586,7 +7586,7 @@ body.day-theme #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.75.0 — refinamento atento da apresentação dos avatares */
+/* v75.75.2 — refinamento atento da apresentação dos avatares */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 314px !important;
   padding: 40px 24px 42px !important;
@@ -7743,7 +7743,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.75.0 — equilíbrio fino do nome e do avatar principal */
+/* v75.75.2 — equilíbrio fino do nome e do avatar principal */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 292px !important;
   padding: 34px 22px 38px !important;
@@ -7807,7 +7807,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.0 — avatar do perfil igual à prévia, com rosto um pouco maior */
+/* v75.75.2 — avatar do perfil igual à prévia, com rosto um pouco maior */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   width: 142px !important;
   height: 142px !important;
@@ -7851,7 +7851,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.0 — avatar do perfil com presença da prévia, sem aro gigante */
+/* v75.75.2 — avatar do perfil com presença da prévia, sem aro gigante */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   width: 126px !important;
   height: 126px !important;
@@ -7894,7 +7894,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.0 — avatar do perfil com presença igual/maior que a prévia */
+/* v75.75.2 — avatar do perfil com presença igual/maior que a prévia */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   width: 120px !important;
   height: 120px !important;
@@ -7937,7 +7937,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.0 — estado pendente de sincronização */
+/* v75.75.2 — estado pendente de sincronização */
 .sync-pill.pending {
   color: #3d2d10 !important;
   background: linear-gradient(135deg, rgba(255, 211, 122, .96), rgba(255, 244, 184, .92)) !important;
@@ -7951,4 +7951,57 @@ body:not(.day-theme) .sync-pill.pending {
 .account-sync-status[data-sync-state="pending"],
 .sync-pending-note {
   color: #ffd37a !important;
+}
+
+
+/* v75.75.2 — atalhos iniciais e próxima soneca mais confiáveis */
+.start-choice {
+  display: none !important;
+}
+.start-choice.is-visible {
+  display: grid !important;
+}
+.main-action-area .start-choice:not(.is-visible) {
+  display: none !important;
+}
+.quick-actions-heading {
+  margin-top: clamp(18px, 4vw, 24px) !important;
+  margin-bottom: clamp(10px, 2.5vw, 14px) !important;
+}
+.quick-actions button {
+  min-height: 112px !important;
+  padding: 18px 18px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 14px !important;
+  border-radius: 28px !important;
+}
+.quick-actions button::after,
+.quick-actions button::before {
+  opacity: 0 !important;
+}
+.quick-actions button > span:last-child {
+  line-height: 1.1 !important;
+  text-align: left !important;
+}
+.quick-actions .action-icon,
+.quick-actions .type-icon {
+  flex: 0 0 auto !important;
+}
+.next-card p {
+  line-height: 1.28 !important;
+  overflow-wrap: anywhere !important;
+}
+.next-card.is-overdue p {
+  color: rgba(255, 233, 224, 0.78) !important;
+}
+body.day-theme .next-card.is-overdue p {
+  color: rgba(105, 79, 92, 0.76) !important;
+}
+@media (max-width: 430px) {
+  .quick-actions button {
+    min-height: 104px !important;
+    padding: 16px 14px !important;
+    gap: 12px !important;
+  }
 }

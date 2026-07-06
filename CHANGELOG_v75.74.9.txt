@@ -1,4 +1,4 @@
-Ninou v75.75.0 — avatar do perfil alinhado com a prévia
+Ninou v75.75.2 — avatar do perfil alinhado com a prévia
 
 - reduzi a espessura do aro do avatar principal;
 - aumentei a presença do bebê dentro do círculo do perfil;

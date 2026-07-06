@@ -45,13 +45,43 @@ export function getNextNapInfo({ state, wakeWindowMinutes, now, formatTime, form
     };
   }
 
-  const target = Number(state.activeStartedAt) + wakeWindowMinutes * 60000;
+  const startedAt = Number(state.activeStartedAt);
+  const windowMs = Math.max(15, Number(wakeWindowMinutes) || 65) * 60000;
+
+  if (!Number.isFinite(startedAt) || startedAt <= 0 || startedAt > now) {
+    return {
+      title: "Acompanhando",
+      hint: "Registre a próxima soneca para recalcular a janela.",
+      status: "waiting",
+    };
+  }
+
+  const awakeMs = now - startedAt;
+  const target = startedAt + windowMs;
   const diff = target - now;
+  const maxUsefulOverdueMs = 3 * 60 * 60000;
+  const impossibleAwakeMs = 14 * 60 * 60000;
+
+  if (awakeMs > impossibleAwakeMs || Math.abs(diff) > impossibleAwakeMs) {
+    return {
+      title: "Recalcular rotina",
+      hint: "O horário anterior ficou antigo. Registre a próxima soneca para atualizar.",
+      status: "waiting",
+    };
+  }
 
   if (diff < 0) {
+    if (Math.abs(diff) > maxUsefulOverdueMs) {
+      return {
+        title: "Observar sinais",
+        hint: "A janela passou. Registre a próxima soneca para recalcular.",
+        status: "overdue",
+      };
+    }
+
     return {
       title: "Observar sinais",
-      hint: `Janela estimada há ${formatShortDuration(Math.abs(diff))}.`,
+      hint: `Janela passou há ${formatShortDuration(Math.abs(diff))}.`,
       status: "overdue",
     };
   }
