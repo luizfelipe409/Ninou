@@ -1,4 +1,4 @@
-Ninou v75.75.2 — ajuste fino do avatar principal
+Ninou v75.75.3 — ajuste fino do avatar principal
 
 - reduzi o peso visual do nome principal para nomes longos ficarem mais elegantes;
 - diminui o anel do avatar principal e deixei o conjunto mais equilibrado;

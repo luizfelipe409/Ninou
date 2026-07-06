@@ -1,4 +1,4 @@
-Ninou v75.75.2 — atalhos iniciais e próxima soneca refinados
+Ninou v75.75.3 — atalhos iniciais e próxima soneca refinados
 
 - Acordou/Iniciar soneca abaixo do botão principal ficam reservados ao início da rotina, quando o dia ainda está zerado.
 - Reforcei o bloqueio visual desses botões para eles não aparecerem com a rotina em andamento.
