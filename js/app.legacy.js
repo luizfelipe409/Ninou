@@ -312,7 +312,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.74.0";
+const NINOU_RUNTIME_VERSION = "75.74.1";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -608,7 +608,7 @@ function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
   const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.74.0: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
+  // v75.74.1: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
   if (babyAvatarCard) {
     babyAvatarCard.hidden = !editorOpen;
     babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
@@ -3307,7 +3307,7 @@ function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFami
 
 function updateGuestWhatsappButton() {
   if (!guestWhatsappButton) return;
-  // v75.74.0: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
+  // v75.74.1: o atalho flutuante estava poluindo a tela e aparecendo em contextos indevidos.
   // O acesso fica concentrado no Perfil para um acabamento mais limpo.
   guestWhatsappButton.href = ADMIN_WHATSAPP_URL;
   guestWhatsappButton.hidden = true;
@@ -6297,7 +6297,7 @@ async function returnToAdminPanel() {
 
 async function connectCurrentAccount() {
   /*
-    v75.74.0 — login rápido, mas consistente:
+    v75.74.1 — login rápido, mas consistente:
     1) lê apenas perfil + dia atual/selecionado uma vez;
     2) só depois libera a tela familiar;
     3) assina snapshots em tempo real;
