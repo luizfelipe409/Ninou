@@ -1,5 +1,5 @@
 /* Ninou v75.75.6 - fluxo familiar completo. */
-@import url("./css/app.legacy.css?v=75.75.25");
+@import url("./css/app.legacy.css?v=75.75.27");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -8646,7 +8646,7 @@ body:not(.day-theme) .join-family-code-field input {
 .admin-audit-item span { color: rgba(104, 72, 88, 0.82); }
 .admin-audit-item small { color: rgba(104, 72, 88, 0.58); }
 
-/* Ninou v75.75.25 — diagnóstico, mensagens e estabilidade familiar
+/* Ninou v75.75.27 — diagnóstico, mensagens e estabilidade familiar
    Mantém a paleta do app: lavanda, creme, verde suave e contraste roxo. */
 .family-health-panel {
   margin-top: 16px;
@@ -8775,7 +8775,7 @@ body:not(.day-theme) .join-family-code-field input {
   }
 }
 
-/* Ninou v75.75.25 — responsividade e admin adaptativo
+/* Ninou v75.75.27 — responsividade e admin adaptativo
    Foco: telas menores que iPhone 14 Pro Max e painel admin em desktop, respeitando a paleta lavanda/creme/verde do app. */
 :root {
   --ninou-admin-max-width: 1180px;
@@ -9139,7 +9139,7 @@ body.admin-family-preview .screen[data-screen="profile"] {
   }
 }
 
-/* Ninou v75.75.25 — polimento visual e estados vazios
+/* Ninou v75.75.27 — polimento visual e estados vazios
    Mantém lavanda, creme, verde suave e roxo; reduz textos técnicos e deixa telas sem dados com orientação clara. */
 :root {
   --ninou-empty-bg: linear-gradient(145deg, rgba(255, 250, 243, .94), rgba(246, 239, 255, .9));
@@ -9344,7 +9344,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.25 — relatórios e PDF mais profissional */
+/* Ninou v75.75.27 — relatórios e PDF mais profissional */
 .export-card {
   position: relative;
 }
@@ -9387,7 +9387,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.25 — Teste real de uso familiar */
+/* Ninou v75.75.27 — Teste real de uso familiar */
 .family-real-test-panel {
   margin-top: 1rem;
   padding: 1rem;
@@ -9474,7 +9474,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.25 — escopo familiar no admin */
+/* Ninou v75.75.27 — escopo familiar no admin */
 .admin-family-client-card .admin-selected-family-note,
 .family-real-test-intro {
   word-break: break-word;
@@ -9484,7 +9484,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.25 — offline e sincronização real */
+/* Ninou v75.75.27 — offline e sincronização real */
 .sync-pill.pending {
   white-space: nowrap;
 }
@@ -9509,7 +9509,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
   }
 }
 
-/* Ninou v75.75.25 — observações rápidas */
+/* Ninou v75.75.27 — observações rápidas */
 .quick-observations-panel {
   display: grid;
   gap: 10px;
@@ -9607,7 +9607,7 @@ body.day-theme .quick-observations-panel {
 }
 
 
-/* v75.75.25 — Limpeza de interface e modo simples.
+/* v75.75.27 — Limpeza de interface e modo simples.
    Mantém a paleta do Ninou usando as cores já existentes: lavanda, creme, verde suave e roxo. */
 .admin-mode-toolbar {
   display: grid;
@@ -9716,7 +9716,7 @@ body.ninou-advanced-mode [data-advanced-only] {
   }
 }
 
-/* Ninou v75.75.25 — painel admin desktop lapidado
+/* Ninou v75.75.27 — painel admin desktop lapidado
    Corrige cards estreitos, textos quebrando letra por letra e navegação sobrepondo o conteúdo no desktop. */
 :root {
   --ninou-admin-desktop-max: 1220px;
@@ -10002,5 +10002,241 @@ body.admin-family-preview .diagnostics-grid strong {
   body.global-admin-mode .screen[data-screen="profile"] #adminDiagnosticsCard,
   body.admin-family-preview .screen[data-screen="profile"] #adminDiagnosticsCard {
     grid-column: 1 / -1 !important;
+  }
+}
+
+/* Ninou v75.75.27 — revisão minuciosa do painel admin desktop
+   Corrige de forma mais agressiva o layout do painel no PC: nada de cards estreitos,
+   e-mails quebrando letra por letra ou conteúdo administrativo preso em grade de celular. */
+body.global-admin-mode.admin-panel-only .phone-shell,
+body.global-admin-mode .phone-shell {
+  overflow-x: hidden !important;
+}
+
+body.global-admin-mode.admin-panel-only .screen[data-screen="profile"] .settings-list {
+  width: 100% !important;
+  max-width: 1280px !important;
+  margin-inline: auto !important;
+}
+
+body.global-admin-mode.admin-panel-only #familyAccessCard,
+body.global-admin-mode.admin-panel-only #adminDiagnosticsCard,
+body.global-admin-mode.admin-panel-only .admin-access-card,
+body.global-admin-mode.admin-panel-only .admin-clean-panel,
+body.global-admin-mode.admin-panel-only #adminInvitePanel {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.global-admin-mode.admin-panel-only .admin-clean-panel,
+body.global-admin-mode.admin-panel-only .admin-clean-panel * {
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+body.global-admin-mode.admin-panel-only .admin-clean-panel :is(strong, span, small, em, p, li, button, label) {
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+}
+
+body.global-admin-mode.admin-panel-only .admin-access-item :is(strong, span, small),
+body.global-admin-mode.admin-panel-only .admin-known-user-item :is(strong, span, small),
+body.global-admin-mode.admin-panel-only .admin-member-item :is(strong, span, small),
+body.global-admin-mode.admin-panel-only .admin-support-item :is(strong, span, small),
+body.global-admin-mode.admin-panel-only .admin-client-item :is(strong, span, small) {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body.global-admin-mode.admin-panel-only .admin-access-item strong,
+body.global-admin-mode.admin-panel-only .admin-known-user-item strong,
+body.global-admin-mode.admin-panel-only .admin-member-item strong,
+body.global-admin-mode.admin-panel-only .admin-support-item strong {
+  overflow-wrap: anywhere !important;
+}
+
+@media (min-width: 900px) {
+  body.global-admin-mode.admin-panel-only {
+    overflow-x: hidden !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .phone-shell {
+    width: min(1280px, calc(100vw - 48px)) !important;
+    max-width: min(1280px, calc(100vw - 48px)) !important;
+    min-width: 0 !important;
+    padding-inline: clamp(18px, 2vw, 28px) !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .screen[data-screen="profile"] .settings-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    align-items: stretch !important;
+    grid-template-columns: none !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .screen[data-screen="profile"] .settings-list > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    grid-column: 1 / -1 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .profile-card,
+  body.global-admin-mode.admin-panel-only .login-card,
+  body.global-admin-mode.admin-panel-only .privacy-note-card {
+    max-width: 760px !important;
+    align-self: center !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #familyAccessCard,
+  body.global-admin-mode.admin-panel-only #adminDiagnosticsCard {
+    align-self: stretch !important;
+    max-width: none !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    align-items: start !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > * {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-clean-hero,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-create-family-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-users-section,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminMigrationSection {
+    grid-column: 1 / -1 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-stats-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminFlowGuide,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminInviteSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminMembersSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-list-section,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-family-audit-section,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-clean-section {
+    grid-column: span 6 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-clean-hero {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 18px !important;
+    align-items: center !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-clean-section,
+  body.global-admin-mode.admin-panel-only .admin-stats-card,
+  body.global-admin-mode.admin-panel-only .admin-create-invite-card,
+  body.global-admin-mode.admin-panel-only .admin-list-section,
+  body.global-admin-mode.admin-panel-only .family-health-panel,
+  body.global-admin-mode.admin-panel-only .admin-diagnostics-card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: clamp(18px, 1.7vw, 24px) !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-stats-grid,
+  body.global-admin-mode.admin-panel-only .diagnostics-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(150px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-stats-grid article,
+  body.global-admin-mode.admin-panel-only .diagnostics-grid article,
+  body.global-admin-mode.admin-panel-only .diagnostics-grid > * {
+    min-width: 0 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-stats-grid article span,
+  body.global-admin-mode.admin-panel-only .diagnostics-grid span {
+    display: block !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    line-height: 1.18 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-access-item,
+  body.global-admin-mode.admin-panel-only .admin-access-list > li.admin-access-item,
+  body.global-admin-mode.admin-panel-only .admin-access-list > li {
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr) minmax(170px, auto) !important;
+    gap: 14px !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-access-item > div,
+  body.global-admin-mode.admin-panel-only .admin-access-item > div:first-child,
+  body.global-admin-mode.admin-panel-only .admin-access-item > div:nth-child(2) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-support-item strong,
+  body.global-admin-mode.admin-panel-only .admin-known-user-item strong,
+  body.global-admin-mode.admin-panel-only .admin-member-item strong,
+  body.global-admin-mode.admin-panel-only .admin-access-item strong {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-access-item span,
+  body.global-admin-mode.admin-panel-only .admin-access-item small {
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-access-actions,
+  body.global-admin-mode.admin-panel-only .member-permission-actions {
+    justify-content: flex-end !important;
+    align-items: center !important;
+    min-width: 170px !important;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1120px) {
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-stats-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminFlowGuide,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminInviteSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminMembersSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-list-section,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-family-audit-section,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-clean-section {
+    grid-column: 1 / -1 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-stats-grid,
+  body.global-admin-mode.admin-panel-only .diagnostics-grid {
+    grid-template-columns: repeat(2, minmax(160px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 899px) {
+  body.global-admin-mode.admin-panel-only .admin-access-item,
+  body.global-admin-mode.admin-panel-only .admin-access-list > li.admin-access-item {
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-access-actions,
+  body.global-admin-mode.admin-panel-only .member-permission-actions {
+    grid-column: 1 / -1 !important;
+    justify-content: stretch !important;
   }
 }

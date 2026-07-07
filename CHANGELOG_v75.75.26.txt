@@ -1,0 +1,7 @@
+Ninou v75.75.26 — Correção da contagem de famílias no admin
+
+- A família técnica do admin (ninou-family-luizfelipe) deixa de entrar na contagem de famílias de clientes.
+- O painel admin passa a listar somente famílias reais/clientes.
+- A família técnica recebe marcação familyType=internal_admin/supportOnly para diagnóstico.
+- Quando não houver famílias de clientes, o painel mostra estado vazio claro.
+- Atualiza runtime/cache para 75.75.26.

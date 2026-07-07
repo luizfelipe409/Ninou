@@ -1,0 +1,9 @@
+Ninou v75.75.27 — Revisão minuciosa do painel admin desktop
+
+- Corrige responsividade real do painel admin no desktop.
+- O painel admin deixa de ficar preso em cards estreitos dentro da grade do perfil.
+- Corrige e-mail do admin quebrando letra por letra; no desktop usa reticências quando necessário.
+- Ajusta grid interno do admin para 12 colunas, com seções largas e sem esmagamento visual.
+- Mantém layout adaptativo para tablet e celular.
+- Preserva correção da contagem de famílias reais da v75.75.26.
+- Atualiza runtime/cache para 75.75.27.

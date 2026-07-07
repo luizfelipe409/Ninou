@@ -355,7 +355,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.25";
+const NINOU_RUNTIME_VERSION = "75.75.27";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -4037,6 +4037,20 @@ function buildGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamil
   };
 }
 
+function isInternalAdminFamily(familyId = "", data = {}) {
+  const id = String(familyId || "").trim();
+  const type = String(data.familyType || data.type || "").trim().toLowerCase();
+  const label = String(data.customerLabel || data.subtitle || "").trim().toLowerCase();
+  return id === APP_ADMIN_FAMILY_ID
+    || data.internalAdminFamily === true
+    || data.supportOnly === true
+    || data.accessMode === "support"
+    || type === "internal_admin"
+    || label.includes("área técnica")
+    || label.includes("area tecnica")
+    || label.includes("admin interno");
+}
+
 function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamilyId(), options = {}) {
   const selectedFamily = saveSelectedAdminFamilyId(familyId);
   const access = buildGlobalAdminAccess(user, selectedFamily);
@@ -5460,13 +5474,13 @@ function renderAdminClients(stats = null) {
   const selectedId = getActiveAdminFamilyId();
   const families = Array.isArray(stats?.families) && stats.families.length
     ? stats.families
-    : [{
+    : (appAdmin ? [] : [{
         id: selectedId,
         name: stats?.familyName || "Família selecionada",
         subtitle: "Família cadastrada",
         membersCount: stats?.membersCount ?? 0,
         pendingInvitesCount: stats?.pendingInvitesCount ?? 0,
-      }];
+      }]);
 
   if (adminClientsList) {
     if (!appAdmin) {
@@ -5478,6 +5492,16 @@ function renderAdminClients(stats = null) {
             <strong>${escapeHtml(family.name || "Minha família")}</strong>
             <span>Diagnóstico restrito a esta família • ${escapeHtml(pluralize(Number(family.membersCount || 0), "membro", "membros"))} • ${escapeHtml(getPendingInviteText(Number(family.pendingInvitesCount || 0)))}</span>
             <small>Nenhuma outra família é listada para este acesso.</small>
+          </div>
+        </li>`;
+    } else if (!families.length) {
+      adminClientsList.innerHTML = `
+        <li class="admin-access-item admin-client-item admin-empty-client-list">
+          <img class="admin-avatar family-avatar" src="${getCaregiverAvatarDataUrl("Ninou", "empty-family", "family")}" alt="" />
+          <div>
+            <strong>Nenhuma família de cliente cadastrada</strong>
+            <span>A família técnica do admin não entra nesta contagem.</span>
+            <small>Use “Criar família” para preparar o primeiro acesso real.</small>
           </div>
         </li>`;
     } else {
@@ -5706,7 +5730,7 @@ function renderAdminStats(stats = null) {
   setText(adminLastMigrationStatus, lastMigrationResult ? "Concluída" : "Sem migração");
   setText(
     adminStatsHint,
-    `${pluralize(stats.familiesCount ?? 0, "família cadastrada", "famílias cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "conta válida para revisão", "contas válidas para revisão")}.`,
+    `${pluralize(stats.familiesCount ?? 0, "família de cliente cadastrada", "famílias de clientes cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "conta válida para revisão", "contas válidas para revisão")}.`,
   );
   renderAdminClients(stats);
   renderAdminAccessLists(stats);
@@ -5882,15 +5906,16 @@ async function refreshAdminStats(options = {}) {
     familiesSnapshot.forEach((familyDoc) => {
       const data = familyDoc.data() || {};
       const profile = familyDoc.id === familyId ? familyProfileData : (familyProfileById.get(familyDoc.id) || {});
+      if (isInternalAdminFamily(familyDoc.id, data)) return;
       familySummaries.push({
         id: familyDoc.id,
-        name: profile.name || data.name || data.title || (familyDoc.id === APP_ADMIN_FAMILY_ID ? "Família principal" : `Família ${familyDoc.id.slice(0, 8)}`),
+        name: profile.name || data.name || data.title || `Família ${familyDoc.id.slice(0, 8)}`,
         subtitle: data.customerLabel || data.subtitle || "Família cadastrada",
         membersCount: familyDoc.id === familyId ? members.filter((member) => !member.isAdmin).length : (Number.isFinite(Number(data.membersCount)) ? Number(data.membersCount) : null),
         pendingInvitesCount: familyDoc.id === familyId ? pendingInvites.length : (Number.isFinite(Number(data.pendingInvitesCount)) ? Number(data.pendingInvitesCount) : null),
       });
     });
-    if (!familySummaries.some((family) => family.id === familyId)) {
+    if (!isInternalAdminFamily(familyId, familyData) && !familySummaries.some((family) => family.id === familyId)) {
       familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
     }
     familySummaries.sort((a, b) => Number(b.id === familyId) - Number(a.id === familyId) || String(a.name).localeCompare(String(b.name)));
@@ -6206,11 +6231,14 @@ async function activatePersonalFamilyInternal() {
       const familyPayload = {
         supportAdminUid: cloudUser.uid,
         supportAdminEmail: cloudUser.email || "",
-        customerLabel: "Família cadastrada",
+        customerLabel: access.familyId === APP_ADMIN_FAMILY_ID ? "Área técnica do app" : "Família cadastrada",
+        familyType: access.familyId === APP_ADMIN_FAMILY_ID ? "internal_admin" : "client",
+        internalAdminFamily: access.familyId === APP_ADMIN_FAMILY_ID,
+        supportOnly: access.familyId === APP_ADMIN_FAMILY_ID,
         createdAt: services.serverTimestamp(),
         updatedAt: services.serverTimestamp(),
       };
-      if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = familyPayload.title || "Família principal";
+      if (access.familyId === APP_ADMIN_FAMILY_ID) familyPayload.title = familyPayload.title || "Área técnica do admin";
       await services.setDoc(services.doc(services.db, "families", access.familyId), familyPayload, { merge: true });
       setSyncStatus("online", cloudUser.email || "");
       if (loginHelper) loginHelper.textContent = "Admin do app conectado. Você já pode gerar convites no Perfil.";
