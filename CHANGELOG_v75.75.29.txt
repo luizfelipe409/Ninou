@@ -1,0 +1,9 @@
+Ninou v75.75.29 — admin premium real
+
+- remove navegação mobile flutuante no painel admin desktop;
+- transforma o painel admin em dashboard amplo no PC;
+- compacta o cabeçalho do perfil admin sem quebrar e-mail;
+- oculta cards familiares irrelevantes no modo admin global;
+- amplia listas de famílias, convites e membros para evitar texto quebrado;
+- reorganiza diagnóstico e saúde da família em cards mais legíveis;
+- atualiza cache/PWA para forçar recarregamento.

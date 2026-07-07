@@ -1,8 +1,8 @@
-/* Ninou v75.75.28 — acabamento premium de interface
+/* Ninou v75.75.29 — acabamento premium de interface
    Pequena camada de UX: protege e-mails, encurta botões longos no painel admin
    e reaplica os ajustes quando o app renderiza listas dinamicamente. */
 (() => {
-  const VERSION = "75.75.28";
+  const VERSION = "75.75.29";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
