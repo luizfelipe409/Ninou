@@ -24244,3 +24244,67 @@ body.day-theme .admin-diagnostics-card strong {
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* Ninou v75.75.33 — ajuste visual do diagnóstico familiar e respiro da barra inferior */
+.family-health-panel {
+  background: linear-gradient(180deg, #fbf7ff 0%, #f4edff 100%) !important;
+  border-color: rgba(93, 71, 139, .22) !important;
+  color: #302454 !important;
+}
+.family-health-header span,
+.family-health-panel > span,
+.family-health-status {
+  color: rgba(55, 41, 90, .78) !important;
+}
+.family-health-header strong,
+.family-health-checklist strong,
+.family-health-panel strong {
+  color: #302454 !important;
+  text-shadow: none !important;
+}
+.family-health-score {
+  background: #ebe1ff !important;
+  color: #46306f !important;
+}
+.family-health-checklist li {
+  background: rgba(255,255,255,.84) !important;
+  border-color: rgba(93,71,139,.18) !important;
+}
+.family-health-checklist li.needs-attention {
+  background: #fff4e3 !important;
+  border-color: rgba(170,124,47,.26) !important;
+}
+.family-health-checklist small,
+.family-health-panel small {
+  color: rgba(64, 49, 95, .76) !important;
+}
+.family-health-actions .secondary-login,
+.family-health-actions button {
+  background: rgba(255,255,255,.92) !important;
+  color: #46306f !important;
+  border-color: rgba(93,71,139,.18) !important;
+  box-shadow: 0 10px 24px rgba(57,39,98,.10) !important;
+}
+body:not(.day-theme) .family-health-panel {
+  background: linear-gradient(180deg, #f6f0ff 0%, #e9e0f7 100%) !important;
+}
+body:not(.day-theme) .family-health-status {
+  color: rgba(64,49,95,.82) !important;
+}
+@media (max-width: 899px) {
+  .phone-shell {
+    padding-bottom: max(180px, calc(150px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+  .screen[data-screen].active {
+    padding-bottom: 150px !important;
+  }
+  .settings-list {
+    padding-bottom: 148px !important;
+  }
+  .export-card,
+  .danger-card,
+  .support-card {
+    scroll-margin-bottom: 150px !important;
+  }
+}

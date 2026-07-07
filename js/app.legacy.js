@@ -355,7 +355,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.32";
+const NINOU_RUNTIME_VERSION = "75.75.33";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -11549,6 +11549,37 @@ function withNinouTimeout(promise, timeoutMs = 12000) {
   ]);
 }
 
+
+function buildBasicFamilyHealthStats() {
+  const familyId = familyAccess?.familyId || (isGlobalAppAdmin() ? getActiveAdminFamilyId() : "");
+  const hasFamilyId = Boolean(familyId);
+  const familyName = getProfileFamilyDisplayName?.() || latestAdminStats?.familyName || getBabyDisplayName?.() || "Família Ninou";
+  const hasProfile = Boolean(hasFamilyId && familyName && familyName !== "Bebê");
+  return {
+    familyName,
+    families: hasFamilyId ? [{ id: familyId, name: familyName, subtitle: "Família conectada" }] : [],
+    members: [],
+    pendingInvites: [],
+    familyAudit: [],
+    knownUsers: [],
+    familiesCount: hasFamilyId ? 1 : 0,
+    membersCount: hasFamilyAccess() ? 1 : 0,
+    pendingInvitesCount: 0,
+    acceptedInvitesCount: 0,
+    knownUsersCount: 0,
+    integrity: {
+      hasFamilyId,
+      selectedHasProfile: hasProfile,
+      visibleMembersCount: hasFamilyAccess() ? 1 : 0,
+      pendingInvitesCount: 0,
+      expiredPendingInvites: 0,
+      usersWithoutLink: 0,
+      emptyFamilies: 0,
+      duplicateEmailCount: 0,
+    },
+  };
+}
+
 async function runFamilyHealthRefresh({ button = familyHealthRefreshButton } = {}) {
   if (button?.dataset?.ninouCheckingFamily === "true") return null;
   if (button) {
@@ -11558,22 +11589,25 @@ async function runFamilyHealthRefresh({ button = familyHealthRefreshButton } = {
   }
   if (familyHealthStatus) familyHealthStatus.textContent = "Verificando família...";
   try {
-    const stats = await withNinouTimeout(refreshAdminStats(), 12000);
-    renderFamilyHealthPanel(stats || latestAdminStats);
-    if (!stats && !latestAdminStats && familyHealthStatus) {
-      familyHealthStatus.textContent = "Não foi possível verificar agora. Atualize o painel ou confira a conexão/Firebase.";
-    } else if (familyHealthStatus && familyHealthStatus.textContent === "Verificando família...") {
-      familyHealthStatus.textContent = "Verificação concluída.";
+    const stats = await withNinouTimeout(refreshAdminStats({ silent: true }), 10000);
+    const effectiveStats = stats || latestAdminStats || buildBasicFamilyHealthStats();
+    renderFamilyHealthPanel(effectiveStats);
+    if (familyHealthStatus) {
+      familyHealthStatus.textContent = stats || latestAdminStats
+        ? "Verificação concluída. Use os alertas acima apenas como apoio técnico."
+        : "Verificação básica concluída neste aparelho. Para checagem completa, confirme conexão e regras do Firebase.";
     }
-    return stats;
+    return effectiveStats;
   } catch (error) {
     console.warn("Verificação da família não concluiu:", error);
+    const fallbackStats = latestAdminStats || buildBasicFamilyHealthStats();
+    renderFamilyHealthPanel(fallbackStats);
     if (familyHealthStatus) {
       familyHealthStatus.textContent = error?.message === "timeout"
-        ? "A verificação demorou demais. Confira a conexão e toque em Verificar família novamente."
-        : getFirebaseErrorMessage(error);
+        ? "Verificação básica exibida. A checagem completa demorou demais; confira a conexão se precisar atualizar os dados da nuvem."
+        : "Verificação básica exibida. A checagem completa depende da conexão e das regras do Firebase.";
     }
-    return null;
+    return fallbackStats;
   } finally {
     if (button) {
       button.textContent = "Verificar família";
@@ -11732,9 +11766,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.32 — polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.33 — polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.32";
+  const VERSION = "75.75.33";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
