@@ -1,0 +1,6 @@
+v75.75.9
+- Corrige criação de família para conta recém-autenticada sem vínculo familiar.
+- Remove leitura indevida da família fixa ninou-family-luizfelipe para usuários comuns.
+- Primeiro grava users/{uid}/families e families/{familyId}/members/{uid}; depois grava families/{familyId} e profile/main.
+- Ajusta texto de conta autenticada sem família para evitar impressão de acesso familiar indevido.
+- Atualiza cache/runtime para 75.75.9.

@@ -332,7 +332,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.8";
+const NINOU_RUNTIME_VERSION = "75.75.9";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -5572,11 +5572,13 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.56.2.1.1: contas já incluídas em members/{uid} também entram sem precisar redigitar convite.
-  const candidateFamilies = [APP_ADMIN_FAMILY_ID, familyAccess?.familyId, getVisibleDataOwnerEmail()].filter(Boolean);
+  // v75.75.9: não tenta consultar a família principal fixa para usuários comuns.
+  // Uma conta recém-autenticada ainda não tem permissão para ler members/{uid} em famílias
+  // onde ela não possui vínculo; isso gerava "Missing or insufficient permissions" antes
+  // mesmo sem ser um erro real. O vínculo agora vem de users/{uid}/families ou convite.
+  const candidateFamilies = [familyAccess?.familyId].filter(Boolean);
   for (const familyId of [...new Set(candidateFamilies)]) {
     try {
-      if (!String(familyId).startsWith("ninou-family-")) continue;
       const memberRef = services.doc(services.db, "families", familyId, "members", user.uid);
       const memberSnapshot = await services.getDoc(memberRef);
       if (!memberSnapshot.exists()) continue;
@@ -5590,7 +5592,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
         acceptedAt: data.acceptedAt || data.joinedAt || data.createdAt || "",
       });
     } catch (error) {
-      console.warn("Não foi possível verificar membro da família:", familyId, error);
+      console.warn("Não foi possível confirmar o membro familiar já vinculado:", familyId, error);
     }
   }
   return null;
@@ -5740,8 +5742,13 @@ async function activatePersonalFamilyInternal() {
 
     if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
 
+    // v75.75.9: primeiro cria o vínculo do usuário e o member/{uid}.
+    // Uma conta nova ainda não tem permissão para ler families/{familyId}; por isso
+    // não fazemos getDoc(familyRef) antes. Depois do vínculo, as regras liberam
+    // a criação/atualização segura da família e dos subdocumentos.
+    await saveAccountAccessToCloud(access, cloudUser);
+
     const familyRef = services.doc(services.db, "families", familyId);
-    const familySnapshot = await services.getDoc(familyRef);
     const familyPayload = {
       familyId,
       title: familyName,
@@ -5749,14 +5756,10 @@ async function activatePersonalFamilyInternal() {
       ownerEmail: email,
       status: "active",
       appVersion: NINOU_RUNTIME_VERSION,
+      createdAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
     };
-    if (!familySnapshot.exists()) familyPayload.createdAt = services.serverTimestamp();
     await services.setDoc(familyRef, familyPayload, { merge: true });
-
-    // Primeiro cria o vínculo/membro. Assim as regras de Firestore liberam os subdocumentos da família
-    // e cliques repetidos reescrevem o mesmo ID estável, em vez de gerar novas famílias.
-    await saveAccountAccessToCloud(access, cloudUser);
 
     const profilePayload = {
       ...getProfilePayload(),
@@ -6521,7 +6524,7 @@ function renderAuthControls() {
   const appAdmin = isGlobalAppAdmin();
   const routineAuthorized = authorized && !authAccessLoading && (!appAdmin || Boolean(window.__ninouAdminFamilyDataOpen));
   document.body.classList.toggle("family-bootstrap-ready", Boolean(familyBootstrapReady && authorized));
-  loginButton.textContent = connected ? "Conectado" : "Entrar";
+  loginButton.textContent = connected ? (authorized ? "Conectado" : "Conta autenticada") : "Entrar";
   loginButton.disabled = connected || authAccessLoading;
   createAccountButton.textContent = connected ? "Sair" : "Criar conta";
   createAccountButton.classList.toggle("logout-button", connected);
@@ -7140,7 +7143,7 @@ async function initFirebaseAuthState() {
 
       if (!hasFamilyAccess()) {
         setAuthAccessLoading(false);
-        loginHelper.textContent = "Conta conectada, mas sem acesso familiar encontrado. Use um convite recebido ou peça ao administrador para verificar o membro da família.";
+        loginHelper.textContent = "Conta autenticada, mas sem família vinculada. Crie sua família se você for o primeiro responsável ou aceite um convite familiar.";
         setSyncStatus("offline", user.email || "");
         renderAuthControls();
         showScreen("profile");
