@@ -355,7 +355,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.31";
+const NINOU_RUNTIME_VERSION = "75.75.32";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -11462,8 +11462,6 @@ if (adminInvitePanel) {
     }
 
     if (event.target.closest("#familyHealthRefreshButton")) {
-      if (familyHealthStatus) familyHealthStatus.textContent = "Verificando família...";
-      await refreshAdminStats();
       return;
     }
 
@@ -11543,14 +11541,53 @@ if (adminInvitePanel) {
     }
   });
 }
+
+function withNinouTimeout(promise, timeoutMs = 12000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), timeoutMs)),
+  ]);
+}
+
+async function runFamilyHealthRefresh({ button = familyHealthRefreshButton } = {}) {
+  if (button?.dataset?.ninouCheckingFamily === "true") return null;
+  if (button) {
+    button.dataset.ninouCheckingFamily = "true";
+    button.disabled = true;
+    button.textContent = "Verificando...";
+  }
+  if (familyHealthStatus) familyHealthStatus.textContent = "Verificando família...";
+  try {
+    const stats = await withNinouTimeout(refreshAdminStats(), 12000);
+    renderFamilyHealthPanel(stats || latestAdminStats);
+    if (!stats && !latestAdminStats && familyHealthStatus) {
+      familyHealthStatus.textContent = "Não foi possível verificar agora. Atualize o painel ou confira a conexão/Firebase.";
+    } else if (familyHealthStatus && familyHealthStatus.textContent === "Verificando família...") {
+      familyHealthStatus.textContent = "Verificação concluída.";
+    }
+    return stats;
+  } catch (error) {
+    console.warn("Verificação da família não concluiu:", error);
+    if (familyHealthStatus) {
+      familyHealthStatus.textContent = error?.message === "timeout"
+        ? "A verificação demorou demais. Confira a conexão e toque em Verificar família novamente."
+        : getFirebaseErrorMessage(error);
+    }
+    return null;
+  } finally {
+    if (button) {
+      button.textContent = "Verificar família";
+      button.disabled = false;
+      delete button.dataset.ninouCheckingFamily;
+    }
+  }
+}
+
 if (familyHealthRefreshButton) {
-  familyHealthRefreshButton.addEventListener("click", async () => {
-    familyHealthRefreshButton.disabled = true;
-    familyHealthRefreshButton.textContent = "Verificando...";
-    if (familyHealthStatus) familyHealthStatus.textContent = "Verificando família...";
-    await refreshAdminStats();
-    familyHealthRefreshButton.textContent = "Verificar família";
-    familyHealthRefreshButton.disabled = false;
+  familyHealthRefreshButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await runFamilyHealthRefresh({ button: familyHealthRefreshButton });
   });
 }
 if (familyHealthRepairButton) {
@@ -11694,15 +11731,13 @@ sheetDateInput?.addEventListener("input", updateSleepDurationPreview);
 sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
-/* ===== Ninou v75.75.31 — acabamento seguro consolidado no JS principal ===== */
-/* Ninou v75.75.31 — acabamento seguro de interface
-   Protege e-mails e encurta rótulos longos sem remover botões/cards. */
+
+/* Ninou v75.75.32 — polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.31";
+  const VERSION = "75.75.32";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
-
   const buttonLabels = new Map([
     ["Abrir rotina da família selecionada", "Abrir rotina"],
     ["Gerenciar membros", "Membros"],
@@ -11712,16 +11747,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
     ["Preparar para consulta", "Consulta"],
     ["Enviar WhatsApp", "WhatsApp"],
   ]);
-
-  function escapeHtml(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  function escapeHtmlLocal(value) {
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
-
   function protectEmailText(element) {
     if (!element || element.closest(SKIP_SELECTOR)) return;
     if (element.dataset?.ninouEmailProtected === "true") return;
@@ -11729,57 +11757,33 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
     const text = element.textContent || "";
     if (!EMAIL_RE.test(text)) return;
     EMAIL_RE.lastIndex = 0;
-    element.innerHTML = escapeHtml(text).replace(EMAIL_RE, (email) => {
-      const safe = escapeHtml(email);
+    element.innerHTML = escapeHtmlLocal(text).replace(EMAIL_RE, (email) => {
+      const safe = escapeHtmlLocal(email);
       return `<span class="ninou-email-token" title="${safe}">${safe}</span>`;
     });
     element.dataset.ninouEmailProtected = "true";
   }
-
-  function protectEmails(root = document) {
+  function polish(root = document) {
+    document.documentElement.dataset.ninouPremiumSafe = VERSION;
     root.querySelectorAll?.(TEXT_TAGS).forEach(protectEmailText);
-  }
-
-  function polishButtons(root = document) {
     root.querySelectorAll?.("button").forEach((button) => {
       if (button.dataset.ninouSafeShortened === "true") return;
       const current = (button.textContent || "").replace(/\s+/g, " ").trim();
       const replacement = buttonLabels.get(current);
       if (!replacement) return;
       button.dataset.ninouSafeShortened = "true";
-      button.dataset.ninouOriginalLabel = current;
       if (!button.getAttribute("aria-label")) button.setAttribute("aria-label", current);
       button.title = current;
       button.textContent = replacement;
     });
   }
-
-  function polish(root = document) {
-    document.documentElement.dataset.ninouPremiumSafe = VERSION;
-    protectEmails(root);
-    polishButtons(root);
-  }
-
   let scheduled = false;
   function schedulePolish() {
     if (scheduled) return;
     scheduled = true;
-    window.requestAnimationFrame(() => {
-      scheduled = false;
-      polish(document);
-    });
+    window.requestAnimationFrame(() => { scheduled = false; polish(document); });
   }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => polish(document), { once: true });
-  } else {
-    polish(document);
-  }
-
-  new MutationObserver(schedulePolish).observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-  });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => polish(document), { once: true });
+  else polish(document);
+  new MutationObserver(schedulePolish).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
 })();
-
