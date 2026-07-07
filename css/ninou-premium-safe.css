@@ -141,6 +141,19 @@ li {
   font-weight: 950 !important;
 }
 
+/* Correção para evitar o esmagamento de textos nas listas vazias do Painel Admin (Desktop) */
+@media (min-width: 900px) {
+  body.global-admin-mode .admin-access-list > li.polished-admin-empty,
+  body.global-admin-mode.admin-panel-only .admin-access-list > li.polished-admin-empty,
+  body.admin-family-preview .admin-access-list > li.polished-admin-empty,
+  body.global-admin-mode .admin-access-list > li:not([class]),
+  body.global-admin-mode.admin-panel-only .admin-access-list > li:not([class]),
+  body.admin-family-preview .admin-access-list > li:not([class]) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+
 .admin-stats-grid,
 .diagnostics-grid,
 .sync-detail-grid,
