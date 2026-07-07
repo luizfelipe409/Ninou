@@ -6,8 +6,8 @@ export function createEmptyTimelineItem(markup) {
 }
 
 export function getLatestEmptyRecordMarkup({
-  title = "Ainda não há registros neste dia",
-  description = "Comece com sono, mamada, fralda ou medicamento para o Ninou montar o resumo da rotina.",
+  title = "Nenhum cuidado registrado neste dia ainda",
+  description = "Comece registrando mamadeira, fralda, sono ou medicamento. O Ninou monta o resumo conforme a rotina aparece.",
 } = {}) {
   return `
     <i class="mark"></i>
@@ -18,6 +18,6 @@ export function getLatestEmptyRecordMarkup({
   `;
 }
 
-export function getSimpleEmptyMarkup(message = "Nenhum item encontrado.") {
+export function getSimpleEmptyMarkup(message = "Nada para mostrar ainda.") {
   return `<p class="empty-state">${message}</p>`;
 }

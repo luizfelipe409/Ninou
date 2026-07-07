@@ -1,0 +1,12 @@
+Ninou v75.75.6 — Fluxo familiar completo
+
+- Separei os estados do Perfil: deslogado, conta sem família, convite pendente, família conectada e painel admin.
+- Adicionei o card "Meu acesso familiar" com conta, família, cuidador local e nível de permissão.
+- O fluxo de convite agora reforça que a pessoa convidada entra na família existente, sem criar outra família.
+- Convites familiares passam a pedir e validar o e-mail convidado, com uso único e status pendente/aceito.
+- O botão "Criar minha família" fica oculto quando há convite pendente para evitar família paralela.
+- Protegi botões principais contra cliques duplicados durante salvamento, criação, exportação e aceite de convite.
+- Apliquei permissões mais claras: responsável/admin gerencia família; cuidador registra rotina; visualização apenas consulta.
+- Adicionei diagnóstico admin de integridade: famílias vazias, duplicadas, vínculos órfãos e convites pendentes.
+- Melhorei mensagens de estado vazio para orientar o primeiro registro.
+- Atualizei runtime/cache para 75.75.6.

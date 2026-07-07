@@ -138,6 +138,21 @@ const familyActiveInviteHint = document.querySelector("#familyActiveInviteHint")
 const familyInviteShareActions = document.querySelector("#familyInviteShareActions");
 const familyCopyInviteButton = document.querySelector("#familyCopyInviteButton");
 const familyShareInviteWhatsAppButton = document.querySelector("#familyShareInviteWhatsAppButton");
+const profileStateNoticeCard = document.querySelector("#profileStateNoticeCard");
+const profileStateKicker = document.querySelector("#profileStateKicker");
+const profileStateTitle = document.querySelector("#profileStateTitle");
+const profileStateText = document.querySelector("#profileStateText");
+const familyAccessSummaryCard = document.querySelector("#familyAccessSummaryCard");
+const familyAccessSummaryTitle = document.querySelector("#familyAccessSummaryTitle");
+const familyAccessSummaryUser = document.querySelector("#familyAccessSummaryUser");
+const familyAccessSummaryFamily = document.querySelector("#familyAccessSummaryFamily");
+const familyAccessSummaryDevice = document.querySelector("#familyAccessSummaryDevice");
+const familyAccessSummaryRole = document.querySelector("#familyAccessSummaryRole");
+const familyAccessSummaryRoleBadge = document.querySelector("#familyAccessSummaryRoleBadge");
+const familyAccessSummaryMembers = document.querySelector("#familyAccessSummaryMembers");
+const familyAccessSummaryInviteButton = document.querySelector("#familyAccessSummaryInviteButton");
+const familyAccessSummaryProfileButton = document.querySelector("#familyAccessSummaryProfileButton");
+const familyAccessSummaryInviteStatus = document.querySelector("#familyAccessSummaryInviteStatus");
 const joinFamilyModal = document.querySelector("#joinFamilyModal");
 const joinInviteCodeInput = document.querySelector("#joinInviteCodeInput");
 const joinInviteFeedback = document.querySelector("#joinInviteFeedback");
@@ -268,6 +283,8 @@ const diagnosticsUserLabel = document.querySelector("#diagnosticsUserLabel");
 const diagnosticsFamilyLabel = document.querySelector("#diagnosticsFamilyLabel");
 const diagnosticsPwaLabel = document.querySelector("#diagnosticsPwaLabel");
 const diagnosticsCacheLabel = document.querySelector("#diagnosticsCacheLabel");
+const diagnosticsIntegrityLabel = document.querySelector("#diagnosticsIntegrityLabel");
+const diagnosticsInviteLabel = document.querySelector("#diagnosticsInviteLabel");
 const diagnosticsAppCheckLabel = document.querySelector("#diagnosticsAppCheckLabel");
 const appUpdateNotice = document.querySelector("#appUpdateNotice");
 const appUpdateButton = document.querySelector("#appUpdateButton");
@@ -315,7 +332,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.5";
+const NINOU_RUNTIME_VERSION = "75.75.6";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -506,6 +523,7 @@ let pendingInviteCode = getInitialInviteCode();
 let accessFlowNotice = "";
 let recentInvites = [];
 let adminStatsRequestId = 0;
+let latestAdminStats = null;
 let selectedAdminFamilyId = loadSelectedAdminFamilyId();
 let activeScreenName = "today";
 let lastMigrationResult = null;
@@ -647,6 +665,140 @@ function setProfileElementHidden(element, hidden) {
   element.setAttribute("aria-hidden", hidden ? "true" : "false");
 }
 
+
+function setText(element, value = "") {
+  if (element) element.textContent = String(value ?? "");
+}
+
+function setOptionalTitle(element, value = "") {
+  if (element) element.title = String(value || "");
+}
+
+function getProfileAccessState() {
+  const connected = isLoggedIn();
+  const authorized = hasFamilyAccess();
+  const appAdmin = isGlobalAppAdmin();
+  const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
+
+  if (!connected) return "guest";
+  if (appAdmin && !window.__ninouAdminFamilyDataOpen) return "admin-panel";
+  if (authorized) return "family-ready";
+  if (pendingCode) return "invite-pending";
+  return "account-no-family";
+}
+
+function canManageFamilyAccess() {
+  if (!hasFamilyAccess()) return false;
+  const role = getEffectiveRole(familyAccess?.role || "visualizacao", cloudUser?.email || familyAccess?.email || "");
+  return role === "admin" || role === "responsavel";
+}
+
+function canEditFamilyProfile() {
+  if (!hasFamilyAccess()) return false;
+  const role = getEffectiveRole(familyAccess?.role || "visualizacao", cloudUser?.email || familyAccess?.email || "");
+  return role === "admin" || role === "responsavel";
+}
+
+function updateProfileStateClasses() {
+  const stateName = getProfileAccessState();
+  document.body.dataset.profileAccessState = stateName;
+  ["guest", "account-no-family", "invite-pending", "family-ready", "admin-panel"].forEach((name) => {
+    document.body.classList.toggle(`profile-state-${name}`, stateName === name);
+  });
+  return stateName;
+}
+
+function renderProfileStateNotice() {
+  const stateName = updateProfileStateClasses();
+  const show = Boolean(profileStateNoticeCard && ["account-no-family", "invite-pending"].includes(stateName));
+  setProfileElementHidden(profileStateNoticeCard, !show);
+  if (!show) return;
+
+  if (stateName === "invite-pending") {
+    setText(profileStateKicker, "Convite familiar");
+    setText(profileStateTitle, "Convite detectado. Falta confirmar o acesso.");
+    setText(profileStateText, "Entre com o mesmo e-mail convidado e aceite o código. O Ninou vai conectar esta conta à família existente, sem criar outra família.");
+    return;
+  }
+
+  setText(profileStateKicker, "Conta conectada");
+  setText(profileStateTitle, "Esta conta ainda não tem família.");
+  setText(profileStateText, "Crie uma família nova somente se você for o primeiro responsável. Se recebeu um convite, use o código para entrar na família já existente.");
+}
+
+function renderFamilyAccessSummary() {
+  const stateName = updateProfileStateClasses();
+  const authorized = hasFamilyAccess();
+  const appAdminPanel = isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen;
+  const show = Boolean(familyAccessSummaryCard && authorized && !appAdminPanel);
+  setProfileElementHidden(familyAccessSummaryCard, !show);
+  if (!show) return;
+
+  const role = getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "");
+  const roleLabel = getRoleLabel(role);
+  const identity = loadCurrentCaregiverIdentity();
+  const familyLabel = getProfileFamilyDisplayName();
+  const email = cloudUser?.email || familyAccess?.email || "Conta conectada";
+  const deviceLabel = identity.label || "Cuidador não configurado";
+  const canInvite = canManageFamilyAccess();
+
+  setText(familyAccessSummaryTitle, familyLabel);
+  setText(familyAccessSummaryUser, email);
+  setOptionalTitle(familyAccessSummaryUser, email);
+  setText(familyAccessSummaryFamily, familyLabel);
+  setOptionalTitle(familyAccessSummaryFamily, familyAccess?.familyId || "");
+  setText(familyAccessSummaryDevice, deviceLabel);
+  setText(familyAccessSummaryRole, roleLabel);
+  setText(familyAccessSummaryRoleBadge, roleLabel);
+  if (familyAccessSummaryRoleBadge) familyAccessSummaryRoleBadge.dataset.role = role;
+  setText(
+    familyAccessSummaryMembers,
+    canInvite
+      ? "Você pode convidar cuidadores, revisar acessos e manter a família organizada. Convites são de uso único."
+      : role === "visualizacao"
+        ? "Seu acesso é somente visualização. Peça a um responsável para alterar permissões ou convidar pessoas."
+        : "Você pode registrar a rotina. Convites e ajustes familiares ficam com um responsável."
+  );
+  if (familyAccessSummaryInviteButton) {
+    familyAccessSummaryInviteButton.hidden = !canInvite;
+    familyAccessSummaryInviteButton.disabled = !canInvite;
+  }
+  if (familyAccessSummaryInviteStatus) {
+    familyAccessSummaryInviteStatus.textContent = canInvite
+      ? "Ao convidar, informe o e-mail correto do cuidador. A pessoa não deve criar outra família."
+      : "Seu perfil não pode gerar convites.";
+  }
+}
+
+function withButtonBusy(button, busyLabel, task, options = {}) {
+  if (!button) return task?.();
+  if (button.dataset.busy === "true") return undefined;
+  const originalText = button.textContent;
+  const originalDisabled = button.disabled;
+  button.dataset.busy = "true";
+  button.disabled = true;
+  if (busyLabel) button.textContent = busyLabel;
+
+  const finish = () => {
+    delete button.dataset.busy;
+    if (options.restoreDisabled !== false) button.disabled = originalDisabled;
+    if (!options.keepLabel) button.textContent = originalText;
+    if (typeof options.afterFinish === "function") options.afterFinish();
+  };
+
+  try {
+    const result = task?.();
+    if (result && typeof result.finally === "function") {
+      return result.finally(finish);
+    }
+    finish();
+    return result;
+  } catch (error) {
+    finish();
+    throw error;
+  }
+}
+
 function renderLoggedOutProfileShell() {
   const loggedOut = !isLoggedIn();
   document.body.classList.toggle("profile-guest-focused", loggedOut);
@@ -655,9 +807,13 @@ function renderLoggedOutProfileShell() {
   if (!loggedOut) {
     setProfileElementHidden(profileHeroCard, false);
     setProfileElementHidden(profilePrivacyCard, false);
+    renderProfileStateNotice();
+    renderFamilyAccessSummary();
     return;
   }
 
+  setProfileElementHidden(profileStateNoticeCard, true);
+  setProfileElementHidden(familyAccessSummaryCard, true);
   setProfileElementHidden(profileHeroCard, true);
   setProfileElementHidden(profileFamilyStack, true);
   setProfileElementHidden(profileReadyCard, true);
@@ -679,6 +835,7 @@ function renderLoggedOutProfileShell() {
   if (loginHelper) {
     loginHelper.textContent = "Use e-mail e senha para entrar. Se recebeu convite, crie a conta com o mesmo e-mail convidado.";
   }
+  updateProfileStateClasses();
 }
 
 function applyGuestInteractionLock() {
@@ -1947,6 +2104,7 @@ function setProfileFamilyStackVisible(visible) {
 
 function resetProfileFamilyCardsForGuest() {
   setProfileFamilyStackVisible(false);
+  setProfileElementHidden(familyAccessSummaryCard, true);
   if (familyProfileBabyMeta) familyProfileBabyMeta.textContent = "Entre para carregar o perfil familiar.";
   if (deviceCaregiverName) deviceCaregiverName.textContent = "Não configurado";
   if (deviceCaregiverAvatar) deviceCaregiverAvatar.textContent = "👤";
@@ -2073,8 +2231,17 @@ function renderProfileFamilyCards() {
   if (familyNameLabel) familyNameLabel.textContent = familyLabel;
   if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || familyAccess?.email || "Conta não conectada";
   if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = getRoleLabel(familyAccess?.role || "responsavel");
-  if (familyInviteDescription) familyInviteDescription.textContent = `Compartilhe um código para outro cuidador acompanhar a rotina ${babyName ? `de ${babyName}` : "do bebê"}.`;
+  if (familyInviteDescription) {
+    familyInviteDescription.textContent = canManageFamilyAccess()
+      ? `Convide outro cuidador para acompanhar a rotina ${babyName ? `de ${babyName}` : "do bebê"}. O convite entra na família existente.`
+      : "Você pode acompanhar a rotina. Convites ficam com o responsável da família.";
+  }
+  if (familyCreateInviteButton) {
+    familyCreateInviteButton.hidden = !canManageFamilyAccess();
+    familyCreateInviteButton.disabled = !canManageFamilyAccess();
+  }
   renderFamilyActiveInvite();
+  renderFamilyAccessSummary();
 }
 
 function openCaregiverEditor() {
@@ -2148,6 +2315,7 @@ async function saveCaregiverIdentityFromForm() {
     : "Identificação limpa neste aparelho. Usaremos o e-mail quando necessário.";
 
   renderCaregiverIdentityPanel();
+  renderFamilyAccessSummary();
   closeCaregiverEditor();
 }
 
@@ -2584,7 +2752,13 @@ function generateFamilyInviteCode() {
 function getFamilyInviteMessage(code) {
   const babyName = getProfileFamilyBabyName();
   const target = babyName ? `do ${babyName}` : "do bebê";
-  return `Você foi convidado(a) para acompanhar a rotina ${target} no Ninou.\nCódigo de convite: ${code}\nAcesse o Ninou, toque em Perfil > Entrar com código e informe este código.`;
+  const invitedEmail = familyActiveInvite?.email ? `
+E-mail convidado: ${familyActiveInvite.email}` : "";
+  const link = code ? `
+Link: ${buildInviteLink(code)}` : "";
+  return `Você foi convidado(a) para acompanhar a rotina ${target} no Ninou.
+Código de convite: ${code}${invitedEmail}${link}
+Entre ou crie sua conta com o mesmo e-mail do convite. Assim você entra na família existente, sem criar outra família.`;
 }
 
 function renderFamilyActiveInvite() {
@@ -2593,13 +2767,33 @@ function renderFamilyActiveInvite() {
   if (familyActiveInviteBox) familyActiveInviteBox.hidden = !active;
   if (familyInviteShareActions) familyInviteShareActions.hidden = !active;
   if (familyActiveInviteCode) familyActiveInviteCode.textContent = active ? invite.code : "—";
-  if (familyActiveInviteHint) familyActiveInviteHint.textContent = active ? "Expira em 7 dias" : "Nenhum convite ativo";
+  if (familyActiveInviteHint) {
+    familyActiveInviteHint.textContent = active
+      ? `${invite.email ? invite.email + " • " : ""}uso único • expira em 7 dias`
+      : "Nenhum convite ativo";
+  }
 }
 
 async function createFamilyCaregiverInvite() {
   if (!canUsePrivateFeatures()) {
     if (loginHelper) loginHelper.textContent = "Entre em uma família para gerar convite de cuidador.";
     resetProfileFamilyCardsForGuest();
+    return;
+  }
+  if (!canManageFamilyAccess()) {
+    if (loginHelper) loginHelper.textContent = "Seu acesso permite registrar a rotina, mas não gerar convites familiares.";
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Peça a um responsável para convidar novos cuidadores.";
+    return;
+  }
+  const invitedEmail = normalizeEmail(window.prompt("E-mail do cuidador convidado:", "") || "");
+  if (!invitedEmail || !invitedEmail.includes("@")) {
+    if (loginHelper) loginHelper.textContent = "Para segurança, informe o e-mail correto do cuidador convidado.";
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Convite cancelado: faltou informar um e-mail válido.";
+    return;
+  }
+  if (normalizeEmail(cloudUser?.email || "") === invitedEmail) {
+    if (loginHelper) loginHelper.textContent = "Este e-mail já é a conta conectada. Use outro e-mail para convidar um cuidador.";
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Convite não criado: o e-mail informado já está conectado neste aparelho.";
     return;
   }
   const code = generateFamilyInviteCode();
@@ -2610,7 +2804,8 @@ async function createFamilyCaregiverInvite() {
     code,
     familyId: familyAccess?.familyId || APP_ADMIN_FAMILY_ID,
     familyName: getProfileFamilyDisplayName(),
-    status: "active",
+    email: invitedEmail,
+    status: "pending",
     role: "cuidador",
     maxUses: INVITE_MAX_USES,
     useCount: 0,
@@ -2620,6 +2815,7 @@ async function createFamilyCaregiverInvite() {
     expiresAtClient: expiry.expiresAtClient,
   };
   saveFamilyActiveInvite(invite);
+  if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = `Convite criado para ${invitedEmail}. Copie o código ou envie pelo WhatsApp.`;
 
   try {
     const services = await getFirebaseServices();
@@ -2711,6 +2907,9 @@ async function confirmJoinFamilyInvite() {
 
     const inviteEmail = normalizeEmail(invite.email || "");
     const userEmail = normalizeEmail(cloudUser.email || "");
+    if (hasFamilyAccess() && familyAccess?.familyId && familyId && familyAccess.familyId !== familyId) {
+      throw new Error("Esta conta já está vinculada a outra família. Saia e limpe os dados deste aparelho antes de aceitar um convite diferente.");
+    }
     if (inviteEmail && inviteEmail !== userEmail) throw new Error(`Este convite foi criado para ${inviteEmail}.`);
 
     const role = normalizeInviteRole(invite.role || "cuidador");
@@ -2807,14 +3006,21 @@ function canUsePrivateFeatures() {
 
 function hasPermissionForAction(actionText = "") {
   if (!hasFamilyAccess()) return false;
-  const role = getEffectiveRole(familyAccess.role);
+  const role = getEffectiveRole(familyAccess.role, cloudUser?.email || familyAccess?.email || "");
   if (role === "admin" || role === "responsavel") return true;
 
   const text = String(actionText).toLowerCase();
-  const sensitive = /(editar|excluir|zerar|perfil|foto|peso|janela|exportar|backup)/.test(text);
+  const familyManagement = /(convite|convidar|permiss|família|familia|membro|cuidador)/.test(text);
+  const profileManagement = /(perfil|foto|avatar|peso|janela|exportar|backup|relatório|relatorio)/.test(text);
+  const destructiveAction = /(excluir|zerar|limpar|apagar)/.test(text);
+  const routineWrite = /(registrar|criar registros|editar registros|salvar registros|salvar a rotina|observações|observacoes|sono|mamada|mamadeira|fralda|medicamento)/.test(text);
 
   if (role === "cuidador") {
-    return !sensitive;
+    return routineWrite && !familyManagement && !profileManagement && !destructiveAction;
+  }
+
+  if (role === "visualizacao") {
+    return false;
   }
 
   return false;
@@ -4944,13 +5150,64 @@ function renderAdminAccessLists(stats = null) {
   renderKnownUsersList(stats);
 }
 
+
+function buildAdminIntegritySnapshot({ familyId = "", familySummaries = [], members = [], pendingInvites = [], knownUsers = [], familyData = {}, familyProfileData = {} } = {}) {
+  const visibleMembers = (members || []).filter((member) => !member.isAdmin);
+  const duplicateEmailCount = (() => {
+    const counts = new Map();
+    (knownUsers || []).forEach((user) => {
+      const email = normalizeEmail(user.email || "");
+      if (!email) return;
+      counts.set(email, (counts.get(email) || 0) + 1);
+    });
+    return Array.from(counts.values()).filter((count) => count > 1).length;
+  })();
+  const emptyFamilies = (familySummaries || []).filter((family) => (
+    family.id !== familyId
+    && Number(family.membersCount || 0) === 0
+    && Number(family.pendingInvitesCount || 0) === 0
+  )).length;
+  const selectedHasProfile = Boolean(familyProfileData?.name || familyProfileData?.familyName || familyData?.name || familyData?.title);
+  const usersWithoutLink = (knownUsers || []).filter((user) => (
+    user.email
+    && !user.isAppAdmin
+    && !user.hasFamilyAccess
+    && !user.hasPendingInvite
+  )).length;
+
+  return {
+    selectedHasProfile,
+    visibleMembersCount: visibleMembers.length,
+    pendingInvitesCount: pendingInvites.length,
+    duplicateEmailCount,
+    emptyFamilies,
+    usersWithoutLink,
+    hasWarning: Boolean(!selectedHasProfile || duplicateEmailCount || emptyFamilies || usersWithoutLink),
+  };
+}
+
+function formatAdminIntegrityLabel(integrity = latestAdminStats?.integrity || {}) {
+  if (!integrity) return "—";
+  const warnings = [];
+  if (!integrity.selectedHasProfile) warnings.push("perfil ausente");
+  if (integrity.duplicateEmailCount) warnings.push(`${integrity.duplicateEmailCount} e-mail duplicado`);
+  if (integrity.emptyFamilies) warnings.push(`${integrity.emptyFamilies} família vazia`);
+  if (integrity.usersWithoutLink) warnings.push(`${integrity.usersWithoutLink} conta sem vínculo`);
+  return warnings.length ? warnings.join(" • ") : "OK";
+}
+
 function renderAdminStats(stats = null) {
-  if (!adminPendingInvitesCount && !adminFamiliesCount && !adminKnownUsersStat) return;
+  latestAdminStats = stats || null;
+  if (!adminPendingInvitesCount && !adminFamiliesCount && !adminKnownUsersStat) {
+    renderAdminDiagnostics();
+    return;
+  }
 
   if (!stats) {
     setAdminStatsPlaceholder();
     renderAdminClients(null);
     renderAdminAccessLists(null);
+    renderAdminDiagnostics();
     return;
   }
 
@@ -4967,6 +5224,7 @@ function renderAdminStats(stats = null) {
   renderAdminClients(stats);
   renderAdminAccessLists(stats);
   renderFamilyMigrationPanel();
+  renderAdminDiagnostics();
 }
 
 async function refreshAdminStats(options = {}) {
@@ -5144,6 +5402,7 @@ async function refreshAdminStats(options = {}) {
       pendingInvitesCount: pendingInvites.length,
       acceptedInvitesCount: acceptedEmails.size,
       knownUsersCount: getCleanKnownUsersForAdmin(knownUsers).length,
+      integrity: buildAdminIntegritySnapshot({ familyId, familySummaries, members, pendingInvites, knownUsers, familyData, familyProfileData }),
     };
     if (requestId === adminStatsRequestId) renderAdminStats(stats);
     return stats;
@@ -5183,6 +5442,8 @@ function renderFamilyAccessPanel() {
   const effectiveRole = authorized ? getEffectiveRole(familyAccess.role, email) : "";
   const roleLabel = authorized ? getRoleLabel(effectiveRole) : "";
   const baby = getBabyDisplayName();
+  const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
+  const canInvite = authorized && !appAdmin && canManageFamilyAccess();
 
   if (familyAccessKicker) {
     familyAccessKicker.textContent = authorized
@@ -5194,7 +5455,7 @@ function renderFamilyAccessPanel() {
     familyAccessTitle.textContent = authorized
       ? (appAdmin ? "Painel admin" : "Família conectada")
       : connected
-        ? "Conta sem acesso familiar"
+        ? (pendingCode ? "Aceitar convite familiar" : "Conta sem acesso familiar")
         : "Convites e permissões";
   }
 
@@ -5204,18 +5465,20 @@ function renderFamilyAccessPanel() {
         ? `${email} está conectado com acesso completo. Os registros são sincronizados no ambiente da família.`
         : `Você acompanha a rotina de ${baby}. Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`)
       : connected
-        ? "Esta conta está conectada, mas ainda não encontramos acesso familiar. Aguarde a sincronização ou use um convite recebido."
-        : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou solicite acesso pelo WhatsApp.";
+        ? (pendingCode
+          ? "Convite detectado. Confirme o código para entrar na família existente, sem criar uma nova família."
+          : "Esta conta está conectada, mas ainda não encontramos acesso familiar. Crie sua família apenas se você for o primeiro responsável ou use um convite recebido.")
+        : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou aceite um convite familiar.";
   }
 
   if (familyAccessBadge) {
-    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? "Sem acesso" : "Visitante";
+    familyAccessBadge.textContent = authorized ? (appAdmin ? "Admin" : getRoleLabel(effectiveRole)) : connected ? (pendingCode ? "Convite pendente" : "Sem família") : "Visitante";
     familyAccessBadge.dataset.role = authorized ? effectiveRole : "offline";
   }
 
   if (createFamilyButton) {
-    // v75.58.1: admin ativa a família principal; usuários novos podem criar a própria família.
-    createFamilyButton.hidden = !connected || authorized;
+    // v75.75.6: convite pendente entra na família existente; não mostra criação paralela.
+    createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
     createFamilyButton.disabled = personalFamilyActivationInFlight;
     createFamilyButton.textContent = personalFamilyActivationInFlight
       ? (appAdmin ? "Ativando..." : "Criando...")
@@ -5241,7 +5504,7 @@ function renderFamilyAccessPanel() {
 
   if (acceptInviteButton) {
     acceptInviteButton.disabled = !connected || appAdmin;
-    acceptInviteButton.textContent = appAdmin ? "Admin não precisa de convite" : "Aceitar convite";
+    acceptInviteButton.textContent = appAdmin ? "Admin não precisa de convite" : (pendingCode ? "Confirmar convite" : "Aceitar convite");
   }
 
   if (inviteCodeInput) {
@@ -5262,6 +5525,8 @@ function renderFamilyAccessPanel() {
     }
   }
 
+  renderProfileStateNotice();
+  renderFamilyAccessSummary();
   renderInviteList();
   renderSyncDetails();
   renderAdminDiagnostics();
@@ -5654,7 +5919,7 @@ async function createAdminClientFamily() {
       await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
       await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), {
         ...payload,
-        status: "active",
+        status: "pending",
       }, { merge: true });
       recentInvites.unshift({ code, email: responsibleEmail, role, link });
       renderInviteList();
@@ -5777,7 +6042,7 @@ async function createFamilyInvite() {
       await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), payload, { merge: true });
       await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), {
         ...payload,
-        status: "active",
+        status: "pending",
       }, { merge: true });
     } catch (mirrorError) {
       console.warn("Convite criado na coleção principal, mas não foi espelhado na família:", mirrorError);
@@ -5853,6 +6118,12 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     const invite = snapshot.data() || {};
     const inviteEmail = normalizeEmail(invite.email || "");
     const userEmail = normalizeEmail(cloudUser.email || "");
+    const inviteFamilyId = String(invite.familyId || "");
+
+    if (hasFamilyAccess() && familyAccess?.familyId && inviteFamilyId && familyAccess.familyId !== inviteFamilyId) {
+      if (!options.silent && loginHelper) loginHelper.textContent = "Esta conta já está vinculada a outra família. Saia e limpe os dados deste aparelho antes de aceitar um convite diferente.";
+      return false;
+    }
 
     if (!isInviteUsable(invite)) {
       if (!options.silent && loginHelper) loginHelper.textContent = isInviteExpired(invite)
@@ -5867,7 +6138,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     }
 
     const access = {
-      familyId: String(invite.familyId || ""),
+      familyId: inviteFamilyId,
       role: normalizeInviteRole(invite.role),
       email: userEmail,
       ownerUid: invite.createdBy || invite.ownerUid || "",
@@ -8637,6 +8908,19 @@ function renderAdminDiagnostics() {
   }
   if (diagnosticsPwaLabel) diagnosticsPwaLabel.textContent = window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone ? "instalado" : "navegador";
   if (diagnosticsCacheLabel) diagnosticsCacheLabel.textContent = `${countFamilyScopedDayCaches()} dia(s) locais`;
+  if (diagnosticsIntegrityLabel) {
+    const integrity = latestAdminStats?.integrity || null;
+    diagnosticsIntegrityLabel.textContent = integrity ? formatAdminIntegrityLabel(integrity) : "aguardando painel";
+    diagnosticsIntegrityLabel.title = integrity
+      ? "Verifica perfil da família selecionada, famílias vazias, e-mails duplicados e contas sem vínculo."
+      : "Atualize o painel admin para montar o diagnóstico de integridade.";
+  }
+  if (diagnosticsInviteLabel) {
+    const pending = Number(latestAdminStats?.pendingInvitesCount || 0);
+    const accepted = Number(latestAdminStats?.acceptedInvitesCount || 0);
+    diagnosticsInviteLabel.textContent = latestAdminStats ? `${pending} pendente(s) • ${accepted} aceito(s)` : "aguardando";
+    diagnosticsInviteLabel.title = "Convites são de uso único, com validade e status pending/accepted/cancelled.";
+  }
   if (diagnosticsAppCheckLabel) {
     const status = firebaseServices?.appCheckStatus;
     diagnosticsAppCheckLabel.textContent = status?.configured
@@ -9502,17 +9786,19 @@ sheetBackdrop.addEventListener("click", () => {
   closeSheet();
   closeOrbitCluster();
 });
-saveButton.addEventListener("click", saveManualEvent);
-resetDataButton.addEventListener("click", resetDayData);
-exportJsonButton.addEventListener("click", () => exportRoutine("json"));
-exportCsvButton.addEventListener("click", () => exportRoutine("csv"));
+saveButton.addEventListener("click", () => withButtonBusy(saveButton, "Salvando...", saveManualEvent));
+resetDataButton.addEventListener("click", () => withButtonBusy(resetDataButton, "Limpando...", resetDayData));
+exportJsonButton.addEventListener("click", () => withButtonBusy(exportJsonButton, "Gerando...", () => exportRoutine("json")));
+exportCsvButton.addEventListener("click", () => withButtonBusy(exportCsvButton, "Gerando...", () => exportRoutine("csv")));
 if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
-if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", saveCaregiverIdentityFromForm);
-if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click", createFamilyCaregiverInvite);
+if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", () => withButtonBusy(saveCaregiverIdentityButton, "Salvando...", saveCaregiverIdentityFromForm));
+if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click", () => withButtonBusy(familyCreateInviteButton, "Criando...", createFamilyCaregiverInvite));
 if (familyCopyInviteButton) familyCopyInviteButton.addEventListener("click", copyFamilyInviteCode);
 if (familyShareInviteWhatsAppButton) familyShareInviteWhatsAppButton.addEventListener("click", shareFamilyInviteOnWhatsApp);
 if (familyJoinInviteButton) familyJoinInviteButton.addEventListener("click", openJoinFamilyModal);
-if (confirmJoinInviteButton) confirmJoinInviteButton.addEventListener("click", confirmJoinFamilyInvite);
+if (familyAccessSummaryInviteButton) familyAccessSummaryInviteButton.addEventListener("click", () => withButtonBusy(familyAccessSummaryInviteButton, "Criando...", createFamilyCaregiverInvite));
+if (familyAccessSummaryProfileButton) familyAccessSummaryProfileButton.addEventListener("click", openCaregiverEditor);
+if (confirmJoinInviteButton) confirmJoinInviteButton.addEventListener("click", () => withButtonBusy(confirmJoinInviteButton, "Aceitando...", confirmJoinFamilyInvite));
 document.querySelectorAll("[data-close-join-modal]").forEach((button) => button.addEventListener("click", closeJoinFamilyModal));
 if (joinFamilyModal) joinFamilyModal.addEventListener("click", (event) => {
   if (event.target === joinFamilyModal) closeJoinFamilyModal();
@@ -9520,8 +9806,8 @@ if (joinFamilyModal) joinFamilyModal.addEventListener("click", (event) => {
 if (supportSuggestionButton) supportSuggestionButton.addEventListener("click", () => openSupportWhatsApp("suggestion"));
 if (supportBugButton) supportBugButton.addEventListener("click", () => openSupportWhatsApp("bug"));
 if (prepareConsultButton) prepareConsultButton.addEventListener("click", prepareConsultMode);
-if (exportPdfButton) exportPdfButton.addEventListener("click", () => exportRoutine("pdf"));
-if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => exportRoutine("whatsapp"));
+if (exportPdfButton) exportPdfButton.addEventListener("click", () => withButtonBusy(exportPdfButton, "Gerando...", () => exportRoutine("pdf")));
+if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => withButtonBusy(shareWhatsappButton, "Preparando...", () => exportRoutine("whatsapp")));
 if (exportStartDateInput) exportStartDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
@@ -9642,7 +9928,7 @@ breastSideButtons.forEach((button) => {
   button.addEventListener("click", () => toggleBreastTimer(button.dataset.breastSide));
 });
 if (resetBreastTimerButton) resetBreastTimerButton.addEventListener("click", resetBreastTimer);
-if (saveBabyWeightButton) saveBabyWeightButton.addEventListener("click", saveBabyWeight);
+if (saveBabyWeightButton) saveBabyWeightButton.addEventListener("click", () => withButtonBusy(saveBabyWeightButton, "Salvando...", saveBabyWeight));
 if (weightHistoryList) {
   weightHistoryList.addEventListener("click", (event) => {
     const editButton = event.target.closest("[data-weight-edit]");
@@ -9701,7 +9987,7 @@ if (babyAvatarDetails) {
   });
 }
 
-if (saveBabyAvatarButton) saveBabyAvatarButton.addEventListener("click", saveBabyAvatarFromDraft);
+if (saveBabyAvatarButton) saveBabyAvatarButton.addEventListener("click", () => withButtonBusy(saveBabyAvatarButton, "Salvando...", saveBabyAvatarFromDraft));
 if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
   pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || {});
   renderAvatarCustomizer();
@@ -9713,35 +9999,35 @@ if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
   if (loginHelper) loginHelper.textContent = "O Ninou agora usa somente avatars ilustrados prontos. Fotos antigas e novos uploads não são usados.";
 });
 
-loginButton.addEventListener("click", signInAccount);
-createAccountButton.addEventListener("click", createAccount);
+loginButton.addEventListener("click", () => withButtonBusy(loginButton, "Entrando...", signInAccount, { restoreDisabled: false, afterFinish: renderAuthControls }));
+createAccountButton.addEventListener("click", () => withButtonBusy(createAccountButton, isLoggedIn() ? "Saindo..." : "Criando...", createAccount, { restoreDisabled: false, afterFinish: renderAuthControls }));
 if (clearDeviceDataButton) clearDeviceDataButton.addEventListener("click", signOutAndClearDeviceData);
 if (createFamilyButton) {
   createFamilyButton.addEventListener("click", () => {
     if (personalFamilyActivationInFlight) return;
-    activatePersonalFamily().catch((error) => {
+    withButtonBusy(createFamilyButton, "Criando...", () => activatePersonalFamily().catch((error) => {
       console.error("Erro ao ativar família:", error);
       if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
-    });
+    }), { restoreDisabled: false, afterFinish: renderAuthControls });
   });
 }
 if (acceptInviteButton) {
   acceptInviteButton.addEventListener("click", () => {
-    acceptFamilyInvite().catch((error) => {
+    withButtonBusy(acceptInviteButton, "Aceitando...", () => acceptFamilyInvite().catch((error) => {
       console.error("Erro ao aceitar convite:", error);
       if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
-    });
+    }), { restoreDisabled: false, afterFinish: renderAuthControls });
   });
 }
 if (createInviteButton) {
   createInviteButton.addEventListener("click", () => {
-    createFamilyInvite().catch((error) => {
+    withButtonBusy(createInviteButton, "Gerando...", () => createFamilyInvite().catch((error) => {
       console.error("Erro ao gerar convite:", error);
       if (inviteResult) {
         inviteResult.hidden = false;
         inviteResult.textContent = getFirebaseErrorMessage(error);
       }
-    });
+    }));
   });
 }
 if (refreshAdminStatsButton) {
@@ -9749,13 +10035,13 @@ if (refreshAdminStatsButton) {
 }
 if (adminCreateClientFamilyButton) {
   adminCreateClientFamilyButton.addEventListener("click", () => {
-    createAdminClientFamily().catch((error) => {
+    withButtonBusy(adminCreateClientFamilyButton, "Criando...", () => createAdminClientFamily().catch((error) => {
       console.error("Erro ao criar família/cliente:", error);
       if (adminCreateFamilyResult) {
         adminCreateFamilyResult.hidden = false;
         adminCreateFamilyResult.textContent = getFirebaseErrorMessage(error);
       }
-    });
+    }));
   });
 }
 if (adminOpenFamilyButton) {

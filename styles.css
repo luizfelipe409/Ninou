@@ -1,5 +1,5 @@
-/* Ninou v75.74.1 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.75.5");
+/* Ninou v75.75.6 - fluxo familiar completo. */
+@import url("./css/app.legacy.css?v=75.75.6");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -8185,5 +8185,193 @@ body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
   .guest-entry-actions,
   body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+/* v75.75.6 — fluxo familiar completo */
+.profile-state-notice-card,
+.family-access-summary-card {
+  width: min(100%, 920px);
+  margin: 0 auto 16px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .08));
+  box-shadow: 0 22px 58px rgba(46, 30, 90, .16);
+  backdrop-filter: blur(18px);
+}
+
+.profile-state-notice-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 18px;
+}
+
+.profile-state-notice-card[hidden],
+.family-access-summary-card[hidden] {
+  display: none !important;
+}
+
+.profile-state-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  font-weight: 900;
+  background: rgba(255, 255, 255, .74);
+  box-shadow: inset 0 0 0 1px rgba(120, 92, 179, .13);
+}
+
+.profile-state-notice-card span,
+.family-access-summary-head span,
+.family-access-summary-grid span {
+  display: block;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 900;
+  opacity: .72;
+}
+
+.profile-state-notice-card strong,
+.family-access-summary-head strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.12rem;
+  line-height: 1.14;
+}
+
+.profile-state-notice-card p,
+.family-access-summary-note,
+.family-access-summary-status {
+  margin: 7px 0 0;
+  line-height: 1.45;
+  opacity: .78;
+}
+
+.family-access-summary-card {
+  padding: 20px;
+}
+
+.family-access-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.family-access-role-badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, .65);
+  box-shadow: inset 0 0 0 1px rgba(120, 92, 179, .13);
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: .78rem !important;
+  opacity: 1 !important;
+}
+
+.family-access-role-badge[data-role="admin"],
+.family-access-role-badge[data-role="responsavel"] {
+  font-weight: 950;
+}
+
+.family-access-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.family-access-summary-grid article {
+  min-width: 0;
+  border-radius: 18px;
+  padding: 13px;
+  background: rgba(255, 255, 255, .52);
+  box-shadow: inset 0 0 0 1px rgba(120, 92, 179, .10);
+}
+
+.family-access-summary-grid strong {
+  display: block;
+  margin-top: 5px;
+  font-size: .96rem;
+  line-height: 1.22;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.family-access-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.family-access-summary-actions .profile-primary-button,
+.family-access-summary-actions .profile-secondary-button {
+  min-height: 44px;
+}
+
+body.profile-state-invite-pending .screen[data-screen="profile"] #createFamilyButton {
+  display: none !important;
+}
+
+body.profile-state-account-no-family .screen[data-screen="profile"] #familyAccessCard {
+  display: block;
+}
+
+body.day-theme .profile-state-notice-card,
+body.day-theme .family-access-summary-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(246, 239, 255, .82));
+  border-color: rgba(132, 101, 190, .16);
+  box-shadow: 0 18px 42px rgba(113, 86, 154, .13);
+}
+
+body.day-theme .profile-state-icon,
+body.day-theme .family-access-role-badge,
+body.day-theme .family-access-summary-grid article {
+  background: rgba(255, 255, 255, .82);
+}
+
+body:not(.day-theme) .profile-state-notice-card,
+body:not(.day-theme) .family-access-summary-card {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(64, 48, 109, .82), rgba(31, 24, 61, .76));
+  border-color: rgba(255, 255, 255, .14);
+}
+
+body:not(.day-theme) .profile-state-icon,
+body:not(.day-theme) .family-access-role-badge,
+body:not(.day-theme) .family-access-summary-grid article {
+  background: rgba(255, 255, 255, .10);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10);
+}
+
+@media (max-width: 760px) {
+  .family-access-summary-head {
+    flex-direction: column;
+  }
+
+  .family-access-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .profile-state-notice-card {
+    grid-template-columns: 1fr;
+  }
+
+  .family-access-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .family-access-summary-actions {
+    display: grid;
   }
 }

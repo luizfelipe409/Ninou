@@ -22,45 +22,82 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function memberPath(familyId) {
+      return /databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid);
+    }
+
+    function userFamilyPath(familyId) {
+      return /databases/$(database)/documents/users/$(request.auth.uid)/families/$(familyId);
+    }
+
     function isFamilyMember(familyId) {
-      return isSignedIn()
-        && exists(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid));
+      return isSignedIn() && exists(memberPath(familyId));
+    }
+
+    function hasUserFamilyLink(familyId) {
+      return isSignedIn() && exists(userFamilyPath(familyId));
+    }
+
+    function memberRole(familyId) {
+      return isFamilyMember(familyId)
+        ? get(memberPath(familyId)).data.role
+        : "";
+    }
+
+    function userFamilyRole(familyId) {
+      return hasUserFamilyLink(familyId)
+        ? get(userFamilyPath(familyId)).data.role
+        : "";
+    }
+
+    function roleCanManage(role) {
+      return role in ["admin", "owner", "responsavel", "pai", "mae"];
+    }
+
+    function roleCanWriteRoutine(role) {
+      return role in ["admin", "owner", "responsavel", "pai", "mae", "cuidador"];
     }
 
     function isFamilyAdmin(familyId) {
       return isGlobalAdmin()
-        || (
-          isSignedIn()
-          && exists(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid))
-          && get(/databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid)).data.role in ["admin", "owner", "responsavel", "pai", "mae"]
-        );
-    }
-
-    function hasUserFamilyLink(familyId) {
-      return isSignedIn()
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/families/$(familyId));
+        || (isSignedIn() && roleCanManage(memberRole(familyId)))
+        || (isSignedIn() && !isFamilyMember(familyId) && roleCanManage(userFamilyRole(familyId)));
     }
 
     function canUseFamily(familyId) {
       return isGlobalAdmin() || isFamilyMember(familyId) || hasUserFamilyLink(familyId);
     }
 
+    function canWriteFamilyRoutine(familyId) {
+      return isGlobalAdmin()
+        || (isSignedIn() && roleCanWriteRoutine(memberRole(familyId)))
+        || (isSignedIn() && !isFamilyMember(familyId) && roleCanWriteRoutine(userFamilyRole(familyId)));
+    }
+
     match /families/{familyId} {
       allow read: if canUseFamily(familyId);
-      allow create, update: if isGlobalAdmin() || isSignedIn();
+      allow create: if isGlobalAdmin() || isSignedIn();
+      allow update: if isGlobalAdmin()
+        || isFamilyAdmin(familyId)
+        || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
       allow delete: if isGlobalAdmin();
 
       match /profile/{profileId} {
-        allow read, write: if canUseFamily(familyId);
+        allow read: if canUseFamily(familyId);
+        allow create, update: if isFamilyAdmin(familyId);
+        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
       }
 
       match /days/{dayId} {
-        allow read, write: if canUseFamily(familyId);
+        allow read: if canUseFamily(familyId);
+        allow create, update: if canWriteFamilyRoutine(familyId);
+        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
       }
 
       match /members/{memberId} {
         allow read: if canUseFamily(familyId);
-        allow create, update: if isGlobalAdmin() || isSelf(memberId) || isFamilyAdmin(familyId);
+        allow create: if isGlobalAdmin() || isSelf(memberId) || isFamilyAdmin(familyId);
+        allow update: if isGlobalAdmin() || isSelf(memberId) || isFamilyAdmin(familyId);
         allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
       }
 

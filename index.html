@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.75.5" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.75.6" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.75.5" />
+    <link rel="stylesheet" href="./styles.css?v=75.75.6" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -696,6 +696,37 @@
           </div>
         </section>
 
+        <section id="profileStateNoticeCard" class="profile-state-notice-card" hidden aria-live="polite">
+          <div class="profile-state-icon" aria-hidden="true">♡</div>
+          <div>
+            <span id="profileStateKicker">Acesso familiar</span>
+            <strong id="profileStateTitle">Conecte sua família para continuar.</strong>
+            <p id="profileStateText">Crie uma família nova somente se você for o primeiro responsável. Se recebeu convite, aceite o código para entrar na família existente.</p>
+          </div>
+        </section>
+
+        <section id="familyAccessSummaryCard" class="family-access-summary-card" hidden aria-live="polite">
+          <div class="family-access-summary-head">
+            <div>
+              <span>Meu acesso familiar</span>
+              <strong id="familyAccessSummaryTitle">Família conectada</strong>
+            </div>
+            <span id="familyAccessSummaryRoleBadge" class="family-access-role-badge">Acesso</span>
+          </div>
+          <div class="family-access-summary-grid" aria-label="Resumo do acesso familiar">
+            <article><span>Conta</span><strong id="familyAccessSummaryUser">—</strong></article>
+            <article><span>Família</span><strong id="familyAccessSummaryFamily">—</strong></article>
+            <article><span>Cuidador neste aparelho</span><strong id="familyAccessSummaryDevice">—</strong></article>
+            <article><span>Permissão</span><strong id="familyAccessSummaryRole">—</strong></article>
+          </div>
+          <p id="familyAccessSummaryMembers" class="family-access-summary-note">Os membros autorizados aparecem no painel familiar.</p>
+          <div class="family-access-summary-actions">
+            <button id="familyAccessSummaryInviteButton" class="profile-primary-button" type="button">Convidar cuidador</button>
+            <button id="familyAccessSummaryProfileButton" class="profile-secondary-button" type="button">Editar meu cuidador</button>
+          </div>
+          <small id="familyAccessSummaryInviteStatus" class="family-access-summary-status">Convites são de uso único e devem ser enviados para o e-mail correto.</small>
+        </section>
+
         <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome guest-profile-entry-card" aria-label="Entrada no Ninou">
           <div class="guest-entry-icon" aria-hidden="true">👶</div>
           <div class="guest-welcome-top">
@@ -1137,13 +1168,15 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.75.5</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.75.6</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
               <div><span>FamilyId</span><strong id="diagnosticsFamilyLabel">—</strong></div>
               <div><span>PWA</span><strong id="diagnosticsPwaLabel">—</strong></div>
               <div><span>Cache local</span><strong id="diagnosticsCacheLabel">—</strong></div>
+              <div><span>Integridade</span><strong id="diagnosticsIntegrityLabel">—</strong></div>
+              <div><span>Convites</span><strong id="diagnosticsInviteLabel">—</strong></div>
               <div><span>App Check</span><strong id="diagnosticsAppCheckLabel">Pendente</strong></div>
             </div>
           </article>
@@ -1370,6 +1403,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.75.5"></script>
+    <script type="module" src="./app.js?v=75.75.6"></script>
   </body>
 </html>
