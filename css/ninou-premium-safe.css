@@ -1,0 +1,394 @@
+/* Ninou v75.75.30 — premium seguro
+   Objetivo: melhorar o acabamento sem esconder funções.
+   Importante: esta camada NÃO usa display:none para cards de Perfil/Admin. */
+
+:root {
+  --premium-safe-shell: 1240px;
+  --premium-safe-side-nav: 86px;
+  --premium-safe-gap: clamp(12px, 1.6vw, 18px);
+  --premium-safe-pad: clamp(16px, 1.9vw, 24px);
+  --premium-safe-radius: 26px;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+strong,
+span,
+p,
+small,
+em,
+label,
+li {
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+.phone-shell,
+.screen[data-screen],
+.settings-list,
+.settings-list > *,
+.admin-access-card,
+.admin-clean-panel,
+.admin-clean-section,
+.admin-diagnostics-card,
+.family-health-panel,
+.family-real-test-panel,
+.export-card,
+.privacy-note-card,
+.support-card,
+.danger-card,
+.admin-access-list,
+.admin-access-list li,
+.admin-stats-grid,
+.diagnostics-grid,
+.sync-detail-grid {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.ninou-email-token,
+.admin-email-token,
+#syncStatusTitle,
+#syncFamilyLabel,
+#diagnosticsUserLabel,
+#diagnosticsFamilyLabel,
+#familyAccountLabel,
+.admin-access-list strong {
+  max-width: 100%;
+}
+
+@media (min-width: 900px) {
+  .ninou-email-token,
+  .admin-email-token,
+  #syncStatusTitle,
+  #syncFamilyLabel,
+  #diagnosticsUserLabel,
+  #diagnosticsFamilyLabel,
+  #familyAccountLabel,
+  .admin-access-list strong {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    overflow-wrap: normal !important;
+    word-break: keep-all !important;
+    vertical-align: bottom;
+  }
+}
+
+.admin-clean-panel :is(p, span, strong, small, em, li, label),
+.admin-diagnostics-card :is(p, span, strong, small, em, li, label),
+.family-health-panel :is(p, span, strong, small, em, li, label),
+.settings-list :is(p, span, strong, small, em, li, label) {
+  overflow-wrap: break-word !important;
+  line-height: 1.42 !important;
+}
+
+.admin-clean-section,
+.admin-diagnostics-card,
+.family-health-panel,
+.family-real-test-panel,
+.login-card,
+.privacy-note-card,
+.export-card,
+.support-card,
+.danger-card,
+.admin-access-card {
+  border-radius: var(--premium-safe-radius) !important;
+  padding: var(--premium-safe-pad) !important;
+  overflow: hidden !important;
+}
+
+.admin-card-actions,
+.admin-access-actions,
+.family-health-actions,
+.export-actions,
+.login-actions,
+.profile-actions-row,
+.security-actions-row {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 138px), 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+.admin-card-actions button,
+.admin-access-actions button,
+.family-health-actions button,
+.export-actions button,
+.login-actions button,
+.profile-actions-row button,
+.security-actions-row button,
+.secondary-login {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  line-height: 1.14 !important;
+  text-align: center !important;
+}
+
+.admin-open-family-button {
+  font-weight: 950 !important;
+}
+
+.admin-stats-grid,
+.diagnostics-grid,
+.sync-detail-grid,
+.profile-ready-grid,
+.premium-trust-grid,
+.post-access-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)) !important;
+  gap: var(--premium-safe-gap) !important;
+}
+
+.admin-access-list {
+  display: grid !important;
+  gap: 10px !important;
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.admin-access-list > li,
+.admin-client-item,
+.admin-known-user-item,
+.admin-member-item,
+.admin-support-item {
+  border-radius: 18px !important;
+  padding: 12px 13px !important;
+  min-width: 0 !important;
+}
+
+body.day-theme .family-health-panel,
+body.day-theme .family-real-test-panel,
+body.day-theme .admin-diagnostics-card,
+body.day-theme .admin-clean-section {
+  background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(249,243,255,.92)) !important;
+  border-color: rgba(122, 88, 146, .15) !important;
+}
+
+body.day-theme .family-health-panel :is(span, small, p, li),
+body.day-theme .family-real-test-panel :is(span, small, p, li),
+body.day-theme .admin-diagnostics-card :is(span, small, p, li),
+body.day-theme .admin-clean-section :is(span, small, p, li, em) {
+  color: rgba(50, 39, 82, .74) !important;
+}
+
+body.day-theme .family-health-panel strong,
+body.day-theme .family-real-test-panel strong,
+body.day-theme .admin-diagnostics-card strong,
+body.day-theme .admin-clean-section strong {
+  color: #302454 !important;
+}
+
+body.day-theme .family-health-checklist li,
+body.day-theme .family-real-test-checklist li {
+  background: rgba(255,255,255,.88) !important;
+  border-color: rgba(122, 88, 146, .14) !important;
+}
+
+/* Desktop: dashboard amplo, mas preservando todos os cards e todas as funções. */
+@media (min-width: 1024px) {
+  body.global-admin-mode.admin-panel-only {
+    padding: 18px !important;
+    min-height: 100vh !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .phone-shell,
+  body.global-admin-mode .phone-shell {
+    width: min(var(--premium-safe-shell), calc(100vw - 44px)) !important;
+    max-width: var(--premium-safe-shell) !important;
+    min-height: calc(100vh - 36px) !important;
+    margin-inline: auto !important;
+    padding: 24px 30px 44px calc(var(--premium-safe-side-nav) + 34px) !important;
+    border-radius: 34px !important;
+    overflow: visible !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .bottom-nav,
+  body.global-admin-mode .bottom-nav {
+    position: fixed !important;
+    left: max(24px, calc(50vw - (var(--premium-safe-shell) / 2) + 24px)) !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: 74px !important;
+    max-width: 74px !important;
+    transform: translateY(-50%) !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 9px !important;
+    border-radius: 28px !important;
+    z-index: 40 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .bottom-nav button,
+  body.global-admin-mode .bottom-nav button {
+    width: 100% !important;
+    min-height: 62px !important;
+    border-radius: 20px !important;
+    padding: 7px 4px !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .bottom-nav span:last-child,
+  body.global-admin-mode .bottom-nav span:last-child {
+    font-size: .66rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .screen[data-screen="profile"] .settings-list,
+  body.global-admin-mode .screen[data-screen="profile"] .settings-list {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    align-items: start !important;
+    width: 100% !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .settings-list > .login-card,
+  body.global-admin-mode .settings-list > .login-card,
+  body.global-admin-mode.admin-panel-only .settings-list > .privacy-note-card,
+  body.global-admin-mode .settings-list > .privacy-note-card {
+    grid-column: span 6 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #familyAccessCard,
+  body.global-admin-mode #familyAccessCard,
+  body.global-admin-mode.admin-panel-only #adminDiagnosticsCard,
+  body.global-admin-mode #adminDiagnosticsCard,
+  body.global-admin-mode.admin-panel-only .settings-list > .export-card,
+  body.global-admin-mode .settings-list > .export-card {
+    grid-column: 1 / -1 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .settings-list > .support-card,
+  body.global-admin-mode .settings-list > .support-card,
+  body.global-admin-mode.admin-panel-only .settings-list > .danger-card,
+  body.global-admin-mode .settings-list > .danger-card {
+    grid-column: span 6 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel,
+  body.global-admin-mode #adminInvitePanel {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    align-items: start !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > *,
+  body.global-admin-mode #adminInvitePanel > * {
+    min-width: 0 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-clean-hero,
+  body.global-admin-mode #adminInvitePanel > .admin-clean-hero,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-family-client-card,
+  body.global-admin-mode #adminInvitePanel > .admin-family-client-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-create-family-card,
+  body.global-admin-mode #adminInvitePanel > .admin-create-family-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-users-section,
+  body.global-admin-mode #adminInvitePanel > .admin-users-section {
+    grid-column: 1 / -1 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-stats-card,
+  body.global-admin-mode #adminInvitePanel > .admin-stats-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminInviteSection,
+  body.global-admin-mode #adminInvitePanel > #adminInviteSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminMembersSection,
+  body.global-admin-mode #adminInvitePanel > #adminMembersSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-list-section,
+  body.global-admin-mode #adminInvitePanel > .admin-list-section {
+    grid-column: span 6 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-stats-grid,
+  body.global-admin-mode .admin-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-card-actions.admin-family-actions,
+  body.global-admin-mode .admin-card-actions.admin-family-actions {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-family-actions .admin-open-family-button,
+  body.global-admin-mode .admin-family-actions .admin-open-family-button {
+    grid-column: span 2 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-client-item,
+  body.global-admin-mode.admin-panel-only .admin-known-user-item,
+  body.global-admin-mode.admin-panel-only .admin-member-item,
+  body.global-admin-mode .admin-client-item,
+  body.global-admin-mode .admin-known-user-item,
+  body.global-admin-mode .admin-member-item {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-access-actions,
+  body.global-admin-mode .admin-access-actions {
+    justify-self: end !important;
+    width: auto !important;
+    min-width: 170px !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1160px) {
+  body.global-admin-mode.admin-panel-only .phone-shell,
+  body.global-admin-mode .phone-shell {
+    padding-left: 112px !important;
+    padding-right: 22px !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .bottom-nav,
+  body.global-admin-mode .bottom-nav {
+    left: 24px !important;
+  }
+
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-stats-card,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminInviteSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > #adminMembersSection,
+  body.global-admin-mode.admin-panel-only #adminInvitePanel > .admin-list-section,
+  body.global-admin-mode #adminInvitePanel > .admin-stats-card,
+  body.global-admin-mode #adminInvitePanel > #adminInviteSection,
+  body.global-admin-mode #adminInvitePanel > #adminMembersSection,
+  body.global-admin-mode #adminInvitePanel > .admin-list-section {
+    grid-column: 1 / -1 !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-card-actions.admin-family-actions,
+  body.global-admin-mode .admin-card-actions.admin-family-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  body.global-admin-mode.admin-panel-only .admin-family-actions .admin-open-family-button,
+  body.global-admin-mode .admin-family-actions .admin-open-family-button {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .family-health-actions,
+  .admin-card-actions,
+  .admin-access-actions,
+  .security-actions-row {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -1,0 +1,9 @@
+Ninou v75.75.30 — Premium seguro sem remover funções
+
+- Refeito em cima da v75.75.27, evitando a limpeza agressiva da v75.75.29.
+- Mantém visíveis os cards de Conta, Privacidade, Backup, Suporte e Zerar dia.
+- Mantém o botão “Sair e limpar dados deste aparelho”.
+- Aplica acabamento desktop/admin por CSS dedicado, sem esconder funções essenciais.
+- Protege e-mails contra quebra visual no desktop.
+- Encurta rótulos longos sem alterar a lógica dos botões.
+- Atualiza cache/PWA para carregar a nova camada.
