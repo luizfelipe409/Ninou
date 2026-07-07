@@ -1,10 +1,26 @@
-const CACHE_NAME = "ninou-v75-75-7-fluxo-familiar";
+const CACHE_NAME = "ninou-v75-75-8-fluxo-familiar";
+
+function canCacheRequest(request, response) {
+  if (!request || request.method !== "GET") return false;
+  try {
+    const url = new URL(request.url);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+  } catch (_) {
+    return false;
+  }
+  return Boolean(response && response.ok && response.status === 200 && response.type !== "opaque");
+}
+
+function safePut(cache, request, response) {
+  if (!canCacheRequest(request, response)) return Promise.resolve();
+  return cache.put(request, response).catch(() => undefined);
+}
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.7",
-  "/css/app.legacy.css?v=75.75.7",
-  "/js/app.legacy.js?v=75.75.7",
+  "/styles.css?v=75.75.8",
+  "/css/app.legacy.css?v=75.75.8",
+  "/js/app.legacy.js?v=75.75.8",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -105,7 +121,7 @@ self.addEventListener("fetch", (event) => {
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          caches.open(CACHE_NAME).then((cache) => safePut(cache, request, copy));
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match("/index.html"))),
@@ -127,7 +143,7 @@ self.addEventListener("fetch", (event) => {
         return fetch(request).then((response) => {
           if (response && response.ok && response.status === 200) {
             const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            caches.open(CACHE_NAME).then((cache) => safePut(cache, request, copy));
           }
           return response;
         });
@@ -142,7 +158,7 @@ self.addEventListener("fetch", (event) => {
       return fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          caches.open(CACHE_NAME).then((cache) => safePut(cache, request, copy));
           return response;
         })
         .catch(() => caches.match("/index.html"));
