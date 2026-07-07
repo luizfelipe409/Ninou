@@ -24,13 +24,14 @@ export const firebaseConfig = Object.freeze({
 
 export const firebaseSdkVersion = "10.12.4";
 
-// v75.61.1 — App Check seguro
-// IMPORTANTE: substitua o placeholder abaixo pela Site Key do reCAPTCHA Enterprise
-// criada no mesmo projeto Firebase/Google Cloud: ninou-3c936.
-// Enquanto a chave estiver vazia ou como placeholder, o app continua funcionando,
-// mas o App Check fica pendente e NÃO deve ter enforcement ativado ainda.
+// v75.75.11 — App Check opcional durante desenvolvimento/testes.
+// O Ninou continua protegido por Firebase Authentication + Firestore Rules.
+// Deixe `enabled: false` enquanto o App Check estiver apenas em monitoramento
+// ou enquanto a chave reCAPTCHA Enterprise ainda gerar 401 no navegador.
+// Quando o fluxo principal estiver validado e o App Check estiver sem erros,
+// troque para `enabled: true` antes de ativar enforcement no Firebase.
 export const appCheckConfig = Object.freeze({
-  enabled: true,
+  enabled: false,
   provider: "recaptcha-enterprise",
   siteKey: "6LdizUItAAAAACvIWR7t2EVC5mJHIr4QXMMxa9YX",
 });

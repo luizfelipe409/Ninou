@@ -1,6 +1,6 @@
-// Ninou v75.75.10 - compatibilidade com versões antigas do index.html.
+// Ninou v75.75.11 - compatibilidade com versões antigas do index.html.
 // A partir desta versão, o index.html carrega js/app.legacy.js diretamente para evitar falso aviso de falha no iPhone/PWA.
-const NINOU_APP_VERSION = "75.75.10";
+const NINOU_APP_VERSION = "75.75.11";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

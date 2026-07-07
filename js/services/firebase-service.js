@@ -59,8 +59,16 @@ export async function getFirebaseServices() {
             && !siteKey.includes("COLE_A_SITE_KEY")
             && siteKey.length >= 20;
 
-          if (!appCheckConfig?.enabled || !hasRealSiteKey) {
+          if (!appCheckConfig?.enabled) {
             appCheckStatus.enabled = false;
+            appCheckStatus.configured = false;
+            appCheckStatus.reason = "optional-disabled";
+            return;
+          }
+
+          if (!hasRealSiteKey) {
+            appCheckStatus.enabled = false;
+            appCheckStatus.configured = false;
             appCheckStatus.reason = "site-key-pending";
             return;
           }
