@@ -1,0 +1,10 @@
+Ninou v75.75.31 — CSS único e responsividade revisada
+
+- Consolida app.legacy.css, styles.css e premium-safe.css em um único styles.css.
+- Remove a importação @import para css/app.legacy.css.
+- Remove o CSS extra css/ninou-premium-safe.css.
+- Consolida a pequena camada JS segura dentro de js/app.legacy.js e remove js/ninou-premium-safe.js.
+- Atualiza index.html para carregar apenas um CSS e um JS principal.
+- Atualiza o Service Worker para cachear somente styles.css como CSS do app.
+- Mantém as funções de Conta, Privacidade, Sair/Limpar, Backup, Suporte e Zerar dia.
+- Revisa desktop, tablet e mobile sem esconder cards funcionais.

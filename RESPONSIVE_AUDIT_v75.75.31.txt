@@ -1,0 +1,34 @@
+Ninou v75.75.31 — Auditoria responsiva e CSS único
+
+Estrutura corrigida:
+- index.html carrega apenas 1 CSS: ./styles.css?v=75.75.31
+- removido @import para css/app.legacy.css
+- removido css/ninou-premium-safe.css
+- removido js/ninou-premium-safe.js; a pequena camada segura foi consolidada em js/app.legacy.js
+- service worker atualizado para cachear somente styles.css como CSS principal
+
+Telas revisadas por CSS:
+- Hoje: cards, orbit, ações rápidas, resumo, alertas, timeline e último registro
+- Diário: chips, lista de eventos, observações e auditoria
+- Dados: KPIs, gráficos, report stack e crescimento
+- Sons: player, lista, botões e controles
+- Perfil/Admin: conta, privacidade, sair/limpar, acesso familiar, admin, convites, membros, diagnóstico, backup, suporte e zerar dia
+
+Breakpoints consolidados:
+- até 430px: celular pequeno, navegação inferior segura e cards em 1 coluna
+- 431px a 767px: celular grande, grids compactos
+- 768px a 1023px: tablet, shell maior e grids em 2 colunas
+- 1024px+: desktop, shell amplo, navegação lateral e admin em dashboard
+- 1280px+: desktop largo, shell até 1280px
+
+Funções preservadas:
+- Sair e limpar dados deste aparelho
+- Gerar PDF profissional
+- Enviar WhatsApp
+- CSV/JSON
+- Suporte/sugestão/problema
+- Zerar dia
+- Criar família, aceitar convite, abrir rotina, membros e diagnóstico
+
+Observação:
+Esta versão prioriza um único CSS e não usa uma folha extra de patch. O objetivo foi reduzir conflito de cascata e facilitar manutenção futura.
