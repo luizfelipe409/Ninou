@@ -1,0 +1,8 @@
+Ninou v75.75.25 — Correção do painel admin desktop
+
+- Reorganiza o Perfil/Admin no desktop em grade ampla de 12 colunas.
+- Faz o painel admin ocupar largura total quando necessário.
+- Corrige cards estreitos, textos quebrando letra por letra e e-mails longos.
+- Ajusta listas, ações, estatísticas e diagnóstico para desktop/tablet.
+- Adiciona respiro inferior para a barra de navegação não cobrir conteúdo.
+- Atualiza cache/runtime para 75.75.25.
