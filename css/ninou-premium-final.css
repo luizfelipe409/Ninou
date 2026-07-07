@@ -1,0 +1,674 @@
+/* Ninou v75.75.24 — acabamento premium desktop/mobile
+   Camada final de responsividade, contraste e leitura do painel admin.
+   Pode ficar importada após styles.css. Não altera regras do Firebase. */
+
+:root {
+  --ninou-desktop-shell: 1120px;
+  --ninou-desktop-side-nav: 84px;
+  --ninou-premium-gap: clamp(12px, 1.7vw, 18px);
+  --ninou-premium-card-pad: clamp(16px, 2vw, 22px);
+  --ninou-premium-radius: 26px;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+strong,
+span,
+p,
+small,
+em,
+label,
+li,
+h1,
+h2,
+h3 {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  hyphens: none !important;
+}
+
+/* E-mails e identificadores: não quebrar luizfelipe.dasilva / @gmail.com em linhas feias. */
+.ninou-email-token,
+.admin-email-token,
+.admin-client-id,
+[data-email],
+[data-admin-email] {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: bottom;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+/* Cards, listas e grids sempre respiram sem cortar bordas. */
+.phone-shell,
+.screen[data-screen],
+.screen[data-screen] > *,
+.admin-clean-panel,
+.admin-clean-section,
+.admin-access-card,
+.admin-access-list,
+.admin-access-list li,
+.admin-client-item,
+.admin-known-user-item,
+.admin-member-item,
+.admin-access-actions,
+.admin-card-actions,
+.admin-stats-grid,
+.sync-detail-grid,
+.diagnostics-grid,
+.profile-family-card,
+.settings-list article {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.growth-card,
+.routine-progress-card,
+.intelligent-timeline-card,
+.weekly-overview-card,
+.day-story-card,
+.last-card,
+.today-last-card,
+.five-day-actions-card,
+.day-notes-card,
+.audit-card,
+.chart-card,
+.sound-player-card,
+.sound-note,
+.profile-card,
+.baby-profile-card,
+.avatar-compact-card,
+.login-card,
+.privacy-note-card,
+.admin-access-card,
+.wake-window-card,
+.export-card,
+.danger-card,
+.profile-ready-card,
+.guest-welcome-card,
+.premium-trust-card,
+.account-journey-card,
+.post-access-card,
+.data-reality-card,
+.first-use-checklist-card,
+.profile-family-card,
+.sync-health-card,
+.admin-diagnostics-card,
+.settings-list article,
+.admin-clean-section {
+  overflow: hidden !important;
+  border-radius: var(--ninou-premium-radius) !important;
+  padding: var(--ninou-premium-card-pad) !important;
+}
+
+/* Títulos e subtítulos com hierarquia clara. */
+.drawer-section-title,
+.section-title,
+.chart-title,
+.today-overview-head,
+.profile-card-head,
+.profile-ready-head,
+.journey-head,
+.admin-invite-header,
+.quick-actions-heading {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px !important;
+  align-items: start !important;
+}
+
+.drawer-section-title > div,
+.section-title > div,
+.chart-title > div,
+.today-overview-head > div,
+.profile-card-head > div,
+.profile-ready-head > div,
+.journey-head > div,
+.admin-invite-header > div,
+.quick-actions-heading > div {
+  min-width: 0 !important;
+}
+
+.drawer-section-title strong,
+.section-title strong,
+.chart-title strong,
+.today-overview-head strong,
+.profile-card-head strong,
+.profile-ready-head strong,
+.journey-head strong,
+.admin-invite-header strong,
+.quick-actions-heading strong {
+  line-height: 1.12 !important;
+  text-wrap: balance;
+}
+
+.drawer-section-title span,
+.section-title span,
+.chart-title span,
+.today-overview-head span,
+.profile-card-head span,
+.profile-ready-head span,
+.journey-head span,
+.admin-invite-header span,
+.quick-actions-heading span,
+.section-helper,
+.chart-helper,
+.admin-section-note,
+.admin-stats-hint,
+.admin-migration-status,
+.form-status {
+  line-height: 1.42 !important;
+}
+
+/* Botões com texto mais premium: nada espremido ou quebrando no meio. */
+button,
+.secondary-login,
+.profile-primary-button,
+.profile-secondary-button,
+.save-button,
+.admin-card-actions button,
+.admin-access-actions button,
+.export-actions button,
+.login-actions button,
+.guest-modal-actions button,
+.avatar-editor-actions button,
+.quick-actions button,
+.start-choice button,
+.record-types button,
+.sound-option {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  line-height: 1.12 !important;
+  text-align: center;
+}
+
+.admin-card-actions,
+.admin-access-actions,
+.export-actions,
+.login-actions,
+.profile-actions-row,
+.guest-modal-actions,
+.avatar-editor-actions {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 138px), 1fr));
+  gap: 10px !important;
+}
+
+.admin-family-actions .admin-open-family-button {
+  font-weight: 950;
+}
+
+/* Estatísticas do admin: evita card cortado à direita e frases quebradas palavra por palavra. */
+.admin-stats-grid,
+.sync-detail-grid,
+.diagnostics-grid,
+.today-overview-grid,
+.summary-grid,
+.weekly-overview,
+.report-stack,
+.profile-ready-grid,
+.premium-trust-grid,
+.post-access-grid,
+.settings-list,
+.sound-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)) !important;
+  gap: var(--ninou-premium-gap) !important;
+  width: 100% !important;
+}
+
+.admin-stats-grid article,
+.sync-detail-grid div,
+.diagnostics-grid div,
+.today-overview-grid article,
+.summary-grid article,
+.weekly-overview article,
+.report-stack article {
+  min-width: 0 !important;
+}
+
+.admin-stats-grid span,
+.admin-stats-grid small,
+.sync-detail-grid span,
+.sync-detail-grid strong,
+.diagnostics-grid span,
+.diagnostics-grid strong {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Listas do admin com aparência de painel, não lista apertada. */
+.admin-access-list {
+  display: grid !important;
+  gap: 10px !important;
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.admin-access-list li,
+.admin-client-item,
+.admin-known-user-item,
+.admin-member-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px !important;
+  border-radius: 18px !important;
+  padding: 12px 13px !important;
+}
+
+.admin-client-item > div:first-child,
+.admin-known-user-item > div:first-child,
+.admin-member-item > div:first-child,
+.admin-access-item > div:first-child {
+  min-width: 0 !important;
+}
+
+.admin-client-item strong,
+.admin-known-user-item strong,
+.admin-member-item strong,
+.admin-access-item strong {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.admin-clean-section details,
+.admin-clean-section summary,
+details.admin-clean-section,
+summary {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Checklist/saúde: corrige contraste fraco no tema claro e preserva estética. */
+.first-use-checklist-card,
+.sync-health-card,
+.admin-diagnostics-card,
+.data-reality-card {
+  color: var(--ink) !important;
+}
+
+.first-use-checklist-card span,
+.first-use-checklist-card small,
+.first-use-checklist-card p,
+.first-use-checklist-card li,
+.sync-health-card span,
+.sync-health-card p,
+.admin-diagnostics-card span,
+.admin-diagnostics-card p,
+.data-reality-card span,
+.data-reality-card p {
+  color: color-mix(in srgb, var(--ink) 72%, transparent) !important;
+}
+
+.first-use-checklist-card strong,
+.sync-health-card strong,
+.admin-diagnostics-card strong,
+.data-reality-card strong {
+  color: var(--ink) !important;
+}
+
+body.day-theme .first-use-checklist-card,
+body.day-theme .sync-health-card,
+body.day-theme .admin-diagnostics-card,
+body.day-theme .data-reality-card {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-color: rgba(90, 70, 130, 0.14) !important;
+  color: #302454 !important;
+}
+
+body.day-theme .first-use-checklist-card span,
+body.day-theme .first-use-checklist-card small,
+body.day-theme .first-use-checklist-card p,
+body.day-theme .first-use-checklist-card li,
+body.day-theme .sync-health-card span,
+body.day-theme .sync-health-card p,
+body.day-theme .admin-diagnostics-card span,
+body.day-theme .admin-diagnostics-card p,
+body.day-theme .data-reality-card span,
+body.day-theme .data-reality-card p {
+  color: rgba(48, 36, 84, 0.72) !important;
+}
+
+body.day-theme .first-use-checklist-card strong,
+body.day-theme .sync-health-card strong,
+body.day-theme .admin-diagnostics-card strong,
+body.day-theme .data-reality-card strong {
+  color: #302454 !important;
+}
+
+/* Mobile continua com comportamento de app. */
+.phone-shell {
+  padding-bottom: max(116px, calc(96px + env(safe-area-inset-bottom, 0px))) !important;
+}
+
+.bottom-nav {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(2px, 1.6vw, 6px) !important;
+  width: min(calc(100% - 24px), 420px) !important;
+  max-width: calc(100vw - 18px) !important;
+  padding: clamp(7px, 2.5vw, 10px) !important;
+}
+
+.bottom-nav button {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  padding-inline: 3px !important;
+}
+
+.bottom-nav span:last-child {
+  display: block !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Desktop/tablet grande: deixa de parecer celular espichado. */
+@media (min-width: 900px) {
+  body {
+    display: block !important;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .phone-shell,
+  .phone-shell.premium-final-shell {
+    width: min(var(--ninou-desktop-shell), calc(100vw - 40px)) !important;
+    max-width: var(--ninou-desktop-shell) !important;
+    min-height: calc(100vh - 40px) !important;
+    margin-inline: auto !important;
+    padding: 24px 28px 38px calc(var(--ninou-desktop-side-nav) + 34px) !important;
+    border-radius: 34px !important;
+    overflow: visible !important;
+    box-shadow:
+      0 30px 90px rgba(10, 8, 32, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .app-header {
+    position: sticky !important;
+    top: 0;
+    z-index: 22;
+    margin: -4px 0 18px !important;
+    padding: 12px 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    background: rgba(19, 16, 47, 0.72);
+    backdrop-filter: blur(18px);
+  }
+
+  body.day-theme .app-header {
+    border-color: rgba(122, 88, 146, 0.14);
+    background: rgba(255, 246, 235, 0.78);
+  }
+
+  .bottom-nav {
+    position: fixed !important;
+    left: max(24px, calc(50vw - (var(--ninou-desktop-shell) / 2) + 24px)) !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: 74px !important;
+    max-width: 74px !important;
+    transform: translateY(-50%) !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 9px !important;
+    border-radius: 28px !important;
+    z-index: 40 !important;
+  }
+
+  .bottom-nav button {
+    width: 100% !important;
+    min-height: 62px !important;
+    border-radius: 21px !important;
+    padding: 7px 4px !important;
+  }
+
+  .bottom-nav span:last-child {
+    font-size: 0.66rem !important;
+    line-height: 1.05 !important;
+  }
+
+  .fab {
+    right: max(28px, calc(50vw - (var(--ninou-desktop-shell) / 2) + 30px)) !important;
+    left: auto !important;
+    bottom: 30px !important;
+    transform: none !important;
+  }
+
+  .screen[data-screen].active {
+    align-content: start !important;
+  }
+
+  .screen[data-screen="profile"].active,
+  body.global-admin-mode .screen[data-screen="profile"].active {
+    gap: 18px !important;
+  }
+
+  body.global-admin-mode .admin-clean-panel,
+  .admin-clean-panel {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    align-items: start !important;
+  }
+
+  body.global-admin-mode .admin-clean-hero,
+  body.global-admin-mode .admin-family-client-card,
+  body.global-admin-mode .admin-create-family-card,
+  body.global-admin-mode .admin-create-invite-card,
+  body.global-admin-mode .admin-migration-card,
+  body.global-admin-mode .admin-diagnostics-card,
+  body.global-admin-mode .admin-users-section,
+  body.global-admin-mode .admin-local-invites,
+  .admin-clean-hero,
+  .admin-family-client-card,
+  .admin-create-family-card,
+  .admin-create-invite-card,
+  .admin-migration-card,
+  .admin-diagnostics-card,
+  .admin-users-section,
+  .admin-local-invites {
+    grid-column: 1 / -1;
+  }
+
+  .admin-form-grid,
+  .admin-create-family-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .admin-card-actions.admin-family-actions {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .admin-family-actions .admin-open-family-button {
+    grid-column: span 2;
+  }
+
+  .admin-family-actions .secondary-login {
+    min-height: 42px !important;
+    padding-inline: 10px !important;
+    font-size: 0.86rem !important;
+  }
+
+  .admin-family-actions .admin-open-family-button {
+    font-size: 0.92rem !important;
+  }
+
+  .admin-client-item,
+  .admin-known-user-item,
+  .admin-member-item {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+  }
+
+  .admin-access-actions {
+    justify-self: end !important;
+    width: auto !important;
+    min-width: 180px !important;
+  }
+
+  .admin-client-item strong,
+  .admin-known-user-item strong,
+  .admin-member-item strong,
+  .admin-access-item strong,
+  .sync-detail-grid strong,
+  .diagnostics-grid strong {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #syncStatusText,
+  #adminStatsHint,
+  .admin-stats-hint,
+  .admin-section-note,
+  .admin-invite-header em {
+    max-width: 74ch;
+  }
+}
+
+/* Desktop menor: mantém painel premium sem empurrar menu para fora. */
+@media (min-width: 900px) and (max-width: 1080px) {
+  .phone-shell,
+  .phone-shell.premium-final-shell {
+    padding-left: 112px !important;
+    padding-right: 22px !important;
+  }
+
+  .bottom-nav {
+    left: 24px !important;
+  }
+
+  .admin-card-actions.admin-family-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .admin-family-actions .admin-open-family-button {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Celulares pequenos: prioriza leitura e não deixa barra cobrir o final. */
+@media (max-width: 430px) {
+  .phone-shell {
+    padding-inline: 14px !important;
+    padding-bottom: max(122px, calc(104px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+
+  .drawer-section-title,
+  .section-title,
+  .chart-title,
+  .today-overview-head,
+  .profile-card-head,
+  .profile-ready-head,
+  .journey-head,
+  .admin-invite-header,
+  .quick-actions-heading {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .admin-form-grid,
+  .admin-create-family-grid,
+  .admin-stats-grid,
+  .sync-detail-grid,
+  .diagnostics-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-access-list li,
+  .admin-client-item,
+  .admin-known-user-item,
+  .admin-member-item {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* Ninou v75.75.28 — refinamentos finais de contraste e leitura */
+body.day-theme .family-health-panel,
+body.day-theme .family-real-test-panel,
+body.day-theme .admin-diagnostics-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,243,255,0.94)) !important;
+  border-color: rgba(122, 88, 146, 0.16) !important;
+}
+
+body.day-theme .family-health-header span,
+body.day-theme .family-health-status,
+body.day-theme .family-real-test-intro,
+body.day-theme .family-real-test-panel small,
+body.day-theme .admin-diagnostics-card p,
+body.day-theme .admin-diagnostics-card span {
+  color: rgba(55, 41, 90, 0.76) !important;
+}
+
+body.day-theme .family-health-header strong,
+body.day-theme .family-health-checklist strong,
+body.day-theme .family-real-test-panel strong,
+body.day-theme .admin-diagnostics-card strong {
+  color: #312451 !important;
+}
+
+body.day-theme .family-health-checklist li,
+body.day-theme .family-real-test-checklist li {
+  background: rgba(255,255,255,0.88) !important;
+  border-color: rgba(122, 88, 146, 0.14) !important;
+}
+
+.account-sync-summary strong,
+#syncStatusTitle,
+#syncFamilyLabel,
+#diagnosticsUserLabel,
+#diagnosticsFamilyLabel,
+#familyAccountLabel {
+  max-width: 100%;
+}
+
+@media (min-width: 900px) {
+  .account-sync-summary strong,
+  #syncStatusTitle,
+  #syncFamilyLabel,
+  #diagnosticsUserLabel,
+  #diagnosticsFamilyLabel,
+  #familyAccountLabel {
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .screen[data-screen="profile"] .settings-list > .login-card,
+  .screen[data-screen="profile"] .settings-list > .privacy-note-card {
+    max-width: 860px !important;
+    width: 100% !important;
+    justify-self: center !important;
+  }
+}

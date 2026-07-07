@@ -5542,7 +5542,7 @@ function renderAdminClients(stats = null) {
   if (adminOpenFamilyButton) {
     adminOpenFamilyButton.hidden = !appAdmin;
     adminOpenFamilyButton.disabled = !appAdmin || previewOpen;
-    adminOpenFamilyButton.textContent = previewOpen ? "Rotina aberta" : "Abrir rotina da família selecionada";
+    adminOpenFamilyButton.textContent = previewOpen ? "Rotina aberta" : "Abrir rotina";
   }
 
   if (adminReturnToPanelButton) {
