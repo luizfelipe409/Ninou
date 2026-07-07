@@ -332,7 +332,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.9";
+const NINOU_RUNTIME_VERSION = "75.75.10";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -1755,7 +1755,12 @@ function getCaregiverAvatarDataUrl(label = "Responsável", seed = "", variant = 
   ];
   const [bg, fg] = palettes[Math.abs(hash) % palettes.length];
   const cleaned = String(label || seed || "R").trim();
-  const initial = escapeSvgText((cleaned.match(/[A-Za-zÀ-ÿ0-9]/)?.[0] || "R").toUpperCase());
+  let initialSource = "R";
+  for (let index = 0; index < cleaned.length; index += 1) {
+    const char = cleaned.charAt(index);
+    if (char && char.trim()) { initialSource = char; break; }
+  }
+  const initial = escapeSvgText(initialSource.toUpperCase());
   const icon = variant === "admin" ? "★" : variant === "family" ? "♡" : variant === "known" ? "•" : "✓";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><radialGradient id="g" cx="32%" cy="24%" r="85%"><stop offset="0" stop-color="#fffdf8" stop-opacity=".9"/><stop offset="1" stop-color="${bg}"/></radialGradient><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#2d2250" flood-opacity=".14"/></filter></defs><circle cx="80" cy="80" r="74" fill="url(#g)" filter="url(#s)"/><circle cx="80" cy="80" r="68" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="5"/><text x="80" y="90" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="64" font-weight="800" fill="${fg}">${initial}</text><circle cx="118" cy="42" r="19" fill="#fff8ef" opacity=".92"/><text x="118" y="48" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="${fg}">${escapeSvgText(icon)}</text></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -3125,7 +3130,7 @@ function loadFamilyAccess() {
   }
 }
 
-function saveFamilyAccess(access) {
+function saveFamilyAccess(access, options = {}) {
   familyAccess = access?.familyId
     ? {
         familyId: String(access.familyId),
@@ -3143,7 +3148,7 @@ function saveFamilyAccess(access) {
     localStorage.removeItem(storageKeys.access);
   }
 
-  renderFamilyAccessPanel();
+  if (options.render !== false) renderFamilyAccessPanel();
   return familyAccess;
 }
 
@@ -3600,11 +3605,11 @@ function buildGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamil
   };
 }
 
-function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamilyId()) {
+function ensureGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamilyId(), options = {}) {
   const selectedFamily = saveSelectedAdminFamilyId(familyId);
   const access = buildGlobalAdminAccess(user, selectedFamily);
   if (!access) return null;
-  return saveFamilyAccess(access);
+  return saveFamilyAccess(access, options);
 }
 
 
@@ -5233,7 +5238,7 @@ async function refreshAdminStats(options = {}) {
     return null;
   }
 
-  if (isGlobalAppAdmin()) ensureGlobalAdminAccess(cloudUser, getActiveAdminFamilyId());
+  if (isGlobalAppAdmin()) ensureGlobalAdminAccess(cloudUser, getActiveAdminFamilyId(), { render: false });
 
   const requestId = ++adminStatsRequestId;
   if (!options.silent) setAdminStatsPlaceholder("Atualizando painel...");
@@ -5572,7 +5577,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.75.9: não tenta consultar a família principal fixa para usuários comuns.
+  // v75.75.10: não tenta consultar a família principal fixa para usuários comuns.
   // Uma conta recém-autenticada ainda não tem permissão para ler members/{uid} em famílias
   // onde ela não possui vínculo; isso gerava "Missing or insufficient permissions" antes
   // mesmo sem ser um erro real. O vínculo agora vem de users/{uid}/families ou convite.
@@ -5742,7 +5747,7 @@ async function activatePersonalFamilyInternal() {
 
     if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
 
-    // v75.75.9: primeiro cria o vínculo do usuário e o member/{uid}.
+    // v75.75.10: primeiro cria o vínculo do usuário e o member/{uid}.
     // Uma conta nova ainda não tem permissão para ler families/{familyId}; por isso
     // não fazemos getDoc(familyRef) antes. Depois do vínculo, as regras liberam
     // a criação/atualização segura da família e dos subdocumentos.

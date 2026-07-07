@@ -1,0 +1,6 @@
+v75.75.10
+- Corrige loop recursivo no painel admin ao entrar com a conta global.
+- Impede que refreshAdminStats chame ensureGlobalAdminAccess com renderização em cascata.
+- Ajusta saveFamilyAccess para aceitar renderização opcional.
+- Simplifica geração de inicial do avatar para evitar erro secundário após stack overflow.
+- Atualiza cache/runtime para 75.75.10.
