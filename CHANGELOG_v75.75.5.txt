@@ -1,0 +1,9 @@
+Ninou v75.75.5 — Perfil deslogado objetivo
+
+- Enxuguei a tela de Perfil quando o usuário está deslogado.
+- Ocultei avatar, perfil do bebê, peso, cuidador local, família, convites, preferências, painel de permissões, jornada longa, demonstração e cards de confiança no estado visitante.
+- Mantive apenas uma entrada clara: título curto, explicação objetiva, botões Entrar/Criar conta e link Tenho um convite familiar.
+- Troquei o botão “Criar família” no visitante por “Criar conta”, evitando a ideia de criar família antes do login.
+- Ajustei o foco dos botões para levar direto ao card de login/criação de conta.
+- O fluxo de “Criar minha família” continua disponível apenas após login e continua idempotente.
+- Atualizei cache/runtime para 75.75.5.

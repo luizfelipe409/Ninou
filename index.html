@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.75.4" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.75.5" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.75.4" />
+    <link rel="stylesheet" href="./styles.css?v=75.75.5" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -696,33 +696,20 @@
           </div>
         </section>
 
-        <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome" aria-label="Boas-vindas ao Ninou">
+        <section id="guestWelcomeCard" class="guest-welcome-card guest-store-welcome guest-profile-entry-card" aria-label="Entrada no Ninou">
+          <div class="guest-entry-icon" aria-hidden="true">👶</div>
           <div class="guest-welcome-top">
-            <span>Bem-vindo ao Ninou</span>
-            <strong>O diário inteligente do bebê, pronto para a família.</strong>
-            <p>Conheça uma experiência completa com rotina em tempo real, histórico por data, gráficos realistas, sons de descanso e acesso familiar.</p>
+            <span>Perfil Ninou</span>
+            <strong>Entre para acessar sua família.</strong>
+            <p>Acompanhe a rotina do bebê, sincronize com cuidadores autorizados e registre os cuidados do dia a dia.</p>
           </div>
 
-          <div class="guest-theme-switch" aria-label="Escolha o tema inicial">
-            <span>Tema inicial</span>
-            <div>
-              <button type="button" data-theme-choice="light">☀ Claro</button>
-              <button type="button" data-theme-choice="dark">🌙 Escuro</button>
-            </div>
-          </div>
-
-          <div class="guest-benefit-grid guest-store-benefits" aria-label="Recursos do Ninou">
-            <article><b>⏱</b><small>Rotina ao vivo</small></article>
-            <article><b>☰</b><small>Diário completo</small></article>
-            <article><b>▥</b><small>Gráficos reais</small></article>
-            <article><b>♪</b><small>Sons de descanso</small></article>
-          </div>
-
-          <div class="guest-welcome-actions">
+          <div class="guest-welcome-actions guest-entry-actions">
             <button id="guestWelcomeLoginButton" type="button">Entrar</button>
-            <button id="guestWelcomeInviteButton" type="button">Tenho convite</button>
-            <button id="guestWelcomeCreateFamilyButton" type="button">Criar família</button>
+            <button id="guestWelcomeCreateFamilyButton" type="button">Criar conta</button>
           </div>
+
+          <button id="guestWelcomeInviteButton" class="guest-invite-link" type="button">Tenho um convite familiar</button>
         </section>
 
         <section id="premiumTrustCard" class="premium-trust-card" aria-label="Diferenciais de confiança do Ninou">
@@ -852,9 +839,9 @@
         </section>
         <section class="settings-list">
           <article class="login-card">
-            <span>Acesso familiar</span>
-            <strong>Entrar no Ninou</strong>
-            <p id="loginHelper">Entre com sua conta. Novos usuários entram por convite do administrador do app.</p>
+            <span>Conta</span>
+            <strong>Entrar ou criar conta</strong>
+            <p id="loginHelper">Use e-mail e senha para entrar. Se recebeu convite, crie a conta com o mesmo e-mail convidado.</p>
             <div class="account-sync-summary" aria-label="Status da conta e sincronização">
               <div class="account-sync-status">
                 <strong id="syncStatusTitle">Sincronização off-line</strong>
@@ -1150,7 +1137,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.75.4</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v75.75.5</strong>
             <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -1383,6 +1370,6 @@
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./app.js?v=75.75.4"></script>
+    <script type="module" src="./app.js?v=75.75.5"></script>
   </body>
 </html>

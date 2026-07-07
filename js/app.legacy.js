@@ -113,6 +113,9 @@ const clearDeviceDataButton = document.querySelector("#clearDeviceDataButton");
 const clearDeviceDataStatus = document.querySelector("#clearDeviceDataStatus");
 const loginHelper = document.querySelector("#loginHelper");
 const loginCard = document.querySelector(".login-card");
+const profileHeroCard = document.querySelector('.screen[data-screen="profile"] > .profile-card');
+const profileSettingsList = document.querySelector('.screen[data-screen="profile"] .settings-list');
+const profilePrivacyCard = document.querySelector('.screen[data-screen="profile"] .privacy-note-card');
 const profileFamilyStack = document.querySelector(".profile-family-stack");
 const caregiverIdentityCard = document.querySelector("#caregiverIdentityCard");
 const caregiverNameInput = document.querySelector("#caregiverNameInput");
@@ -312,7 +315,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.4";
+const NINOU_RUNTIME_VERSION = "75.75.5";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -638,6 +641,46 @@ function setAuthAccessLoading(value, message = "Validando acesso familiar...") {
   renderAuthControls();
 }
 
+function setProfileElementHidden(element, hidden) {
+  if (!element) return;
+  element.hidden = Boolean(hidden);
+  element.setAttribute("aria-hidden", hidden ? "true" : "false");
+}
+
+function renderLoggedOutProfileShell() {
+  const loggedOut = !isLoggedIn();
+  document.body.classList.toggle("profile-guest-focused", loggedOut);
+  if (profileSettingsList) profileSettingsList.dataset.profileState = loggedOut ? "guest" : "account";
+
+  if (!loggedOut) {
+    setProfileElementHidden(profileHeroCard, false);
+    setProfileElementHidden(profilePrivacyCard, false);
+    return;
+  }
+
+  setProfileElementHidden(profileHeroCard, true);
+  setProfileElementHidden(profileFamilyStack, true);
+  setProfileElementHidden(profileReadyCard, true);
+  setProfileElementHidden(premiumTrustCard, true);
+  setProfileElementHidden(postAccessCard, true);
+  setProfileElementHidden(dataRealityCard, true);
+  setProfileElementHidden(firstUseChecklistCard, true);
+  setProfileElementHidden(familyAccessCard, true);
+  setProfileElementHidden(profilePrivacyCard, true);
+
+  if (loginCard) {
+    loginCard.dataset.state = "guest";
+    const kicker = loginCard.querySelector("span");
+    const title = loginCard.querySelector("strong");
+    if (kicker) kicker.textContent = "Conta";
+    if (title) title.textContent = "Entrar ou criar conta";
+  }
+
+  if (loginHelper) {
+    loginHelper.textContent = "Use e-mail e senha para entrar. Se recebeu convite, crie a conta com o mesmo e-mail convidado.";
+  }
+}
+
 function applyGuestInteractionLock() {
   const locked = !isLoggedIn();
   document.body.classList.toggle("guest-locked", locked);
@@ -665,6 +708,7 @@ function applyGuestInteractionLock() {
     }
   }
   if (guestWelcomeCard) guestWelcomeCard.hidden = !locked;
+  renderLoggedOutProfileShell();
   renderGuestPremiumContent();
   updateAccountJourneyGuide();
 }
@@ -1149,6 +1193,11 @@ function updateDataRealityCard() {
   const authorized = hasFamilyAccess();
   const appAdmin = isGlobalAppAdmin();
 
+  if (!connected && activeScreenName === "profile") {
+    dataRealityCard.hidden = true;
+    return;
+  }
+
   if (authorized || (appAdmin && !window.__ninouAdminFamilyDataOpen)) {
     dataRealityCard.hidden = true;
     return;
@@ -1241,6 +1290,7 @@ function updateProfileReadyExperience() {
   }
 
   normalizeLoggedProfileCards();
+  renderLoggedOutProfileShell();
 }
 
 function normalizeLoggedProfileCards() {
@@ -1267,11 +1317,16 @@ function normalizeLoggedProfileCards() {
     if (connected && authorized) {
       if (kicker) kicker.textContent = "Conta e sincronização";
       if (title) title.textContent = cloudUser?.email || "Sessão ativa";
-    } else {
+    } else if (connected) {
       if (kicker) kicker.textContent = "Acesso familiar";
-      if (title) title.textContent = "Entrar no Ninou";
+      if (title) title.textContent = "Conta conectada";
+    } else {
+      if (kicker) kicker.textContent = "Conta";
+      if (title) title.textContent = "Entrar ou criar conta";
     }
   }
+
+  renderLoggedOutProfileShell();
 }
 
 function updateFirstUseChecklist() {
@@ -1413,8 +1468,8 @@ function updateAccountJourneyGuide() {
   const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
   const hint = card.querySelector("#accountJourneyHint");
 
-  card.hidden = appAdmin || authorized;
-  if (appAdmin || authorized) return;
+  card.hidden = appAdmin || authorized || !connected;
+  if (appAdmin || authorized || !connected) return;
 
   card.dataset.state = authorized ? "ready" : connected ? "connected" : "guest";
 
@@ -1479,7 +1534,9 @@ function focusProfileAccess(mode = "login") {
   window.setTimeout(() => {
     const loginCard = loginHelper?.closest(".login-card");
     const journeyCard = document.querySelector("#accountJourneyCard");
-    const target = wantsInvite && isLoggedIn() ? inviteAcceptBox : (journeyCard || loginCard);
+    const target = wantsInvite && isLoggedIn()
+      ? inviteAcceptBox
+      : (isLoggedIn() ? (journeyCard || loginCard) : loginCard);
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
     if (wantsInvite && isLoggedIn()) {
       inviteCodeInput?.focus();
@@ -6759,7 +6816,7 @@ async function initFirebaseAuthState() {
       loginEmail.value = "";
       loginPassword.value = "";
       renderAuthControls();
-      loginHelper.textContent = "Entre com sua conta. Novas pessoas acessam por convite da família.";
+      loginHelper.textContent = "Use e-mail e senha para entrar. Se recebeu convite, crie a conta com o mesmo e-mail convidado.";
       return;
     }
 
@@ -9472,16 +9529,9 @@ if (guestWelcomeLoginButton) guestWelcomeLoginButton.addEventListener("click", (
 if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
 if (guestWelcomeCreateFamilyButton) {
   guestWelcomeCreateFamilyButton.addEventListener("click", () => {
-    focusProfileAccess("login");
-    if (!isLoggedIn()) {
-      if (loginHelper) loginHelper.textContent = "Crie sua conta e depois toque em Criar minha família.";
-      loginEmail?.focus();
-      return;
-    }
-    activatePersonalFamily().catch((error) => {
-      console.error("Erro ao criar família:", error);
-      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
-    });
+    focusProfileAccess("create");
+    if (loginHelper) loginHelper.textContent = "Digite seu e-mail, escolha uma senha com pelo menos 6 caracteres e toque em Criar conta.";
+    loginEmail?.focus();
   });
 }
 if (guestModalCloseButton) guestModalCloseButton.addEventListener("click", closeGuestLoginModal);

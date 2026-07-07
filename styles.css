@@ -1,5 +1,5 @@
 /* Ninou v75.74.1 - seguranÃ§a multi-famÃ­lia para mÃºltiplos tamanhos de tela. */
-@import url("./css/app.legacy.css?v=75.75.4");
+@import url("./css/app.legacy.css?v=75.75.5");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -8068,5 +8068,122 @@ body.day-theme .next-card.is-overdue p {
   }
   .quick-actions button > span:last-child {
     font-size: .92rem !important;
+  }
+}
+
+/* v75.75.5 — perfil deslogado mais objetivo */
+body.profile-guest-focused .screen[data-screen="profile"] > .profile-card,
+body.profile-guest-focused .screen[data-screen="profile"] .profile-family-stack,
+body.profile-guest-focused .screen[data-screen="profile"] #premiumTrustCard,
+body.profile-guest-focused .screen[data-screen="profile"] #accountJourneyCard,
+body.profile-guest-focused .screen[data-screen="profile"] #postAccessCard,
+body.profile-guest-focused .screen[data-screen="profile"] #dataRealityCard,
+body.profile-guest-focused .screen[data-screen="profile"] #firstUseChecklistCard,
+body.profile-guest-focused .screen[data-screen="profile"] #familyAccessCard,
+body.profile-guest-focused .screen[data-screen="profile"] .privacy-note-card {
+  display: none !important;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] {
+  padding-top: 16px;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] .settings-list {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] .settings-list > *:not(.login-card) {
+  display: none !important;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] .login-card {
+  margin: 0;
+}
+
+.guest-profile-entry-card {
+  max-width: 720px;
+  margin: 0 auto 14px;
+  text-align: center;
+  align-items: center;
+}
+
+.guest-entry-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  font-size: 30px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 0 0 1px rgba(120, 92, 179, .12), 0 16px 36px rgba(71, 56, 124, .13);
+}
+
+.guest-profile-entry-card .guest-welcome-top {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.guest-profile-entry-card .guest-welcome-top strong {
+  display: block;
+  font-size: clamp(1.45rem, 4vw, 2.05rem);
+  line-height: 1.08;
+  margin-top: 4px;
+}
+
+.guest-profile-entry-card .guest-welcome-top p {
+  max-width: 500px;
+  margin: 10px auto 0;
+}
+
+.guest-entry-actions {
+  width: min(100%, 460px);
+  margin: 18px auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.guest-entry-actions button {
+  min-height: 48px;
+}
+
+.guest-invite-link {
+  margin-top: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  opacity: .78;
+  cursor: pointer;
+}
+
+.guest-invite-link:focus-visible,
+.guest-invite-link:hover {
+  opacity: 1;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] .account-sync-summary .sync-detail-grid {
+  display: none;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] .account-sync-summary {
+  margin-top: 12px;
+}
+
+body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 560px) {
+  .guest-entry-actions,
+  body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
+    grid-template-columns: 1fr;
   }
 }

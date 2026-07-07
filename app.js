@@ -1,6 +1,6 @@
-// Ninou v75.75.4 - Criar família idempotente e sem duplicidade
+// Ninou v75.75.5 - Perfil deslogado objetivo
 // Loader modular com cache renovado e fallback de carregamento.
-const NINOU_APP_VERSION = "75.75.4";
+const NINOU_APP_VERSION = "75.75.5";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
