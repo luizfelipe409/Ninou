@@ -1,0 +1,5 @@
+Ninou v75.75.24 — Correção de sintaxe no app legado
+
+- Corrige token inválido em js/app.legacy.js que travava o app na tela inicial.
+- Atualiza cache/runtime para 75.75.24.
+- Mantém alterações da v75.75.23.

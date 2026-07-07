@@ -355,7 +355,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.23";
+const NINOU_RUNTIME_VERSION = "75.75.24";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -9251,10 +9251,8 @@ function appendQuickObservation(rawText = "") {
     return;
   }
   const current = normalizeSafeDayNotes(dayNotesTextarea.value || state.dayNotes || "");
-  const next = normalizeSafeDayNotes([current, noteLine].filter(Boolean).join("
-"));
-  if (next.length >= MAX_DAY_NOTES_LENGTH && next !== [current, noteLine].filter(Boolean).join("
-")) {
+  const next = normalizeSafeDayNotes([current, noteLine].filter(Boolean).join("\n"));
+  if (next.length >= MAX_DAY_NOTES_LENGTH && next !== [current, noteLine].filter(Boolean).join("\n")) {
     showToast?.("Observação atingiu o limite de caracteres do dia.");
   }
   dayNotesTextarea.value = next;

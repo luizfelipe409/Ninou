@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-23-interface-limpa";
+const CACHE_NAME = "ninou-v75-75-24-interface-limpa";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.23",
-  "/css/app.legacy.css?v=75.75.23",
-  "/js/app.legacy.js?v=75.75.23",
+  "/styles.css?v=75.75.24",
+  "/css/app.legacy.css?v=75.75.24",
+  "/js/app.legacy.js?v=75.75.24",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

@@ -24,7 +24,7 @@ export const firebaseConfig = Object.freeze({
 
 export const firebaseSdkVersion = "10.12.4";
 
-// v75.75.23 — App Check opcional durante desenvolvimento/testes.
+// v75.75.24 — App Check opcional durante desenvolvimento/testes.
 // O Ninou continua protegido por Firebase Authentication + Firestore Rules.
 // Deixe `enabled: false` enquanto o App Check estiver apenas em monitoramento
 // ou enquanto a chave reCAPTCHA Enterprise ainda gerar 401 no navegador.
