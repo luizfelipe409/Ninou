@@ -1,11 +1,10 @@
-const CACHE_NAME = "ninou-v75-75-6-fluxo-familiar";
+const CACHE_NAME = "ninou-v75-75-7-fluxo-familiar";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.6",
-  "/css/app.legacy.css?v=75.75.6",
-  "/app.js?v=75.75.6",
-  "/js/app.legacy.js?v=75.75.6",
+  "/styles.css?v=75.75.7",
+  "/css/app.legacy.css?v=75.75.7",
+  "/js/app.legacy.js?v=75.75.7",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

@@ -332,7 +332,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.6";
+const NINOU_RUNTIME_VERSION = "75.75.7";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -5477,7 +5477,7 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.75.6: convite pendente entra na família existente; não mostra criação paralela.
+    // v75.75.7: convite pendente entra na família existente; não mostra criação paralela.
     createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
     createFamilyButton.disabled = personalFamilyActivationInFlight;
     createFamilyButton.textContent = personalFamilyActivationInFlight
