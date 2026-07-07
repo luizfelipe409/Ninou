@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.75.11" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.75.23" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.75.11" />
+    <link rel="stylesheet" href="./styles.css?v=75.75.23" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -60,9 +60,9 @@
         <section class="state-orbit">
           <div class="orbit-ring" aria-hidden="true"></div>
           <div id="orbitEvents" class="orbit-events" aria-label="Atividades das últimas 24 horas"></div>
-          <span id="stateLabel">Rotina zerada</span>
+          <span id="stateLabel">Começar hoje</span>
           <strong id="stateClock">00:00:00</strong>
-          <p id="stateHint">Escolha como começar o dia.</p>
+          <p id="stateHint">Informe como o bebê está para iniciar a rotina com segurança.</p>
         </section>
 
 
@@ -74,11 +74,15 @@
           <div id="startChoice" class="start-choice">
             <button type="button" data-start-mode="awake">
               <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Acordou</span>
+              <span>Acordou / acordado desde...</span>
             </button>
             <button type="button" data-start-mode="sleeping">
               <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Iniciar soneca</span>
+              <span>Está dormindo desde...</span>
+            </button>
+            <button type="button" data-start-mode="now">
+              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span>Começar agora</span>
             </button>
           </div>
         </section>
@@ -98,6 +102,21 @@
             <article><span>Tempo acordado</span><strong>—</strong></article>
           </div>
           <p id="todayOverviewSuggestion" class="today-overview-suggestion">Registre a primeira ação para o Ninou montar um acompanhamento gentil.</p>
+        </section>
+
+        <section id="routineCorrectionCard" class="routine-correction-card" aria-live="polite" hidden>
+          <div class="routine-correction-head">
+            <div>
+              <span id="routineCorrectionKicker">Correção rápida</span>
+              <strong id="routineCorrectionTitle">Último registro</strong>
+            </div>
+            <i aria-hidden="true">✓</i>
+          </div>
+          <p id="routineCorrectionText">Quando houver um registro recente, você poderá corrigir ou desfazer com segurança.</p>
+          <div class="routine-correction-actions">
+            <button type="button" data-last-record-action="correct">Corrigir último registro</button>
+            <button type="button" data-last-record-action="undo">Desfazer última ação</button>
+          </div>
         </section>
 
         <section id="smartInsightCard" class="smart-insight-card" aria-live="polite">
@@ -235,7 +254,7 @@
             <button class="ghost-link" type="button" data-target-shortcut="diary">Abrir diário</button>
           </div>
           <div id="intelligentTimeline" class="intelligent-timeline">
-            <article class="timeline-empty">Ainda não há registros suficientes para montar a linha do tempo.</article>
+            <article class="timeline-empty polished-inline-empty">A linha do tempo inteligente aparece depois dos primeiros cuidados do dia.</article>
           </div>
         </section>
 
@@ -312,8 +331,8 @@
           <li class="event-card">
             <i class="mark"></i>
             <div>
-              <strong>Nenhum registro</strong>
-              <span>Escolha uma data ou crie um novo registro.</span>
+              <strong>Nenhum registro ainda</strong>
+              <span>Escolha uma data, limpe o filtro ou toque no botão + para adicionar um cuidado.</span>
             </div>
           </li>
         </ol>
@@ -323,9 +342,27 @@
             <strong>Notas da família</strong>
           </div>
           <p class="section-helper">Registre percepções importantes para pais, cuidadores ou pediatra, sem substituir orientação médica.</p>
+          <div class="quick-observations-panel" aria-label="Observações rápidas">
+            <div class="quick-observations-title">
+              <span>Atalhos rápidos</span>
+              <strong>Toque para adicionar uma nota</strong>
+            </div>
+            <div class="quick-observation-chips" role="list" aria-label="Sugestões de observação">
+              <button type="button" data-quick-observation="Teve cólica">Cólica</button>
+              <button type="button" data-quick-observation="Regurgitou">Regurgitou</button>
+              <button type="button" data-quick-observation="Tomou banho">Banho</button>
+              <button type="button" data-quick-observation="Medicamento registrado/administrado">Medicamento</button>
+              <button type="button" data-quick-observation="Teve febre ou temperatura elevada">Febre</button>
+              <button type="button" data-quick-observation="Consulta ou orientação profissional">Consulta</button>
+            </div>
+            <div class="quick-observation-custom">
+              <input id="quickObservationInput" type="text" maxlength="180" placeholder="Escrever observação rápida" autocomplete="off" />
+              <button id="addQuickObservationButton" class="secondary-login" type="button">Adicionar</button>
+            </div>
+          </div>
           <textarea id="dayNotesTextarea" rows="4" maxlength="1200" placeholder="Ex.: Dormiu melhor após o banho, teve mais cólica pela manhã, aceitou menos mamadeira à noite."></textarea>
           <div class="day-notes-actions">
-            <small id="dayNotesStatus">Nenhuma observação salva neste dia.</small>
+            <small id="dayNotesStatus">Nenhuma observação salva. Use este espaço para lembretes importantes da família.</small>
             <button id="saveDayNotesButton" class="secondary-login" type="button">Salvar observação</button>
           </div>
         </section>
@@ -615,7 +652,7 @@
                 <strong id="familyNameLabel">Família não conectada</strong>
               </div>
             </div>
-            <p class="profile-sync-copy">Conta, sincronização e convites ficam juntos para manter o diário familiar simples.</p>
+            <p class="profile-sync-copy">Conta e sincronização ficam ligadas à família autorizada. Convites aparecem em um único fluxo de acesso familiar.</p>
             <div class="profile-soft-row">
               <span>Conta familiar</span>
               <strong id="familyAccountLabel">Conta não conectada</strong>
@@ -631,11 +668,11 @@
             <div class="profile-invite-area">
               <div class="profile-card-head profile-subhead">
                 <div>
-                  <span>Convites</span>
-                  <strong>Acesso de cuidador</strong>
+                  <span>Convite familiar</span>
+                  <strong>Fluxo centralizado</strong>
                 </div>
               </div>
-              <p id="familyInviteDescription">Entre com uma conta familiar para gerar ou aceitar convites de cuidador.</p>
+              <p id="familyInviteDescription">Use o card Acesso familiar para criar, aceitar ou revisar convites sem duplicidade.</p>
               <div id="familyActiveInviteBox" class="active-invite-box" hidden>
                 <span>Código ativo</span>
                 <strong id="familyActiveInviteCode">—</strong>
@@ -723,6 +760,7 @@
           <div class="family-access-summary-actions">
             <button id="familyAccessSummaryInviteButton" class="profile-primary-button" type="button">Convidar cuidador</button>
             <button id="familyAccessSummaryProfileButton" class="profile-secondary-button" type="button">Editar meu cuidador</button>
+            <button id="familyLeaveButton" class="profile-secondary-button family-danger-button" type="button" hidden>Sair da família</button>
           </div>
           <small id="familyAccessSummaryInviteStatus" class="family-access-summary-status">Convites são de uso único e devem ser enviados para o e-mail correto.</small>
         </section>
@@ -904,8 +942,8 @@
           </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Acesso familiar</span>
-            <strong id="familyAccessTitle">Convites e permissões</strong>
-            <p id="familyAccessText">Somente o administrador do app pode gerar convites. Pessoas convidadas acessam com e-mail e senha próprios.</p>
+            <strong id="familyAccessTitle">Criar família ou entrar por convite</strong>
+            <p id="familyAccessText">Use este único card para criar a família inicial ou aceitar um convite recebido. O convite sempre entra na família existente.</p>
             <div class="access-status-row">
               <span id="familyAccessBadge" class="access-badge">Sem login</span>
               <button id="createFamilyButton" class="secondary-login" type="button" hidden>Ativar família</button>
@@ -922,7 +960,7 @@
                 <input id="inviteCodeInput" type="text" placeholder="Ex.: NINOU-AB12-CD34" autocomplete="off" />
               </label>
               <button id="acceptInviteButton" class="secondary-login" type="button">Aceitar convite</button>
-              <p class="invite-note">Use esse campo apenas se você recebeu um convite.</p>
+              <p class="invite-note">Use esse campo apenas se você recebeu um convite. Quem recebeu convite não deve criar uma nova família.</p>
             </div>
             <div id="adminInvitePanel" class="admin-invite-panel admin-clean-panel" hidden>
               <section class="admin-clean-hero" aria-live="polite">
@@ -931,10 +969,14 @@
                   <strong>Painel de administração</strong>
                   <p>Gerencie famílias, membros e convites de forma objetiva. Informações técnicas ficam recolhidas para não expor dados sem necessidade.</p>
                 </div>
+                <div class="admin-mode-toolbar" aria-label="Modo de visualização do painel admin">
+                  <button id="adminModeToggleButton" class="secondary-login admin-mode-toggle" type="button" aria-pressed="false">Mostrar modo avançado</button>
+                  <small id="adminModeHint">Modo simples ativo: o Ninou mostra só o essencial e mantém diagnóstico técnico recolhido.</small>
+                </div>
                 <button id="refreshAdminStatsButton" class="admin-refresh-button" type="button">Atualizar</button>
               </section>
 
-              <section id="adminFlowGuide" class="admin-flow-guide admin-clean-section" aria-label="Organização do acesso familiar">
+              <section id="adminFlowGuide" class="admin-flow-guide admin-clean-section" data-advanced-only aria-label="Organização do acesso familiar">
                 <div class="admin-invite-header">
                   <strong>Organização do acesso familiar</strong>
                   <em>Use esta área apenas quando precisar criar família, enviar convite ou revisar acessos.</em>
@@ -1044,11 +1086,11 @@
                   <button class="secondary-login" type="button" data-admin-scroll="create-family">Criar família</button>
                   <button class="secondary-login" type="button" data-admin-scroll="members">Gerenciar membros</button>
                   <button class="secondary-login" type="button" data-admin-scroll="invite">Criar convite</button>
-                  <button class="secondary-login" type="button" data-admin-scroll="migration">Revisar migração</button>
+                  <button class="secondary-login" type="button" data-admin-scroll="migration" data-advanced-only>Revisar migração</button>
                 </div>
               </section>
 
-              <details id="adminMigrationSection" class="admin-clean-section admin-migration-card admin-maintenance-section">
+              <details id="adminMigrationSection" class="admin-clean-section admin-migration-card admin-maintenance-section" data-advanced-only>
                 <summary>Revisão técnica de dados antigos</summary>
                 <div class="admin-invite-header">
                   <strong>Revisão de dados antigos</strong>
@@ -1123,11 +1165,11 @@
                   <em>Copie o código ou link e envie para a pessoa convidada.</em>
                 </div>
                 <ul id="adminPendingInviteList" class="admin-access-list">
-                  <li>Nenhum convite pendente.</li>
+                  <li class="polished-admin-empty">Nenhum convite pendente no momento.</li>
                 </ul>
               </section>
 
-              <section class="admin-clean-section admin-list-section admin-support-section">
+              <section class="admin-clean-section admin-list-section admin-support-section" data-advanced-only>
                 <div class="admin-invite-header">
                   <strong>Acesso administrativo</strong>
                   <em>O admin pode abrir qualquer família para suporte, mas não aparece como membro da família.</em>
@@ -1140,14 +1182,24 @@
               <section id="adminMembersSection" class="admin-clean-section admin-list-section">
                 <div class="admin-invite-header">
                   <strong>Membros desta família</strong>
-                  <em>Pessoas realmente vinculadas à família selecionada. O admin do app fica separado em acesso administrativo.</em>
+                  <em>Pessoas realmente vinculadas à família selecionada. Altere permissões com cuidado e remova acessos somente após confirmação.</em>
                 </div>
                 <ul id="adminMembersList" class="admin-access-list">
-                  <li>Nenhum membro autorizado ainda.</li>
+                  <li class="polished-admin-empty">Nenhum membro autorizado ainda. Convide ou vincule um cuidador para compartilhar a rotina.</li>
                 </ul>
               </section>
 
-              <details class="admin-clean-section admin-list-section admin-users-section admin-maintenance-section">
+              <details class="admin-clean-section admin-list-section admin-family-audit-section" data-advanced-only><summary>Histórico familiar</summary>
+                <div class="admin-invite-header">
+                  <strong>Histórico familiar</strong>
+                  <em>Últimas alterações de convites, permissões e membros.</em>
+                </div>
+                <ul id="adminFamilyAuditList" class="admin-access-list admin-audit-list">
+                  <li class="polished-admin-empty">Nenhuma alteração familiar registrada ainda.</li>
+                </ul>
+              </details>
+
+              <details class="admin-clean-section admin-list-section admin-users-section admin-maintenance-section" data-advanced-only>
                 <summary>Revisão técnica de contas</summary>
                 <div class="admin-invite-header">
                   <strong>Contas para revisão</strong>
@@ -1158,19 +1210,19 @@
                 </ul>
               </details>
 
-              <div class="invite-list-box admin-local-invites" hidden>
+              <div class="invite-list-box admin-local-invites" hidden data-advanced-only>
                 <span>Convites recentes neste aparelho</span>
                 <ul id="inviteList" class="invite-list">
-                  <li>Nenhum convite gerado neste aparelho.</li>
+                  <li class="polished-admin-empty">Nenhum convite gerado neste aparelho.</li>
                 </ul>
               </div>
             </div>
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v75.75.11</strong>
-            <p id="diagnosticsSummary">Informações técnicas para validar família, cache, PWA, sincronização e App Check.</p>
-            <div class="diagnostics-grid" aria-label="Diagnóstico técnico">
+            <strong id="diagnosticsVersionLabel">Ninou v75.75.23</strong>
+            <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
+            <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
               <div><span>FamilyId</span><strong id="diagnosticsFamilyLabel">—</strong></div>
               <div><span>PWA</span><strong id="diagnosticsPwaLabel">—</strong></div>
@@ -1179,11 +1231,47 @@
               <div><span>Convites</span><strong id="diagnosticsInviteLabel">—</strong></div>
               <div><span>App Check</span><strong id="diagnosticsAppCheckLabel">Pendente</strong></div>
             </div>
+            <section class="family-health-panel" aria-label="Saúde da família">
+              <div class="family-health-header">
+                <div>
+                  <span>Saúde da família</span>
+                  <strong>Verificação rápida</strong>
+                </div>
+                <span id="familyHealthScore" class="family-health-score">—</span>
+              </div>
+              <ul id="familyHealthChecklist" class="family-health-checklist">
+                <li><strong>Aguardando painel</strong><small>Atualize o painel para validar vínculos, perfil, convites e cache.</small></li>
+              </ul>
+              <div class="family-health-actions">
+                <button id="familyHealthRefreshButton" class="secondary-login" type="button">Verificar família</button>
+                <button id="familyHealthRepairButton" class="secondary-login" type="button" data-advanced-only>Corrigir vínculos</button>
+                <button id="familyBackupJsonButton" class="secondary-login" type="button" data-advanced-only>Exportar backup JSON</button>
+              </div>
+              <small id="familyHealthStatus" class="family-health-status">As correções preservam o histórico e seguem as permissões do usuário conectado.</small>
+            </section>
+            <section class="family-real-test-panel" aria-label="Teste da minha família" data-advanced-only>
+              <div class="family-real-test-header">
+                <div>
+                  <span>Teste da minha família</span>
+                  <strong>Checklist guiado por família</strong>
+                </div>
+                <span id="familyRealTestScore" class="family-health-score">—</span>
+              </div>
+              <p class="family-real-test-intro">Use este roteiro para validar somente a família atual. Uma família comum não visualiza dados, convites, membros ou backups de outra família.</p>
+              <ol id="familyRealTestChecklist" class="family-real-test-checklist">
+                <li><strong>Aguardando verificação</strong><small>Toque em Rodar checklist para revisar o fluxo completo com os dados atuais.</small></li>
+              </ol>
+              <div class="family-health-actions family-real-test-actions">
+                <button id="familyRealTestRefreshButton" class="secondary-login" type="button">Rodar checklist</button>
+                <button id="familyRealTestExportButton" class="secondary-login" type="button">Exportar checklist</button>
+              </div>
+              <small id="familyRealTestStatus" class="family-health-status">O checklist não altera dados. Ele valida o fluxo dentro da família atual e preserva o isolamento entre famílias.</small>
+            </section>
           </article>
           <article class="export-card">
             <span>Backup e compartilhamento</span>
             <strong>Relatório da rotina</strong>
-            <p>Gere um PDF mais bonito, baixe os dados ou envie um resumo personalizado pelo WhatsApp.</p>
+            <p>Gere um PDF com margens seguras, período correto, responsáveis identificados e resumo pronto para consulta.</p>
 
             <div class="export-period-grid" aria-label="Período do relatório">
               <label class="export-period-field has-select-control">
@@ -1222,7 +1310,7 @@
             </div>
 
             <div class="export-actions">
-              <button id="exportPdfButton" type="button">Gerar PDF</button>
+              <button id="exportPdfButton" type="button">Gerar PDF profissional</button>
               <button id="shareWhatsappButton" type="button">Enviar WhatsApp</button>
               <button id="exportCsvButton" type="button">CSV</button>
               <button id="exportJsonButton" type="button">JSON</button>
@@ -1397,12 +1485,31 @@
       <div id="orbitClusterList" class="cluster-list"></div>
     </section>
 
+
+    <section id="joinFamilyModal" class="join-family-modal" role="dialog" aria-modal="true" aria-labelledby="joinFamilyModalTitle" hidden aria-hidden="true">
+      <div class="join-family-dialog">
+        <button class="join-family-close" type="button" data-close-join-modal aria-label="Fechar convite familiar">×</button>
+        <span>Convite familiar</span>
+        <strong id="joinFamilyModalTitle">Entrar em uma família existente</strong>
+        <p>Digite ou cole o código recebido. Use a mesma conta de e-mail informada no convite para evitar criar uma família separada.</p>
+        <label class="join-family-code-field">
+          Código de convite
+          <input id="joinInviteCodeInput" type="text" placeholder="Ex.: NINOU-AB12-CD34" autocomplete="off" />
+        </label>
+        <div class="join-family-actions">
+          <button id="confirmJoinInviteButton" class="profile-primary-button" type="button">Aceitar convite</button>
+          <button class="profile-secondary-button" type="button" data-close-join-modal>Cancelar</button>
+        </div>
+        <small id="joinInviteFeedback" class="join-family-feedback">O convite será validado antes de liberar a rotina da família.</small>
+      </div>
+    </section>
+
     <audio id="sleepSoundAudio" preload="auto" loop playsinline></audio>
     <a id="guestWhatsappButton" class="guest-whatsapp-button" href="https://wa.me/5521981904591?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20acessar%20o%20Ninou.%20Pode%20me%20enviar%20um%20convite%3F" target="_blank" rel="noopener noreferrer" aria-label="Falar com o administrador pelo WhatsApp" hidden>
       <span aria-hidden="true">☘</span>
       <strong>Solicitar acesso</strong>
     </a>
 
-    <script type="module" src="./js/app.legacy.js?v=75.75.11"></script>
+    <script type="module" src="./js/app.legacy.js?v=75.75.23"></script>
   </body>
 </html>

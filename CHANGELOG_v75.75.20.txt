@@ -1,0 +1,8 @@
+Ninou v75.75.20 — Teste real de uso familiar
+
+- Adicionado painel de checklist guiado para validar o fluxo real Felipe/Maria.
+- Checklist revisa admin autenticado, família selecionada, perfil, membros, convite, aceite em segundo aparelho, auditoria, permissões e backup.
+- Adicionado botão Rodar checklist no diagnóstico.
+- Adicionada exportação JSON do checklist de uso familiar.
+- Mantidas as cores do app: lavanda, creme, verde suave e roxo.
+- Atualizado runtime/cache para 75.75.20.

@@ -1,0 +1,9 @@
+v75.75.12
+
+- Adiciona início diário inteligente para usuários novos e recorrentes.
+- Quando o dia está sem registros, o app pergunta se o bebê acordou/está acordado, está dormindo desde um horário informado ou se a rotina deve começar agora.
+- Permite informar horário manual do início do estado atual, com validação contra horário futuro.
+- Suporta sono/soneca atravessando a meia-noite: se começou ontem e continua hoje, o cronômetro segue normalmente.
+- Ao finalizar um sono iniciado em outro dia, o evento é preservado no dia de origem e no dia atual para relatórios e diário.
+- Exibe aviso “sono continuado de ontem” no card principal quando aplicável.
+- Mantém App Check opcional durante testes e atualiza cache/runtime para 75.75.12.

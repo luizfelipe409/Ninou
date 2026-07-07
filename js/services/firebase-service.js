@@ -184,11 +184,18 @@ export function getFirebaseErrorMessage(error) {
     "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",
     "auth/network-request-failed": "Não foi possível concluir o login agora. Atualize a página e tente novamente. Se persistir, limpe o PWA/cache do Ninou.",
-    "permission-denied": "Sem permissão no banco. Revise convites, membros da família ou regras do Firestore.",
+    "permission-denied": "Você não tem permissão para fazer isso nesta família. Confira se o convite foi aceito e se seu acesso ainda está ativo.",
+    "not-found": "Não encontrei esse dado no Firebase. Atualize o painel ou peça um novo convite.",
+    "cancelled": "A operação foi interrompida. Verifique sua conexão e tente novamente.",
+    "deadline-exceeded": "O Firebase demorou para responder. Tente novamente em alguns segundos.",
     "resource-exhausted": "Não foi possível salvar. Os dados ficaram grandes demais para o Firestore.",
-    "invalid-argument": "Não foi possível salvar. Revise os dados do perfil.",
+    "invalid-argument": "Não foi possível salvar. Revise os dados preenchidos.",
     unavailable: "Firebase indisponível no momento. Tente novamente em alguns segundos.",
   };
 
-  return messages[code] || "Não foi possível concluir a operação. Tente novamente.";
+  const text = String(error?.message || "");
+  if (/insufficient permissions|permission denied/i.test(text)) return messages["permission-denied"];
+  if (/network|failed to fetch/i.test(text)) return messages["auth/network-request-failed"];
+
+  return messages[code] || "Não foi possível concluir a operação. Tente novamente. Se continuar, atualize a página e verifique o acesso familiar.";
 }

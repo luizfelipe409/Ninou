@@ -1,5 +1,5 @@
 /* Ninou v75.75.6 - fluxo familiar completo. */
-@import url("./css/app.legacy.css?v=75.75.11");
+@import url("./css/app.legacy.css?v=75.75.23");
 
 
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
@@ -8373,5 +8373,1345 @@ body:not(.day-theme) .family-access-summary-grid article {
 
   .family-access-summary-actions {
     display: grid;
+  }
+}
+
+/* Ninou v75.75.15 — revisão de registros respeitando a paleta do app */
+.routine-correction-card {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(124, 229, 194, 0.24);
+  background:
+    radial-gradient(circle at 16% 0%, rgba(124, 229, 194, 0.18), transparent 34%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055));
+  box-shadow: 0 18px 42px rgba(18, 15, 47, 0.16);
+  backdrop-filter: blur(16px);
+  color: #fff;
+}
+
+.routine-correction-card[hidden] { display: none !important; }
+
+.routine-correction-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.routine-correction-head span,
+.routine-correction-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.70);
+  font-size: 0.82rem;
+  line-height: 1.38;
+}
+
+.routine-correction-head strong {
+  display: block;
+  margin-top: 3px;
+  color: #fff;
+  font-size: 1.02rem;
+  line-height: 1.2;
+}
+
+.routine-correction-head i {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #241b3f;
+  background: linear-gradient(135deg, #7ce5c2, #ffd37a);
+  box-shadow: 0 12px 24px rgba(124, 229, 194, 0.24);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.routine-correction-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.routine-correction-actions button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-weight: 800;
+  color: #241b3f;
+  background: linear-gradient(135deg, #f7f3ff, #ffffff);
+  box-shadow: 0 10px 24px rgba(18, 15, 47, 0.14);
+}
+
+.routine-correction-actions button[data-last-record-action="undo"] {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255, 154, 118, 0.95), rgba(255, 211, 122, 0.92));
+}
+
+.routine-correction-actions button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.event-edit-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.76rem;
+  line-height: 1.32;
+}
+
+@media (max-width: 420px) {
+  .routine-correction-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Ninou v75.75.15 — convite familiar simplificado, respeitando a paleta do app */
+.screen[data-screen="profile"] .profile-sharing-card .profile-invite-area {
+  display: none !important;
+}
+
+body.profile-state-family-ready .screen[data-screen="profile"] #familyAccessCard:not(.admin-open),
+body.profile-state-family-ready .screen[data-screen="profile"] #familyAccessCard[hidden] {
+  display: none !important;
+}
+
+.screen[data-screen="profile"] #familyAccessCard {
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .08));
+  box-shadow: 0 22px 58px rgba(46, 30, 90, .14);
+  backdrop-filter: blur(18px);
+}
+
+body.day-theme .screen[data-screen="profile"] #familyAccessCard {
+  background: linear-gradient(135deg, rgba(255, 255, 255, .96), rgba(246, 239, 255, .84));
+  border-color: rgba(132, 101, 190, .16);
+  box-shadow: 0 18px 42px rgba(113, 86, 154, .12);
+}
+
+.invite-accept-box {
+  border-radius: 22px;
+  padding: 14px;
+  background: rgba(255, 255, 255, .48);
+  box-shadow: inset 0 0 0 1px rgba(120, 92, 179, .11);
+}
+
+body:not(.day-theme) .invite-accept-box {
+  background: rgba(255, 255, 255, .08);
+}
+
+.join-family-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(28, 20, 44, .42);
+  backdrop-filter: blur(10px);
+}
+
+.join-family-modal[hidden] {
+  display: none !important;
+}
+
+.join-family-dialog {
+  position: relative;
+  width: min(100%, 440px);
+  border-radius: 30px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .96), rgba(246, 239, 255, .88));
+  box-shadow: 0 30px 80px rgba(46, 30, 90, .26);
+  color: var(--text-color, #322747);
+}
+
+body:not(.day-theme) .join-family-dialog {
+  background: linear-gradient(135deg, rgba(50, 39, 71, .96), rgba(35, 27, 52, .94));
+  color: #fff;
+}
+
+.join-family-dialog > span {
+  display: block;
+  font-size: .72rem;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  font-weight: 950;
+  opacity: .72;
+}
+
+.join-family-dialog > strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.28rem;
+  line-height: 1.12;
+}
+
+.join-family-dialog > p,
+.join-family-feedback {
+  display: block;
+  margin: 10px 0 0;
+  line-height: 1.45;
+  opacity: .78;
+}
+
+.join-family-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .66);
+  color: inherit;
+  font-size: 1.25rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.join-family-code-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  font-weight: 900;
+}
+
+.join-family-code-field input {
+  min-height: 48px;
+  border: 0;
+  border-radius: 17px;
+  padding: 0 14px;
+  font: inherit;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, .78);
+  box-shadow: inset 0 0 0 1px rgba(120, 92, 179, .18);
+}
+
+body:not(.day-theme) .join-family-code-field input {
+  background: rgba(255, 255, 255, .10);
+  color: #fff;
+}
+
+.join-family-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+@media (max-width: 520px) {
+  .join-family-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Ninou v75.75.15 — membros, permissões e segurança familiar */
+.family-danger-button,
+.danger-soft-button {
+  border-color: rgba(180, 86, 90, 0.28) !important;
+  background: linear-gradient(180deg, rgba(255, 246, 246, 0.92), rgba(255, 238, 238, 0.86)) !important;
+  color: #8f3d43 !important;
+}
+.member-permission-actions {
+  align-items: center;
+  gap: 0.45rem;
+}
+.member-role-select-label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  color: rgba(100, 74, 84, 0.78);
+}
+.member-role-select-label select {
+  border: 1px solid rgba(204, 154, 170, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 252, 249, 0.95);
+  color: #684858;
+  padding: 0.45rem 0.7rem;
+  font-weight: 800;
+}
+.admin-audit-item strong { color: #684858; }
+.admin-audit-item span { color: rgba(104, 72, 88, 0.82); }
+.admin-audit-item small { color: rgba(104, 72, 88, 0.58); }
+
+/* Ninou v75.75.23 — diagnóstico, mensagens e estabilidade familiar
+   Mantém a paleta do app: lavanda, creme, verde suave e contraste roxo. */
+.family-health-panel {
+  margin-top: 16px;
+  padding: 15px;
+  border: 1px solid rgba(130, 112, 180, .14);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(255, 250, 243, .92), rgba(244, 238, 255, .82));
+  box-shadow: 0 14px 34px rgba(67, 50, 94, .07);
+}
+
+.family-health-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.family-health-header span,
+.family-health-status {
+  color: #7b6f91;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.family-health-header strong {
+  display: block;
+  margin-top: 3px;
+  color: #3f3564;
+  font-size: 1rem;
+}
+
+.family-health-score {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #efe7ff;
+  color: #4b3a78;
+  font-size: .78rem;
+  font-weight: 900;
+}
+
+.family-health-score.is-ok {
+  background: #e2f5eb;
+  color: #1f6b57;
+}
+
+.family-health-score.needs-attention {
+  background: #fff1d6;
+  color: #8a5b16;
+}
+
+.family-health-checklist {
+  display: grid;
+  gap: 9px;
+  margin: 14px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.family-health-checklist li {
+  padding: 11px 12px;
+  border: 1px solid rgba(130, 112, 180, .12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .68);
+}
+
+.family-health-checklist li.is-ok {
+  border-color: rgba(31, 107, 87, .16);
+  background: rgba(226, 245, 235, .64);
+}
+
+.family-health-checklist li.needs-attention {
+  border-color: rgba(138, 91, 22, .18);
+  background: rgba(255, 241, 214, .70);
+}
+
+.family-health-checklist strong,
+.family-health-checklist small {
+  display: block;
+}
+
+.family-health-checklist strong {
+  color: #3f3564;
+  font-size: .9rem;
+}
+
+.family-health-checklist small {
+  margin-top: 3px;
+  color: #756985;
+  font-size: .78rem;
+  line-height: 1.35;
+}
+
+.family-health-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.family-health-actions .secondary-login {
+  min-height: 38px;
+  padding-inline: 10px;
+  border-color: rgba(130, 112, 180, .18);
+  background: rgba(255, 250, 243, .92);
+  color: #4b3a78;
+}
+
+.family-health-actions .secondary-login:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.family-health-status {
+  display: block;
+  margin-top: 10px;
+  letter-spacing: 0;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+@media (max-width: 560px) {
+  .family-health-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ninou v75.75.23 — responsividade e admin adaptativo
+   Foco: telas menores que iPhone 14 Pro Max e painel admin em desktop, respeitando a paleta lavanda/creme/verde do app. */
+:root {
+  --ninou-admin-max-width: 1180px;
+  --ninou-admin-gap: 14px;
+  --ninou-admin-card-pad: clamp(14px, 2.4vw, 20px);
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body.global-admin-mode,
+body.admin-family-preview {
+  overflow-x: hidden;
+}
+
+body.global-admin-mode .phone-shell,
+body.admin-family-preview .phone-shell {
+  width: min(var(--ninou-admin-max-width), calc(100vw - 18px)) !important;
+  max-width: min(var(--ninou-admin-max-width), calc(100vw - 18px)) !important;
+}
+
+body.global-admin-mode .screen[data-screen="profile"],
+body.admin-family-preview .screen[data-screen="profile"] {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#adminInvitePanel,
+#adminDiagnosticsCard,
+.admin-clean-panel,
+.admin-clean-section,
+.admin-access-card,
+.family-health-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-clean-panel {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: var(--ninou-admin-gap) !important;
+  overflow: visible !important;
+}
+
+.admin-clean-section,
+.admin-diagnostics-card,
+.family-health-panel {
+  padding: var(--ninou-admin-card-pad) !important;
+  overflow: clip !important;
+}
+
+.admin-access-list,
+.admin-access-list li,
+.admin-flow-steps,
+.admin-flow-steps li,
+.family-health-checklist,
+.family-health-checklist li,
+.diagnostics-grid,
+.permission-guide,
+.admin-stats-grid,
+.admin-health-grid,
+.admin-form-grid,
+.admin-card-actions,
+.admin-flow-actions,
+.admin-family-actions,
+.family-health-actions {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.admin-access-list {
+  display: grid !important;
+  gap: 10px !important;
+  overflow: visible !important;
+}
+
+.admin-access-list li {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 10px !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+.admin-access-list li > *,
+.admin-flow-steps li > *,
+.family-health-checklist li > *,
+.diagnostics-grid > *,
+.permission-guide > * {
+  min-width: 0 !important;
+}
+
+.admin-clean-panel :is(p, span, strong, small, em, li, label),
+.admin-diagnostics-card :is(p, span, strong, small, em, li, label),
+.family-health-panel :is(p, span, strong, small, em, li, label),
+.invite-result,
+.invite-message-preview {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.admin-clean-panel :is(button, input, select, textarea),
+.admin-diagnostics-card :is(button, input, select, textarea),
+.family-health-panel :is(button, input, select, textarea) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-clean-panel button,
+.admin-diagnostics-card button,
+.family-health-panel button {
+  min-height: 42px;
+  white-space: normal !important;
+}
+
+.admin-clean-panel input,
+.admin-clean-panel select,
+.admin-clean-panel textarea {
+  width: 100% !important;
+}
+
+.admin-invite-header,
+.admin-clean-hero,
+.admin-stats-header,
+.family-health-header {
+  min-width: 0 !important;
+}
+
+/* Desktop: admin respira em grade, mas sem estourar largura. */
+@media (min-width: 980px) {
+  body.global-admin-mode .phone-shell,
+  body.admin-family-preview .phone-shell {
+    padding-inline: 18px !important;
+  }
+
+  body.global-admin-mode #adminInvitePanel,
+  body.admin-family-preview #adminInvitePanel {
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    align-items: start !important;
+  }
+
+  body.global-admin-mode #adminInvitePanel > *,
+  body.admin-family-preview #adminInvitePanel > * {
+    grid-column: span 12;
+  }
+
+  body.global-admin-mode #adminFlowGuide,
+  body.admin-family-preview #adminFlowGuide,
+  body.global-admin-mode .admin-stats-card,
+  body.admin-family-preview .admin-stats-card {
+    grid-column: span 6 !important;
+  }
+
+  body.global-admin-mode #adminCreateFamilySection,
+  body.admin-family-preview #adminCreateFamilySection,
+  body.global-admin-mode .admin-family-client-card,
+  body.admin-family-preview .admin-family-client-card,
+  body.global-admin-mode #adminInviteSection,
+  body.admin-family-preview #adminInviteSection,
+  body.global-admin-mode #adminMembersSection,
+  body.admin-family-preview #adminMembersSection,
+  body.global-admin-mode .admin-family-audit-section,
+  body.admin-family-preview .admin-family-audit-section,
+  body.global-admin-mode .admin-list-section,
+  body.admin-family-preview .admin-list-section {
+    grid-column: span 6 !important;
+  }
+
+  body.global-admin-mode #adminMigrationSection,
+  body.admin-family-preview #adminMigrationSection,
+  body.global-admin-mode .admin-users-section,
+  body.admin-family-preview .admin-users-section {
+    grid-column: span 12 !important;
+  }
+
+  body.global-admin-mode #adminDiagnosticsCard,
+  body.admin-family-preview #adminDiagnosticsCard {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .diagnostics-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .admin-stats-grid.admin-health-grid,
+  .permission-guide {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-form-grid.admin-create-family-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .family-health-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet e desktop estreito: duas colunas leves, se couber. */
+@media (min-width: 721px) and (max-width: 979px) {
+  body.global-admin-mode .phone-shell,
+  body.admin-family-preview .phone-shell {
+    width: min(100%, calc(100vw - 14px)) !important;
+    max-width: min(100%, calc(100vw - 14px)) !important;
+    padding-inline: 12px !important;
+  }
+
+  .diagnostics-grid,
+  .admin-stats-grid.admin-health-grid,
+  .permission-guide,
+  .admin-form-grid,
+  .admin-card-actions,
+  .admin-flow-actions,
+  .admin-family-actions,
+  .family-health-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Celulares menores: admin vira lista de cards, sem tabelas e sem botões espremidos. */
+@media (max-width: 720px) {
+  body.global-admin-mode .phone-shell,
+  body.admin-family-preview .phone-shell,
+  .phone-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #adminInvitePanel,
+  #adminDiagnosticsCard {
+    gap: 12px !important;
+  }
+
+  .admin-clean-section,
+  .admin-diagnostics-card,
+  .family-health-panel {
+    border-radius: 20px !important;
+  }
+
+  .admin-clean-hero,
+  .admin-invite-header,
+  .admin-stats-header,
+  .family-health-header,
+  .admin-form-grid,
+  .admin-stats-grid,
+  .admin-health-grid,
+  .diagnostics-grid,
+  .permission-guide,
+  .admin-card-actions,
+  .admin-flow-actions,
+  .admin-family-actions,
+  .family-health-actions,
+  .join-family-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .family-health-header {
+    display: grid !important;
+  }
+
+  .family-health-score {
+    justify-self: start;
+  }
+
+  .admin-clean-panel button,
+  .admin-diagnostics-card button,
+  .family-health-panel button,
+  .admin-clean-panel .secondary-login,
+  .admin-diagnostics-card .secondary-login,
+  .family-health-panel .secondary-login {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .admin-flow-steps {
+    padding-left: 0 !important;
+  }
+
+  .admin-flow-steps li {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: flex-start !important;
+  }
+
+  .admin-access-list li,
+  .admin-clients-list li,
+  .admin-audit-list li {
+    border-radius: 16px !important;
+    padding: 12px !important;
+  }
+
+  .member-permission-actions,
+  .admin-access-list li .member-permission-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+  }
+
+  .member-role-select-label,
+  .member-role-select-label select {
+    width: 100% !important;
+  }
+
+  .invite-message-preview {
+    padding: 12px !important;
+  }
+}
+
+/* Telas muito estreitas: reduz densidade sem mexer no visual principal do app. */
+@media (max-width: 390px) {
+  :root {
+    --ninou-admin-gap: 10px;
+    --ninou-admin-card-pad: 12px;
+  }
+
+  .phone-shell {
+    padding-left: max(10px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(10px, env(safe-area-inset-right, 0px)) !important;
+  }
+
+  .admin-clean-section,
+  .admin-diagnostics-card,
+  .family-health-panel {
+    border-radius: 18px !important;
+  }
+
+  .admin-clean-hero strong,
+  .admin-invite-header strong,
+  .family-health-header strong {
+    font-size: .98rem !important;
+    line-height: 1.16 !important;
+  }
+
+  .admin-clean-panel :is(p, small, em),
+  .admin-diagnostics-card :is(p, small, em),
+  .family-health-panel :is(p, small, em) {
+    font-size: .78rem !important;
+  }
+
+  .admin-clean-panel button,
+  .admin-diagnostics-card button,
+  .family-health-panel button {
+    min-height: 40px !important;
+    padding-inline: 10px !important;
+  }
+}
+
+/* Desktop comum fora do modo admin: mantém a experiência de app centralizado, sem esticar demais. */
+@media (min-width: 1024px) {
+  body:not(.global-admin-mode):not(.admin-family-preview) .phone-shell {
+    width: min(520px, calc(100vw - 32px)) !important;
+  }
+}
+
+/* Ninou v75.75.23 — polimento visual e estados vazios
+   Mantém lavanda, creme, verde suave e roxo; reduz textos técnicos e deixa telas sem dados com orientação clara. */
+:root {
+  --ninou-empty-bg: linear-gradient(145deg, rgba(255, 250, 243, .94), rgba(246, 239, 255, .9));
+  --ninou-empty-border: rgba(143, 124, 255, .18);
+  --ninou-empty-ink: #4b3a78;
+  --ninou-empty-muted: #756985;
+  --ninou-empty-sage: rgba(124, 229, 194, .28);
+}
+
+body:not(.day-theme) {
+  --ninou-empty-bg: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.065));
+  --ninou-empty-border: rgba(201, 192, 255, .18);
+  --ninou-empty-ink: #f7f3ff;
+  --ninou-empty-muted: rgba(247, 243, 255, .72);
+  --ninou-empty-sage: rgba(124, 229, 194, .18);
+}
+
+.polished-empty-card,
+.event-card.empty-event.polished-empty-card {
+  border: 1px solid var(--ninou-empty-border) !important;
+  background: var(--ninou-empty-bg) !important;
+  box-shadow: 0 16px 38px rgba(34, 29, 76, .10) !important;
+  align-items: start !important;
+}
+
+.polished-empty-icon,
+.event-card.empty-event .polished-empty-icon {
+  display: grid !important;
+  place-items: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(145deg, rgba(143, 124, 255, .16), var(--ninou-empty-sage)) !important;
+  color: var(--sage) !important;
+  font-size: 1rem !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.38) !important;
+}
+
+.polished-empty-content {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.polished-empty-content small {
+  color: var(--sage);
+  font-weight: 900;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.polished-empty-content strong {
+  color: var(--ninou-empty-ink) !important;
+  font-size: clamp(.98rem, 2.8vw, 1.06rem) !important;
+  line-height: 1.18 !important;
+  text-wrap: balance;
+}
+
+.polished-empty-content span,
+.polished-empty-content em,
+.polished-inline-empty {
+  color: var(--ninou-empty-muted) !important;
+  font-style: normal;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.polished-empty-content em {
+  margin-top: 2px;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.polished-inline-empty,
+.timeline-empty.polished-inline-empty {
+  border: 1px dashed var(--ninou-empty-border);
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, .08);
+}
+
+body.day-theme .polished-inline-empty,
+body.day-theme .timeline-empty.polished-inline-empty {
+  background: rgba(255, 250, 243, .72);
+}
+
+/* Estado inicial do dia: mais acolhedor e menos técnico. */
+body.ninou-daily-empty-state .state-orbit {
+  border-color: rgba(124, 229, 194, .26) !important;
+  box-shadow: 0 18px 46px rgba(75, 58, 120, .12) !important;
+}
+
+body.ninou-daily-empty-state #stateLabel,
+body.ninou-empty-profile-state #stateLabel,
+body.ninou-reviewing-past-state #stateLabel {
+  letter-spacing: .02em;
+}
+
+body.ninou-daily-empty-state #stateHint,
+body.ninou-empty-profile-state #stateHint,
+body.ninou-reviewing-past-state #stateHint {
+  max-width: 28rem;
+  margin-inline: auto;
+  text-wrap: balance;
+}
+
+.start-choice.is-visible {
+  padding: 2px;
+}
+
+.start-choice.is-visible button {
+  min-height: 62px;
+  border-color: rgba(143, 124, 255, .18) !important;
+  box-shadow: 0 12px 26px rgba(34, 29, 76, .08);
+}
+
+body.day-theme .start-choice.is-visible button {
+  background: rgba(255, 250, 243, .92) !important;
+}
+
+/* Estados vazios do admin ficam com aparência de orientação, não de erro. */
+.polished-admin-empty,
+.admin-access-list li.polished-admin-empty {
+  border: 1px dashed rgba(143, 124, 255, .22) !important;
+  background: linear-gradient(145deg, rgba(255,250,243,.8), rgba(246,239,255,.72)) !important;
+  color: #756985 !important;
+  font-weight: 800;
+  line-height: 1.38;
+}
+
+body:not(.day-theme) .polished-admin-empty,
+body:not(.day-theme) .admin-access-list li.polished-admin-empty {
+  background: rgba(255,255,255,.075) !important;
+  color: rgba(247,243,255,.74) !important;
+}
+
+/* Polimento de cards e textos longos: evita sensação de tela quebrada sem alterar a estrutura principal. */
+.section-title strong,
+.drawer-section-title strong,
+.profile-card-head strong,
+.admin-invite-header strong,
+.family-health-header strong {
+  text-wrap: balance;
+}
+
+.section-helper,
+.chart-helper,
+.admin-invite-header em,
+.invite-message-preview p,
+.family-health-status,
+.form-status,
+.day-notes-actions small {
+  text-wrap: pretty;
+}
+
+.day-notes-card textarea::placeholder,
+.login-card input::placeholder,
+.profile-family-card input::placeholder,
+.admin-clean-panel input::placeholder {
+  color: rgba(117, 105, 133, .78);
+}
+
+/* Desktop: estados vazios não ficam perdidos em cards largos. */
+@media (min-width: 980px) {
+  .polished-empty-card,
+  .event-card.empty-event.polished-empty-card {
+    padding: 18px !important;
+  }
+
+  body.global-admin-mode .polished-admin-empty,
+  body.admin-family-preview .polished-admin-empty {
+    min-height: 54px;
+    align-content: center;
+  }
+}
+
+/* Celular pequeno: o estado vazio vira orientação curta e confortável. */
+@media (max-width: 430px) {
+  .polished-empty-card,
+  .event-card.empty-event.polished-empty-card {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    padding: 13px !important;
+    gap: 10px !important;
+  }
+
+  .polished-empty-icon,
+  .event-card.empty-event .polished-empty-icon {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 14px !important;
+  }
+
+  .polished-empty-content span,
+  .polished-empty-content em {
+    font-size: .78rem !important;
+  }
+
+  #stateHint {
+    font-size: .82rem !important;
+  }
+}
+
+
+/* Ninou v75.75.23 — relatórios e PDF mais profissional */
+.export-card {
+  position: relative;
+}
+
+.export-card::after {
+  content: "PDF com margem segura, resumo por dia e responsáveis";
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(226, 245, 235, 0.92);
+  color: #1f6b57;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+}
+
+.export-actions button:first-child {
+  background: linear-gradient(135deg, #4b3a78, #8f7cff) !important;
+  box-shadow: 0 14px 28px rgba(75, 58, 120, 0.22);
+}
+
+.export-period-grid,
+.export-personal-message {
+  overflow-wrap: anywhere;
+}
+
+.export-personal-message small {
+  color: rgba(48, 38, 63, 0.62);
+}
+
+@media (max-width: 520px) {
+  .export-card::after {
+    font-size: 0.72rem;
+    line-height: 1.25;
+    white-space: normal;
+  }
+}
+
+
+/* Ninou v75.75.23 — Teste real de uso familiar */
+.family-real-test-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 24px;
+  border: 1px solid rgba(139, 108, 176, 0.16);
+  background: linear-gradient(135deg, rgba(255, 251, 244, 0.96), rgba(242, 235, 255, 0.88));
+  box-shadow: 0 18px 42px rgba(98, 77, 128, 0.08);
+}
+.family-real-test-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.9rem;
+  margin-bottom: 0.65rem;
+}
+.family-real-test-header div {
+  display: grid;
+  gap: 0.15rem;
+}
+.family-real-test-header span:first-child,
+.family-real-test-panel > span {
+  color: #8b6cb0;
+  font-weight: 800;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.family-real-test-header strong {
+  color: #4b3869;
+  font-size: 1.04rem;
+}
+.family-real-test-intro {
+  margin: 0 0 0.85rem;
+  color: #6a5a78;
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+.family-real-test-checklist {
+  display: grid;
+  gap: 0.58rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.family-real-test-checklist li {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.78rem 0.85rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(139, 108, 176, 0.12);
+  overflow-wrap: anywhere;
+}
+.family-real-test-checklist li.is-ok {
+  border-color: rgba(114, 160, 133, 0.28);
+  background: rgba(232, 246, 238, 0.7);
+}
+.family-real-test-checklist li.needs-review {
+  border-color: rgba(213, 174, 92, 0.26);
+  background: rgba(255, 247, 225, 0.72);
+}
+.family-real-test-checklist li.needs-attention {
+  border-color: rgba(194, 95, 110, 0.24);
+  background: rgba(255, 238, 241, 0.7);
+}
+.family-real-test-checklist strong {
+  color: #4b3869;
+  font-size: 0.92rem;
+}
+.family-real-test-checklist small {
+  color: #75667f;
+  line-height: 1.35;
+}
+.family-real-test-actions {
+  margin-top: 0.9rem;
+}
+@media (max-width: 560px) {
+  .family-real-test-header {
+    flex-direction: column;
+  }
+  .family-real-test-actions button {
+    width: 100%;
+  }
+}
+
+
+/* Ninou v75.75.23 — escopo familiar no admin */
+.admin-family-client-card .admin-selected-family-note,
+.family-real-test-intro {
+  word-break: break-word;
+}
+.admin-client-item small {
+  color: var(--muted);
+}
+
+
+/* Ninou v75.75.23 — offline e sincronização real */
+.sync-pill.pending {
+  white-space: nowrap;
+}
+.sync-pill.pending::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  margin-right: 0.35rem;
+  background: currentColor;
+  opacity: 0.55;
+}
+.sync-card strong[id="syncLastSavedLabel"] {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 420px) {
+  .sync-pill {
+    max-width: 48vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Ninou v75.75.23 — observações rápidas */
+.quick-observations-panel {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(159, 128, 201, .18);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(250, 246, 255, .86), rgba(241, 252, 244, .76));
+  box-shadow: 0 14px 28px rgba(88, 71, 110, .08);
+}
+
+.quick-observations-title {
+  display: grid;
+  gap: 2px;
+}
+
+.quick-observations-title span {
+  color: rgba(108, 88, 139, .72);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.quick-observations-title strong {
+  color: #5f4c78;
+  font-size: .94rem;
+  line-height: 1.18;
+}
+
+.quick-observation-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-observation-chips button {
+  border: 1px solid rgba(143, 116, 184, .22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  color: #6c588b;
+  font-weight: 800;
+  min-height: 36px;
+  padding: 0 12px;
+  box-shadow: 0 8px 18px rgba(98, 77, 124, .08);
+}
+
+.quick-observation-chips button:active {
+  transform: translateY(1px);
+}
+
+.quick-observation-custom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.quick-observation-custom input {
+  min-width: 0;
+  min-height: 44px;
+  border-radius: 16px;
+  border: 1px solid rgba(143, 116, 184, .20);
+  background: rgba(255, 255, 255, .88);
+  color: #5f4c78;
+  padding: 0 12px;
+  font: inherit;
+  outline: none;
+}
+
+.quick-observation-custom input:focus {
+  border-color: rgba(143, 116, 184, .45);
+  box-shadow: 0 0 0 4px rgba(184, 162, 217, .18);
+}
+
+.quick-observation-custom button {
+  min-height: 44px !important;
+  border-radius: 16px !important;
+  white-space: nowrap;
+}
+
+body.day-theme .quick-observations-panel {
+  background: linear-gradient(135deg, rgba(255, 251, 242, .92), rgba(241, 252, 244, .82));
+}
+
+@media (max-width: 520px) {
+  .quick-observation-custom {
+    grid-template-columns: 1fr;
+  }
+  .quick-observation-custom button {
+    width: 100% !important;
+  }
+  .quick-observation-chips button {
+    flex: 1 1 calc(50% - 8px);
+  }
+}
+
+
+/* v75.75.23 — Limpeza de interface e modo simples.
+   Mantém a paleta do Ninou usando as cores já existentes: lavanda, creme, verde suave e roxo. */
+.admin-mode-toolbar {
+  display: grid;
+  gap: 6px;
+  min-width: min(100%, 260px);
+}
+
+.admin-mode-toggle {
+  width: 100%;
+}
+
+.admin-mode-toolbar small {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+body.ninou-simple-mode [data-advanced-only] {
+  display: none !important;
+}
+
+body.ninou-simple-mode .admin-invite-panel {
+  gap: 14px;
+}
+
+body.ninou-simple-mode .admin-clean-hero,
+body.ninou-simple-mode .admin-clean-section,
+body.ninou-simple-mode .admin-diagnostics-card,
+body.ninou-simple-mode .family-health-panel,
+body.ninou-simple-mode .export-card,
+body.ninou-simple-mode .quick-observations-panel {
+  border-color: rgba(124, 229, 194, 0.16);
+}
+
+body.ninou-simple-mode .admin-clean-hero p,
+body.ninou-simple-mode .admin-invite-header em,
+body.ninou-simple-mode .admin-section-note,
+body.ninou-simple-mode .family-health-status,
+body.ninou-simple-mode .invite-note {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+body.ninou-simple-mode .admin-clean-section > .admin-invite-header,
+body.ninou-simple-mode .family-health-header {
+  gap: 10px;
+}
+
+body.ninou-simple-mode .admin-card-actions,
+body.ninou-simple-mode .family-health-actions {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+}
+
+body.ninou-simple-mode .quick-observations-panel {
+  margin-top: 10px;
+  padding: 12px;
+}
+
+body.ninou-simple-mode .quick-observations-title strong {
+  font-size: 0.94rem;
+}
+
+body.ninou-simple-mode .quick-observation-chips {
+  gap: 7px;
+}
+
+body.ninou-simple-mode .quick-observation-chips button {
+  min-height: 36px;
+  padding: 8px 10px;
+}
+
+body.ninou-advanced-mode [data-advanced-only] {
+  animation: ninouAdvancedFade .18s ease-out;
+}
+
+@keyframes ninouAdvancedFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 720px) {
+  .admin-clean-hero {
+    align-items: stretch;
+  }
+
+  .admin-mode-toolbar,
+  .admin-mode-toolbar .secondary-login,
+  .admin-clean-hero > .admin-refresh-button {
+    width: 100%;
+  }
+
+  body.ninou-simple-mode .admin-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  body.ninou-simple-mode .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.ninou-simple-mode .admin-clean-section,
+  body.ninou-simple-mode .admin-diagnostics-card,
+  body.ninou-simple-mode .family-health-panel {
+    padding: 13px;
+    border-radius: 20px;
   }
 }

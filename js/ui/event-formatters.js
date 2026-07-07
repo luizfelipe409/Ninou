@@ -55,10 +55,11 @@ function formatSleepMeta(event) {
   const wakeWindow = Number(event.wakeWindowMs) > 0
     ? `Acordado ${formatShortDuration(Number(event.wakeWindowMs))} antes`
     : "";
+  const sleepKindLabel = String(event.sleepKindLabel || "").trim();
   return {
     primary: [timeText, duration].filter(Boolean).join(" • "),
-    secondary: [detail, wakeWindow].filter(Boolean).join(" • "),
-    compact: [timeText, duration, detail].filter(Boolean).join(" • "),
+    secondary: [sleepKindLabel, detail, wakeWindow].filter(Boolean).join(" • "),
+    compact: [timeText, duration, sleepKindLabel || detail].filter(Boolean).join(" • "),
   };
 }
 
@@ -141,6 +142,10 @@ export function getEventRenderSignature(event, options = {}) {
     event.updatedByDeviceId || "",
     event.updatedByName || "",
     event.updatedByRelationship || "",
+    event.updatedByLabel || "",
+    event.editReason || "",
+    event.sleepKind || "",
+    event.sleepKindLabel || "",
     event.babyId || "",
     event.familyId || "",
     event.lastAction || "",
@@ -211,10 +216,12 @@ function getRoutineDetailLine(event, parts = {}) {
 export function getEventCardMarkup(event, { empty = false } = {}) {
   if (empty) {
     return `
-      <i class="mark"></i>
-      <div>
-        <strong>Nenhum registro</strong>
-        <span>Escolha outro filtro, outra data ou crie um novo registro.</span>
+      <i class="mark polished-empty-icon" aria-hidden="true">☁</i>
+      <div class="polished-empty-content">
+        <small>Diário</small>
+        <strong>Nenhum registro encontrado</strong>
+        <span>Troque a data, limpe o filtro ou adicione um cuidado pelo botão +.</span>
+        <em>O Ninou mantém a linha do tempo organizada assim que houver registros.</em>
       </div>
     `;
   }
@@ -225,6 +232,12 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   const actorName = getEventAuthorLabel(event);
   const registeredLine = `Registrado por ${actorName} • ${getDisplayStartLabel(event)}`;
   const extraMeta = getRoutineDetailLine(event, parts);
+  const editedBy = String(event.updatedByLabel || event.updatedByName || "").trim();
+  const editedAt = Number(event.updatedAtClient) || (event.updatedAt ? Date.parse(event.updatedAt) : 0);
+  const editReason = String(event.editReason || "").trim();
+  const editedLine = editedAt
+    ? `Editado${editedBy ? ` por ${editedBy}` : ""} às ${formatTime(editedAt)}${editReason ? ` • ${editReason}` : ""}`
+    : "";
   return `
     <i class="mark ${config.arcType}">${config.icon}</i>
     <div class="event-main">
@@ -232,6 +245,7 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
         <strong>${escapeHtml(config.title)}</strong>
         <span class="event-meta-primary">${escapeHtml(registeredLine)}</span>
         ${extraMeta ? `<span class="event-meta-extra">${escapeHtml(extraMeta)}</span>` : ""}
+        ${editedLine ? `<span class="event-edit-note">${escapeHtml(editedLine)}</span>` : ""}
         ${notes}
       </div>
       <div class="event-actions">

@@ -1,0 +1,7 @@
+Ninou v75.75.23 — Limpeza de interface e modo simples
+
+- Criado modo simples/avançado no painel admin.
+- Diagnóstico técnico, revisão de dados antigos, histórico completo, backup JSON e checklist ficam recolhidos por padrão.
+- Mantidas as cores do Ninou em todos os estados: lavanda, creme, verde suave e roxo.
+- Observações rápidas ficaram mais discretas no modo simples.
+- Melhor hierarquia visual para evitar poluição em telas pequenas e desktop.

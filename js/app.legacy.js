@@ -21,7 +21,7 @@ import { applyRecordSheetType as renderRecordSheetType, closeRecordSheet as clos
 import { buildDeleteConfirmationText, buildManualEventPayload, clearRecordFormAfterSave } from "./domain/event-editor.js";
 import { bindShortcutNavigation } from "./ui/navigation.js";
 import { bindBottomNavigation, bindSyncPillNavigation, createHorizontalScrollToggle, updateScreenVisibility } from "./ui/app-navigation.js";
-import { createEmptyTimelineItem, getLatestEmptyRecordMarkup } from "./ui/empty-states.js";
+import { createEmptyTimelineItem, getDiaryEmptyRecordMarkup, getLatestEmptyRecordMarkup } from "./ui/empty-states.js";
 import { setHtml } from "./ui/render-utils.js";
 import { applyProfilePhotoToImages, clearWeightForm, getBabyAgeTextFromProfile, getBabyNameFromProfile, getBabyReferenceFromProfile, getDiaryTitleFromProfile, hydrateWeightForm, readWeightFormValue, renderBabyIdentityPanel, renderWeightProfilePanel, resizeProfileImage, syncBabyProfileFormPanel } from "./ui/profile.js";
 import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
@@ -153,6 +153,7 @@ const familyAccessSummaryMembers = document.querySelector("#familyAccessSummaryM
 const familyAccessSummaryInviteButton = document.querySelector("#familyAccessSummaryInviteButton");
 const familyAccessSummaryProfileButton = document.querySelector("#familyAccessSummaryProfileButton");
 const familyAccessSummaryInviteStatus = document.querySelector("#familyAccessSummaryInviteStatus");
+const familyLeaveButton = document.querySelector("#familyLeaveButton");
 const joinFamilyModal = document.querySelector("#joinFamilyModal");
 const joinInviteCodeInput = document.querySelector("#joinInviteCodeInput");
 const joinInviteFeedback = document.querySelector("#joinInviteFeedback");
@@ -205,6 +206,7 @@ const inviteResult = document.querySelector("#inviteResult");
 const inviteList = document.querySelector("#inviteList");
 const adminPendingInviteList = document.querySelector("#adminPendingInviteList");
 const adminMembersList = document.querySelector("#adminMembersList");
+const adminFamilyAuditList = document.querySelector("#adminFamilyAuditList");
 const adminKnownUsersList = document.querySelector("#adminKnownUsersList");
 const adminUsersCount = document.querySelector("#adminUsersCount");
 const adminFamiliesCount = document.querySelector("#adminFamiliesCount");
@@ -214,6 +216,8 @@ const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesC
 const adminLastMigrationStatus = document.querySelector("#adminLastMigrationStatus");
 const adminStatsHint = document.querySelector("#adminStatsHint");
 const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
+const adminModeToggleButton = document.querySelector("#adminModeToggleButton");
+const adminModeHint = document.querySelector("#adminModeHint");
 const adminClientsList = document.querySelector("#adminClientsList");
 const adminSelectedFamilyHint = document.querySelector("#adminSelectedFamilyHint");
 const adminOpenFamilyButton = document.querySelector("#adminOpenFamilyButton");
@@ -229,6 +233,11 @@ const todayOverviewKicker = document.querySelector("#todayOverviewKicker");
 const todayOverviewTitle = document.querySelector("#todayOverviewTitle");
 const todayOverviewGrid = document.querySelector("#todayOverviewGrid");
 const todayOverviewSuggestion = document.querySelector("#todayOverviewSuggestion");
+const routineCorrectionCard = document.querySelector("#routineCorrectionCard");
+const routineCorrectionKicker = document.querySelector("#routineCorrectionKicker");
+const routineCorrectionTitle = document.querySelector("#routineCorrectionTitle");
+const routineCorrectionText = document.querySelector("#routineCorrectionText");
+const routineCorrectionButtons = document.querySelectorAll("[data-last-record-action]");
 const gentleAlertCard = document.querySelector("#gentleAlertCard");
 const notificationCenterCard = document.querySelector("#notificationCenterCard");
 const notificationCenterList = document.querySelector("#notificationCenterList");
@@ -247,6 +256,9 @@ const auditTrailList = document.querySelector("#auditTrailList");
 const dayNotesTextarea = document.querySelector("#dayNotesTextarea");
 const saveDayNotesButton = document.querySelector("#saveDayNotesButton");
 const dayNotesStatus = document.querySelector("#dayNotesStatus");
+const quickObservationButtons = document.querySelectorAll("[data-quick-observation]");
+const quickObservationInput = document.querySelector("#quickObservationInput");
+const addQuickObservationButton = document.querySelector("#addQuickObservationButton");
 const familyWelcomeCard = document.querySelector("#familyWelcomeCard");
 const familyWelcomeTitle = document.querySelector("#familyWelcomeTitle");
 const familyWelcomeText = document.querySelector("#familyWelcomeText");
@@ -286,6 +298,17 @@ const diagnosticsCacheLabel = document.querySelector("#diagnosticsCacheLabel");
 const diagnosticsIntegrityLabel = document.querySelector("#diagnosticsIntegrityLabel");
 const diagnosticsInviteLabel = document.querySelector("#diagnosticsInviteLabel");
 const diagnosticsAppCheckLabel = document.querySelector("#diagnosticsAppCheckLabel");
+const familyHealthScore = document.querySelector("#familyHealthScore");
+const familyHealthChecklist = document.querySelector("#familyHealthChecklist");
+const familyHealthRefreshButton = document.querySelector("#familyHealthRefreshButton");
+const familyHealthRepairButton = document.querySelector("#familyHealthRepairButton");
+const familyBackupJsonButton = document.querySelector("#familyBackupJsonButton");
+const familyHealthStatus = document.querySelector("#familyHealthStatus");
+const familyRealTestScore = document.querySelector("#familyRealTestScore");
+const familyRealTestChecklist = document.querySelector("#familyRealTestChecklist");
+const familyRealTestRefreshButton = document.querySelector("#familyRealTestRefreshButton");
+const familyRealTestExportButton = document.querySelector("#familyRealTestExportButton");
+const familyRealTestStatus = document.querySelector("#familyRealTestStatus");
 const appUpdateNotice = document.querySelector("#appUpdateNotice");
 const appUpdateButton = document.querySelector("#appUpdateButton");
 const wakeWindowInput = document.querySelector("#wakeWindowInput");
@@ -332,7 +355,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.11";
+const NINOU_RUNTIME_VERSION = "75.75.23";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -369,7 +392,7 @@ function saveSelectedAdminFamilyId(familyId = APP_ADMIN_FAMILY_ID) {
 }
 
 function getSelectedFamilyIdForAdminOrAccess() {
-  return isGlobalAppAdmin() ? getActiveAdminFamilyId() : (familyAccess?.familyId || APP_ADMIN_FAMILY_ID);
+  return isGlobalAppAdmin() ? getActiveAdminFamilyId() : (familyAccess?.familyId || "");
 }
 
 function getAdminSelectedFamilyLabel(stats = null) {
@@ -536,11 +559,15 @@ const lastCloudSyncStorageKey = "ninou.sync.lastCloudSaveAt";
 let profileCloudSaveTimer = null;
 let dayCloudSaveTimer = null;
 let pendingCloudRetryTimer = null;
+let pendingCloudFlushInFlight = false;
 let applyingCloudState = false;
 const pendingCloudSyncStorageKey = "ninou.sync.pendingCloudReason";
+const pendingProfileSyncStorageKey = "ninou.sync.pendingProfile";
+const pendingDaySyncStorageKey = "ninou.sync.pendingDays";
 let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
+let lastRoutineUndoSnapshot = null;
 let liveTickMinute = -1;
 let breastTimerState = createBreastTimerState();
 let state = loadLocalDayState(getCurrentDayId());
@@ -767,6 +794,11 @@ function renderFamilyAccessSummary() {
     familyAccessSummaryInviteStatus.textContent = canInvite
       ? "Ao convidar, informe o e-mail correto do cuidador. A pessoa não deve criar outra família."
       : "Seu perfil não pode gerar convites.";
+  }
+  if (familyLeaveButton) {
+    const canLeave = canCurrentUserLeaveFamily();
+    familyLeaveButton.hidden = !canLeave;
+    familyLeaveButton.disabled = !canLeave;
   }
 }
 
@@ -1832,6 +1864,167 @@ function createEmptyDayState() {
   return createEmptyRoutineDayState();
 }
 
+function cloneRoutineDayState(dayState = state) {
+  try {
+    return normalizeDayState(JSON.parse(JSON.stringify(dayState || createEmptyDayState())));
+  } catch {
+    return normalizeDayState(dayState || createEmptyDayState());
+  }
+}
+
+function getSleepKind(type = "sono", start = Date.now(), end = start) {
+  const safeStart = Number(start);
+  const safeEnd = Number(end);
+  if (type === "despertar-noturno") return "night-wake";
+  if (type === "dormir") return "night";
+  const startHour = Number.isFinite(safeStart) ? new Date(safeStart).getHours() : 0;
+  const crossesMidnight = Number.isFinite(safeStart) && Number.isFinite(safeEnd) && toDateInputValue(safeStart) !== toDateInputValue(safeEnd);
+  const duration = Number.isFinite(safeStart) && Number.isFinite(safeEnd) ? Math.max(0, safeEnd - safeStart) : 0;
+  if (crossesMidnight || startHour >= 19 || startHour < 5 || duration >= 5 * hour) return "night";
+  return "nap";
+}
+
+function getSleepKindLabel(kind = "nap") {
+  if (kind === "night") return "Sono noturno";
+  if (kind === "night-wake") return "Despertar noturno";
+  return "Soneca";
+}
+
+function getSleepClassificationFields(type = "sono", start = Date.now(), end = start) {
+  if (!isSleepEvent({ type }) && type !== "despertar-noturno") return {};
+  const sleepKind = getSleepKind(type, start, end);
+  return {
+    sleepKind,
+    sleepKindLabel: getSleepKindLabel(sleepKind),
+  };
+}
+
+function markRoutineMutationSnapshot(action = "alteração") {
+  lastRoutineUndoSnapshot = {
+    dayId: getSelectedDayId(),
+    action,
+    at: Date.now(),
+    state: cloneRoutineDayState(state),
+  };
+}
+
+function getLastRoutineUndoSnapshot() {
+  if (!lastRoutineUndoSnapshot) return null;
+  if (Date.now() - Number(lastRoutineUndoSnapshot.at || 0) > 10 * 60000) {
+    lastRoutineUndoSnapshot = null;
+    return null;
+  }
+  return lastRoutineUndoSnapshot;
+}
+
+function getLatestEditableEventForToday() {
+  const todayStart = getDayStart();
+  const events = getFamilyEventsForWindow(todayStart, todayStart + day)
+    .filter((event) => eventOverlapsWindow(event, todayStart, todayStart + day));
+  return getLatestEvent(events);
+}
+
+function restoreLastRoutineMutation() {
+  const snapshot = getLastRoutineUndoSnapshot();
+  if (!snapshot) {
+    window.alert("Não há uma ação recente para desfazer.");
+    renderQuickCorrectionCard();
+    return;
+  }
+  if (!window.confirm("Desfazer a última alteração da rotina neste aparelho?")) return;
+
+  syncSelectedDayIntoFamilyCache();
+  setSelectedDiaryDayById(snapshot.dayId);
+  state = cloneRoutineDayState(snapshot.state);
+  loadedStateDayId = snapshot.dayId;
+  lastRoutineUndoSnapshot = null;
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
+  saveDayState();
+  renderAll();
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    window.clearTimeout(dayCloudSaveTimer);
+    void saveDayToCloud(snapshot.dayId, { silentRetry: true });
+  }
+}
+
+function correctLatestRoutineEvent() {
+  const event = getLatestEditableEventForToday();
+  if (!event) {
+    window.alert("Ainda não há registro de hoje para corrigir.");
+    return;
+  }
+  editEvent(event.id);
+}
+
+function renderQuickCorrectionCard() {
+  if (!routineCorrectionCard) return;
+  const latest = getLatestEditableEventForToday();
+  const snapshot = getLastRoutineUndoSnapshot();
+  const show = canUsePrivateFeatures() && getSelectedDayId() === getCurrentDayId() && (latest || snapshot);
+  routineCorrectionCard.hidden = !show;
+  if (!show) return;
+
+  const config = latest ? getEventConfig(latest.type) : null;
+  if (routineCorrectionKicker) routineCorrectionKicker.textContent = snapshot ? "Correção rápida disponível" : "Correção rápida";
+  if (routineCorrectionTitle) routineCorrectionTitle.textContent = latest
+    ? `Último registro: ${config.title} às ${formatTime(getEventOrderTime(latest) || latest.start)}`
+    : "Última alteração pode ser desfeita";
+  if (routineCorrectionText) {
+    const editedText = latest?.updatedAtClient ? ` Editado às ${formatTime(latest.updatedAtClient)}.` : "";
+    routineCorrectionText.textContent = latest
+      ? `Corrija o último registro sem procurar no diário ou desfaça a alteração recente por até 10 minutos.${editedText}`
+      : `Você pode desfazer a última alteração recente: ${snapshot?.action || "alteração"}.`;
+  }
+  routineCorrectionButtons.forEach((button) => {
+    const action = button.dataset.lastRecordAction;
+    button.disabled = action === "correct" ? !latest : !snapshot;
+  });
+}
+
+function getManualEventValidationWarning(payload = {}, existingEvent = null) {
+  const now = Date.now();
+  const type = payload.type || "";
+  const start = Number(payload.start);
+  const end = Number(payload.hasManualEnd ? payload.end : payload.start);
+  if (Number.isFinite(start) && start > now + 2 * 60000) {
+    return "Esse horário está no futuro. Revise antes de salvar.";
+  }
+
+  const duplicate = (state.events || []).find((event) => event?.id !== existingEvent?.id
+    && event.type === type
+    && Math.abs(Number(event.start) - start) < 60000);
+  if (duplicate) return "Já existe um registro parecido no mesmo minuto. Salvar mesmo assim?";
+
+  if (type === "mamadeira") {
+    const amount = parseAmountMl(payload.detail || "");
+    if (Number.isFinite(amount) && amount > 300) return "A quantidade da mamadeira parece muito alta para um único registro. Salvar mesmo assim?";
+  }
+
+  if ((type === "sono" || type === "dormir") && payload.hasManualEnd && Number.isFinite(start) && Number.isFinite(end)) {
+    const duration = end - start;
+    if (type === "sono" && duration > 8 * hour) return "Essa soneca ficou com mais de 8 horas. Talvez seja sono noturno. Salvar mesmo assim?";
+    if (type === "dormir" && duration > 14 * hour) return "Esse sono noturno ficou com mais de 14 horas. Salvar mesmo assim?";
+  }
+
+  if ((type === "sono" || type === "dormir") && !payload.hasManualEnd && state.mode === "sleeping" && !existingEvent) {
+    return "Já existe um sono em andamento. Salvar outro início de sono mesmo assim?";
+  }
+
+  if (type === "acordou" && state.mode !== "sleeping" && !existingEvent) {
+    return "Não há sono em andamento agora. Registrar Acordou mesmo assim?";
+  }
+
+  if (type === "fralda") {
+    const duplicateDiaper = (state.events || []).find((event) => event?.id !== existingEvent?.id
+      && event.type === "fralda"
+      && Math.abs(Number(event.start) - start) < 2 * 60000);
+    if (duplicateDiaper) return "Já existe uma fralda registrada quase no mesmo horário. Salvar mesmo assim?";
+  }
+
+  return "";
+}
+
 function getWakeWindowForSleepStart(sleepStart, excludeEventId = null) {
   const start = Number(sleepStart);
   if (!Number.isFinite(start)) return null;
@@ -2382,6 +2575,7 @@ function makeEvent(type, start, end = start, detail = "", notes = "") {
   const standardFields = getStandardEventFields(type, start, actor);
   return applyWakeWindowMetadata(createRoutineEvent(type, start, end, detail, notes, {
     ...standardFields,
+    ...getSleepClassificationFields(type, start, end),
     createdAt: nowIso,
     updatedAt: nowIso,
     createdByUid: actor.uid,
@@ -2507,6 +2701,147 @@ function saveLocalDayState(dayId = getSelectedDayId()) {
   // O app não usa mais este cache genérico para abrir outros dias.
   localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
   persistVisibleContextForCurrentOwner();
+}
+
+
+function persistDayStateForDay(dayState = createEmptyDayState(), dayId = getCurrentDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const sanitized = sanitizeDayStateForDay(dayState, safeDayId, { preserveLive: true });
+  const now = Date.now();
+  const payload = {
+    ...sanitized,
+    dayId: safeDayId,
+    date: safeDayId,
+    dayNotesDayId: sanitized.dayNotes ? safeDayId : "",
+    dayNotesUpdatedAt: sanitized.dayNotes ? (sanitized.dayNotesUpdatedAt || now) : 0,
+    clientUpdatedAt: now,
+  };
+
+  familyDayStatesCache = {
+    ...familyDayStatesCache,
+    [safeDayId]: payload,
+  };
+  if ((dayStateHasVisibleContent(payload) || getDeletedEventIdsFromState(payload).size) && !familyDayIdsCache.includes(safeDayId)) {
+    familyDayIdsCache = [...familyDayIdsCache, safeDayId].filter(isDateId).sort();
+  }
+
+  localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
+  localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
+  if (safeDayId === getSelectedDayId()) localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
+  persistVisibleContextForCurrentOwner();
+  return payload;
+}
+
+function getPreviousDayId(dayId = getCurrentDayId()) {
+  const base = getDayStartFromId(isDateId(dayId) ? dayId : getCurrentDayId());
+  return toDateInputValue(base - day);
+}
+
+function getOpenSleepFromPreviousDay(dayId = getCurrentDayId(), now = Date.now()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const previousDayId = getPreviousDayId(safeDayId);
+  const previousState = sanitizeDayStateForDay(familyDayStatesCache[previousDayId] || loadLocalDayState(previousDayId), previousDayId, { preserveLive: true });
+  const start = Number(previousState.activeStartedAt);
+  const todayStart = getDayStartFromId(safeDayId);
+  if (previousState.mode !== "sleeping" || !Number.isFinite(start)) return null;
+  if (start >= todayStart || start < todayStart - 36 * hour || start > now + 2 * 60000) return null;
+  return {
+    dayId: previousDayId,
+    start,
+    type: isSleepEvent({ type: previousState.activeType }) ? previousState.activeType : "sono",
+    detail: previousState.activeDetail || "Continuado de ontem",
+    notes: previousState.activeNotes || "",
+  };
+}
+
+function todayHasPersistentRoutineContent() {
+  return (Array.isArray(state.events) && state.events.length > 0) || String(state.dayNotes || "").trim();
+}
+
+function continueOpenSleepFromPreviousDayIfNeeded() {
+  if (getSelectedDayId() !== getCurrentDayId()) return false;
+  if (state.mode !== "idle" || todayHasPersistentRoutineContent()) return false;
+  const openSleep = getOpenSleepFromPreviousDay(getCurrentDayId());
+  if (!openSleep) return false;
+
+  state = normalizeDayState({
+    ...state,
+    mode: "sleeping",
+    activeStartedAt: openSleep.start,
+    activeType: openSleep.type,
+    activeDetail: openSleep.detail || "Continuado de ontem",
+    activeNotes: openSleep.notes || "",
+  });
+  syncSelectedDayIntoFamilyCache();
+  saveLocalDayState(getCurrentDayId());
+  return true;
+}
+
+function parseManualStartTimeInput(mode = "awake") {
+  const now = Date.now();
+  const label = mode === "sleeping"
+    ? `Desde que horas ${getBabyReference()} está dormindo? (HH:MM)`
+    : mode === "awake"
+      ? `Que horas ${getBabyReference()} acordou ou está acordado(a) desde? (HH:MM)`
+      : "";
+  if (!label) return now;
+
+  const defaultValue = formatTime(now);
+  const answer = window.prompt(label, defaultValue);
+  if (answer === null) return null;
+
+  const match = String(answer || "").trim().match(/^(\d{1,2})[:hH](\d{2})$/);
+  if (!match) {
+    window.alert("Informe um horário no formato HH:MM, por exemplo 07:20.");
+    return null;
+  }
+
+  const hoursValue = Number(match[1]);
+  const minutesValue = Number(match[2]);
+  if (!Number.isInteger(hoursValue) || !Number.isInteger(minutesValue) || hoursValue < 0 || hoursValue > 23 || minutesValue < 0 || minutesValue > 59) {
+    window.alert("Horário inválido. Use horas entre 00 e 23 e minutos entre 00 e 59.");
+    return null;
+  }
+
+  const todayStart = getDayStart();
+  let timestamp = todayStart + hoursValue * hour + minutesValue * 60000;
+  if (mode === "sleeping" && timestamp > now + 2 * 60000) {
+    timestamp -= day;
+  }
+
+  const earliest = mode === "sleeping" ? todayStart - day : todayStart;
+  if (timestamp < earliest) {
+    window.alert(mode === "sleeping"
+      ? "Para sono atravessando a meia-noite, informe um horário de ontem ou de hoje."
+      : "Para acordado, escolha um horário de hoje.");
+    return null;
+  }
+  if (timestamp > now + 2 * 60000) {
+    window.alert("Não é possível iniciar a rotina em um horário futuro.");
+    return null;
+  }
+
+  return timestamp;
+}
+
+function persistCrossDaySleepEvent(event = {}) {
+  if (!event || !isSleepEvent(event)) return;
+  const startDayId = getDayIdFromStart(event.start);
+  const currentDayId = getSelectedDayId();
+  if (!isDateId(startDayId) || startDayId === currentDayId) return;
+
+  const originState = sanitizeDayStateForDay(familyDayStatesCache[startDayId] || loadLocalDayState(startDayId), startDayId, { preserveLive: true });
+  const originEvents = Array.isArray(originState.events) ? originState.events : [];
+  const withoutDuplicate = originEvents.filter((item) => item?.id !== event.id && getEventDisplayDedupeKey(item) !== getEventDisplayDedupeKey(event));
+  const nextOriginState = stripLiveStateFromHistoricalDay(normalizeDayState({
+    ...originState,
+    events: dedupeEventsByDisplayKey([...withoutDuplicate, event]),
+  }), startDayId);
+
+  persistDayStateForDay(nextOriginState, startDayId);
+  if (firebaseServices && cloudUser && hasFamilyAccess()) {
+    void saveDayToCloud(startDayId, { silentRetry: true });
+  }
 }
 
 const visibleContextKeys = [
@@ -2839,9 +3174,16 @@ async function createFamilyCaregiverInvite() {
       };
       await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), familyInvitePayload, { merge: true });
       await services.setDoc(services.doc(services.db, "invites", code), globalInvitePayload, { merge: true });
+      await writeFamilyAuditLog("invite_created", { familyId: invite.familyId, targetEmail: invitedEmail, role: invite.role, code });
     }
   } catch (error) {
-    console.warn("Convite salvo apenas localmente:", error);
+    console.warn("Não foi possível salvar o convite no Firebase:", error);
+    saveFamilyActiveInvite(null);
+    const message = error?.code === "permission-denied"
+      ? "Sem permissão para salvar convite. Confira as regras do Firestore e o papel deste usuário na família."
+      : "Não foi possível salvar o convite agora. Tente novamente em alguns segundos.";
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = message;
+    if (loginHelper) loginHelper.textContent = message;
   }
 }
 
@@ -2861,13 +3203,21 @@ function shareFamilyInviteOnWhatsApp() {
 }
 
 function openJoinFamilyModal() {
-  if (joinInviteCodeInput) joinInviteCodeInput.value = "";
-  if (joinInviteFeedback) joinInviteFeedback.textContent = "";
+  const currentCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
+  if (joinInviteCodeInput) joinInviteCodeInput.value = currentCode;
+  if (joinInviteFeedback) {
+    joinInviteFeedback.textContent = isLoggedIn()
+      ? "O convite será validado antes de liberar a rotina da família."
+      : "Entre ou crie sua conta com o mesmo e-mail do convite antes de aceitar.";
+  }
   if (joinFamilyModal) {
     joinFamilyModal.hidden = false;
     joinFamilyModal.setAttribute("aria-hidden", "false");
+    setTimeout(() => joinInviteCodeInput?.focus(), 50);
+    return;
   }
-  setTimeout(() => joinInviteCodeInput?.focus(), 50);
+  showScreen("profile");
+  setTimeout(() => inviteCodeInput?.focus(), 50);
 }
 
 function closeJoinFamilyModal() {
@@ -2884,9 +3234,19 @@ async function confirmJoinFamilyInvite() {
     return;
   }
 
+  pendingInviteCode = code;
+  try { localStorage.setItem(storageKeys.pendingInvite, code); } catch {}
+
+  if (!cloudUser) {
+    if (joinInviteFeedback) joinInviteFeedback.textContent = "Agora entre ou crie sua conta com o mesmo e-mail convidado. Depois confirme o código.";
+    closeJoinFamilyModal();
+    focusProfileAccess("login");
+    return;
+  }
+
   try {
     const services = await getFirebaseServices();
-    if (!services?.db || !cloudUser) throw new Error("Firebase indisponível");
+    if (!services?.db) throw new Error("Firebase indisponível");
 
     let invite = null;
     let familyId = "";
@@ -2901,7 +3261,9 @@ async function confirmJoinFamilyInvite() {
       console.warn("Convite global não disponível. Tentando família conhecida.", error);
     }
 
-    if (!familyId) familyId = familyAccess?.familyId || APP_ADMIN_FAMILY_ID;
+    if (!familyId) {
+      throw new Error("Convite não encontrado. Confira o código ou peça um novo convite ao responsável.");
+    }
 
     const inviteRef = services.doc(services.db, "families", familyId, "invitations", code);
     const inviteSnap = await services.getDoc(inviteRef);
@@ -2963,12 +3325,14 @@ async function confirmJoinFamilyInvite() {
     await services.setDoc(inviteRef, acceptedPayload, { merge: true });
     try {
       await services.setDoc(services.doc(services.db, "invites", code), acceptedPayload, { merge: true });
+      await writeFamilyAuditLog("invite_accepted", { familyId, targetEmail: userEmail, role, code });
     } catch (globalUpdateError) {
       console.warn("Convite aceito, mas o espelho global não foi atualizado:", globalUpdateError);
     }
 
     saveFamilyAccess({ ...accessPayload, acceptedAt: new Date().toISOString() });
     clearPendingInviteCode();
+    if (inviteCodeInput) inviteCodeInput.value = "";
     await connectCurrentAccount();
     setSyncStatus("online", cloudUser.email || "");
 
@@ -3111,6 +3475,74 @@ function getRoleLabel(role = "responsavel") {
     visualizacao: "Somente visualização",
   };
   return labels[normalizeRole(role)] || labels.responsavel;
+}
+
+function getRoleDescription(role = "responsavel") {
+  const descriptions = {
+    admin: "gerencia família, membros, convites, relatórios e rotina",
+    responsavel: "edita perfil, rotina, convites e relatórios",
+    cuidador: "registra rotina, observações, mamadas, fraldas e sono",
+    visualizacao: "acompanha a rotina sem alterar registros",
+  };
+  return descriptions[normalizeRole(role)] || descriptions.responsavel;
+}
+
+function getFamilyActionLabel(action = "") {
+  const labels = {
+    invite_created: "Convite criado",
+    invite_accepted: "Convite aceito",
+    invite_cancelled: "Convite cancelado",
+    member_role_updated: "Permissão alterada",
+    member_removed: "Membro removido",
+    member_left: "Membro saiu da família",
+    family_created: "Família criada",
+  };
+  return labels[String(action || "")] || "Alteração familiar";
+}
+
+function getAuditTimeLabel(value) {
+  const millis = toMilliseconds(value);
+  if (!millis) return "agora";
+  try {
+    return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(millis));
+  } catch {
+    return "registro recente";
+  }
+}
+
+function canCurrentUserLeaveFamily() {
+  if (!hasFamilyAccess()) return false;
+  if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) return false;
+  const role = getEffectiveRole(familyAccess?.role || "visualizacao", cloudUser?.email || familyAccess?.email || "");
+  return role === "cuidador" || role === "visualizacao";
+}
+
+async function writeFamilyAuditLog(action, details = {}) {
+  try {
+    if (!cloudUser || !hasFamilyAccess()) return false;
+    const services = await getFirebaseServices();
+    if (!services?.db) return false;
+    const familyId = details.familyId || familyAccess?.familyId;
+    if (!familyId) return false;
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    await services.setDoc(services.doc(services.db, "families", familyId, "audit", id), {
+      action: String(action || "family_change"),
+      actorUid: cloudUser.uid,
+      actorEmail: normalizeEmail(cloudUser.email || familyAccess?.email || ""),
+      actorName: getCurrentActorProfile().label || "Cuidador",
+      targetUid: details.targetUid || "",
+      targetEmail: normalizeEmail(details.targetEmail || ""),
+      role: details.role ? normalizeRole(details.role) : "",
+      code: details.code ? normalizeInviteCode(details.code) : "",
+      message: details.message || "",
+      createdAtClient: Date.now(),
+      createdAt: services.serverTimestamp(),
+    }, { merge: true });
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível registrar histórico familiar:", error);
+    return false;
+  }
 }
 
 function loadFamilyAccess() {
@@ -4512,7 +4944,7 @@ function renderFamilyMigrationPanel(options = {}) {
 
   if (!isFamilyAdmin()) {
     adminMigrationStatus.textContent = "Entre como admin para revisar dados antigos.";
-    adminMigrationSources.innerHTML = "<li>Nenhuma conta em análise.</li>";
+    adminMigrationSources.innerHTML = "<li class=\"polished-admin-empty\">Nenhuma conta em análise. Use busca por e-mail ou UID apenas quando necessário.</li>";
     restoreFamilyDataButton.hidden = true;
     renderMigrationChecklist(null);
     return;
@@ -4975,7 +5407,7 @@ function renderKnownUsersList(stats = null) {
   if (!users.length) {
     adminKnownUsersList.innerHTML = hiddenCount
       ? `<li>${pluralize(hiddenCount, "item técnico oculto", "itens técnicos ocultos")} por estar sem e-mail válido ou duplicado. Nenhuma conta precisa de ação agora.</li>`
-      : "<li>Nenhuma conta com e-mail válido para revisão no momento.</li>";
+      : "<li class=\"polished-admin-empty\">Nenhuma conta com e-mail válido para revisão no momento.</li>";
     return;
   }
 
@@ -5038,7 +5470,16 @@ function renderAdminClients(stats = null) {
 
   if (adminClientsList) {
     if (!appAdmin) {
-      adminClientsList.innerHTML = "<li>Entre como admin para visualizar famílias/clientes.</li>";
+      const family = families[0] || { id: familyAccess?.familyId || "", name: stats?.familyName || getProfileFamilyDisplayName?.() || "Minha família", subtitle: "Acesso familiar", membersCount: stats?.membersCount ?? 0, pendingInvitesCount: stats?.pendingInvitesCount ?? 0 };
+      adminClientsList.innerHTML = `
+        <li class="admin-access-item admin-client-item is-selected-family">
+          <img class="admin-avatar family-avatar" src="${getCaregiverAvatarDataUrl(family.name || "Família", family.id || "family", "family")}" alt="" />
+          <div>
+            <strong>${escapeHtml(family.name || "Minha família")}</strong>
+            <span>Diagnóstico restrito a esta família • ${escapeHtml(pluralize(Number(family.membersCount || 0), "membro", "membros"))} • ${escapeHtml(getPendingInviteText(Number(family.pendingInvitesCount || 0)))}</span>
+            <small>Nenhuma outra família é listada para este acesso.</small>
+          </div>
+        </li>`;
     } else {
       adminClientsList.innerHTML = families.map((family) => {
         const isSelected = family.id === selectedId;
@@ -5067,9 +5508,11 @@ function renderAdminClients(stats = null) {
 
   if (adminSelectedFamilyHint) {
     const selectedLabel = getAdminSelectedFamilyLabel(stats);
-    adminSelectedFamilyHint.textContent = previewOpen
-      ? `Você está visualizando a rotina de ${selectedLabel} como administrador. Use Voltar ao painel para sair da visualização familiar.`
-      : `Família selecionada: ${selectedLabel}. A rotina só abre quando você tocar em Abrir rotina.`;
+    adminSelectedFamilyHint.textContent = appAdmin
+      ? (previewOpen
+        ? `Você está visualizando a rotina de ${selectedLabel} como administrador global. Use Voltar ao painel para sair da visualização familiar.`
+        : `Família selecionada: ${selectedLabel}. A rotina só abre quando você tocar em Abrir rotina.`)
+      : `Diagnóstico restrito a ${selectedLabel}. Uma família comum não visualiza dados de outras famílias.`;
   }
 
   if (adminOpenFamilyButton) {
@@ -5111,7 +5554,7 @@ function renderAdminAccessLists(stats = null) {
   if (adminPendingInviteList) {
     const pending = Array.isArray(stats?.pendingInvites) ? stats.pendingInvites : [];
     if (!pending.length) {
-      adminPendingInviteList.innerHTML = "<li>Nenhum convite pendente.</li>";
+      adminPendingInviteList.innerHTML = "<li class=\"polished-admin-empty\">Nenhum convite pendente no momento.</li>";
     } else {
       adminPendingInviteList.innerHTML = pending.slice(0, 8).map((invite) => {
         const code = escapeHtml(invite.code || "");
@@ -5137,18 +5580,48 @@ function renderAdminAccessLists(stats = null) {
   if (adminMembersList) {
     const members = Array.isArray(stats?.members) ? stats.members.filter((member) => !member.isAdmin) : [];
     if (!members.length) {
-      adminMembersList.innerHTML = "<li>Nenhum membro autorizado ainda.</li>";
+      adminMembersList.innerHTML = "<li class=\"polished-admin-empty\">Nenhum membro autorizado ainda. Convide ou vincule um cuidador para compartilhar a rotina.</li>";
     } else {
-      adminMembersList.innerHTML = members.slice(0, 12).map((member) => `
+      adminMembersList.innerHTML = members.slice(0, 12).map((member) => {
+        const uid = escapeHtml(member.uid || "");
+        const email = escapeHtml(member.email || "Usuário sem e-mail");
+        const role = normalizeRole(member.role || "visualizacao");
+        const protectedMember = !member.uid || isGlobalAdminEmail(member.email || "");
+        return `
         <li class="admin-access-item admin-member-item">
           <img class="admin-avatar member-avatar" src="${getCaregiverAvatarDataUrl(member.email || "Membro", member.uid || member.email || "member", "member")}" alt="" />
           <div>
-            <strong>${escapeHtml(member.email || "Usuário sem e-mail")}</strong>
-            <span>${escapeHtml(getRoleLabel(member.role))}</span>
+            <strong>${email}</strong>
+            <span>${escapeHtml(getRoleLabel(role))} — ${escapeHtml(getRoleDescription(role))}</span>
           </div>
-          <small>${member.joinedAt ? "Membro ativo" : "Autorizado"}</small>
-        </li>
-      `).join("");
+          <div class="admin-access-actions member-permission-actions">
+            <label class="member-role-select-label">
+              <span>Permissão</span>
+              <select data-member-role-select="${uid}" ${protectedMember ? "disabled" : ""}>
+                ${["responsavel", "cuidador", "visualizacao"].map((option) => `<option value="${option}" ${role === option ? "selected" : ""}>${escapeHtml(getRoleLabel(option))}</option>`).join("")}
+              </select>
+            </label>
+            <button type="button" data-update-member-role="${uid}" ${protectedMember ? "disabled" : ""}>Salvar permissão</button>
+            <button type="button" class="danger-soft-button" data-remove-member="${uid}" data-remove-member-email="${email}" ${protectedMember ? "disabled" : ""}>Remover</button>
+          </div>
+        </li>`;
+      }).join("");
+    }
+  }
+
+  if (adminFamilyAuditList) {
+    const audit = Array.isArray(stats?.familyAudit) ? stats.familyAudit : [];
+    if (!audit.length) {
+      adminFamilyAuditList.innerHTML = "<li class=\"polished-admin-empty\">Nenhuma alteração familiar registrada ainda.</li>";
+    } else {
+      adminFamilyAuditList.innerHTML = audit.slice(0, 12).map((item) => `
+        <li class="admin-access-item admin-audit-item">
+          <div>
+            <strong>${escapeHtml(getFamilyActionLabel(item.action))}</strong>
+            <span>${escapeHtml(item.targetEmail || item.code || item.message || "Família")}</span>
+            <small>${escapeHtml(item.actorEmail || "Sistema")} • ${escapeHtml(getAuditTimeLabel(item.createdAtClient || item.createdAt))}</small>
+          </div>
+        </li>`).join("");
     }
   }
 
@@ -5180,21 +5653,30 @@ function buildAdminIntegritySnapshot({ familyId = "", familySummaries = [], memb
     && !user.hasPendingInvite
   )).length;
 
+  const expiredPendingInvites = (pendingInvites || []).filter((invite) => invite.expired || isInviteExpired(invite)).length;
+  const hasActiveMember = visibleMembers.length > 0;
+  const hasFamilyId = Boolean(familyId);
+
   return {
+    hasFamilyId,
     selectedHasProfile,
+    hasActiveMember,
     visibleMembersCount: visibleMembers.length,
     pendingInvitesCount: pendingInvites.length,
+    expiredPendingInvites,
     duplicateEmailCount,
     emptyFamilies,
     usersWithoutLink,
-    hasWarning: Boolean(!selectedHasProfile || duplicateEmailCount || emptyFamilies || usersWithoutLink),
+    hasWarning: Boolean(!hasFamilyId || !selectedHasProfile || duplicateEmailCount || emptyFamilies || usersWithoutLink || expiredPendingInvites),
   };
 }
 
 function formatAdminIntegrityLabel(integrity = latestAdminStats?.integrity || {}) {
   if (!integrity) return "—";
   const warnings = [];
+  if (!integrity.hasFamilyId) warnings.push("sem família selecionada");
   if (!integrity.selectedHasProfile) warnings.push("perfil ausente");
+  if (integrity.expiredPendingInvites) warnings.push(`${integrity.expiredPendingInvites} convite expirado`);
   if (integrity.duplicateEmailCount) warnings.push(`${integrity.duplicateEmailCount} e-mail duplicado`);
   if (integrity.emptyFamilies) warnings.push(`${integrity.emptyFamilies} família vazia`);
   if (integrity.usersWithoutLink) warnings.push(`${integrity.usersWithoutLink} conta sem vínculo`);
@@ -5247,16 +5729,26 @@ async function refreshAdminStats(options = {}) {
   try {
     const services = await getFirebaseServices();
     const familyId = getSelectedFamilyIdForAdminOrAccess();
-    const [membersSnapshot, globalInvitesSnapshot, familiesSnapshot, familySnap, familyProfileSnap, usersSnapshot, accessSnapshot, accountSnapshot, profileSnapshot] = await Promise.all([
+    const appAdmin = isGlobalAppAdmin();
+    const emptySnapshot = { docs: [], forEach() {} };
+    if (!familyId) {
+      setAdminStatsPlaceholder("Entre em uma família antes de abrir o diagnóstico familiar.");
+      renderAdminStats(null);
+      return null;
+    }
+    const [membersSnapshot, globalInvitesSnapshot, familiesSnapshot, familySnap, familyProfileSnap, familyAuditSnapshot, usersSnapshot, accessSnapshot, accountSnapshot, profileSnapshot] = await Promise.all([
       services.getDocs(services.collection(services.db, "families", familyId, "members")),
-      services.getDocs(services.collection(services.db, "invites")),
-      services.getDocs(services.query(services.collection(services.db, "families"), services.limit(50))),
+      appAdmin
+        ? services.getDocs(services.collection(services.db, "invites"))
+        : services.getDocs(services.collection(services.db, "families", familyId, "invitations")),
+      appAdmin ? services.getDocs(services.query(services.collection(services.db, "families"), services.limit(50))) : Promise.resolve(emptySnapshot),
       services.getDoc(services.doc(services.db, "families", familyId)),
       services.getDoc(services.doc(services.db, "families", familyId, "profile", "main")),
-      services.getDocs(services.query(services.collection(services.db, "users"), services.limit(80))),
-      services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "access"), services.limit(120))) : Promise.resolve({ docs: [], forEach() {} }),
-      services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "account"), services.limit(120))) : Promise.resolve({ docs: [], forEach() {} }),
-      services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "profile"), services.limit(120))) : Promise.resolve({ docs: [], forEach() {} }),
+      services.getDocs(services.query(services.collection(services.db, "families", familyId, "audit"), services.limit(40))),
+      appAdmin ? services.getDocs(services.query(services.collection(services.db, "users"), services.limit(80))) : Promise.resolve(emptySnapshot),
+      appAdmin && services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "access"), services.limit(120))) : Promise.resolve(emptySnapshot),
+      appAdmin && services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "account"), services.limit(120))) : Promise.resolve(emptySnapshot),
+      appAdmin && services.collectionGroup ? services.getDocs(services.query(services.collectionGroup(services.db, "profile"), services.limit(120))) : Promise.resolve(emptySnapshot),
     ]);
 
     const members = [];
@@ -5296,6 +5788,10 @@ async function refreshAdminStats(options = {}) {
         email: emailKey,
         role: normalizeInviteRole(data.role || "responsavel"),
         status,
+        expiresAt: data.expiresAt || null,
+        expiresAtClient: Number(data.expiresAtClient || 0),
+        createdAtClient: Number(data.createdAtClient || 0),
+        expired: isInviteExpired(data),
       };
       if (status === "accepted" || status === "active") {
         acceptedEmails.add(emailKey);
@@ -5307,6 +5803,11 @@ async function refreshAdminStats(options = {}) {
 
     acceptedEmails.forEach((email) => pendingMap.delete(email));
     const pendingInvites = Array.from(pendingMap.values()).filter((invite) => invite.email);
+    const familyAudit = [];
+    familyAuditSnapshot.forEach((auditDoc) => {
+      familyAudit.push({ id: auditDoc.id, ...(auditDoc.data() || {}) });
+    });
+    familyAudit.sort((a, b) => Number(toMilliseconds(b.createdAtClient || b.createdAt) || 0) - Number(toMilliseconds(a.createdAtClient || a.createdAt) || 0));
 
     const knownUserMap = new Map();
     const addKnownUser = (uid = "", data = {}, source = "users", path = "") => {
@@ -5358,7 +5859,7 @@ async function refreshAdminStats(options = {}) {
       addKnownUser(uid, docSnap.data() || {}, "profile", path);
     });
     members.filter((member) => !member.isAdmin).forEach((member) => addKnownUser(member.uid, { email: member.email, role: member.role, familyId }, "member", `families/${familyId}/members/${member.uid}`));
-    invitedEmails.forEach((email) => addKnownUser("", { email, familyId }, "invite", `invites/${email}`));
+    invitedEmails.forEach((email) => addKnownUser("", { email, familyId }, "invite", appAdmin ? `invites/${email}` : `families/${familyId}/invitations/${email}`));
 
     const knownUsers = Array.from(knownUserMap.values()).map((user) => {
       const email = normalizeEmail(user.email || "");
@@ -5401,6 +5902,7 @@ async function refreshAdminStats(options = {}) {
       families: familySummaries,
       members,
       pendingInvites,
+      familyAudit,
       knownUsers,
       familiesCount: familySummaries.length,
       membersCount: visibleMembers.length,
@@ -5426,7 +5928,7 @@ async function refreshAdminStats(options = {}) {
 function renderInviteList() {
   if (!inviteList) return;
   if (!recentInvites.length) {
-    inviteList.innerHTML = "<li>Nenhum convite gerado neste aparelho.</li>";
+    inviteList.innerHTML = "<li class=\"polished-admin-empty\">Nenhum convite gerado neste aparelho.</li>";
     return;
   }
 
@@ -5449,6 +5951,11 @@ function renderFamilyAccessPanel() {
   const baby = getBabyDisplayName();
   const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
   const canInvite = authorized && !appAdmin && canManageFamilyAccess();
+  const showFamilyAccessCard = !authorized || appAdmin;
+  if (familyAccessCard) {
+    familyAccessCard.hidden = !showFamilyAccessCard;
+    familyAccessCard.classList.toggle("admin-open", Boolean(appAdmin));
+  }
 
   if (familyAccessKicker) {
     familyAccessKicker.textContent = authorized
@@ -5461,7 +5968,7 @@ function renderFamilyAccessPanel() {
       ? (appAdmin ? "Painel admin" : "Família conectada")
       : connected
         ? (pendingCode ? "Aceitar convite familiar" : "Conta sem acesso familiar")
-        : "Convites e permissões";
+        : "Entrar ou aceitar convite";
   }
 
   if (familyAccessText) {
@@ -5473,7 +5980,7 @@ function renderFamilyAccessPanel() {
         ? (pendingCode
           ? "Convite detectado. Confirme o código para entrar na família existente, sem criar uma nova família."
           : "Esta conta está conectada, mas ainda não encontramos acesso familiar. Crie sua família apenas se você for o primeiro responsável ou use um convite recebido.")
-        : "Visitantes podem conhecer o app. Para registrar dados, entre com usuário e senha ou aceite um convite familiar.";
+        : "Visitantes podem conhecer o app. Para registrar dados reais, entre com usuário e senha. Se recebeu convite, use o mesmo e-mail convidado.";
   }
 
   if (familyAccessBadge) {
@@ -5548,7 +6055,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
       if (selectedAccess) return;
       const data = docSnap.data() || {};
       const familyId = data.familyId || docSnap.id;
-      if (!familyId || data.status === "inactive" || data.status === "revoked") return;
+      if (!familyId || ["inactive", "revoked", "removed"].includes(String(data.status || "active"))) return;
       selectedAccess = {
         familyId,
         role: data.role || "responsavel",
@@ -5567,6 +6074,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
   const snapshot = await services.getDoc(accessRef);
   if (snapshot.exists()) {
     const data = snapshot.data() || {};
+    if (["inactive", "revoked", "removed"].includes(String(data.status || "active"))) return null;
     return saveFamilyAccess({
       familyId: data.familyId,
       role: data.role,
@@ -5588,6 +6096,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
       const memberSnapshot = await services.getDoc(memberRef);
       if (!memberSnapshot.exists()) continue;
       const data = memberSnapshot.data() || {};
+      if (["inactive", "revoked", "removed"].includes(String(data.status || "active"))) continue;
       return saveFamilyAccess({
         familyId,
         role: data.role || "responsavel",
@@ -5791,9 +6300,116 @@ async function activatePersonalFamilyInternal() {
   }
 }
 
+async function updateFamilyMemberRole(memberUid = "", roleValue = "") {
+  const uid = String(memberUid || "").trim();
+  const role = normalizeRole(roleValue || "visualizacao");
+  if (!uid || !isFamilyAdmin()) return false;
+  if (!window.confirm(`Alterar permissão deste membro para ${getRoleLabel(role)}?`)) return false;
+  try {
+    const services = await getFirebaseServices();
+    const familyId = getSelectedFamilyIdForAdminOrAccess();
+    const memberRef = services.doc(services.db, "families", familyId, "members", uid);
+    const memberSnap = await services.getDoc(memberRef);
+    const memberData = memberSnap.exists?.() ? (memberSnap.data() || {}) : {};
+    const targetEmail = normalizeEmail(memberData.email || "");
+    await services.setDoc(memberRef, {
+      role,
+      updatedBy: cloudUser.uid,
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", uid, "families", familyId), { role, updatedAt: services.serverTimestamp() }, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", uid, "access", "ninou"), { role, updatedAt: services.serverTimestamp() }, { merge: true });
+    await writeFamilyAuditLog("member_role_updated", { familyId, targetUid: uid, targetEmail, role });
+    await refreshAdminStats({ silent: true });
+    if (loginHelper) loginHelper.textContent = `Permissão atualizada para ${getRoleLabel(role)}.`;
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível alterar permissão:", error);
+    if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    return false;
+  }
+}
+
+async function removeFamilyMember(memberUid = "", memberEmail = "") {
+  const uid = String(memberUid || "").trim();
+  const email = normalizeEmail(memberEmail || "");
+  if (!uid || !isFamilyAdmin()) return false;
+  if (uid === cloudUser?.uid) {
+    if (loginHelper) loginHelper.textContent = "Use Sair da família para remover seu próprio acesso.";
+    return false;
+  }
+  if (!window.confirm(`Remover ${email || "este membro"} da família? A pessoa perderá acesso aos dados do bebê neste app.`)) return false;
+  try {
+    const services = await getFirebaseServices();
+    const familyId = getSelectedFamilyIdForAdminOrAccess();
+    await services.setDoc(services.doc(services.db, "families", familyId, "members", uid), {
+      status: "removed",
+      removedBy: cloudUser.uid,
+      removedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", uid, "families", familyId), {
+      status: "removed",
+      removedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", uid, "access", "ninou"), {
+      familyId,
+      status: "removed",
+      removedAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await writeFamilyAuditLog("member_removed", { familyId, targetUid: uid, targetEmail: email });
+    await refreshAdminStats({ silent: true });
+    if (loginHelper) loginHelper.textContent = "Membro removido da família.";
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível remover membro:", error);
+    if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    return false;
+  }
+}
+
+async function leaveCurrentFamily() {
+  if (!canCurrentUserLeaveFamily()) return false;
+  const familyId = familyAccess?.familyId || "";
+  if (!familyId || !cloudUser) return false;
+  if (!window.confirm("Sair desta família? Você perderá acesso aos registros familiares neste aparelho, mas os dados da família serão preservados.")) return false;
+  try {
+    const services = await getFirebaseServices();
+    await services.setDoc(services.doc(services.db, "families", familyId, "members", cloudUser.uid), {
+      status: "removed",
+      leftAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "families", familyId), {
+      status: "removed",
+      leftAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "access", "ninou"), {
+      familyId,
+      status: "removed",
+      leftAt: services.serverTimestamp(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+    await writeFamilyAuditLog("member_left", { familyId, targetUid: cloudUser.uid, targetEmail: cloudUser.email || familyAccess?.email || "" });
+    saveFamilyAccess(null);
+    clearFamilyCacheForAccess();
+    renderAll();
+    if (loginHelper) loginHelper.textContent = "Você saiu da família neste aparelho. Para voltar, use um novo convite.";
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível sair da família:", error);
+    if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+    return false;
+  }
+}
+
 async function cancelFamilyInvite(codeValue = "") {
   const code = normalizeInviteCode(codeValue);
   if (!code || !isFamilyAdmin()) return false;
+  if (!window.confirm(`Cancelar o convite ${code}? Esse código deixará de funcionar.`)) return false;
   try {
     const services = await getFirebaseServices();
     await services.setDoc(services.doc(services.db, "invites", code), {
@@ -5803,15 +6419,19 @@ async function cancelFamilyInvite(codeValue = "") {
       updatedAt: services.serverTimestamp(),
     }, { merge: true });
     try {
-      await services.setDoc(services.doc(services.db, "families", getSelectedFamilyIdForAdminOrAccess(), "invites", code), {
+      const selectedFamilyId = getSelectedFamilyIdForAdminOrAccess();
+      const cancelPayload = {
         status: "cancelled",
         cancelledBy: cloudUser.uid,
         cancelledAt: services.serverTimestamp(),
         updatedAt: services.serverTimestamp(),
-      }, { merge: true });
+      };
+      await services.setDoc(services.doc(services.db, "families", selectedFamilyId, "invites", code), cancelPayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", selectedFamilyId, "invitations", code), cancelPayload, { merge: true });
     } catch (mirrorError) {
       console.warn("Convite cancelado na coleção principal, mas não no espelho:", mirrorError);
     }
+    await writeFamilyAuditLog("invite_cancelled", { code, familyId: getSelectedFamilyIdForAdminOrAccess() });
     await refreshAdminStats();
     if (inviteResult) {
       inviteResult.hidden = false;
@@ -6196,7 +6816,8 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     if (!cloudContentAfterInvite.profile && hasProfileContent()) await saveProfileToCloud();
     if (!cloudContentAfterInvite.day && hasRoutineDayContent()) await saveDayToCloud();
     await connectCurrentAccount();
-    setSyncStatus("online", cloudUser.email || "");
+    await flushPendingCloudSync("invite-accepted");
+    setSyncStatus(hasPendingCloudSyncItems() ? "pending" : "online", cloudUser.email || "", getPendingSyncSummary());
     showScreen("today");
     renderAll();
     return true;
@@ -6741,6 +7362,12 @@ async function connectCurrentAccount() {
     .catch((error) => {
       console.warn("A lista histórica de dias será carregada depois:", error);
     });
+
+  if (hasPendingCloudSyncItems()) {
+    void flushPendingCloudSync("connect");
+  } else {
+    setSyncStatus(isBrowserOnline() ? "online" : "pending", cloudUser?.email || "", getPendingSyncSummary());
+  }
 }
 
 function getProfilePayload(options = {}) {
@@ -6846,41 +7473,56 @@ function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
 }
 
 function scheduleProfileCloudSave(options = {}) {
-  if (applyingCloudState || !cloudUser || !firebaseServices) return;
+  if (applyingCloudState) return;
+  if (cloudUser && hasFamilyAccess()) markProfileSyncQueued();
+  if (!cloudUser || !firebaseServices || !hasFamilyAccess()) return;
   pendingProfilePhotoSave = false;
 
   window.clearTimeout(profileCloudSaveTimer);
-  profileCloudSaveTimer = window.setTimeout(saveProfileToCloud, 600);
+  setSyncStatus(isBrowserOnline() ? "saving" : "pending", cloudUser.email || "", getPendingSyncSummary());
+  profileCloudSaveTimer = window.setTimeout(() => saveProfileToCloud(options), 600);
 }
 
 async function saveProfileToCloud(options = {}) {
   const profileRef = getCloudProfileRef();
-  if (!profileRef) return;
+  if (!profileRef || applyingCloudState) return;
+  if (!isBrowserOnline()) {
+    markProfileSyncQueued();
+    markCloudSyncPending({ code: "offline" });
+    return;
+  }
 
   const includePhoto = false;
   const payload = getProfilePayload();
   const savedProfileVersion = payload.clientUpdatedAt;
 
   try {
+    setSyncStatus("syncing", cloudUser.email || "", "Enviando perfil para a família...");
     await firebaseServices.setDoc(profileRef, payload, { merge: true });
+    clearProfileSyncQueued();
     if (includePhoto) pendingProfilePhotoSave = false;
     if (savedProfileVersion === profileClientUpdatedAt) {
-      setSyncStatus("online", cloudUser.email);
       markCloudSynced();
+      setSyncStatus(hasPendingCloudSyncItems() ? "pending" : "online", cloudUser.email, getPendingSyncSummary());
     }
   } catch (error) {
     console.error("Erro ao salvar perfil:", error);
     if (savedProfileVersion === profileClientUpdatedAt) {
+      markProfileSyncQueued();
       markCloudSyncPending(error);
     }
   }
 }
 
 function scheduleDayCloudSave(dayId = getSelectedDayId()) {
-  if (applyingCloudState || !cloudUser || !firebaseServices) return;
+  if (applyingCloudState) return;
 
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  if (cloudUser && hasFamilyAccess()) markDaySyncQueued(safeDayId);
+  if (!cloudUser || !firebaseServices || !hasFamilyAccess()) return;
+
   window.clearTimeout(dayCloudSaveTimer);
+  setSyncStatus(isBrowserOnline() ? "saving" : "pending", cloudUser.email || "", getPendingSyncSummary());
   dayCloudSaveTimer = window.setTimeout(() => saveDayToCloud(safeDayId), 500);
 }
 
@@ -6951,6 +7593,11 @@ async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
+  if (!isBrowserOnline()) {
+    markDaySyncQueued(safeDayId);
+    markCloudSyncPending({ code: "offline" });
+    return;
+  }
 
   const selectedDayId = getSelectedDayId();
   const sourceState = safeDayId === selectedDayId && loadedStateDayId === safeDayId
@@ -6983,6 +7630,7 @@ async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
     };
     if (shouldSetCreatedAt) cloudTimestamps.createdAt = firebaseServices.serverTimestamp();
 
+    setSyncStatus("syncing", cloudUser.email || "", `Enviando rotina de ${safeDayId}...`);
     await firebaseServices.setDoc(
       dayRef,
       {
@@ -7004,10 +7652,12 @@ async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
       renderAll();
     }
 
-    setSyncStatus("online", cloudUser.email);
+    clearDaySyncQueued(safeDayId);
     markCloudSynced();
+    setSyncStatus(hasPendingCloudSyncItems() ? "pending" : "online", cloudUser.email, getPendingSyncSummary());
   } catch (error) {
     console.error("Erro ao salvar rotina:", error);
+    markDaySyncQueued(safeDayId);
     markCloudSyncPending(error);
   }
 }
@@ -7079,7 +7729,29 @@ async function subscribeToCloudDay(dayId = getSelectedDayId(), options = {}) {
   });
 }
 
+
+function installOfflineSyncEventHandlers() {
+  if (window.__ninouOfflineSyncEventsInstalled) return;
+  window.__ninouOfflineSyncEventsInstalled = true;
+  window.addEventListener("online", () => {
+    if (cloudUser && hasFamilyAccess()) {
+      setSyncStatus(hasPendingCloudSyncItems() ? "syncing" : "online", cloudUser.email || "", hasPendingCloudSyncItems() ? "Conexão voltou. Sincronizando pendências..." : "Conexão restabelecida.");
+      void flushPendingCloudSync("online");
+    } else {
+      setSyncStatus("online", cloudUser?.email || "");
+    }
+  });
+  window.addEventListener("offline", () => {
+    if (cloudUser && hasFamilyAccess()) {
+      setSyncStatus("pending", cloudUser.email || "", getPendingSyncSummary());
+    } else {
+      setSyncStatus("offline", cloudUser?.email || "");
+    }
+  });
+}
+
 async function initFirebaseAuthState() {
+  installOfflineSyncEventHandlers();
   const services = await getFirebaseServices();
 
   services.onAuthStateChanged(services.auth, async (user) => {
@@ -7326,9 +7998,11 @@ function renderCurrentState() {
   if (!canUsePrivateFeatures()) {
     setHidden(wakeAction, true);
     syncStartChoiceVisibility(false);
-    setText(stateLabel, "Acesso necessário");
+    document.body.classList.add("ninou-empty-profile-state");
+    document.body.classList.remove("ninou-daily-empty-state", "ninou-reviewing-past-state");
+    setText(stateLabel, "Entre para registrar");
     setText(stateClock, "--:--");
-    setText(stateHint, "Entre com login e senha ou solicite acesso para registrar a rotina.");
+    setText(stateHint, "A rotina fica protegida na família. Entre, crie uma família ou aceite um convite para começar.");
     renderActiveTimerCard();
     return;
   }
@@ -7336,23 +8010,32 @@ function renderCurrentState() {
   if (getSelectedDayId() !== getCurrentDayId()) {
     setHidden(wakeAction, true);
     syncStartChoiceVisibility(false);
-    setText(stateLabel, "Data selecionada");
+    document.body.classList.add("ninou-reviewing-past-state");
+    document.body.classList.remove("ninou-empty-profile-state", "ninou-daily-empty-state");
+    setText(stateLabel, "Dia em revisão");
     setText(stateClock, "--:--");
-    setText(stateHint, "Você está revisando um dia anterior. Use o botão + para incluir ou editar registros nessa data.");
+    setText(stateHint, "Você está vendo uma data anterior. Use o botão + para incluir ou corrigir registros desse dia.");
     renderActiveTimerCard();
     return;
   }
 
   if (state.mode === "idle") {
+    if (continueOpenSleepFromPreviousDayIfNeeded()) {
+      renderCurrentState();
+      return;
+    }
     setHidden(wakeAction, true);
     syncStartChoiceVisibility(true);
-    setText(stateLabel, "Rotina zerada");
+    document.body.classList.add("ninou-daily-empty-state");
+    document.body.classList.remove("ninou-empty-profile-state", "ninou-reviewing-past-state");
+    setText(stateLabel, "Começar hoje");
     setText(stateClock, "00:00:00");
-    setText(stateHint, `Escolha se ${getBabyReference()} acordou ou iniciou uma soneca.`);
+    setText(stateHint, `Ainda não há registros hoje. Informe como ${getBabyReference()} estava quando você começou a acompanhar.`);
     renderActiveTimerCard();
     return;
   }
 
+  document.body.classList.remove("ninou-empty-profile-state", "ninou-reviewing-past-state", "ninou-daily-empty-state");
   setHidden(wakeAction, false);
   syncStartChoiceVisibility(false);
   const elapsed = Date.now() - Number(state.activeStartedAt || Date.now());
@@ -7367,7 +8050,10 @@ function renderCurrentState() {
   setText(wakeActionLabel, sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca");
   setText(stateLabel, sleeping ? "Dormindo há" : nightWakeActive ? "Despertar noturno há" : "Acordado há");
   setText(stateClock, formatDuration(elapsed));
-  setText(stateHint, getWakeWindowText());
+  const crossedMidnight = sleeping && Number(state.activeStartedAt) < getDayStart();
+  setText(stateHint, crossedMidnight
+    ? `Sono continuado de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Acordou, o Ninou fecha o sono com a duração total.`
+    : getWakeWindowText());
   setWakeActionIcon();
   renderActiveTimerCard();
 }
@@ -7584,7 +8270,11 @@ function renderTimeline() {
   diaryDateHint.textContent = selectedStart === getDayStart() ? "Hoje" : "Data selecionada";
 
   if (!visibleEvents.length) {
-    timeline.append(createEmptyTimelineItem(getEventCardMarkup(null, { empty: true })));
+    timeline.append(createEmptyTimelineItem(getDiaryEmptyRecordMarkup({
+      isToday: selectedStart === getDayStart(),
+      hasFilter: currentDiaryFilter !== "all",
+      babyName: getBabyReference(),
+    })));
   }
 
   visibleEvents.forEach((event) => {
@@ -7978,6 +8668,7 @@ function renderTodayHomeSections() {
   renderTodayLastEvents();
   renderTodayMiniChart();
   renderIntelligentHomeSections();
+  renderQuickCorrectionCard();
 }
 
 function formatBreastTimer(ms) {
@@ -8216,19 +8907,27 @@ function renderTodayOverview() {
   const lastSleep = getLatestSleepEvent(events);
   const awakeInfo = getTodayAwakeCalculation(now, events);
   const awakeText = awakeInfo.hasWake ? awakeInfo.durationLabel : "—";
-  const napText = lastSleep
-    ? `${formatTime(lastSleep.start)}–${formatTime(lastSleep.end)}`
-    : "Sem registro";
+  const sleepTotalText = formatShortDuration(getSleepMsForRange(todayStart, todayStart + day));
+  const bottleCount = events.filter((event) => event.type === "mamadeira").length;
+  const bottleTotal = sumBottleAmountMl(events);
+  const diaperCount = countDiaperEvents(events);
+  const stateText = state.mode === "sleeping"
+    ? `Dormindo há ${formatShortDuration(Math.max(0, now - Number(state.activeStartedAt || now)))}`
+    : awakeInfo.hasWake && awakeInfo.isOpen
+      ? `Acordado há ${formatShortDuration(Number(awakeInfo.durationMs) || 0)}`
+      : events.length ? "Rotina em andamento" : "Sem registro";
   const bottleText = lastBottle ? `${formatTime(lastBottle.start)}${getBottleAmountText(lastBottle)}` : "Sem registro";
   const diaperText = lastDiaper ? `${formatTime(lastDiaper.start)}${lastDiaper.detail && lastDiaper.detail !== "Não se aplica" ? ` • ${lastDiaper.detail}` : ""}` : "Sem registro";
 
   if (todayOverviewTitle) todayOverviewTitle.textContent = `Hoje com ${baby}`;
-  if (todayOverviewKicker) todayOverviewKicker.textContent = "Assistente de rotina";
+  if (todayOverviewKicker) todayOverviewKicker.textContent = "Resumo do dia";
   todayOverviewGrid.innerHTML = [
+    ["Estado atual", stateText],
+    ["Sono total", sleepTotalText],
+    ["Mamadeiras", bottleCount ? `${bottleCount}${bottleTotal ? ` • ${bottleTotal} ml` : ""}` : "0"],
+    ["Fraldas", String(diaperCount || 0)],
     ["Última mamadeira", bottleText],
     ["Última fralda", diaperText],
-    ["Última soneca", napText],
-    ["Tempo acordado", awakeText],
   ].map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join("");
 
   if (todayOverviewSuggestion) {
@@ -8519,7 +9218,7 @@ function renderDayNotesPanel() {
   }
   if (dayNotesStatus) {
     const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - value.length);
-    dayNotesStatus.textContent = value.trim() ? `Observação salva neste dia. ${remaining} caracteres restantes.` : "Nenhuma observação salva neste dia.";
+    dayNotesStatus.textContent = value.trim() ? `Observação salva neste dia. ${remaining} caracteres restantes.` : "Nenhuma observação salva. Use este espaço para lembretes importantes da família.";
   }
 }
 
@@ -8533,6 +9232,40 @@ function saveDayNotes() {
   state = sanitizeDayStateForDay(state, selectedDayId, { preserveLive: true });
   saveDayState();
   renderDayNotesPanel();
+}
+
+function buildQuickObservationText(rawText = "") {
+  const text = String(rawText || "").trim().replace(/\s+/g, " ");
+  if (!text) return "";
+  const actor = getCurrentActorProfile();
+  const actorLabel = actor?.displayName || actor?.label || actor?.email || "Responsável";
+  return `${formatTime(Date.now())} — ${text} (${actorLabel})`;
+}
+
+function appendQuickObservation(rawText = "") {
+  if (!requireLogin("adicionar observação rápida")) return;
+  if (!dayNotesTextarea) return;
+  const noteLine = buildQuickObservationText(rawText);
+  if (!noteLine) {
+    quickObservationInput?.focus();
+    return;
+  }
+  const current = normalizeSafeDayNotes(dayNotesTextarea.value || state.dayNotes || "");
+  const next = normalizeSafeDayNotes([current, noteLine].filter(Boolean).join("
+"));
+  if (next.length >= MAX_DAY_NOTES_LENGTH && next !== [current, noteLine].filter(Boolean).join("
+")) {
+    showToast?.("Observação atingiu o limite de caracteres do dia.");
+  }
+  dayNotesTextarea.value = next;
+  state.dayNotes = next;
+  state.dayNotesDayId = next ? getSelectedDayId() : "";
+  state.dayNotesUpdatedAt = next ? Date.now() : 0;
+  state = sanitizeDayStateForDay(state, getSelectedDayId(), { preserveLive: true });
+  saveDayState();
+  renderDayNotesPanel();
+  if (quickObservationInput) quickObservationInput.value = "";
+  dayNotesTextarea.focus({ preventScroll: true });
 }
 
 function renderProductExperienceSections() {
@@ -8639,35 +9372,61 @@ function renderLiveTick() {
   setText(stateHint, getWakeWindowText());
   renderSummary();
   renderIntelligentHomeSections();
+  renderQuickCorrectionCard();
   renderProductExperienceSections();
 }
 
 function finishSleep() {
   if (!requireLogin("salvar a rotina")) return;
   const finishedAt = Date.now();
+  const activeStartedAt = Number(state.activeStartedAt);
+  if (Number.isFinite(activeStartedAt) && finishedAt - activeStartedAt > 14 * hour) {
+    const ok = window.confirm("Esse sono passou de 14 horas. Deseja finalizar mesmo assim?");
+    if (!ok) return;
+  }
+  markRoutineMutationSnapshot("finalizou sono");
   const activeType = state.activeType || "sono";
   const beforeIds = new Set((state.events || []).map((event) => event.id));
   state = finishActiveSleep(state, makeEvent, finishedAt);
-  (state.events || []).filter((event) => !beforeIds.has(event.id)).forEach((event) => pushAuditEntry("adicionou", event));
+  const newSleepEvents = (state.events || []).filter((event) => !beforeIds.has(event.id));
+  newSleepEvents.forEach((event) => {
+    pushAuditEntry("adicionou", event);
+    persistCrossDaySleepEvent(event);
+  });
   addAwakeEvent(finishedAt, activeType === "dormir" ? "Após sono noturno" : "Após soneca");
   saveDayState();
 }
 
 function startSleep() {
   if (!requireLogin("salvar a rotina")) return;
+  if (state.mode === "sleeping") {
+    window.alert("Já existe um sono em andamento. Finalize ou corrija o registro atual antes de iniciar outro.");
+    return;
+  }
+  markRoutineMutationSnapshot("iniciou sono");
   state = startSleepTimer(state, Date.now());
   saveDayState();
 }
 
 function startRoutine(mode) {
   if (!requireLogin("salvar a rotina")) return;
-  if (mode === "awake" && getActiveAwakeWindowStart()) {
+  if (getSelectedDayId() !== getCurrentDayId()) {
+    window.alert("Volte para hoje para iniciar a rotina em tempo real.");
+    return;
+  }
+
+  const startMode = mode === "sleeping" ? "sleeping" : "awake";
+  if (startMode === "awake" && getActiveAwakeWindowStart()) {
     renderAll();
     return;
   }
-  const startedAt = Date.now();
-  state = startRoutineTimer(state, mode, startedAt);
-  if (mode === "awake") addAwakeEvent(startedAt, "Início da rotina");
+
+  const startedAt = mode === "now" ? Date.now() : parseManualStartTimeInput(startMode);
+  if (!Number.isFinite(Number(startedAt))) return;
+
+  markRoutineMutationSnapshot(startMode === "sleeping" ? "iniciou sono informado" : "iniciou dia informado");
+  state = startRoutineTimer(state, startMode, Number(startedAt));
+  if (startMode === "awake") addAwakeEvent(Number(startedAt), mode === "now" ? "Rotina iniciada agora" : "Início do dia informado");
   reconcileCurrentAwakeStateFromEvents({ persist: false });
   timelineRenderSignature = "";
   orbitRenderSignature = "";
@@ -8803,6 +9562,106 @@ function updateWakeWindow(value, options = {}) {
   }
 }
 
+
+function isBrowserOnline() {
+  return typeof navigator === "undefined" || navigator.onLine !== false;
+}
+
+function readPendingDaySyncIds() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(pendingDaySyncStorageKey) || "[]");
+    return Array.isArray(raw) ? raw.filter(isDateId) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePendingDaySyncIds(dayIds = []) {
+  const ids = [...new Set((dayIds || []).filter(isDateId))].sort();
+  try {
+    if (ids.length) localStorage.setItem(pendingDaySyncStorageKey, JSON.stringify(ids));
+    else localStorage.removeItem(pendingDaySyncStorageKey);
+  } catch {}
+  return ids;
+}
+
+function markDaySyncQueued(dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  writePendingDaySyncIds([...readPendingDaySyncIds(), safeDayId]);
+  persistPendingCloudSync(getPendingSyncSummary());
+  renderSyncDetails();
+}
+
+function clearDaySyncQueued(dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  writePendingDaySyncIds(readPendingDaySyncIds().filter((id) => id !== safeDayId));
+  renderSyncDetails();
+}
+
+function isProfileSyncQueued() {
+  try { return localStorage.getItem(pendingProfileSyncStorageKey) === "1"; } catch { return false; }
+}
+
+function markProfileSyncQueued() {
+  try { localStorage.setItem(pendingProfileSyncStorageKey, "1"); } catch {}
+  persistPendingCloudSync(getPendingSyncSummary());
+  renderSyncDetails();
+}
+
+function clearProfileSyncQueued() {
+  try { localStorage.removeItem(pendingProfileSyncStorageKey); } catch {}
+  renderSyncDetails();
+}
+
+function getPendingCloudSyncCount() {
+  return readPendingDaySyncIds().length + (isProfileSyncQueued() ? 1 : 0);
+}
+
+function hasPendingCloudSyncItems() {
+  return getPendingCloudSyncCount() > 0;
+}
+
+function getPendingSyncSummary() {
+  const count = getPendingCloudSyncCount();
+  if (!count) return "Tudo sincronizado.";
+  if (!isBrowserOnline()) return `${count} item(ns) salvo(s) neste aparelho aguardando conexão.`;
+  return `${count} item(ns) aguardando envio para a família.`;
+}
+
+async function flushPendingCloudSync(reason = "manual") {
+  if (pendingCloudFlushInFlight || !cloudUser || !firebaseServices || !hasFamilyAccess()) return false;
+  if (!isBrowserOnline()) {
+    setSyncStatus("pending", cloudUser.email || "", getPendingSyncSummary());
+    schedulePendingCloudRetry();
+    return false;
+  }
+
+  pendingCloudFlushInFlight = true;
+  setSyncStatus("syncing", cloudUser.email || "", "Sincronizando pendências salvas neste aparelho...");
+  try {
+    if (isProfileSyncQueued()) await saveProfileToCloud({ silentRetry: true, reason });
+    const dayIds = readPendingDaySyncIds();
+    for (const dayId of dayIds) {
+      await saveDayToCloud(dayId, { silentRetry: true, reason });
+    }
+    if (!hasPendingCloudSyncItems()) {
+      clearPendingCloudSync();
+      markCloudSynced();
+      setSyncStatus("online", cloudUser.email || "");
+    } else {
+      setSyncStatus("pending", cloudUser.email || "", getPendingSyncSummary());
+      schedulePendingCloudRetry();
+    }
+    return true;
+  } catch (error) {
+    console.warn("Falha ao sincronizar pendências:", error);
+    markCloudSyncPending(error);
+    return false;
+  } finally {
+    pendingCloudFlushInFlight = false;
+  }
+}
+
 function getCloudSyncErrorKind(error = {}) {
   const code = String(error?.code || error?.name || "").toLowerCase();
   const message = String(error?.message || "").toLowerCase();
@@ -8842,13 +9701,12 @@ function schedulePendingCloudRetry() {
     pendingCloudRetryTimer = null;
     if (!cloudUser || !firebaseServices || !hasFamilyAccess()) return;
     try {
-      await saveProfileToCloud({ silentRetry: true });
-      await saveDayToCloud(getSelectedDayId(), { silentRetry: true });
+      await flushPendingCloudSync("retry");
     } catch (error) {
       console.warn("Nova tentativa de sincronização adiada:", error);
       schedulePendingCloudRetry();
     }
-  }, 12_000);
+  }, isBrowserOnline() ? 8000 : 15000);
 }
 
 function markCloudSyncPending(error = {}, fallback = "Salvo neste aparelho • aguardando sincronização.") {
@@ -8872,7 +9730,8 @@ function formatSyncMoment(timestamp = getLastCloudSyncAt()) {
 }
 
 function markCloudSynced() {
-  clearPendingCloudSync();
+  if (!hasPendingCloudSyncItems()) clearPendingCloudSync();
+  else persistPendingCloudSync(getPendingSyncSummary());
   try { localStorage.setItem(lastCloudSyncStorageKey, String(Date.now())); } catch {}
   renderSyncDetails();
 }
@@ -8897,7 +9756,318 @@ function renderSyncDetails() {
     syncFamilyLabel.textContent = label;
     syncFamilyLabel.title = familyAccess?.familyId || "";
   }
-  if (syncLastSavedLabel) syncLastSavedLabel.textContent = formatSyncMoment();
+  if (syncLastSavedLabel) {
+    const pendingCount = getPendingCloudSyncCount();
+    syncLastSavedLabel.textContent = pendingCount ? `${pendingCount} pendente(s) • ${formatSyncMoment()}` : formatSyncMoment();
+  }
+}
+
+
+function getHealthItemMarkup(ok, title, hint) {
+  return `<li class="${ok ? "is-ok" : "needs-attention"}"><strong>${ok ? "✓" : "!"} ${escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small></li>`;
+}
+
+function buildFamilyHealthItems(stats = latestAdminStats) {
+  const integrity = stats?.integrity || null;
+  const familyId = familyAccess?.familyId || (isGlobalAppAdmin() ? getActiveAdminFamilyId() : "");
+  if (!stats || !integrity) {
+    return [{ ok: false, title: "Painel ainda não verificado", hint: "Toque em Verificar família para carregar o diagnóstico atual." }];
+  }
+
+  const familyItems = [
+    {
+      ok: Boolean(integrity.hasFamilyId || familyId),
+      title: "Família selecionada",
+      hint: familyId || "Nenhuma família ativa foi encontrada para este painel.",
+    },
+    {
+      ok: Boolean(integrity.selectedHasProfile),
+      title: "Perfil familiar",
+      hint: integrity.selectedHasProfile ? "Nome da família/bebê encontrado." : "O perfil principal está ausente; a correção cria um perfil mínimo.",
+    },
+    {
+      ok: true,
+      title: "Membros ativos",
+      hint: `${Number(integrity.visibleMembersCount || 0)} membro(s) vinculado(s) nesta família.`,
+    },
+    {
+      ok: !integrity.expiredPendingInvites,
+      title: "Convites desta família",
+      hint: integrity.expiredPendingInvites ? `${integrity.expiredPendingInvites} convite(s) expirado(s) ainda pendente(s).` : `${Number(integrity.pendingInvitesCount || 0)} convite(s) pendente(s) sem alerta.`,
+    },
+  ];
+
+  if (!isGlobalAppAdmin()) {
+    familyItems.push({
+      ok: true,
+      title: "Isolamento entre famílias",
+      hint: "Este diagnóstico usa somente a família atual; outras famílias não são consultadas nem exibidas.",
+    });
+    return familyItems;
+  }
+
+  return familyItems.concat([
+    {
+      ok: !integrity.usersWithoutLink,
+      title: "Contas sem vínculo",
+      hint: integrity.usersWithoutLink ? `${integrity.usersWithoutLink} conta(s) precisam de convite ou vínculo.` : "Nenhuma conta solta detectada na revisão global.",
+    },
+    {
+      ok: !integrity.emptyFamilies,
+      title: "Famílias vazias",
+      hint: integrity.emptyFamilies ? `${integrity.emptyFamilies} família(s) sem membro/convite para revisar.` : "Nenhuma família vazia crítica detectada no painel global.",
+    },
+    {
+      ok: !integrity.duplicateEmailCount,
+      title: "E-mails duplicados",
+      hint: integrity.duplicateEmailCount ? `${integrity.duplicateEmailCount} e-mail(s) aparecem em mais de uma origem.` : "Sem duplicidade relevante no painel global.",
+    },
+  ]);
+}
+
+function renderFamilyHealthPanel(stats = latestAdminStats) {
+  if (!familyHealthChecklist && !familyHealthScore) return;
+  const items = buildFamilyHealthItems(stats);
+  const okCount = items.filter((item) => item.ok).length;
+  const total = items.length || 1;
+  if (familyHealthScore) {
+    familyHealthScore.textContent = stats ? `${okCount}/${total}` : "—";
+    familyHealthScore.classList.toggle("is-ok", Boolean(stats && okCount === total));
+    familyHealthScore.classList.toggle("needs-attention", Boolean(stats && okCount < total));
+  }
+  if (familyHealthChecklist) familyHealthChecklist.innerHTML = items.map((item) => getHealthItemMarkup(item.ok, item.title, item.hint)).join("");
+  if (familyHealthRepairButton) familyHealthRepairButton.disabled = !cloudUser || !hasFamilyAccess();
+  if (familyBackupJsonButton) familyBackupJsonButton.disabled = !canUsePrivateFeatures();
+  if (familyHealthStatus && stats) {
+    familyHealthStatus.textContent = okCount === total
+      ? "Diagnóstico sem alertas críticos. Backup recomendado antes de testes grandes."
+      : "Há pontos para revisar. Use Corrigir vínculos apenas após confirmar que a família selecionada está correta.";
+  }
+}
+
+function getRealFamilyTestItemMarkup(item = {}, index = 0) {
+  const state = item.ok ? "is-ok" : item.warning ? "needs-review" : "needs-attention";
+  const prefix = item.ok ? "✓" : item.warning ? "•" : "!";
+  return `<li class="${state}"><strong>${prefix} ${index + 1}. ${escapeHtml(item.title || "Etapa")}</strong><small>${escapeHtml(item.hint || "")}</small></li>`;
+}
+
+function buildRealFamilyUseTestItems(stats = latestAdminStats) {
+  const familyId = familyAccess?.familyId || (isGlobalAppAdmin() ? getActiveAdminFamilyId() : "");
+  const memberCount = Number(stats?.membersCount || 0);
+  const pendingInvites = Number(stats?.pendingInvitesCount || 0);
+  const acceptedInvites = Number(stats?.acceptedInvitesCount || 0);
+  const auditCount = Array.isArray(stats?.familyAudit) ? stats.familyAudit.length : 0;
+  const hasProfile = Boolean(stats?.integrity?.selectedHasProfile || stats?.familyData?.name || stats?.familyName);
+  const hasFamily = Boolean(familyId && stats);
+  const appAdmin = isGlobalAppAdmin();
+  const hasAuthorizedAccess = Boolean(cloudUser && (appAdmin || hasFamilyAccess()));
+  const canInvite = Boolean(hasFamily && isFamilyAdmin());
+  const hasBackupData = Boolean(familyId && (familyDayIdsCache.length || stats));
+
+  if (!stats) {
+    return [{ ok: false, title: "Painel ainda não carregado", hint: "Entre como admin e toque em Rodar checklist para carregar os dados atuais do Firestore." }];
+  }
+
+  return [
+    {
+      ok: hasAuthorizedAccess,
+      title: "Acesso familiar autenticado",
+      hint: hasAuthorizedAccess ? `${cloudUser.email || "Conta conectada"} está validado para esta família.` : "Entre com uma conta vinculada à família antes de rodar o checklist.",
+    },
+    {
+      ok: hasFamily,
+      title: "Família selecionada",
+      hint: hasFamily ? `Família em teste: ${familyId}.` : "Crie ou selecione uma família antes de convidar outro cuidador.",
+    },
+    {
+      ok: hasProfile,
+      title: "Perfil do bebê/família",
+      hint: hasProfile ? `Perfil encontrado para ${stats.familyName || "a família selecionada"}.` : "Configure o perfil principal antes de iniciar testes com outro aparelho.",
+    },
+    {
+      ok: memberCount >= 1,
+      warning: memberCount === 0,
+      title: "Membros ativos",
+      hint: memberCount >= 1 ? `${memberCount} membro(s) ativo(s) além do suporte admin.` : "Depois de aceitar um convite, o cuidador deve aparecer aqui como membro ativo.",
+    },
+    {
+      ok: pendingInvites > 0 || acceptedInvites > 0,
+      warning: pendingInvites === 0 && acceptedInvites === 0,
+      title: "Convite familiar testado",
+      hint: pendingInvites > 0 ? `${pendingInvites} convite(s) pendente(s) pronto(s) para envio.` : acceptedInvites > 0 ? `${acceptedInvites} convite(s) já aceito(s).` : "Gere um convite para Maria/cuidador e confira se ele não cria outra família.",
+    },
+    {
+      ok: acceptedInvites > 0 || memberCount >= 2,
+      warning: true,
+      title: "Aceite em segundo aparelho",
+      hint: acceptedInvites > 0 || memberCount >= 2 ? "Há sinal de convite aceito ou múltiplos membros. Confirme com login no outro aparelho." : "Teste em aba anônima/celular: criar conta do convidado, aceitar convite e registrar uma rotina.",
+    },
+    {
+      ok: auditCount > 0,
+      warning: auditCount === 0,
+      title: "Histórico familiar",
+      hint: auditCount > 0 ? `${auditCount} evento(s) de auditoria registrados.` : "Convite criado/aceito, alteração de permissão e saída/remoção devem gerar histórico.",
+    },
+    {
+      ok: canInvite,
+      title: "Permissões protegidas",
+      hint: canInvite ? "Responsável/admin desta família pode gerenciar convites e membros. Cuidador/visualização ficam sem ações sensíveis." : "Confira se apenas responsável/admin da própria família consegue alterar membros e convites.",
+    },
+    {
+      ok: hasBackupData,
+      warning: true,
+      title: "Backup antes do teste pesado",
+      hint: "Exporte o JSON antes de remover membro, limpar banco ou fazer teste com vários aparelhos.",
+    },
+    {
+      ok: true,
+      title: "Roteiro final manual",
+      hint: "Felipe cria família → convida Maria → Maria aceita → registra rotina → Felipe vê → Maria não altera permissões → backup/exportação funciona.",
+    },
+  ];
+}
+
+function renderRealFamilyUseTestPanel(stats = latestAdminStats) {
+  if (!familyRealTestChecklist && !familyRealTestScore) return;
+  const items = buildRealFamilyUseTestItems(stats);
+  const okCount = items.filter((item) => item.ok).length;
+  const total = items.length || 1;
+  if (familyRealTestScore) {
+    familyRealTestScore.textContent = stats ? `${okCount}/${total}` : "—";
+    familyRealTestScore.classList.toggle("is-ok", Boolean(stats && okCount >= total - 1));
+    familyRealTestScore.classList.toggle("needs-attention", Boolean(stats && okCount < total - 1));
+  }
+  if (familyRealTestChecklist) familyRealTestChecklist.innerHTML = items.map(getRealFamilyTestItemMarkup).join("");
+  if (familyRealTestExportButton) familyRealTestExportButton.disabled = !stats;
+  if (familyRealTestStatus) {
+    familyRealTestStatus.textContent = stats
+      ? "Checklist atualizado somente para a família atual. Itens com ponto (•) são testes manuais recomendados, não erros obrigatórios."
+      : "Atualize o painel para montar o roteiro com base nos dados reais desta família.";
+  }
+}
+
+function exportRealFamilyUseChecklist() {
+  const items = buildRealFamilyUseTestItems(latestAdminStats);
+  const payload = {
+    app: "Ninou",
+    version: NINOU_RUNTIME_VERSION,
+    exportedAt: new Date().toISOString(),
+    familyId: getSelectedFamilyIdForAdminOrAccess?.() || familyAccess?.familyId || "",
+    exportedBy: cloudUser?.email || "",
+    checklist: items.map((item, index) => ({
+      order: index + 1,
+      status: item.ok ? "ok" : item.warning ? "manual-review" : "attention",
+      title: item.title,
+      hint: item.hint,
+    })),
+    roteiroManual: [
+      "Responsável/admin valida a família atual",
+      "Responsável/admin gera convite para o e-mail do cuidador",
+      "Cuidador cria conta ou entra com o mesmo e-mail",
+      "Cuidador aceita convite e não cria nova família",
+      "Cuidador registra mamadeira/fralda/sono",
+      "Responsável/admin visualiza o registro no mesmo familyId",
+      "Cuidador não consegue remover membros nem alterar permissões",
+      "Responsável/admin exporta backup JSON e PDF da própria família",
+      "Logout/login mantém vínculos corretos",
+    ],
+  };
+  const dateId = toDateInputValue(Date.now());
+  downloadFile(`ninou-checklist-uso-familiar-${dateId}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+  if (familyRealTestStatus) familyRealTestStatus.textContent = "Checklist exportado em JSON neste aparelho.";
+}
+
+function buildFullFamilyBackupPayload() {
+  syncSelectedDayIntoFamilyCache();
+  const dayIds = Array.from(new Set([
+    ...familyDayIdsCache,
+    getSelectedDayId(),
+    getCurrentDayId(),
+  ].filter(isDateId))).sort();
+  const days = {};
+  dayIds.forEach((dayId) => {
+    days[dayId] = normalizeDayState(getFamilyDayState(dayId));
+  });
+
+  return {
+    app: "Ninou",
+    version: NINOU_RUNTIME_VERSION,
+    exportedAt: new Date().toISOString(),
+    exportedBy: cloudUser?.email || familyAccess?.email || "",
+    familyAccess: familyAccess ? { ...familyAccess } : null,
+    selectedFamilyId: getSelectedFamilyIdForAdminOrAccess?.() || familyAccess?.familyId || "",
+    profile: normalizeBabyProfile(babyProfile),
+    weights: getSortedWeightsAsc(),
+    wakeWindowMinutes,
+    caregiver: loadCurrentCaregiverIdentity(),
+    days,
+    adminStats: latestAdminStats ? {
+      familyName: latestAdminStats.familyName || "",
+      scope: isGlobalAppAdmin() ? "global-admin" : "family",
+      familiesCount: isGlobalAppAdmin() ? (latestAdminStats.familiesCount || 0) : 1,
+      membersCount: latestAdminStats.membersCount || 0,
+      pendingInvitesCount: latestAdminStats.pendingInvitesCount || 0,
+      integrity: latestAdminStats.integrity || null,
+    } : null,
+  };
+}
+
+function exportFullFamilyBackup() {
+  if (!requireLogin("exportar backup da família")) return;
+  const payload = buildFullFamilyBackupPayload();
+  const familyId = sanitizeLocalStorageSegment(payload.selectedFamilyId || "familia");
+  const dateId = toDateInputValue(Date.now());
+  downloadFile(`ninou-backup-${familyId}-${dateId}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+  if (familyHealthStatus) familyHealthStatus.textContent = "Backup JSON gerado neste aparelho.";
+}
+
+async function repairFamilyIntegrity() {
+  if (!cloudUser || !hasFamilyAccess()) {
+    if (familyHealthStatus) familyHealthStatus.textContent = "Entre em uma família antes de corrigir vínculos.";
+    return false;
+  }
+  const familyId = familyAccess?.familyId || getSelectedFamilyIdForAdminOrAccess();
+  if (!familyId) {
+    if (familyHealthStatus) familyHealthStatus.textContent = "Nenhuma família selecionada para corrigir.";
+    return false;
+  }
+  if (!window.confirm("Corrigir vínculos básicos desta família? O Ninou preserva o histórico e só atualiza documentos mínimos de acesso/perfil.")) return false;
+
+  try {
+    const services = await getFirebaseServices();
+    const nowPayload = { updatedAt: services.serverTimestamp(), appVersion: NINOU_RUNTIME_VERSION };
+    await services.setDoc(services.doc(services.db, "families", familyId), {
+      familyId,
+      status: "active",
+      title: getProfileFamilyDisplayName() || latestAdminStats?.familyName || "Família Ninou",
+      ...nowPayload,
+    }, { merge: true });
+
+    const profileRef = services.doc(services.db, "families", familyId, "profile", "main");
+    const profileSnap = await services.getDoc(profileRef);
+    if (!profileSnap.exists?.()) {
+      await services.setDoc(profileRef, {
+        ...getProfilePayload(),
+        familyId,
+        createdAt: services.serverTimestamp(),
+        ...nowPayload,
+      }, { merge: true });
+    }
+
+    if (!isGlobalAppAdmin()) {
+      await saveAccountAccessToCloud({ ...familyAccess, familyId, role: familyAccess?.role || "responsavel", email: cloudUser.email || familyAccess?.email || "" }, cloudUser);
+    }
+
+    await writeFamilyAuditLog("family_integrity_repaired", { familyId, message: "Correção básica de vínculos e perfil executada pelo painel." });
+    await refreshAdminStats({ silent: true });
+    markCloudSynced();
+    if (familyHealthStatus) familyHealthStatus.textContent = "Vínculos básicos verificados e corrigidos quando necessário.";
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível corrigir integridade da família:", error);
+    if (familyHealthStatus) familyHealthStatus.textContent = getFirebaseErrorMessage(error);
+    return false;
+  }
 }
 
 function renderAdminDiagnostics() {
@@ -8908,7 +10078,9 @@ function renderAdminDiagnostics() {
 
   const familyId = familyAccess?.familyId || (isGlobalAppAdmin() ? getActiveAdminFamilyId() : "");
   if (diagnosticsVersionLabel) diagnosticsVersionLabel.textContent = `Ninou v${NINOU_RUNTIME_VERSION}`;
-  if (diagnosticsSummary) diagnosticsSummary.textContent = "Use este quadro para conferir se a conta, a família, o cache, o PWA e o App Check estão apontando para o lugar certo.";
+  if (diagnosticsSummary) diagnosticsSummary.textContent = isGlobalAppAdmin()
+    ? "Área administrativa global: use para suporte, revisão técnica e diagnóstico geral do app."
+    : "Diagnóstico da minha família: este quadro não lista nem consulta outras famílias.";
   if (diagnosticsUserLabel) diagnosticsUserLabel.textContent = cloudUser?.email || "sem login";
   if (diagnosticsFamilyLabel) {
     diagnosticsFamilyLabel.textContent = familyId || "não selecionada";
@@ -8920,8 +10092,8 @@ function renderAdminDiagnostics() {
     const integrity = latestAdminStats?.integrity || null;
     diagnosticsIntegrityLabel.textContent = integrity ? formatAdminIntegrityLabel(integrity) : "aguardando painel";
     diagnosticsIntegrityLabel.title = integrity
-      ? "Verifica perfil da família selecionada, famílias vazias, e-mails duplicados e contas sem vínculo."
-      : "Atualize o painel admin para montar o diagnóstico de integridade.";
+      ? (isGlobalAppAdmin() ? "Verifica perfil da família selecionada, famílias vazias, e-mails duplicados e contas sem vínculo." : "Verifica somente perfil, membros e convites da sua família.")
+      : "Atualize o painel para montar o diagnóstico de integridade.";
   }
   if (diagnosticsInviteLabel) {
     const pending = Number(latestAdminStats?.pendingInvitesCount || 0);
@@ -8933,13 +10105,17 @@ function renderAdminDiagnostics() {
     const status = firebaseServices?.appCheckStatus;
     diagnosticsAppCheckLabel.textContent = status?.configured
       ? "ativo"
-      : status?.reason === "init-error"
-        ? "erro"
-        : "pendente";
+      : status?.enabled === false
+        ? "opcional"
+        : status?.reason === "init-error" || status?.reason === "init-error-monitoring"
+          ? "erro"
+          : "pendente";
     diagnosticsAppCheckLabel.title = status?.configured
       ? "App Check inicializado no cliente."
-      : "Cole a Site Key do reCAPTCHA Enterprise em js/config/constants.js antes de ativar enforcement.";
+      : "App Check está opcional durante os testes. Mantenha o Firebase em modo Monitorando até o fluxo familiar ficar estável.";
   }
+  renderFamilyHealthPanel(latestAdminStats);
+  renderRealFamilyUseTestPanel(latestAdminStats);
 }
 
 function setSyncStatus(status = "offline", email = "", detail = "") {
@@ -8953,39 +10129,56 @@ function setSyncStatus(status = "offline", email = "", detail = "") {
   // falhas pontuais de leitura/escrita no Firestore devem aparecer como aviso,
   // mas não devem rebaixar visualmente o admin conectado para visitante/off-line.
   if ((status === "offline" || status === "error") && cloudUser && isGlobalAppAdmin(cloudUser)) {
-    status = "online";
+    status = isBrowserOnline() ? "online" : "pending";
     email = email || cloudUser.email || GLOBAL_APP_ADMIN_EMAIL;
+    detail = detail || (isBrowserOnline() ? "Painel administrativo ativo." : "Offline — alterações ficam neste aparelho até a conexão voltar.");
+  }
+
+  if (status === "online" && !isBrowserOnline() && cloudUser && hasFamilyAccess()) {
+    status = "pending";
+    detail = detail || getPendingSyncSummary();
   }
 
   const online = status === "online";
   const loading = status === "loading";
+  const saving = status === "saving";
+  const syncing = status === "syncing";
   const error = status === "error";
   const pending = status === "pending";
+  const offline = status === "offline" || !isBrowserOnline();
 
-  syncPill.textContent = online ? "Online" : loading ? "Conectando" : pending ? "Pendente" : error ? "Erro" : "Off-line";
+  syncPill.textContent = online ? "Sincronizado" : syncing ? "Sincronizando" : saving ? "Salvando" : loading ? "Conectando" : pending ? "Pendente" : error ? "Erro" : "Off-line";
   syncPill.classList.toggle("online", online);
-  syncPill.classList.toggle("offline", !online && !pending);
-  syncPill.classList.toggle("pending", pending);
+  syncPill.classList.toggle("offline", !online && !pending && !saving && !syncing);
+  syncPill.classList.toggle("pending", pending || saving || syncing);
   syncStatusTitle.textContent = online
-    ? "Sincronização ativa"
-    : loading
-      ? "Conectando"
-      : pending
-        ? "Aguardando sincronização"
-        : error
-          ? "Erro na sincronização"
-          : "Sincronização off-line";
+    ? "Tudo sincronizado"
+    : syncing
+      ? "Sincronizando pendências"
+      : saving
+        ? "Salvando..."
+        : loading
+          ? "Conectando"
+          : pending
+            ? (offline ? "Offline — salvo neste aparelho" : "Aguardando sincronização")
+            : error
+              ? "Erro na sincronização"
+              : "Sincronização off-line";
   syncStatusText.textContent = online
     ? (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen
       ? "Painel administrativo ativo. A rotina de uma família só deve ser aberta quando selecionada."
-      : "Rotina familiar sincronizando em tempo real.")
-    : loading
-      ? "Conectando ao Firebase..."
-      : pending
-        ? (detail || "Registro salvo neste aparelho. O Ninou tenta sincronizar novamente em instantes.")
-        : error
-          ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
-          : "Os dados ficam salvos neste aparelho. Entre para sincronizar entre celulares.";
+      : "Rotina familiar sincronizada entre os aparelhos autorizados.")
+    : syncing
+      ? (detail || "Enviando registros pendentes para a família.")
+      : saving
+        ? (detail || "Salvando neste aparelho e preparando envio para o Firebase.")
+        : loading
+          ? "Conectando ao Firebase..."
+          : pending
+            ? (detail || "Registro salvo neste aparelho. O Ninou tenta sincronizar novamente em instantes.")
+            : error
+              ? "Não foi possível sincronizar. Verifique conexão, login ou regras do Firestore."
+              : "Os dados ficam salvos neste aparelho. Entre para sincronizar entre celulares.";
 
   renderSyncDetails();
   renderAdminDiagnostics();
@@ -9203,6 +10396,9 @@ function saveManualEvent() {
   }
 
   const existingEvent = payload.editingEventId ? getEventById(payload.editingEventId) : null;
+  const validationWarning = getManualEventValidationWarning(payload, existingEvent);
+  if (validationWarning && !window.confirm(validationWarning)) return;
+  markRoutineMutationSnapshot(existingEvent ? "editou registro" : "adicionou registro");
   const payloadDayId = getDayIdFromStart(payload.start);
   const selectedBeforeSaveId = getSelectedDayId();
 
@@ -9235,6 +10431,7 @@ function saveManualEvent() {
       ? getWakeWindowForSleepStart(payload.start, existingEvent.id)
       : null;
     const actor = getCurrentActorProfile();
+    const editReason = String(window.prompt("Motivo da correção (opcional):", existingEvent.editReason || "") || "").trim().slice(0, 120);
     const standardFields = getStandardEventFields(payload.type, payload.start, actor);
     updateEventKeepingDuration(existingEvent, {
       ...standardFields,
@@ -9245,13 +10442,16 @@ function saveManualEvent() {
       notes: payload.notes,
       wakeWindowStartedAt: wakeWindow?.wakeWindowStartedAt,
       wakeWindowMs: wakeWindow?.wakeWindowMs,
+      ...getSleepClassificationFields(payload.type, payload.start, payload.hasManualEnd ? payload.end : payload.start),
       updatedAt: new Date().toISOString(),
       updatedByUid: actor.uid,
       updatedByEmail: actor.email,
       updatedByDeviceId: actor.deviceId,
       updatedByName: actor.displayName || actor.label,
       updatedByRelationship: actor.relationshipLabel,
+      updatedByLabel: formatCaregiverNameRole(actor.displayName || actor.label, actor.relationshipLabel) || actor.label,
       updatedAtClient: Date.now(),
+      editReason,
       lastAction: "editou",
     });
     pushAuditEntry("editou", existingEvent);
@@ -9327,6 +10527,7 @@ function deleteEvent(eventId) {
   if (!event) return;
   if (!window.confirm(buildDeleteConfirmationText(event, { getEventConfig, formatTime }))) return;
 
+  markRoutineMutationSnapshot("excluiu registro");
   pushAuditEntry("excluiu", event);
   state.deletedEventIds = [...new Set([...(state.deletedEventIds || []), event.id])].slice(-240);
   state.events = removeEventById(state.events, eventId).filter((item) => !getDeletedEventIdsFromState(state).has(item.id));
@@ -9435,7 +10636,7 @@ function getExportPayload() {
     events: buildExportEvents(events, getEventConfig),
     summary: {
       text: daySummaryText?.textContent || "",
-      exportedFrom: "Ninou v75.31",
+      exportedFrom: `Ninou v${NINOU_RUNTIME_VERSION}`,
     },
   };
 }
@@ -9524,25 +10725,84 @@ function buildRoutineSummaryText(payload = getExportPayload()) {
   ].filter(Boolean).join("\n");
 }
 
+function formatReportDateTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return `${date.toLocaleDateString("pt-BR")} às ${date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function formatReportDurationMinutes(minutes) {
+  const total = Number(minutes || 0);
+  if (!Number.isFinite(total) || total <= 0) return "-";
+  const hours = Math.floor(total / 60);
+  const mins = Math.round(total % 60);
+  if (hours && mins) return `${hours}h${String(mins).padStart(2, "0")}`;
+  if (hours) return `${hours}h`;
+  return `${mins}min`;
+}
+
+function getReportDayLabelFromIso(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sem data";
+  return date.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" }).replace(".", "");
+}
+
+function buildReportDayRows(events = []) {
+  const buckets = new Map();
+  for (const event of events || []) {
+    const date = new Date(event.start);
+    const key = Number.isNaN(date.getTime()) ? "sem-data" : date.toISOString().slice(0, 10);
+    const current = buckets.get(key) || { label: getReportDayLabelFromIso(event.start), events: 0, sleepMinutes: 0, feeds: 0, diapers: 0, bottleMl: 0 };
+    current.events += 1;
+    const type = String(event.type || "");
+    if (type.includes("sono") || type === "dormir") current.sleepMinutes += Number(event.durationMinutes || 0);
+    if (type === "mamadeira" || type === "amamentacao") current.feeds += 1;
+    if (type === "fralda") current.diapers += 1;
+    if (type === "mamadeira") {
+      const match = String(event.detail || "").match(/(\d+(?:[,.]\d+)?)\s*ml/i);
+      if (match) {
+        const value = Number(match[1].replace(",", "."));
+        if (Number.isFinite(value)) current.bottleMl += value;
+      }
+    }
+    buckets.set(key, current);
+  }
+  return [...buckets.entries()]
+    .sort(([a], [b]) => String(a).localeCompare(String(b)))
+    .map(([, item]) => `<tr><td><strong>${escapeHtml(item.label)}</strong></td><td>${escapeHtml(String(item.events))}</td><td>${escapeHtml(formatReportDurationMinutes(item.sleepMinutes))}</td><td>${escapeHtml(String(item.feeds))}${item.bottleMl ? `<small>${escapeHtml(Math.round(item.bottleMl))} ml</small>` : ""}</td><td>${escapeHtml(String(item.diapers))}</td></tr>`)
+    .join("") || `<tr><td colspan="5" class="empty-cell">Sem registros no período.</td></tr>`;
+}
+
 function buildPrintableReportHtml(payload = getExportPayload()) {
   const baby = getBabyDisplayName();
   const stats = getRoutineStats(payload);
   const weightInfo = getWeightReportInfo(payload.weights || []);
-  const eventRows = (payload.events || []).map((event, index) => {
-    const startTime = formatTime(new Date(event.start).getTime());
-    const endTime = event.end && event.end !== event.start ? formatTime(new Date(event.end).getTime()) : "";
+  const events = payload.events || [];
+  const eventRows = events.map((event) => {
+    const startText = formatReportDateTime(event.start);
+    const endText = event.end && event.end !== event.start ? formatReportDateTime(event.end) : "";
     const actor = getActorDisplayNameFromEvent(event);
-    const detail = [event.detail, event.notes ? `Obs.: ${event.notes}` : ""].filter(Boolean).join(" - ");
-    return `<tr><td><b>${escapeHtml(startTime)}</b>${endTime ? `<small>até ${escapeHtml(endTime)}</small>` : ""}</td><td><strong>${escapeHtml(event.title)}</strong><small>${escapeHtml(event.type || "")}</small></td><td>${escapeHtml(detail || "-")}</td><td>${escapeHtml(String(event.durationMinutes || "-"))}</td><td>${escapeHtml(actor || "-")}</td></tr>`;
-  }).join("") || `<tr><td colspan="5" class="empty-cell">Sem registros nesta data.</td></tr>`;
+    const detail = [event.detail, event.notes ? `Obs.: ${event.notes}` : ""].filter(Boolean).join(" — ");
+    const edited = event.updatedAt ? `Editado por ${event.updatedByName || event.updatedByEmail || "responsável"}` : "";
+    return `<tr>
+      <td><b>${escapeHtml(startText)}</b>${endText ? `<small>até ${escapeHtml(endText)}</small>` : ""}</td>
+      <td><strong>${escapeHtml(event.title)}</strong><small>${escapeHtml(event.type || "")}</small></td>
+      <td>${escapeHtml(detail || "-")}${edited ? `<small>${escapeHtml(edited)}</small>` : ""}</td>
+      <td>${escapeHtml(formatReportDurationMinutes(event.durationMinutes))}</td>
+      <td>${escapeHtml(actor || "Responsável")}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="5" class="empty-cell">Sem registros neste período.</td></tr>`;
 
   const weightRows = weightInfo.sorted.slice(-10).reverse().map((item) => `<tr><td>${escapeHtml(formatReportDate(item.date))}</td><td><strong>${escapeHtml(formatKg(item.value))}</strong></td></tr>`).join("") || `<tr><td colspan="2" class="empty-cell">Sem pesos cadastrados.</td></tr>`;
   const weightDelta = formatWeightDelta(weightInfo.diff);
   const reportTitle = `Relatório da rotina - ${baby}`;
   const safeSummary = escapeHtml(buildRoutineSummaryText(payload)).replaceAll("\n", "<br>");
-  const dayNotesBlock = payload.dayNotes ? `<section><h2>Observações do dia</h2><div class="growth-note">${escapeHtml(payload.dayNotes)}</div></section>` : "";
+  const dayRows = buildReportDayRows(events);
+  const dayNotesBlock = payload.dayNotes ? `<section><h2>Observações</h2><div class="growth-note">${escapeHtml(payload.dayNotes).replaceAll("\n", "<br>")}</div></section>` : "";
+  const generatedAt = new Date(payload.exportedAt).toLocaleString("pt-BR");
+  const latestText = stats.latest ? `${stats.latest.title} · ${formatReportDateTime(stats.latest.start)}` : "Sem registros";
   const cards = [
-    ["Sono", formatShortDuration(stats.sleepMinutes * 60000), payload.period?.mode === "day" ? "Total no dia" : "Total do período"],
+    ["Sono", formatReportDurationMinutes(stats.sleepMinutes), payload.period?.mode === "day" ? "Total no dia" : "Total do período"],
     ["Alimentações", String(stats.feeds), stats.bottleMl ? `${stats.bottleMl} ml em mamadeiras` : "Mamadas e mamadeiras"],
     ["Fraldas", String(stats.diapers), payload.period?.mode === "day" ? "Trocas do dia" : "Trocas no período"],
     ["Peso atual", weightInfo.latest ? formatKg(weightInfo.latest.value) : "Sem peso", weightInfo.latest ? formatReportDate(weightInfo.latest.date) : "Cadastre no perfil"],
@@ -9555,34 +10815,42 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(reportTitle)}</title>
   <style>
-    :root{--ink:#30263f;--muted:#756985;--soft:#f8f2e9;--card:#fffaf3;--line:#e8d9ca;--sage:#1f6b57;--purple:#4b3a78;--accent:#8f7cff}
+    :root{--ink:#30263f;--muted:#756985;--soft:#f8f2e9;--card:#fffaf3;--line:#e8d9ca;--sage:#1f6b57;--purple:#4b3a78;--accent:#8f7cff;--cream:#fffaf3;--lav:#efe7ff}
+    @page{size:A4;margin:12mm}
     *{box-sizing:border-box}
-    body{margin:0;background:#f2eadf;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
-    .page{width:100%;max-width:794px;margin:0 auto;padding:32px;box-sizing:border-box;overflow-wrap:anywhere}
-    .cover{padding:28px;border-radius:30px;background:linear-gradient(135deg,#fffaf3,#efe7ff);border:1px solid rgba(75,58,120,.12);box-shadow:0 18px 50px rgba(67,50,94,.12)}
-    .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+    body{margin:0;background:#f2eadf;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.42;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .page{width:100%;max-width:820px;margin:0 auto;padding:28px;overflow-wrap:anywhere}
+    .cover{padding:28px;border-radius:30px;background:linear-gradient(135deg,#fffaf3 0%,#f5edff 58%,#eaf8f1 100%);border:1px solid rgba(75,58,120,.12);box-shadow:0 18px 50px rgba(67,50,94,.12)}
+    .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
     .brand span{font-size:13px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
-    .brand b{padding:8px 14px;border-radius:999px;background:#e2f5eb;color:var(--sage);font-size:13px}
-    h1{font-size:34px;line-height:1.08;margin:0 0 8px}
-    .subtitle{font-size:16px;color:var(--muted);margin:0}
-    .summary{margin-top:22px;padding:18px;border-radius:22px;background:rgba(255,255,255,.64);border:1px solid rgba(75,58,120,.10)}
-    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
-    .cards article{padding:16px;border-radius:20px;background:var(--card);border:1px solid rgba(75,58,120,.10)}
-    .cards span,.cards small{display:block;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
-    .cards strong{display:block;margin:8px 0 4px;font-size:22px;color:var(--purple)}
-    section{margin-top:24px;padding:22px;border-radius:26px;background:#fffaf5;border:1px solid var(--line);break-inside:avoid;page-break-inside:avoid;overflow-wrap:anywhere}
-    h2{font-size:22px;margin:0 0 12px;color:var(--purple)}
-    .section-hint{margin:-4px 0 14px;color:var(--muted)}
-    .table-wrap{width:100%;overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
-    table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed;min-width:0}
-    th{background:#efe7ff;color:var(--purple);font-size:11px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px;word-break:normal;overflow-wrap:anywhere}
-    td{padding:11px 10px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9;word-break:normal;overflow-wrap:anywhere}
-    td small{display:block;color:var(--muted);margin-top:3px}
+    .brand b{padding:8px 14px;border-radius:999px;background:#e2f5eb;color:var(--sage);font-size:13px;white-space:nowrap}
+    h1{font-size:32px;line-height:1.08;margin:0 0 8px;color:var(--purple);letter-spacing:-.03em}
+    .subtitle{font-size:14px;color:var(--muted);margin:0;max-width:680px}
+    .meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+    .meta-grid div{padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(75,58,120,.10)}
+    .meta-grid span,.cards span,.cards small{display:block;color:var(--muted);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.05em}
+    .meta-grid strong{display:block;margin-top:4px;color:var(--ink);font-size:13px}
+    .summary{margin-top:18px;padding:16px;border-radius:22px;background:rgba(255,255,255,.70);border:1px solid rgba(75,58,120,.10);font-size:14px}
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+    .cards article{padding:15px;border-radius:20px;background:var(--card);border:1px solid rgba(75,58,120,.10);min-width:0}
+    .cards strong{display:block;margin:7px 0 3px;font-size:20px;color:var(--purple);letter-spacing:-.02em}
+    section{margin-top:20px;padding:20px;border-radius:24px;background:#fffaf5;border:1px solid var(--line);break-inside:avoid;page-break-inside:avoid;overflow-wrap:anywhere}
+    h2{font-size:20px;margin:0 0 10px;color:var(--purple);letter-spacing:-.02em}
+    .section-hint{margin:-2px 0 12px;color:var(--muted);font-size:13px}
+    .table-wrap{width:100%;overflow:hidden;border-radius:18px;border:1px solid var(--line);background:#fffdf9}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;table-layout:fixed}
+    th{background:#efe7ff;color:var(--purple);font-size:10px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:9px 8px;overflow-wrap:anywhere}
+    td{padding:10px 8px;border-top:1px solid var(--line);vertical-align:top;background:#fffdf9;overflow-wrap:anywhere;word-break:break-word}
+    tr{break-inside:avoid;page-break-inside:avoid}
+    td small{display:block;color:var(--muted);margin-top:3px;font-size:10.5px;line-height:1.35}
+    .events-table th:nth-child(1),.events-table td:nth-child(1){width:20%}.events-table th:nth-child(2),.events-table td:nth-child(2){width:19%}.events-table th:nth-child(3),.events-table td:nth-child(3){width:31%}.events-table th:nth-child(4),.events-table td:nth-child(4){width:10%}.events-table th:nth-child(5),.events-table td:nth-child(5){width:20%}
     .empty-cell{text-align:center;color:var(--muted);padding:22px}
-    .growth-note{padding:14px 16px;border-radius:18px;background:#e9f7f1;color:var(--sage);font-weight:800;margin-bottom:12px}
-    .footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
-    @media print{body{background:#fff}.page{max-width:100%;padding:0}.cover,section{box-shadow:none}.no-print{display:none}.cards{grid-template-columns:repeat(4,1fr)}table{font-size:11px}th,td{padding:8px 7px}}
-    @media (max-width:760px){.page{padding:14px}.cover,section{padding:18px;border-radius:22px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:26px}table{font-size:12px}th,td{padding:9px 8px}}
+    .growth-note{padding:14px 16px;border-radius:18px;background:#e9f7f1;color:var(--sage);font-weight:800;margin-bottom:12px;white-space:pre-line}
+    .disclaimer{margin-top:14px;padding:12px 14px;border-radius:18px;background:#f4edff;color:var(--purple);font-size:12px;font-weight:700;border:1px solid rgba(75,58,120,.10)}
+    .footer{margin-top:16px;color:var(--muted);font-size:11px;text-align:center}
+    .print-actions{display:flex;gap:10px;justify-content:center;margin:18px 0 0}.print-actions button{border:0;border-radius:999px;padding:10px 16px;background:var(--purple);color:white;font-weight:900;cursor:pointer}.print-actions button.secondary{background:#e2f5eb;color:var(--sage)}
+    @media print{body{background:#fff}.page{max-width:100%;padding:0}.cover,section{box-shadow:none}.print-actions{display:none}.cards{grid-template-columns:repeat(4,1fr)}table{font-size:10.8px}th,td{padding:7px 6px}.cover{border-radius:22px}section{border-radius:18px;margin-top:14px}h1{font-size:28px}h2{font-size:17px}.summary{font-size:12px}.footer{position:fixed;bottom:0;left:0;right:0}}
+    @media (max-width:760px){.page{padding:14px}.cover,section{padding:18px;border-radius:22px}.cards,.meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:26px}.table-wrap{overflow-x:auto}table{min-width:720px;font-size:12px}}
   </style>
 </head>
 <body>
@@ -9590,15 +10858,28 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
     <div class="cover">
       <div class="brand"><span>Ninou</span><b>Relatório da rotina</b></div>
       <h1>${escapeHtml(reportTitle)}</h1>
-      <p class="subtitle">Período: ${escapeHtml(payload.period?.label || formatReportDate(payload.day))} • Exportado em ${escapeHtml(new Date(payload.exportedAt).toLocaleString("pt-BR"))}${payload.exportedBy ? ` • por ${escapeHtml(payload.exportedBy)}` : ""}</p>
+      <p class="subtitle">Período: ${escapeHtml(payload.period?.label || formatReportDate(payload.day))} • Gerado em ${escapeHtml(generatedAt)}${payload.exportedBy ? ` • por ${escapeHtml(payload.exportedBy)}` : ""}</p>
+      <div class="meta-grid">
+        <div><span>Bebê</span><strong>${escapeHtml(baby)}</strong></div>
+        <div><span>Período analisado</span><strong>${escapeHtml(payload.period?.start || payload.day)} a ${escapeHtml(payload.period?.end || payload.day)}</strong></div>
+        <div><span>Último registro</span><strong>${escapeHtml(latestText)}</strong></div>
+      </div>
       <div class="summary">${safeSummary}</div>
       <div class="cards">${cards}</div>
+      <div class="disclaimer">Relatório informativo para acompanhamento familiar. Não substitui avaliação do pediatra ou orientação profissional.</div>
+      <div class="print-actions"><button onclick="window.print()">Imprimir ou salvar PDF</button><button class="secondary" onclick="window.close()">Fechar</button></div>
     </div>
 
     <section>
+      <h2>Resumo por dia</h2>
+      <p class="section-hint">Consolidação do período para evitar leitura incorreta de “últimos 30 dias” quando o usuário escolhe outro intervalo.</p>
+      <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Registros</th><th>Sono</th><th>Alimentações</th><th>Fraldas</th></tr></thead><tbody>${dayRows}</tbody></table></div>
+    </section>
+
+    <section>
       <h2>${payload.period?.mode === "day" ? "Rotina do dia" : "Rotina do período"}</h2>
-      <p class="section-hint">Linha do tempo dos registros selecionados para consulta, acompanhamento ou compartilhamento com responsáveis.</p>
-      <div class="table-wrap"><table><thead><tr><th>Hora</th><th>Registro</th><th>Detalhe</th><th>Min</th><th>Responsável</th></tr></thead><tbody>${eventRows}</tbody></table></div>
+      <p class="section-hint">Linha do tempo com horário, detalhe e responsável por cada registro.</p>
+      <div class="table-wrap"><table class="events-table"><thead><tr><th>Data e hora</th><th>Registro</th><th>Detalhe</th><th>Duração</th><th>Responsável</th></tr></thead><tbody>${eventRows}</tbody></table></div>
     </section>
 
     ${dayNotesBlock}
@@ -9609,9 +10890,9 @@ function buildPrintableReportHtml(payload = getExportPayload()) {
       <div class="table-wrap"><table><thead><tr><th>Data</th><th>Peso</th></tr></thead><tbody>${weightRows}</tbody></table></div>
     </section>
 
-    <p class="footer">Relatório gerado pelo Ninou. Use Arquivo > Imprimir ou Salvar como PDF.</p>
+    <p class="footer">Relatório gerado pelo Ninou v${escapeHtml(NINOU_RUNTIME_VERSION)}.</p>
   </main>
-  <script>window.onload=()=>setTimeout(()=>window.print(),350)</script>
+  <script>window.onload=()=>setTimeout(()=>window.print(),450)</script>
 </body>
 </html>`;
 }
@@ -9763,6 +11044,14 @@ timeline.addEventListener("click", (event) => {
   }
 });
 
+routineCorrectionButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const action = button.dataset.lastRecordAction;
+    if (action === "undo") restoreLastRoutineMutation();
+    if (action === "correct") correctLatestRoutineEvent();
+  });
+});
+
 startModeButtons.forEach((button) => {
   button.addEventListener("click", () => startRoutine(button.dataset.startMode));
 });
@@ -9799,6 +11088,18 @@ resetDataButton.addEventListener("click", () => withButtonBusy(resetDataButton, 
 exportJsonButton.addEventListener("click", () => withButtonBusy(exportJsonButton, "Gerando...", () => exportRoutine("json")));
 exportCsvButton.addEventListener("click", () => withButtonBusy(exportCsvButton, "Gerando...", () => exportRoutine("csv")));
 if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
+quickObservationButtons.forEach((button) => {
+  button.addEventListener("click", () => appendQuickObservation(button.dataset.quickObservation || button.textContent || ""));
+});
+if (addQuickObservationButton) addQuickObservationButton.addEventListener("click", () => appendQuickObservation(quickObservationInput?.value || ""));
+if (quickObservationInput) {
+  quickObservationInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      appendQuickObservation(quickObservationInput.value || "");
+    }
+  });
+}
 if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", () => withButtonBusy(saveCaregiverIdentityButton, "Salvando...", saveCaregiverIdentityFromForm));
 if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click", () => withButtonBusy(familyCreateInviteButton, "Criando...", createFamilyCaregiverInvite));
 if (familyCopyInviteButton) familyCopyInviteButton.addEventListener("click", copyFamilyInviteCode);
@@ -9806,6 +11107,7 @@ if (familyShareInviteWhatsAppButton) familyShareInviteWhatsAppButton.addEventLis
 if (familyJoinInviteButton) familyJoinInviteButton.addEventListener("click", openJoinFamilyModal);
 if (familyAccessSummaryInviteButton) familyAccessSummaryInviteButton.addEventListener("click", () => withButtonBusy(familyAccessSummaryInviteButton, "Criando...", createFamilyCaregiverInvite));
 if (familyAccessSummaryProfileButton) familyAccessSummaryProfileButton.addEventListener("click", openCaregiverEditor);
+if (familyLeaveButton) familyLeaveButton.addEventListener("click", () => withButtonBusy(familyLeaveButton, "Saindo...", leaveCurrentFamily));
 if (confirmJoinInviteButton) confirmJoinInviteButton.addEventListener("click", () => withButtonBusy(confirmJoinInviteButton, "Aceitando...", confirmJoinFamilyInvite));
 document.querySelectorAll("[data-close-join-modal]").forEach((button) => button.addEventListener("click", closeJoinFamilyModal));
 if (joinFamilyModal) joinFamilyModal.addEventListener("click", (event) => {
@@ -10133,6 +11435,27 @@ if (adminInvitePanel) {
       return;
     }
 
+    if (event.target.closest("#familyHealthRefreshButton")) {
+      if (familyHealthStatus) familyHealthStatus.textContent = "Verificando família...";
+      await refreshAdminStats();
+      return;
+    }
+
+    if (event.target.closest("#familyHealthRepairButton")) {
+      const button = event.target.closest("#familyHealthRepairButton");
+      button.disabled = true;
+      button.textContent = "Corrigindo...";
+      await repairFamilyIntegrity();
+      button.textContent = "Corrigir vínculos";
+      button.disabled = !cloudUser || !hasFamilyAccess();
+      return;
+    }
+
+    if (event.target.closest("#familyBackupJsonButton")) {
+      exportFullFamilyBackup();
+      return;
+    }
+
     const newFamilyResponsibleButton = event.target.closest("[data-fill-new-family-responsible]");
     if (newFamilyResponsibleButton) {
       if (adminNewResponsibleEmailInput) adminNewResponsibleEmailInput.value = newFamilyResponsibleButton.dataset.fillNewFamilyResponsible || "";
@@ -10170,8 +11493,65 @@ if (adminInvitePanel) {
       cancelButton.disabled = true;
       cancelButton.textContent = "Cancelando...";
       await cancelFamilyInvite(code);
+      return;
+    }
+
+    const roleButton = event.target.closest("[data-update-member-role]");
+    if (roleButton) {
+      const uid = roleButton.dataset.updateMemberRole || "";
+      const select = adminInvitePanel.querySelector(`[data-member-role-select="${CSS.escape(uid)}"]`);
+      roleButton.disabled = true;
+      roleButton.textContent = "Salvando...";
+      await updateFamilyMemberRole(uid, select?.value || "visualizacao");
+      return;
+    }
+
+    const removeButton = event.target.closest("[data-remove-member]");
+    if (removeButton) {
+      const uid = removeButton.dataset.removeMember || "";
+      const email = removeButton.dataset.removeMemberEmail || "";
+      removeButton.disabled = true;
+      removeButton.textContent = "Removendo...";
+      await removeFamilyMember(uid, email);
+      return;
     }
   });
+}
+if (familyHealthRefreshButton) {
+  familyHealthRefreshButton.addEventListener("click", async () => {
+    familyHealthRefreshButton.disabled = true;
+    familyHealthRefreshButton.textContent = "Verificando...";
+    if (familyHealthStatus) familyHealthStatus.textContent = "Verificando família...";
+    await refreshAdminStats();
+    familyHealthRefreshButton.textContent = "Verificar família";
+    familyHealthRefreshButton.disabled = false;
+  });
+}
+if (familyHealthRepairButton) {
+  familyHealthRepairButton.addEventListener("click", async () => {
+    familyHealthRepairButton.disabled = true;
+    familyHealthRepairButton.textContent = "Corrigindo...";
+    await repairFamilyIntegrity();
+    familyHealthRepairButton.textContent = "Corrigir vínculos";
+    familyHealthRepairButton.disabled = !cloudUser || !hasFamilyAccess();
+  });
+}
+if (familyBackupJsonButton) {
+  familyBackupJsonButton.addEventListener("click", () => exportFullFamilyBackup());
+}
+if (familyRealTestRefreshButton) {
+  familyRealTestRefreshButton.addEventListener("click", async () => {
+    familyRealTestRefreshButton.disabled = true;
+    familyRealTestRefreshButton.textContent = "Verificando...";
+    if (familyRealTestStatus) familyRealTestStatus.textContent = "Revisando fluxo familiar com os dados atuais...";
+    await refreshAdminStats();
+    renderRealFamilyUseTestPanel(latestAdminStats);
+    familyRealTestRefreshButton.textContent = "Rodar checklist";
+    familyRealTestRefreshButton.disabled = false;
+  });
+}
+if (familyRealTestExportButton) {
+  familyRealTestExportButton.addEventListener("click", () => exportRealFamilyUseChecklist());
 }
 if (inviteResult) {
   inviteResult.addEventListener("click", async (event) => {
@@ -10184,6 +11564,31 @@ if (inviteResult) {
     } catch {
       button.textContent = "Copie manualmente";
     }
+  });
+}
+
+
+function setAdminInterfaceMode(isAdvanced, { persist = true } = {}) {
+  const advanced = Boolean(isAdvanced);
+  document.body.classList.toggle("ninou-advanced-mode", advanced);
+  document.body.classList.toggle("ninou-simple-mode", !advanced);
+  if (adminModeToggleButton) {
+    adminModeToggleButton.setAttribute("aria-pressed", advanced ? "true" : "false");
+    adminModeToggleButton.textContent = advanced ? "Usar modo simples" : "Mostrar modo avançado";
+  }
+  if (adminModeHint) {
+    adminModeHint.textContent = advanced
+      ? "Modo avançado ativo: diagnóstico técnico, histórico completo, backup JSON e manutenção ficam visíveis."
+      : "Modo simples ativo: o Ninou mostra só o essencial e mantém diagnóstico técnico recolhido.";
+  }
+  if (persist) localStorage.setItem("ninou_admin_interface_mode", advanced ? "advanced" : "simple");
+}
+
+function initAdminInterfaceMode() {
+  const savedMode = localStorage.getItem("ninou_admin_interface_mode");
+  setAdminInterfaceMode(savedMode === "advanced", { persist: false });
+  adminModeToggleButton?.addEventListener("click", () => {
+    setAdminInterfaceMode(!document.body.classList.contains("ninou-advanced-mode"));
   });
 }
 
@@ -10207,6 +11612,7 @@ syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
 renderAuthControls();
+initAdminInterfaceMode();
 renderAll();
 updateDiaryChipsMoreButton();
 initSleepSounds();

@@ -1,0 +1,10 @@
+Ninou v75.75.13 — Revisão de registros e segurança da rotina
+
+- Adicionado card de correção rápida no Hoje, respeitando a paleta visual do app.
+- Adicionado botão para corrigir o último registro sem procurar no diário.
+- Adicionado desfazer da última alteração recente por até 10 minutos.
+- Registros editados agora exibem marcação de edição, responsável e motivo opcional.
+- Adicionadas validações para horários futuros, duplicidade no mesmo minuto, fralda duplicada, mamadeira incomum e sonos muito longos.
+- Sono agora recebe classificação visual: Soneca, Sono noturno ou Despertar noturno.
+- Resumo de Hoje foi reforçado com estado atual, sono total, mamadeiras, fraldas e últimos registros.
+- Mantidas as cores e acabamento visual do Ninou.

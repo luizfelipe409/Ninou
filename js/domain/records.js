@@ -142,9 +142,13 @@ export function normalizeEvent(event = {}) {
     updatedByDeviceId: typeof event.updatedByDeviceId === "string" ? event.updatedByDeviceId : "",
     updatedByName: typeof event.updatedByName === "string" ? event.updatedByName : "",
     updatedByRelationship: typeof event.updatedByRelationship === "string" ? event.updatedByRelationship : "",
+    updatedByLabel: typeof event.updatedByLabel === "string" ? event.updatedByLabel : "",
+    editReason: typeof event.editReason === "string" ? event.editReason : "",
     updatedAtClient: Number.isFinite(Number(event.updatedAtClient)) ? Number(event.updatedAtClient) : null,
     babyId: typeof event.babyId === "string" ? event.babyId : "",
     familyId: typeof event.familyId === "string" ? event.familyId : "",
+    sleepKind: typeof event.sleepKind === "string" ? event.sleepKind : "",
+    sleepKindLabel: typeof event.sleepKindLabel === "string" ? event.sleepKindLabel : "",
     lastAction: typeof event.lastAction === "string" ? event.lastAction : "",
     ...(Number.isFinite(wakeWindowStartedAt) && Number.isFinite(wakeWindowMs) && wakeWindowMs > 0
       ? { wakeWindowStartedAt, wakeWindowMs }

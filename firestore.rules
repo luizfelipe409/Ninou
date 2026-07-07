@@ -30,12 +30,28 @@ service cloud.firestore {
       return /databases/$(database)/documents/users/$(request.auth.uid)/families/$(familyId);
     }
 
+    function memberStatus(familyId) {
+      return isSignedIn() && exists(memberPath(familyId))
+        ? get(memberPath(familyId)).data.status
+        : "";
+    }
+
+    function userFamilyStatus(familyId) {
+      return isSignedIn() && exists(userFamilyPath(familyId))
+        ? get(userFamilyPath(familyId)).data.status
+        : "";
+    }
+
+    function activeStatus(status) {
+      return !(status in ["removed", "revoked", "inactive"]);
+    }
+
     function isFamilyMember(familyId) {
-      return isSignedIn() && exists(memberPath(familyId));
+      return isSignedIn() && exists(memberPath(familyId)) && activeStatus(memberStatus(familyId));
     }
 
     function hasUserFamilyLink(familyId) {
-      return isSignedIn() && exists(userFamilyPath(familyId));
+      return isSignedIn() && exists(userFamilyPath(familyId)) && activeStatus(userFamilyStatus(familyId));
     }
 
     function memberRole(familyId) {
@@ -110,6 +126,12 @@ service cloud.firestore {
         allow read: if isSignedIn();
         allow create, update: if isSignedIn();
         allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+      }
+
+      match /audit/{auditId} {
+        allow read: if canUseFamily(familyId);
+        allow create: if isGlobalAdmin() || isFamilyAdmin(familyId) || isFamilyMember(familyId);
+        allow update, delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
       }
 
       match /migrations/{migrationId} {
