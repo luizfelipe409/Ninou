@@ -1,0 +1,12 @@
+Ninou v75.75.58 — revisão geral do tema claro
+
+- Remove a faixa branca do cabeçalho no tema claro.
+- Restaura o sol diurno com brilho mais quente, natural e orgânico.
+- Ajusta o arco do relógio diurno para proporção mais próxima do relógio noturno.
+- Mantém o estado “dormindo” com linguagem diurna quando o tema claro está ativo.
+- Reforça contraste de textos, labels, botões, status, cartões e navegação no tema claro.
+- Revisa os cards do Diário para ficarem mais limpos e menos poluídos.
+- Ajusta botões Editar/Excluir no tema claro para melhor legibilidade.
+- Reforça gráficos da tela Dados: estado real de dados, barras visíveis e indicação correta quando não houver registros.
+- Mantém identificação automática: Felipe/Pai e Maria/Mãe pelos e-mails próprios.
+- Mantém CSS único: styles.css.

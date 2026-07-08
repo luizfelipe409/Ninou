@@ -1,0 +1,23 @@
+Revisão focada nos pontos observados nos vídeos e imagens enviados:
+
+1. Topo da Home
+   - Removida a faixa clara atrás de avatar/título/status.
+   - O cabeçalho agora fica integrado ao fundo claro.
+
+2. Relógio grande
+   - Sol restaurado com gradientes quentes, brilho mais natural e sem emoji artificial.
+   - Arco do modo claro usa proporções mais próximas do relógio noturno.
+   - Dormindo durante o dia não força aparência noturna.
+
+3. Tema claro
+   - Contraste reforçado em títulos, textos secundários, botões, status e cards.
+   - Navegação inferior clara revisada para leitura e acabamento.
+
+4. Diário
+   - Cards mais limpos, com menos ruído visual.
+   - Ícone, título, horário/detalhe e autor mantidos com hierarquia mais elegante.
+
+5. Dados/Gráficos
+   - O renderizador de gráficos agora marca corretamente quando há dados reais.
+   - Cards exibem mensagem de vazio somente quando realmente não houver registros.
+   - Barras com valores reais recebem classe e metadados para renderização mais consistente.

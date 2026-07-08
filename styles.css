@@ -29466,3 +29466,356 @@ body.day-theme .data-chart-card[data-has-real-data="false"] .bars.premium-bars::
     min-height: 44px !important;
   }
 }
+
+/* v75.75.58 — revisão geral do tema claro: legibilidade, topo limpo, sol natural e gráficos úteis. */
+body.day-theme {
+  --ninou-light-text: #2f214b;
+  --ninou-light-muted: rgba(65, 48, 86, .82);
+  --ninou-light-soft: rgba(82, 62, 102, .68);
+  --ninou-light-border: rgba(122, 88, 130, .16);
+  --ninou-light-card: rgba(255, 250, 244, .96);
+  --ninou-light-card-2: rgba(255, 242, 231, .94);
+}
+
+body.day-theme .phone-shell {
+  background:
+    radial-gradient(circle at 16% 1%, rgba(255, 220, 151, .28), transparent 30%),
+    radial-gradient(circle at 90% 8%, rgba(255, 184, 132, .12), transparent 28%),
+    linear-gradient(180deg, #fff3df 0%, #fff0d4 38%, #fff7ee 64%, #f8f0ff 100%) !important;
+  color: var(--ninou-light-text) !important;
+}
+
+/* Remove a faixa branca do cabeçalho no tema claro; os elementos ficam flutuando no fundo. */
+body.day-theme .app-header {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding-inline: 2px !important;
+  color: var(--ninou-light-text) !important;
+}
+
+body.day-theme .app-header .identity img {
+  background: rgba(255,255,255,.72) !important;
+  border: 2px solid rgba(255,255,255,.88) !important;
+  box-shadow: 0 10px 24px rgba(138, 91, 72, .12) !important;
+}
+
+body.day-theme .app-header .identity span {
+  color: rgba(75, 58, 96, .76) !important;
+  text-shadow: none !important;
+}
+
+body.day-theme .app-header .identity strong,
+body.day-theme #diaryTitle {
+  color: #2f214b !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.55) !important;
+}
+
+body.day-theme .sync-pill {
+  background: rgba(247, 226, 199, .78) !important;
+  color: #2f8c70 !important;
+  border: 1px solid rgba(80, 190, 151, .24) !important;
+  box-shadow: 0 10px 22px rgba(99, 79, 111, .07), inset 0 1px 0 rgba(255,255,255,.62) !important;
+}
+body.day-theme .sync-pill.offline,
+body.day-theme .sync-pill.pending {
+  color: #8a6751 !important;
+  border-color: rgba(206, 150, 86, .24) !important;
+}
+body.day-theme .sync-pill.online {
+  color: #2c9c7b !important;
+  background: rgba(232, 244, 205, .72) !important;
+  border-color: rgba(75, 191, 151, .28) !important;
+}
+
+/* Sol diurno restaurado com brilho quente e sem emoji artificial. */
+body.day-theme .screen[data-screen="today"] > .state-orbit,
+body.day-theme .state-orbit {
+  min-height: 348px !important;
+  border-radius: 34px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  border: 0 !important;
+  background:
+    radial-gradient(circle at 18% 17%, rgba(255, 224, 150, .94) 0 7%, rgba(255, 206, 119, .38) 8%, transparent 20%),
+    radial-gradient(circle at 78% 22%, rgba(255, 247, 220, .58), transparent 17%),
+    radial-gradient(circle at 62% 76%, rgba(255, 188, 120, .16), transparent 24%),
+    linear-gradient(180deg, rgba(255, 246, 229, .99), rgba(249, 229, 209, .97) 58%, rgba(243, 218, 205, .99)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.66),
+    0 22px 46px rgba(166,117,84,.14) !important;
+}
+
+body.day-theme .state-orbit::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  left: auto !important;
+  top: auto !important;
+  display: block !important;
+  border-radius: inherit !important;
+  font-size: 0 !important;
+  transform: none !important;
+  opacity: .92 !important;
+  background:
+    radial-gradient(circle at 18% 17%, rgba(255,255,255,.95) 0 9px, transparent 10px),
+    radial-gradient(circle at 18% 17%, rgba(255, 211, 122, .76) 0 30px, rgba(255, 211, 122, .30) 31px 61px, transparent 62px),
+    radial-gradient(circle at 30% 15%, rgba(255,255,255,.70) 0 3px, transparent 7px),
+    radial-gradient(circle at 38% 24%, rgba(255,255,255,.45) 0 2px, transparent 5px),
+    radial-gradient(circle at 78% 22%, rgba(255,250,231,.66) 0 4px, transparent 13px),
+    radial-gradient(circle at 72% 34%, rgba(255,244,214,.46) 0 2.4px, transparent 7px),
+    radial-gradient(circle at 66% 70%, rgba(255,243,210,.40) 0 2px, transparent 6px),
+    radial-gradient(circle at 90% 58%, rgba(255,238,202,.32) 0 2px, transparent 6px),
+    radial-gradient(circle at 24% 76%, rgba(255,244,218,.36) 0 2px, transparent 6px) !important;
+  box-shadow: none !important;
+  mix-blend-mode: normal !important;
+  animation: orbitSunFlares 18s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+body.day-theme .state-orbit::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255, 219, 143, .36), transparent 20%),
+    radial-gradient(circle at 64% 34%, rgba(255, 250, 231, .22), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 34%, transparent 100%) !important;
+  mix-blend-mode: screen !important;
+  opacity: .9 !important;
+  animation: orbitDayBreathe 12s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+body.day-theme .orbit-ring {
+  width: 292px !important;
+  height: 292px !important;
+  border-width: 28px !important;
+  border-style: solid !important;
+  border-color: rgba(214,154,60,.20) !important;
+  border-bottom-color: transparent !important;
+  transform: rotate(17deg) !important;
+  filter: none !important;
+  box-shadow: 0 18px 36px rgba(166,117,84,.10) !important;
+  opacity: 1 !important;
+  z-index: 1 !important;
+}
+
+body.day-theme .orbit-ring::before {
+  content: "" !important;
+  width: 28px !important;
+  height: 28px !important;
+  left: 7px !important;
+  bottom: 34px !important;
+  border-radius: 50% !important;
+  background: rgba(214,154,60,.20) !important;
+  box-shadow: 228px 0 0 rgba(214,154,60,.20) !important;
+}
+
+/* Sono durante o dia continua com linguagem diurna, não vira relógio noturno. */
+body.day-theme[data-routine-mode="sleeping"] .state-orbit,
+body.day-theme[data-day-period="night"] .state-orbit {
+  background:
+    radial-gradient(circle at 18% 17%, rgba(255, 224, 150, .94) 0 7%, rgba(255, 206, 119, .38) 8%, transparent 20%),
+    radial-gradient(circle at 78% 22%, rgba(255, 247, 220, .58), transparent 17%),
+    radial-gradient(circle at 62% 76%, rgba(255, 188, 120, .16), transparent 24%),
+    linear-gradient(180deg, rgba(255, 246, 229, .99), rgba(249, 229, 209, .97) 58%, rgba(243, 218, 205, .99)) !important;
+}
+
+body.day-theme .state-orbit #stateLabel,
+body.day-theme .state-orbit > span {
+  color: rgba(67, 49, 88, .78) !important;
+  font-weight: 950 !important;
+  letter-spacing: .075em !important;
+}
+body.day-theme .state-orbit #stateClock,
+body.day-theme .state-orbit strong {
+  color: #2d2049 !important;
+  text-shadow: 0 8px 28px rgba(255,255,255,.70) !important;
+}
+body.day-theme .state-orbit #stateHint,
+body.day-theme .state-orbit p {
+  color: rgba(67, 49, 82, .82) !important;
+  font-weight: 850 !important;
+}
+
+/* Reforço geral de leitura no tema claro. */
+body.day-theme h1,
+body.day-theme h2,
+body.day-theme h3,
+body.day-theme .section-title strong,
+body.day-theme .screen-title,
+body.day-theme .card-title,
+body.day-theme .live-assistant-card strong,
+body.day-theme .next-card strong,
+body.day-theme .day-summary-card strong,
+body.day-theme .routine-progress-card strong,
+body.day-theme .profile-card strong,
+body.day-theme .data-chart-card strong,
+body.day-theme .data-chart-card h3 {
+  color: #2f214b !important;
+}
+
+body.day-theme p,
+body.day-theme small,
+body.day-theme .muted,
+body.day-theme .section-helper,
+body.day-theme .chart-helper,
+body.day-theme .event-meta-extra,
+body.day-theme .event-author-line,
+body.day-theme .event-edit-note {
+  color: rgba(65,48,86,.76) !important;
+}
+
+body.day-theme .bottom-nav,
+body.day-theme .tabbar {
+  background: rgba(255, 244, 230, .84) !important;
+  border-color: rgba(131, 92, 129, .15) !important;
+  box-shadow: 0 -14px 36px rgba(115, 72, 102, .12), inset 0 1px 0 rgba(255,255,255,.70) !important;
+  backdrop-filter: blur(18px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
+}
+body.day-theme .bottom-nav button,
+body.day-theme .tabbar button {
+  color: rgba(66, 49, 86, .74) !important;
+}
+body.day-theme .bottom-nav button.active,
+body.day-theme .tabbar button.active {
+  color: #2f214b !important;
+  background: rgba(255,255,255,.62) !important;
+}
+
+/* Diário limpo: menos poluição visual, mais próximo do acabamento antigo. */
+body.day-theme .timeline .event-card,
+body.day-theme .event-card {
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 22px !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 9% 0%, rgba(255,255,255,.88), transparent 35%),
+    linear-gradient(160deg, rgba(255, 249, 241, .98), rgba(255, 238, 226, .94)) !important;
+  border-color: rgba(125, 86, 120, .14) !important;
+  box-shadow: 0 16px 34px rgba(130, 84, 74, .10), inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+body.day-theme .timeline .event-card .mark,
+body.day-theme .event-card .mark {
+  width: 54px !important;
+  height: 54px !important;
+  box-shadow: 0 12px 24px rgba(62, 34, 92, .16) !important;
+}
+body.day-theme .event-main {
+  gap: 12px !important;
+}
+body.day-theme .event-text strong {
+  color: #2f214b !important;
+  font-weight: 950 !important;
+}
+body.day-theme .event-meta-primary {
+  color: rgba(77, 58, 95, .82) !important;
+  font-weight: 760 !important;
+}
+body.day-theme .event-actions {
+  gap: 10px !important;
+}
+body.day-theme .event-action-button {
+  min-height: 46px !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+}
+body.day-theme .event-action-button.edit {
+  background: rgba(116, 80, 138, .065) !important;
+  color: #332451 !important;
+  border-color: rgba(116,80,138,.16) !important;
+}
+body.day-theme .event-action-button.delete {
+  background: rgba(255,154,118,.11) !important;
+  color: #c9684f !important;
+  border-color: rgba(255,154,118,.25) !important;
+}
+
+/* Gráficos: leitura real mesmo com poucos registros, sem aparência quebrada. */
+.data-chart-card[data-has-real-data="true"] .data-chart-empty-hint,
+.data-chart-card[data-has-data="true"] .data-chart-empty-hint,
+.bars[data-has-real-data="true"] + .data-chart-empty-hint {
+  display: none !important;
+}
+body.day-theme .data-chart-card {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255,255,255,.88), transparent 36%),
+    linear-gradient(160deg, rgba(255, 249, 241, .98), rgba(249,241,255,.94)) !important;
+  color: #2f214b !important;
+  border-color: rgba(108,76,138,.16) !important;
+}
+body.day-theme .data-bars,
+body.day-theme .data-bars-sleep,
+body.day-theme .bars.premium-bars {
+  height: 202px !important;
+  min-height: 202px !important;
+  border-radius: 22px !important;
+  background:
+    linear-gradient(to top, rgba(83,55,120,.09) 1px, transparent 1px) 0 30px / 100% 34px,
+    rgba(255,255,255,.64) !important;
+  border: 1px solid rgba(108,76,138,.13) !important;
+}
+body.day-theme .data-bars > span::before,
+body.day-theme .bars.premium-bars > span::before {
+  width: min(34px, 78%) !important;
+  min-height: 12px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 34%),
+    linear-gradient(180deg, #4fcda6 0%, #8067e8 100%) !important;
+  box-shadow: 0 12px 24px rgba(72,115,150,.14), inset 0 1px 0 rgba(255,255,255,.56) !important;
+}
+body.day-theme .data-bars > span.has-value::before,
+body.day-theme .bars.premium-bars > span.has-value::before {
+  min-height: 26px !important;
+}
+body.day-theme .data-bars b,
+body.day-theme .bars.premium-bars b {
+  color: #2f214b !important;
+  background: rgba(255,255,255,.76) !important;
+  border-color: rgba(87,68,124,.12) !important;
+  box-shadow: 0 6px 14px rgba(60, 45, 90, .08) !important;
+}
+body.day-theme .data-bars i,
+body.day-theme .bars.premium-bars i {
+  color: rgba(61,49,86,.72) !important;
+  font-weight: 900 !important;
+}
+
+@media (max-width: 420px) {
+  body.day-theme .screen[data-screen="today"] > .state-orbit,
+  body.day-theme .state-orbit {
+    min-height: 318px !important;
+  }
+  body.day-theme .orbit-ring {
+    width: 262px !important;
+    height: 262px !important;
+    border-width: 25px !important;
+  }
+  body.day-theme .orbit-ring::before {
+    width: 25px !important;
+    height: 25px !important;
+    left: 6px !important;
+    bottom: 31px !important;
+    box-shadow: 204px 0 0 rgba(214,154,60,.20) !important;
+  }
+  body.day-theme .app-header {
+    padding-inline: 0 !important;
+  }
+}

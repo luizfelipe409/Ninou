@@ -42,9 +42,22 @@ export function renderBarChart(container, days, getValue, options = {}) {
   container.classList.add("premium-bars");
   container.style.setProperty("--avg-y", averagePercent ? `${100 - averagePercent}%` : "100%");
   container.style.setProperty("--avg-opacity", averagePercent ? ".75" : "0");
+  const hasRealData = positiveValues.length > 0;
   container.dataset.hasAverage = averagePercent ? "true" : "false";
-  container.dataset.hasData = positiveValues.length ? "true" : "false";
+  container.dataset.hasData = hasRealData ? "true" : "false";
+  container.dataset.hasRealData = hasRealData ? "true" : "false";
   container.dataset.maxValue = String(maxValue);
+  const card = container.closest(".data-chart-card");
+  if (card) {
+    card.dataset.hasData = hasRealData ? "true" : "false";
+    card.dataset.hasRealData = hasRealData ? "true" : "false";
+    if (!card.querySelector(".data-chart-empty-hint")) {
+      const hint = document.createElement("small");
+      hint.className = "data-chart-empty-hint";
+      hint.textContent = "Sem registros reais neste período.";
+      card.append(hint);
+    }
+  }
   container.innerHTML = "";
 
   days.forEach((item, index) => {
