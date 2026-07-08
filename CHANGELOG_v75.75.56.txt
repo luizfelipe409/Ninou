@@ -1,4 +1,4 @@
-Ninou v75.75.56 — revisão visual, primeiro acesso e dados
+Ninou v75.75.57 — revisão visual, primeiro acesso e dados
 
 - Reforça contraste do tema claro em cards, textos, inputs e botões.
 - Redesenha o relógio grande no tema claro com identidade diurna e sol.

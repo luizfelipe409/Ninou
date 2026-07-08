@@ -55,9 +55,13 @@ export function renderBarChart(container, days, getValue, options = {}) {
     bar.style.setProperty("--h", `${height}%`);
     bar.style.setProperty("--delay", `${index * 36}ms`);
     bar.dataset.value = formatted;
+    bar.dataset.rawValue = String(value);
     bar.dataset.day = item.label;
+    bar.style.setProperty("--value", String(value));
     bar.setAttribute("aria-label", `${item.label}: ${formatted}`);
+    bar.title = `${item.label}: ${formatted}`;
     bar.classList.toggle("is-empty", value <= 0);
+    bar.classList.toggle("has-value", value > 0);
     bar.innerHTML = `<b>${escapeHtml(formatted)}</b><i>${escapeHtml(item.label)}</i>`;
     container.append(bar);
   });

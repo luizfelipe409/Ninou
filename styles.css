@@ -28735,7 +28735,7 @@ body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button svg {
 }
 
 
-/* v75.75.56 — revisão visual real: tema claro, primeiro acesso, dados e perfil familiar. */
+/* v75.75.57 — revisão visual real: tema claro, primeiro acesso, dados e perfil familiar. */
 body.day-theme {
   --ninou-light-text: #332451;
   --ninou-light-muted: rgba(61, 49, 86, .72);
@@ -29067,8 +29067,402 @@ body.day-theme textarea::placeholder { color: rgba(61,49,86,.48) !important; }
   .first-routine-card { padding: 20px; border-radius: 28px 28px 24px 24px; }
 }
 
-/* v75.75.56 — identidade automática dos pais: sem botão Trocar no uso normal. */
+/* v75.75.57 — identidade automática dos pais: sem botão Trocar no uso normal. */
 .today-caregiver-card.caregiver-auto-locked .today-caregiver-edit,
 .today-caregiver-card[data-auto-locked="true"] .today-caregiver-edit {
   display: none !important;
+}
+
+/* v75.75.57 — restauração premium da Home, Diário e gráficos reais.
+   Escopo: relógio diurno proporcional ao noturno, Home limpa sem card de cuidador,
+   cards do Diário menos poluídos e gráficos de Dados legíveis. */
+
+/* Home: o cuidador é automático pelos e-mails do pai/mãe e não ocupa a tela inicial. */
+.screen[data-screen="today"] #todayCaregiverCard,
+#todayCaregiverCard.home-caregiver-card-retired {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Relógio grande: proporção consistente entre tema claro e noturno. */
+.screen[data-screen="today"] > .state-orbit,
+.state-orbit {
+  min-height: clamp(314px, 56vw, 362px) !important;
+  border-radius: 34px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+.state-orbit .orbit-ring,
+.orbit-ring {
+  width: clamp(244px, 70vw, 292px) !important;
+  height: clamp(244px, 70vw, 292px) !important;
+  border-width: clamp(22px, 6vw, 28px) !important;
+  border-style: solid !important;
+  border-bottom-color: transparent !important;
+  transform: rotate(17deg) !important;
+  opacity: .98 !important;
+  z-index: 1 !important;
+}
+
+.orbit-ring::before {
+  width: clamp(21px, 5.5vw, 28px) !important;
+  height: clamp(21px, 5.5vw, 28px) !important;
+  left: clamp(5px, 2vw, 7px) !important;
+  bottom: clamp(28px, 8vw, 34px) !important;
+  border-radius: 999px !important;
+}
+
+body.day-theme .state-orbit {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255,255,255,.96) 0 12px, transparent 13px),
+    radial-gradient(circle at 18% 20%, rgba(255,218,126,.72) 0 42px, rgba(255,218,126,.22) 43px 88px, transparent 89px),
+    radial-gradient(circle at 32% 18%, rgba(255,255,255,.54) 0 4px, transparent 8px),
+    radial-gradient(circle at 40% 27%, rgba(255,255,255,.34) 0 3px, transparent 8px),
+    radial-gradient(circle at 76% 74%, rgba(242,174,91,.16), transparent 23%),
+    linear-gradient(155deg, #fff4d4 0%, #fffaf2 42%, #f8edff 100%) !important;
+  border: 1px solid rgba(245, 180, 104, .16) !important;
+  box-shadow:
+    0 24px 58px rgba(196, 128, 70, .15),
+    inset 0 1px 0 rgba(255,255,255,.94) !important;
+}
+
+body.day-theme .state-orbit::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  left: auto !important;
+  top: auto !important;
+  display: block !important;
+  border-radius: inherit !important;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255,255,255,.98) 0 12px, transparent 13px),
+    radial-gradient(circle at 18% 20%, rgba(255,214,118,.50) 0 58px, transparent 102px),
+    radial-gradient(circle at 36% 16%, rgba(255,255,255,.40) 0 3px, transparent 9px),
+    radial-gradient(circle at 24% 76%, rgba(255,238,194,.36) 0 5px, transparent 16px),
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent 58%) !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  animation: orbitDayBreathe 16s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+body.day-theme .state-orbit::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: auto 8% 6% auto !important;
+  width: 28% !important;
+  height: 28% !important;
+  min-width: 92px !important;
+  min-height: 92px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  background: radial-gradient(circle, rgba(255,202,104,.22), transparent 68%) !important;
+  opacity: .8 !important;
+  mix-blend-mode: multiply !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+body.day-theme .orbit-ring {
+  border-color: rgba(224, 163, 72, .22) !important;
+  border-bottom-color: transparent !important;
+  filter: drop-shadow(0 18px 22px rgba(211,141,70,.10)) !important;
+  box-shadow: none !important;
+}
+
+body.day-theme .orbit-ring::before {
+  background: rgba(230, 163, 70, .24) !important;
+  box-shadow: 228px 0 0 rgba(230, 163, 70, .24) !important;
+}
+
+body.day-theme .state-orbit #stateLabel,
+body.day-theme .state-orbit > span {
+  color: rgba(76, 58, 96, .70) !important;
+  letter-spacing: .055em !important;
+}
+
+body.day-theme .state-orbit #stateClock,
+body.day-theme .state-orbit strong {
+  color: #2f214b !important;
+  font-size: clamp(3.25rem, 13vw, 4.72rem) !important;
+  text-shadow: 0 8px 30px rgba(255,255,255,.62) !important;
+}
+
+body.day-theme .state-orbit #stateHint,
+body.day-theme .state-orbit p {
+  color: rgba(75, 57, 90, .74) !important;
+  max-width: 82% !important;
+}
+
+/* Quando o bebê está dormindo durante o dia, o relógio continua diurno; o estado é sono, não modo noturno. */
+body.day-theme[data-routine-mode="sleeping"] .state-orbit,
+body.day-theme[data-day-period="night"] .state-orbit {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255,255,255,.96) 0 12px, transparent 13px),
+    radial-gradient(circle at 18% 20%, rgba(255,218,126,.68) 0 42px, rgba(255,218,126,.20) 43px 88px, transparent 89px),
+    radial-gradient(circle at 76% 74%, rgba(242,174,91,.14), transparent 23%),
+    linear-gradient(155deg, #fff1d2 0%, #fff8ef 48%, #f7ecff 100%) !important;
+}
+
+/* Diário: volta para cards mais limpos, parecidos com o acabamento antigo. */
+.timeline {
+  gap: 18px !important;
+}
+.timeline::before {
+  display: none !important;
+}
+.timeline .event-card,
+.event-card {
+  display: grid !important;
+  grid-template-columns: 64px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 18px !important;
+  padding: 22px !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 6% 8%, rgba(255,255,255,.09), transparent 34%),
+    linear-gradient(160deg, rgba(34, 27, 72, .92), rgba(25, 21, 58, .92)) !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  box-shadow: 0 18px 44px rgba(5, 4, 19, .22), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+
+.timeline .event-card .mark,
+.event-card .mark {
+  width: 58px !important;
+  height: 58px !important;
+  align-self: start !important;
+  margin-top: 4px !important;
+  box-shadow: 0 12px 26px rgba(28,16,65,.22) !important;
+}
+
+.event-main {
+  min-width: 0 !important;
+  display: grid !important;
+  gap: 14px !important;
+}
+.event-text {
+  display: grid !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+}
+.event-text strong {
+  color: rgba(252,249,255,.96) !important;
+  font-size: clamp(1.24rem, 5vw, 1.52rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.035em !important;
+}
+.event-meta-primary {
+  color: rgba(225,218,255,.78) !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  font-size: clamp(.98rem, 4vw, 1.08rem) !important;
+  font-weight: 780 !important;
+}
+.event-meta-extra,
+.event-author-line,
+.event-edit-note,
+.event-text p {
+  color: rgba(225,218,255,.58) !important;
+  font-size: .92rem !important;
+  font-weight: 720 !important;
+  line-height: 1.28 !important;
+}
+.event-author-line {
+  display: block !important;
+}
+.event-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+.event-action-button {
+  min-height: 46px !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  box-shadow: none !important;
+}
+.event-action-button.edit {
+  background: rgba(255,255,255,.045) !important;
+  color: rgba(252,249,255,.92) !important;
+  border-color: rgba(255,255,255,.10) !important;
+}
+.event-action-button.delete {
+  background: rgba(255,154,118,.08) !important;
+  color: #ffb49a !important;
+  border-color: rgba(255,154,118,.20) !important;
+}
+
+body.day-theme .timeline .event-card,
+body.day-theme .event-card {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255,255,255,.88), transparent 36%),
+    linear-gradient(160deg, rgba(255, 249, 240, .98), rgba(255, 240, 230, .94)) !important;
+  border-color: rgba(120, 85, 118, .14) !important;
+  box-shadow: 0 16px 34px rgba(130, 84, 74, .10), inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+body.day-theme .event-text strong {
+  color: #332451 !important;
+}
+body.day-theme .event-meta-primary {
+  color: rgba(83, 66, 104, .76) !important;
+}
+body.day-theme .event-meta-extra,
+body.day-theme .event-author-line,
+body.day-theme .event-edit-note,
+body.day-theme .event-text p {
+  color: rgba(91, 73, 100, .62) !important;
+}
+body.day-theme .event-action-button.edit {
+  background: rgba(116, 80, 138, .06) !important;
+  color: #392651 !important;
+  border-color: rgba(116, 80, 138, .14) !important;
+}
+body.day-theme .event-action-button.delete {
+  background: rgba(255,154,118,.10) !important;
+  color: #d8795d !important;
+  border-color: rgba(255,154,118,.25) !important;
+}
+
+/* Dados: barras realmente visíveis e legíveis. */
+.data-chart-card {
+  overflow: visible !important;
+}
+.data-bars,
+.data-bars-sleep,
+.bars.premium-bars {
+  height: 190px !important;
+  min-height: 190px !important;
+  padding: 30px 10px 30px !important;
+  align-items: end !important;
+  overflow: visible !important;
+  background:
+    linear-gradient(to top, rgba(255,255,255,.07) 1px, transparent 1px) 0 27px / 100% 32px,
+    rgba(255,255,255,.035) !important;
+}
+.data-bars > span,
+.bars.premium-bars > span {
+  position: relative !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  padding-top: 0 !important;
+}
+.data-bars > span::before,
+.bars.premium-bars > span::before {
+  width: min(30px, 78%) !important;
+  min-height: 10px !important;
+  height: var(--h, 8%) !important;
+  border-radius: 999px 999px 10px 10px !important;
+  opacity: 1 !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,0) 34%),
+    linear-gradient(180deg, #79f3cf 0%, #9275ff 100%) !important;
+  box-shadow: 0 12px 24px rgba(103,241,200,.18), inset 0 1px 0 rgba(255,255,255,.46) !important;
+}
+.data-bars > span.has-value::before,
+.bars.premium-bars > span.has-value::before {
+  min-height: 22px !important;
+}
+.data-bars > span.is-empty::before,
+.bars.premium-bars > span.is-empty::before {
+  width: min(24px, 68%) !important;
+  height: 9px !important;
+  min-height: 9px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.16) !important;
+  box-shadow: none !important;
+}
+.data-bars b,
+.bars.premium-bars b {
+  top: -24px !important;
+  background: rgba(255,255,255,.09) !important;
+  color: rgba(252,249,255,.92) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+}
+.data-bars i,
+.bars.premium-bars i {
+  bottom: -25px !important;
+  color: rgba(225,218,255,.72) !important;
+}
+.data-chart-card[data-has-real-data="true"] .data-chart-empty-hint {
+  display: none !important;
+}
+.data-chart-card[data-has-real-data="false"] .data-bars::before,
+.data-chart-card[data-has-real-data="false"] .bars.premium-bars::before {
+  content: "Sem registros reais neste período";
+  position: absolute;
+  inset: 42% 12px auto;
+  text-align: center;
+  color: rgba(225,218,255,.52);
+  font-size: .78rem;
+  font-weight: 850;
+  z-index: 2;
+}
+body.day-theme .data-chart-card {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255,255,255,.86), transparent 36%),
+    linear-gradient(160deg, rgba(255,249,241,.96), rgba(249,241,255,.92)) !important;
+  border-color: rgba(108,76,138,.14) !important;
+  box-shadow: 0 16px 34px rgba(108,76,138,.09), inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+body.day-theme .data-bars,
+body.day-theme .bars.premium-bars {
+  background:
+    linear-gradient(to top, rgba(83, 55, 120, .08) 1px, transparent 1px) 0 27px / 100% 32px,
+    rgba(255,255,255,.58) !important;
+  border-color: rgba(108,76,138,.12) !important;
+}
+body.day-theme .data-bars > span::before,
+body.day-theme .bars.premium-bars > span::before {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.60), rgba(255,255,255,0) 34%),
+    linear-gradient(180deg, #50cda7 0%, #8067e8 100%) !important;
+  box-shadow: 0 12px 24px rgba(72,115,150,.14), inset 0 1px 0 rgba(255,255,255,.56) !important;
+}
+body.day-theme .data-bars > span.is-empty::before,
+body.day-theme .bars.premium-bars > span.is-empty::before {
+  background: rgba(89,63,116,.16) !important;
+}
+body.day-theme .data-bars b,
+body.day-theme .bars.premium-bars b {
+  background: rgba(87,68,124,.08) !important;
+  color: rgba(51,36,81,.86) !important;
+  border-color: rgba(87,68,124,.10) !important;
+}
+body.day-theme .data-bars i,
+body.day-theme .bars.premium-bars i {
+  color: rgba(61,49,86,.62) !important;
+}
+body.day-theme .data-chart-card[data-has-real-data="false"] .data-bars::before,
+body.day-theme .data-chart-card[data-has-real-data="false"] .bars.premium-bars::before {
+  color: rgba(61,49,86,.52) !important;
+}
+
+@media (max-width: 420px) {
+  .timeline .event-card,
+  .event-card {
+    grid-template-columns: 56px minmax(0, 1fr) !important;
+    gap: 14px !important;
+    padding: 18px !important;
+    border-radius: 26px !important;
+  }
+  .timeline .event-card .mark,
+  .event-card .mark {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .event-actions {
+    gap: 10px !important;
+  }
+  .event-action-button {
+    min-height: 44px !important;
+  }
 }

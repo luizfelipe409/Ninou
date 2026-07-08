@@ -230,8 +230,9 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
   const parts = getEventDisplayParts(event);
   const notes = event.notes && event.type !== "medicamento" ? `<p>${escapeHtml(event.notes)}</p>` : "";
   const actorName = getEventAuthorLabel(event);
-  const registeredLine = `Registrado por ${actorName} • ${getDisplayStartLabel(event)}`;
+  const primaryLine = parts.primary || parts.compact || getDisplayStartLabel(event);
   const extraMeta = getRoutineDetailLine(event, parts);
+  const registeredLine = `Adicionado por ${actorName}`;
   const editedBy = String(event.updatedByLabel || event.updatedByName || "").trim();
   const editedAt = Number(event.updatedAtClient) || (event.updatedAt ? Date.parse(event.updatedAt) : 0);
   const editReason = String(event.editReason || "").trim();
@@ -243,8 +244,9 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
     <div class="event-main">
       <div class="event-text">
         <strong>${escapeHtml(config.title)}</strong>
-        <span class="event-meta-primary">${escapeHtml(registeredLine)}</span>
-        ${extraMeta ? `<span class="event-meta-extra">${escapeHtml(extraMeta)}</span>` : ""}
+        <span class="event-meta-primary">${escapeHtml(primaryLine)}</span>
+        ${extraMeta && !primaryLine.includes(extraMeta) ? `<span class="event-meta-extra">${escapeHtml(extraMeta)}</span>` : ""}
+        <span class="event-author-line">${escapeHtml(registeredLine)}</span>
         ${editedLine ? `<span class="event-edit-note">${escapeHtml(editedLine)}</span>` : ""}
         ${notes}
       </div>

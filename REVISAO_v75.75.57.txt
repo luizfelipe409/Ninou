@@ -1,0 +1,10 @@
+Revisão v75.75.57
+
+Checklist aplicado:
+1. Home sem card de "registrando neste aparelho".
+2. Relógio claro com sol realista, sem emoji solto e sem aparência noturna.
+3. Arco do relógio claro com proporção compatível com o noturno.
+4. Cards do Diário mais próximos do acabamento premium anterior.
+5. Gráficos de Dados com barras explícitas e legíveis.
+6. Validação JavaScript por node --check.
+7. App versionado para 75.75.57 em index, manifest, service worker, app loader e runtime.

@@ -1,6 +1,6 @@
-// Ninou v75.75.56 - carregador de compatibilidade.
+// Ninou v75.75.57 - carregador de compatibilidade.
 // Mantido apenas para index.html antigo/PWA antigo; a versão atual carrega js/app.legacy.js diretamente.
-const NINOU_APP_VERSION = "75.75.56";
+const NINOU_APP_VERSION = "75.75.57";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);
