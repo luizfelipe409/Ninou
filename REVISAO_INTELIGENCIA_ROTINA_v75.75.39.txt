@@ -1,0 +1,17 @@
+Revisão v75.75.39
+
+Escopo:
+1. Próxima sugestão inteligente na tela Hoje.
+2. Resumo diário mais útil.
+3. Alertas leves de sono, alimentação e fralda.
+4. Central de avisos com priorização.
+5. Responsividade mobile dos cards inteligentes.
+6. Tema claro/escuro dos novos estados visuais.
+7. Preservação das funções críticas.
+
+Sem alteração:
+- Firebase/Firestore rules.
+- Fluxo de família e convites.
+- Login e logout.
+- Sair e limpar dados deste aparelho.
+- Exportações PDF, WhatsApp, CSV e JSON.

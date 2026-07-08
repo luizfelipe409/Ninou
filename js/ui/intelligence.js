@@ -120,9 +120,105 @@ export function renderSmartInsight({
   `;
 }
 
-export function renderLiveAssistant({ card } = {}) {
-  // v75.1: removido visualmente para evitar duplicidade com o card principal e o card Próxima soneca.
-  if (card) card.hidden = true;
+export function renderLiveAssistant({
+  card,
+  state,
+  now = Date.now(),
+  todayStart,
+  dayMs = DAY,
+  wakeWindowMinutes = 70,
+  formatShortDuration,
+  formatTime,
+  getSleepMsForRange,
+} = {}) {
+  if (!card) return;
+  const events = getEventsForDay(state?.events || [], todayStart, dayMs);
+  const ordered = sortEventsByStartAsc(events);
+  const latest = ordered[ordered.length - 1] || null;
+  const latestFeed = [...ordered].reverse().find((event) => event.type === "mamadeira" || event.type === "amamentacao");
+  const latestDiaper = [...ordered].reverse().find((event) => event.type === "fralda");
+  const sleepEvents = ordered.filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start));
+  const sleepToday = typeof getSleepMsForRange === "function"
+    ? getSleepMsForRange(todayStart, Math.min(todayStart + dayMs, now))
+    : 0;
+
+  let kicker = "Próxima sugestão";
+  let title = "Comece com o primeiro registro";
+  let text = "Registre sono, mamada, fralda ou medicamento para o Ninou orientar a rotina com cuidado.";
+  let badge = "✨";
+  let tone = "neutral";
+
+  const activeStartedAt = Number(state?.activeStartedAt);
+  if (state?.mode === "sleeping" && Number.isFinite(activeStartedAt)) {
+    const sleepingMs = Math.max(0, now - activeStartedAt);
+    kicker = "Sono em andamento";
+    title = "Quando acordar, registre o despertar";
+    text = `O sono está em andamento há ${formatShortDuration(sleepingMs)}. Ao acordar, toque em Acordou para fechar o ciclo.`;
+    badge = "🌙";
+    tone = "sleep";
+  } else if (state?.mode === "awake" && Number.isFinite(activeStartedAt)) {
+    const awakeMs = Math.max(0, now - activeStartedAt);
+    const targetMs = Math.max(30, Number(wakeWindowMinutes) || 70) * 60000;
+    const remainingMs = targetMs - awakeMs;
+    kicker = "Janela acordado";
+    badge = "🌤️";
+    if (remainingMs > 20 * 60000) {
+      title = "Rotina em acompanhamento";
+      text = `Está acordado há ${formatShortDuration(awakeMs)}. A próxima janela de sono ainda parece distante pela referência atual.`;
+      tone = "neutral";
+    } else if (remainingMs > 0) {
+      title = "Observe sinais de sono em breve";
+      text = `Faltam cerca de ${formatShortDuration(remainingMs)} para a janela de sono de referência. Observe bocejos, irritação ou olhar mais parado.`;
+      tone = "warm";
+    } else {
+      title = "Pode ser hora de preparar a soneca";
+      text = `Já passou da janela de referência em ${formatShortDuration(Math.abs(remainingMs))}. Sem pressa: observe os sinais do bebê.`;
+      tone = "attention";
+    }
+  } else if (!events.length) {
+    kicker = "Dia pronto para começar";
+    title = "Primeiro cuidado do dia";
+    text = "Depois do primeiro registro, o Ninou começa a sugerir próximos passos e montar o resumo do dia.";
+    badge = "☀️";
+  } else if (latestFeed && now - Number(latestFeed.start) >= 3 * HOUR) {
+    const elapsed = now - Number(latestFeed.start);
+    kicker = "Alimentação";
+    title = "Confira se já faz sentido mamar";
+    text = `A última alimentação registrada foi há ${formatShortDuration(elapsed)}, às ${formatTime(latestFeed.start)}.`;
+    badge = "🍼";
+    tone = "warm";
+  } else if (latestDiaper && now - Number(latestDiaper.start) >= 3.5 * HOUR) {
+    const elapsed = now - Number(latestDiaper.start);
+    kicker = "Fralda";
+    title = "Vale conferir a próxima troca";
+    text = `A última fralda registrada foi há ${formatShortDuration(elapsed)}, às ${formatTime(latestDiaper.start)}.`;
+    badge = "🧷";
+    tone = "warm";
+  } else if (sleepEvents.length && sleepToday) {
+    kicker = "Sono acompanhado";
+    title = "Sono do dia registrado";
+    text = `Hoje já foram ${sleepEvents.length} ${sleepEvents.length === 1 ? "sono" : "sonos"} e ${formatShortDuration(sleepToday)} de sono acumulado.`;
+    badge = "🌙";
+    tone = "sleep";
+  } else if (latest) {
+    const config = getEventConfig(latest.type);
+    kicker = "Tudo organizado";
+    title = "Último cuidado registrado";
+    text = `${config.title} registrado às ${formatTime(latest.start)}. O Ninou segue acompanhando a rotina.`;
+    badge = "✓";
+    tone = "ok";
+  }
+
+  card.hidden = false;
+  card.dataset.tone = tone;
+  card.innerHTML = `
+    <div>
+      <span id="liveAssistantKicker">${escapeHtml(kicker)}</span>
+      <strong id="liveAssistantTitle">${escapeHtml(title)}</strong>
+      <p id="liveAssistantText">${escapeHtml(text)}</p>
+    </div>
+    <div id="liveAssistantBadge" class="live-assistant-badge">${escapeHtml(badge)}</div>
+  `;
 }
 
 export function renderDailyRhythm({

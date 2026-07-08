@@ -1,0 +1,15 @@
+Revisão v75.75.49.1
+
+Correção aplicada:
+- Removida a premissa de que Francisco usa uma conta compartilhada única.
+- Registrado que o pai usa luizfelipe.4092@hotmail.com e a mãe usa marry@gmail.com.
+- Ambos são tratados como contas familiares autorizadas para a família canônica do Francisco.
+
+Validação esperada:
+1. Entrar como admin global luizfelipe.dasilva@gmail.com.
+2. Abrir Admin > Família Francisco.
+3. Clicar em Preparar família Francisco.
+4. Conferir se foram gerados dois convites: um para o pai e outro para a mãe.
+5. Entrar com luizfelipe.4092@hotmail.com e aceitar o convite do pai.
+6. Entrar com marry@gmail.com e aceitar o convite da mãe.
+7. Conferir se ambos acessam families/family-francisco-principal.

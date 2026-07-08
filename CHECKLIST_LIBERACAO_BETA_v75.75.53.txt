@@ -1,0 +1,25 @@
+Checklist de liberação beta — Ninou v75.75.53
+
+[ ] Subir ZIP no projeto correto.
+[ ] Conferir que index.html carrega styles.css?v=75.75.53.
+[ ] Publicar firestore.rules no Firebase Console.
+[ ] Fazer hard refresh/limpar cache do PWA.
+[ ] Entrar com admin global luizfelipe.dasilva@gmail.com.
+[ ] Preparar família Francisco no painel admin.
+[ ] Entrar com luizfelipe.4092@hotmail.com e validar papel de Pai.
+[ ] Entrar com marry@gmail.com e validar papel de Mãe.
+[ ] Registrar rotina no aparelho do pai.
+[ ] Registrar rotina no aparelho da mãe.
+[ ] Confirmar que ambos veem os mesmos registros.
+[ ] Criar família piloto nova.
+[ ] Criar convite para cuidador.
+[ ] Aceitar convite com e-mail correto.
+[ ] Confirmar que cuidador não vê backup/exportação/exclusão.
+[ ] Criar usuário visualização.
+[ ] Confirmar que visualização não registra rotina nem vê ações sensíveis.
+[ ] Testar PDF.
+[ ] Testar WhatsApp.
+[ ] Testar CSV/JSON.
+[ ] Testar Relatar problema.
+[ ] Baixar diagnóstico pelo admin global.
+[ ] Registrar resultado dos testes antes de chamar novas famílias.

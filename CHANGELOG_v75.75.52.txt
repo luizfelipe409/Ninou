@@ -1,0 +1,18 @@
+Ninou v75.75.52 — suporte e monitoramento simples do beta
+
+Base: v75.75.51
+
+Alterações principais:
+- Adicionado card "Suporte beta" no Perfil.
+- Adicionado modal para relatar problema com tipo, urgência e descrição.
+- Relatório inclui diagnóstico automático: versão, e-mail, familyId, PWA/navegador, tela, conexão e últimos erros locais.
+- Relatórios são salvos localmente e, quando possível, em families/{familyId}/legal como support_request.
+- Adicionado botão para copiar diagnóstico.
+- Adicionado botão de backup JSON no card de suporte.
+- Adicionada captura local de erros de runtime e promises rejeitadas.
+- Adicionado bloco "Suporte e monitoramento" no painel admin.
+- Atualizadas versões para 75.75.52 em index, app, service worker, manifest, runtime e regras.
+- Mantido CSS único: styles.css.
+
+Observação:
+As regras da v75.75.51 já contemplavam type support_request em families/{familyId}/legal. Nesta versão o arquivo firestore.rules foi versionado para 75.75.52, mas não houve mudança estrutural crítica de permissão além da continuidade do suporte legal.

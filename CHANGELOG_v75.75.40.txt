@@ -1,0 +1,10 @@
+Ninou v75.75.40 — polimento visual premium geral
+
+- Melhora a tela Hoje com cards mais acolhedores, atalhos mais bem acabados e estado principal mais premium.
+- Melhora o sheet/modal de registro com maior contraste, melhor organização dos tipos e campos seguros para iPhone.
+- Melhora o Diário em estilo linha do tempo, com assinatura de cuidador mais destacada.
+- Melhora o Perfil com visual menos técnico e cards mais acolhedores.
+- Melhora o painel admin no desktop com grid mais consistente, sem esconder funções.
+- Mantém CSS único: apenas styles.css.
+- Atualiza index.html, app.js, sw.js, manifest e runtime para 75.75.40.
+- Não altera Firebase, regras, família, convites, PDF, WhatsApp, CSV, JSON ou sair/limpar dados.

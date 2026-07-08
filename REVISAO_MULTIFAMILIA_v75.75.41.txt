@@ -1,0 +1,55 @@
+Revisão técnica — v75.75.41 preparação multi-família
+
+Objetivo desta versão:
+Preparar o Ninou para deixar de depender de uma família fixa, sem mudar ainda o onboarding comercial.
+
+O que foi criado/organizado:
+1. NINOU_INTERNAL_ADMIN_FAMILY_ID
+   - Identifica a área técnica/admin do app.
+   - Mantém compatibilidade com APP_ADMIN_FAMILY_ID.
+
+2. NINOU_FAMILY_SCOPE_VERSION
+   - Marca o formato de escopo salvo no acesso local.
+
+3. normalizeFamilyId()
+   - Padroniza IDs de família antes de salvar ou consultar.
+
+4. getFamilyScopeType()
+   - Classifica o escopo como:
+     - internal_admin
+     - client_family
+     - legacy_family
+     - none
+
+5. buildFamilyScopePayload()
+   - Monta o payload local de acesso familiar de forma padronizada.
+
+6. getResolvedFamilyScope()
+   - Novo ponto central para resolver qual família está ativa.
+   - Considera admin global, família conectada e fallback legado.
+
+7. getActiveClientFamilyId()
+   - Preparação para versões futuras diferenciarem família cliente de admin.
+
+8. getFamilyCollectionPath()
+   - Preparação para padronizar caminhos como families/{familyId}.
+
+9. window.__ninouFamilyScope
+   - Ajuda de diagnóstico no navegador para conferir qual família está ativa.
+
+Compatibilidade mantida:
+- Família atual do Francisco continua funcionando.
+- Admin global continua funcionando.
+- A seleção de família no admin continua funcionando.
+- Cache local continua preservando escopo por família quando há familyId.
+- Fallback legado por UID foi mantido para não quebrar contas antigas nesta fase.
+
+Ainda não feito nesta versão:
+- Tela inicial comercial.
+- Criar família por novo usuário com tela dedicada.
+- Convites por família redesenhados.
+- Regras Firestore multi-família finais.
+- Migração definitiva da família Francisco.
+
+Próxima versão sugerida:
+v75.75.42 — Tela inicial comercial.

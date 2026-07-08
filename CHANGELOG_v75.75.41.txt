@@ -1,0 +1,13 @@
+Ninou v75.75.41 — preparação multi-família
+
+- Prepara a base do app para famílias comerciais sem alterar o fluxo visual principal.
+- Centraliza a resolução do familyId em um resolvedor de escopo familiar.
+- Mantém compatibilidade com a família atual do Francisco e com a área técnica/admin.
+- Normaliza IDs de família antes de salvar/acessar dados.
+- Mantém o ID técnico/admin legado como alias seguro: ninou-family-luizfelipe.
+- Adiciona metadados de escopo ao acesso local: scopeVersion e scopeType.
+- Separa conceitualmente família interna/admin, família cliente e fallback legado.
+- Expõe window.__ninouFamilyScope para conferência técnica durante testes.
+- Atualiza cache/PWA para 75.75.41.
+- Mantém CSS único: apenas styles.css.
+- Não altera regras do Firebase, convites, login, PDF, WhatsApp, CSV/JSON ou telas principais.

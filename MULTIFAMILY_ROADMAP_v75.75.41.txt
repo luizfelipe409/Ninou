@@ -1,0 +1,53 @@
+Roadmap multi-família — base v75.75.41
+
+Versões planejadas:
+
+v75.75.41 — Preparação multi-família
+Status: concluído nesta entrega.
+
+v75.75.42 — Tela inicial comercial
+- Criar minha família
+- Entrar com convite
+- Já tenho conta
+
+v75.75.43 — Criar nova família
+- Nome do bebê
+- Data de nascimento
+- Nome da família
+- Responsável principal
+- FamilyId próprio
+
+v75.75.44 — Convites por família
+- Código por família
+- Validade
+- Limite de uso
+- Convite vinculado ao familyId correto
+
+v75.75.45 — Isolamento real por família
+- Eventos
+- Perfil
+- Peso
+- Relatórios
+- Exportações
+
+v75.75.46 — Papéis dos membros
+- Responsável principal
+- Cuidador
+- Leitura
+
+v75.75.47 — Painel admin comercial
+- Famílias ativas
+- Membros
+- Convites
+- Última atividade
+
+v75.75.48 — Regras Firestore seguras
+- Leitura/gravação apenas por membro
+- Admin global com acesso controlado
+- Convites protegidos
+
+v75.75.49 — Migração família Francisco
+- Converter a família atual para estrutura comercial final
+
+v75.75.50 — Revisão comercial final
+- Testes de ponta a ponta para beta com outras famílias

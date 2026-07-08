@@ -1,0 +1,12 @@
+Ninou v75.75.51 — privacidade, termos e exclusão de dados
+
+- Adiciona Centro de confiança no Perfil.
+- Inclui política de privacidade resumida dentro do app.
+- Inclui termos de uso para beta familiar.
+- Inclui aviso médico explícito: o Ninou não substitui pediatra.
+- Registra aceite de termos localmente e tenta salvar na nuvem quando há login/família.
+- Adiciona exportação de dados pelo centro legal.
+- Adiciona solicitação de exclusão de dados com arquivo JSON e registro na nuvem quando possível.
+- Adiciona seção de privacidade e termos no painel admin.
+- Atualiza firestore.rules para aceitar documentos legais em families/{familyId}/legal.
+- Atualiza app, manifest, service worker, runtime e cache para 75.75.51.

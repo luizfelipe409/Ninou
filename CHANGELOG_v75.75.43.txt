@@ -1,0 +1,11 @@
+Ninou v75.75.43 — criação real de nova família
+
+- Corrige o detalhe da v75.75.42: Criar minha família agora abre um fluxo próprio de criação.
+- Adiciona formulário de nova família no Perfil: bebê, nascimento, nome da família, responsável e vínculo.
+- Cria a família em families/{familyId} com familyType=client.
+- Cria/atualiza families/{familyId}/profile/main com perfil do bebê.
+- Vincula o usuário em users/{uid}/families/{familyId}, users/{uid}/access/ninou e families/{familyId}/members/{uid}.
+- Salva o cuidador local deste aparelho como responsável inicial.
+- Mantém CSS único: styles.css.
+- Atualiza index.html, app.js, sw.js, manifest e runtime para 75.75.43.
+- Não altera Firestore Rules ainda; segurança multi-família segue para a versão planejada de regras.

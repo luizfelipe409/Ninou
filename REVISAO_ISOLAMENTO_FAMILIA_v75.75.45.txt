@@ -1,0 +1,16 @@
+Revisão de isolamento familiar v75.75.45
+
+Escopo revisado:
+1. Dias/rotina em localStorage por familyId.
+2. Perfil do bebê em localStorage por familyId.
+3. Pesos em localStorage por familyId.
+4. Payload de perfil enviado para families/{familyId}/profile/main.
+5. Payload de rotina enviado para families/{familyId}/days/{dayId}.
+6. Debug técnico em window.__ninouFamilyScope com escopo e chaves ativas.
+7. Compatibilidade com família antiga do Francisco e admin global.
+
+Critério principal:
+Ao alternar entre famílias, o app não deve reaproveitar perfil, pesos ou rotina do cache global/legado.
+
+Observação:
+As regras Firestore definitivas continuam planejadas para a versão específica de segurança.

@@ -1,0 +1,10 @@
+Ninou v75.75.47 — painel admin comercial
+
+- Transforma o painel admin em uma visão comercial de produto.
+- Adiciona métricas de famílias ativas, membros totais, convites globais e última atividade.
+- Adiciona monitor de famílias para suporte, com status, membros, convites e última movimentação.
+- Mantém ações rápidas: nova família, novo convite, ver famílias e ver membros.
+- Melhora a seleção/abertura de famílias pelo admin global.
+- Mantém CSS único: apenas styles.css.
+- Atualiza index.html, app.js, sw.js, manifest e runtime para 75.75.47.
+- Não altera Firebase Rules, login, criação de família, convites, registros, PDF, WhatsApp ou exportações.

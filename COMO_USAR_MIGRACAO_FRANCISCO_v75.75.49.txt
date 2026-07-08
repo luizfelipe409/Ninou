@@ -1,0 +1,12 @@
+Como usar a v75.75.49 — Família Francisco
+
+1. Publique o arquivo firestore.rules no Firebase Console.
+2. Suba a versão v75.75.49 no Vercel.
+3. Entre com o admin global luizfelipe.dasilva@gmail.com.
+4. No Perfil/Admin, toque em "Preparar família Francisco".
+5. O app cria/seleciona families/family-francisco-principal.
+6. O app gera convite para luizfelipe.4092@hotmail.com e marry@gmail.com.
+7. Use "Buscar dados antigos" ou "Abrir revisão técnica" para recuperar dados legados, se necessário.
+8. Confirme a origem por e-mail ou UID antes de migrar.
+9. Depois, entre com luizfelipe.4092@hotmail.com e marry@gmail.com e aceite o convite caso ainda não esteja vinculado.
+10. Felipe/Pai e Maria/Mãe continuam sendo definidos por aparelho no cuidador local.

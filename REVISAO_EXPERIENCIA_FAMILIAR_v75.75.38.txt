@@ -1,0 +1,14 @@
+Revisão v75.75.38
+
+Escopo:
+1. Identidade local do cuidador por aparelho.
+2. Tela Hoje com confirmação visual do cuidador que assina os registros.
+3. Perfil com presets rápidos para Felipe/Pai e Maria/Mãe.
+4. Assinatura dos registros no Diário preservada e reforçada visualmente.
+5. CSS único e cache/PWA atualizados.
+
+Pontos de segurança:
+- A identificação fica no localStorage do aparelho, não no perfil global da conta.
+- A conta compartilhada da família pode continuar sendo usada em celulares diferentes.
+- O app não grava Felipe/Maria como perfil global de todos os aparelhos.
+- Regras do Firebase não foram alteradas.

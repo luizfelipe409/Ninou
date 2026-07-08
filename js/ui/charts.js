@@ -35,15 +35,30 @@ export function renderBarChart(container, days, getValue, options = {}) {
   const formatValue = options.formatValue || formatNumber;
   const values = days.map((item) => Number(getValue(item)) || 0);
   const maxValue = Math.max(...values, 1);
+  const positiveValues = values.filter((value) => value > 0);
+  const averageValue = positiveValues.length ? positiveValues.reduce((total, value) => total + value, 0) / positiveValues.length : 0;
+  const averagePercent = averageValue > 0 ? Math.max(8, Math.min(92, Math.round((averageValue / maxValue) * 100))) : 0;
+
+  container.classList.add("premium-bars");
+  container.style.setProperty("--avg-y", averagePercent ? `${100 - averagePercent}%` : "100%");
+  container.style.setProperty("--avg-opacity", averagePercent ? ".75" : "0");
+  container.dataset.hasAverage = averagePercent ? "true" : "false";
+  container.dataset.hasData = positiveValues.length ? "true" : "false";
+  container.dataset.maxValue = String(maxValue);
   container.innerHTML = "";
 
   days.forEach((item, index) => {
     const value = values[index];
     const bar = document.createElement("span");
-    const height = value > 0 ? Math.max(8, Math.round((value / maxValue) * 100)) : 6;
+    const height = value > 0 ? Math.max(10, Math.round((value / maxValue) * 100)) : 7;
+    const formatted = formatValue(value);
     bar.style.setProperty("--h", `${height}%`);
+    bar.style.setProperty("--delay", `${index * 36}ms`);
+    bar.dataset.value = formatted;
+    bar.dataset.day = item.label;
+    bar.setAttribute("aria-label", `${item.label}: ${formatted}`);
     bar.classList.toggle("is-empty", value <= 0);
-    bar.innerHTML = `<b>${escapeHtml(formatValue(value))}</b><i>${escapeHtml(item.label)}</i>`;
+    bar.innerHTML = `<b>${escapeHtml(formatted)}</b><i>${escapeHtml(item.label)}</i>`;
     container.append(bar);
   });
 }

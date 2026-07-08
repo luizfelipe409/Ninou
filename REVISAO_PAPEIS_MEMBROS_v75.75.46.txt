@@ -1,0 +1,13 @@
+Revisão v75.75.46
+
+Papéis implementados:
+1. Responsável principal: dono da família criada no app.
+2. Admin familiar: gerencia perfil, convites, membros e rotina.
+3. Cuidador: registra rotina, sono, mamadas, fraldas e observações.
+4. Visualização: acompanha dados sem alterar registros.
+
+Proteções:
+- Responsável principal não pode ser removido ou rebaixado nesta etapa.
+- Convites não concedem papel de responsável principal.
+- Papel legado "responsavel" continua aceito como admin familiar.
+- Regras Firestore definitivas ficam para a etapa de segurança.

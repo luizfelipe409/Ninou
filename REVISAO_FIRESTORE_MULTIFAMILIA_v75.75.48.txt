@@ -1,0 +1,19 @@
+Revisão Firestore v75.75.48
+
+Objetivo:
+Tornar o app seguro para uso por múltiplas famílias antes de comercialização.
+
+Garantias principais:
+1. Usuário só lê dados de famílias onde possui member ativo.
+2. user/{uid}/families não libera leitura de família sozinho; o member ativo é a fonte de autorização.
+3. Registro de rotina exige papel com escrita: owner, admin_familiar, responsavel, pai, mae, cuidador ou admin legado.
+4. visualizacao não grava rotina.
+5. Perfil da família e convites exigem owner/admin_familiar/responsavel/admin legado ou admin global.
+6. Convites por código só são lidos pelo e-mail convidado, pela família administradora ou pelo admin global.
+7. Aceite de convite só permite entrar na familyId contida no convite.
+8. familyId em documentos gravados não pode apontar para outra família.
+9. Responsável principal/owner não pode ser removido ou rebaixado por admin familiar nesta etapa.
+10. Admin global permanece restrito ao e-mail luizfelipe.dasilva@gmail.com.
+
+Importante:
+Estas regras precisam ser publicadas no Firebase Console em Firestore Database > Rules.

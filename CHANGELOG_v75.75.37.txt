@@ -1,0 +1,12 @@
+Ninou v75.75.37 — revisão final de estabilidade e responsividade geral
+
+- Mantém a v75.75.36 como base visual principal dos gráficos.
+- Mantém CSS único: apenas styles.css.
+- Atualiza cache/PWA, app.js, index.html, sw.js, manifest e runtime para 75.75.37.
+- Reforça prevenção de zoom em inputs no iPhone/Safari.
+- Reforça respiro inferior para a barra de navegação não cobrir conteúdo.
+- Reforça centralização dos avatares sem corte.
+- Reforça responsividade de cards, gráficos, modais, sheet de registro e painel admin.
+- Adiciona guarda contra botões presos em estados como verificando/salvando após timeout longo.
+- Preserva funções: sair/limpar, família, convites, admin, PDF, WhatsApp, CSV, JSON e zerar dia.
+- Não altera regras do Firebase e não cria funções novas.

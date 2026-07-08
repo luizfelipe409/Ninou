@@ -1,0 +1,10 @@
+Ninou v75.75.38 — experiência familiar premium
+
+- Adiciona card na tela Hoje mostrando quem está registrando neste aparelho.
+- Adiciona botão rápido para trocar/configurar o cuidador local.
+- Melhora o card "Cuidador local" no Perfil com escolhas rápidas: Felipe/Pai, Maria/Mãe, Avó e Babá.
+- Reforça a lógica de identidade por aparelho: Felipe e Maria podem usar a mesma conta familiar sem misturar assinaturas.
+- Melhora a assinatura visual dos registros no Diário: "Registrado por Nome · Vínculo".
+- Mantém CSS único: somente styles.css.
+- Atualiza app.js, index.html, sw.js, manifest e runtime para 75.75.38.
+- Não altera regras do Firebase, convites, login, PDF, WhatsApp, CSV ou JSON.

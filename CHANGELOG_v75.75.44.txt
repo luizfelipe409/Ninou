@@ -1,0 +1,12 @@
+Ninou v75.75.44 — convites por família
+
+- Adiciona fluxo de convite familiar diretamente no Perfil.
+- Permite informar e-mail do convidado e permissão antes de gerar o convite.
+- Cada convite fica vinculado ao familyId atual da família.
+- Convites continuam com validade de 7 dias e uso único.
+- Convite é salvo no índice global invites/{code} e também dentro de families/{familyId}/invites/{code} e families/{familyId}/invitations/{code}.
+- Aceite de convite atualiza os espelhos da família e o índice global.
+- Convite ativo passa a ser armazenado localmente por família, evitando mostrar código de outra família ao trocar de contexto.
+- Mantém CSS único: apenas styles.css.
+- Atualiza index.html, app.js, sw.js, manifest e runtime para 75.75.44.
+- Não altera regras Firestore ainda; a revisão de segurança fica para a etapa planejada.

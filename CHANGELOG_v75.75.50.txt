@@ -1,0 +1,9 @@
+Ninou v75.75.50 — revisão comercial final para beta
+
+- Fecha a sequência multi-família iniciada na v75.75.41.
+- Mantém a correção dos e-mails do pai e da mãe do Francisco.
+- Adiciona card de beta comercial no Perfil.
+- Adiciona checklist beta comercial no painel admin.
+- Reforça aviso de privacidade e uso responsável: diário familiar, não ferramenta médica.
+- Atualiza versão do app, loader, service worker, manifest e runtime para 75.75.50.
+- Mantém CSS único: styles.css.

@@ -1,0 +1,19 @@
+Revisão visual geral v75.75.40
+
+Escopo:
+1. Tela Hoje.
+2. Atalhos principais.
+3. Modal/sheet de registro.
+4. Diário/linha do tempo.
+5. Perfil.
+6. Painel admin desktop.
+7. Tema claro/escuro.
+8. Mobile pequeno e iPhone/Safari.
+9. CSS único.
+
+Critérios preservados:
+- Não remover funções.
+- Não criar CSS extra.
+- Não alterar regras do Firebase.
+- Não alterar lógica de login/convites/família.
+- Manter botão de sair/limpar dados visível.

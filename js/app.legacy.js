@@ -130,6 +130,11 @@ const familyNameLabel = document.querySelector("#familyNameLabel");
 const familyAccountLabel = document.querySelector("#familyAccountLabel");
 const familyAccessTypeLabel = document.querySelector("#familyAccessTypeLabel");
 const familyInviteDescription = document.querySelector("#familyInviteDescription");
+const familyInviteForm = document.querySelector("#familyInviteForm");
+const familyInviteEmailInput = document.querySelector("#familyInviteEmailInput");
+const familyInviteRoleSelect = document.querySelector("#familyInviteRoleSelect");
+const familyInviteFormHint = document.querySelector("#familyInviteFormHint");
+const familyPendingInviteList = document.querySelector("#familyPendingInviteList");
 const familyCreateInviteButton = document.querySelector("#familyCreateInviteButton");
 const familyJoinInviteButton = document.querySelector("#familyJoinInviteButton");
 const familyActiveInviteBox = document.querySelector("#familyActiveInviteBox");
@@ -161,12 +166,28 @@ const confirmJoinInviteButton = document.querySelector("#confirmJoinInviteButton
 const supportSuggestionButton = document.querySelector("#supportSuggestionButton");
 const supportBugButton = document.querySelector("#supportBugButton");
 const caregiverIdentityStatus = document.querySelector("#caregiverIdentityStatus");
+const caregiverPresetButtons = document.querySelectorAll("[data-caregiver-preset]");
+const todayCaregiverCard = document.querySelector("#todayCaregiverCard");
+const todayCaregiverAvatar = document.querySelector("#todayCaregiverAvatar");
+const todayCaregiverName = document.querySelector("#todayCaregiverName");
+const todayCaregiverHint = document.querySelector("#todayCaregiverHint");
+const todayCaregiverEditButton = document.querySelector("#todayCaregiverEditButton");
 const familyAccessCard = document.querySelector("#familyAccessCard");
 const familyAccessKicker = document.querySelector("#familyAccessCard > span");
 const familyAccessTitle = document.querySelector("#familyAccessTitle");
 const familyAccessText = document.querySelector("#familyAccessText");
 const familyAccessBadge = document.querySelector("#familyAccessBadge");
 const createFamilyButton = document.querySelector("#createFamilyButton");
+const createFamilyWizard = document.querySelector("#createFamilyWizard");
+const newFamilyBabyNameInput = document.querySelector("#newFamilyBabyNameInput");
+const newFamilyBabyBirthInput = document.querySelector("#newFamilyBabyBirthInput");
+const newFamilyNameInput = document.querySelector("#newFamilyNameInput");
+const newFamilyBabyArticleInput = document.querySelector("#newFamilyBabyArticleInput");
+const newFamilyResponsibleNameInput = document.querySelector("#newFamilyResponsibleNameInput");
+const newFamilyResponsibleRelationInput = document.querySelector("#newFamilyResponsibleRelationInput");
+const confirmCreateFamilyButton = document.querySelector("#confirmCreateFamilyButton");
+const cancelCreateFamilyButton = document.querySelector("#cancelCreateFamilyButton");
+const createFamilyWizardStatus = document.querySelector("#createFamilyWizardStatus");
 const inviteCodeInput = document.querySelector("#inviteCodeInput");
 const acceptInviteButton = document.querySelector("#acceptInviteButton");
 const inviteAcceptBox = document.querySelector(".invite-accept-box");
@@ -196,6 +217,7 @@ const profileReadyRole = document.querySelector("#profileReadyRole");
 const profileReadyDevice = document.querySelector("#profileReadyDevice");
 const guestOnboardingModal = document.querySelector("#guestOnboardingModal");
 const guestModalCloseButton = document.querySelector("#guestModalCloseButton");
+const guestModalCreateFamilyButton = document.querySelector("#guestModalCreateFamilyButton");
 const guestModalLoginButton = document.querySelector("#guestModalLoginButton");
 const guestModalInviteButton = document.querySelector("#guestModalInviteButton");
 const adminInvitePanel = document.querySelector("#adminInvitePanel");
@@ -220,6 +242,13 @@ const adminModeToggleButton = document.querySelector("#adminModeToggleButton");
 const adminModeHint = document.querySelector("#adminModeHint");
 const adminClientsList = document.querySelector("#adminClientsList");
 const adminSelectedFamilyHint = document.querySelector("#adminSelectedFamilyHint");
+const adminCommercialDashboard = document.querySelector("#adminCommercialDashboard");
+const adminCommercialActiveFamilies = document.querySelector("#adminCommercialActiveFamilies");
+const adminCommercialTotalMembers = document.querySelector("#adminCommercialTotalMembers");
+const adminCommercialGlobalPendingInvites = document.querySelector("#adminCommercialGlobalPendingInvites");
+const adminCommercialLastActivity = document.querySelector("#adminCommercialLastActivity");
+const adminCommercialInsight = document.querySelector("#adminCommercialInsight");
+const adminFamilyMonitorList = document.querySelector("#adminFamilyMonitorList");
 const adminOpenFamilyButton = document.querySelector("#adminOpenFamilyButton");
 const adminCreateClientFamilyButton = document.querySelector("#adminCreateClientFamilyButton");
 const adminNewFamilyNameInput = document.querySelector("#adminNewFamilyNameInput");
@@ -227,6 +256,8 @@ const adminNewBabyNameInput = document.querySelector("#adminNewBabyNameInput");
 const adminNewBabyArticleInput = document.querySelector("#adminNewBabyArticleInput");
 const adminNewResponsibleEmailInput = document.querySelector("#adminNewResponsibleEmailInput");
 const adminCreateFamilyResult = document.querySelector("#adminCreateFamilyResult");
+const prepareFranciscoFamilyButton = document.querySelector("#prepareFranciscoFamilyButton");
+const franciscoMigrationResult = document.querySelector("#franciscoMigrationResult");
 const adminPreviewBanner = document.querySelector("#adminPreviewBanner");
 const adminReturnToPanelButton = document.querySelector("#adminReturnToPanelButton");
 const todayOverviewKicker = document.querySelector("#todayOverviewKicker");
@@ -355,12 +386,27 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.33";
+const NINOU_RUNTIME_VERSION = "75.75.53";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
 const GLOBAL_APP_ADMIN_EMAIL = "luizfelipe.dasilva@gmail.com";
-const APP_ADMIN_FAMILY_ID = "ninou-family-luizfelipe";
+const NINOU_INTERNAL_ADMIN_FAMILY_ID = "ninou-family-luizfelipe";
+const NINOU_FRANCISCO_FATHER_EMAIL = "luizfelipe.4092@hotmail.com";
+const NINOU_FRANCISCO_MOTHER_EMAIL = "marry@gmail.com";
+const NINOU_FRANCISCO_PARENT_EMAILS = [NINOU_FRANCISCO_FATHER_EMAIL, NINOU_FRANCISCO_MOTHER_EMAIL];
+// Compatibilidade: alguns fluxos antigos esperam uma conta principal; pai fica como contato primário.
+const NINOU_FRANCISCO_ACCOUNT_EMAIL = NINOU_FRANCISCO_FATHER_EMAIL;
+const NINOU_FRANCISCO_FAMILY_ID = "family-francisco-principal";
+const NINOU_FRANCISCO_FAMILY_NAME = "Família do Francisco";
+const NINOU_FRANCISCO_BABY_NAME = "Francisco";
+const NINOU_FRANCISCO_BABY_ARTICLE = "do";
+// v75.75.41: alias mantido para não quebrar chamadas antigas.
+// As próximas versões passam a tratar a família técnica/admin e famílias clientes
+// pelo mesmo resolvedor de escopo familiar.
+const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.53-commercial-final-sequence";
+const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
 const ADMIN_WHATSAPP_URL = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(ADMIN_WHATSAPP_MESSAGE)}`;
@@ -373,26 +419,194 @@ function isGlobalAppAdmin(user = cloudUser) {
   return Boolean(user && isGlobalAdminEmail(user.email));
 }
 
+function isFranciscoFamilyAccountEmail(email = "") {
+  const normalized = normalizeEmail(email);
+  return NINOU_FRANCISCO_PARENT_EMAILS.some((item) => normalizeEmail(item) === normalized);
+}
+
+function isFranciscoSharedAccount(user = cloudUser) {
+  // v75.75.53: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  return isFranciscoFamilyAccountEmail(user?.email || "");
+}
+
+function isFranciscoFamilyId(familyId = "") {
+  return normalizeFamilyId(familyId) === NINOU_FRANCISCO_FAMILY_ID;
+}
+
+function getDefaultFamilyLabelsForAccount(user = cloudUser) {
+  if (isFranciscoSharedAccount(user)) {
+    return {
+      familyId: NINOU_FRANCISCO_FAMILY_ID,
+      familyName: NINOU_FRANCISCO_FAMILY_NAME,
+      babyName: NINOU_FRANCISCO_BABY_NAME,
+      babyArticle: NINOU_FRANCISCO_BABY_ARTICLE,
+      accountEmail: normalizeEmail(user?.email || "") || NINOU_FRANCISCO_ACCOUNT_EMAIL,
+      fatherEmail: NINOU_FRANCISCO_FATHER_EMAIL,
+      motherEmail: NINOU_FRANCISCO_MOTHER_EMAIL,
+      parentEmails: [...NINOU_FRANCISCO_PARENT_EMAILS],
+    };
+  }
+  return { familyId: "", familyName: "", babyName: "", babyArticle: "do", accountEmail: normalizeEmail(user?.email || "") };
+}
+
+function getCanonicalFamilyIdForAccount(user = cloudUser, familyName = "", babyName = "") {
+  if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
+  return createStablePersonalFamilyId(user, familyName, babyName);
+}
+
+function getCanonicalFamilyIdForAdminCreation({ responsibleEmail = "", familyName = "", babyName = "" } = {}) {
+  if (isFranciscoFamilyAccountEmail(responsibleEmail)) return NINOU_FRANCISCO_FAMILY_ID;
+  return createFamilyIdFromNames(familyName, babyName);
+}
+
+function buildFranciscoFamilyBasePayload(services = firebaseServices, options = {}) {
+  const nowClient = new Date().toISOString();
+  const timestamp = services?.serverTimestamp ? services.serverTimestamp() : nowClient;
+  return {
+    familyId: NINOU_FRANCISCO_FAMILY_ID,
+    title: NINOU_FRANCISCO_FAMILY_NAME,
+    name: NINOU_FRANCISCO_FAMILY_NAME,
+    babyName: NINOU_FRANCISCO_BABY_NAME,
+    babyArticle: NINOU_FRANCISCO_BABY_ARTICLE,
+    accountEmail: NINOU_FRANCISCO_ACCOUNT_EMAIL,
+    fatherEmail: NINOU_FRANCISCO_FATHER_EMAIL,
+    motherEmail: NINOU_FRANCISCO_MOTHER_EMAIL,
+    parentEmails: [...NINOU_FRANCISCO_PARENT_EMAILS],
+    customerLabel: "Família atual do Francisco",
+    familyType: "client",
+    status: "active",
+    legacyMigrationTarget: true,
+    franciscoMigrationReady: true,
+    migrationVersion: NINOU_RUNTIME_VERSION,
+    appVersion: NINOU_RUNTIME_VERSION,
+    updatedAt: timestamp,
+    ...options,
+  };
+}
+
+
+function normalizeFamilyId(value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (raw === NINOU_INTERNAL_ADMIN_FAMILY_ID) return NINOU_INTERNAL_ADMIN_FAMILY_ID;
+  return raw
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9._@-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 96);
+}
+
+function getFamilyScopeType(familyId = "") {
+  const id = normalizeFamilyId(familyId);
+  if (!id) return "none";
+  if (id === NINOU_INTERNAL_ADMIN_FAMILY_ID) return "internal_admin";
+  if (id.startsWith(NINOU_CLIENT_FAMILY_PREFIX)) return "client_family";
+  return "legacy_family";
+}
+
+function getLegacyAccountFamilyFallbackId(user = cloudUser) {
+  // v75.75.53: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // Isso evita que a família atual caia em um familyId temporário por UID.
+  if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
+  // Compatibilidade: versões antigas usavam o UID como familyId provisório.
+  // A partir da jornada comercial, o caminho correto é criar/aceitar família.
+  return user?.uid ? String(user.uid) : "";
+}
+
+function buildFamilyScopePayload(access = {}, options = {}) {
+  const normalizedFamilyId = normalizeFamilyId(access.familyId || options.familyId || "");
+  if (!normalizedFamilyId) return null;
+  const email = normalizeEmail(access.email || options.email || cloudUser?.email || "");
+  const role = getEffectiveRole(access.role || options.role, email);
+  return {
+    familyId: normalizedFamilyId,
+    role,
+    email,
+    ownerUid: access.ownerUid ? String(access.ownerUid) : (options.ownerUid ? String(options.ownerUid) : ""),
+    inviteCode: access.inviteCode ? normalizeInviteCode(access.inviteCode) : "",
+    acceptedAt: access.acceptedAt || access.createdAt || options.acceptedAt || new Date().toISOString(),
+    scopeVersion: NINOU_FAMILY_SCOPE_VERSION,
+    scopeType: getFamilyScopeType(normalizedFamilyId),
+  };
+}
+
+function getResolvedFamilyScope(options = {}) {
+  const allowAdminSelection = options.allowAdminSelection !== false;
+  const allowLegacyFallback = options.allowLegacyFallback !== false;
+  const access = familyAccess?.familyId ? familyAccess : null;
+
+  if (allowAdminSelection && isGlobalAppAdmin()) {
+    const selectedFamilyId = normalizeFamilyId(getActiveAdminFamilyId());
+    if (selectedFamilyId) {
+      return {
+        familyId: selectedFamilyId,
+        source: "admin_selection",
+        scopeType: getFamilyScopeType(selectedFamilyId),
+        role: "admin",
+        email: normalizeEmail(cloudUser?.email || GLOBAL_APP_ADMIN_EMAIL),
+        isInternalAdminFamily: selectedFamilyId === NINOU_INTERNAL_ADMIN_FAMILY_ID,
+        isLegacyFallback: false,
+      };
+    }
+  }
+
+  if (access?.familyId) {
+    const payload = buildFamilyScopePayload(access);
+    if (payload) {
+      return {
+        ...payload,
+        source: "family_access",
+        isInternalAdminFamily: payload.familyId === NINOU_INTERNAL_ADMIN_FAMILY_ID,
+        isLegacyFallback: false,
+      };
+    }
+  }
+
+  const legacyId = allowLegacyFallback ? normalizeFamilyId(getLegacyAccountFamilyFallbackId()) : "";
+  return {
+    familyId: legacyId,
+    source: legacyId ? "legacy_account_fallback" : "none",
+    scopeType: getFamilyScopeType(legacyId),
+    role: legacyId ? "responsavel" : "",
+    email: normalizeEmail(cloudUser?.email || ""),
+    isInternalAdminFamily: legacyId === NINOU_INTERNAL_ADMIN_FAMILY_ID,
+    isLegacyFallback: Boolean(legacyId),
+  };
+}
+
+function getActiveClientFamilyId() {
+  const scope = getResolvedFamilyScope({ allowAdminSelection: false, allowLegacyFallback: false });
+  return scope.familyId || "";
+}
+
+function getFamilyCollectionPath(familyId = getActiveFamilyId()) {
+  const id = normalizeFamilyId(familyId);
+  return id ? `families/${id}` : "";
+}
+
 function loadSelectedAdminFamilyId() {
   try {
-    return String(localStorage.getItem("ninou.admin.selectedFamilyId") || APP_ADMIN_FAMILY_ID);
+    return normalizeFamilyId(localStorage.getItem("ninou.admin.selectedFamilyId") || APP_ADMIN_FAMILY_ID);
   } catch {
     return APP_ADMIN_FAMILY_ID;
   }
 }
 
 function getActiveAdminFamilyId() {
-  return selectedAdminFamilyId || APP_ADMIN_FAMILY_ID;
+  return normalizeFamilyId(selectedAdminFamilyId || APP_ADMIN_FAMILY_ID);
 }
 
 function saveSelectedAdminFamilyId(familyId = APP_ADMIN_FAMILY_ID) {
-  selectedAdminFamilyId = String(familyId || APP_ADMIN_FAMILY_ID);
+  selectedAdminFamilyId = normalizeFamilyId(familyId || APP_ADMIN_FAMILY_ID);
   try { localStorage.setItem("ninou.admin.selectedFamilyId", selectedAdminFamilyId); } catch {}
+  try { exposeFamilyScopeForDebug(); } catch {}
   return selectedAdminFamilyId;
 }
 
 function getSelectedFamilyIdForAdminOrAccess() {
-  return isGlobalAppAdmin() ? getActiveAdminFamilyId() : (familyAccess?.familyId || "");
+  return getResolvedFamilyScope({ allowLegacyFallback: false }).familyId || "";
 }
 
 function getAdminSelectedFamilyLabel(stats = null) {
@@ -428,15 +642,80 @@ function isAdminPanelOnlyContext() {
   return Boolean(isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen);
 }
 
-function getEffectiveRole(role = familyAccess?.role || "responsavel", email = cloudUser?.email || familyAccess?.email || "") {
+const FAMILY_ROLE_OWNER = "owner";
+const FAMILY_ROLE_ADMIN = "admin_familiar";
+const FAMILY_ROLE_CAREGIVER = "cuidador";
+const FAMILY_ROLE_VIEWER = "visualizacao";
+const FAMILY_ROLE_LEGACY_RESPONSIBLE = "responsavel";
+const FAMILY_ROLE_GLOBAL_ADMIN = "admin";
+
+function normalizeRole(value = FAMILY_ROLE_ADMIN) {
+  const raw = String(value || "").trim().toLowerCase().replace(/-/g, "_");
+  const aliases = {
+    proprietario: FAMILY_ROLE_OWNER,
+    proprietário: FAMILY_ROLE_OWNER,
+    owner: FAMILY_ROLE_OWNER,
+    responsavel_principal: FAMILY_ROLE_OWNER,
+    responsável_principal: FAMILY_ROLE_OWNER,
+    titular: FAMILY_ROLE_OWNER,
+    admin: FAMILY_ROLE_GLOBAL_ADMIN,
+    global_admin: FAMILY_ROLE_GLOBAL_ADMIN,
+    admin_global: FAMILY_ROLE_GLOBAL_ADMIN,
+    admin_familiar: FAMILY_ROLE_ADMIN,
+    administrador_familiar: FAMILY_ROLE_ADMIN,
+    responsavel: FAMILY_ROLE_ADMIN,
+    responsável: FAMILY_ROLE_ADMIN,
+    familiar_admin: FAMILY_ROLE_ADMIN,
+    cuidador: FAMILY_ROLE_CAREGIVER,
+    caregiver: FAMILY_ROLE_CAREGIVER,
+    leitura: FAMILY_ROLE_VIEWER,
+    viewer: FAMILY_ROLE_VIEWER,
+    visualizacao: FAMILY_ROLE_VIEWER,
+    visualização: FAMILY_ROLE_VIEWER,
+    somente_leitura: FAMILY_ROLE_VIEWER,
+  };
+  return aliases[raw] || FAMILY_ROLE_ADMIN;
+}
+
+function getEffectiveRole(role = familyAccess?.role || FAMILY_ROLE_ADMIN, email = cloudUser?.email || familyAccess?.email || "") {
   const normalized = normalizeRole(role);
-  if (normalized === "admin" && !isGlobalAdminEmail(email)) return "responsavel";
+  if (normalized === FAMILY_ROLE_GLOBAL_ADMIN && !isGlobalAdminEmail(email)) return FAMILY_ROLE_ADMIN;
   return normalized;
 }
 
-function normalizeInviteRole(value = "responsavel") {
+function isFamilyOwnerRole(role = familyAccess?.role) {
+  return getEffectiveRole(role, cloudUser?.email || familyAccess?.email || "") === FAMILY_ROLE_OWNER;
+}
+
+function isFamilyManagerRole(role = familyAccess?.role, email = cloudUser?.email || familyAccess?.email || "") {
+  const effectiveRole = getEffectiveRole(role || FAMILY_ROLE_VIEWER, email);
+  return [FAMILY_ROLE_GLOBAL_ADMIN, FAMILY_ROLE_OWNER, FAMILY_ROLE_ADMIN].includes(effectiveRole);
+}
+
+function normalizeInviteRole(value = FAMILY_ROLE_CAREGIVER) {
   const role = normalizeRole(value);
-  return role === "admin" ? "responsavel" : role;
+  if (role === FAMILY_ROLE_GLOBAL_ADMIN || role === FAMILY_ROLE_OWNER) return FAMILY_ROLE_ADMIN;
+  return role;
+}
+
+function normalizeAssignableMemberRole(value = FAMILY_ROLE_CAREGIVER) {
+  const role = normalizeInviteRole(value);
+  return role === FAMILY_ROLE_OWNER ? FAMILY_ROLE_ADMIN : role;
+}
+
+function getAssignableFamilyRoles() {
+  return [FAMILY_ROLE_ADMIN, FAMILY_ROLE_CAREGIVER, FAMILY_ROLE_VIEWER];
+}
+
+function getRoleRank(role = FAMILY_ROLE_VIEWER) {
+  const ranks = {
+    [FAMILY_ROLE_GLOBAL_ADMIN]: 100,
+    [FAMILY_ROLE_OWNER]: 90,
+    [FAMILY_ROLE_ADMIN]: 70,
+    [FAMILY_ROLE_CAREGIVER]: 40,
+    [FAMILY_ROLE_VIEWER]: 10,
+  };
+  return ranks[normalizeRole(role)] || 0;
 }
 
 function limitText(value = "", maxLength = MAX_DAY_NOTES_LENGTH) {
@@ -490,7 +769,7 @@ function getMinimalGlobalInvitePayload(invite = {}) {
   const payload = {
     code: normalizeInviteCode(invite.code || ""),
     familyId: String(invite.familyId || ""),
-    role: normalizeInviteRole(invite.role || "cuidador"),
+    role: normalizeInviteRole(invite.role || FAMILY_ROLE_CAREGIVER),
     status: String(invite.status || "active"),
     maxUses: Number(invite.maxUses || INVITE_MAX_USES),
     useCount: Number(invite.useCount || 0),
@@ -542,6 +821,7 @@ let personalFamilyActivationInFlight = false;
 let authFlowRunId = 0;
 let familyBootstrapReady = false;
 let familyAccess = loadFamilyAccess();
+try { exposeFamilyScopeForDebug(); } catch {}
 let pendingInviteCode = getInitialInviteCode();
 let accessFlowNotice = "";
 let recentInvites = [];
@@ -716,14 +996,12 @@ function getProfileAccessState() {
 
 function canManageFamilyAccess() {
   if (!hasFamilyAccess()) return false;
-  const role = getEffectiveRole(familyAccess?.role || "visualizacao", cloudUser?.email || familyAccess?.email || "");
-  return role === "admin" || role === "responsavel";
+  return isFamilyManagerRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
 }
 
 function canEditFamilyProfile() {
   if (!hasFamilyAccess()) return false;
-  const role = getEffectiveRole(familyAccess?.role || "visualizacao", cloudUser?.email || familyAccess?.email || "");
-  return role === "admin" || role === "responsavel";
+  return isFamilyManagerRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
 }
 
 function updateProfileStateClasses() {
@@ -761,7 +1039,7 @@ function renderFamilyAccessSummary() {
   setProfileElementHidden(familyAccessSummaryCard, !show);
   if (!show) return;
 
-  const role = getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "");
+  const role = getEffectiveRole(familyAccess?.role || FAMILY_ROLE_ADMIN, cloudUser?.email || familyAccess?.email || "");
   const roleLabel = getRoleLabel(role);
   const identity = loadCurrentCaregiverIdentity();
   const familyLabel = getProfileFamilyDisplayName();
@@ -782,9 +1060,11 @@ function renderFamilyAccessSummary() {
     familyAccessSummaryMembers,
     canInvite
       ? "Você pode convidar cuidadores, revisar acessos e manter a família organizada. Convites são de uso único."
-      : role === "visualizacao"
-        ? "Seu acesso é somente visualização. Peça a um responsável para alterar permissões ou convidar pessoas."
-        : "Você pode registrar a rotina. Convites e ajustes familiares ficam com um responsável."
+      : role === FAMILY_ROLE_VIEWER
+        ? "Seu acesso é de visualização. Você acompanha a rotina sem alterar registros."
+        : role === FAMILY_ROLE_CAREGIVER
+          ? "Você pode registrar a rotina. Convites, membros e perfil ficam com um admin familiar."
+          : "Seu papel permite acompanhar a família conforme as permissões configuradas."
   );
   if (familyAccessSummaryInviteButton) {
     familyAccessSummaryInviteButton.hidden = !canInvite;
@@ -1316,15 +1596,17 @@ function getGuestPremiumCardMarkup(screenKey) {
 
     <div class="guest-premium-proof" aria-label="Confirmações da prévia">
       <span>Prévia do app</span>
-      <span>Fluxo por convite</span>
+      <span>Criar família</span>
+      <span>Convite seguro</span>
       <span>Claro ou escuro</span>
     </div>
 
     <p class="guest-store-cta">${escapeHtml(item.cta)}</p>
 
-    <div class="guest-premium-actions">
-      <button type="button" data-guest-action="login">Entrar agora</button>
-      <button type="button" data-guest-action="invite">Tenho convite</button>
+    <div class="guest-premium-actions commercial-entry-actions-inline">
+      <button type="button" data-guest-action="create">Criar minha família</button>
+      <button type="button" data-guest-action="invite">Entrar com convite</button>
+      <button type="button" data-guest-action="login">Já tenho conta</button>
     </div>
   `;
 }
@@ -1349,7 +1631,7 @@ function renderGuestPremiumContent() {
     if (!guestAction) return;
     event.preventDefault();
     event.stopPropagation();
-    focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
+    focusProfileAccess(normalizeCommercialEntryAction(guestAction.dataset.guestAction));
   });
   activeScreen.prepend(card);
 }
@@ -1452,7 +1734,7 @@ function updateProfileReadyExperience() {
   const familyAdmin = isFamilyAdmin();
   const baby = getBabyDisplayName();
   const identity = loadCurrentCaregiverIdentity();
-  const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
+  const role = authorized ? getEffectiveRole(familyAccess?.role || FAMILY_ROLE_ADMIN, cloudUser?.email || familyAccess?.email || "") : "";
 
   document.body.classList.toggle("profile-daily-ready", ready);
 
@@ -1547,7 +1829,7 @@ function updatePostAccessExperience() {
   const appAdmin = isGlobalAppAdmin();
   const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
   const baby = getBabyDisplayName();
-  const role = authorized ? getEffectiveRole(familyAccess?.role || "responsavel", cloudUser?.email || familyAccess?.email || "") : "";
+  const role = authorized ? getEffectiveRole(familyAccess?.role || FAMILY_ROLE_ADMIN, cloudUser?.email || familyAccess?.email || "") : "";
   const roleLabel = authorized ? getRoleLabel(role) : "";
 
   postAccessCard.hidden = appAdmin || !connected || authorized;
@@ -1611,7 +1893,7 @@ function getWhatsAppShareUrl(message = "") {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
-function renderInviteResultWithMessage({ title = "Convite pronto", familyLabel = "", email = "", role = "responsavel", code = "", link = "" } = {}) {
+function renderInviteResultWithMessage({ title = "Convite pronto", familyLabel = "", email = "", role = FAMILY_ROLE_ADMIN, code = "", link = "" } = {}) {
   if (!inviteResult) return;
   const roleLabel = getRoleLabel(role);
   const message = buildProfessionalInviteMessage({ familyLabel, code, link, roleLabel });
@@ -1673,25 +1955,35 @@ function updateAccountJourneyGuide() {
       : connected
         ? (pendingCode
           ? "Convite detectado. Cole ou confirme o código para conectar esta conta à família certa."
-          : "Conta criada. Agora use o código de convite enviado pelo administrador para liberar a família.")
+          : "Conta criada. Agora você pode criar sua família ou usar o código de convite recebido.")
         : (pendingCode
           ? "Convite salvo neste aparelho. Crie sua conta ou entre usando o mesmo e-mail convidado pelo admin."
-          : "O admin gera o convite; depois você entra ou cria conta com o mesmo e-mail para liberar a rotina familiar.");
+          : "Crie sua família se você for o primeiro responsável ou entre com um convite recebido.");
   }
 
   card.querySelectorAll("[data-journey-action]").forEach((button) => {
     const action = button.dataset.journeyAction || "login";
     if (action === "invite") {
-      button.textContent = connected ? "Inserir convite" : "Tenho convite";
+      button.textContent = connected ? "Inserir convite" : "Entrar com convite";
       button.hidden = authorized;
     }
-    if (action === "create") button.hidden = connected;
+    if (action === "create") {
+      button.hidden = connected;
+      button.textContent = "Criar minha família";
+    }
     if (action === "login") {
       button.hidden = false;
-      button.textContent = connected ? (authorized ? "Ver rotina" : "Conta conectada") : "Entrar agora";
+      button.textContent = connected ? (authorized ? "Ver rotina" : "Conta conectada") : "Já tenho conta";
       button.disabled = connected && !authorized;
     }
   });
+}
+
+function normalizeCommercialEntryAction(action = "login") {
+  const value = String(action || "login").trim();
+  if (value === "invite") return "invite";
+  if (value === "create" || value === "family") return "create";
+  return "login";
 }
 
 function closeGuestLoginModal() {
@@ -1712,27 +2004,165 @@ function focusProfileAccess(mode = "login") {
 
   const wantsInvite = mode === "invite";
   const wantsCreate = mode === "create";
+  setCommercialEntryIntent(wantsCreate ? "create" : wantsInvite ? "invite" : "login");
+  if (loginCard) loginCard.dataset.commercialIntent = wantsCreate ? "create" : wantsInvite ? "invite" : "login";
+  if (createAccountButton) createAccountButton.textContent = wantsCreate ? "Criar conta familiar" : "Criar conta";
+  if (loginButton) loginButton.textContent = wantsInvite ? "Entrar para usar convite" : "Entrar";
   if (loginHelper) {
     loginHelper.textContent = wantsInvite
-      ? "Entre ou crie sua conta com o mesmo e-mail do convite. Depois cole o código recebido pelo administrador."
+      ? "Entre ou crie sua conta com o mesmo e-mail do convite. Depois cole o código da família existente."
       : wantsCreate
-        ? "Informe seu e-mail, crie uma senha e toque em Criar conta. Se você recebeu convite, use o mesmo e-mail indicado pelo admin."
-        : "Entre para salvar a rotina com segurança e acompanhar o bebê em família.";
+        ? "Crie sua conta familiar com e-mail e senha. Depois preencha os dados do bebê para criar a família agora."
+        : "Entre com sua conta Ninou para acessar uma família já conectada.";
   }
 
   window.setTimeout(() => {
-    const loginCard = loginHelper?.closest(".login-card");
+    const loginCardElement = loginHelper?.closest(".login-card");
     const journeyCard = document.querySelector("#accountJourneyCard");
     const target = wantsInvite && isLoggedIn()
       ? inviteAcceptBox
-      : (isLoggedIn() ? (journeyCard || loginCard) : loginCard);
+      : wantsCreate && isLoggedIn()
+        ? (createFamilyWizard || familyAccessCard || journeyCard || loginCardElement)
+        : (isLoggedIn() ? (journeyCard || loginCardElement) : loginCardElement);
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
     if (wantsInvite && isLoggedIn()) {
       inviteCodeInput?.focus();
+    } else if (wantsCreate && isLoggedIn()) {
+      openCreateFamilyWizard({ focus: true });
     } else {
       loginEmail?.focus();
     }
   }, 220);
+}
+
+const COMMERCIAL_ENTRY_INTENT_KEY = "ninou.commercialEntryIntent";
+
+function setCommercialEntryIntent(action = "login") {
+  const value = normalizeCommercialEntryAction(action);
+  try { localStorage.setItem(COMMERCIAL_ENTRY_INTENT_KEY, value); } catch {}
+  return value;
+}
+
+function getCommercialEntryIntent() {
+  try { return normalizeCommercialEntryAction(localStorage.getItem(COMMERCIAL_ENTRY_INTENT_KEY) || loginCard?.dataset.commercialIntent || "login"); } catch {
+    return normalizeCommercialEntryAction(loginCard?.dataset.commercialIntent || "login");
+  }
+}
+
+function clearCommercialEntryIntent() {
+  try { localStorage.removeItem(COMMERCIAL_ENTRY_INTENT_KEY); } catch {}
+  if (loginCard) loginCard.dataset.commercialIntent = "login";
+}
+
+function getCreateFamilyWizardDefaults() {
+  const identity = loadCurrentCaregiverIdentity();
+  const babyName = String(newFamilyBabyNameInput?.value || babyNameInput?.value || babyProfile?.name || "").trim();
+  const fallbackFamilyName = babyName ? `Família do ${babyName}` : "";
+  return {
+    babyName,
+    birthDate: String(newFamilyBabyBirthInput?.value || babyBirthInput?.value || babyProfile?.birthDate || "").trim(),
+    familyName: String(newFamilyNameInput?.value || fallbackFamilyName).trim(),
+    article: String(newFamilyBabyArticleInput?.value || babyProfile?.article || "do").trim() === "da" ? "da" : "do",
+    responsibleName: String(newFamilyResponsibleNameInput?.value || identity.name || "").trim(),
+    responsibleRelation: String(newFamilyResponsibleRelationInput?.value || identity.relation || "responsavel").trim() || "responsavel",
+  };
+}
+
+function syncCreateFamilyWizardDefaults({ force = false } = {}) {
+  if (!createFamilyWizard) return;
+  const defaults = getCreateFamilyWizardDefaults();
+  if (newFamilyBabyNameInput && (force || !newFamilyBabyNameInput.value)) newFamilyBabyNameInput.value = defaults.babyName;
+  if (newFamilyBabyBirthInput && (force || !newFamilyBabyBirthInput.value)) newFamilyBabyBirthInput.value = defaults.birthDate;
+  if (newFamilyNameInput && (force || !newFamilyNameInput.value)) newFamilyNameInput.value = defaults.familyName;
+  if (newFamilyBabyArticleInput && (force || !newFamilyBabyArticleInput.value)) newFamilyBabyArticleInput.value = defaults.article;
+  if (newFamilyResponsibleNameInput && (force || !newFamilyResponsibleNameInput.value)) newFamilyResponsibleNameInput.value = defaults.responsibleName;
+  if (newFamilyResponsibleRelationInput && (force || !newFamilyResponsibleRelationInput.value)) newFamilyResponsibleRelationInput.value = defaults.responsibleRelation;
+}
+
+function openCreateFamilyWizard(options = {}) {
+  if (!createFamilyWizard) return false;
+  setCommercialEntryIntent("create");
+  if (!isLoggedIn()) {
+    focusProfileAccess("create");
+    return false;
+  }
+  if (hasFamilyAccess()) {
+    createFamilyWizard.hidden = true;
+    if (loginHelper) loginHelper.textContent = "Esta conta já está vinculada a uma família.";
+    return false;
+  }
+  syncCreateFamilyWizardDefaults();
+  createFamilyWizard.hidden = false;
+  if (createFamilyWizardStatus) {
+    createFamilyWizardStatus.innerHTML = "Preencha os dados e toque em <strong>Criar família agora</strong>.";
+  }
+  if (options.focus !== false) {
+    createFamilyWizard.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => (newFamilyBabyNameInput || newFamilyNameInput || confirmCreateFamilyButton)?.focus(), 180);
+  }
+  return true;
+}
+
+function closeCreateFamilyWizard() {
+  if (createFamilyWizard) createFamilyWizard.hidden = true;
+  if (getCommercialEntryIntent() === "create") clearCommercialEntryIntent();
+}
+
+function getCommercialFamilyFormValues() {
+  const values = getCreateFamilyWizardDefaults();
+  values.babyName = String(newFamilyBabyNameInput?.value || values.babyName || "").trim();
+  values.birthDate = String(newFamilyBabyBirthInput?.value || values.birthDate || "").trim();
+  values.familyName = String(newFamilyNameInput?.value || values.familyName || "").trim();
+  values.article = String(newFamilyBabyArticleInput?.value || values.article || "do").trim() === "da" ? "da" : "do";
+  values.responsibleName = String(newFamilyResponsibleNameInput?.value || values.responsibleName || "").trim();
+  values.responsibleRelation = String(newFamilyResponsibleRelationInput?.value || values.responsibleRelation || "responsavel").trim() || "responsavel";
+  if (!values.familyName && values.babyName) values.familyName = `Família do ${values.babyName}`;
+  return values;
+}
+
+function validateCommercialFamilyForm() {
+  const values = getCommercialFamilyFormValues();
+  if (!values.babyName) {
+    if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = "Informe o nome do bebê para criar a família.";
+    newFamilyBabyNameInput?.focus();
+    return null;
+  }
+  if (!values.familyName) {
+    values.familyName = `Família do ${values.babyName}`;
+    if (newFamilyNameInput) newFamilyNameInput.value = values.familyName;
+  }
+  if (!values.responsibleName) {
+    if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = "Informe seu nome para assinar os registros deste aparelho.";
+    newFamilyResponsibleNameInput?.focus();
+    return null;
+  }
+  return values;
+}
+
+async function createCommercialFamilyFromWizard() {
+  if (!cloudUser) {
+    focusProfileAccess("create");
+    return null;
+  }
+  if (hasFamilyAccess()) {
+    if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = "Esta conta já possui uma família conectada.";
+    return familyAccess;
+  }
+  const values = validateCommercialFamilyForm();
+  if (!values) return null;
+  if (confirmCreateFamilyButton) {
+    confirmCreateFamilyButton.disabled = true;
+    confirmCreateFamilyButton.textContent = "Criando família...";
+  }
+  if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = "Criando ambiente familiar seguro...";
+  try {
+    return await activatePersonalFamily(values);
+  } finally {
+    if (confirmCreateFamilyButton) {
+      confirmCreateFamilyButton.disabled = false;
+      confirmCreateFamilyButton.textContent = "Criar família agora";
+    }
+  }
 }
 
 function syncAvatarModalScrollLock(locked) {
@@ -2104,7 +2534,7 @@ function getCurrentActorProfile() {
   const displayName = storedName || (isPrimaryAdmin ? "Luiz Felipe" : "");
   const relationshipLabel = storedRelationshipLabel || (isPrimaryAdmin ? "Pai" : "");
   const label = [displayName, relationshipLabel].filter(Boolean).join(" · ") || getFallbackActorNameFromEmail(email);
-  const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
+  const role = getEffectiveRole(familyAccess?.role || FAMILY_ROLE_ADMIN, email);
   return {
     uid: getCurrentActorUid(),
     email,
@@ -2168,8 +2598,8 @@ const caregiverDeviceIdKey = "ninou.deviceId";
 /*
   v75.56.2.1.1 — identificação por aparelho
 
-  A família usa a mesma conta (francisco@gmail.com) em mais de um celular.
-  Por isso, a identificação do cuidador não pode ser salva na conta global.
+  Felipe e Maria usam e-mails próprios, mas pertencem à mesma família do Francisco.
+  Por isso, a identificação do cuidador continua salva por aparelho.
   Ela fica salva somente neste aparelho:
   - celular do Felipe: Felipe / Pai
   - celular da Maria: Maria / Mãe
@@ -2235,11 +2665,12 @@ function loadCurrentCaregiverIdentity() {
     const name = String(data.displayName || data.name || "").trim();
     const relation = String(data.relationship || data.relation || "").trim();
     const relationLabel = String(data.relationshipLabel || getCaregiverRelationLabel(relation) || "").trim();
+    const label = formatCaregiverNameRole(name, relationLabel) || name || relationLabel;
     return {
       name,
       relation,
       relationshipLabel: relationLabel,
-      label: name || relationLabel,
+      label,
       deviceId: String(data.deviceId || getOrCreateCaregiverDeviceId()).trim(),
     };
   } catch {
@@ -2252,7 +2683,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const cleanName = String(name || "").trim();
   const cleanRelation = String(relation || "").trim();
   const relationshipLabel = String(extras.relationshipLabel || getCaregiverRelationLabel(cleanRelation) || "").trim();
-  const role = getEffectiveRole(familyAccess?.role || "responsavel", email);
+  const role = getEffectiveRole(familyAccess?.role || FAMILY_ROLE_ADMIN, email);
   const payload = {
     uid: String(extras.uid || getCurrentActorUid() || "").trim(),
     email,
@@ -2428,7 +2859,7 @@ function renderProfileFamilyCards() {
   }
   if (familyNameLabel) familyNameLabel.textContent = familyLabel;
   if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || familyAccess?.email || "Conta não conectada";
-  if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = getRoleLabel(familyAccess?.role || "responsavel");
+  if (familyAccessTypeLabel) familyAccessTypeLabel.textContent = getRoleLabel(familyAccess?.role || FAMILY_ROLE_ADMIN);
   if (familyInviteDescription) {
     familyInviteDescription.textContent = canManageFamilyAccess()
       ? `Convide outro cuidador para acompanhar a rotina ${babyName ? `de ${babyName}` : "do bebê"}. O convite entra na família existente.`
@@ -2440,6 +2871,58 @@ function renderProfileFamilyCards() {
   }
   renderFamilyActiveInvite();
   renderFamilyAccessSummary();
+}
+
+
+function renderTodayCaregiverCard() {
+  if (!todayCaregiverCard) return;
+  const familyReady = canUsePrivateFeatures();
+  todayCaregiverCard.hidden = !familyReady;
+  todayCaregiverCard.setAttribute("aria-hidden", familyReady ? "false" : "true");
+  if (!familyReady) return;
+
+  const identity = loadCurrentCaregiverIdentity();
+  const relationLabel = identity.relationshipLabel || getCaregiverRelationLabel(identity.relation);
+  const label = formatCaregiverNameRole(identity.name, relationLabel) || identity.label || "Cuidador não configurado";
+  const configured = Boolean(identity.name || identity.relation || identity.label);
+
+  todayCaregiverCard.classList.toggle("caregiver-configured", configured);
+  todayCaregiverCard.dataset.configured = configured ? "true" : "false";
+
+  if (todayCaregiverAvatar) todayCaregiverAvatar.textContent = getCaregiverEmoji(identity.relation);
+  if (todayCaregiverName) todayCaregiverName.textContent = label;
+  if (todayCaregiverHint) {
+    todayCaregiverHint.textContent = configured
+      ? `Os próximos registros serão assinados como ${label}.`
+      : "Toque em configurar para o diário mostrar quem fez cada registro.";
+  }
+  if (todayCaregiverEditButton) {
+    todayCaregiverEditButton.textContent = configured ? "Trocar" : "Configurar";
+    todayCaregiverEditButton.title = configured ? "Trocar cuidador deste aparelho" : "Configurar cuidador deste aparelho";
+  }
+}
+
+function applyCaregiverPresetFromButton(button) {
+  if (!button) return;
+  const name = String(button.dataset.caregiverPresetName || "").trim();
+  const relation = String(button.dataset.caregiverPresetRelation || "").trim();
+  if (!name && !relation) return;
+
+  saveCurrentCaregiverIdentity(name, relation);
+  if (caregiverNameInput) caregiverNameInput.value = name;
+  if (caregiverRelationInput) caregiverRelationInput.value = relation;
+
+  const identity = loadCurrentCaregiverIdentity();
+  if (caregiverIdentityStatus) {
+    caregiverIdentityStatus.textContent = identity.label
+      ? `Pronto. Este aparelho agora registra como ${identity.label}.`
+      : "Identificação atualizada neste aparelho.";
+  }
+
+  renderCaregiverIdentityPanel();
+  renderFamilyAccessSummary();
+  renderTodayCaregiverCard();
+  try { updateProfileReadyExperience(); } catch {}
 }
 
 function openCaregiverEditor() {
@@ -2492,6 +2975,7 @@ function renderCaregiverIdentityPanel() {
         : "Defina o nome e o vínculo que aparecerão nos registros deste aparelho.");
   }
   renderProfileFamilyCards();
+  renderTodayCaregiverCard();
 }
 
 async function saveCaregiverIdentityFromForm() {
@@ -2500,7 +2984,7 @@ async function saveCaregiverIdentityFromForm() {
 
   // v75.56.2.1.1: salva somente neste aparelho.
   // Não grava em users/{uid}/account/profile para não trocar o nome do cuidador
-  // em todos os celulares que usam a conta compartilhada francisco@gmail.com.
+  // em todos os aparelhos da família do Francisco.
   saveCurrentCaregiverIdentity(name, relation);
   const identity = loadCurrentCaregiverIdentity();
 
@@ -2514,6 +2998,7 @@ async function saveCaregiverIdentityFromForm() {
 
   renderCaregiverIdentityPanel();
   renderFamilyAccessSummary();
+  renderTodayCaregiverCard();
   closeCaregiverEditor();
 }
 
@@ -2608,7 +3093,7 @@ function sanitizeLocalStorageSegment(value = "") {
 }
 
 function getActiveFamilyCacheScope() {
-  const familyId = familyAccess?.familyId || "";
+  const familyId = getResolvedFamilyScope({ allowLegacyFallback: false }).familyId || "";
   if (familyId) return `family.${familyId}`;
 
   const ownerEmail = getVisibleDataOwnerEmail?.() || normalizeEmail(cloudUser?.email || localStorage.getItem(storageKeys.email) || "");
@@ -2621,6 +3106,79 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const scope = sanitizeLocalStorageSegment(familyId ? `family.${familyId}` : getActiveFamilyCacheScope());
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
+}
+
+// v75.75.45 — isolamento local/comercial por família.
+// Perfil, pesos e dias passam a usar chaves derivadas do familyId ativo.
+// O cache legado fica apenas como compatibilidade para contas antigas sem família comercial.
+function getActiveDataScope(options = {}) {
+  const scope = getResolvedFamilyScope({
+    allowAdminSelection: options.allowAdminSelection !== false,
+    allowLegacyFallback: false,
+  });
+  if (scope.familyId) return {
+    ...scope,
+    storageScope: sanitizeLocalStorageSegment(`family.${scope.familyId}`),
+    isFamilyScoped: true,
+  };
+
+  const fallbackScope = getActiveFamilyCacheScope();
+  return {
+    ...scope,
+    familyId: "",
+    storageScope: sanitizeLocalStorageSegment(fallbackScope),
+    isFamilyScoped: false,
+  };
+}
+
+function isFamilyScopedDataActive() {
+  return Boolean(getActiveDataScope().isFamilyScoped);
+}
+
+function getScopedStorageKey(baseKey = "", familyId = "") {
+  const base = String(baseKey || "").trim();
+  if (!base) return "";
+  const scope = familyId
+    ? sanitizeLocalStorageSegment(`family.${normalizeFamilyId(familyId)}`)
+    : getActiveDataScope().storageScope;
+  return `${base}.${scope}`;
+}
+
+function getScopedProfileStorageKey(familyId = "") {
+  return getScopedStorageKey(storageKeys.profile, familyId);
+}
+
+function getScopedProfileVersionStorageKey(familyId = "") {
+  return getScopedStorageKey(storageKeys.profileVersion, familyId);
+}
+
+function getScopedWakeWindowStorageKey(familyId = "") {
+  return getScopedStorageKey(storageKeys.wakeWindow, familyId);
+}
+
+function getScopedWeightsStorageKey(familyId = "") {
+  return getScopedStorageKey(storageKeys.weights, familyId);
+}
+
+function getActiveFamilyMetadata() {
+  const scope = getResolvedFamilyScope({ allowLegacyFallback: false });
+  return {
+    familyId: scope.familyId || "",
+    familyScopeType: scope.scopeType || getFamilyScopeType(scope.familyId || ""),
+    familyScopeVersion: NINOU_FAMILY_SCOPE_VERSION,
+  };
+}
+
+function stampFamilyData(payload = {}) {
+  const meta = getActiveFamilyMetadata();
+  return meta.familyId ? { ...payload, ...meta } : { ...payload };
+}
+
+function payloadBelongsToActiveFamily(payload = {}) {
+  const activeFamilyId = normalizeFamilyId(getActiveFamilyMetadata().familyId || "");
+  const payloadFamilyId = normalizeFamilyId(payload?.familyId || "");
+  if (!activeFamilyId || !payloadFamilyId) return true;
+  return activeFamilyId === payloadFamilyId;
 }
 
 function getLegacyLocalDayStateStorageKey(dayId = getCurrentDayId()) {
@@ -2652,14 +3210,22 @@ function dayStateBelongsToDay(dayState = {}, dayId = getCurrentDayId()) {
 
 function loadLocalDayState(dayId = getCurrentDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const familyScoped = isFamilyScopedDataActive();
 
   try {
     const scopedValue = localStorage.getItem(getLocalDayStateStorageKey(safeDayId));
     if (scopedValue !== null && typeof scopedValue !== "undefined") {
-      return sanitizeDayStateForDay(JSON.parse(scopedValue || "{}"), safeDayId);
+      const parsed = JSON.parse(scopedValue || "{}");
+      if (!payloadBelongsToActiveFamily(parsed)) return sanitizeDayStateForDay(createEmptyDayState(), safeDayId);
+      return sanitizeDayStateForDay(parsed, safeDayId);
     }
   } catch {
     // Se o cache por família+dia estiver inválido, cai para os fluxos seguros abaixo.
+  }
+
+  // Famílias comerciais não podem herdar rotina do cache legado/global.
+  if (familyScoped) {
+    return sanitizeDayStateForDay(createEmptyDayState(), safeDayId);
   }
 
   try {
@@ -2685,21 +3251,22 @@ function saveLocalDayState(dayId = getSelectedDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const sanitized = sanitizeDayStateForDay(state, safeDayId, { preserveLive: true });
   const now = Date.now();
-  const payload = {
+  const payload = stampFamilyData({
     ...sanitized,
     dayId: safeDayId,
     date: safeDayId,
     dayNotesDayId: sanitized.dayNotes ? safeDayId : "",
     dayNotesUpdatedAt: sanitized.dayNotes ? (sanitized.dayNotesUpdatedAt || now) : 0,
     clientUpdatedAt: now,
-  };
+  });
 
   localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
-  localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
 
-  // Compatibilidade apenas como espelho do dia atualmente carregado.
-  // O app não usa mais este cache genérico para abrir outros dias.
-  localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
+  // Compatibilidade apenas para contas antigas sem família comercial ativa.
+  if (!isFamilyScopedDataActive()) {
+    localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
+    localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
+  }
   persistVisibleContextForCurrentOwner();
 }
 
@@ -2708,14 +3275,14 @@ function persistDayStateForDay(dayState = createEmptyDayState(), dayId = getCurr
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const sanitized = sanitizeDayStateForDay(dayState, safeDayId, { preserveLive: true });
   const now = Date.now();
-  const payload = {
+  const payload = stampFamilyData({
     ...sanitized,
     dayId: safeDayId,
     date: safeDayId,
     dayNotesDayId: sanitized.dayNotes ? safeDayId : "",
     dayNotesUpdatedAt: sanitized.dayNotes ? (sanitized.dayNotesUpdatedAt || now) : 0,
     clientUpdatedAt: now,
-  };
+  });
 
   familyDayStatesCache = {
     ...familyDayStatesCache,
@@ -2726,8 +3293,10 @@ function persistDayStateForDay(dayState = createEmptyDayState(), dayId = getCurr
   }
 
   localStorage.setItem(getLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
-  localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
-  if (safeDayId === getSelectedDayId()) localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
+  if (!isFamilyScopedDataActive()) {
+    localStorage.setItem(getLegacyLocalDayStateStorageKey(safeDayId), JSON.stringify(payload));
+    if (safeDayId === getSelectedDayId()) localStorage.setItem(storageKeys.dayState, JSON.stringify(payload));
+  }
   persistVisibleContextForCurrentOwner();
   return payload;
 }
@@ -3052,7 +3621,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.56.2.1.1: Felipe e Maria usam a mesma conta da família (francisco@gmail.com),
+    v75.75.53: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3065,22 +3634,38 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   };
 }
 
-const familyInviteStorageKey = "ninou.family.activeInvite.v75.57";
+const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.46";
 let familyActiveInvite = loadFamilyActiveInvite();
 
-function loadFamilyActiveInvite() {
+function getFamilyInviteTargetFamilyId(invite = null) {
+  return normalizeFamilyId(invite?.familyId || getActiveClientFamilyId() || familyAccess?.familyId || "");
+}
+
+function getFamilyInviteStorageKey(familyId = getFamilyInviteTargetFamilyId()) {
+  const normalizedFamilyId = normalizeFamilyId(familyId || "guest");
+  return `${familyInviteStorageBaseKey}.${normalizedFamilyId || "guest"}`;
+}
+
+function loadFamilyActiveInvite(familyId = getFamilyInviteTargetFamilyId()) {
   try {
-    return JSON.parse(localStorage.getItem(familyInviteStorageKey) || "null");
+    const invite = JSON.parse(localStorage.getItem(getFamilyInviteStorageKey(familyId)) || "null");
+    if (!invite || typeof invite !== "object") return null;
+    const inviteFamilyId = normalizeFamilyId(invite.familyId || familyId || "");
+    const currentFamilyId = normalizeFamilyId(familyId || "");
+    if (currentFamilyId && inviteFamilyId && inviteFamilyId !== currentFamilyId) return null;
+    return { ...invite, familyId: inviteFamilyId };
   } catch {
     return null;
   }
 }
 
 function saveFamilyActiveInvite(invite) {
-  familyActiveInvite = invite;
+  const targetFamilyId = getFamilyInviteTargetFamilyId(invite);
+  familyActiveInvite = invite ? { ...invite, familyId: targetFamilyId || invite.familyId || "" } : null;
   try {
-    if (invite) localStorage.setItem(familyInviteStorageKey, JSON.stringify(invite));
-    else localStorage.removeItem(familyInviteStorageKey);
+    const key = getFamilyInviteStorageKey(targetFamilyId);
+    if (familyActiveInvite) localStorage.setItem(key, JSON.stringify(familyActiveInvite));
+    else localStorage.removeItem(key);
   } catch {}
   renderFamilyActiveInvite();
 }
@@ -3102,17 +3687,43 @@ Entre ou crie sua conta com o mesmo e-mail do convite. Assim você entra na fam�
 }
 
 function renderFamilyActiveInvite() {
+  const currentFamilyId = getFamilyInviteTargetFamilyId();
+  const loadedInvite = loadFamilyActiveInvite(currentFamilyId);
+  if (loadedInvite?.code !== familyActiveInvite?.code || loadedInvite?.familyId !== familyActiveInvite?.familyId) {
+    familyActiveInvite = loadedInvite;
+  }
+
   const invite = familyActiveInvite;
-  const active = Boolean(invite?.code && (!invite.expiresAtClient || Number(invite.expiresAtClient) > Date.now()));
+  const active = Boolean(invite?.code && (!invite.expiresAtClient || Number(invite.expiresAtClient) > Date.now()) && (!currentFamilyId || invite.familyId === currentFamilyId));
+  const canInvite = canManageFamilyAccess();
+
+  if (familyInviteForm) familyInviteForm.hidden = !canInvite;
+  if (familyInviteEmailInput) familyInviteEmailInput.disabled = !canInvite;
+  if (familyInviteRoleSelect) familyInviteRoleSelect.disabled = !canInvite;
+  if (familyInviteFormHint) {
+    familyInviteFormHint.textContent = canInvite
+      ? "O convite fica preso a esta família, expira em 7 dias e tem uso único."
+      : hasFamilyAccess()
+        ? "Seu papel atual não permite criar convites. Peça a um responsável."
+        : "Entre ou crie uma família para gerar convites.";
+  }
+
   if (familyActiveInviteBox) familyActiveInviteBox.hidden = !active;
   if (familyInviteShareActions) familyInviteShareActions.hidden = !active;
   if (familyActiveInviteCode) familyActiveInviteCode.textContent = active ? invite.code : "—";
   if (familyActiveInviteHint) {
+    const roleLabel = invite?.role ? getRoleLabel(invite.role) : "Cuidador";
     familyActiveInviteHint.textContent = active
-      ? `${invite.email ? invite.email + " • " : ""}uso único • expira em 7 dias`
+      ? `${invite.email ? invite.email + " • " : ""}${roleLabel} • uso único • expira em 7 dias`
       : "Nenhum convite ativo";
   }
+  if (familyPendingInviteList) {
+    familyPendingInviteList.innerHTML = active
+      ? `<li><strong>${escapeHtml(invite.email || "Convidado")}</strong><span>${escapeHtml(getRoleLabel(invite.role || "cuidador"))} • ${escapeHtml(invite.code)}</span></li>`
+      : `<li>Nenhum convite familiar ativo neste aparelho.</li>`;
+  }
 }
+
 
 async function createFamilyCaregiverInvite() {
   if (!canUsePrivateFeatures()) {
@@ -3123,37 +3734,64 @@ async function createFamilyCaregiverInvite() {
   if (!canManageFamilyAccess()) {
     if (loginHelper) loginHelper.textContent = "Seu acesso permite registrar a rotina, mas não gerar convites familiares.";
     if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Peça a um responsável para convidar novos cuidadores.";
+    renderFamilyActiveInvite();
     return;
   }
-  const invitedEmail = normalizeEmail(window.prompt("E-mail do cuidador convidado:", "") || "");
+
+  const familyId = getFamilyInviteTargetFamilyId();
+  if (!familyId) {
+    const message = "Crie ou entre em uma família antes de gerar convites.";
+    if (loginHelper) loginHelper.textContent = message;
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = message;
+    return;
+  }
+
+  let invitedEmail = normalizeEmail(familyInviteEmailInput?.value || "");
+  if (!invitedEmail && !familyInviteEmailInput) {
+    invitedEmail = normalizeEmail(window.prompt("E-mail do cuidador convidado:", "") || "");
+  }
+  const role = normalizeInviteRole(familyInviteRoleSelect?.value || FAMILY_ROLE_CAREGIVER);
+
   if (!invitedEmail || !invitedEmail.includes("@")) {
-    if (loginHelper) loginHelper.textContent = "Para segurança, informe o e-mail correto do cuidador convidado.";
+    const message = "Informe o e-mail correto da pessoa convidada.";
+    if (loginHelper) loginHelper.textContent = message;
     if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Convite cancelado: faltou informar um e-mail válido.";
+    familyInviteEmailInput?.focus();
     return;
   }
   if (normalizeEmail(cloudUser?.email || "") === invitedEmail) {
+    const message = "Convite não criado: o e-mail informado já está conectado neste aparelho.";
     if (loginHelper) loginHelper.textContent = "Este e-mail já é a conta conectada. Use outro e-mail para convidar um cuidador.";
-    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Convite não criado: o e-mail informado já está conectado neste aparelho.";
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = message;
     return;
   }
+
   const code = generateFamilyInviteCode();
   const now = Date.now();
   const expiry = getInviteExpiryPayload(null, now);
   const actor = getCurrentActorProfile();
+  const familyName = getProfileFamilyDisplayName();
+  const link = buildInviteLink(code);
   const invite = {
     code,
-    familyId: familyAccess?.familyId || APP_ADMIN_FAMILY_ID,
-    familyName: getProfileFamilyDisplayName(),
+    familyId,
+    familyName,
+    familyScopeType: getFamilyScopeType(familyId),
     email: invitedEmail,
     status: "pending",
-    role: "cuidador",
+    role,
     maxUses: INVITE_MAX_USES,
     useCount: 0,
+    link,
+    inviteVersion: NINOU_RUNTIME_VERSION,
+    source: "family_profile",
     createdByUid: cloudUser?.uid || null,
+    createdByEmail: normalizeEmail(cloudUser?.email || ""),
     createdByName: actor.label || actor.email || "Cuidador",
     createdAtClient: now,
     expiresAtClient: expiry.expiresAtClient,
   };
+
   saveFamilyActiveInvite(invite);
   if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = `Convite criado para ${invitedEmail}. Copie o código ou envie pelo WhatsApp.`;
 
@@ -3169,13 +3807,20 @@ async function createFamilyCaregiverInvite() {
       };
       const globalInvitePayload = {
         ...getMinimalGlobalInvitePayload({ ...invite, ...cloudExpiry }),
+        link,
+        source: "family_profile",
+        familyName,
+        familyScopeType: getFamilyScopeType(familyId),
+        inviteVersion: NINOU_RUNTIME_VERSION,
         createdAt: services.serverTimestamp(),
         updatedAt: services.serverTimestamp(),
       };
-      await services.setDoc(services.doc(services.db, "families", invite.familyId, "invitations", code), familyInvitePayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), familyInvitePayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), familyInvitePayload, { merge: true });
       await services.setDoc(services.doc(services.db, "invites", code), globalInvitePayload, { merge: true });
-      await writeFamilyAuditLog("invite_created", { familyId: invite.familyId, targetEmail: invitedEmail, role: invite.role, code });
+      await writeFamilyAuditLog("invite_created", { familyId, targetEmail: invitedEmail, role, code });
     }
+    if (familyInviteEmailInput) familyInviteEmailInput.value = "";
   } catch (error) {
     console.warn("Não foi possível salvar o convite no Firebase:", error);
     saveFamilyActiveInvite(null);
@@ -3186,6 +3831,7 @@ async function createFamilyCaregiverInvite() {
     if (loginHelper) loginHelper.textContent = message;
   }
 }
+
 
 async function copyFamilyInviteCode() {
   if (!familyActiveInvite?.code) return;
@@ -3279,7 +3925,7 @@ async function confirmJoinFamilyInvite() {
     }
     if (inviteEmail && inviteEmail !== userEmail) throw new Error(`Este convite foi criado para ${inviteEmail}.`);
 
-    const role = normalizeInviteRole(invite.role || "cuidador");
+    const role = normalizeInviteRole(invite.role || FAMILY_ROLE_CAREGIVER);
     const accessPayload = {
       familyId,
       role,
@@ -3287,6 +3933,7 @@ async function confirmJoinFamilyInvite() {
       ownerUid: invite.ownerUid || invite.createdByUid || invite.createdBy || "",
       inviteCode: code,
       joinedByInvite: code,
+      roleVersion: NINOU_FAMILY_SCOPE_VERSION,
     };
 
     await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "families", familyId), {
@@ -3324,10 +3971,11 @@ async function confirmJoinFamilyInvite() {
 
     await services.setDoc(inviteRef, acceptedPayload, { merge: true });
     try {
+      await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), acceptedPayload, { merge: true });
       await services.setDoc(services.doc(services.db, "invites", code), acceptedPayload, { merge: true });
       await writeFamilyAuditLog("invite_accepted", { familyId, targetEmail: userEmail, role, code });
     } catch (globalUpdateError) {
-      console.warn("Convite aceito, mas o espelho global não foi atualizado:", globalUpdateError);
+      console.warn("Convite aceito, mas o espelho global/familiar não foi atualizado:", globalUpdateError);
     }
 
     saveFamilyAccess({ ...accessPayload, acceptedAt: new Date().toISOString() });
@@ -3376,20 +4024,21 @@ function canUsePrivateFeatures() {
 function hasPermissionForAction(actionText = "") {
   if (!hasFamilyAccess()) return false;
   const role = getEffectiveRole(familyAccess.role, cloudUser?.email || familyAccess?.email || "");
-  if (role === "admin" || role === "responsavel") return true;
+  if ([FAMILY_ROLE_GLOBAL_ADMIN, FAMILY_ROLE_OWNER, FAMILY_ROLE_ADMIN].includes(role)) return true;
 
   const text = String(actionText).toLowerCase();
   const familyManagement = /(convite|convidar|permiss|família|familia|membro|cuidador)/.test(text);
   const profileManagement = /(perfil|foto|avatar|peso|janela|exportar|backup|relatório|relatorio)/.test(text);
   const destructiveAction = /(excluir|zerar|limpar|apagar)/.test(text);
   const routineWrite = /(registrar|criar registros|editar registros|salvar registros|salvar a rotina|observações|observacoes|sono|mamada|mamadeira|fralda|medicamento)/.test(text);
+  const readOnlyAction = /(ver|visualizar|acompanhar|abrir|consultar)/.test(text);
 
-  if (role === "cuidador") {
+  if (role === FAMILY_ROLE_CAREGIVER) {
     return routineWrite && !familyManagement && !profileManagement && !destructiveAction;
   }
 
-  if (role === "visualizacao") {
-    return false;
+  if (role === FAMILY_ROLE_VIEWER) {
+    return readOnlyAction && !routineWrite && !familyManagement && !profileManagement && !destructiveAction;
   }
 
   return false;
@@ -3414,7 +4063,7 @@ function requireLogin(actionText = "usar o Ninou") {
   }
   showScreen("profile");
   if (loginHelper) {
-    loginHelper.textContent = `Sua conta precisa estar vinculada a uma família para ${actionText}. Use um convite do administrador do app.`;
+    loginHelper.textContent = `Sua conta precisa estar vinculada a uma família para ${actionText}. Crie sua família ou use um convite recebido.`;
   }
   return false;
 }
@@ -3463,28 +4112,37 @@ function normalizeInviteCode(value = "") {
   return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
 }
 
-function normalizeRole(value = "responsavel") {
-  return ["admin", "responsavel", "cuidador", "visualizacao"].includes(value) ? value : "responsavel";
-}
-
-function getRoleLabel(role = "responsavel") {
+function getRoleLabel(role = FAMILY_ROLE_ADMIN) {
   const labels = {
-    admin: "Administrador",
-    responsavel: "Acesso completo",
-    cuidador: "Cuidador",
-    visualizacao: "Somente visualização",
+    [FAMILY_ROLE_GLOBAL_ADMIN]: "Administrador global",
+    [FAMILY_ROLE_OWNER]: "Responsável principal",
+    [FAMILY_ROLE_ADMIN]: "Admin familiar",
+    [FAMILY_ROLE_CAREGIVER]: "Cuidador",
+    [FAMILY_ROLE_VIEWER]: "Visualização",
   };
-  return labels[normalizeRole(role)] || labels.responsavel;
+  return labels[normalizeRole(role)] || labels[FAMILY_ROLE_ADMIN];
 }
 
-function getRoleDescription(role = "responsavel") {
+function getRoleDescription(role = FAMILY_ROLE_ADMIN) {
   const descriptions = {
-    admin: "gerencia família, membros, convites, relatórios e rotina",
-    responsavel: "edita perfil, rotina, convites e relatórios",
-    cuidador: "registra rotina, observações, mamadas, fraldas e sono",
-    visualizacao: "acompanha a rotina sem alterar registros",
+    [FAMILY_ROLE_GLOBAL_ADMIN]: "acessa o painel global de suporte e famílias",
+    [FAMILY_ROLE_OWNER]: "controla a família, membros, convites, perfil, relatórios e rotina",
+    [FAMILY_ROLE_ADMIN]: "gerencia perfil, rotina, membros, convites e relatórios da família",
+    [FAMILY_ROLE_CAREGIVER]: "registra rotina, observações, mamadas, fraldas e sono",
+    [FAMILY_ROLE_VIEWER]: "acompanha a rotina e relatórios sem alterar registros",
   };
-  return descriptions[normalizeRole(role)] || descriptions.responsavel;
+  return descriptions[normalizeRole(role)] || descriptions[FAMILY_ROLE_ADMIN];
+}
+
+function getRoleShortDescription(role = FAMILY_ROLE_ADMIN) {
+  const descriptions = {
+    [FAMILY_ROLE_OWNER]: "dono da família",
+    [FAMILY_ROLE_ADMIN]: "gerencia família",
+    [FAMILY_ROLE_CAREGIVER]: "registra rotina",
+    [FAMILY_ROLE_VIEWER]: "somente acompanha",
+    [FAMILY_ROLE_GLOBAL_ADMIN]: "suporte global",
+  };
+  return descriptions[normalizeRole(role)] || descriptions[FAMILY_ROLE_ADMIN];
 }
 
 function getFamilyActionLabel(action = "") {
@@ -3513,8 +4171,8 @@ function getAuditTimeLabel(value) {
 function canCurrentUserLeaveFamily() {
   if (!hasFamilyAccess()) return false;
   if (isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen) return false;
-  const role = getEffectiveRole(familyAccess?.role || "visualizacao", cloudUser?.email || familyAccess?.email || "");
-  return role === "cuidador" || role === "visualizacao";
+  const role = getEffectiveRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
+  return role !== FAMILY_ROLE_OWNER && role !== FAMILY_ROLE_GLOBAL_ADMIN;
 }
 
 async function writeFamilyAuditLog(action, details = {}) {
@@ -3549,30 +4207,14 @@ function loadFamilyAccess() {
   try {
     const data = JSON.parse(localStorage.getItem(storageKeys.access) || "null");
     if (!data || typeof data !== "object" || !data.familyId) return null;
-    return {
-      familyId: String(data.familyId),
-      role: normalizeRole(data.role),
-      email: normalizeEmail(data.email),
-      ownerUid: data.ownerUid ? String(data.ownerUid) : "",
-      inviteCode: data.inviteCode ? normalizeInviteCode(data.inviteCode) : "",
-      acceptedAt: data.acceptedAt || data.createdAt || "",
-    };
+    return buildFamilyScopePayload(data);
   } catch {
     return null;
   }
 }
 
 function saveFamilyAccess(access, options = {}) {
-  familyAccess = access?.familyId
-    ? {
-        familyId: String(access.familyId),
-        role: getEffectiveRole(access.role, access.email || cloudUser?.email || ""),
-        email: normalizeEmail(access.email || cloudUser?.email || ""),
-        ownerUid: access.ownerUid ? String(access.ownerUid) : "",
-        inviteCode: access.inviteCode ? normalizeInviteCode(access.inviteCode) : "",
-        acceptedAt: access.acceptedAt || access.createdAt || new Date().toISOString(),
-      }
-    : null;
+  familyAccess = access?.familyId ? buildFamilyScopePayload(access) : null;
 
   if (familyAccess) {
     localStorage.setItem(storageKeys.access, JSON.stringify(familyAccess));
@@ -3581,6 +4223,7 @@ function saveFamilyAccess(access, options = {}) {
   }
 
   if (options.render !== false) renderFamilyAccessPanel();
+  try { exposeFamilyScopeForDebug(); } catch {}
   return familyAccess;
 }
 
@@ -3658,7 +4301,7 @@ function createFamilyIdFromNames(familyName = "", babyName = "") {
   const token = stableInviteToken(`${base}|${familyName}|${babyName}|${cloudUser?.uid || "admin"}|${Date.now()}`)
     .slice(0, 6)
     .toLowerCase();
-  return `family-${base}-${token}`;
+  return normalizeFamilyId(`family-${base}-${token}`);
 }
 
 function createStablePersonalFamilyId(user = cloudUser, familyName = "", babyName = "") {
@@ -3669,7 +4312,7 @@ function createStablePersonalFamilyId(user = cloudUser, familyName = "", babyNam
   const token = stableInviteToken(`personal-family|${stableOwnerKey}|${email}`)
     .slice(0, 6)
     .toLowerCase();
-  return `family-${base}-${token}`;
+  return normalizeFamilyId(`family-${base}-${token}`);
 }
 
 function buildInviteLink(code) {
@@ -3704,8 +4347,28 @@ async function cleanupDuplicatePendingInvites(services, email, familyId, keepCod
   }
 }
 
-function getActiveFamilyId() {
-  return familyAccess?.familyId || (cloudUser ? cloudUser.uid : "");
+function getActiveFamilyId(options = {}) {
+  return getResolvedFamilyScope(options).familyId || "";
+}
+
+function exposeFamilyScopeForDebug() {
+  try {
+    window.__ninouFamilyScope = {
+      version: NINOU_FAMILY_SCOPE_VERSION,
+      active: getResolvedFamilyScope(),
+      client: getResolvedFamilyScope({ allowAdminSelection: false, allowLegacyFallback: false }),
+      familyPath: getFamilyCollectionPath(),
+      franciscoFamilyId: NINOU_FRANCISCO_FAMILY_ID,
+      storageScope: getActiveDataScope().storageScope,
+      profileKey: getScopedProfileStorageKey(),
+      weightsKey: getScopedWeightsStorageKey(),
+      commercialReadiness: {
+        version: NINOU_RUNTIME_VERSION,
+        status: "beta-candidato",
+        requiredBeforePublic: ["publicar-firestore-rules", "testar-dispositivos", "politica-privacidade", "termos-uso", "suporte", "exclusao-dados"],
+      },
+    };
+  } catch {}
 }
 
 function getSelectedDayId() {
@@ -4022,13 +4685,13 @@ function buildFamilyStateForRecentWindow(count = 7, anchorStart = getDayStart())
 
 function isFamilyAdmin() {
   if (isGlobalAppAdmin()) return true;
-  return hasFamilyAccess() && getEffectiveRole(familyAccess?.role) === "admin";
+  return hasFamilyAccess() && isFamilyManagerRole(familyAccess?.role, cloudUser?.email || familyAccess?.email || "");
 }
 
 function buildGlobalAdminAccess(user = cloudUser, familyId = getActiveAdminFamilyId()) {
   if (!user || !isGlobalAppAdmin(user)) return null;
   return {
-    familyId: String(familyId || APP_ADMIN_FAMILY_ID),
+    familyId: normalizeFamilyId(familyId || APP_ADMIN_FAMILY_ID),
     role: "admin",
     email: user.email || GLOBAL_APP_ADMIN_EMAIL,
     ownerUid: user.uid,
@@ -4076,6 +4739,7 @@ function setAdminStatsPlaceholder(message = "Entre como admin para visualizar o 
   setText(adminAcceptedInvitesCount, "--");
   setText(adminLastMigrationStatus, "--");
   setText(adminStatsHint, message);
+  renderAdminCommercialDashboard(null);
 }
 
 function getAccountCacheSuffix(key) {
@@ -5026,9 +5690,25 @@ function applyMigrationContextToCurrentView(context) {
 
   const migratedWeights = normalizeWeights(context.weights || context.profile?.weights || []);
   const migratedProfile = normalizeBabyProfile({ ...(context.profile || createDefaultBabyProfile()), weights: migratedWeights });
+  const migrationFamilyId = normalizeFamilyId(context.destinationFamilyId || getSelectedFamilyIdForAdminOrAccess() || getActiveFamilyMetadata().familyId || "");
+  const wakeWindowValueForMigration = String(context.wakeWindow || 70);
+
+  if (migrationFamilyId) {
+    localStorage.setItem(getScopedProfileStorageKey(migrationFamilyId), JSON.stringify({
+      ...migratedProfile,
+      familyId: migrationFamilyId,
+      familyScopeVersion: NINOU_FAMILY_SCOPE_VERSION,
+    }));
+    localStorage.setItem(getScopedWakeWindowStorageKey(migrationFamilyId), wakeWindowValueForMigration);
+    localStorage.setItem(getScopedProfileVersionStorageKey(migrationFamilyId), String(Date.now()));
+    localStorage.setItem(getScopedWeightsStorageKey(migrationFamilyId), JSON.stringify(migratedWeights));
+  }
+
+  // Compatibilidade visual: mantém o cache legado apenas para a tela já aberta,
+  // mas a leitura normal das famílias passa a usar as chaves escopadas acima.
   localStorage.setItem(storageKeys.profile, JSON.stringify(migratedProfile));
   localStorage.removeItem(storageKeys.photo);
-  localStorage.setItem(storageKeys.wakeWindow, String(context.wakeWindow || 70));
+  localStorage.setItem(storageKeys.wakeWindow, wakeWindowValueForMigration);
   localStorage.setItem(storageKeys.profileVersion, String(Date.now()));
   localStorage.setItem(storageKeys.weights, JSON.stringify(migratedWeights));
 
@@ -5039,14 +5719,20 @@ function applyMigrationContextToCurrentView(context) {
   const currentDayState = (context.dayStates || {})[visibleDayId] || createEmptyDayState();
   const currentDayPayload = { ...normalizeDayState(currentDayState), dayId: visibleDayId || todayId, clientUpdatedAt: Date.now() };
   localStorage.setItem(storageKeys.dayState, JSON.stringify(currentDayPayload));
-  if (visibleDayId) localStorage.setItem(getLocalDayStateStorageKey(visibleDayId), JSON.stringify(currentDayPayload));
+  if (visibleDayId) {
+    localStorage.setItem(getLocalDayStateStorageKey(visibleDayId), JSON.stringify(currentDayPayload));
+    if (migrationFamilyId) localStorage.setItem(getLocalDayStateStorageKey(visibleDayId, migrationFamilyId), JSON.stringify({ ...currentDayPayload, familyId: migrationFamilyId, familyScopeVersion: NINOU_FAMILY_SCOPE_VERSION }));
+  }
   Object.entries(context.dayStates || {}).forEach(([dayId, dayState]) => {
     if (!isDateId(dayId)) return;
-    localStorage.setItem(getLocalDayStateStorageKey(dayId), JSON.stringify({
+    const dayPayload = {
       ...normalizeDayState(dayState),
       dayId,
+      date: dayId,
       clientUpdatedAt: Date.now(),
-    }));
+    };
+    localStorage.setItem(getLocalDayStateStorageKey(dayId), JSON.stringify(dayPayload));
+    if (migrationFamilyId) localStorage.setItem(getLocalDayStateStorageKey(dayId, migrationFamilyId), JSON.stringify({ ...dayPayload, familyId: migrationFamilyId, familyScopeVersion: NINOU_FAMILY_SCOPE_VERSION }));
   });
   familyDayStatesCache = {
     ...familyDayStatesCache,
@@ -5108,7 +5794,7 @@ async function linkMigrationSourceAccountToFamily(context, familyId, sourceLabel
   if (!sourceUid) return false;
 
   const services = await getFirebaseServices();
-  const role = "responsavel";
+  const role = FAMILY_ROLE_ADMIN;
   const payload = {
     familyId,
     role,
@@ -5132,7 +5818,9 @@ async function linkMigrationSourceAccountToFamily(context, familyId, sourceLabel
 
 async function uploadMigrationContextToFamily(context) {
   const services = await getFirebaseServices();
-  const familyId = getSelectedFamilyIdForAdminOrAccess();
+  const familyId = normalizeFamilyId(getSelectedFamilyIdForAdminOrAccess());
+  if (!familyId) throw new Error("Selecione uma família antes de migrar os dados.");
+  const isFranciscoTarget = isFranciscoFamilyId(familyId);
   const sourceLabel = context.source === "cloud" ? `users/${context.uid || context.email}` : `cache/${context.email}`;
   const migrationId = `${Date.now()}-${String(context.uid || context.email || "origem").replace(/[^a-z0-9]+/gi, "-").slice(0, 32)}`;
   const normalizedWeights = normalizeWeights(context.weights || context.profile?.weights || []);
@@ -5142,12 +5830,23 @@ async function uploadMigrationContextToFamily(context) {
   });
 
   await services.setDoc(services.doc(services.db, "families", familyId), {
-    ownerUid: cloudUser.uid,
+    familyId,
+    ...(isFranciscoTarget ? buildFranciscoFamilyBasePayload(services) : {
+      title: normalizedProfile.name || "Família selecionada",
+      name: normalizedProfile.name ? `Família do ${normalizedProfile.name}` : "Família selecionada",
+      babyName: normalizedProfile.name || "",
+      babyArticle: normalizedProfile.article || "do",
+      customerLabel: "Família cadastrada",
+      familyType: "client",
+      status: "active",
+      appVersion: NINOU_RUNTIME_VERSION,
+    }),
+    ownerUid: isGlobalAppAdmin() ? (cloudUser.uid || "") : (familyAccess?.ownerUid || cloudUser.uid || ""),
     ownerEmail: cloudUser.email || "",
-    title: normalizedProfile.name || "Família selecionada",
-    customerLabel: "Família cadastrada",
     latestMigratedDayId: Object.keys(context.dayStates || {}).filter(isDateId).sort().at(-1) || "",
     migratedDayIds: Object.keys(context.dayStates || {}).filter(isDateId).sort(),
+    migrationVersion: NINOU_RUNTIME_VERSION,
+    lastMigrationAt: services.serverTimestamp(),
     updatedAt: services.serverTimestamp(),
   }, { merge: true });
 
@@ -5156,6 +5855,10 @@ async function uploadMigrationContextToFamily(context) {
   if (context.profile || normalizedWeights.length) {
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
       ...normalizedProfile,
+      name: isFranciscoTarget ? NINOU_FRANCISCO_BABY_NAME : normalizedProfile.name,
+      article: isFranciscoTarget ? NINOU_FRANCISCO_BABY_ARTICLE : normalizedProfile.article,
+      familyId,
+      familyScopeVersion: NINOU_FAMILY_SCOPE_VERSION,
       weights: normalizedWeights,
       wakeWindowMinutes: Number(context.wakeWindow) || 70,
       clientUpdatedAt: Date.now(),
@@ -5169,6 +5872,10 @@ async function uploadMigrationContextToFamily(context) {
   for (const [dayId, dayState] of dayEntries) {
     await services.setDoc(services.doc(services.db, "families", familyId, "days", dayId), {
       ...normalizeDayState(dayState),
+      familyId,
+      familyScopeVersion: NINOU_FAMILY_SCOPE_VERSION,
+      dayId,
+      date: dayId,
       migratedFrom: sourceLabel,
       migratedAt: services.serverTimestamp(),
       updatedAt: services.serverTimestamp(),
@@ -5609,8 +6316,8 @@ function renderAdminAccessLists(stats = null) {
       adminMembersList.innerHTML = members.slice(0, 12).map((member) => {
         const uid = escapeHtml(member.uid || "");
         const email = escapeHtml(member.email || "Usuário sem e-mail");
-        const role = normalizeRole(member.role || "visualizacao");
-        const protectedMember = !member.uid || isGlobalAdminEmail(member.email || "");
+        const role = normalizeRole(member.role || FAMILY_ROLE_VIEWER);
+        const protectedMember = !member.uid || isGlobalAdminEmail(member.email || "") || role === FAMILY_ROLE_OWNER;
         return `
         <li class="admin-access-item admin-member-item">
           <img class="admin-avatar member-avatar" src="${getCaregiverAvatarDataUrl(member.email || "Membro", member.uid || member.email || "member", "member")}" alt="" />
@@ -5622,7 +6329,7 @@ function renderAdminAccessLists(stats = null) {
             <label class="member-role-select-label">
               <span>Permissão</span>
               <select data-member-role-select="${uid}" ${protectedMember ? "disabled" : ""}>
-                ${["responsavel", "cuidador", "visualizacao"].map((option) => `<option value="${option}" ${role === option ? "selected" : ""}>${escapeHtml(getRoleLabel(option))}</option>`).join("")}
+                ${[FAMILY_ROLE_ADMIN, FAMILY_ROLE_CAREGIVER, FAMILY_ROLE_VIEWER].map((option) => `<option value="${option}" ${role === option ? "selected" : ""}>${escapeHtml(getRoleLabel(option))}</option>`).join("")}
               </select>
             </label>
             <button type="button" data-update-member-role="${uid}" ${protectedMember ? "disabled" : ""}>Salvar permissão</button>
@@ -5707,6 +6414,112 @@ function formatAdminIntegrityLabel(integrity = latestAdminStats?.integrity || {}
   return warnings.length ? warnings.join(" • ") : "OK";
 }
 
+
+function getAdminCommercialActivityMillis(value = {}) {
+  if (!value || typeof value !== "object") return toMilliseconds(value);
+  return Math.max(
+    Number(value.lastActivityAtClient || 0),
+    Number(value.lastEventAtClient || 0),
+    Number(value.updatedAtClient || 0),
+    Number(value.createdAtClient || 0),
+    toMilliseconds(value.lastActivityAt),
+    toMilliseconds(value.lastEventAt),
+    toMilliseconds(value.updatedAt),
+    toMilliseconds(value.createdAt),
+  );
+}
+
+function getAdminCommercialActivityLabel(value = 0) {
+  const millis = Number(value || 0);
+  if (!millis) return "Sem atividade";
+  const diff = Date.now() - millis;
+  if (diff < 0) return "Agora";
+  if (diff < 60 * 60000) return "Há poucos minutos";
+  if (diff < day) return `Há ${Math.max(1, Math.round(diff / 3600000))}h`;
+  const days = Math.max(1, Math.round(diff / day));
+  if (days <= 30) return `Há ${days} ${days === 1 ? "dia" : "dias"}`;
+  try { return new Date(millis).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }); } catch { return "Data registrada"; }
+}
+
+function getAdminCommercialFamilyStatus(family = {}) {
+  const last = Number(family.lastActivityAt || 0);
+  if (!last) return { label: "Sem atividade", tone: "neutral" };
+  const diff = Date.now() - last;
+  if (diff <= 14 * day) return { label: "Ativa", tone: "good" };
+  if (diff <= 45 * day) return { label: "Acompanhar", tone: "warn" };
+  return { label: "Inativa", tone: "quiet" };
+}
+
+function renderAdminCommercialDashboard(stats = null) {
+  if (!adminCommercialDashboard && !adminFamilyMonitorList) return;
+  const appAdmin = isGlobalAppAdmin();
+  const families = Array.isArray(stats?.families) ? stats.families : [];
+  const selectedId = getActiveAdminFamilyId();
+  const selectedFamily = families.find((family) => family.id === selectedId) || null;
+  const activeCount = Number(stats?.activeFamiliesCount || 0);
+  const totalMembers = Number(stats?.totalMembersCount ?? stats?.membersCount ?? 0);
+  const globalPending = Number(stats?.globalPendingInvitesCount ?? stats?.pendingInvitesCount ?? 0);
+  const selectedLast = Number(stats?.selectedLastActivityAt || selectedFamily?.lastActivityAt || 0);
+
+  setText(adminCommercialActiveFamilies, appAdmin ? String(activeCount) : "1");
+  setText(adminCommercialTotalMembers, String(totalMembers || 0));
+  setText(adminCommercialGlobalPendingInvites, String(globalPending || 0));
+  setText(adminCommercialLastActivity, getAdminCommercialActivityLabel(selectedLast));
+
+  if (adminCommercialInsight) {
+    if (!stats) {
+      adminCommercialInsight.textContent = "Atualize o painel para carregar a visão comercial.";
+    } else if (appAdmin) {
+      const activeText = pluralize(activeCount, "família ativa", "famílias ativas");
+      const familyText = pluralize(families.length, "família cadastrada", "famílias cadastradas");
+      adminCommercialInsight.textContent = `${familyText}, ${activeText}, ${pluralize(globalPending, "convite pendente", "convites pendentes")} e ${pluralize(totalMembers, "membro mapeado", "membros mapeados")}.`;
+    } else {
+      adminCommercialInsight.textContent = "Visão restrita à família conectada. Usuários comuns não visualizam outras famílias.";
+    }
+  }
+
+  if (!adminFamilyMonitorList) return;
+  if (!stats) {
+    adminFamilyMonitorList.innerHTML = "<li class=\"polished-admin-empty\">Atualize o painel para carregar o monitor de famílias.</li>";
+    return;
+  }
+  if (!appAdmin) {
+    adminFamilyMonitorList.innerHTML = `
+      <li class="admin-access-item admin-family-monitor-item is-selected-family">
+        <img class="admin-avatar family-avatar" src="${getCaregiverAvatarDataUrl(stats.familyName || "Família", selectedId || "family", "family")}" alt="" />
+        <div>
+          <strong>${escapeHtml(stats.familyName || "Minha família")}</strong>
+          <span>Ambiente familiar isolado • ${escapeHtml(pluralize(Number(stats.membersCount || 0), "membro", "membros"))} • ${escapeHtml(getPendingInviteText(Number(stats.pendingInvitesCount || 0)))}</span>
+          <small>Somente dados desta família aparecem para este acesso.</small>
+        </div>
+      </li>`;
+    return;
+  }
+  if (!families.length) {
+    adminFamilyMonitorList.innerHTML = "<li class=\"polished-admin-empty\">Nenhuma família comercial cadastrada ainda.</li>";
+    return;
+  }
+  adminFamilyMonitorList.innerHTML = families.slice(0, 12).map((family) => {
+    const status = getAdminCommercialFamilyStatus(family);
+    const membersLabel = Number.isFinite(Number(family.membersCount)) ? pluralize(Number(family.membersCount), "membro", "membros") : "membros sob consulta";
+    const pendingLabel = Number.isFinite(Number(family.pendingInvitesCount)) ? getPendingInviteText(Number(family.pendingInvitesCount)) : "convites sob consulta";
+    const selected = family.id === selectedId;
+    return `
+      <li class="admin-access-item admin-family-monitor-item ${selected ? "is-selected-family" : ""}" data-commercial-status="${escapeHtml(status.tone)}">
+        <img class="admin-avatar family-avatar" src="${getCaregiverAvatarDataUrl(family.name || "Família", family.id || "family", "family")}" alt="" />
+        <div>
+          <strong>${escapeHtml(family.name || "Família sem nome")}</strong>
+          <span>${escapeHtml(status.label)} • ${escapeHtml(membersLabel)} • ${escapeHtml(pendingLabel)}</span>
+          <small>${escapeHtml(family.subtitle || "Família cadastrada")} • última atividade: ${escapeHtml(getAdminCommercialActivityLabel(family.lastActivityAt))}</small>
+        </div>
+        <div class="admin-access-actions">
+          ${selected ? "<small>Selecionada</small>" : `<button type="button" data-select-admin-family="${escapeHtml(family.id)}">Selecionar</button>`}
+          <button type="button" data-open-admin-family="${escapeHtml(family.id)}">Abrir rotina</button>
+        </div>
+      </li>`;
+  }).join("");
+}
+
 function renderAdminStats(stats = null) {
   latestAdminStats = stats || null;
   if (!adminPendingInvitesCount && !adminFamiliesCount && !adminKnownUsersStat) {
@@ -5717,6 +6530,7 @@ function renderAdminStats(stats = null) {
   if (!stats) {
     setAdminStatsPlaceholder();
     renderAdminClients(null);
+    renderAdminCommercialDashboard(null);
     renderAdminAccessLists(null);
     renderAdminDiagnostics();
     return;
@@ -5733,6 +6547,7 @@ function renderAdminStats(stats = null) {
     `${pluralize(stats.familiesCount ?? 0, "família de cliente cadastrada", "famílias de clientes cadastradas")}. ${pluralize(stats.membersCount ?? 0, "membro", "membros")} na família selecionada e ${pluralize(stats.knownUsersCount ?? 0, "conta válida para revisão", "contas válidas para revisão")}.`,
   );
   renderAdminClients(stats);
+  renderAdminCommercialDashboard(stats);
   renderAdminAccessLists(stats);
   renderFamilyMigrationPanel();
   renderAdminDiagnostics();
@@ -5782,8 +6597,8 @@ async function refreshAdminStats(options = {}) {
       const data = memberDoc.data() || {};
       if ((data.status || "active") === "removed") return;
       const email = normalizeEmail(data.email || "");
-      const role = getEffectiveRole(data.role || "visualizacao", email);
-      const isAdminMember = isGlobalAdminEmail(email) || role === "admin";
+      const role = getEffectiveRole(data.role || FAMILY_ROLE_VIEWER, email);
+      const isAdminMember = isGlobalAdminEmail(email) || role === FAMILY_ROLE_GLOBAL_ADMIN;
       if (!isAdminMember) {
         memberUidSet.add(memberDoc.id);
         if (email) memberEmailSet.add(email);
@@ -5801,22 +6616,31 @@ async function refreshAdminStats(options = {}) {
     const pendingMap = new Map();
     const acceptedEmails = new Set();
     const invitedEmails = new Set();
+    const globalPendingInvites = [];
+    const pendingInvitesByFamily = new Map();
     globalInvitesSnapshot.forEach((inviteDoc) => {
       const data = inviteDoc.data() || {};
-      if (data.familyId !== familyId) return;
+      const inviteFamilyId = String(data.familyId || familyId || "");
       const emailKey = normalizeEmail(data.email || inviteDoc.id);
-      const status = data.status || "pending";
-      if (emailKey) invitedEmails.add(emailKey);
+      const status = String(data.status || "pending").toLowerCase();
       const invite = {
         code: data.code || inviteDoc.id,
         email: emailKey,
-        role: normalizeInviteRole(data.role || "responsavel"),
+        familyId: inviteFamilyId,
+        role: normalizeInviteRole(data.role || FAMILY_ROLE_ADMIN),
         status,
         expiresAt: data.expiresAt || null,
         expiresAtClient: Number(data.expiresAtClient || 0),
         createdAtClient: Number(data.createdAtClient || 0),
         expired: isInviteExpired(data),
       };
+      if (inviteFamilyId && status === "pending" && !invite.expired) {
+        if (!pendingInvitesByFamily.has(inviteFamilyId)) pendingInvitesByFamily.set(inviteFamilyId, []);
+        pendingInvitesByFamily.get(inviteFamilyId).push(invite);
+        globalPendingInvites.push(invite);
+      }
+      if (inviteFamilyId !== familyId) return;
+      if (emailKey) invitedEmails.add(emailKey);
       if (status === "accepted" || status === "active") {
         acceptedEmails.add(emailKey);
         pendingMap.delete(emailKey);
@@ -5907,31 +6731,48 @@ async function refreshAdminStats(options = {}) {
       const data = familyDoc.data() || {};
       const profile = familyDoc.id === familyId ? familyProfileData : (familyProfileById.get(familyDoc.id) || {});
       if (isInternalAdminFamily(familyDoc.id, data)) return;
+      const familyPendingCount = pendingInvitesByFamily.has(familyDoc.id)
+        ? pendingInvitesByFamily.get(familyDoc.id).length
+        : (Number.isFinite(Number(data.pendingInvitesCount)) ? Number(data.pendingInvitesCount) : null);
       familySummaries.push({
         id: familyDoc.id,
         name: profile.name || data.name || data.title || `Família ${familyDoc.id.slice(0, 8)}`,
         subtitle: data.customerLabel || data.subtitle || "Família cadastrada",
         membersCount: familyDoc.id === familyId ? members.filter((member) => !member.isAdmin).length : (Number.isFinite(Number(data.membersCount)) ? Number(data.membersCount) : null),
-        pendingInvitesCount: familyDoc.id === familyId ? pendingInvites.length : (Number.isFinite(Number(data.pendingInvitesCount)) ? Number(data.pendingInvitesCount) : null),
+        pendingInvitesCount: familyDoc.id === familyId ? pendingInvites.length : familyPendingCount,
+        lastActivityAt: getAdminCommercialActivityMillis({ ...data, ...profile }),
       });
     });
     if (!isInternalAdminFamily(familyId, familyData) && !familySummaries.some((family) => family.id === familyId)) {
-      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length });
+      familySummaries.unshift({ id: familyId, name: familyName, subtitle: "Família cadastrada", membersCount: members.filter((member) => !member.isAdmin).length, pendingInvitesCount: pendingInvites.length, lastActivityAt: getAdminCommercialActivityMillis({ ...familyData, ...familyProfileData }) });
     }
     familySummaries.sort((a, b) => Number(b.id === familyId) - Number(a.id === familyId) || String(a.name).localeCompare(String(b.name)));
 
     const visibleMembers = members.filter((member) => !member.isAdmin);
+    const selectedAuditLastActivity = familyAudit.reduce((latest, item) => Math.max(latest, getAdminCommercialActivityMillis(item)), 0);
+    const selectedLastActivityAt = Math.max(getAdminCommercialActivityMillis({ ...familyData, ...familyProfileData }), selectedAuditLastActivity);
+    familySummaries.forEach((family) => {
+      if (family.id === familyId) family.lastActivityAt = Math.max(Number(family.lastActivityAt || 0), selectedLastActivityAt);
+    });
+    const commercialActiveCutoff = Date.now() - 14 * day;
+    const activeFamiliesCount = familySummaries.filter((family) => Number(family.lastActivityAt || 0) >= commercialActiveCutoff).length;
+    const totalMembersCount = familySummaries.reduce((total, family) => total + (Number.isFinite(Number(family.membersCount)) ? Number(family.membersCount) : 0), 0);
     const stats = {
       familyName,
       familyData,
       families: familySummaries,
       members,
       pendingInvites,
+      globalPendingInvites,
       familyAudit,
       knownUsers,
       familiesCount: familySummaries.length,
       membersCount: visibleMembers.length,
+      totalMembersCount: totalMembersCount || visibleMembers.length,
+      activeFamiliesCount,
+      selectedLastActivityAt,
       pendingInvitesCount: pendingInvites.length,
+      globalPendingInvitesCount: isGlobalAppAdmin() ? globalPendingInvites.length : pendingInvites.length,
       acceptedInvitesCount: acceptedEmails.size,
       knownUsersCount: getCleanKnownUsersForAdmin(knownUsers).length,
       integrity: buildAdminIntegritySnapshot({ familyId, familySummaries, members, pendingInvites, knownUsers, familyData, familyProfileData }),
@@ -6000,11 +6841,11 @@ function renderFamilyAccessPanel() {
     familyAccessText.textContent = authorized
       ? (appAdmin
         ? `${email} está conectado com acesso completo. Os registros são sincronizados no ambiente da família.`
-        : `Você acompanha a rotina de ${baby}. Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`)
+        : `Você acompanha a rotina de ${baby}. Seu acesso: ${roleLabel}. ${effectiveRole === FAMILY_ROLE_VIEWER ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`)
       : connected
         ? (pendingCode
           ? "Convite detectado. Confirme o código para entrar na família existente, sem criar uma nova família."
-          : "Esta conta está conectada, mas ainda não encontramos acesso familiar. Crie sua família apenas se você for o primeiro responsável ou use um convite recebido.")
+          : "Esta conta está conectada, mas ainda não encontramos acesso familiar. Crie sua família agora se você for o primeiro responsável ou use um convite recebido.")
         : "Visitantes podem conhecer o app. Para registrar dados reais, entre com usuário e senha. Se recebeu convite, use o mesmo e-mail convidado.";
   }
 
@@ -6014,12 +6855,22 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.75.8: convite pendente entra na família existente; não mostra criação paralela.
+    // v75.75.43: criar família agora abre o fluxo real de cadastro da família.
     createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
     createFamilyButton.disabled = personalFamilyActivationInFlight;
     createFamilyButton.textContent = personalFamilyActivationInFlight
       ? (appAdmin ? "Ativando..." : "Criando...")
       : (appAdmin ? "Ativar família principal" : "Criar minha família");
+  }
+
+  if (createFamilyWizard) {
+    const shouldShowCreateWizard = connected
+      && !authorized
+      && !appAdmin
+      && !pendingCode
+      && getCommercialEntryIntent() === "create";
+    createFamilyWizard.hidden = !shouldShowCreateWizard;
+    if (shouldShowCreateWizard) syncCreateFamilyWizardDefaults();
   }
 
   if (inviteAcceptBox) {
@@ -6058,7 +6909,7 @@ function renderFamilyAccessPanel() {
     familyWelcomeCard.hidden = !showWelcome;
     if (showWelcome) {
       if (familyWelcomeTitle) familyWelcomeTitle.textContent = `Você acompanha a rotina de ${baby}.`;
-      if (familyWelcomeText) familyWelcomeText.textContent = `Seu acesso: ${roleLabel}. ${effectiveRole === "visualizacao" ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`;
+      if (familyWelcomeText) familyWelcomeText.textContent = `Seu acesso: ${roleLabel}. ${effectiveRole === FAMILY_ROLE_VIEWER ? "Você pode acompanhar os registros." : "Você pode participar da rotina conforme sua permissão."}`;
     }
   }
 
@@ -6075,21 +6926,23 @@ async function readAccountAccessFromCloud(user = cloudUser) {
 
   try {
     const familyAccessSnapshot = await services.getDocs(services.collection(services.db, "users", user.uid, "families"));
-    let selectedAccess = null;
+    const availableAccesses = [];
     familyAccessSnapshot.forEach((docSnap) => {
-      if (selectedAccess) return;
       const data = docSnap.data() || {};
-      const familyId = data.familyId || docSnap.id;
+      const familyId = normalizeFamilyId(data.familyId || docSnap.id);
       if (!familyId || ["inactive", "revoked", "removed"].includes(String(data.status || "active"))) return;
-      selectedAccess = {
+      availableAccesses.push({
         familyId,
-        role: data.role || "responsavel",
+        role: data.role || FAMILY_ROLE_ADMIN,
         email: data.email || user.email || "",
         ownerUid: data.ownerUid || data.owner || "",
         inviteCode: data.inviteCode || data.joinedByInvite || "",
         acceptedAt: data.acceptedAt || data.joinedAt || data.createdAt || "",
-      };
+      });
     });
+    const selectedAccess = isFranciscoSharedAccount(user)
+      ? (availableAccesses.find((access) => isFranciscoFamilyId(access.familyId)) || availableAccesses[0])
+      : (availableAccesses.find((access) => getFamilyScopeType(access.familyId) === "client_family") || availableAccesses[0]);
     if (selectedAccess) return saveFamilyAccess(selectedAccess);
   } catch (error) {
     console.warn("Não foi possível ler famílias do usuário:", error);
@@ -6124,7 +6977,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
       if (["inactive", "revoked", "removed"].includes(String(data.status || "active"))) continue;
       return saveFamilyAccess({
         familyId,
-        role: data.role || "responsavel",
+        role: data.role || FAMILY_ROLE_ADMIN,
         email: data.email || user.email || "",
         ownerUid: data.ownerUid || data.familyId || familyId,
         inviteCode: data.inviteCode || "",
@@ -6141,9 +6994,10 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
   if (!user || !access?.familyId) return null;
   const payload = {
     familyId: access.familyId,
-    role: getEffectiveRole(access.role, access.email || user.email || ""),
+    role: getEffectiveRole(access.role || FAMILY_ROLE_ADMIN, access.email || user.email || ""),
     email: normalizeEmail(access.email || user.email || ""),
     ownerUid: access.ownerUid || access.familyId,
+    roleVersion: NINOU_FAMILY_SCOPE_VERSION,
   };
 
   if (access.inviteCode) {
@@ -6197,7 +7051,7 @@ async function saveAccountAccessToCloud(access, user = cloudUser) {
   return saveFamilyAccess({ ...payload, acceptedAt: new Date().toISOString() });
 }
 
-async function activatePersonalFamily() {
+async function activatePersonalFamily(formValues = null) {
   if (personalFamilyActivationInFlight) {
     if (loginHelper) loginHelper.textContent = "A criação da família já está em andamento. Aguarde alguns segundos.";
     return familyAccess;
@@ -6207,14 +7061,14 @@ async function activatePersonalFamily() {
   renderAuthControls();
 
   try {
-    return await activatePersonalFamilyInternal();
+    return await activatePersonalFamilyInternal(formValues);
   } finally {
     personalFamilyActivationInFlight = false;
     renderAuthControls();
   }
 }
 
-async function activatePersonalFamilyInternal() {
+async function activatePersonalFamilyInternal(formValues = null) {
   if (!cloudUser) {
     if (loginHelper) loginHelper.textContent = "Entre antes de ativar sua família.";
     return null;
@@ -6257,6 +7111,7 @@ async function activatePersonalFamilyInternal() {
   try {
     const email = normalizeEmail(cloudUser.email || "");
     const emailName = email.split("@")[0] || "familia";
+    const defaultFamilyLabels = getDefaultFamilyLabelsForAccount(cloudUser);
 
     const existingAccess = await readAccountAccessFromCloud(cloudUser);
     if (existingAccess?.familyId) {
@@ -6270,13 +7125,40 @@ async function activatePersonalFamilyInternal() {
       return familyAccess;
     }
 
-    const babyName = String(babyNameInput?.value || babyProfile?.name || "").trim();
-    const familyName = babyName ? `Família do ${babyName}` : `Família de ${emailName}`;
-    const familyId = createStablePersonalFamilyId(cloudUser, familyName, babyName || emailName);
+    const wizardValues = formValues || (getCommercialEntryIntent() === "create" ? getCommercialFamilyFormValues() : null);
+    const babyName = String(wizardValues?.babyName || babyNameInput?.value || babyProfile?.name || defaultFamilyLabels.babyName || "").trim() || emailName;
+    const fallbackFamilyName = defaultFamilyLabels.familyName || (babyName ? `Família do ${babyName}` : `Família de ${emailName}`);
+    const familyName = String(wizardValues?.familyName || fallbackFamilyName).trim();
+    const babyBirthDate = String(wizardValues?.birthDate || babyBirthInput?.value || babyProfile?.birthDate || "").trim();
+    const babyArticle = String(wizardValues?.article || babyProfile?.article || defaultFamilyLabels.babyArticle || "do") === "da" ? "da" : "do";
+    const responsibleName = String(wizardValues?.responsibleName || "").trim();
+    const responsibleRelation = String(wizardValues?.responsibleRelation || "responsavel").trim() || "responsavel";
+
+    if (wizardValues && responsibleName) {
+      saveCurrentCaregiverIdentity(responsibleName, responsibleRelation, {
+        uid: cloudUser.uid,
+        email,
+        relationshipLabel: getCaregiverRelationLabel(responsibleRelation),
+      });
+      if (caregiverNameInput) caregiverNameInput.value = responsibleName;
+      if (caregiverRelationInput) caregiverRelationInput.value = responsibleRelation;
+    }
+
+    babyProfile = normalizeBabyProfile({
+      ...babyProfile,
+      name: babyName,
+      birthDate: babyBirthDate || babyProfile?.birthDate || "",
+      article: babyArticle,
+    });
+    if (babyNameInput) babyNameInput.value = babyProfile.name || "";
+    if (babyBirthInput) babyBirthInput.value = babyProfile.birthDate || "";
+    if (babyArticleInput) babyArticleInput.value = babyArticle === "da" ? "da" : "do";
+
+    const familyId = getCanonicalFamilyIdForAccount(cloudUser, familyName, babyName || emailName);
     const nowIso = new Date().toISOString();
     const access = {
       familyId,
-      role: "responsavel",
+      role: FAMILY_ROLE_OWNER,
       email,
       ownerUid: cloudUser.uid,
       acceptedAt: nowIso,
@@ -6294,8 +7176,22 @@ async function activatePersonalFamilyInternal() {
     const familyPayload = {
       familyId,
       title: familyName,
+      name: familyName,
+      babyName,
+      babyArticle,
       ownerUid: cloudUser.uid,
       ownerEmail: email,
+      responsibleName,
+      responsibleRelation,
+      customerLabel: isFranciscoFamilyId(familyId) ? "Família atual do Francisco" : "Família criada pelo app",
+      familyType: "client",
+      accountEmail: isFranciscoFamilyId(familyId) ? email : email,
+      fatherEmail: isFranciscoFamilyId(familyId) ? NINOU_FRANCISCO_FATHER_EMAIL : "",
+      motherEmail: isFranciscoFamilyId(familyId) ? NINOU_FRANCISCO_MOTHER_EMAIL : "",
+      parentEmails: isFranciscoFamilyId(familyId) ? [...NINOU_FRANCISCO_PARENT_EMAILS] : [],
+      legacyMigrationTarget: isFranciscoFamilyId(familyId),
+      franciscoMigrationReady: isFranciscoFamilyId(familyId),
+      migrationVersion: isFranciscoFamilyId(familyId) ? NINOU_RUNTIME_VERSION : "",
       status: "active",
       appVersion: NINOU_RUNTIME_VERSION,
       createdAt: services.serverTimestamp(),
@@ -6306,17 +7202,38 @@ async function activatePersonalFamilyInternal() {
     const profilePayload = {
       ...getProfilePayload(),
       familyId,
+      familyName,
+      name: babyName,
+      birthDate: babyBirthDate || babyProfile?.birthDate || "",
+      article: babyArticle,
       ownerUid: cloudUser.uid,
+      responsibleName,
+      responsibleRelation,
+      commercialCreatedAtClient: nowIso,
       updatedAt: services.serverTimestamp(),
     };
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), profilePayload, { merge: true });
 
     saveFamilyAccess(access);
+    if (wizardValues && responsibleName) {
+      saveCurrentCaregiverIdentity(responsibleName, responsibleRelation, {
+        uid: cloudUser.uid,
+        email,
+        familyId,
+        accessLevel: getRoleLabel(access.role),
+        relationshipLabel: getCaregiverRelationLabel(responsibleRelation),
+      });
+    }
+    clearCommercialEntryIntent();
+    closeCreateFamilyWizard();
     setVisibleDataOwnerEmail(email);
     await connectCurrentAccount();
     setSyncStatus("online", email);
     markCloudSynced();
-    if (loginHelper) loginHelper.textContent = "Família criada. Agora você já pode registrar a rotina e convidar cuidadores.";
+    if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = "Família criada com sucesso.";
+    if (loginHelper) loginHelper.textContent = `Família criada para ${babyName}. Agora você já pode registrar a rotina e convidar cuidadores.`;
+    renderCaregiverIdentityPanel();
+    renderTodayCaregiverCard();
     showScreen("profile");
     return familyAccess;
   } catch (error) {
@@ -6330,7 +7247,7 @@ async function activatePersonalFamilyInternal() {
 
 async function updateFamilyMemberRole(memberUid = "", roleValue = "") {
   const uid = String(memberUid || "").trim();
-  const role = normalizeRole(roleValue || "visualizacao");
+  const role = normalizeAssignableMemberRole(roleValue || FAMILY_ROLE_VIEWER);
   if (!uid || !isFamilyAdmin()) return false;
   if (!window.confirm(`Alterar permissão deste membro para ${getRoleLabel(role)}?`)) return false;
   try {
@@ -6339,6 +7256,11 @@ async function updateFamilyMemberRole(memberUid = "", roleValue = "") {
     const memberRef = services.doc(services.db, "families", familyId, "members", uid);
     const memberSnap = await services.getDoc(memberRef);
     const memberData = memberSnap.exists?.() ? (memberSnap.data() || {}) : {};
+    const currentRole = normalizeRole(memberData.role || FAMILY_ROLE_VIEWER);
+    if (currentRole === FAMILY_ROLE_OWNER) {
+      if (loginHelper) loginHelper.textContent = "O responsável principal não pode ter a permissão alterada nesta etapa. Primeiro será necessário transferir a família.";
+      return false;
+    }
     const targetEmail = normalizeEmail(memberData.email || "");
     await services.setDoc(memberRef, {
       role,
@@ -6370,7 +7292,14 @@ async function removeFamilyMember(memberUid = "", memberEmail = "") {
   try {
     const services = await getFirebaseServices();
     const familyId = getSelectedFamilyIdForAdminOrAccess();
-    await services.setDoc(services.doc(services.db, "families", familyId, "members", uid), {
+    const memberRef = services.doc(services.db, "families", familyId, "members", uid);
+    const memberSnap = await services.getDoc(memberRef);
+    const memberData = memberSnap.exists?.() ? (memberSnap.data() || {}) : {};
+    if (normalizeRole(memberData.role || FAMILY_ROLE_VIEWER) === FAMILY_ROLE_OWNER) {
+      if (loginHelper) loginHelper.textContent = "O responsável principal não pode ser removido nesta etapa.";
+      return false;
+    }
+    await services.setDoc(memberRef, {
       status: "removed",
       removedBy: cloudUser.uid,
       removedAt: services.serverTimestamp(),
@@ -6476,6 +7405,120 @@ async function cancelFamilyInvite(codeValue = "") {
   }
 }
 
+async function prepareFranciscoFamilyForMigration() {
+  if (!cloudUser || !isGlobalAppAdmin()) {
+    if (franciscoMigrationResult) {
+      franciscoMigrationResult.hidden = false;
+      franciscoMigrationResult.textContent = "Apenas o admin global pode preparar a família Francisco.";
+    }
+    return null;
+  }
+
+  const services = await getFirebaseServices();
+  const familyId = NINOU_FRANCISCO_FAMILY_ID;
+  const inviteTargets = [
+    { email: NINOU_FRANCISCO_FATHER_EMAIL, role: FAMILY_ROLE_ADMIN, label: "Felipe · Pai" },
+    { email: NINOU_FRANCISCO_MOTHER_EMAIL, role: FAMILY_ROLE_ADMIN, label: "Maria · Mãe" },
+  ];
+  const now = Date.now();
+
+  if (prepareFranciscoFamilyButton) {
+    prepareFranciscoFamilyButton.disabled = true;
+    prepareFranciscoFamilyButton.textContent = "Preparando...";
+  }
+  if (franciscoMigrationResult) {
+    franciscoMigrationResult.hidden = false;
+    franciscoMigrationResult.textContent = "Preparando família Francisco e convites para pai e mãe...";
+  }
+
+  try {
+    await services.setDoc(services.doc(services.db, "families", familyId), {
+      ...buildFranciscoFamilyBasePayload(services),
+      supportAdminUid: cloudUser.uid,
+      supportAdminEmail: cloudUser.email || "",
+      pendingInvitesCount: inviteTargets.length,
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
+      familyId,
+      familyName: NINOU_FRANCISCO_FAMILY_NAME,
+      name: NINOU_FRANCISCO_BABY_NAME,
+      article: NINOU_FRANCISCO_BABY_ARTICLE,
+      fatherEmail: NINOU_FRANCISCO_FATHER_EMAIL,
+      motherEmail: NINOU_FRANCISCO_MOTHER_EMAIL,
+      parentEmails: [...NINOU_FRANCISCO_PARENT_EMAILS],
+      weights: [],
+      wakeWindowMinutes: 70,
+      legacyMigrationTarget: true,
+      clientUpdatedAt: new Date().toISOString(),
+      updatedAt: services.serverTimestamp(),
+    }, { merge: true });
+
+    const preparedInvites = [];
+    for (const target of inviteTargets) {
+      const code = createInviteCodeForEmail(target.email, familyId);
+      const link = buildInviteLink(code);
+      const expiry = getInviteExpiryPayload(services, now);
+      const invitePayload = {
+        code,
+        familyId,
+        email: target.email,
+        role: target.role,
+        roleLabel: target.label,
+        status: "pending",
+        maxUses: INVITE_MAX_USES,
+        useCount: 0,
+        legacyMigrationTarget: true,
+        createdBy: cloudUser.uid,
+        createdByUid: cloudUser.uid,
+        createdByEmail: cloudUser.email || "",
+        createdAt: services.serverTimestamp(),
+        updatedAt: services.serverTimestamp(),
+        expiresAt: expiry.expiresAt,
+        expiresAtClient: expiry.expiresAtClient,
+      };
+      await services.setDoc(services.doc(services.db, "invites", code), getMinimalGlobalInvitePayload(invitePayload), { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invites", code), invitePayload, { merge: true });
+      await services.setDoc(services.doc(services.db, "families", familyId, "invitations", code), invitePayload, { merge: true });
+      await cleanupDuplicatePendingInvites(services, target.email, familyId, code);
+      preparedInvites.push({ code, email: target.email, role: target.role, link, label: target.label });
+      recentInvites.unshift({ code, email: target.email, role: target.role, link });
+    }
+
+    saveSelectedAdminFamilyId(familyId);
+    ensureGlobalAdminAccess(cloudUser, familyId);
+    window.__ninouAdminFamilyDataOpen = false;
+    if (adminMigrationEmailInput) adminMigrationEmailInput.value = NINOU_FRANCISCO_FATHER_EMAIL;
+    renderInviteList();
+
+    if (franciscoMigrationResult) {
+      const inviteLines = preparedInvites.map((invite) => `
+        <span>${escapeHtml(invite.label)}: ${escapeHtml(invite.email)} · código ${escapeHtml(invite.code)}</span>
+        <button type="button" data-copy-invite="${escapeHtml(invite.link)}">Copiar convite de ${escapeHtml(invite.label.split(" · ")[0] || "membro")}</button>`).join("");
+      franciscoMigrationResult.innerHTML = `
+        <strong>Família Francisco preparada</strong>
+        <span>Destino: families/${escapeHtml(familyId)}</span>
+        <span>Pai: ${escapeHtml(NINOU_FRANCISCO_FATHER_EMAIL)}</span>
+        <span>Mãe: ${escapeHtml(NINOU_FRANCISCO_MOTHER_EMAIL)}</span>
+        ${inviteLines}`;
+    }
+    if (loginHelper) loginHelper.textContent = "Família Francisco selecionada. Convites gerados para pai e mãe. Agora use Revisão técnica para migrar dados antigos, se necessário.";
+    await refreshAdminStats({ silent: true });
+    scrollAdminSection("adminMigrationSection");
+    return { familyId, invites: preparedInvites };
+  } catch (error) {
+    console.error("Erro ao preparar família Francisco:", error);
+    if (franciscoMigrationResult) franciscoMigrationResult.textContent = getFirebaseErrorMessage(error);
+    return null;
+  } finally {
+    if (prepareFranciscoFamilyButton) {
+      prepareFranciscoFamilyButton.disabled = false;
+      prepareFranciscoFamilyButton.textContent = "Preparar família Francisco";
+    }
+  }
+}
+
 async function createAdminClientFamily() {
   if (!cloudUser || !isGlobalAppAdmin()) {
     if (loginHelper) loginHelper.textContent = "Apenas o admin do app pode criar famílias/clientes.";
@@ -6507,7 +7550,7 @@ async function createAdminClientFamily() {
 
   const babyName = babyNameRaw || familyNameRaw.replace(/^família\s+/i, "").replace(/^familia\s+/i, "") || "Bebê";
   const familyName = familyNameRaw || `Família ${babyName}`;
-  const familyId = createFamilyIdFromNames(familyName, babyName);
+  const familyId = getCanonicalFamilyIdForAdminCreation({ responsibleEmail, familyName, babyName });
   const services = await getFirebaseServices();
 
   if (adminCreateClientFamilyButton) {
@@ -6520,12 +7563,19 @@ async function createAdminClientFamily() {
   }
 
   try {
+    const isFranciscoTarget = isFranciscoFamilyId(familyId);
     const familyPayload = {
-      title: familyName,
-      name: familyName,
-      babyName,
-      babyArticle,
-      customerLabel: "Família cadastrada",
+      familyId,
+      ...(isFranciscoTarget ? buildFranciscoFamilyBasePayload(services) : {
+        title: familyName,
+        name: familyName,
+        babyName,
+        babyArticle,
+        customerLabel: "Família cadastrada",
+        familyType: "client",
+        status: "active",
+        appVersion: NINOU_RUNTIME_VERSION,
+      }),
       status: "active",
       supportAdminUid: cloudUser.uid,
       supportAdminEmail: cloudUser.email || "",
@@ -6539,9 +7589,10 @@ async function createAdminClientFamily() {
 
     await services.setDoc(services.doc(services.db, "families", familyId), familyPayload, { merge: true });
     await services.setDoc(services.doc(services.db, "families", familyId, "profile", "main"), {
-      name: babyName,
-      familyName,
-      article: babyArticle,
+      familyId,
+      familyName: isFranciscoTarget ? NINOU_FRANCISCO_FAMILY_NAME : familyName,
+      name: isFranciscoTarget ? NINOU_FRANCISCO_BABY_NAME : babyName,
+      article: isFranciscoTarget ? NINOU_FRANCISCO_BABY_ARTICLE : babyArticle,
       weights: [],
       createdByAdmin: cloudUser.uid,
       clientUpdatedAt: new Date().toISOString(),
@@ -6550,7 +7601,7 @@ async function createAdminClientFamily() {
 
     let inviteMarkup = "";
     if (responsibleEmail) {
-      const role = "responsavel";
+      const role = FAMILY_ROLE_ADMIN;
       const code = createInviteCodeForEmail(responsibleEmail, familyId);
       const link = buildInviteLink(code);
       const now = Date.now();
@@ -6622,7 +7673,7 @@ async function createFamilyInvite() {
   }
 
   const email = normalizeEmail(adminInviteEmail?.value || "");
-  const role = normalizeInviteRole(adminInviteRole?.value || "responsavel");
+  const role = normalizeInviteRole(adminInviteRole?.value || FAMILY_ROLE_ADMIN);
 
   if (!email || !email.includes("@")) {
     if (inviteResult) {
@@ -6722,7 +7773,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.59 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.53 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -6853,7 +7904,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.59 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.53 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -6941,12 +7992,32 @@ function normalizeWeights(weights = []) {
 
 
 function loadLocalWeights() {
+  let familyScoped = false;
+  try { familyScoped = isFamilyScopedDataActive(); } catch { familyScoped = false; }
+  const scopedKey = familyScoped ? getScopedWeightsStorageKey() : "";
+  if (familyScoped && scopedKey) {
+    try {
+      const raw = localStorage.getItem(scopedKey);
+      if (raw !== null && typeof raw !== "undefined") return normalizeWeights(JSON.parse(raw || "[]"));
+      return [];
+    } catch {
+      return [];
+    }
+  }
   return loadStoredWeights();
 }
 
 
 function persistLocalWeights(weights) {
-  persistStoredWeights(weights);
+  const normalized = normalizeWeights(weights);
+  let familyScoped = false;
+  try { familyScoped = isFamilyScopedDataActive(); } catch { familyScoped = false; }
+  const scopedKey = familyScoped ? getScopedWeightsStorageKey() : "";
+  if (familyScoped && scopedKey) {
+    try { localStorage.setItem(scopedKey, JSON.stringify(normalized)); } catch {}
+    return;
+  }
+  persistStoredWeights(normalized);
 }
 
 
@@ -6961,19 +8032,52 @@ function normalizeBabyProfile(profile = {}) {
 
 
 function loadBabyProfile() {
+  let familyScoped = false;
+  try { familyScoped = isFamilyScopedDataActive(); } catch { familyScoped = false; }
+  if (familyScoped) {
+    const profileKey = getScopedProfileStorageKey();
+    const weightKey = getScopedWeightsStorageKey();
+    try {
+      const storedProfile = JSON.parse(localStorage.getItem(profileKey) || "{}");
+      const storedWeights = JSON.parse(localStorage.getItem(weightKey) || "[]");
+      return normalizeBabyProfile({
+        themeMode: localStorage.getItem(storageKeys.themeMode) || "dark",
+        ...storedProfile,
+        weights: normalizeWeights(storedProfile.weights || storedWeights),
+      });
+    } catch {
+      return normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark", weights: [] });
+    }
+  }
   return loadStoredBabyProfile();
 }
 
 
 function saveBabyProfile() {
-  babyProfile = persistBabyProfile(babyProfile, { profileClientUpdatedAt });
+  let familyScoped = false;
+  try { familyScoped = isFamilyScopedDataActive(); } catch { familyScoped = false; }
+  if (familyScoped) {
+    babyProfile = normalizeBabyProfile({ ...babyProfile, weights: normalizeWeights(babyProfile.weights || loadLocalWeights()) });
+    try { localStorage.setItem(getScopedProfileStorageKey(), JSON.stringify(stampFamilyData(babyProfile))); } catch {}
+    try { localStorage.setItem(storageKeys.themeMode, babyProfile.themeMode); } catch {}
+    persistLocalWeights(babyProfile.weights);
+    if (profileClientUpdatedAt) {
+      try { localStorage.setItem(getScopedProfileVersionStorageKey(), String(profileClientUpdatedAt)); } catch {}
+    }
+  } else {
+    babyProfile = persistBabyProfile(babyProfile, { profileClientUpdatedAt });
+  }
   persistVisibleContextForCurrentOwner();
 }
 
 
 function markProfileLocallyChanged() {
   profileClientUpdatedAt = Math.max(Date.now(), profileClientUpdatedAt + 1);
-  localStorage.setItem(storageKeys.profileVersion, String(profileClientUpdatedAt));
+  if (isFamilyScopedDataActive()) {
+    localStorage.setItem(getScopedProfileVersionStorageKey(), String(profileClientUpdatedAt));
+  } else {
+    localStorage.setItem(storageKeys.profileVersion, String(profileClientUpdatedAt));
+  }
 }
 
 function ensureProfileVersion() {
@@ -7399,12 +8503,12 @@ async function connectCurrentAccount() {
 }
 
 function getProfilePayload(options = {}) {
-  const payload = {
+  const payload = stampFamilyData({
     ...normalizeBabyProfile(babyProfile),
     wakeWindowMinutes,
     clientUpdatedAt: ensureProfileVersion(),
     updatedAt: firebaseServices.serverTimestamp(),
-  };
+  });
 
   payload.photo = "";
   payload.photoDataUrl = "";
@@ -7661,10 +8765,10 @@ async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
     setSyncStatus("syncing", cloudUser.email || "", `Enviando rotina de ${safeDayId}...`);
     await firebaseServices.setDoc(
       dayRef,
-      {
+      stampFamilyData({
         ...dayPayload,
         ...cloudTimestamps,
-      },
+      }),
       { merge: true },
     );
 
@@ -8979,6 +10083,10 @@ function renderGentleAlert() {
   const baby = getBabyDisplayName();
   const lastFeed = getLatestEventByTypes(events, ["mamadeira", "amamentacao"]);
   const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
+  const sleepMs = getSleepMsForRange(todayStart, Math.min(todayStart + day, now));
+  const feedCount = countFeedingEvents(events);
+  const diaperCount = countDiaperEvents(events);
+
   let title = "Rotina tranquila";
   let text = "O Ninou mostrará lembretes leves conforme os registros aparecerem.";
   let show = false;
@@ -8986,22 +10094,29 @@ function renderGentleAlert() {
   const awakeInfo = getTodayAwakeCalculation(now, events);
   if (state.mode === "awake" && awakeInfo.hasWake && awakeInfo.isOpen) {
     const awakeMs = Number(awakeInfo.durationMs) || 0;
-    if (awakeMs >= wakeWindowMinutes * 60000 * 0.9) {
+    const referenceMs = Math.max(30, wakeWindowMinutes) * 60000;
+    if (awakeMs >= referenceMs * 0.9) {
       title = `${baby} está acordado há ${formatShortDuration(awakeMs)}`;
-      text = "Talvez seja um bom momento para observar sinais de sono com calma, sem pressa.";
+      text = "Talvez seja um bom momento para observar sinais de sono. Este é só um lembrete gentil, sem diagnóstico.";
       show = true;
     }
   }
 
   if (!show && lastFeed && now - Number(lastFeed.start) >= 3 * hour) {
     title = `Última alimentação há ${formatShortDuration(now - Number(lastFeed.start))}`;
-    text = "Um lembrete suave para conferir se a próxima mamada já faz sentido na rotina de vocês.";
+    text = "Confira com calma se a próxima mamada já faz sentido para a rotina de vocês.";
     show = true;
   }
 
   if (!show && lastDiaper && now - Number(lastDiaper.start) >= 4 * hour) {
     title = `Última fralda às ${formatTime(lastDiaper.start)}`;
-    text = "Quando fizer sentido para vocês, vale dar uma olhada na próxima troca.";
+    text = "Quando fizer sentido, vale conferir se já está na hora da próxima troca.";
+    show = true;
+  }
+
+  if (!show && events.length >= 4 && sleepMs < 45 * 60000 && feedCount >= 2 && diaperCount >= 1) {
+    title = "Sono ainda baixo hoje";
+    text = "O dia já tem alguns registros, mas pouco sono acumulado. Observe os sinais do bebê com tranquilidade.";
     show = true;
   }
 
@@ -9025,33 +10140,65 @@ function getBottleMlTotal(events = []) {
 
 function getNotificationItems() {
   const todayStart = getDayStart();
-  const events = getFamilyEventsForWindow(todayStart, todayStart + day);
-  const latestBottle = [...events].reverse().find((event) => event.type === "mamadeira" || event.type === "amamentacao");
-  const latestDiaper = [...events].reverse().find((event) => event.type === "fralda");
-  const latestAny = [...events].reverse()[0] || null;
-  const items = [];
   const now = Date.now();
+  const events = getFamilyEventsForWindow(todayStart, todayStart + day);
+  const ordered = [...events].sort((a, b) => Number(a.start) - Number(b.start));
+  const latestFeed = [...ordered].reverse().find((event) => event.type === "mamadeira" || event.type === "amamentacao");
+  const latestDiaper = [...ordered].reverse().find((event) => event.type === "fralda");
+  const latestAny = ordered[ordered.length - 1] || null;
+  const sleepMs = getSleepMsForRange(todayStart, Math.min(todayStart + day, now));
+  const feeds = countFeedingEvents(events);
+  const diapers = countDiaperEvents(events);
+  const meds = countMedicationEvents(events);
+  const items = [];
+
   if (!events.length) {
-    items.push({ icon: "✨", title: "Dia pronto para começar", text: "Quando houver o primeiro registro, o Ninou monta lembretes suaves para acompanhar a rotina." });
+    items.push({ icon: "✨", title: "Dia pronto para começar", text: "Faça o primeiro registro para o Ninou montar sugestões e resumo do dia." });
     return items;
   }
-  if (latestBottle) {
-    const elapsed = now - Number(latestBottle.start);
-    if (elapsed > 2.5 * hour) items.push({ icon: "🍼", title: "Alimentação", text: `Já faz ${formatShortDuration(elapsed)} desde a última alimentação registrada.` });
-  }
-  if (latestDiaper) {
-    const elapsed = now - Number(latestDiaper.start);
-    if (elapsed > 3 * hour) items.push({ icon: "🧷", title: "Fralda", text: `Última fralda registrada há ${formatShortDuration(elapsed)}.` });
-  }
+
   const awakeInfo = getTodayAwakeCalculation(now, events);
   if (state.mode === "awake" && awakeInfo.hasWake && awakeInfo.isOpen) {
     const awake = Math.max(0, Number(awakeInfo.durationMs) || 0);
-    if (awake > wakeWindowMinutes * 60000) items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
+    const reference = Math.max(30, wakeWindowMinutes) * 60000;
+    if (awake >= reference * 0.9) {
+      items.push({ icon: "🌙", title: "Sono", text: `${getBabyDisplayName()} está acordado há ${formatShortDuration(awake)}. Observe sinais de sono com calma.` });
+    }
   }
+
+  if (latestFeed) {
+    const elapsed = now - Number(latestFeed.start);
+    if (elapsed > 2.5 * hour) {
+      items.push({ icon: "🍼", title: "Alimentação", text: `Já faz ${formatShortDuration(elapsed)} desde a última alimentação registrada.` });
+    }
+  } else if (events.length >= 2) {
+    items.push({ icon: "🍼", title: "Alimentação", text: "Ainda não há alimentação registrada hoje." });
+  }
+
+  if (latestDiaper) {
+    const elapsed = now - Number(latestDiaper.start);
+    if (elapsed > 3.5 * hour) {
+      items.push({ icon: "🧷", title: "Fralda", text: `Última fralda registrada há ${formatShortDuration(elapsed)}.` });
+    }
+  } else if (events.length >= 2) {
+    items.push({ icon: "🧷", title: "Fralda", text: "Ainda não há fralda registrada hoje." });
+  }
+
+  if (events.length >= 4 && sleepMs < 45 * 60000) {
+    items.push({ icon: "🌙", title: "Sono acumulado", text: `Sono registrado hoje: ${formatShortDuration(sleepMs)}. Observe se uma soneca faz sentido.` });
+  }
+
+  if (meds) {
+    items.push({ icon: "💊", title: "Medicamento", text: `${meds} ${meds === 1 ? "dose registrada" : "doses registradas"} hoje.` });
+  }
+
   if (latestAny?.createdByName || latestAny?.createdByEmail) {
     items.push({ icon: "👥", title: "Última atualização", text: `${getActorDisplayNameFromEvent(latestAny)} registrou ${getEventConfig(latestAny.type).title.toLowerCase()} às ${formatTime(latestAny.start)}.` });
   }
-  if (!items.length) items.push({ icon: "🌿", title: "Tudo tranquilo", text: "Os registros de hoje estão organizados. O Ninou avisará quando houver algo útil para lembrar." });
+
+  if (!items.length) {
+    items.push({ icon: "🌿", title: "Tudo organizado", text: `Hoje há ${events.length} registros, ${feeds} alimentação(ões) e ${diapers} fralda(s).` });
+  }
   return items.slice(0, 4);
 }
 
@@ -9080,21 +10227,50 @@ function renderDaySummaryCard() {
   const meds = countMedicationEvents(events);
   const latest = [...events].sort((a, b) => Number(b.start) - Number(a.start))[0] || null;
   const baby = getBabyDisplayName();
-  if (daySummaryMoment) daySummaryMoment.textContent = new Date(now).getHours() >= 20 ? "Fechamento do dia" : "Resumo em tempo real";
+  const hourNow = new Date(now).getHours();
+
+  if (daySummaryMoment) {
+    daySummaryMoment.textContent = hourNow >= 20 ? "Fechamento do dia" : "Resumo em tempo real";
+  }
+
   if (!events.length) {
-    daySummaryText.textContent = `Ainda não há registros hoje. Comece com sono, mamada, fralda ou medicamento para o Ninou montar um resumo acolhedor do dia.`;
+    daySummaryText.textContent = "Ainda não há registros hoje. Comece com sono, mamada, fralda ou medicamento para o Ninou montar um resumo acolhedor do dia.";
     return;
   }
+
+  const recentSleepValues = [];
+  for (let idx = 1; idx <= 6; idx += 1) {
+    const dStart = todayStart - idx * day;
+    const dEvents = getFamilyEventsForWindow(dStart, dStart + day);
+    if (!dEvents.length) continue;
+    recentSleepValues.push(getSleepMsForRange(dStart, dStart + day));
+  }
+  const recentSleepAvg = recentSleepValues.length
+    ? recentSleepValues.reduce((total, value) => total + value, 0) / recentSleepValues.length
+    : 0;
+
   const latestTitle = latest ? getEventConfig(latest.type).title.toLowerCase() : "registro";
-  const parts = [
-    `${feeds} ${feeds === 1 ? "alimentação" : "alimentações"}`,
-    `${diapers} ${diapers === 1 ? "fralda" : "fraldas"}`,
-    `${naps} ${naps === 1 ? "sono" : "sonos"}`,
-  ];
-  if (bottleMl) parts.push(`${bottleMl} ml em mamadeiras`);
-  if (meds) parts.push(`${meds} ${meds === 1 ? "medicamento" : "medicamentos"}`);
-  const lastText = latest ? `Último registro: ${latestTitle} às ${formatTime(latest.start)}.` : "";
-  daySummaryText.textContent = `Hoje ${baby} teve ${parts.join(", ")}. Total de sono: ${formatShortDuration(sleepMs)}. ${lastText}`.trim();
+  const lastText = latest ? ` Último registro: ${latestTitle} às ${formatTime(latest.start)}.` : "";
+  const bottleText = bottleMl ? `, ${bottleMl} ml em mamadeiras` : "";
+  const medText = meds ? `, ${meds} ${meds === 1 ? "medicamento" : "medicamentos"}` : "";
+  let comparison = "";
+
+  if (recentSleepAvg && sleepMs) {
+    const diff = sleepMs - recentSleepAvg;
+    if (Math.abs(diff) <= 35 * 60000) {
+      comparison = " O sono está próximo da média recente.";
+    } else if (diff > 0) {
+      comparison = ` O sono está ${formatShortDuration(diff)} acima da média recente.`;
+    } else {
+      comparison = ` O sono está ${formatShortDuration(Math.abs(diff))} abaixo da média recente.`;
+    }
+  }
+
+  const rhythmText = events.length >= 6
+    ? " A rotina de hoje já tem boa quantidade de registros."
+    : " O resumo ainda é parcial e vai melhorar com mais registros.";
+
+  daySummaryText.textContent = `Hoje ${baby} dormiu ${formatShortDuration(sleepMs)}, teve ${feeds} ${feeds === 1 ? "alimentação" : "alimentações"}, ${diapers} ${diapers === 1 ? "fralda" : "fraldas"} e ${naps} ${naps === 1 ? "sono" : "sonos"} registrados${bottleText}${medText}.${comparison}${rhythmText}${lastText}`.trim();
 }
 
 function getSortedWeightsAsc() {
@@ -9134,41 +10310,103 @@ function formatWeightDelta(diff) {
   return `${sign}${kg.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg desde o peso anterior`;
 }
 
+
+function buildPremiumSmoothPath(points = []) {
+  if (!points.length) return "";
+  if (points.length < 3) {
+    return points.map((point, index) => `${index ? "L" : "M"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+  }
+  const path = [`M${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const current = points[index];
+    const next = points[index + 1];
+    const previous = points[index - 1] || current;
+    const afterNext = points[index + 2] || next;
+    const cp1x = current.x + (next.x - previous.x) / 6;
+    const cp1y = current.y + (next.y - previous.y) / 6;
+    const cp2x = next.x - (afterNext.x - current.x) / 6;
+    const cp2y = next.y - (afterNext.y - current.y) / 6;
+    path.push(`C${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${next.x.toFixed(1)} ${next.y.toFixed(1)}`);
+  }
+  return path.join(" ");
+}
+
 function renderSparkline(container, weights = []) {
   if (!container) return;
   const normalized = weights
     .map((item) => ({ ...item, kg: getWeightKgValue(item.value) }))
     .filter((item) => Number.isFinite(item.kg))
     .slice(-8);
+
+  container.classList.add("premium-weight-chart");
+
   if (normalized.length < 2) {
-    container.innerHTML = `<span>Gráfico aparece com 2 pesos</span>`;
+    container.innerHTML = `
+      <div class="weight-empty-state">
+        <strong>Curva aparece com 2 pesos</strong>
+        <span>Registre mais um peso para formar a curva de evolução.</span>
+      </div>`;
     return;
   }
+
   const values = normalized.map((item) => item.kg);
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const paddedMin = Math.max(0, min - 0.3);
-  const paddedMax = max + 0.3;
+  const delta = values[values.length - 1] - values[0];
+  const paddedMin = Math.max(0, min - Math.max(0.15, (max - min) * 0.28));
+  const paddedMax = max + Math.max(0.15, (max - min) * 0.28);
   const spread = Math.max(0.15, paddedMax - paddedMin);
-  const width = 168;
-  const height = 92;
-  const chartLeft = 10;
-  const chartRight = width - 10;
-  const chartTop = 14;
-  const chartBottom = height - 22;
+  const width = 320;
+  const height = 154;
+  const chartLeft = 32;
+  const chartRight = width - 20;
+  const chartTop = 24;
+  const chartBottom = height - 38;
   const points = normalized.map((item, index) => {
     const x = normalized.length === 1 ? width / 2 : chartLeft + (index / (normalized.length - 1)) * (chartRight - chartLeft);
     const y = chartBottom - ((item.kg - paddedMin) / spread) * (chartBottom - chartTop);
     return { x, y, item };
   });
-  const path = points.map((point, index) => `${index ? "L" : "M"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+  const path = buildPremiumSmoothPath(points);
   const areaPath = `${path} L${points[points.length - 1].x.toFixed(1)} ${chartBottom} L${points[0].x.toFixed(1)} ${chartBottom} Z`;
-  const circles = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3.8"><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></circle>`).join("");
+  const circles = points.map((point, index) => {
+    const isLast = index === points.length - 1;
+    return `<g class="weight-point${isLast ? " is-latest" : ""}"><circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${isLast ? 5.2 : 4.2}"></circle><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></g>`;
+  }).join("");
+  const gridLines = [0, 0.5, 1].map((ratio) => {
+    const y = chartTop + ratio * (chartBottom - chartTop);
+    return `<line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" class="weight-grid-line"></line>`;
+  }).join("");
   const minLabel = escapeHtml(formatKg(paddedMin));
   const maxLabel = escapeHtml(formatKg(paddedMax));
-  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso"><defs><linearGradient id="weightSoftFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".20"/><stop offset="1" stop-color="currentColor" stop-opacity=".02"/></linearGradient></defs><line x1="${chartLeft}" y1="${chartTop}" x2="${chartRight}" y2="${chartTop}" class="weight-grid-line"></line><line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" class="weight-grid-line"></line><path d="${areaPath}" fill="url(#weightSoftFill)"></path><path d="${path}" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>${circles}<text x="${chartLeft}" y="10" class="weight-axis-label">${maxLabel}</text><text x="${chartLeft}" y="${height - 4}" class="weight-axis-label">${minLabel}</text></svg>`;
+  const firstDate = escapeHtml(String(normalized[0].date || "").split("-").reverse().slice(0, 2).join("/"));
+  const lastDate = escapeHtml(String(normalized[normalized.length - 1].date || "").split("-").reverse().slice(0, 2).join("/"));
+  const deltaLabel = escapeHtml(formatWeightDelta(delta).replace(" desde o peso anterior", " no período"));
+  container.innerHTML = `
+    <div class="weight-chart-topline">
+      <span>${normalized.length} registros</span>
+      <strong>${deltaLabel}</strong>
+    </div>
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso">
+      <defs>
+        <linearGradient id="weightPremiumFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="currentColor" stop-opacity=".26"/>
+          <stop offset="1" stop-color="currentColor" stop-opacity=".025"/>
+        </linearGradient>
+        <filter id="weightGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="currentColor" flood-opacity=".16"/>
+        </filter>
+      </defs>
+      ${gridLines}
+      <path d="${areaPath}" fill="url(#weightPremiumFill)"></path>
+      <path d="${path}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#weightGlow)"></path>
+      ${circles}
+      <text x="${chartLeft}" y="16" class="weight-axis-label">${maxLabel}</text>
+      <text x="${chartLeft}" y="${height - 7}" class="weight-axis-label">${minLabel}</text>
+      <text x="${chartLeft}" y="${height - 22}" class="weight-date-label">${firstDate}</text>
+      <text x="${chartRight}" y="${height - 22}" text-anchor="end" class="weight-date-label">${lastDate}</text>
+    </svg>`;
 }
-
 function renderGrowthHistoryMini(weights = []) {
   if (!growthHistoryMini) return;
   const recent = weights.slice(-4).reverse();
@@ -9372,6 +10610,7 @@ function renderAll() {
   updateProfileReadyExperience();
   normalizeLoggedProfileCards();
   renderCaregiverIdentityPanel();
+  renderTodayCaregiverCard();
 }
 
 function renderLiveTick() {
@@ -10081,7 +11320,7 @@ async function repairFamilyIntegrity() {
     }
 
     if (!isGlobalAppAdmin()) {
-      await saveAccountAccessToCloud({ ...familyAccess, familyId, role: familyAccess?.role || "responsavel", email: cloudUser.email || familyAccess?.email || "" }, cloudUser);
+      await saveAccountAccessToCloud({ ...familyAccess, familyId, role: familyAccess?.role || FAMILY_ROLE_ADMIN, email: cloudUser.email || familyAccess?.email || "" }, cloudUser);
     }
 
     await writeFamilyAuditLog("family_integrity_repaired", { familyId, message: "Correção básica de vínculos e perfil executada pelo painel." });
@@ -11127,6 +12366,10 @@ if (quickObservationInput) {
   });
 }
 if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", () => withButtonBusy(saveCaregiverIdentityButton, "Salvando...", saveCaregiverIdentityFromForm));
+caregiverPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => applyCaregiverPresetFromButton(button));
+});
+if (todayCaregiverEditButton) todayCaregiverEditButton.addEventListener("click", openCaregiverEditor);
 if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click", () => withButtonBusy(familyCreateInviteButton, "Criando...", createFamilyCaregiverInvite));
 if (familyCopyInviteButton) familyCopyInviteButton.addEventListener("click", copyFamilyInviteCode);
 if (familyShareInviteWhatsAppButton) familyShareInviteWhatsAppButton.addEventListener("click", shareFamilyInviteOnWhatsApp);
@@ -11152,11 +12395,16 @@ if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click",
 if (guestWelcomeCreateFamilyButton) {
   guestWelcomeCreateFamilyButton.addEventListener("click", () => {
     focusProfileAccess("create");
-    if (loginHelper) loginHelper.textContent = "Digite seu e-mail, escolha uma senha com pelo menos 6 caracteres e toque em Criar conta.";
-    loginEmail?.focus();
+    if (isLoggedIn()) {
+      openCreateFamilyWizard({ focus: true });
+    } else {
+      if (loginHelper) loginHelper.textContent = "Crie sua conta familiar com e-mail e senha. Depois preencha os dados do bebê para criar a família.";
+      loginEmail?.focus();
+    }
   });
 }
 if (guestModalCloseButton) guestModalCloseButton.addEventListener("click", closeGuestLoginModal);
+if (guestModalCreateFamilyButton) guestModalCreateFamilyButton.addEventListener("click", () => focusProfileAccess("create"));
 if (guestModalLoginButton) guestModalLoginButton.addEventListener("click", () => focusProfileAccess("login"));
 if (guestModalInviteButton) guestModalInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
 if (guestOnboardingModal) {
@@ -11209,7 +12457,7 @@ document.addEventListener("click", (event) => {
   if (!guestAction) return;
   event.preventDefault();
   event.stopPropagation();
-  focusProfileAccess(guestAction.dataset.guestAction === "invite" ? "invite" : "login");
+  focusProfileAccess(normalizeCommercialEntryAction(guestAction.dataset.guestAction));
 }, true);
 
 wakeWindowInput.addEventListener("input", () => {
@@ -11341,10 +12589,40 @@ if (clearDeviceDataButton) clearDeviceDataButton.addEventListener("click", signO
 if (createFamilyButton) {
   createFamilyButton.addEventListener("click", () => {
     if (personalFamilyActivationInFlight) return;
-    withButtonBusy(createFamilyButton, "Criando...", () => activatePersonalFamily().catch((error) => {
-      console.error("Erro ao ativar família:", error);
+    if (isGlobalAppAdmin()) {
+      withButtonBusy(createFamilyButton, "Ativando...", () => activatePersonalFamily().catch((error) => {
+        console.error("Erro ao ativar família admin:", error);
+        if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
+      }), { restoreDisabled: false, afterFinish: renderAuthControls });
+      return;
+    }
+    openCreateFamilyWizard({ focus: true });
+  });
+}
+if (confirmCreateFamilyButton) {
+  confirmCreateFamilyButton.addEventListener("click", () => {
+    withButtonBusy(confirmCreateFamilyButton, "Criando...", () => createCommercialFamilyFromWizard().catch((error) => {
+      console.error("Erro ao criar família comercial:", error);
+      if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = getFirebaseErrorMessage(error);
       if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
     }), { restoreDisabled: false, afterFinish: renderAuthControls });
+  });
+}
+if (cancelCreateFamilyButton) cancelCreateFamilyButton.addEventListener("click", closeCreateFamilyWizard);
+if (newFamilyBabyNameInput) {
+  newFamilyBabyNameInput.addEventListener("input", () => {
+    if (!newFamilyNameInput) return;
+    const babyName = String(newFamilyBabyNameInput.value || "").trim();
+    const currentFamilyName = String(newFamilyNameInput.value || "").trim();
+    if (!currentFamilyName || /^Família d[oa]\s+/i.test(currentFamilyName) || /^Familia d[oa]\s+/i.test(currentFamilyName)) {
+      newFamilyNameInput.value = babyName ? `Família do ${babyName}` : "";
+    }
+  });
+}
+if (newFamilyResponsibleRelationInput) {
+  newFamilyResponsibleRelationInput.addEventListener("change", () => {
+    const relation = String(newFamilyResponsibleRelationInput.value || "responsavel").trim();
+    if (caregiverRelationInput && !caregiverRelationInput.value) caregiverRelationInput.value = relation;
   });
 }
 if (acceptInviteButton) {
@@ -11378,6 +12656,17 @@ if (adminCreateClientFamilyButton) {
         adminCreateFamilyResult.textContent = getFirebaseErrorMessage(error);
       }
     }));
+  });
+}
+if (prepareFranciscoFamilyButton) {
+  prepareFranciscoFamilyButton.addEventListener("click", () => {
+    prepareFranciscoFamilyForMigration().catch((error) => {
+      console.error("Erro ao preparar família Francisco:", error);
+      if (franciscoMigrationResult) {
+        franciscoMigrationResult.hidden = false;
+        franciscoMigrationResult.textContent = getFirebaseErrorMessage(error);
+      }
+    });
   });
 }
 if (adminOpenFamilyButton) {
@@ -11456,7 +12745,7 @@ if (adminInvitePanel) {
     const scrollButton = event.target.closest("[data-admin-scroll]");
     if (scrollButton) {
       const target = scrollButton.dataset.adminScroll || "";
-      const map = { "create-family": "adminCreateFamilySection", members: "adminMembersSection", invite: "adminInviteSection", migration: "adminMigrationSection" };
+      const map = { "create-family": "adminCreateFamilySection", clients: "adminFamilyMonitorSection", commercial: "adminCommercialDashboard", beta: "adminCommercialReadinessSection", members: "adminMembersSection", invite: "adminInviteSection", migration: "adminMigrationSection" };
       scrollAdminSection(map[target] || target);
       return;
     }
@@ -11526,7 +12815,7 @@ if (adminInvitePanel) {
       const select = adminInvitePanel.querySelector(`[data-member-role-select="${CSS.escape(uid)}"]`);
       roleButton.disabled = true;
       roleButton.textContent = "Salvando...";
-      await updateFamilyMemberRole(uid, select?.value || "visualizacao");
+      await updateFamilyMemberRole(uid, select?.value || FAMILY_ROLE_VIEWER);
       return;
     }
 
@@ -11766,9 +13055,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.33 — polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.53 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.33";
+  const VERSION = "75.75.53";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -11820,4 +13109,718 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => polish(document), { once: true });
   else polish(document);
   new MutationObserver(schedulePolish).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+})();
+
+
+/* Ninou v75.75.53 — guarda de estabilidade + preparação multi-família. */
+(() => {
+  const VERSION = "75.75.53";
+  const RESET_LABELS = new Map([
+    ["familyHealthRefreshButton", "Verificar família"],
+    ["familyHealthRepairButton", "Corrigir vínculos"],
+    ["familyRealTestRefreshButton", "Rodar checklist"],
+    ["loginButton", "Entrar"],
+    ["createAccountButton", "Criar conta"],
+    ["saveBabyWeightButton", "Atualizar peso"],
+    ["saveCaregiverIdentityButton", "Salvar identificação"],
+  ]);
+
+  function normalizeText(value) {
+    return String(value || "").replace(/\s+/g, " ").trim();
+  }
+
+  function clearLongPendingButton(button) {
+    if (!button || button.dataset.ninouAllowPending === "true") return;
+    const text = normalizeText(button.textContent);
+    if (!button.disabled) return;
+    if (!/(verificando|salvando|entrando|criando|corrigindo|carregando|atualizando)/i.test(text)) return;
+    const startedAt = Number(button.dataset.ninouPendingStartedAt || 0);
+    const now = Date.now();
+    if (!startedAt) {
+      button.dataset.ninouPendingStartedAt = String(now);
+      return;
+    }
+    if (now - startedAt < 18000) return;
+    const fallback = RESET_LABELS.get(button.id);
+    if (fallback) button.textContent = fallback;
+    button.disabled = false;
+    delete button.dataset.ninouCheckingFamily;
+    delete button.dataset.ninouPendingStartedAt;
+  }
+
+  function markPendingButtons(root = document) {
+    root.querySelectorAll?.("button:disabled").forEach(clearLongPendingButton);
+  }
+
+  function stabilizeViewport() {
+    document.documentElement.dataset.ninouStabilityVersion = VERSION;
+    document.querySelectorAll("input, select, textarea").forEach((field) => {
+      field.style.fontSize = "16px";
+    });
+  }
+
+  function stabilize() {
+    stabilizeViewport();
+    markPendingButtons(document);
+  }
+
+  window.addEventListener("pageshow", stabilize);
+  window.addEventListener("focus", stabilize);
+  setInterval(stabilize, 6000);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", stabilize, { once: true });
+  } else {
+    stabilize();
+  }
+})();
+
+
+/* Ninou v75.75.53 — centro de privacidade, termos e solicitações de dados. */
+(() => {
+  const LEGAL_VERSION = "75.75.53";
+  const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
+  const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
+  const modal = document.querySelector("#legalInfoModal");
+  const modalKicker = document.querySelector("#legalInfoKicker");
+  const modalTitle = document.querySelector("#legalInfoTitle");
+  const modalBody = document.querySelector("#legalInfoBody");
+  const modalAccept = document.querySelector("#legalInfoAcceptButton");
+  const closeButtons = document.querySelectorAll("[data-close-legal-modal], #legalInfoCloseButton");
+  const privacyButton = document.querySelector("#legalPrivacyPolicyButton");
+  const termsButton = document.querySelector("#legalTermsButton");
+  const medicalButton = document.querySelector("#legalMedicalDisclaimerButton");
+  const consentButton = document.querySelector("#legalConsentButton");
+  const exportButton = document.querySelector("#legalExportDataButton");
+  const requestButton = document.querySelector("#legalDataRequestButton");
+  const status = document.querySelector("#legalReadinessStatus");
+  const badge = document.querySelector("#legalConsentBadge");
+  const consentStatus = document.querySelector("#legalConsentStatus");
+  const consentDate = document.querySelector("#legalConsentDate");
+  const versionLabel = document.querySelector("#legalVersionLabel");
+
+  const content = {
+    privacy: {
+      kicker: "Privacidade",
+      title: "Política de privacidade do Ninou",
+      html: `
+        <article><strong>Quais dados o Ninou organiza</strong><p>Rotina do bebê, horários, mamadas, fraldas, sono, peso, observações, nomes de cuidadores, vínculo familiar, convites e dados básicos da conta usada para login.</p></article>
+        <article><strong>Como os dados são separados</strong><p>Cada família usa um <b>familyId</b>. Um cuidador só deve acessar a família em que foi autorizado por convite ou vínculo familiar.</p></article>
+        <article><strong>Finalidade</strong><p>O uso é familiar: acompanhar a rotina, gerar relatórios, compartilhar resumo por WhatsApp/PDF e facilitar a comunicação entre cuidadores.</p></article>
+        <article><strong>Controle da família</strong><p>A família pode exportar os dados no Perfil e solicitar exclusão. Em beta, a exclusão deve ser confirmada pelo administrador antes de remoções definitivas.</p></article>
+      `,
+    },
+    terms: {
+      kicker: "Termos de uso",
+      title: "Termos de uso do beta Ninou",
+      html: `
+        <article><strong>Uso familiar</strong><p>O Ninou é um diário de rotina familiar para bebês. O responsável deve cadastrar apenas dados necessários e convidar somente cuidadores autorizados.</p></article>
+        <article><strong>Conta e convite</strong><p>Cada pessoa deve usar seu próprio e-mail quando possível. Convites são pessoais e devem ser aceitos pelo e-mail informado.</p></article>
+        <article><strong>Beta controlado</strong><p>Esta versão é candidata a beta. Pode haver ajustes, correções e revisão jurídica antes de lançamento público ou cobrança recorrente.</p></article>
+        <article><strong>Responsabilidade</strong><p>O usuário deve revisar registros, exportar backup antes de testes críticos e procurar suporte ao notar divergência de dados.</p></article>
+      `,
+    },
+    medical: {
+      kicker: "Aviso médico",
+      title: "O Ninou não substitui pediatra",
+      html: `
+        <article><strong>Sem diagnóstico</strong><p>O Ninou não diagnostica, não prescreve, não determina tratamento e não substitui avaliação pediátrica.</p></article>
+        <article><strong>Medicamentos</strong><p>Registros de medicamentos são apenas anotações familiares. Doses, horários e decisões clínicas devem seguir orientação profissional.</p></article>
+        <article><strong>Sinais de alerta</strong><p>Em caso de febre, dificuldade respiratória, engasgos, sonolência incomum, baixa alimentação ou qualquer preocupação, procure atendimento médico.</p></article>
+      `,
+    },
+  };
+
+  function getLegalContext(extra = {}) {
+    const familyId = getActiveFamilyId?.({ allowLegacyFallback: false }) || familyAccess?.familyId || "";
+    return {
+      app: "Ninou",
+      legalVersion: LEGAL_VERSION,
+      familyId,
+      email: cloudUser?.email || localStorage.getItem(storageKeys.email) || "",
+      uid: cloudUser?.uid || "",
+      createdAtClient: new Date().toISOString(),
+      appVersion: NINOU_RUNTIME_VERSION,
+      ...extra,
+    };
+  }
+
+  function readConsent() {
+    try { return JSON.parse(localStorage.getItem(CONSENT_KEY) || "null"); }
+    catch { return null; }
+  }
+
+  function setLegalStatus(message) {
+    if (status) status.textContent = message;
+  }
+
+  function formatConsentDate(value) {
+    if (!value) return "Aguardando aceite";
+    try { return new Date(value).toLocaleString("pt-BR"); }
+    catch { return "Aceito neste aparelho"; }
+  }
+
+  function canUseFamilyDataExport() {
+    if (typeof window.ninouCanManageFamilyData === "function") return window.ninouCanManageFamilyData();
+    try { return typeof isFamilyAdmin === "function" && isFamilyAdmin(); }
+    catch { return false; }
+  }
+
+  function canRequestFamilyDataDeletion() {
+    if (typeof window.ninouCanRequestFamilyDeletion === "function") return window.ninouCanRequestFamilyDeletion();
+    try { return typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin(); }
+    catch { return false; }
+  }
+
+  function renderLegalCenter() {
+    const consent = readConsent();
+    if (versionLabel) versionLabel.textContent = `v${LEGAL_VERSION}`;
+    const accepted = Boolean(consent?.acceptedAtClient);
+    if (badge) {
+      badge.dataset.state = accepted ? "accepted" : "pending";
+      badge.textContent = accepted ? "Aceito" : "Pendente";
+    }
+    if (consentStatus) consentStatus.textContent = accepted ? "Confirmado" : "Não confirmado";
+    if (consentDate) consentDate.textContent = accepted ? formatConsentDate(consent.acceptedAtClient) : "Aguardando aceite";
+    if (consentButton) consentButton.textContent = accepted ? "Aceite registrado" : "Aceitar termos";
+    if (exportButton) exportButton.hidden = !canUseFamilyDataExport();
+    if (requestButton) requestButton.hidden = !canRequestFamilyDataDeletion();
+    if (!canUseFamilyDataExport() && status) {
+      status.textContent = "Política, termos e aviso médico ficam disponíveis. Exportação e exclusão aparecem apenas para responsável/admin.";
+    }
+  }
+
+  function openLegalModal(type = "privacy") {
+    const item = content[type] || content.privacy;
+    if (!modal || !modalTitle || !modalBody) return;
+    if (modalKicker) modalKicker.textContent = item.kicker;
+    modalTitle.textContent = item.title;
+    modalBody.innerHTML = item.html;
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+  }
+
+  function closeLegalModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+  }
+
+  async function writeLegalDoc(collectionDoc, payload) {
+    try {
+      const services = await getFirebaseServices();
+      await services.setDoc(collectionDoc(services), {
+        ...payload,
+        updatedAt: services.serverTimestamp(),
+      }, { merge: true });
+      return true;
+    } catch (error) {
+      console.warn("Registro legal não salvo na nuvem:", error);
+      return false;
+    }
+  }
+
+  async function saveConsent() {
+    const payload = getLegalContext({
+      type: "terms_acceptance",
+      acceptedAtClient: new Date().toISOString(),
+      privacyPolicyVersion: LEGAL_VERSION,
+      termsVersion: LEGAL_VERSION,
+      medicalDisclaimerAccepted: true,
+    });
+    localStorage.setItem(CONSENT_KEY, JSON.stringify(payload));
+    renderLegalCenter();
+    closeLegalModal();
+    setLegalStatus("Aceite registrado neste aparelho. Quando logado em uma família, o Ninou também tenta salvar esse aceite na nuvem.");
+
+    if (cloudUser?.uid) {
+      await writeLegalDoc((services) => services.doc(services.db, "users", cloudUser.uid, "account", "legal"), payload);
+    }
+    if (cloudUser?.uid && payload.familyId) {
+      await writeLegalDoc((services) => services.doc(services.db, "families", payload.familyId, "legal", `consent_${cloudUser.uid}`), {
+        ...payload,
+        familyId: payload.familyId,
+        actorUid: cloudUser.uid,
+        actorEmail: payload.email,
+        status: "accepted",
+      });
+    }
+  }
+
+  function downloadLegalRequest(payload) {
+    const familyId = sanitizeLocalStorageSegment(payload.familyId || "familia");
+    const dateId = toDateInputValue(Date.now());
+    downloadFile(`ninou-solicitacao-dados-${familyId}-${dateId}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+  }
+
+  async function requestDataDeletion() {
+    if (!canRequestFamilyDataDeletion()) {
+      setLegalStatus("Solicitação de exclusão fica disponível apenas para responsável principal/admin global.");
+      return;
+    }
+    const confirmed = window.confirm("Deseja registrar uma solicitação de exclusão dos dados desta família/conta? Antes de excluir definitivamente, exporte um backup JSON.");
+    if (!confirmed) return;
+    const payload = getLegalContext({
+      type: "data_deletion_request",
+      status: "requested",
+      requestedAtClient: new Date().toISOString(),
+      note: "Solicitação feita pelo Centro de confiança do Ninou. Exige conferência antes de exclusão definitiva.",
+    });
+    localStorage.setItem(REQUEST_KEY, JSON.stringify(payload));
+    downloadLegalRequest(payload);
+    setLegalStatus("Solicitação de exclusão registrada e baixada em JSON. Em beta, confirme com o administrador antes de remover dados definitivos.");
+
+    if (cloudUser?.uid) {
+      await writeLegalDoc((services) => services.doc(services.db, "users", cloudUser.uid, "account", "dataDeletionRequest"), payload);
+    }
+    if (cloudUser?.uid && payload.familyId) {
+      await writeLegalDoc((services) => services.doc(services.db, "families", payload.familyId, "legal", `data_request_${cloudUser.uid}`), {
+        ...payload,
+        familyId: payload.familyId,
+        actorUid: cloudUser.uid,
+        actorEmail: payload.email,
+      });
+    }
+  }
+
+  privacyButton?.addEventListener("click", () => openLegalModal("privacy"));
+  termsButton?.addEventListener("click", () => openLegalModal("terms"));
+  medicalButton?.addEventListener("click", () => openLegalModal("medical"));
+  consentButton?.addEventListener("click", saveConsent);
+  modalAccept?.addEventListener("click", saveConsent);
+  closeButtons.forEach((button) => button.addEventListener("click", closeLegalModal));
+  modal?.addEventListener("click", (event) => {
+    if (event.target?.dataset?.closeLegalModal === "true") closeLegalModal();
+  });
+  exportButton?.addEventListener("click", () => {
+    if (!canUseFamilyDataExport()) {
+      setLegalStatus("Exportação de dados fica disponível apenas para responsável/admin familiar.");
+      return;
+    }
+    if (typeof exportFullFamilyBackup === "function") exportFullFamilyBackup();
+    else exportRoutine?.("json");
+    setLegalStatus("Use o backup JSON como cópia antes de qualquer limpeza ou troca de família.");
+  });
+  requestButton?.addEventListener("click", requestDataDeletion);
+  window.addEventListener("pageshow", renderLegalCenter);
+  renderLegalCenter();
+})();
+
+/* Ninou v75.75.53 — suporte e monitoramento simples para beta comercial. */
+(() => {
+  const SUPPORT_VERSION = "75.75.53";
+  const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
+  const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
+
+  const modal = document.querySelector("#supportReportModal");
+  const reportButton = document.querySelector("#supportReportButton");
+  const copyDiagnosticsButton = document.querySelector("#supportCopyDiagnosticsButton");
+  const backupButton = document.querySelector("#supportDownloadBackupButton");
+  const closeButtons = document.querySelectorAll("[data-close-support-modal], #supportReportCloseButton");
+  const submitButton = document.querySelector("#supportSubmitButton");
+  const typeInput = document.querySelector("#supportIssueTypeInput");
+  const severityInput = document.querySelector("#supportSeverityInput");
+  const descriptionInput = document.querySelector("#supportDescriptionInput");
+  const preview = document.querySelector("#supportDiagnosticsPreview");
+  const status = document.querySelector("#supportBetaStatus");
+  const badge = document.querySelector("#supportBetaBadge");
+  const versionLabel = document.querySelector("#supportVersionLabel");
+  const lastReportLabel = document.querySelector("#supportLastReportLabel");
+  const lastReportDetail = document.querySelector("#supportLastReportDetail");
+  const adminList = document.querySelector("#adminSupportReportsList");
+  const adminReportsCount = document.querySelector("#adminSupportReportsCount");
+  const adminErrorsCount = document.querySelector("#adminSupportErrorsCount");
+  const adminStatusLabel = document.querySelector("#adminSupportStatusLabel");
+  const adminStatus = document.querySelector("#adminSupportReportsStatus");
+  const adminRefresh = document.querySelector("#adminSupportRefreshButton");
+  const adminDownload = document.querySelector("#adminSupportDownloadButton");
+
+  function canUseSupportBackup() {
+    if (typeof window.ninouCanManageFamilyData === "function") return window.ninouCanManageFamilyData();
+    try { return typeof isFamilyAdmin === "function" && isFamilyAdmin(); }
+    catch { return false; }
+  }
+
+  function safeReadList(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || "[]");
+      return Array.isArray(value) ? value : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function safeWriteList(key, items, limit = 20) {
+    try {
+      localStorage.setItem(key, JSON.stringify(items.slice(0, limit)));
+    } catch (error) {
+      console.warn("Não foi possível salvar diagnóstico local do Ninou:", error);
+    }
+  }
+
+  function supportFamilyId() {
+    try {
+      if (typeof getActiveFamilyId === "function") {
+        return getActiveFamilyId({ allowLegacyFallback: false }) || familyAccess?.familyId || "";
+      }
+      return familyAccess?.familyId || "";
+    } catch {
+      return familyAccess?.familyId || "";
+    }
+  }
+
+  function supportEmail() {
+    try {
+      return cloudUser?.email || localStorage.getItem(storageKeys.email) || "";
+    } catch {
+      return cloudUser?.email || "";
+    }
+  }
+
+  function getPwaMode() {
+    const standalone = window.matchMedia?.("(display-mode: standalone)")?.matches || navigator.standalone === true;
+    return standalone ? "PWA instalado" : "Navegador";
+  }
+
+  function collectDiagnostics() {
+    const errors = safeReadList(ERRORS_KEY).slice(0, 5);
+    const reports = safeReadList(REPORTS_KEY);
+    const familyId = supportFamilyId();
+    return {
+      app: "Ninou",
+      supportVersion: SUPPORT_VERSION,
+      appVersion: typeof NINOU_RUNTIME_VERSION !== "undefined" ? NINOU_RUNTIME_VERSION : SUPPORT_VERSION,
+      familyId,
+      familyScopeVersion: typeof NINOU_FAMILY_SCOPE_VERSION !== "undefined" ? NINOU_FAMILY_SCOPE_VERSION : "",
+      email: supportEmail(),
+      uid: cloudUser?.uid || "",
+      pwa: getPwaMode(),
+      url: location.href,
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      screen: `${screen.width}x${screen.height}`,
+      online: navigator.onLine,
+      localTime: new Date().toISOString(),
+      localSupportReports: reports.length,
+      recentErrors: errors,
+    };
+  }
+
+  function diagnosticsText() {
+    return JSON.stringify(collectDiagnostics(), null, 2);
+  }
+
+  function setSupportStatus(message, state = "ready") {
+    if (status) status.textContent = message;
+    if (badge) {
+      badge.dataset.state = state === "error" ? "pending" : "accepted";
+      badge.textContent = state === "error" ? "Atenção" : "Pronto";
+    }
+  }
+
+  function formatDate(value) {
+    if (!value) return "Nenhum";
+    try { return new Date(value).toLocaleString("pt-BR"); }
+    catch { return "Registrado"; }
+  }
+
+  function renderSupportCenter() {
+    const reports = safeReadList(REPORTS_KEY);
+    const errors = safeReadList(ERRORS_KEY);
+    const latest = reports[0];
+    if (versionLabel) versionLabel.textContent = `v${SUPPORT_VERSION}`;
+    if (lastReportLabel) lastReportLabel.textContent = latest ? formatDate(latest.createdAtClient) : "Nenhum";
+    if (lastReportDetail) lastReportDetail.textContent = latest ? `${latest.issueType || "problema"} · ${latest.severity || "normal"}` : "Aguardando teste real";
+    if (adminReportsCount) adminReportsCount.textContent = String(reports.length);
+    if (adminErrorsCount) adminErrorsCount.textContent = String(errors.length);
+    if (adminStatusLabel) adminStatusLabel.textContent = reports.length || errors.length ? "Acompanhar" : "Aguardando beta";
+    if (adminStatus) adminStatus.textContent = reports.length || errors.length
+      ? "Baixe o diagnóstico antes de investigar permissões, convites ou cache em outro aparelho."
+      : "Os relatórios também tentam salvar em families/{familyId}/legal quando o usuário está logado e autorizado.";
+    if (backupButton) backupButton.hidden = !canUseSupportBackup();
+    const isGlobal = typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin();
+    document.querySelectorAll("[data-global-admin-only]").forEach((node) => { node.hidden = !isGlobal; });
+    renderAdminSupportList(reports, errors);
+  }
+
+  function escapeSupportHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;",
+    }[char] || char));
+  }
+
+  function renderAdminSupportList(reports, errors) {
+    if (!adminList) return;
+    if (!reports.length && !errors.length) {
+      adminList.innerHTML = '<li class="polished-admin-empty">Nenhum relatório de suporte registrado neste aparelho.</li>';
+      return;
+    }
+    const reportItems = reports.slice(0, 8).map((item) => {
+      const issue = item.issueType || "relatório";
+      const severity = item.severity || "normal";
+      const familyId = item.familyId || "sem família";
+      const description = (item.description || "Sem descrição.").slice(0, 160);
+      return `<li><strong>${escapeSupportHtml(issue)} · ${escapeSupportHtml(severity)}</strong><span>${escapeSupportHtml(description)}</span><small>${escapeSupportHtml(familyId)} · ${escapeSupportHtml(formatDate(item.createdAtClient))}</small></li>`;
+    });
+    const errorItems = errors.slice(0, 4).map((item) => {
+      return `<li><strong>Erro local capturado</strong><span>${escapeSupportHtml((item.message || "Erro sem mensagem").slice(0, 160))}</span><small>${escapeSupportHtml(formatDate(item.createdAtClient))}</small></li>`;
+    });
+    adminList.innerHTML = [...reportItems, ...errorItems].join("");
+  }
+
+  function refreshPreview() {
+    if (!preview) return;
+    const d = collectDiagnostics();
+    preview.textContent = `v${d.appVersion} · ${d.email || "sem e-mail"} · ${d.familyId || "sem familyId"} · ${d.pwa} · ${d.viewport} · erros: ${d.recentErrors.length}`;
+  }
+
+  function openSupportModal() {
+    if (!modal) return;
+    refreshPreview();
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    setTimeout(() => descriptionInput?.focus(), 40);
+  }
+
+  function closeSupportModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+  }
+
+  async function writeSupportDoc(payload) {
+    if (!cloudUser?.uid || !payload.familyId) return false;
+    try {
+      const services = await getFirebaseServices();
+      const stamp = Date.now();
+      const uidSegment = String(cloudUser.uid).replace(/[^a-zA-Z0-9_-]/g, "_");
+      await services.setDoc(services.doc(services.db, "families", payload.familyId, "legal", `support_${uidSegment}_${stamp}`), {
+        ...payload,
+        familyId: payload.familyId,
+        actorUid: cloudUser.uid,
+        actorEmail: payload.email,
+        status: "requested",
+        type: "support_request",
+        updatedAt: services.serverTimestamp(),
+      }, { merge: true });
+      await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "account", "supportLastRequest"), {
+        ...payload,
+        status: "requested",
+        type: "support_request",
+        updatedAt: services.serverTimestamp(),
+      }, { merge: true });
+      return true;
+    } catch (error) {
+      console.warn("Relatório de suporte não salvo na nuvem:", error);
+      return false;
+    }
+  }
+
+  async function saveSupportReport() {
+    const description = (descriptionInput?.value || "").trim();
+    if (!description) {
+      setSupportStatus("Descreva o que aconteceu antes de salvar o relatório.", "error");
+      descriptionInput?.focus();
+      return;
+    }
+    const payload = {
+      ...collectDiagnostics(),
+      type: "support_request",
+      issueType: typeInput?.value || "outro",
+      severity: severityInput?.value || "normal",
+      description,
+      status: "requested",
+      createdAtClient: new Date().toISOString(),
+    };
+    const reports = safeReadList(REPORTS_KEY);
+    safeWriteList(REPORTS_KEY, [payload, ...reports], 25);
+    const savedCloud = await writeSupportDoc(payload);
+    renderSupportCenter();
+    closeSupportModal();
+    if (descriptionInput) descriptionInput.value = "";
+    setSupportStatus(savedCloud
+      ? "Relatório salvo neste aparelho e enviado para a nuvem da família."
+      : "Relatório salvo neste aparelho. Baixe ou copie o diagnóstico para enviar ao suporte.");
+  }
+
+  async function copyDiagnostics() {
+    const text = diagnosticsText();
+    try {
+      await navigator.clipboard.writeText(text);
+      setSupportStatus("Diagnóstico copiado. Cole na conversa de suporte para investigarmos com mais precisão.");
+    } catch {
+      downloadDiagnostics();
+      setSupportStatus("Não consegui copiar automaticamente. Baixei o diagnóstico em JSON.");
+    }
+  }
+
+  function downloadDiagnostics() {
+    const familyId = typeof sanitizeLocalStorageSegment === "function" ? sanitizeLocalStorageSegment(supportFamilyId() || "familia") : (supportFamilyId() || "familia");
+    const dateId = typeof toDateInputValue === "function" ? toDateInputValue(Date.now()) : new Date().toISOString().slice(0, 10);
+    const payload = {
+      diagnostics: collectDiagnostics(),
+      reports: safeReadList(REPORTS_KEY),
+      errors: safeReadList(ERRORS_KEY),
+    };
+    downloadFile(`ninou-suporte-${familyId}-${dateId}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+  }
+
+  function backupFamily() {
+    if (!canUseSupportBackup()) {
+      setSupportStatus("Backup JSON fica disponível apenas para responsável/admin familiar.", "error");
+      return;
+    }
+    try {
+      if (typeof exportFullFamilyBackup === "function") exportFullFamilyBackup();
+      else if (typeof exportRoutine === "function") exportRoutine("json");
+      setSupportStatus("Backup JSON gerado. Guarde antes de limpar cache, trocar família ou investigar sincronização.");
+    } catch (error) {
+      console.warn("Backup de suporte falhou:", error);
+      setSupportStatus("Não consegui gerar o backup automaticamente. Tente novamente após atualizar o app.", "error");
+    }
+  }
+
+  function captureRuntimeError(source, message, extra = {}) {
+    const item = {
+      source,
+      message: String(message || "Erro sem mensagem"),
+      createdAtClient: new Date().toISOString(),
+      appVersion: typeof NINOU_RUNTIME_VERSION !== "undefined" ? NINOU_RUNTIME_VERSION : SUPPORT_VERSION,
+      familyId: supportFamilyId(),
+      email: supportEmail(),
+      ...extra,
+    };
+    const current = safeReadList(ERRORS_KEY);
+    safeWriteList(ERRORS_KEY, [item, ...current], 25);
+    renderSupportCenter();
+  }
+
+  window.addEventListener("error", (event) => {
+    captureRuntimeError("window.error", event.message, {
+      filename: event.filename || "",
+      lineno: event.lineno || 0,
+      colno: event.colno || 0,
+    });
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    const reason = event.reason;
+    captureRuntimeError("unhandledrejection", reason?.message || reason || "Promise rejeitada", {
+      stack: reason?.stack ? String(reason.stack).slice(0, 600) : "",
+    });
+  });
+
+  reportButton?.addEventListener("click", openSupportModal);
+  copyDiagnosticsButton?.addEventListener("click", copyDiagnostics);
+  backupButton?.addEventListener("click", backupFamily);
+  submitButton?.addEventListener("click", saveSupportReport);
+  closeButtons.forEach((button) => button.addEventListener("click", closeSupportModal));
+  modal?.addEventListener("click", (event) => {
+    if (event.target?.dataset?.closeSupportModal === "true") closeSupportModal();
+  });
+  adminRefresh?.addEventListener("click", renderSupportCenter);
+  adminDownload?.addEventListener("click", downloadDiagnostics);
+  window.addEventListener("pageshow", renderSupportCenter);
+  window.addEventListener("online", () => setSupportStatus("Conexão voltou. Se houve erro de sincronização, gere um novo relatório se necessário."));
+  window.addEventListener("offline", () => setSupportStatus("Sem internet. O relatório pode ser salvo localmente e enviado depois.", "error"));
+
+  refreshPreview();
+  renderSupportCenter();
+})();
+
+/* Ninou v75.75.53 — revisão comercial final: restrição visual por permissão. */
+(() => {
+  const REVIEW_VERSION = "75.75.53";
+
+  function currentEffectiveRole() {
+    try {
+      if (typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin()) return FAMILY_ROLE_GLOBAL_ADMIN || "admin";
+      if (typeof getEffectiveRole === "function") return getEffectiveRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
+      return String(familyAccess?.role || "");
+    } catch {
+      return "";
+    }
+  }
+
+  function canManageFamilyData() {
+    try {
+      if (typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin()) return true;
+      if (typeof isFamilyManagerRole === "function") return Boolean(familyAccess?.familyId && isFamilyManagerRole(familyAccess?.role, cloudUser?.email || familyAccess?.email || ""));
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  function canRequestDeletion() {
+    try {
+      if (typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin()) return true;
+      if (typeof isFamilyOwnerRole === "function") return Boolean(familyAccess?.familyId && isFamilyOwnerRole(familyAccess?.role));
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  function isGlobalAdminVisible() {
+    try { return typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin(); }
+    catch { return false; }
+  }
+
+  window.ninouCanManageFamilyData = canManageFamilyData;
+  window.ninouCanRequestFamilyDeletion = canRequestDeletion;
+  window.ninouCommercialReviewVersion = REVIEW_VERSION;
+
+  function setHidden(node, hidden, title = "") {
+    if (!node) return;
+    node.hidden = Boolean(hidden);
+    if (hidden && title) node.setAttribute("data-permission-hidden-reason", title);
+    else node.removeAttribute("data-permission-hidden-reason");
+  }
+
+  function applyPermissionVisibility() {
+    const managerAllowed = canManageFamilyData();
+    const ownerAllowed = canRequestDeletion();
+    const globalAllowed = isGlobalAdminVisible();
+    const role = currentEffectiveRole();
+
+    document.querySelectorAll('[data-sensitive-action="manager"]').forEach((node) => {
+      setHidden(node, !managerAllowed, "Disponível apenas para responsável/admin familiar.");
+    });
+    document.querySelectorAll('[data-sensitive-action="owner"]').forEach((node) => {
+      setHidden(node, !ownerAllowed, "Disponível apenas para responsável principal/admin global.");
+    });
+    document.querySelectorAll('[data-global-admin-only]').forEach((node) => {
+      setHidden(node, !globalAllowed, "Disponível apenas para admin global.");
+    });
+
+    const status = document.querySelector("#supportBetaStatus");
+    if (status && !managerAllowed) {
+      status.textContent = "Você pode relatar problema e copiar diagnóstico. Backup, exportação e exclusão ficam restritos ao responsável/admin.";
+    }
+    const legalStatus = document.querySelector("#legalReadinessStatus");
+    if (legalStatus && !managerAllowed) {
+      legalStatus.textContent = "Política, termos e aviso médico ficam disponíveis. Dados sensíveis aparecem conforme o papel na família.";
+    }
+    const badge = document.querySelector("#supportBetaBadge");
+    if (badge) {
+      badge.title = `Papel atual: ${role || "sem papel"}`;
+    }
+  }
+
+  window.ninouApplyCommercialPermissionVisibility = applyPermissionVisibility;
+  window.addEventListener("pageshow", applyPermissionVisibility);
+  window.addEventListener("focus", applyPermissionVisibility);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) applyPermissionVisibility(); });
+  setTimeout(applyPermissionVisibility, 120);
+  setInterval(applyPermissionVisibility, 5000);
 })();

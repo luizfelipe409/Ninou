@@ -1,0 +1,10 @@
+Ninou v75.75.42 — tela inicial comercial multi-família
+
+- Cria uma entrada comercial para novas famílias: Criar minha família, Entrar com convite e Já tenho conta.
+- Atualiza o modal de visitante para explicar os três caminhos sem misturar dados entre famílias.
+- Atualiza o card de entrada no Perfil com linguagem de produto comercial.
+- Atualiza a prévia de visitante com três chamadas claras.
+- Ajusta o fluxo visual de conta para preparar a futura criação completa de família.
+- Mantém CSS único: apenas styles.css.
+- Atualiza index.html, app.js, sw.js, manifest e runtime para 75.75.42.
+- Não altera Firebase Rules, criação real de família, convites reais, família do Francisco ou isolamento de dados.

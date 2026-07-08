@@ -1,0 +1,17 @@
+Como publicar as regras da v75.75.50
+
+1. Abra Firebase Console.
+2. Entre no projeto do Ninou.
+3. Vá em Firestore Database > Rules.
+4. Abra o arquivo firestore.rules deste ZIP.
+5. Copie todo o conteúdo.
+6. Cole no editor do Firebase.
+7. Clique em Publish.
+
+Depois teste:
+- admin global;
+- pai do Francisco;
+- mãe do Francisco;
+- família nova;
+- convite de cuidador;
+- convite de visualização.

@@ -1,0 +1,12 @@
+Ninou v75.75.45 — isolamento real por família
+
+- Mantém a v75.75.44 como base.
+- Isola cache local de rotina por familyId.
+- Isola perfil do bebê por familyId.
+- Isola histórico de peso por familyId.
+- Evita que uma família comercial herde rotina do cache legado/global.
+- Grava metadados familyId, familyScopeType e familyScopeVersion nos dados locais e na nuvem.
+- Mantém compatibilidade com contas antigas sem família comercial ativa.
+- Mantém CSS único: apenas styles.css.
+- Atualiza index.html, app.js, sw.js, manifest e runtime para 75.75.45.
+- Não altera Firebase Rules ainda.

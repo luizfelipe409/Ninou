@@ -1,0 +1,22 @@
+Revisão v75.75.42
+
+Objetivo desta versão:
+Preparar a primeira tela/entrada comercial do Ninou para famílias externas.
+
+Caminhos visuais adicionados:
+1. Criar minha família.
+2. Entrar com convite.
+3. Já tenho conta.
+
+Limites intencionais:
+- A criação real da família será feita na v75.75.43.
+- As regras Firestore multi-família seguras serão feitas na v75.75.48.
+- Esta versão não muda a família atual do Francisco nem regras de acesso.
+
+Checklist preservado:
+- CSS único.
+- Botão Sair e limpar dados deste aparelho.
+- PDF/WhatsApp/CSV/JSON.
+- Login atual.
+- Convite atual.
+- Admin global.

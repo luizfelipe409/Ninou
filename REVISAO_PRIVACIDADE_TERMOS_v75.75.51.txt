@@ -1,0 +1,14 @@
+Revisão — v75.75.51
+
+Esta versão prepara o Ninou para beta com mais segurança operacional.
+
+Incluído:
+1. Política de privacidade resumida e visível no app.
+2. Termos de uso do beta.
+3. Aviso médico explícito.
+4. Aceite de termos por versão.
+5. Exportação de dados pelo Centro de confiança.
+6. Solicitação de exclusão de dados.
+7. Registro opcional na nuvem para consentimento e solicitações legais.
+
+Observação: antes de lançamento público pago, o texto jurídico final deve ser validado com orientação jurídica/LGPD.
