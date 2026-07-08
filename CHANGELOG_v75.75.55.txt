@@ -1,0 +1,8 @@
+Ninou v75.75.55 — ações da madrugada e amamentação visível
+
+Correções:
+- O botão flutuante de novo registro agora abre diretamente em Amamentação, pois os botões principais já cobrem sono/acordou.
+- O seletor do sheet de registro não fica mais limitado visualmente aos 3 primeiros botões.
+- Amamentação, Mamadeira, Fralda, Medicamento, Acordou, Soneca, Noite e Despertar ficam visíveis no modal.
+- A ordem dos tipos de registro prioriza cuidados de madrugada: Amamentação, Mamadeira e Fralda.
+- Mantido CSS único e compatibilidade com as regras multi-família atuais.

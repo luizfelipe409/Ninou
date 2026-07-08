@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-53-revisao-comercial-final-sequencia";
+const CACHE_NAME = "ninou-v75-75-56-revisao-visual-primeiro-acesso-dados";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.53",
-  "/app.js?v=75.75.53",
-  "/js/app.legacy.js?v=75.75.53",
+  "/styles.css?v=75.75.56",
+  "/app.js?v=75.75.56",
+  "/js/app.legacy.js?v=75.75.56",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",

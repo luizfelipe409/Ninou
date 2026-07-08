@@ -1,0 +1,10 @@
+Ninou v75.75.56 — revisão visual, primeiro acesso e dados
+
+- Reforça contraste do tema claro em cards, textos, inputs e botões.
+- Redesenha o relógio grande no tema claro com identidade diurna e sol.
+- Adiciona pergunta real no primeiro acesso do dia: acordado, dormindo ou começar agora.
+- Mantém o horário de referência para iniciar o resumo corretamente.
+- Melhora os gráficos da tela Dados, com estado vazio e barras legíveis no tema claro.
+- Remove cards comerciais/beta sem sentido do Perfil para usuários familiares comuns.
+- Mantém suporte/privacidade somente com textos úteis para família.
+- Preserva CSS único: styles.css.

@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.53";
+const NINOU_RUNTIME_VERSION = "75.75.56";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -405,7 +405,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.53-commercial-final-sequence";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.56-revisao-visual-primeiro-acesso-dados";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -425,12 +425,43 @@ function isFranciscoFamilyAccountEmail(email = "") {
 }
 
 function isFranciscoSharedAccount(user = cloudUser) {
-  // v75.75.53: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  // v75.75.56: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
   return isFranciscoFamilyAccountEmail(user?.email || "");
 }
 
 function isFranciscoFamilyId(familyId = "") {
   return normalizeFamilyId(familyId) === NINOU_FRANCISCO_FAMILY_ID;
+}
+
+function getAutomaticCaregiverIdentityForEmail(email = getCurrentIdentityEmail?.() || "") {
+  const normalized = normalizeEmail(email);
+  if (normalized === NINOU_FRANCISCO_FATHER_EMAIL) {
+    return {
+      name: "Felipe",
+      relation: "pai",
+      relationshipLabel: "Pai",
+      label: "Felipe · Pai",
+      lockedByEmail: true,
+      automatic: true,
+      source: "francisco-parent-email",
+    };
+  }
+  if (normalized === NINOU_FRANCISCO_MOTHER_EMAIL) {
+    return {
+      name: "Maria",
+      relation: "mae",
+      relationshipLabel: "Mãe",
+      label: "Maria · Mãe",
+      lockedByEmail: true,
+      automatic: true,
+      source: "francisco-parent-email",
+    };
+  }
+  return null;
+}
+
+function isCaregiverIdentityAutomatic() {
+  return Boolean(getAutomaticCaregiverIdentityForEmail(getCurrentIdentityEmail?.() || cloudUser?.email || familyAccess?.email || ""));
 }
 
 function getDefaultFamilyLabelsForAccount(user = cloudUser) {
@@ -507,7 +538,7 @@ function getFamilyScopeType(familyId = "") {
 }
 
 function getLegacyAccountFamilyFallbackId(user = cloudUser) {
-  // v75.75.53: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // v75.75.56: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
   // Isso evita que a família atual caia em um familyId temporário por UID.
   if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
   // Compatibilidade: versões antigas usavam o UID como familyId provisório.
@@ -1074,6 +1105,11 @@ function renderFamilyAccessSummary() {
     familyAccessSummaryInviteStatus.textContent = canInvite
       ? "Ao convidar, informe o e-mail correto do cuidador. A pessoa não deve criar outra família."
       : "Seu perfil não pode gerar convites.";
+  }
+  if (familyAccessSummaryProfileButton) {
+    const automaticIdentity = Boolean(identity.lockedByEmail);
+    familyAccessSummaryProfileButton.hidden = automaticIdentity;
+    familyAccessSummaryProfileButton.disabled = automaticIdentity;
   }
   if (familyLeaveButton) {
     const canLeave = canCurrentUserLeaveFamily();
@@ -2649,6 +2685,14 @@ function getCaregiverRelationLabel(value = "") {
 }
 
 function loadCurrentCaregiverIdentity() {
+  const automaticIdentity = getAutomaticCaregiverIdentityForEmail(getCurrentIdentityEmail());
+  if (automaticIdentity) {
+    return {
+      ...automaticIdentity,
+      deviceId: getOrCreateCaregiverDeviceId(),
+    };
+  }
+
   try {
     let data = JSON.parse(localStorage.getItem(getCaregiverIdentityKey()) || "{}");
 
@@ -2672,14 +2716,22 @@ function loadCurrentCaregiverIdentity() {
       relationshipLabel: relationLabel,
       label,
       deviceId: String(data.deviceId || getOrCreateCaregiverDeviceId()).trim(),
+      automatic: false,
+      lockedByEmail: false,
     };
   } catch {
-    return { name: "", relation: "", relationshipLabel: "", label: "", deviceId: getOrCreateCaregiverDeviceId() };
+    return { name: "", relation: "", relationshipLabel: "", label: "", deviceId: getOrCreateCaregiverDeviceId(), automatic: false, lockedByEmail: false };
   }
 }
 
 function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
+  const automaticIdentity = getAutomaticCaregiverIdentityForEmail(email);
+  if (automaticIdentity && extras.force !== true) {
+    // v75.75.56: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
+    // não por um botão de troca neste aparelho. Isso evita registros assinados pela pessoa errada.
+    return true;
+  }
   const cleanName = String(name || "").trim();
   const cleanRelation = String(relation || "").trim();
   const relationshipLabel = String(extras.relationshipLabel || getCaregiverRelationLabel(cleanRelation) || "").trim();
@@ -2853,9 +2905,11 @@ function renderProfileFamilyCards() {
     deviceCaregiverRelationChip.textContent = identity.relationshipLabel || "Vínculo não definido";
   }
   if (deviceCaregiverHint) {
-    deviceCaregiverHint.textContent = identity.label
-      ? `Registros feitos neste aparelho serão assinados como ${identity.label}.`
-      : "Escolha quem está usando este aparelho para os registros ficarem corretos.";
+    deviceCaregiverHint.textContent = identity.lockedByEmail
+      ? `Identificação automática pelo e-mail conectado: ${identity.label}.`
+      : identity.label
+        ? `Registros feitos neste aparelho serão assinados como ${identity.label}.`
+        : "Escolha quem está usando este aparelho para os registros ficarem corretos.";
   }
   if (familyNameLabel) familyNameLabel.textContent = familyLabel;
   if (familyAccountLabel) familyAccountLabel.textContent = cloudUser?.email || familyAccess?.email || "Conta não conectada";
@@ -2887,16 +2941,22 @@ function renderTodayCaregiverCard() {
   const configured = Boolean(identity.name || identity.relation || identity.label);
 
   todayCaregiverCard.classList.toggle("caregiver-configured", configured);
+  todayCaregiverCard.classList.toggle("caregiver-auto-locked", Boolean(identity.lockedByEmail));
   todayCaregiverCard.dataset.configured = configured ? "true" : "false";
+  todayCaregiverCard.dataset.autoLocked = identity.lockedByEmail ? "true" : "false";
 
   if (todayCaregiverAvatar) todayCaregiverAvatar.textContent = getCaregiverEmoji(identity.relation);
   if (todayCaregiverName) todayCaregiverName.textContent = label;
   if (todayCaregiverHint) {
-    todayCaregiverHint.textContent = configured
-      ? `Os próximos registros serão assinados como ${label}.`
-      : "Toque em configurar para o diário mostrar quem fez cada registro.";
+    todayCaregiverHint.textContent = identity.lockedByEmail
+      ? "Identificado automaticamente pelo e-mail desta conta."
+      : configured
+        ? `Os próximos registros serão assinados como ${label}.`
+        : "Toque em configurar para o diário mostrar quem fez cada registro.";
   }
   if (todayCaregiverEditButton) {
+    todayCaregiverEditButton.hidden = Boolean(identity.lockedByEmail);
+    todayCaregiverEditButton.disabled = Boolean(identity.lockedByEmail);
     todayCaregiverEditButton.textContent = configured ? "Trocar" : "Configurar";
     todayCaregiverEditButton.title = configured ? "Trocar cuidador deste aparelho" : "Configurar cuidador deste aparelho";
   }
@@ -2928,6 +2988,12 @@ function applyCaregiverPresetFromButton(button) {
 function openCaregiverEditor() {
   showScreen("profile");
   renderCaregiverIdentityPanel();
+  const identity = loadCurrentCaregiverIdentity();
+  if (identity.lockedByEmail) {
+    if (caregiverIdentityStatus) caregiverIdentityStatus.textContent = `Este aparelho registra automaticamente como ${identity.label}, conforme o e-mail conectado.`;
+    setTimeout(() => caregiverIdentityCard?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+    return;
+  }
   if (caregiverIdentityCard) {
     caregiverIdentityCard.hidden = false;
     caregiverIdentityCard.dataset.userOpened = "true";
@@ -2959,20 +3025,31 @@ function renderCaregiverIdentityPanel() {
   const identity = loadCurrentCaregiverIdentity();
   const isPrimaryAdmin = isGlobalAppAdmin();
   caregiverIdentityCard.classList.toggle("caregiver-configured", Boolean(identity.label));
+  caregiverIdentityCard.classList.toggle("caregiver-auto-locked", Boolean(identity.lockedByEmail));
   if (identity.label && !caregiverIdentityCard.dataset.userOpened) {
     caregiverIdentityCard.open = false;
   }
   if (document.activeElement !== caregiverNameInput) caregiverNameInput.value = identity.name || (isPrimaryAdmin ? "Luiz Felipe" : "");
   if (document.activeElement !== caregiverRelationInput) caregiverRelationInput.value = identity.relation || (isPrimaryAdmin ? "pai" : "");
+  if (caregiverNameInput) caregiverNameInput.disabled = Boolean(identity.lockedByEmail);
+  if (caregiverRelationInput) caregiverRelationInput.disabled = Boolean(identity.lockedByEmail);
+  caregiverPresetButtons.forEach((button) => {
+    button.hidden = Boolean(identity.lockedByEmail);
+    button.disabled = Boolean(identity.lockedByEmail);
+  });
   if (saveCaregiverIdentityButton) {
+    saveCaregiverIdentityButton.hidden = Boolean(identity.lockedByEmail);
+    saveCaregiverIdentityButton.disabled = Boolean(identity.lockedByEmail);
     saveCaregiverIdentityButton.textContent = identity.label ? "Salvar alterações" : "Salvar cuidador";
   }
   if (caregiverIdentityStatus) {
-    caregiverIdentityStatus.textContent = identity.label
-      ? `Os próximos registros deste aparelho serão assinados como ${identity.label}.`
-      : (isPrimaryAdmin
-        ? "Sugestão inicial: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
-        : "Defina o nome e o vínculo que aparecerão nos registros deste aparelho.");
+    caregiverIdentityStatus.textContent = identity.lockedByEmail
+      ? `Automático: este login registra como ${identity.label}. Não é necessário trocar no aparelho.`
+      : identity.label
+        ? `Os próximos registros deste aparelho serão assinados como ${identity.label}.`
+        : (isPrimaryAdmin
+          ? "Sugestão inicial: Luiz Felipe / Pai. Admin é permissão do sistema; Pai é apenas como os registros aparecem no diário."
+          : "Defina o nome e o vínculo que aparecerão nos registros deste aparelho.");
   }
   renderProfileFamilyCards();
   renderTodayCaregiverCard();
@@ -3393,6 +3470,122 @@ function parseManualStartTimeInput(mode = "awake") {
   return timestamp;
 }
 
+function getFirstRoutinePromptKey() {
+  let familyId = "local";
+  try {
+    if (typeof getFamilyInviteTargetFamilyId === "function") familyId = getFamilyInviteTargetFamilyId() || familyId;
+    if ((!familyId || familyId === "local") && familyAccess?.familyId) familyId = familyAccess.familyId;
+    if ((!familyId || familyId === "local") && babyProfile?.familyId) familyId = babyProfile.familyId;
+  } catch {}
+  return `ninou:first-routine-state:${familyId || "local"}:${getCurrentDayId()}`;
+}
+
+function parseFirstRoutineTimeValue(mode = "awake") {
+  const input = document.querySelector("#firstRoutineTimeInput");
+  const value = String(input?.value || "").trim();
+  const now = Date.now();
+  const match = value.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) {
+    window.alert("Informe o horário no formato HH:MM.");
+    return null;
+  }
+  const h = Number(match[1]);
+  const m = Number(match[2]);
+  if (!Number.isInteger(h) || !Number.isInteger(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+    window.alert("Horário inválido. Use horas entre 00 e 23 e minutos entre 00 e 59.");
+    return null;
+  }
+  let timestamp = getDayStart() + h * hour + m * 60000;
+  if (timestamp > now + 2 * 60000) timestamp -= day;
+  if (timestamp < now - 36 * hour || timestamp > now + 2 * 60000) {
+    window.alert("Escolha um horário das últimas 36 horas.");
+    return null;
+  }
+  return timestamp;
+}
+
+function ensureFirstRoutineStatePrompt() {
+  let modal = document.querySelector("#firstRoutineStatePrompt");
+  if (modal) return modal;
+  modal = document.createElement("section");
+  modal.id = "firstRoutineStatePrompt";
+  modal.className = "first-routine-state-prompt";
+  modal.hidden = true;
+  modal.setAttribute("aria-label", "Configuração inicial da rotina do bebê");
+  modal.innerHTML = `
+    <div class="first-routine-backdrop" data-first-routine-close="true"></div>
+    <div class="first-routine-card" role="dialog" aria-modal="true" aria-labelledby="firstRoutineTitle">
+      <button class="first-routine-close" type="button" data-first-routine-close="true" aria-label="Fechar">×</button>
+      <span class="first-routine-kicker">Primeiro registro do dia</span>
+      <strong id="firstRoutineTitle">Como ${escapeHtml(getBabyReference())} está agora?</strong>
+      <p>Antes do primeiro cuidado, informe se começou acordado ou dormindo. Assim o relógio, o resumo e os gráficos nascem corretos.</p>
+      <label class="first-routine-time-label">
+        Horário de referência
+        <input id="firstRoutineTimeInput" type="time" />
+      </label>
+      <div class="first-routine-actions">
+        <button type="button" data-first-routine-mode="awake">☀️ Acordado desde esse horário</button>
+        <button type="button" data-first-routine-mode="sleeping">🌙 Dormindo desde esse horário</button>
+      </div>
+      <button class="first-routine-now" type="button" data-first-routine-mode="now">Começar agora</button>
+      <small>Essa pergunta aparece só no início do dia ou quando ainda não há registros.</small>
+    </div>
+  `;
+  document.body.append(modal);
+  modal.addEventListener("click", (event) => {
+    const close = event.target.closest("[data-first-routine-close]");
+    const action = event.target.closest("[data-first-routine-mode]");
+    if (close) {
+      try { localStorage.setItem(getFirstRoutinePromptKey(), "dismissed"); } catch {}
+      closeFirstRoutineStatePrompt();
+      return;
+    }
+    if (!action) return;
+    const mode = action.dataset.firstRoutineMode || "now";
+    if (mode === "now") {
+      startRoutine("now", Date.now(), "Rotina iniciada agora");
+      return;
+    }
+    const timestamp = parseFirstRoutineTimeValue(mode);
+    if (!Number.isFinite(Number(timestamp))) return;
+    startRoutine(mode, Number(timestamp), mode === "awake" ? "Primeiro estado informado" : "Sono inicial informado");
+  });
+  return modal;
+}
+
+function closeFirstRoutineStatePrompt() {
+  const modal = document.querySelector("#firstRoutineStatePrompt");
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove("first-routine-prompt-open");
+}
+
+function shouldShowFirstRoutineStatePrompt() {
+  if (activeScreenName !== "today") return false;
+  if (!isLoggedIn() || !hasFamilyAccess() || authAccessLoading) return false;
+  if (getSelectedDayId() !== getCurrentDayId()) return false;
+  if (state?.mode !== "idle") return false;
+  if (todayHasPersistentRoutineContent()) return false;
+  try {
+    if (localStorage.getItem(getFirstRoutinePromptKey())) return false;
+  } catch {}
+  return true;
+}
+
+function scheduleFirstRoutineStatePrompt() {
+  window.clearTimeout(window.__ninouFirstRoutinePromptTimer);
+  window.__ninouFirstRoutinePromptTimer = window.setTimeout(() => {
+    if (!shouldShowFirstRoutineStatePrompt()) return;
+    const modal = ensureFirstRoutineStatePrompt();
+    const input = modal.querySelector("#firstRoutineTimeInput");
+    if (input && !input.value) input.value = formatTime(Date.now());
+    const title = modal.querySelector("#firstRoutineTitle");
+    if (title) title.textContent = `Como ${getBabyReference()} está agora?`;
+    modal.hidden = false;
+    document.body.classList.add("first-routine-prompt-open");
+  }, 750);
+}
+
 function persistCrossDaySleepEvent(event = {}) {
   if (!event || !isSleepEvent(event)) return;
   const startDayId = getDayIdFromStart(event.start);
@@ -3621,7 +3814,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.75.53: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
+    v75.75.56: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -7773,7 +7966,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.53 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.56 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -7904,7 +8097,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.53 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.56 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -8270,9 +8463,12 @@ function unsubscribeCloudListeners() {
 function updateBodyModeClasses() {
   const appAdmin = Boolean(isGlobalAppAdmin());
   const previewOpen = Boolean(window.__ninouAdminFamilyDataOpen);
+  const familySurface = Boolean(isLoggedIn() && hasFamilyAccess() && (!appAdmin || previewOpen));
   document.body.classList.toggle("global-admin-mode", appAdmin && !previewOpen);
   document.body.classList.toggle("admin-panel-only", appAdmin && !previewOpen);
   document.body.classList.toggle("admin-family-preview", appAdmin && previewOpen);
+  document.body.classList.toggle("family-daily-surface", familySurface);
+  document.body.classList.toggle("regular-family-mode", familySurface && !appAdmin);
   renderAdminClients();
 }
 
@@ -9555,13 +9751,27 @@ function renderSleepReport() {
     : "Nenhuma soneca registrada nos últimos 7 dias.";
 
   sleepBars.innerHTML = "";
-  days.forEach((item) => {
+  days.forEach((item, index) => {
     const bar = document.createElement("span");
     const height = Math.max(6, Math.round((item.sleepMs / maxSleep) * 100));
     bar.style.setProperty("--h", `${height}%`);
+    bar.style.setProperty("--delay", `${index * 36}ms`);
+    bar.classList.toggle("is-empty", item.sleepMs <= 0);
     bar.innerHTML = `<b>${item.sleepMs ? formatShortDuration(item.sleepMs) : "0"}</b><i>${item.label}</i>`;
     sleepBars.append(bar);
   });
+  const sleepCard = sleepBars.closest(".data-chart-card");
+  const hasSleepData = days.some((item) => item.sleepMs > 0);
+  sleepBars.dataset.hasRealData = hasSleepData ? "true" : "false";
+  if (sleepCard) {
+    sleepCard.dataset.hasRealData = hasSleepData ? "true" : "false";
+    if (!sleepCard.querySelector(".data-chart-empty-hint")) {
+      const hint = document.createElement("small");
+      hint.className = "data-chart-empty-hint";
+      hint.textContent = "Sem registros neste período.";
+      sleepCard.append(hint);
+    }
+  }
 
   if (!routineEvents.length) {
     bestWindow.textContent = "Sem dados";
@@ -9611,6 +9821,19 @@ function renderBarChart(container, days, getValue, formatValue = formatNumber) {
 
 function renderSupplementalReports() {
   const reportDays = getReportDays(7);
+  const setChartDataState = (container, values = []) => {
+    if (!container) return;
+    const card = container.closest(".data-chart-card");
+    const hasData = values.some((value) => Number(value) > 0);
+    container.dataset.hasRealData = hasData ? "true" : "false";
+    if (card) card.dataset.hasRealData = hasData ? "true" : "false";
+    if (card && !card.querySelector(".data-chart-empty-hint")) {
+      const hint = document.createElement("small");
+      hint.className = "data-chart-empty-hint";
+      hint.textContent = "Sem registros neste período.";
+      card.append(hint);
+    }
+  };
   renderTrendKpis({
     container: trendKpis,
     state: buildFamilyStateForRecentWindow(7),
@@ -9624,30 +9847,38 @@ function renderSupplementalReports() {
     formatShortDuration,
   });
 
+  const breastfeedingValues = reportDays.map((item) => countBreastfeedingEvents(item.events));
   renderBarChart(
     breastfeedingBars,
     reportDays,
     (item) => countBreastfeedingEvents(item.events),
   );
+  setChartDataState(breastfeedingBars, breastfeedingValues);
 
+  const bottleValues = reportDays.map((item) => sumBottleAmountMl(item.events));
   renderBarChart(
     bottleBars,
     reportDays,
     (item) => sumBottleAmountMl(item.events),
     (value) => value ? `${formatNumber(value)} ml` : "0",
   );
+  setChartDataState(bottleBars, bottleValues);
 
+  const diaperValues = reportDays.map((item) => countDiaperEvents(item.events));
   renderBarChart(
     diaperBars,
     reportDays,
     (item) => countDiaperEvents(item.events),
   );
+  setChartDataState(diaperBars, diaperValues);
 
+  const medicationValues = reportDays.map((item) => countMedicationEvents(item.events));
   renderBarChart(
     medicationBars,
     reportDays,
     (item) => countMedicationEvents(item.events),
   );
+  setChartDataState(medicationBars, medicationValues);
 }
 
 
@@ -10611,6 +10842,7 @@ function renderAll() {
   normalizeLoggedProfileCards();
   renderCaregiverIdentityPanel();
   renderTodayCaregiverCard();
+  scheduleFirstRoutineStatePrompt();
 }
 
 function renderLiveTick() {
@@ -10673,7 +10905,7 @@ function startSleep() {
   saveDayState();
 }
 
-function startRoutine(mode) {
+function startRoutine(mode, forcedStartedAt = null, sourceLabel = "") {
   if (!requireLogin("salvar a rotina")) return;
   if (getSelectedDayId() !== getCurrentDayId()) {
     window.alert("Volte para hoje para iniciar a rotina em tempo real.");
@@ -10686,16 +10918,24 @@ function startRoutine(mode) {
     return;
   }
 
-  const startedAt = mode === "now" ? Date.now() : parseManualStartTimeInput(startMode);
+  const hasForcedStart = Number.isFinite(Number(forcedStartedAt));
+  const startedAt = hasForcedStart ? Number(forcedStartedAt) : (mode === "now" ? Date.now() : parseManualStartTimeInput(startMode));
   if (!Number.isFinite(Number(startedAt))) return;
+
+  try {
+    localStorage.setItem(getFirstRoutinePromptKey(), "answered");
+  } catch {}
 
   markRoutineMutationSnapshot(startMode === "sleeping" ? "iniciou sono informado" : "iniciou dia informado");
   state = startRoutineTimer(state, startMode, Number(startedAt));
-  if (startMode === "awake") addAwakeEvent(Number(startedAt), mode === "now" ? "Rotina iniciada agora" : "Início do dia informado");
+  if (startMode === "awake") {
+    addAwakeEvent(Number(startedAt), sourceLabel || (mode === "now" ? "Rotina iniciada agora" : "Início do dia informado"));
+  }
   reconcileCurrentAwakeStateFromEvents({ persist: false });
   timelineRenderSignature = "";
   orbitRenderSignature = "";
   saveDayState();
+  closeFirstRoutineStatePrompt();
   renderAll();
 
   if (firebaseServices && cloudUser && hasFamilyAccess()) {
@@ -11644,6 +11884,54 @@ function startLiveSleepFromManualEvent(type, start, detail, notes) {
   state = startLiveSleepFromManualEventInState(state, type, start, detail, notes);
 }
 
+function isManualSleepType(type = "") {
+  return type === "sono" || type === "dormir";
+}
+
+function manualSleepOverlapsActiveState(event = {}, dayState = state) {
+  if (!event || !isManualSleepType(event.type) || dayState?.mode !== "sleeping") return false;
+  const activeStart = Number(dayState.activeStartedAt);
+  const start = Number(event.start);
+  const end = Number(event.end);
+  if (!Number.isFinite(activeStart) || !Number.isFinite(start) || !Number.isFinite(end) || end <= start) return false;
+  return activeStart >= start - 5 * 60000 && activeStart <= end + 5 * 60000;
+}
+
+function shouldKeepSelectedDayForManualSleep(payload = {}, selectedDayId = getSelectedDayId()) {
+  if (!payload || !isManualSleepType(payload.type)) return false;
+  if (!isDateId(selectedDayId)) return false;
+  const selectedStart = getDayStartFromId(selectedDayId);
+  const selectedEnd = selectedStart + day;
+  const start = Number(payload.start);
+  const end = payload.hasManualEnd ? Number(payload.end) : Date.now();
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  return start < selectedEnd && Math.max(end, start) >= selectedStart;
+}
+
+function startCrossDayOpenSleepFromManualPayload(payload = {}) {
+  const start = Number(payload.start);
+  if (!Number.isFinite(start)) return false;
+  state = normalizeDayState({
+    ...state,
+    mode: "sleeping",
+    activeStartedAt: start,
+    activeType: isManualSleepType(payload.type) ? payload.type : "sono",
+    activeDetail: payload.detail || "Informado manualmente",
+    activeNotes: payload.notes || "",
+    lastWakeWindowStartedAt: null,
+    lastWakeWindowMs: null,
+  });
+  return true;
+}
+
+function reconcileAfterManualSleepEvent(savedEvent = null) {
+  if (!savedEvent || !isManualSleepType(savedEvent.type)) return false;
+  persistCrossDaySleepEvent(savedEvent);
+  if (!manualSleepOverlapsActiveState(savedEvent, state)) return false;
+  state = rebuildRoutineModeAfterMutation(state, getSelectedDayId(), { preserveSleeping: false });
+  return true;
+}
+
 function saveManualEvent() {
   if (!requireLogin("salvar registros")) return;
   const payload = buildManualEventPayload({
@@ -11666,8 +11954,11 @@ function saveManualEvent() {
   markRoutineMutationSnapshot(existingEvent ? "editou registro" : "adicionou registro");
   const payloadDayId = getDayIdFromStart(payload.start);
   const selectedBeforeSaveId = getSelectedDayId();
+  const keepSelectedForManualSleep = !existingEvent
+    && payloadDayId !== selectedBeforeSaveId
+    && shouldKeepSelectedDayForManualSleep(payload, selectedBeforeSaveId);
 
-  if (!existingEvent && payloadDayId !== selectedBeforeSaveId) {
+  if (!existingEvent && payloadDayId !== selectedBeforeSaveId && !keepSelectedForManualSleep) {
     syncSelectedDayIntoFamilyCache();
     setSelectedDiaryDayById(payloadDayId);
     state = getFamilyDayState(payloadDayId);
@@ -11725,6 +12016,7 @@ function saveManualEvent() {
     const newEvent = makeEvent(payload.type, payload.start, payload.end, payload.detail, payload.notes);
     state.events.push(newEvent);
     pushAuditEntry("adicionou", newEvent);
+    if (isManualSleepType(payload.type)) reconcileAfterManualSleepEvent(newEvent);
   } else if (payload.type === "acordou") {
     if (state.mode === "sleeping" && canUseManualTimeForLiveState(payload.start)) {
       state = finishActiveSleep(state, makeEvent, payload.start);
@@ -11736,6 +12028,8 @@ function saveManualEvent() {
       window.alert("Não foi possível criar outro Acordou no mesmo minuto. Edite o registro existente se precisar ajustar o horário.");
       return;
     }
+  } else if (keepSelectedForManualSleep && isManualSleepType(payload.type) && !payload.hasManualEnd) {
+    startCrossDayOpenSleepFromManualPayload(payload);
   } else if (startsLiveAwake) {
     startLiveAwakeFromManualNightWake(payload.start, payload.detail, payload.notes);
   } else if (startsLiveSleep) {
@@ -13055,9 +13349,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.53 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.56 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.53";
+  const VERSION = "75.75.56";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13112,9 +13406,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.53 — guarda de estabilidade + preparação multi-família. */
+/* Ninou v75.75.56 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.53";
+  const VERSION = "75.75.56";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -13176,9 +13470,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.53 — centro de privacidade, termos e solicitações de dados. */
+/* Ninou v75.75.56 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.53";
+  const LEGAL_VERSION = "75.75.56";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -13408,9 +13702,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderLegalCenter();
 })();
 
-/* Ninou v75.75.53 — suporte e monitoramento simples para beta comercial. */
+/* Ninou v75.75.56 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.53";
+  const SUPPORT_VERSION = "75.75.56";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -13737,9 +14031,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderSupportCenter();
 })();
 
-/* Ninou v75.75.53 — revisão comercial final: restrição visual por permissão. */
+/* Ninou v75.75.56 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.53";
+  const REVIEW_VERSION = "75.75.56";
 
   function currentEffectiveRole() {
     try {

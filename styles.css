@@ -28639,3 +28639,436 @@ body.day-theme .admin-commercial-sequence-section {
     border-radius: 12px;
   }
 }
+
+/* v75.75.54 — identidade por e-mail dos pais + correção dark do botão Editar avatar */
+.screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-editor-panel,
+.screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-quick-grid,
+.screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-device-explain,
+.screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .profile-actions-row {
+  display: none !important;
+}
+
+.screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked summary {
+  cursor: default !important;
+}
+
+.screen[data-screen="profile"] .avatar-inline-edit-button,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-inline-edit-button,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-inline-edit-button span,
+body:not(.day-theme) .screen[data-screen="profile"] .avatar-inline-edit-button svg {
+  color: #17132f !important;
+  -webkit-text-fill-color: #17132f !important;
+  text-shadow: none !important;
+}
+
+body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button,
+body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button span,
+body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button svg {
+  color: #17312a !important;
+  -webkit-text-fill-color: #17312a !important;
+  text-shadow: none !important;
+}
+
+/* v75.75.55 — seletor de ações do registro sempre completo.
+   Correção: no iPhone, o sheet estava preso em uma linha de 3 botões
+   (Acordou/Soneca/Noite), ocultando Amamentação, Mamadeira e Fralda. */
+.record-sheet .record-types {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 4px 0 8px !important;
+  margin: 0 !important;
+  scroll-snap-type: none !important;
+}
+.record-sheet .record-types button {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 76px !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 9px 5px !important;
+  border-radius: 18px !important;
+  grid-template-rows: 38px minmax(22px, auto) !important;
+}
+.record-sheet .record-types .type-icon,
+.record-sheet .record-types .type-icon img,
+.record-sheet .record-types .type-icon svg {
+  width: 38px !important;
+  height: 38px !important;
+}
+.record-sheet .record-types button > span:last-child {
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+  min-height: 2.1em !important;
+  max-height: 2.2em !important;
+  letter-spacing: -.015em !important;
+}
+@media (max-width: 390px) {
+  .record-sheet .record-types {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  .record-sheet .record-types button > span:last-child {
+    font-size: .66rem !important;
+  }
+}
+@media (max-height: 740px) {
+  .record-sheet .record-types {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+  .record-sheet .record-types button {
+    min-height: 68px !important;
+    padding-block: 7px !important;
+    grid-template-rows: 32px minmax(20px, auto) !important;
+  }
+  .record-sheet .record-types .type-icon,
+  .record-sheet .record-types .type-icon img,
+  .record-sheet .record-types .type-icon svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+
+/* v75.75.56 — revisão visual real: tema claro, primeiro acesso, dados e perfil familiar. */
+body.day-theme {
+  --ninou-light-text: #332451;
+  --ninou-light-muted: rgba(61, 49, 86, .72);
+  --ninou-light-soft: rgba(61, 49, 86, .58);
+  --ninou-light-border: rgba(115, 86, 150, .16);
+  --ninou-light-card: rgba(255, 253, 250, .96);
+  --ninou-light-card-2: rgba(250, 244, 255, .94);
+}
+
+body.day-theme .phone-shell {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 211, 122, .24), transparent 28%),
+    radial-gradient(circle at 100% 12%, rgba(124, 229, 194, .18), transparent 32%),
+    linear-gradient(180deg, #fffaf2 0%, #f6f0ff 54%, #fff6ee 100%) !important;
+  color: var(--ninou-light-text) !important;
+}
+
+body.day-theme .app-header,
+body.day-theme .today-caregiver-card,
+body.day-theme .today-overview-card,
+body.day-theme .routine-correction-card,
+body.day-theme .smart-insight-card,
+body.day-theme .gentle-alert-card,
+body.day-theme .notification-center-card,
+body.day-theme .live-assistant-card,
+body.day-theme .next-card,
+body.day-theme .day-summary-card,
+body.day-theme .growth-card,
+body.day-theme .weekly-overview-card,
+body.day-theme .day-story-card,
+body.day-theme .last-card,
+body.day-theme .profile-family-card,
+body.day-theme .family-access-summary-card,
+body.day-theme .family-roles-guide-card,
+body.day-theme .profile-ready-card,
+body.day-theme .profile-state-notice-card,
+body.day-theme .legal-readiness-card,
+body.day-theme .support-beta-card,
+body.day-theme .login-card,
+body.day-theme .privacy-note-card,
+body.day-theme .export-card,
+body.day-theme .support-card,
+body.day-theme .danger-card {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255,255,255,.82), transparent 38%),
+    linear-gradient(160deg, var(--ninou-light-card), var(--ninou-light-card-2)) !important;
+  border-color: var(--ninou-light-border) !important;
+  color: var(--ninou-light-text) !important;
+  box-shadow: 0 18px 38px rgba(95,65,140,.10), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+
+body.day-theme .app-header strong,
+body.day-theme .drawer-section-title strong,
+body.day-theme .profile-card-head strong,
+body.day-theme .profile-family-card strong,
+body.day-theme .family-access-summary-card strong,
+body.day-theme .legal-readiness-card strong,
+body.day-theme .support-beta-card strong,
+body.day-theme .today-overview-grid strong,
+body.day-theme .summary-grid strong,
+body.day-theme .commercial-beta-card strong,
+body.day-theme .parent-identity-sleep-recalc-card strong,
+body.day-theme .premium-trust-card strong,
+body.day-theme .data-reality-card strong {
+  color: var(--ninou-light-text) !important;
+}
+
+body.day-theme .app-header span,
+body.day-theme .drawer-section-title span,
+body.day-theme .profile-card-head span,
+body.day-theme .profile-family-card span,
+body.day-theme .family-access-summary-card span,
+body.day-theme .legal-readiness-card span,
+body.day-theme .support-beta-card span,
+body.day-theme .today-overview-grid span,
+body.day-theme .summary-grid span,
+body.day-theme .section-helper,
+body.day-theme .chart-helper,
+body.day-theme .family-health-status,
+body.day-theme .profile-family-card p,
+body.day-theme .legal-readiness-card p,
+body.day-theme .support-beta-card p {
+  color: var(--ninou-light-muted) !important;
+}
+
+/* O relógio grande no tema claro deixa de parecer noturno. */
+body.day-theme .state-orbit {
+  min-height: 320px !important;
+  overflow: hidden !important;
+  border-color: rgba(242, 159, 88, .20) !important;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 214, 118, .98) 0 22px, rgba(255, 214, 118, .35) 23px 64px, transparent 65px),
+    radial-gradient(circle at 75% 12%, rgba(255,255,255,.95) 0 15px, transparent 16px),
+    radial-gradient(circle at 25% 78%, rgba(124,229,194,.18), transparent 36%),
+    linear-gradient(160deg, #fff4cf 0%, #fff9f2 44%, #f3edff 100%) !important;
+  box-shadow: 0 22px 50px rgba(174, 106, 69, .14), inset 0 1px 0 rgba(255,255,255,.90) !important;
+}
+
+body.day-theme .state-orbit::before {
+  content: "☀️" !important;
+  position: absolute !important;
+  left: 32px !important;
+  top: 30px !important;
+  width: 76px !important;
+  height: 76px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 2.15rem !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.46) !important;
+  box-shadow: 0 20px 44px rgba(244, 171, 83, .22) !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+body.day-theme .state-orbit::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: auto -24px -56px auto !important;
+  width: 220px !important;
+  height: 220px !important;
+  border-radius: 999px !important;
+  border: 26px solid rgba(143,115,255,.10) !important;
+  background: transparent !important;
+  opacity: 1 !important;
+}
+
+body.day-theme .orbit-ring,
+body.day-theme .orbit-ring::before {
+  border-color: rgba(242,159,88,.24) !important;
+  box-shadow: none !important;
+}
+
+body.day-theme .state-orbit #stateLabel,
+body.day-theme .state-orbit span {
+  color: rgba(89, 63, 116, .70) !important;
+}
+
+body.day-theme .state-orbit #stateClock,
+body.day-theme .state-orbit strong {
+  color: #2f234c !important;
+  text-shadow: 0 4px 20px rgba(255,255,255,.52) !important;
+}
+
+body.day-theme .state-orbit #stateHint,
+body.day-theme .state-orbit p {
+  color: rgba(61,49,86,.72) !important;
+}
+
+body.day-theme[data-day-period="night"] .state-orbit {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 214, 118, .78) 0 18px, rgba(255, 214, 118, .22) 19px 58px, transparent 59px),
+    linear-gradient(160deg, #fff4d8, #f8f1ff) !important;
+}
+
+/* Primeiro acesso: pergunta real antes de iniciar o diário. */
+.first-routine-state-prompt[hidden] { display: none !important; }
+.first-routine-state-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: end center;
+  padding: 18px;
+}
+.first-routine-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(27, 21, 48, .54);
+  backdrop-filter: blur(14px);
+}
+.first-routine-card {
+  position: relative;
+  width: min(100%, 430px);
+  border-radius: 32px 32px 26px 26px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255,255,255,.92), transparent 38%),
+    linear-gradient(160deg, rgba(255,252,247,.98), rgba(246,238,255,.96));
+  color: #332451;
+  box-shadow: 0 28px 80px rgba(20,12,48,.30), inset 0 1px 0 rgba(255,255,255,.90);
+  border: 1px solid rgba(121,91,150,.18);
+}
+.first-routine-close {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(72,54,116,.12);
+  background: rgba(255,255,255,.75);
+  color: #332451;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+.first-routine-kicker {
+  display: block;
+  color: rgba(89,63,116,.62);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .72rem;
+  font-weight: 950;
+  margin-bottom: 8px;
+}
+.first-routine-card strong {
+  display: block;
+  color: #332451;
+  font-size: 1.42rem;
+  line-height: 1.06;
+  letter-spacing: -.045em;
+  padding-right: 42px;
+}
+.first-routine-card p,
+.first-routine-card small { color: rgba(61,49,86,.72); line-height: 1.38; }
+.first-routine-time-label {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 14px;
+  color: rgba(61,49,86,.76);
+  font-weight: 850;
+  font-size: .84rem;
+}
+.first-routine-time-label input {
+  height: 54px;
+  border-radius: 18px;
+  border: 1px solid rgba(121,91,150,.15);
+  background: rgba(255,255,255,.86);
+  color: #332451;
+  padding: 0 16px;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+.first-routine-actions { display: grid; gap: 10px; }
+.first-routine-actions button,
+.first-routine-now {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 20px;
+  border: 1px solid rgba(121,91,150,.14);
+  font-weight: 950;
+  color: #332451;
+  background: rgba(255,255,255,.84);
+  box-shadow: 0 12px 26px rgba(95,65,140,.10);
+}
+.first-routine-actions button:first-child {
+  background: linear-gradient(160deg, #fff2bd, #fffaf0);
+}
+.first-routine-actions button:last-child {
+  background: linear-gradient(160deg, #ebe6ff, #f9f4ff);
+}
+.first-routine-now {
+  margin-top: 10px;
+  background: linear-gradient(160deg, rgba(143,115,255,.96), rgba(232,137,109,.92));
+  color: #fff;
+}
+body.dark-mode .first-routine-card,
+body:not(.day-theme) .first-routine-card {
+  background: linear-gradient(160deg, rgba(36,28,70,.98), rgba(18,13,40,.98));
+  color: rgba(252,249,255,.96);
+  border-color: rgba(255,255,255,.12);
+}
+body.dark-mode .first-routine-card strong,
+body:not(.day-theme) .first-routine-card strong { color: rgba(252,249,255,.96); }
+body.dark-mode .first-routine-card p,
+body.dark-mode .first-routine-card small,
+body.dark-mode .first-routine-kicker,
+body:not(.day-theme) .first-routine-card p,
+body:not(.day-theme) .first-routine-card small,
+body:not(.day-theme) .first-routine-kicker { color: rgba(225,218,255,.72); }
+
+/* Perfil familiar: o usuário comum vê apenas o que faz sentido para o uso diário. */
+body.regular-family-mode #commercialBetaCard,
+body.regular-family-mode #commercialFinalSequenceCard,
+body.regular-family-mode #dataRealityCard,
+body.regular-family-mode #premiumTrustCard,
+body.regular-family-mode #firstUseChecklistCard {
+  display: none !important;
+}
+
+body.regular-family-mode #legalReadinessCard,
+body.regular-family-mode #supportBetaCard {
+  order: 60;
+}
+
+body.regular-family-mode #familyRolesGuideCard {
+  display: none !important;
+}
+
+/* Dados: deixar claro que todos os gráficos existem, mesmo antes de ter dados suficientes. */
+.data-chart-card { position: relative; }
+.data-chart-empty-hint {
+  display: none;
+  margin-top: 10px;
+  color: rgba(225,218,255,.62);
+  font-size: .76rem;
+  font-weight: 800;
+}
+.data-chart-card[data-has-real-data="false"] .data-chart-empty-hint { display: block; }
+body.day-theme .data-chart-empty-hint { color: rgba(61,49,86,.58); }
+
+body.day-theme .data-bars > span::before,
+body.day-theme .bars.premium-bars > span::before {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 36%),
+    linear-gradient(180deg, #49caa4, #7d62e7) !important;
+  box-shadow: 0 12px 24px rgba(85,118,160,.14), inset 0 1px 0 rgba(255,255,255,.60) !important;
+}
+body.day-theme .data-bars > span.is-empty::before,
+body.day-theme .bars.premium-bars > span.is-empty::before {
+  background: rgba(89,63,116,.14) !important;
+}
+
+body.day-theme input,
+body.day-theme select,
+body.day-theme textarea {
+  color: #332451 !important;
+  background-color: rgba(255,255,255,.88) !important;
+  border-color: rgba(121,91,150,.16) !important;
+}
+body.day-theme input::placeholder,
+body.day-theme textarea::placeholder { color: rgba(61,49,86,.48) !important; }
+
+/* iPhone pequeno: evita corte dos gráficos e mantém texto legível. */
+@media (max-width: 430px) {
+  body.day-theme .state-orbit { min-height: 318px !important; }
+  body.day-theme .state-orbit #stateClock { font-size: clamp(3.25rem, 15vw, 4.8rem) !important; }
+  .first-routine-state-prompt { padding: 12px; }
+  .first-routine-card { padding: 20px; border-radius: 28px 28px 24px 24px; }
+}
+
+/* v75.75.56 — identidade automática dos pais: sem botão Trocar no uso normal. */
+.today-caregiver-card.caregiver-auto-locked .today-caregiver-edit,
+.today-caregiver-card[data-auto-locked="true"] .today-caregiver-edit {
+  display: none !important;
+}

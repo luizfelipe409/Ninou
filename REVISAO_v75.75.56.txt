@@ -1,0 +1,10 @@
+Revisão v75.75.56
+
+Principais reclamações tratadas:
+1. Tema claro sem lapidação e textos ilegíveis.
+2. Relógio grande com aparência noturna mesmo de manhã.
+3. Falta de pergunta inicial sobre o estado do bebê ao abrir o app pela primeira vez.
+4. Gráficos de dados pouco claros/parecendo que apenas o peso funcionava.
+5. Informes comerciais/beta no Perfil sem utilidade para pai/mãe no uso diário.
+
+Observação: esta versão não altera estruturalmente as regras Firestore. O firestore.rules foi apenas versionado junto ao pacote.
