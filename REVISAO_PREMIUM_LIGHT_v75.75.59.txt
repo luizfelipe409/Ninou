@@ -1,0 +1,11 @@
+Revisão premium light v75.75.59
+
+Checklist executado:
+1. Tema claro revisado com foco em leitura real no iPhone.
+2. Cabeçalho da Home sem card/faixa branca artificial.
+3. Sol diurno e arco restaurados com base no acabamento antigo premium.
+4. Cards do Diário limpos e menos carregados.
+5. Perfil sem excesso de aparência administrativa para usuário familiar.
+6. Gráficos reforçados visualmente e com cálculo de sono cruzando meia-noite por sobreposição.
+7. Mantido CSS único.
+8. Mantidas funções críticas: PDF, WhatsApp, CSV/JSON, sair e limpar aparelho.

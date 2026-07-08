@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.58";
+const NINOU_RUNTIME_VERSION = "75.75.60";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -405,7 +405,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.58-revisao-geral-tema-claro";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.60-light-final-refine";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -425,7 +425,7 @@ function isFranciscoFamilyAccountEmail(email = "") {
 }
 
 function isFranciscoSharedAccount(user = cloudUser) {
-  // v75.75.58: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  // v75.75.60: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
   return isFranciscoFamilyAccountEmail(user?.email || "");
 }
 
@@ -538,7 +538,7 @@ function getFamilyScopeType(familyId = "") {
 }
 
 function getLegacyAccountFamilyFallbackId(user = cloudUser) {
-  // v75.75.58: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // v75.75.60: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
   // Isso evita que a família atual caia em um familyId temporário por UID.
   if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
   // Compatibilidade: versões antigas usavam o UID como familyId provisório.
@@ -2728,7 +2728,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
   const automaticIdentity = getAutomaticCaregiverIdentityForEmail(email);
   if (automaticIdentity && extras.force !== true) {
-    // v75.75.58: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
+    // v75.75.60: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
     // não por um botão de troca neste aparelho. Isso evita registros assinados pela pessoa errada.
     return true;
   }
@@ -2929,7 +2929,7 @@ function renderProfileFamilyCards() {
 
 
 function renderTodayCaregiverCard() {
-  // v75.75.58: Felipe e Maria usam e-mails próprios em celulares próprios.
+  // v75.75.60: Felipe e Maria usam e-mails próprios em celulares próprios.
   // A identificação continua no Perfil e no Diário, mas o card da Home não ocupa mais a tela inicial.
   if (!todayCaregiverCard) return;
   todayCaregiverCard.hidden = true;
@@ -3816,7 +3816,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.75.58: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
+    v75.75.60: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -7968,7 +7968,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.58 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.60 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8099,7 +8099,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.58 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.60 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -9770,8 +9770,12 @@ function renderSleepReport() {
   const sleepCard = sleepBars.closest(".data-chart-card");
   const hasSleepData = days.some((item) => item.sleepMs > 0);
   sleepBars.dataset.hasRealData = hasSleepData ? "true" : "false";
+  sleepBars.dataset.hasData = hasSleepData ? "true" : "false";
+  sleepBars.classList.toggle("is-operational", hasSleepData);
+  sleepBars.classList.toggle("is-empty", !hasSleepData);
   if (sleepCard) {
     sleepCard.dataset.hasRealData = hasSleepData ? "true" : "false";
+    sleepCard.dataset.hasData = hasSleepData ? "true" : "false";
     if (!sleepCard.querySelector(".data-chart-empty-hint")) {
       const hint = document.createElement("small");
       hint.className = "data-chart-empty-hint";
@@ -10574,75 +10578,95 @@ function renderSparkline(container, weights = []) {
   const normalized = weights
     .map((item) => ({ ...item, kg: getWeightKgValue(item.value) }))
     .filter((item) => Number.isFinite(item.kg))
-    .slice(-8);
+    .slice(-10);
 
-  container.classList.add("premium-weight-chart");
+  container.classList.add("premium-weight-chart", "weight-chart-readable");
+
+  if (!normalized.length) {
+    container.innerHTML = `
+      <div class="weight-empty-state weight-empty-state-readable">
+        <strong>Sem peso cadastrado</strong>
+        <span>Registre o primeiro peso no Perfil para montar uma curva simples e legível.</span>
+      </div>`;
+    return;
+  }
+
+  const latest = normalized[normalized.length - 1];
+  const latestDate = String(latest.date || "").split("-").reverse().join("/");
 
   if (normalized.length < 2) {
     container.innerHTML = `
-      <div class="weight-empty-state">
-        <strong>Curva aparece com 2 pesos</strong>
-        <span>Registre mais um peso para formar a curva de evolução.</span>
+      <div class="weight-single-state" aria-label="Peso atual">
+        <span>Peso atual</span>
+        <strong>${escapeHtml(formatKg(latest.value))}</strong>
+        <small>${escapeHtml(latestDate || "Primeiro registro")}</small>
+        <em>Com mais um peso, o Ninou desenha a evolução.</em>
       </div>`;
     return;
   }
 
   const values = normalized.map((item) => item.kg);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  const realMin = Math.min(...values);
+  const realMax = Math.max(...values);
   const delta = values[values.length - 1] - values[0];
-  const paddedMin = Math.max(0, min - Math.max(0.15, (max - min) * 0.28));
-  const paddedMax = max + Math.max(0.15, (max - min) * 0.28);
-  const spread = Math.max(0.15, paddedMax - paddedMin);
-  const width = 320;
-  const height = 154;
-  const chartLeft = 32;
-  const chartRight = width - 20;
-  const chartTop = 24;
-  const chartBottom = height - 38;
+  const naturalSpread = Math.max(0.18, realMax - realMin);
+  const paddedMin = Math.max(0, realMin - Math.max(0.08, naturalSpread * 0.22));
+  const paddedMax = realMax + Math.max(0.08, naturalSpread * 0.22);
+  const spread = Math.max(0.18, paddedMax - paddedMin);
+  const width = 360;
+  const height = 190;
+  const chartLeft = 58;
+  const chartRight = width - 24;
+  const chartTop = 34;
+  const chartBottom = height - 48;
   const points = normalized.map((item, index) => {
-    const x = normalized.length === 1 ? width / 2 : chartLeft + (index / (normalized.length - 1)) * (chartRight - chartLeft);
+    const x = normalized.length === 1 ? (chartLeft + chartRight) / 2 : chartLeft + (index / (normalized.length - 1)) * (chartRight - chartLeft);
     const y = chartBottom - ((item.kg - paddedMin) / spread) * (chartBottom - chartTop);
     return { x, y, item };
   });
   const path = buildPremiumSmoothPath(points);
   const areaPath = `${path} L${points[points.length - 1].x.toFixed(1)} ${chartBottom} L${points[0].x.toFixed(1)} ${chartBottom} Z`;
+  const axisValues = [realMax, (realMax + realMin) / 2, realMin];
+  const gridLines = axisValues.map((value) => {
+    const y = chartBottom - ((value - paddedMin) / spread) * (chartBottom - chartTop);
+    return `<g class="weight-grid-row"><line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" class="weight-grid-line"></line><text x="${chartLeft - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="weight-axis-label">${escapeHtml(formatKg(value))}</text></g>`;
+  }).join("");
   const circles = points.map((point, index) => {
     const isLast = index === points.length - 1;
-    return `<g class="weight-point${isLast ? " is-latest" : ""}"><circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${isLast ? 5.2 : 4.2}"></circle><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></g>`;
+    const radius = isLast ? 6.2 : 4.2;
+    return `<g class="weight-point${isLast ? " is-latest" : ""}"><circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${radius}"></circle><title>${escapeHtml(formatReportDate(point.item.date))} • ${escapeHtml(formatKg(point.item.value))}</title></g>`;
   }).join("");
-  const gridLines = [0, 0.5, 1].map((ratio) => {
-    const y = chartTop + ratio * (chartBottom - chartTop);
-    return `<line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" class="weight-grid-line"></line>`;
-  }).join("");
-  const minLabel = escapeHtml(formatKg(paddedMin));
-  const maxLabel = escapeHtml(formatKg(paddedMax));
   const firstDate = escapeHtml(String(normalized[0].date || "").split("-").reverse().slice(0, 2).join("/"));
   const lastDate = escapeHtml(String(normalized[normalized.length - 1].date || "").split("-").reverse().slice(0, 2).join("/"));
   const deltaLabel = escapeHtml(formatWeightDelta(delta).replace(" desde o peso anterior", " no período"));
+  const latestLabelX = Math.max(chartLeft + 38, Math.min(chartRight - 46, points[points.length - 1].x));
+  const latestLabelY = Math.max(chartTop + 18, points[points.length - 1].y - 14);
+
   container.innerHTML = `
-    <div class="weight-chart-topline">
+    <div class="weight-chart-topline weight-chart-topline-readable">
       <span>${normalized.length} registros</span>
       <strong>${deltaLabel}</strong>
     </div>
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso">
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso do bebê">
       <defs>
-        <linearGradient id="weightPremiumFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="currentColor" stop-opacity=".26"/>
+        <linearGradient id="weightPremiumFillReadable" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="currentColor" stop-opacity=".18"/>
           <stop offset="1" stop-color="currentColor" stop-opacity=".025"/>
         </linearGradient>
-        <filter id="weightGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="currentColor" flood-opacity=".16"/>
+        <filter id="weightGlowReadable" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="currentColor" flood-opacity=".14"/>
         </filter>
       </defs>
       ${gridLines}
-      <path d="${areaPath}" fill="url(#weightPremiumFill)"></path>
-      <path d="${path}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#weightGlow)"></path>
+      <path d="${areaPath}" fill="url(#weightPremiumFillReadable)" class="weight-area-path"></path>
+      <path d="${path}" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#weightGlowReadable)" class="weight-main-path"></path>
       ${circles}
-      <text x="${chartLeft}" y="16" class="weight-axis-label">${maxLabel}</text>
-      <text x="${chartLeft}" y="${height - 7}" class="weight-axis-label">${minLabel}</text>
-      <text x="${chartLeft}" y="${height - 22}" class="weight-date-label">${firstDate}</text>
-      <text x="${chartRight}" y="${height - 22}" text-anchor="end" class="weight-date-label">${lastDate}</text>
+      <g class="weight-latest-label">
+        <rect x="${(latestLabelX - 42).toFixed(1)}" y="${(latestLabelY - 18).toFixed(1)}" width="84" height="26" rx="13"></rect>
+        <text x="${latestLabelX.toFixed(1)}" y="${(latestLabelY - 1).toFixed(1)}" text-anchor="middle">${escapeHtml(formatKg(latest.value))}</text>
+      </g>
+      <text x="${chartLeft}" y="${height - 18}" class="weight-date-label">${firstDate}</text>
+      <text x="${chartRight}" y="${height - 18}" text-anchor="end" class="weight-date-label">${lastDate}</text>
     </svg>`;
 }
 function renderGrowthHistoryMini(weights = []) {
@@ -13356,9 +13380,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.58 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.60 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.58";
+  const VERSION = "75.75.60";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13413,9 +13437,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.58 — guarda de estabilidade + preparação multi-família. */
+/* Ninou v75.75.60 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.58";
+  const VERSION = "75.75.60";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -13477,9 +13501,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.58 — centro de privacidade, termos e solicitações de dados. */
+/* Ninou v75.75.60 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.58";
+  const LEGAL_VERSION = "75.75.60";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -13709,9 +13733,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderLegalCenter();
 })();
 
-/* Ninou v75.75.58 — suporte e monitoramento simples para beta comercial. */
+/* Ninou v75.75.60 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.58";
+  const SUPPORT_VERSION = "75.75.60";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -14038,9 +14062,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderSupportCenter();
 })();
 
-/* Ninou v75.75.58 — revisão comercial final: restrição visual por permissão. */
+/* Ninou v75.75.60 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.58";
+  const REVIEW_VERSION = "75.75.60";
 
   function currentEffectiveRole() {
     try {

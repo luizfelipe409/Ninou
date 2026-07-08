@@ -1,0 +1,17 @@
+Ninou v75.75.60 — refino final do modo claro, diário e gráficos
+
+Base: v75.75.59.
+
+Correções principais:
+- Reforcei a legibilidade do tema claro em "dias de vida / semanas", Perfil, filtros do Diário, labels, cards e gráficos.
+- Deixei o sol do contador principal mais quente, orgânico e presente.
+- Ajustei o arco diurno para ficar mais proporcional ao relógio noturno.
+- Reduzi o botão principal e os atalhos da Home para ficarem menos grosseiros e mais próximos da referência antiga.
+- Reposicionei e reduzi o botão flutuante + para não sobrepor a barra inferior no iPhone/PWA.
+- Refinei os cards do Diário: menores, menos poluídos, mais charmosos e com botões Editar/Excluir mais discretos.
+- Reforcei contraste dos nomes, filtros e chips no Diário.
+- Recriei a renderização do gráfico de peso para ficar legível: linha principal clara, labels úteis, peso atual destacado e estado vazio compreensível.
+- Reforcei os gráficos de rotina para as barras aparecerem como dados reais, não apenas bolhas/labels no topo.
+
+Sem mudanças estruturais nas regras Firestore.
+Mantido CSS único: styles.css.

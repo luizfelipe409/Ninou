@@ -17,8 +17,18 @@ export function getSleepReportDays(events = [], { count = 7, todayStart, dayMs, 
   return Array.from({ length: count }, (_, index) => {
     const start = todayStart - (count - 1 - index) * dayMs;
     const end = start + dayMs;
-    const sleepEvents = events.filter((event) => isSleepEvent(event) && event.start >= start && event.start < end);
-    const sleepMs = sleepEvents.reduce((total, event) => total + Math.max(0, event.end - event.start), 0);
+    const sleepEvents = events.filter((event) => {
+      if (!isSleepEvent(event)) return false;
+      const eventStart = Number(event.start);
+      const eventEnd = Number(event.end) > eventStart ? Number(event.end) : eventStart;
+      return Number.isFinite(eventStart) && eventStart < end && eventEnd > start;
+    });
+    const sleepMs = sleepEvents.reduce((total, event) => {
+      const eventStart = Number(event.start);
+      const eventEnd = Number(event.end) > eventStart ? Number(event.end) : eventStart;
+      const overlapMs = Math.max(0, Math.min(eventEnd, end) - Math.max(eventStart, start));
+      return total + overlapMs;
+    }, 0);
     return {
       start,
       end,
@@ -39,10 +49,13 @@ export function renderBarChart(container, days, getValue, options = {}) {
   const averageValue = positiveValues.length ? positiveValues.reduce((total, value) => total + value, 0) / positiveValues.length : 0;
   const averagePercent = averageValue > 0 ? Math.max(8, Math.min(92, Math.round((averageValue / maxValue) * 100))) : 0;
 
+  const hasRealData = positiveValues.length > 0;
   container.classList.add("premium-bars");
+  container.classList.toggle("is-operational", hasRealData);
+  container.classList.toggle("is-empty", !hasRealData);
+  container.dataset.values = JSON.stringify(values);
   container.style.setProperty("--avg-y", averagePercent ? `${100 - averagePercent}%` : "100%");
   container.style.setProperty("--avg-opacity", averagePercent ? ".75" : "0");
-  const hasRealData = positiveValues.length > 0;
   container.dataset.hasAverage = averagePercent ? "true" : "false";
   container.dataset.hasData = hasRealData ? "true" : "false";
   container.dataset.hasRealData = hasRealData ? "true" : "false";

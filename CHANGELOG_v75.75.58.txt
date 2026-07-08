@@ -1,4 +1,4 @@
-Ninou v75.75.58 — revisão geral do tema claro
+Ninou v75.75.59 — revisão geral do tema claro
 
 - Remove a faixa branca do cabeçalho no tema claro.
 - Restaura o sol diurno com brilho mais quente, natural e orgânico.
