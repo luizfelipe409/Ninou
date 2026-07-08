@@ -1,0 +1,26 @@
+Ninou v75.75.61 — hierarquia premium, ações e avatar
+
+Base: v75.75.60.
+
+Correções principais:
+- Corrigida normalização de activeStartedAt legado salvo em segundos Unix, evitando durações absurdas como 495411h.
+- Botão Acordou/Iniciar soneca restaurado com mais presença abaixo do cronômetro principal.
+- Card de correção do último registro compactado e suavizado.
+- Título dos atalhos simplificado para “Registre em poucos toques”.
+- Atalhos principais refinados com visual menor, mais charmoso e menos grosseiro.
+- Botão flutuante + reduzido e reposicionado acima da barra inferior respeitando safe-area do iPhone/PWA.
+- Modal de ações reorganizado para selector horizontal compacto, sem mostrar todos os ícones como grade e sem sobrepor campos do formulário.
+- Cards do Diário reduzidos e refinados para ficarem mais próximos da referência antiga.
+- Filtros/chips do Diário ganharam contraste e estado ativo mais claro no tema light.
+- Gráfico de peso reforçado visualmente com labels maiores, linha mais legível e destaque melhor do peso atual.
+- Menu de avatar refinado: cards alinhados, miniaturas centralizadas, texto alinhado e selecionado com elevação visual.
+- Sol e arco do contador principal no tema claro reforçados com mais calor, contraste e presença.
+
+Validações:
+- node --check app.js
+- node --check sw.js
+- node --check js/app.legacy.js
+- node --check js/ui/charts.js
+- node --check js/domain/records.js
+- node --check js/ui/event-formatters.js
+- CSS único mantido: styles.css

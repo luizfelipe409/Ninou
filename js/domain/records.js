@@ -160,10 +160,13 @@ export function normalizeDayState(dayState = {}) {
   const emptyState = createEmptyDayState();
   const validModes = ["idle", "awake", "sleeping"];
   const mode = validModes.includes(dayState.mode) ? dayState.mode : emptyState.mode;
-  const activeStartedAt = Number(dayState.activeStartedAt);
+  // v75.75.61: alguns estados legados podiam salvar activeStartedAt em segundos
+  // Unix, o que gerava durações absurdas como 495411h. Normalizamos aqui,
+  // na camada mais baixa, para todos os cálculos da Home, Diário e Dados.
+  const activeStartedAt = toMilliseconds(dayState.activeStartedAt);
   const activeType = isSleepType(dayState.activeType) ? dayState.activeType : emptyState.activeType;
 
-  const lastWakeWindowStartedAt = Number(dayState.lastWakeWindowStartedAt);
+  const lastWakeWindowStartedAt = toMilliseconds(dayState.lastWakeWindowStartedAt);
   const lastWakeWindowMs = Number(dayState.lastWakeWindowMs);
 
   return {

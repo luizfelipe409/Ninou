@@ -30725,3 +30725,638 @@ body.day-theme .data-section-heading strong {
   color: var(--ninou-v60-ink) !important;
   font-weight: 950 !important;
 }
+
+/* Ninou v75.75.61 — hierarquia premium: Home, ações, Diário, gráfico e avatar.
+   Escopo: não adiciona recurso; corrige acabamento observado na v75.75.60. */
+:root {
+  --ninou-v61-ink: #2e214a;
+  --ninou-v61-muted: rgba(55, 42, 75, .74);
+  --ninou-v61-soft: rgba(55, 42, 75, .56);
+  --ninou-v61-card: rgba(255, 249, 241, .94);
+  --ninou-v61-card-strong: rgba(255, 252, 246, .98);
+  --ninou-v61-border: rgba(103, 77, 132, .16);
+  --ninou-v61-coral: #f88969;
+  --ninou-v61-coral-2: #ffbc96;
+  --ninou-v61-purple: #38265a;
+}
+
+/* Cabeçalho claro: idade/semanas e Perfil precisam ter presença. */
+body.day-theme .app-header,
+body.day-theme .app-header * {
+  text-shadow: none !important;
+}
+body.day-theme .app-header {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  padding-top: 6px !important;
+}
+body.day-theme .app-header strong,
+body.day-theme #babyNameDisplay,
+body.day-theme #profileNameDisplay {
+  color: var(--ninou-v61-ink) !important;
+  font-weight: 950 !important;
+}
+body.day-theme .app-header span,
+body.day-theme #ageDisplay,
+body.day-theme #babyAgeLabel,
+body.day-theme .baby-age-label {
+  color: rgba(47, 36, 75, .82) !important;
+  font-weight: 950 !important;
+  letter-spacing: .015em !important;
+}
+body.day-theme .app-header .ghost-link,
+body.day-theme .app-header a,
+body.day-theme [data-target-shortcut="profile"].ghost-link,
+body.day-theme .profile-link {
+  color: #159c79 !important;
+  -webkit-text-fill-color: #159c79 !important;
+  font-weight: 950 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.72) !important;
+}
+
+/* Relógio principal: sol mais presente, texto mais forte e arco diurno com proporção do noturno. */
+body.day-theme .state-orbit {
+  min-height: 324px !important;
+  border-color: rgba(233, 166, 86, .22) !important;
+  background:
+    radial-gradient(circle at 17% 20%, rgba(255, 218, 107, 1) 0 17px, rgba(255, 218, 107, .72) 18px 42px, rgba(255, 196, 89, .26) 43px 78px, transparent 79px),
+    radial-gradient(circle at 50% 44%, rgba(255, 255, 255, .74) 0 33%, rgba(255, 251, 244, .48) 34% 53%, transparent 54%),
+    linear-gradient(145deg, rgba(255, 251, 241, .94), rgba(255, 231, 215, .78)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 22px 44px rgba(194, 121, 73, .13) !important;
+}
+body.day-theme .state-orbit::before {
+  width: 235px !important;
+  height: 235px !important;
+  border-width: 30px !important;
+  border-color: rgba(234, 176, 93, .33) !important;
+  border-left-color: rgba(255, 206, 107, .72) !important;
+  border-bottom-color: rgba(244, 178, 99, .42) !important;
+  filter: blur(.08px) !important;
+  opacity: 1 !important;
+}
+body.day-theme .state-orbit::after {
+  opacity: .50 !important;
+  background:
+    radial-gradient(circle at 19% 19%, rgba(255,255,255,.92) 0 5px, transparent 6px),
+    radial-gradient(circle at 25% 28%, rgba(255,255,255,.54) 0 4px, transparent 5px),
+    radial-gradient(circle at 74% 75%, rgba(255, 211, 122, .48) 0 17px, transparent 18px) !important;
+}
+body.day-theme .state-orbit > span,
+body.day-theme .state-orbit .state-label,
+body.day-theme #stateLabel {
+  color: rgba(58, 45, 78, .72) !important;
+  font-size: .78rem !important;
+  font-weight: 950 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+}
+body.day-theme .state-orbit strong,
+body.day-theme #stateClock {
+  color: #33214f !important;
+  font-weight: 950 !important;
+  letter-spacing: -.055em !important;
+  text-shadow: 0 2px 0 rgba(255,255,255,.66), 0 18px 34px rgba(89, 58, 126, .12) !important;
+}
+body.day-theme .state-orbit p,
+body.day-theme #stateHint {
+  color: rgba(56, 42, 74, .82) !important;
+  font-weight: 850 !important;
+  line-height: 1.22 !important;
+}
+body.day-theme .orbit-event {
+  box-shadow: 0 8px 18px rgba(58, 31, 90, .18) !important;
+}
+
+/* Botão Acordou/Iniciar soneca: volta a ter presença bonita abaixo do cronômetro. */
+.main-action-area {
+  margin-top: 6px !important;
+  margin-bottom: 8px !important;
+}
+.main-action-area .primary-action,
+body.day-theme .main-action-area .primary-action {
+  width: min(82%, 338px) !important;
+  min-height: 72px !important;
+  grid-template-columns: 52px auto !important;
+  justify-content: center !important;
+  column-gap: 14px !important;
+  border-radius: 30px !important;
+  padding: 12px 24px !important;
+  background: linear-gradient(135deg, #ef7d63 0%, #ffb994 100%) !important;
+  color: #241a3e !important;
+  -webkit-text-fill-color: #241a3e !important;
+  border: 1px solid rgba(255, 255, 255, .50) !important;
+  box-shadow: 0 18px 34px rgba(233, 125, 99, .22), inset 0 1px 0 rgba(255,255,255,.42) !important;
+}
+.main-action-area .primary-action .action-icon,
+body.day-theme .main-action-area .primary-action .action-icon {
+  width: 48px !important;
+  height: 48px !important;
+  background: rgba(43, 34, 70, .14) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.32) !important;
+}
+.main-action-area .primary-action > span:last-child,
+body.day-theme .main-action-area .primary-action > span:last-child {
+  font-size: 1.02rem !important;
+  font-weight: 950 !important;
+  letter-spacing: -.015em !important;
+}
+
+/* Correção do último registro: deixa de parecer um bloco pesado. */
+.routine-correction-card,
+body.day-theme .routine-correction-card {
+  padding: 12px 13px !important;
+  border-radius: 22px !important;
+  gap: 9px !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,246,235,.66)) !important;
+  border-color: rgba(91, 68, 121, .12) !important;
+  box-shadow: 0 12px 24px rgba(95, 65, 140, .06), inset 0 1px 0 rgba(255,255,255,.82) !important;
+  color: var(--ninou-v61-ink) !important;
+}
+.routine-correction-head i {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: .82rem !important;
+  background: rgba(124,229,194,.20) !important;
+  color: #22745f !important;
+  box-shadow: none !important;
+}
+body.day-theme .routine-correction-head span,
+body.day-theme .routine-correction-card p,
+.routine-correction-head span,
+.routine-correction-card p {
+  color: rgba(55,42,75,.62) !important;
+  font-size: .76rem !important;
+  line-height: 1.24 !important;
+}
+body.day-theme .routine-correction-head strong,
+.routine-correction-head strong {
+  color: var(--ninou-v61-ink) !important;
+  font-size: .94rem !important;
+  font-weight: 950 !important;
+}
+.routine-correction-actions {
+  gap: 8px !important;
+}
+.routine-correction-actions button,
+body.day-theme .routine-correction-actions button {
+  min-height: 34px !important;
+  border-radius: 999px !important;
+  padding: 7px 9px !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  background: rgba(255,255,255,.56) !important;
+  border: 1px solid rgba(91, 68, 121, .12) !important;
+  color: rgba(48, 36, 74, .78) !important;
+  box-shadow: none !important;
+}
+
+/* Atalhos: remove ruído do título e aproxima do charme antigo. */
+.quick-actions-heading,
+.quick-actions-heading-clean {
+  display: block !important;
+  margin: 6px 4px -2px !important;
+}
+.quick-actions-heading span { display: none !important; }
+.quick-actions-heading strong,
+.quick-actions-heading-clean strong,
+body.day-theme .quick-actions-heading strong {
+  display: block !important;
+  color: rgba(47, 36, 75, .82) !important;
+  font-size: .94rem !important;
+  font-weight: 950 !important;
+  letter-spacing: -.01em !important;
+}
+.quick-actions {
+  gap: 10px !important;
+}
+.quick-actions button,
+body.day-theme .quick-actions button {
+  min-height: 64px !important;
+  grid-template-columns: 42px 1fr !important;
+  border-radius: 23px !important;
+  padding: 10px 12px !important;
+  justify-items: start !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,247,237,.76)) !important;
+  border-color: rgba(95, 70, 124, .11) !important;
+  box-shadow: 0 12px 24px rgba(98, 67, 138, .075), inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+.quick-actions .action-icon,
+body.day-theme .quick-actions .action-icon {
+  width: 40px !important;
+  height: 40px !important;
+  background: rgba(63, 42, 90, .07) !important;
+}
+.quick-actions button > span:last-child,
+body.day-theme .quick-actions button > span:last-child {
+  font-size: .80rem !important;
+  color: rgba(47,36,75,.84) !important;
+  font-weight: 920 !important;
+  line-height: 1.08 !important;
+}
+
+/* Botão +: acima da barra, menor, sem disputar com Perfil. */
+.fab,
+body.day-theme .fab,
+button.fab.icon-button-add {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  right: max(20px, calc((100vw - min(100vw, 430px)) / 2 + 18px)) !important;
+  bottom: max(114px, calc(96px + env(safe-area-inset-bottom, 0px))) !important;
+  border-radius: 21px !important;
+  box-shadow: 0 18px 34px rgba(231, 125, 89, .24), inset 0 1px 0 rgba(255,255,255,.34) !important;
+}
+.fab::before,
+.fab::after,
+.icon-button-add::before,
+.icon-button-add::after {
+  width: 24px !important;
+  height: 3px !important;
+}
+.icon-button-add::after { transform: rotate(90deg) !important; }
+
+/* Home: reduz densidade visual dos cards secundários. */
+.today-overview-card,
+.smart-insight-card,
+.gentle-alert-card,
+.notification-center-card,
+.live-assistant-card,
+.next-card,
+.day-summary-card,
+.routine-progress-card {
+  border-radius: 24px !important;
+  padding: 15px !important;
+  gap: 11px !important;
+}
+.today-overview-grid {
+  gap: 8px !important;
+}
+.today-overview-grid article,
+body.day-theme .today-overview-grid article {
+  padding: 10px 11px !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.58) !important;
+}
+.today-overview-suggestion,
+body.day-theme .today-overview-suggestion {
+  color: rgba(55,42,75,.72) !important;
+  font-weight: 780 !important;
+}
+
+/* Diário: chips e registros menores, mais charmosos, próximos da referência. */
+.screen[data-screen="diary"] .chips-shell {
+  padding: 0 !important;
+}
+.screen[data-screen="diary"] .chips {
+  gap: 7px !important;
+  padding: 2px 46px 3px 0 !important;
+}
+.screen[data-screen="diary"] .chips button,
+body.day-theme .screen[data-screen="diary"] .chips button {
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0 13px !important;
+  border-radius: 999px !important;
+  color: rgba(47, 36, 75, .70) !important;
+  background: rgba(255,255,255,.56) !important;
+  border-color: rgba(95,70,124,.13) !important;
+  font-size: .76rem !important;
+  font-weight: 900 !important;
+  box-shadow: none !important;
+}
+.screen[data-screen="diary"] .chips button.active,
+body.day-theme .screen[data-screen="diary"] .chips button.active {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  background: linear-gradient(135deg, #6c55c8, #8a69e9) !important;
+  border-color: rgba(108,85,200,.32) !important;
+  box-shadow: 0 8px 18px rgba(108, 85, 200, .18) !important;
+}
+.timeline {
+  gap: 10px !important;
+}
+.timeline .event-card,
+.event-card,
+body.day-theme .timeline .event-card,
+body.day-theme .event-card {
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: center !important;
+  padding: 13px !important;
+  border-radius: 24px !important;
+  background: linear-gradient(145deg, rgba(255,249,241,.90), rgba(255,239,225,.72)) !important;
+  border-color: rgba(95,70,124,.13) !important;
+  box-shadow: 0 10px 22px rgba(95, 65, 140, .065), inset 0 1px 0 rgba(255,255,255,.80) !important;
+}
+.timeline .event-card .mark,
+body.day-theme .timeline .event-card .mark {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 16px !important;
+}
+.timeline .event-main,
+body.day-theme .timeline .event-main {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 8px !important;
+}
+.timeline .event-text strong,
+.event-card strong,
+body.day-theme .timeline .event-text strong,
+body.day-theme .event-card strong {
+  font-size: .98rem !important;
+  line-height: 1.12 !important;
+  color: var(--ninou-v61-ink) !important;
+  margin: 0 0 1px !important;
+}
+.timeline .event-meta-primary,
+.timeline .event-meta-extra,
+body.day-theme .timeline .event-meta-primary,
+body.day-theme .timeline .event-meta-extra {
+  font-size: .86rem !important;
+  color: rgba(55,42,75,.70) !important;
+  font-weight: 760 !important;
+  line-height: 1.18 !important;
+}
+.timeline .event-author-line,
+.event-card p,
+body.day-theme .timeline .event-author-line,
+body.day-theme .event-card p {
+  color: rgba(55,42,75,.58) !important;
+  font-size: .75rem !important;
+  font-weight: 720 !important;
+}
+.timeline .event-actions,
+body.day-theme .timeline .event-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  margin-top: 2px !important;
+}
+.timeline .event-action-button,
+body.day-theme .timeline .event-action-button {
+  min-height: 32px !important;
+  border-radius: 999px !important;
+  font-size: .72rem !important;
+  padding: 0 8px !important;
+  font-weight: 900 !important;
+}
+
+/* Gráfico de peso: menos confuso, labels maiores e ponto atual legível. */
+.weight-chart-readable,
+.weight-sparkline.weight-chart-readable {
+  min-height: 248px !important;
+  padding: 16px 13px 12px !important;
+  border-radius: 24px !important;
+}
+.weight-chart-topline-readable {
+  margin-bottom: 10px !important;
+}
+.weight-chart-topline-readable span,
+.weight-chart-topline-readable strong {
+  min-height: 30px !important;
+  font-size: .80rem !important;
+  padding: 0 12px !important;
+}
+body.day-theme .weight-chart-readable {
+  color: #5c43c9 !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.74), rgba(255,247,238,.62)) !important;
+  border-color: rgba(91, 68, 121, .14) !important;
+}
+.weight-grid-line { opacity: .20 !important; }
+.weight-axis-label,
+.weight-date-label {
+  font-size: 12.5px !important;
+  font-weight: 950 !important;
+  opacity: .94 !important;
+  stroke: rgba(255, 252, 246, .92) !important;
+  stroke-width: 3px !important;
+}
+.weight-date-label { opacity: .86 !important; }
+.weight-main-path { stroke-width: 5.2px !important; }
+.weight-point circle { r: 5px; }
+.weight-point.is-latest circle {
+  r: 7px;
+  filter: drop-shadow(0 7px 9px rgba(77, 55, 155, .22)) !important;
+}
+.weight-latest-label rect {
+  fill: rgba(255, 255, 255, .96) !important;
+  stroke: rgba(91, 68, 121, .18) !important;
+}
+.weight-latest-label text {
+  fill: #2e214a !important;
+  font-size: 12.5px !important;
+}
+
+/* Sheet de ação: selector horizontal compacto; formulário não sobrepõe campos. */
+.record-sheet,
+.orbit-cluster-sheet {
+  height: min(88dvh, 710px) !important;
+  max-height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - 8px) !important;
+  grid-template-rows: 12px minmax(54px, auto) 78px minmax(0, 1fr) auto !important;
+  overflow: hidden !important;
+  padding: 10px 14px max(12px, env(safe-area-inset-bottom, 0px)) !important;
+}
+.record-types {
+  height: 78px !important;
+  min-height: 78px !important;
+  max-height: 78px !important;
+  display: grid !important;
+  grid-auto-flow: column !important;
+  grid-auto-columns: 76px !important;
+  grid-template-columns: none !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 3px 2px 9px !important;
+  margin: 0 -2px !important;
+  scroll-snap-type: x proximity !important;
+  scrollbar-width: none !important;
+  align-items: stretch !important;
+  flex-wrap: nowrap !important;
+}
+.record-types::-webkit-scrollbar { display: none !important; }
+.record-types button,
+body.day-theme .record-types button {
+  width: 76px !important;
+  min-width: 76px !important;
+  max-width: 76px !important;
+  height: 66px !important;
+  min-height: 66px !important;
+  max-height: 66px !important;
+  grid-template-rows: 34px 20px !important;
+  gap: 4px !important;
+  padding: 6px 5px !important;
+  border-radius: 18px !important;
+  scroll-snap-align: start !important;
+  background: rgba(255,255,255,.70) !important;
+  border-color: rgba(91,68,121,.14) !important;
+}
+.record-types .type-icon,
+.record-types .type-icon img,
+.record-types .type-icon svg {
+  width: 34px !important;
+  height: 34px !important;
+  flex-basis: 34px !important;
+}
+.record-types button > span:last-child {
+  min-height: 18px !important;
+  max-height: 20px !important;
+  font-size: .61rem !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+}
+.record-types button.active,
+body.day-theme .record-types button.active {
+  transform: translateY(-2px) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(239,232,255,.86)) !important;
+  border-color: rgba(108,85,200,.34) !important;
+  box-shadow: 0 9px 18px rgba(91,68,121,.13) !important;
+}
+.record-form {
+  display: grid !important;
+  grid-auto-rows: max-content !important;
+  gap: 12px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 8px 3px 16px !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+.record-form > *,
+.record-form label,
+.record-form .select-label,
+#sheetAmountField,
+#sheetEndTimeField,
+#breastTimerPanel,
+#sleepDurationPreview {
+  position: relative !important;
+  z-index: auto !important;
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+.record-form input:not([type="range"]),
+.record-form select,
+.record-form .select-control-wrap,
+.record-form textarea {
+  position: relative !important;
+  z-index: 1 !important;
+}
+.record-actions-footer {
+  padding: 9px 3px 0 !important;
+  z-index: 5 !important;
+}
+.record-actions-footer .save-button {
+  min-height: 54px !important;
+  height: 54px !important;
+  border-radius: 19px !important;
+}
+
+/* Avatar: grade premium, alinhada, com destaque real no selecionado. */
+.avatar-modal .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  padding: 2px 0 4px !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice,
+body.day-theme .avatar-modal .avatar-option-grid .avatar-choice,
+body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
+  min-width: 0 !important;
+  height: 124px !important;
+  min-height: 124px !important;
+  max-height: 124px !important;
+  display: grid !important;
+  grid-template-rows: 78px 26px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 8px !important;
+  padding: 11px 8px 9px !important;
+  border-radius: 24px !important;
+  text-align: center !important;
+  overflow: visible !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(255,247,238,.70)) !important;
+  border: 1px solid rgba(91,68,121,.13) !important;
+  box-shadow: 0 10px 20px rgba(91,68,121,.07), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+.avatar-modal .avatar-face-wrap,
+#babyAvatarTestCard .avatar-face-wrap {
+  width: 76px !important;
+  height: 76px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 24px !important;
+  transform: none !important;
+  background: rgba(255,255,255,.62) !important;
+  box-shadow: inset 0 0 0 1px rgba(91,68,121,.10) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-preset-thumb {
+  width: 72px !important;
+  height: 72px !important;
+  display: block !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: none !important;
+  margin: 0 auto !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice small {
+  width: 100% !important;
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  color: rgba(47,36,75,.74) !important;
+  font-size: .68rem !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.01em !important;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] {
+  transform: translateY(-5px) !important;
+  border-color: rgba(108,85,200,.40) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(238,232,255,.88)) !important;
+  box-shadow: 0 18px 30px rgba(91,68,121,.18), inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected .avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] .avatar-face-wrap {
+  transform: translateY(-3px) scale(1.04) !important;
+  box-shadow: 0 12px 22px rgba(91,68,121,.16), inset 0 0 0 2px rgba(108,85,200,.18) !important;
+}
+
+@media (max-width: 380px) {
+  .main-action-area .primary-action { width: min(88%, 320px) !important; }
+  .quick-actions button { min-height: 62px !important; padding-inline: 10px !important; }
+  .record-types { grid-auto-columns: 72px !important; }
+  .record-types button { width: 72px !important; min-width: 72px !important; max-width: 72px !important; }
+  .avatar-modal .avatar-option-grid.icon-grid,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid { gap: 8px !important; }
+  .avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice { height: 116px !important; min-height: 116px !important; grid-template-rows: 72px 24px !important; }
+  .avatar-modal .avatar-face-wrap,
+  #babyAvatarTestCard .avatar-face-wrap { width: 70px !important; height: 70px !important; }
+  .avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb,
+  .avatar-preset-thumb { width: 66px !important; height: 66px !important; }
+}

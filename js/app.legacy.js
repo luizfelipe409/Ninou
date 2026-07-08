@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.60";
+const NINOU_RUNTIME_VERSION = "75.75.61";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -405,7 +405,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.60-light-final-refine";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.61-premium-hierarchy-actions-avatar";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -425,7 +425,7 @@ function isFranciscoFamilyAccountEmail(email = "") {
 }
 
 function isFranciscoSharedAccount(user = cloudUser) {
-  // v75.75.60: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  // v75.75.61: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
   return isFranciscoFamilyAccountEmail(user?.email || "");
 }
 
@@ -538,7 +538,7 @@ function getFamilyScopeType(familyId = "") {
 }
 
 function getLegacyAccountFamilyFallbackId(user = cloudUser) {
-  // v75.75.60: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // v75.75.61: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
   // Isso evita que a família atual caia em um familyId temporário por UID.
   if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
   // Compatibilidade: versões antigas usavam o UID como familyId provisório.
@@ -2728,7 +2728,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
   const automaticIdentity = getAutomaticCaregiverIdentityForEmail(email);
   if (automaticIdentity && extras.force !== true) {
-    // v75.75.60: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
+    // v75.75.61: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
     // não por um botão de troca neste aparelho. Isso evita registros assinados pela pessoa errada.
     return true;
   }
@@ -2809,11 +2809,22 @@ function isSleepBoundaryEvent(event = {}) {
 }
 
 function formatAwakeDuration(ms = 0) {
-  const minutes = Math.max(0, Math.round(Number(ms) / 60000));
+  const rawMs = Number(ms);
+  if (!Number.isFinite(rawMs) || rawMs < 0 || rawMs > 72 * hour) return "revisar horário";
+  const minutes = Math.max(0, Math.round(rawMs / 60000));
   if (minutes < 60) return `${minutes} min`;
   const hoursValue = Math.floor(minutes / 60);
   const minutesValue = minutes % 60;
   return minutesValue ? `${hoursValue}h ${minutesValue}min` : `${hoursValue}h`;
+}
+
+function isSaneRoutineDuration(ms = 0, maxHours = 72) {
+  const value = Number(ms);
+  return Number.isFinite(value) && value >= 0 && value <= maxHours * hour;
+}
+
+function formatRoutineDurationSafe(ms = 0, maxHours = 72) {
+  return isSaneRoutineDuration(ms, maxHours) ? formatShortDuration(ms) : "revisar horário";
 }
 
 function getProfileActorLabel(event = {}) {
@@ -2929,7 +2940,7 @@ function renderProfileFamilyCards() {
 
 
 function renderTodayCaregiverCard() {
-  // v75.75.60: Felipe e Maria usam e-mails próprios em celulares próprios.
+  // v75.75.61: Felipe e Maria usam e-mails próprios em celulares próprios.
   // A identificação continua no Perfil e no Diário, mas o card da Home não ocupa mais a tela inicial.
   if (!todayCaregiverCard) return;
   todayCaregiverCard.hidden = true;
@@ -3816,7 +3827,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.75.60: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
+    v75.75.61: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -7968,7 +7979,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.60 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.61 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8099,7 +8110,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.60 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.61 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -10285,10 +10296,12 @@ function renderTodayOverview() {
   const bottleCount = events.filter((event) => event.type === "mamadeira").length;
   const bottleTotal = sumBottleAmountMl(events);
   const diaperCount = countDiaperEvents(events);
+  const liveStartedAt = Number(state.activeStartedAt);
+  const liveElapsedMs = Number.isFinite(liveStartedAt) ? Math.max(0, now - liveStartedAt) : 0;
   const stateText = state.mode === "sleeping"
-    ? `Dormindo há ${formatShortDuration(Math.max(0, now - Number(state.activeStartedAt || now)))}`
+    ? `Dormindo há ${formatRoutineDurationSafe(liveElapsedMs, 72)}`
     : awakeInfo.hasWake && awakeInfo.isOpen
-      ? `Acordado há ${formatShortDuration(Number(awakeInfo.durationMs) || 0)}`
+      ? `Acordado há ${formatRoutineDurationSafe(Number(awakeInfo.durationMs) || 0, 72)}`
       : events.length ? "Rotina em andamento" : "Sem registro";
   const bottleText = lastBottle ? `${formatTime(lastBottle.start)}${getBottleAmountText(lastBottle)}` : "Sem registro";
   const diaperText = lastDiaper ? `${formatTime(lastDiaper.start)}${lastDiaper.detail && lastDiaper.detail !== "Não se aplica" ? ` • ${lastDiaper.detail}` : ""}` : "Sem registro";
@@ -10310,7 +10323,8 @@ function renderTodayOverview() {
     else if (awakeInfo.hasWake && awakeInfo.isOpen) {
       const awakeMs = Math.max(0, Number(awakeInfo.durationMs) || 0);
       const targetMs = wakeWindowMinutes * 60000;
-      if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
+      if (!isSaneRoutineDuration(awakeMs, 72)) suggestion = "O Ninou encontrou um horário antigo demais. Revise o último Acordou/Soneca antes de usar a sugestão.";
+      else if (awakeMs >= targetMs * 0.85) suggestion = `${baby} está acordado há ${formatShortDuration(awakeMs)}. Talvez seja hora de observar sinais de sono.`;
       else suggestion = `Rotina em andamento. Próxima janela de sono estimada em ${formatShortDuration(Math.max(0, targetMs - awakeMs))}.`;
     } else if (events.length) suggestion = `Hoje já há ${events.length} ${events.length === 1 ? "registro" : "registros"}. O Ninou está organizando a rotina do dia para você.`;
     todayOverviewSuggestion.textContent = suggestion;
@@ -13380,9 +13394,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.60 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.61 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.60";
+  const VERSION = "75.75.61";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13437,9 +13451,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.60 — guarda de estabilidade + preparação multi-família. */
+/* Ninou v75.75.61 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.60";
+  const VERSION = "75.75.61";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -13501,9 +13515,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.60 — centro de privacidade, termos e solicitações de dados. */
+/* Ninou v75.75.61 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.60";
+  const LEGAL_VERSION = "75.75.61";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -13733,9 +13747,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderLegalCenter();
 })();
 
-/* Ninou v75.75.60 — suporte e monitoramento simples para beta comercial. */
+/* Ninou v75.75.61 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.60";
+  const SUPPORT_VERSION = "75.75.61";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -14062,9 +14076,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderSupportCenter();
 })();
 
-/* Ninou v75.75.60 — revisão comercial final: restrição visual por permissão. */
+/* Ninou v75.75.61 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.60";
+  const REVIEW_VERSION = "75.75.61";
 
   function currentEffectiveRole() {
     try {
