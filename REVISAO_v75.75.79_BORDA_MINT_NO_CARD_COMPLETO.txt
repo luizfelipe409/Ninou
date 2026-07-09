@@ -1,0 +1,8 @@
+Versão v75.75.79
+
+- O estado selecionado agora aplica a borda mint no CARD inteiro.
+- Removido o destaque mint do slot interno/foto.
+- Mantido check elegante no canto superior direito.
+- Fundo do card selecionado ficou mais premium e claro.
+- Ajustado para seguir a prévia aprovada.
+- Cache/versionamento atualizado para 75.75.79.
