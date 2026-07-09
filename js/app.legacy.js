@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.67";
+const NINOU_RUNTIME_VERSION = "75.75.68";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -401,11 +401,11 @@ const NINOU_FRANCISCO_FAMILY_ID = "family-francisco-principal";
 const NINOU_FRANCISCO_FAMILY_NAME = "Família do Francisco";
 const NINOU_FRANCISCO_BABY_NAME = "Francisco";
 const NINOU_FRANCISCO_BABY_ARTICLE = "do";
-// v75.75.67: alias mantido para não quebrar chamadas antigas.
+// v75.75.68: alias mantido para não quebrar chamadas antigas.
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.67-premium-hierarchy-actions-avatar";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.68-premium-hierarchy-actions-avatar";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -425,7 +425,7 @@ function isFranciscoFamilyAccountEmail(email = "") {
 }
 
 function isFranciscoSharedAccount(user = cloudUser) {
-  // v75.75.67: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  // v75.75.68: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
   return isFranciscoFamilyAccountEmail(user?.email || "");
 }
 
@@ -538,7 +538,7 @@ function getFamilyScopeType(familyId = "") {
 }
 
 function getLegacyAccountFamilyFallbackId(user = cloudUser) {
-  // v75.75.67: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // v75.75.68: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
   // Isso evita que a família atual caia em um familyId temporário por UID.
   if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
   // Compatibilidade: versões antigas usavam o UID como familyId provisório.
@@ -897,19 +897,27 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
+const NINOU_AVATAR_ASSET_VERSION = "75.75.68";
+
+function avatarAsset(path = "") {
+  const cleanPath = String(path || "").trim();
+  if (!cleanPath) return "";
+  return `${cleanPath}?v=${NINOU_AVATAR_ASSET_VERSION}`;
+}
+
 const babyAvatarHairOptions = Object.freeze([
-  { id: "avatar-01", label: "Bebê clássico", src: "./icons/baby-avatars/avatar-01.png" },
-  { id: "avatar-02", label: "Castanho", src: "./icons/baby-avatars/avatar-02.png" },
-  { id: "avatar-03", label: "Laço", src: "./icons/baby-avatars/avatar-03.png" },
-  { id: "avatar-04", label: "Cacheado", src: "./icons/baby-avatars/avatar-04.png" },
-  { id: "avatar-05", label: "Ondulado", src: "./icons/baby-avatars/avatar-05.png" },
-  { id: "avatar-06", label: "Loirinha", src: "./icons/baby-avatars/avatar-06.png" },
-  { id: "avatar-07", label: "Cacheadinho", src: "./icons/baby-avatars/avatar-07.png" },
-  { id: "avatar-08", label: "Ruivinho", src: "./icons/baby-avatars/avatar-08.png" },
-  { id: "avatar-09", label: "Touca", src: "./icons/baby-avatars/avatar-09.png" },
-  { id: "avatar-10", label: "Tiara", src: "./icons/baby-avatars/avatar-10.png" },
-  { id: "avatar-11", label: "Raspadinho", src: "./icons/baby-avatars/avatar-11.png" },
-  { id: "avatar-12", label: "Cabelo preto", src: "./icons/baby-avatars/avatar-12.png" },
+  { id: "avatar-01", label: "Bebê clássico", src: avatarAsset("./icons/baby-avatars/avatar-01.webp") },
+  { id: "avatar-02", label: "Castanho", src: avatarAsset("./icons/baby-avatars/avatar-02.webp") },
+  { id: "avatar-03", label: "Laço", src: avatarAsset("./icons/baby-avatars/avatar-03.webp") },
+  { id: "avatar-04", label: "Cacheado", src: avatarAsset("./icons/baby-avatars/avatar-04.webp") },
+  { id: "avatar-05", label: "Ondulado", src: avatarAsset("./icons/baby-avatars/avatar-05.webp") },
+  { id: "avatar-06", label: "Loirinha", src: avatarAsset("./icons/baby-avatars/avatar-06.webp") },
+  { id: "avatar-07", label: "Cacheadinho", src: avatarAsset("./icons/baby-avatars/avatar-07.webp") },
+  { id: "avatar-08", label: "Ruivinho", src: avatarAsset("./icons/baby-avatars/avatar-08.webp") },
+  { id: "avatar-09", label: "Touca", src: avatarAsset("./icons/baby-avatars/avatar-09.webp") },
+  { id: "avatar-10", label: "Tiara", src: avatarAsset("./icons/baby-avatars/avatar-10.webp") },
+  { id: "avatar-11", label: "Raspadinho", src: avatarAsset("./icons/baby-avatars/avatar-11.webp") },
+  { id: "avatar-12", label: "Cabelo preto", src: avatarAsset("./icons/baby-avatars/avatar-12.webp") },
 ]);
 
 const legacyAvatarHairMap = Object.freeze({
@@ -2272,7 +2280,7 @@ function renderAvatarOptionButton(container, options, type, avatar = pendingBaby
   container.innerHTML = options
     .map((item) => {
       const style = item.value ? ` style="--swatch:${item.value};--swatch-text:${item.text || item.value || "#33224d"}"` : "";
-      const preview = type === "hair" ? `<span class="avatar-face-wrap" aria-hidden="true"><img class="avatar-face-thumb avatar-preset-thumb" src="${item.src || getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" /></span>` : "";
+      const preview = type === "hair" ? `<span class="avatar-face-wrap" aria-hidden="true"><img class="avatar-face-thumb avatar-preset-thumb" src="${item.src || getBabyAvatarDataUrl({ ...avatar, hair: item.id })}" alt="" loading="eager" decoding="async" draggable="false" data-avatar-id="${escapeHtml(item.id)}" /></span>` : "";
       const content = swatchTypes.has(type)
         ? `<span class="avatar-swatch" aria-hidden="true"></span><small>${escapeHtml(item.label)}</small>`
         : `${preview}<small>${escapeHtml(item.label)}</small>`;
@@ -2728,7 +2736,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
   const automaticIdentity = getAutomaticCaregiverIdentityForEmail(email);
   if (automaticIdentity && extras.force !== true) {
-    // v75.75.67: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
+    // v75.75.68: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
     // não por um botão de troca neste aparelho. Isso evita registros assinados pela pessoa errada.
     return true;
   }
@@ -2940,7 +2948,7 @@ function renderProfileFamilyCards() {
 
 
 function renderTodayCaregiverCard() {
-  // v75.75.67: Felipe e Maria usam e-mails próprios em celulares próprios.
+  // v75.75.68: Felipe e Maria usam e-mails próprios em celulares próprios.
   // A identificação continua no Perfil e no Diário, mas o card da Home não ocupa mais a tela inicial.
   if (!todayCaregiverCard) return;
   todayCaregiverCard.hidden = true;
@@ -3198,7 +3206,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.75.67 — isolamento local/comercial por família.
+// v75.75.68 — isolamento local/comercial por família.
 // Perfil, pesos e dias passam a usar chaves derivadas do familyId ativo.
 // O cache legado fica apenas como compatibilidade para contas antigas sem família comercial.
 function getActiveDataScope(options = {}) {
@@ -3845,7 +3853,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.75.67: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
+    v75.75.68: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3858,7 +3866,7 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   };
 }
 
-const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.67";
+const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.68";
 let familyActiveInvite = loadFamilyActiveInvite();
 
 function getFamilyInviteTargetFamilyId(invite = null) {
@@ -7079,7 +7087,7 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.75.67: criar família agora abre o fluxo real de cadastro da família.
+    // v75.75.68: criar família agora abre o fluxo real de cadastro da família.
     createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
     createFamilyButton.disabled = personalFamilyActivationInFlight;
     createFamilyButton.textContent = personalFamilyActivationInFlight
@@ -7187,7 +7195,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.75.67: não tenta consultar a família principal fixa para usuários comuns.
+  // v75.75.68: não tenta consultar a família principal fixa para usuários comuns.
   // Uma conta recém-autenticada ainda não tem permissão para ler members/{uid} em famílias
   // onde ela não possui vínculo; isso gerava "Missing or insufficient permissions" antes
   // mesmo sem ser um erro real. O vínculo agora vem de users/{uid}/families ou convite.
@@ -7390,7 +7398,7 @@ async function activatePersonalFamilyInternal(formValues = null) {
 
     if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
 
-    // v75.75.67: primeiro cria o vínculo do usuário e o member/{uid}.
+    // v75.75.68: primeiro cria o vínculo do usuário e o member/{uid}.
     // Uma conta nova ainda não tem permissão para ler families/{familyId}; por isso
     // não fazemos getDoc(familyRef) antes. Depois do vínculo, as regras liberam
     // a criação/atualização segura da família e dos subdocumentos.
@@ -7997,7 +8005,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.67 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.68 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8128,7 +8136,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.67 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.68 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -13414,9 +13422,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.68 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.67";
+  const VERSION = "75.75.68";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13471,9 +13479,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
+/* Ninou v75.75.68 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.67";
+  const VERSION = "75.75.68";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -13535,9 +13543,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
+/* Ninou v75.75.68 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.67";
+  const LEGAL_VERSION = "75.75.68";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -13767,9 +13775,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderLegalCenter();
 })();
 
-/* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
+/* Ninou v75.75.68 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.67";
+  const SUPPORT_VERSION = "75.75.68";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -14096,9 +14104,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderSupportCenter();
 })();
 
-/* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
+/* Ninou v75.75.68 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.67";
+  const REVIEW_VERSION = "75.75.68";
 
   function currentEffectiveRole() {
     try {

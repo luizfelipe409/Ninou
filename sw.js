@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-61-hierarquia-premium-acoes-avatar";
+const CACHE_NAME = "ninou-v75-75-68-avatar-webp-final";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.67",
-  "/app.js?v=75.75.67",
-  "/js/app.legacy.js?v=75.75.67",
+  "/styles.css?v=75.75.68",
+  "/app.js?v=75.75.68",
+  "/js/app.legacy.js?v=75.75.68",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest",
+  "/manifest.webmanifest?v=75.75.68",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
@@ -64,18 +64,18 @@ const APP_SHELL = [
   "/icons/actions/fralda.png",
   "/icons/actions/mamadeira.png",
   "/icons/actions/soneca.png",
-  "/icons/baby-avatars/avatar-01.png",
-  "/icons/baby-avatars/avatar-02.png",
-  "/icons/baby-avatars/avatar-03.png",
-  "/icons/baby-avatars/avatar-04.png",
-  "/icons/baby-avatars/avatar-05.png",
-  "/icons/baby-avatars/avatar-06.png",
-  "/icons/baby-avatars/avatar-07.png",
-  "/icons/baby-avatars/avatar-08.png",
-  "/icons/baby-avatars/avatar-09.png",
-  "/icons/baby-avatars/avatar-10.png",
-  "/icons/baby-avatars/avatar-11.png",
-  "/icons/baby-avatars/avatar-12.png",
+  "/icons/baby-avatars/avatar-01.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-02.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-03.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-04.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-05.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-06.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-07.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-08.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-09.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-10.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-11.webp?v=75.75.68",
+  "/icons/baby-avatars/avatar-12.webp?v=75.75.68",
 ];
 
 self.addEventListener("message", (event) => {
