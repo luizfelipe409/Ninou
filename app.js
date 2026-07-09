@@ -1,6 +1,6 @@
-// Ninou v75.75.62 - hierarquia premium, ações e avatar.
+// Ninou v75.75.64 - hierarquia premium, ações e avatar.
 // Mantido apenas para index.html antigo/PWA antigo; a versão atual carrega js/app.legacy.js diretamente.
-const NINOU_APP_VERSION = "75.75.62";
+const NINOU_APP_VERSION = "75.75.64";
 
 import(`./js/app.legacy.js?v=${NINOU_APP_VERSION}`).catch((error) => {
   console.error("Não foi possível iniciar o Ninou:", error);

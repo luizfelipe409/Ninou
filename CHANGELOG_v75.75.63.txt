@@ -1,0 +1,10 @@
+Ninou v75.75.63 — correção real sem remendo
+
+- Botão + trocado no HTML para uma classe nova: fab-real-plus.
+- Modal de ação virou carrossel horizontal limpo, evitando sobreposição de textos.
+- Labels longos do modal foram encurtados no próprio HTML.
+- Botão Zerar foi fixado dentro do cabeçalho do timer.
+- Artefatos do arco foram removidos no tema claro, substituindo mini-ícones por pontos limpos.
+- Gráficos zerados não exibem bolhas/labels 0; ficam apenas com base discreta.
+- Avatar teve halo/anel excedente reduzido.
+- CSS continua único: styles.css.

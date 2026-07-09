@@ -1,0 +1,16 @@
+Ninou v75.75.64 — consolidação do CSS único
+
+- Mantém CSS único: styles.css.
+- Não adiciona recurso novo.
+- Não altera Firebase, regras, família, login, convites ou dados.
+- Consolida no final do styles.css uma camada canônica para:
+  - FAB/botão +
+  - botões Perfil/Ver diário
+  - modal de registro
+  - timer da amamentação e botão Zerar
+  - arco do contador no tema claro
+  - gráficos zerados
+  - avatar
+  - legibilidade básica no tema claro
+- Mantém o botão + com a classe nova fab-real-plus criada na v75.75.63.
+- Objetivo: reduzir conflitos de CSS acumulados sem separar arquivos nesta fase.

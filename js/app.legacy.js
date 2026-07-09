@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.62";
+const NINOU_RUNTIME_VERSION = "75.75.64";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -401,11 +401,11 @@ const NINOU_FRANCISCO_FAMILY_ID = "family-francisco-principal";
 const NINOU_FRANCISCO_FAMILY_NAME = "Família do Francisco";
 const NINOU_FRANCISCO_BABY_NAME = "Francisco";
 const NINOU_FRANCISCO_BABY_ARTICLE = "do";
-// v75.75.41: alias mantido para não quebrar chamadas antigas.
+// v75.75.64: alias mantido para não quebrar chamadas antigas.
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.62-premium-hierarchy-actions-avatar";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.64-premium-hierarchy-actions-avatar";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -425,7 +425,7 @@ function isFranciscoFamilyAccountEmail(email = "") {
 }
 
 function isFranciscoSharedAccount(user = cloudUser) {
-  // v75.75.62: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  // v75.75.64: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
   return isFranciscoFamilyAccountEmail(user?.email || "");
 }
 
@@ -538,7 +538,7 @@ function getFamilyScopeType(familyId = "") {
 }
 
 function getLegacyAccountFamilyFallbackId(user = cloudUser) {
-  // v75.75.62: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // v75.75.64: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
   // Isso evita que a família atual caia em um familyId temporário por UID.
   if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
   // Compatibilidade: versões antigas usavam o UID como familyId provisório.
@@ -2728,7 +2728,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
   const automaticIdentity = getAutomaticCaregiverIdentityForEmail(email);
   if (automaticIdentity && extras.force !== true) {
-    // v75.75.62: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
+    // v75.75.64: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
     // não por um botão de troca neste aparelho. Isso evita registros assinados pela pessoa errada.
     return true;
   }
@@ -2940,7 +2940,7 @@ function renderProfileFamilyCards() {
 
 
 function renderTodayCaregiverCard() {
-  // v75.75.62: Felipe e Maria usam e-mails próprios em celulares próprios.
+  // v75.75.64: Felipe e Maria usam e-mails próprios em celulares próprios.
   // A identificação continua no Perfil e no Diário, mas o card da Home não ocupa mais a tela inicial.
   if (!todayCaregiverCard) return;
   todayCaregiverCard.hidden = true;
@@ -3198,7 +3198,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.75.45 — isolamento local/comercial por família.
+// v75.75.64 — isolamento local/comercial por família.
 // Perfil, pesos e dias passam a usar chaves derivadas do familyId ativo.
 // O cache legado fica apenas como compatibilidade para contas antigas sem família comercial.
 function getActiveDataScope(options = {}) {
@@ -3827,7 +3827,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.75.62: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
+    v75.75.64: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3840,7 +3840,7 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   };
 }
 
-const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.46";
+const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.64";
 let familyActiveInvite = loadFamilyActiveInvite();
 
 function getFamilyInviteTargetFamilyId(invite = null) {
@@ -7061,7 +7061,7 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.75.43: criar família agora abre o fluxo real de cadastro da família.
+    // v75.75.64: criar família agora abre o fluxo real de cadastro da família.
     createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
     createFamilyButton.disabled = personalFamilyActivationInFlight;
     createFamilyButton.textContent = personalFamilyActivationInFlight
@@ -7169,7 +7169,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.75.10: não tenta consultar a família principal fixa para usuários comuns.
+  // v75.75.64: não tenta consultar a família principal fixa para usuários comuns.
   // Uma conta recém-autenticada ainda não tem permissão para ler members/{uid} em famílias
   // onde ela não possui vínculo; isso gerava "Missing or insufficient permissions" antes
   // mesmo sem ser um erro real. O vínculo agora vem de users/{uid}/families ou convite.
@@ -7372,7 +7372,7 @@ async function activatePersonalFamilyInternal(formValues = null) {
 
     if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
 
-    // v75.75.10: primeiro cria o vínculo do usuário e o member/{uid}.
+    // v75.75.64: primeiro cria o vínculo do usuário e o member/{uid}.
     // Uma conta nova ainda não tem permissão para ler families/{familyId}; por isso
     // não fazemos getDoc(familyRef) antes. Depois do vínculo, as regras liberam
     // a criação/atualização segura da família e dos subdocumentos.
@@ -7979,7 +7979,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.62 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.64 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8110,7 +8110,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.62 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.64 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -13394,9 +13394,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.62 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.64 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.62";
+  const VERSION = "75.75.64";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13451,9 +13451,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.62 — guarda de estabilidade + preparação multi-família. */
+/* Ninou v75.75.64 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.62";
+  const VERSION = "75.75.64";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -13515,9 +13515,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.62 — centro de privacidade, termos e solicitações de dados. */
+/* Ninou v75.75.64 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.62";
+  const LEGAL_VERSION = "75.75.64";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -13747,9 +13747,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderLegalCenter();
 })();
 
-/* Ninou v75.75.62 — suporte e monitoramento simples para beta comercial. */
+/* Ninou v75.75.64 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.62";
+  const SUPPORT_VERSION = "75.75.64";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -14076,9 +14076,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderSupportCenter();
 })();
 
-/* Ninou v75.75.62 — revisão comercial final: restrição visual por permissão. */
+/* Ninou v75.75.64 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.62";
+  const REVIEW_VERSION = "75.75.64";
 
   function currentEffectiveRole() {
     try {
