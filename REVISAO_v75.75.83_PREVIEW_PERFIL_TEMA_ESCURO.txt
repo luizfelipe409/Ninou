@@ -1,0 +1,7 @@
+Versão v75.75.83
+
+- O preview superior do avatar no modal agora usa o mesmo visual do avatar principal do perfil.
+- A moldura do preview recebe o mesmo gradient shell, border-radius e box-shadow do avatar principal.
+- Revisada a legibilidade do tema escuro: títulos, textos auxiliares, nomes dos cards e status com contraste mais forte.
+- Mantido o grid de 2 colunas no mobile e o acabamento premium da seleção no card inteiro.
+- Cache/versionamento atualizados para 75.75.83.
