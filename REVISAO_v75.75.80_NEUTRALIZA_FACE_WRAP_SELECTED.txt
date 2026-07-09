@@ -1,0 +1,9 @@
+Versão v75.75.80
+
+Correção feita a partir do DevTools:
+- Confirmado que a borda mint ainda vinha de .avatar-choice.selected .avatar-face-wrap.
+- Neutralizei explicitamente selected/aria-pressed no span.avatar-face-wrap.
+- Também neutralizei qualquer destaque na imagem interna.
+- A seleção premium agora fica somente no button.avatar-choice, ou seja, no card inteiro.
+- Mantido o check no canto superior direito do card.
+- Cache/versionamento atualizado para 75.75.80.

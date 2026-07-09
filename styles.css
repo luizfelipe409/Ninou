@@ -33726,3 +33726,113 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] img {
   filter: none !important;
   box-shadow: none !important;
 }
+
+
+/* v75.75.80 definitivo: neutraliza selected no avatar-face-wrap */
+
+/* O DevTools confirmou que o mint vinha daqui:
+   .avatar-choice.selected .avatar-face-wrap
+   Portanto, esta regra precisa vir NO FINAL e com seletor mais forte. */
+
+/* 1) Desliga qualquer seleção no WRAP/FOTO */
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+button.avatar-choice.selected > span.avatar-face-wrap,
+button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* 2) Garante que a imagem em si também não receba destaque */
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+button.avatar-choice.selected > span.avatar-face-wrap img,
+button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* 3) Aplica a seleção premium no CARD COMPLETO */
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+button.avatar-choice.selected,
+button.avatar-choice[aria-pressed="true"] {
+  border: 5px solid rgba(124, 229, 194, .96) !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(145deg,
+      rgba(255,255,255,.99) 0%,
+      rgba(244,252,246,.97) 45%,
+      rgba(234,248,239,.96) 100%) !important;
+  box-shadow:
+    0 0 0 3px rgba(124, 229, 194, .16),
+    0 10px 20px rgba(81, 68, 115, .14),
+    inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+
+/* 4) Check no canto do card, acima de tudo */
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+button.avatar-choice.selected::after,
+button.avatar-choice[aria-pressed="true"]::after {
+  content: "✓" !important;
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  background: linear-gradient(135deg, #7ce5c2, #8b5cf6) !important;
+  box-shadow:
+    0 6px 12px rgba(81, 68, 115, .20),
+    inset 0 1px 0 rgba(255,255,255,.42) !important;
+  z-index: 10 !important;
+}
