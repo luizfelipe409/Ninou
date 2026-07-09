@@ -1,0 +1,9 @@
+Versão v75.75.86
+
+Correção técnica:
+- Corrigido warning do Chrome: "Blocked aria-hidden because its descendant retained focus".
+- Antes de ocultar o modal de avatar, o foco é removido do botão interno ativo.
+- O modal agora usa inert=true quando fechado, evitando foco em conteúdo oculto.
+- Ao fechar, o foco retorna ao botão Editar avatar quando possível.
+- Mantido o fade inferior e o acabamento do seletor da versão anterior.
+- Cache/versionamento atualizado para 75.75.86.

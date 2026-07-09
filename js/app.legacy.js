@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.85";
+const BABY_AVATAR_ASSET_VERSION = "75.75.86";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -978,11 +978,41 @@ function renderAvatarEditorVisibility() {
   const canEditAvatar = canUsePrivateFeatures();
   const editorOpen = canEditAvatar && avatarEditorForceOpen;
 
-  // v75.74.1: a seleção de avatares virou modal, aberto apenas pelo botão Editar.
+  // v75.75.86: antes de ocultar o modal, tira o foco de qualquer botão dentro dele.
+  // Isso evita o warning: "Blocked aria-hidden because its descendant retained focus".
   if (babyAvatarCard) {
-    babyAvatarCard.hidden = !editorOpen;
-    babyAvatarCard.setAttribute("aria-hidden", editorOpen ? "false" : "true");
+    const activeElement = document.activeElement;
+    const focusInsideModal = activeElement && babyAvatarCard.contains(activeElement);
+
+    if (editorOpen) {
+      babyAvatarCard.hidden = false;
+      babyAvatarCard.inert = false;
+      babyAvatarCard.setAttribute("aria-hidden", "false");
+    } else {
+      if (focusInsideModal) {
+        try {
+          activeElement.blur?.();
+        } catch (_) {
+          // noop
+        }
+
+        if (editBabyAvatarButton && !editBabyAvatarButton.hidden && !editBabyAvatarButton.disabled) {
+          window.requestAnimationFrame(() => {
+            try {
+              editBabyAvatarButton.focus({ preventScroll: true });
+            } catch (_) {
+              editBabyAvatarButton.focus?.();
+            }
+          });
+        }
+      }
+
+      babyAvatarCard.inert = true;
+      babyAvatarCard.setAttribute("aria-hidden", "true");
+      babyAvatarCard.hidden = true;
+    }
   }
+
   syncAvatarModalScrollLock(editorOpen);
   if (babyAvatarDetails) babyAvatarDetails.open = editorOpen;
 
@@ -2241,6 +2271,14 @@ function openAvatarEditor() {
 }
 
 function closeAvatarEditor(statusText = "") {
+  const activeElement = document.activeElement;
+  if (babyAvatarCard && activeElement && babyAvatarCard.contains(activeElement)) {
+    try {
+      activeElement.blur?.();
+    } catch (_) {
+      // noop
+    }
+  }
   avatarEditorForceOpen = false;
   renderAvatarEditorVisibility();
   if (statusText && babyAvatarStatus) babyAvatarStatus.textContent = statusText;
