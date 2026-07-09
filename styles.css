@@ -34507,3 +34507,186 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-option-grid.icon-grid button.av
     font-size: clamp(1.38rem, 5.8vw, 1.78rem) !important;
   }
 }
+
+
+/* v75.75.84 preview header refinado - sem aspecto mal acabado */
+
+/* Correção do preview superior:
+   A tentativa de copiar exatamente o avatar grande do perfil deixou o modal pesado.
+   Agora o preview vira uma versão premium compacta, alinhada, sem moldura exagerada
+   e sem quebrar o equilíbrio do cabeçalho. */
+
+.avatar-modal .avatar-test-header,
+#babyAvatarTestCard .avatar-test-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 96px !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin-bottom: 18px !important;
+}
+
+.avatar-modal .avatar-preview-wrap.minimal-preview-panel,
+#babyAvatarTestCard .avatar-preview-wrap.minimal-preview-panel {
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  padding: 7px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 28px !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(246,242,255,.92)) !important;
+  border: 1px solid rgba(92, 75, 130, .10) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 12px 24px rgba(76, 59, 112, .12) !important;
+}
+
+.avatar-modal .minimal-preview-panel .baby-avatar-preview,
+#babyAvatarTestCard .minimal-preview-panel .baby-avatar-preview {
+  width: 82px !important;
+  height: 82px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 22px !important;
+  background: transparent !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body:not(.day-theme) .avatar-modal .avatar-preview-wrap.minimal-preview-panel,
+body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.minimal-preview-panel {
+  background:
+    linear-gradient(180deg, rgba(53,45,77,.98), rgba(38,31,59,.98)) !important;
+  border-color: rgba(255,255,255,.10) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 14px 28px rgba(2,1,10,.34) !important;
+}
+
+body:not(.day-theme) .avatar-modal .avatar-copy-column span,
+body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column span {
+  color: rgba(220, 211, 242, .92) !important;
+}
+
+body:not(.day-theme) .avatar-modal .avatar-copy-column strong,
+body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column strong {
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,.18) !important;
+}
+
+body:not(.day-theme) .avatar-modal .avatar-copy-column p,
+body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column p {
+  color: rgba(235, 229, 247, .92) !important;
+}
+
+body:not(.day-theme) .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
+body:not(.day-theme) #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small {
+  color: rgba(250, 247, 255, .96) !important;
+}
+
+body.day-theme .avatar-modal .avatar-copy-column span,
+body.day-theme #babyAvatarTestCard .avatar-copy-column span {
+  color: rgba(92, 82, 118, .78) !important;
+}
+
+body.day-theme .avatar-modal .avatar-copy-column strong,
+body.day-theme #babyAvatarTestCard .avatar-copy-column strong {
+  color: #2f2843 !important;
+}
+
+body.day-theme .avatar-modal .avatar-copy-column p,
+body.day-theme #babyAvatarTestCard .avatar-copy-column p {
+  color: rgba(91, 80, 116, .82) !important;
+}
+
+@media (max-width: 430px) {
+  .avatar-modal .avatar-test-header,
+  #babyAvatarTestCard .avatar-test-header {
+    grid-template-columns: minmax(0, 1fr) 96px !important;
+    gap: 12px !important;
+  }
+
+  .avatar-modal .avatar-copy-column strong,
+  #babyAvatarTestCard .avatar-copy-column strong {
+    font-size: clamp(1.34rem, 5.6vw, 1.72rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  .avatar-modal .avatar-copy-column p,
+  #babyAvatarTestCard .avatar-copy-column p {
+    font-size: .88rem !important;
+    line-height: 1.28 !important;
+  }
+}
+
+
+/* v75.75.85 fade inferior suave acima dos botões do seletor */
+
+/* Acabamento premium: evita corte seco da grade antes dos botões.
+   A transição para o rodapé ganha um fade superior suave, em vez de término brusco. */
+.avatar-modal .avatar-picker-section,
+#babyAvatarTestCard .avatar-picker-section {
+  position: relative !important;
+}
+
+.avatar-modal .avatar-editor-actions,
+#babyAvatarTestCard .avatar-editor-actions {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 6 !important;
+  margin-top: -8px !important;
+  padding: 26px 0 0 !important;
+  border-top: 0 !important;
+  background-clip: padding-box !important;
+}
+
+/* Tema claro: fade superior bem sutil, sem esconder demais a última linha */
+body.day-theme .avatar-modal .avatar-editor-actions,
+body.day-theme #babyAvatarTestCard .avatar-editor-actions {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(253, 250, 252, 0) 0%,
+      rgba(253, 250, 252, 0.46) 16%,
+      rgba(253, 250, 252, 0.82) 34%,
+      rgba(253, 250, 252, 0.96) 56%,
+      rgba(253, 250, 252, 1) 74%
+    ) !important;
+}
+
+/* Tema escuro: mesmo fade, preservando contraste e acabamento */
+body:not(.day-theme) .avatar-modal .avatar-editor-actions,
+body:not(.day-theme) #babyAvatarTestCard .avatar-editor-actions {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(34, 28, 53, 0) 0%,
+      rgba(34, 28, 53, 0.42) 16%,
+      rgba(34, 28, 53, 0.78) 34%,
+      rgba(34, 28, 53, 0.94) 56%,
+      rgba(34, 28, 53, 1) 74%
+    ) !important;
+}
+
+/* Mantém os botões acima do fade e visualmente separados */
+.avatar-modal .avatar-save-button,
+.avatar-modal .avatar-skip-button,
+#babyAvatarTestCard .avatar-save-button,
+#babyAvatarTestCard .avatar-skip-button {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Em telas mais baixas, o fade continua elegante sem roubar muita área útil */
+@media (max-height: 760px) {
+  .avatar-modal .avatar-editor-actions,
+  #babyAvatarTestCard .avatar-editor-actions {
+    margin-top: -6px !important;
+    padding-top: 22px !important;
+  }
+}

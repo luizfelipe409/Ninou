@@ -1,0 +1,7 @@
+Versão v75.75.85
+
+- Aplicado fade inferior suave acima dos botões Salvar/Fechar no seletor de avatar.
+- A transição da grade para o rodapé deixa de parecer cortada de forma seca.
+- Fade revisado para tema claro e tema escuro.
+- Botões mantidos legíveis e destacados acima do gradiente.
+- Cache/versionamento atualizados para 75.75.85.
