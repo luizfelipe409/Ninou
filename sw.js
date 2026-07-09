@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-77-real-avatar-card-override";
+const CACHE_NAME = "ninou-v75-75-78-selected-avatar-card-polish";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.77",
-  "/app.js?v=75.75.77",
-  "/js/app.legacy.js?v=75.75.77",
+  "/styles.css?v=75.75.78",
+  "/app.js?v=75.75.78",
+  "/js/app.legacy.js?v=75.75.78",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest?v=75.75.77",
+  "/manifest.webmanifest?v=75.75.78",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",

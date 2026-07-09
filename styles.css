@@ -33473,3 +33473,125 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] {
     inset 0 1px 0 rgba(255,255,255,.96),
     0 12px 24px rgba(81, 68, 115, .20) !important;
 }
+
+
+/* v75.75.78 selected avatar card: acabamento premium no card inteiro */
+
+/* Seleção premium: tira o destaque pesado em cima da imagem e trata o CARD inteiro. */
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+button.avatar-choice[data-avatar-value].selected,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] {
+  position: relative !important;
+  overflow: hidden !important;
+
+  transform: translateY(-2px) !important;
+  border-color: rgba(124, 229, 194, .96) !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.98), rgba(239,250,235,.92) 54%, rgba(232,245,230,.92)) !important;
+  box-shadow:
+    0 0 0 3px rgba(124, 229, 194, .20),
+    0 0 0 7px rgba(124, 229, 194, .08),
+    inset 0 1px 0 rgba(255,255,255,.98),
+    0 16px 28px rgba(81, 68, 115, .20) !important;
+}
+
+/* Brilho interno discreto no card selecionado. */
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::before,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::before,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::before,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::before,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected::before,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::before,
+button.avatar-choice[data-avatar-value].selected::before,
+button.avatar-choice[data-avatar-value][aria-pressed="true"]::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 5px !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255,255,255,.76) !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,.52), rgba(255,255,255,0) 45%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Check pequeno e elegante no canto, em vez de “marcar” a foto. */
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+button.avatar-choice[data-avatar-value].selected::after,
+button.avatar-choice[data-avatar-value][aria-pressed="true"]::after {
+  content: "✓" !important;
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  background: linear-gradient(135deg, #7ce5c2, #8b5cf6) !important;
+  box-shadow:
+    0 6px 12px rgba(81, 68, 115, .20),
+    inset 0 1px 0 rgba(255,255,255,.42) !important;
+  z-index: 3 !important;
+}
+
+/* Garante que imagem e texto fiquem acima do brilho, mas sem sombra/halo próprio. */
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-wrap,
+button.avatar-choice[data-avatar-value].selected .avatar-face-wrap,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] .avatar-face-wrap,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected small,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected small,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
+button.avatar-choice[data-avatar-value].selected small,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] small {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-thumb,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-thumb,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-thumb,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-thumb,
+button.avatar-choice[data-avatar-value].selected img,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] img {
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Texto do card selecionado fica mais premium sem “pular” layout. */
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected small,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected small,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
+button.avatar-choice[data-avatar-value].selected small,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] small {
+  color: #31264f !important;
+}
