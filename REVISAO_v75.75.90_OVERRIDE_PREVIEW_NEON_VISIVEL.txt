@@ -1,0 +1,11 @@
+Versão v75.75.90
+
+Correção após a v75.75.89 aparentemente não alterar visualmente:
+- Adicionado HARD OVERRIDE com especificidade alta para o container:
+  .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel
+- Tema claro agora força lavanda/roxo premium visível.
+- Tema escuro agora força grafite arroxeado + verde mint neon suave visível.
+- Removida sensação de arco preto pesado com borda glass.
+- Atualizados também data-ninou-premium-safe e data-ninou-stability-version no HTML para 75.75.90.
+- Mantidos fade real, foco/aria e grid mobile.
+- Cache/versionamento atualizado para 75.75.90.

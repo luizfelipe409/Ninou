@@ -35012,3 +35012,142 @@ body:not(.day-theme) .avatar-modal .avatar-copy-column p,
 body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column p {
   color: rgba(235,229,247,.90) !important;
 }
+
+
+/* v75.75.90 HARD OVERRIDE preview avatar neon visivel */
+
+/* OVERRIDE FINAL COM ESPECIFICIDADE ALTA.
+   Motivo: em alguns aparelhos/tema, regras antigas ainda venciam visualmente.
+   Este bloco força diferença clara no preview do avatar. */
+
+/* Base do preview */
+html body .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  position: relative !important;
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  padding: 7px !important;
+  border-radius: 30px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+/* Tema claro — mudança visual bem perceptível: lavanda premium */
+html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  background:
+    radial-gradient(circle at 30% 18%,
+      rgba(255,255,255,1) 0%,
+      rgba(255,255,255,.84) 24%,
+      rgba(213,199,255,.58) 52%,
+      rgba(170,139,255,.30) 76%,
+      rgba(139,92,246,.18) 100%
+    ),
+    linear-gradient(145deg, rgba(255,255,255,.98), rgba(246,241,255,.98)) !important;
+  border: 1.5px solid rgba(167,139,250,.52) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 0 0 4px rgba(167,139,250,.10),
+    0 0 26px rgba(139,92,246,.28),
+    0 16px 32px rgba(76,59,112,.16) !important;
+}
+
+/* Tema claro — brilho interno */
+html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 7px !important;
+  border-radius: 23px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(135deg,
+      rgba(188,165,255,.34) 0%,
+      rgba(255,255,255,0) 48%,
+      rgba(139,92,246,.18) 100%
+    ) !important;
+  opacity: .90 !important;
+}
+
+/* Tema escuro — mudança visual bem perceptível: grafite arroxeado + mint */
+html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  background:
+    radial-gradient(circle at 32% 18%,
+      rgba(124,229,194,.36) 0%,
+      rgba(84,211,169,.24) 30%,
+      rgba(43,35,66,.92) 66%,
+      rgba(30,24,48,1) 100%
+    ),
+    linear-gradient(145deg, rgba(43,35,66,.98), rgba(26,21,42,1)) !important;
+  border: 1.5px solid rgba(124,229,194,.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.075),
+    0 0 0 4px rgba(124,229,194,.075),
+    0 0 28px rgba(124,229,194,.24),
+    0 18px 36px rgba(0,0,0,.42) !important;
+}
+
+/* Tema escuro — brilho interno */
+html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 7px !important;
+  border-radius: 23px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(135deg,
+      rgba(124,229,194,.28) 0%,
+      rgba(255,255,255,0) 50%,
+      rgba(124,229,194,.14) 100%
+    ) !important;
+  opacity: .94 !important;
+}
+
+/* Garante que a imagem fique por cima do brilho */
+html body .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel
+img.baby-avatar-preview {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 82px !important;
+  height: 82px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  object-fit: contain !important;
+  filter: none !important;
+}
+
+/* Mini borda glass, bem mais premium que arco preto */
+html body .ninou-modal.avatar-modal#babyAvatarTestCard
+.ninou-modal-card.avatar-modal-card
+.avatar-test-header.avatar-minimal-header
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 1px !important;
+  border-radius: 29px !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+  border: 1px solid rgba(255,255,255,.32) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
