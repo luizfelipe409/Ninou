@@ -33183,3 +33183,158 @@ svg.select-control-icon.diary-date-icon path {
   object-position: center center !important;
   transform: none !important;
 }
+
+
+
+/* v75.75.76 avatar picker: formato EXATO do card identity */
+
+/* Correção definitiva: o FORMATO da opção agora é o mesmo do avatar da identity.
+   Antes o estilo ficou fraco porque regras antigas ainda controlavam o .avatar-choice.
+   Este bloco usa seletores mais fortes e substitui border-radius, fundo, borda e sombra. */
+
+.avatar-picker-modal .avatar-compact-card .avatar-option-grid.icon-grid,
+.avatar-modal .avatar-compact-card .avatar-option-grid.icon-grid,
+.avatar-compact-card .avatar-option-grid.icon-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px 14px !important;
+  align-items: stretch !important;
+}
+
+.avatar-picker-modal .avatar-compact-card .avatar-option-grid.icon-grid button.avatar-choice,
+.avatar-picker-modal .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice,
+.avatar-modal .avatar-compact-card .avatar-option-grid.icon-grid button.avatar-choice,
+.avatar-modal .avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice,
+.avatar-compact-card .avatar-option-grid.icon-grid button.avatar-choice,
+.avatar-compact-card .avatar-option-grid.icon-grid .avatar-choice,
+button.avatar-choice[data-avatar-value] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  min-height: 188px !important;
+  height: 188px !important;
+  padding: 14px 10px 12px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+
+  text-align: center !important;
+  overflow: hidden !important;
+
+  border-radius: 34px !important;
+
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255,255,255,.98) 0%, rgba(255,255,255,.84) 35%, rgba(237,247,230,.78) 100%) !important;
+
+  border: 5px solid rgba(255,255,255,.96) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 2px 0 rgba(255,255,255,.58),
+    0 18px 34px rgba(81, 68, 115, .18) !important;
+}
+
+.avatar-picker-modal .avatar-choice .avatar-face-wrap,
+.avatar-modal .avatar-choice .avatar-face-wrap,
+.avatar-compact-card .avatar-choice .avatar-face-wrap,
+button.avatar-choice[data-avatar-value] .avatar-face-wrap {
+  width: 112px !important;
+  height: 112px !important;
+  min-width: 112px !important;
+  min-height: 112px !important;
+  display: grid !important;
+  place-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.avatar-picker-modal .avatar-choice .avatar-face-thumb,
+.avatar-picker-modal .avatar-choice .avatar-preset-thumb,
+.avatar-picker-modal .avatar-choice img,
+.avatar-modal .avatar-choice .avatar-face-thumb,
+.avatar-modal .avatar-choice .avatar-preset-thumb,
+.avatar-modal .avatar-choice img,
+.avatar-compact-card .avatar-choice .avatar-face-thumb,
+.avatar-compact-card .avatar-choice .avatar-preset-thumb,
+.avatar-compact-card .avatar-choice img,
+button.avatar-choice[data-avatar-value] img {
+  width: 106px !important;
+  height: 106px !important;
+  max-width: 106px !important;
+  max-height: 106px !important;
+  display: block !important;
+  margin: 0 auto !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+  transform: none !important;
+}
+
+.avatar-picker-modal .avatar-choice small,
+.avatar-modal .avatar-choice small,
+.avatar-compact-card .avatar-choice small,
+button.avatar-choice[data-avatar-value] small {
+  width: 100% !important;
+  display: block !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  text-align: center !important;
+  line-height: 1.08 !important;
+  color: #5f5678 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.03em !important;
+}
+
+.avatar-picker-modal .avatar-choice.selected,
+.avatar-picker-modal .avatar-choice.active,
+.avatar-picker-modal .avatar-choice[aria-pressed="true"],
+.avatar-modal .avatar-choice.selected,
+.avatar-modal .avatar-choice.active,
+.avatar-modal .avatar-choice[aria-pressed="true"],
+.avatar-compact-card .avatar-choice.selected,
+.avatar-compact-card .avatar-choice.active,
+.avatar-compact-card .avatar-choice[aria-pressed="true"],
+button.avatar-choice[data-avatar-value].selected,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] {
+  border-color: rgba(124, 229, 194, .96) !important;
+  box-shadow:
+    0 0 0 4px rgba(124, 229, 194, .18),
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 18px 34px rgba(81, 68, 115, .22) !important;
+}
+
+.avatar-preview-wrap.avatar-preview-panel,
+.avatar-preview-wrap.minimal-preview-panel,
+.avatar-preview-panel.minimal-preview-panel {
+  border-radius: 34px !important;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255,255,255,.98) 0%, rgba(255,255,255,.84) 35%, rgba(237,247,230,.78) 100%) !important;
+  border: 5px solid rgba(255,255,255,.96) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 18px 34px rgba(81, 68, 115, .18) !important;
+}
+
+.avatar-preview-wrap.avatar-preview-panel .baby-avatar-preview,
+.avatar-preview-wrap.minimal-preview-panel .baby-avatar-preview,
+.avatar-preview-panel.minimal-preview-panel .baby-avatar-preview,
+#babyAvatarPreview.baby-avatar-preview {
+  width: 112px !important;
+  height: 112px !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  transform: none !important;
+}
