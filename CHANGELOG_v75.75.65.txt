@@ -1,0 +1,10 @@
+Ninou v75.75.65 — ajustes finos pós-teste real
+
+- Corrige avatar no modal: centralização, seleção sem card quadrado exagerado e texto final sem vazamento.
+- Remove risco/linha visual da linha do tempo inteligente quando não há registros suficientes.
+- Ajusta alinhamento dos gráficos para evitar barra torta ou invadindo outro dia da semana.
+- Corrige continuidade após meia-noite: se o último estado de ontem ainda estava aberto, o contador segue em vez de zerar.
+- Ajusta o ícone/dropdown do card de data do diário.
+- Reduz levemente o FAB para não invadir cards.
+- Mantém CSS único: styles.css.
+- Não altera Firebase, regras, convites, família, PDF, WhatsApp, CSV ou JSON.

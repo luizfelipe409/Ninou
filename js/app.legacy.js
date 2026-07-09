@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.64";
+const NINOU_RUNTIME_VERSION = "75.75.65";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -401,11 +401,11 @@ const NINOU_FRANCISCO_FAMILY_ID = "family-francisco-principal";
 const NINOU_FRANCISCO_FAMILY_NAME = "Família do Francisco";
 const NINOU_FRANCISCO_BABY_NAME = "Francisco";
 const NINOU_FRANCISCO_BABY_ARTICLE = "do";
-// v75.75.64: alias mantido para não quebrar chamadas antigas.
+// v75.75.65: alias mantido para não quebrar chamadas antigas.
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.64-premium-hierarchy-actions-avatar";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.65-premium-hierarchy-actions-avatar";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -425,7 +425,7 @@ function isFranciscoFamilyAccountEmail(email = "") {
 }
 
 function isFranciscoSharedAccount(user = cloudUser) {
-  // v75.75.64: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
+  // v75.75.65: Felipe e Maria usam e-mails próprios, mas pertencem à mesma família canônica.
   return isFranciscoFamilyAccountEmail(user?.email || "");
 }
 
@@ -538,7 +538,7 @@ function getFamilyScopeType(familyId = "") {
 }
 
 function getLegacyAccountFamilyFallbackId(user = cloudUser) {
-  // v75.75.64: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
+  // v75.75.65: os e-mails do pai e da mãe do Francisco agora têm destino canônico.
   // Isso evita que a família atual caia em um familyId temporário por UID.
   if (isFranciscoSharedAccount(user)) return NINOU_FRANCISCO_FAMILY_ID;
   // Compatibilidade: versões antigas usavam o UID como familyId provisório.
@@ -2728,7 +2728,7 @@ function saveCurrentCaregiverIdentity(name = "", relation = "", extras = {}) {
   const email = getCurrentIdentityEmail();
   const automaticIdentity = getAutomaticCaregiverIdentityForEmail(email);
   if (automaticIdentity && extras.force !== true) {
-    // v75.75.64: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
+    // v75.75.65: Felipe e Maria usam e-mails próprios. O cuidador é definido pelo login,
     // não por um botão de troca neste aparelho. Isso evita registros assinados pela pessoa errada.
     return true;
   }
@@ -2940,7 +2940,7 @@ function renderProfileFamilyCards() {
 
 
 function renderTodayCaregiverCard() {
-  // v75.75.64: Felipe e Maria usam e-mails próprios em celulares próprios.
+  // v75.75.65: Felipe e Maria usam e-mails próprios em celulares próprios.
   // A identificação continua no Perfil e no Diário, mas o card da Home não ocupa mais a tela inicial.
   if (!todayCaregiverCard) return;
   todayCaregiverCard.hidden = true;
@@ -3198,7 +3198,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.75.64 — isolamento local/comercial por família.
+// v75.75.65 — isolamento local/comercial por família.
 // Perfil, pesos e dias passam a usar chaves derivadas do familyId ativo.
 // O cache legado fica apenas como compatibilidade para contas antigas sem família comercial.
 function getActiveDataScope(options = {}) {
@@ -3396,20 +3396,38 @@ function getPreviousDayId(dayId = getCurrentDayId()) {
   return toDateInputValue(base - day);
 }
 
-function getOpenSleepFromPreviousDay(dayId = getCurrentDayId(), now = Date.now()) {
+function getOpenRoutineFromPreviousDay(dayId = getCurrentDayId(), now = Date.now()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const previousDayId = getPreviousDayId(safeDayId);
   const previousState = sanitizeDayStateForDay(familyDayStatesCache[previousDayId] || loadLocalDayState(previousDayId), previousDayId, { preserveLive: true });
   const start = Number(previousState.activeStartedAt);
   const todayStart = getDayStartFromId(safeDayId);
-  if (previousState.mode !== "sleeping" || !Number.isFinite(start)) return null;
+  const previousMode = String(previousState.mode || "idle");
+  if (!["awake", "sleeping", "night-wake"].includes(previousMode) || !Number.isFinite(start)) return null;
   if (start >= todayStart || start < todayStart - 36 * hour || start > now + 2 * 60000) return null;
+
+  const fallbackType = previousMode === "sleeping"
+    ? "sono"
+    : previousMode === "night-wake"
+      ? "despertar-noturno"
+      : "acordou";
+
   return {
     dayId: previousDayId,
+    mode: previousMode,
     start,
-    type: isSleepEvent({ type: previousState.activeType }) ? previousState.activeType : "sono",
+    type: previousState.activeType || fallbackType,
     detail: previousState.activeDetail || "Continuado de ontem",
     notes: previousState.activeNotes || "",
+  };
+}
+
+function getOpenSleepFromPreviousDay(dayId = getCurrentDayId(), now = Date.now()) {
+  const openRoutine = getOpenRoutineFromPreviousDay(dayId, now);
+  if (!openRoutine || openRoutine.mode !== "sleeping") return null;
+  return {
+    ...openRoutine,
+    type: isSleepEvent({ type: openRoutine.type }) ? openRoutine.type : "sono",
   };
 }
 
@@ -3420,16 +3438,16 @@ function todayHasPersistentRoutineContent() {
 function continueOpenSleepFromPreviousDayIfNeeded() {
   if (getSelectedDayId() !== getCurrentDayId()) return false;
   if (state.mode !== "idle" || todayHasPersistentRoutineContent()) return false;
-  const openSleep = getOpenSleepFromPreviousDay(getCurrentDayId());
-  if (!openSleep) return false;
+  const openRoutine = getOpenRoutineFromPreviousDay(getCurrentDayId());
+  if (!openRoutine) return false;
 
   state = normalizeDayState({
     ...state,
-    mode: "sleeping",
-    activeStartedAt: openSleep.start,
-    activeType: openSleep.type,
-    activeDetail: openSleep.detail || "Continuado de ontem",
-    activeNotes: openSleep.notes || "",
+    mode: openRoutine.mode,
+    activeStartedAt: openRoutine.start,
+    activeType: openRoutine.type,
+    activeDetail: openRoutine.detail || "Continuado de ontem",
+    activeNotes: openRoutine.notes || "",
   });
   syncSelectedDayIntoFamilyCache();
   saveLocalDayState(getCurrentDayId());
@@ -3827,7 +3845,7 @@ async function saveAdminAccountProfileToCloud() {
 
 async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   /*
-    v75.75.64: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
+    v75.75.65: Felipe e Maria usam e-mails próprios na mesma família do Francisco,
     mas cada aparelho deve registrar com o próprio nome.
     Por isso, não carregamos displayName/relationship da nuvem para este campo,
     para evitar que Maria/Mãe sobrescreva Felipe/Pai no outro celular.
@@ -3840,7 +3858,7 @@ async function loadCurrentAccountIdentityFromCloud(user = cloudUser) {
   };
 }
 
-const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.64";
+const familyInviteStorageBaseKey = "ninou.family.activeInvite.v75.75.65";
 let familyActiveInvite = loadFamilyActiveInvite();
 
 function getFamilyInviteTargetFamilyId(invite = null) {
@@ -7061,7 +7079,7 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.75.64: criar família agora abre o fluxo real de cadastro da família.
+    // v75.75.65: criar família agora abre o fluxo real de cadastro da família.
     createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
     createFamilyButton.disabled = personalFamilyActivationInFlight;
     createFamilyButton.textContent = personalFamilyActivationInFlight
@@ -7169,7 +7187,7 @@ async function readAccountAccessFromCloud(user = cloudUser) {
     });
   }
 
-  // v75.75.64: não tenta consultar a família principal fixa para usuários comuns.
+  // v75.75.65: não tenta consultar a família principal fixa para usuários comuns.
   // Uma conta recém-autenticada ainda não tem permissão para ler members/{uid} em famílias
   // onde ela não possui vínculo; isso gerava "Missing or insufficient permissions" antes
   // mesmo sem ser um erro real. O vínculo agora vem de users/{uid}/families ou convite.
@@ -7372,7 +7390,7 @@ async function activatePersonalFamilyInternal(formValues = null) {
 
     if (loginHelper) loginHelper.textContent = "Criando sua família no Ninou...";
 
-    // v75.75.64: primeiro cria o vínculo do usuário e o member/{uid}.
+    // v75.75.65: primeiro cria o vínculo do usuário e o member/{uid}.
     // Uma conta nova ainda não tem permissão para ler families/{familyId}; por isso
     // não fazemos getDoc(familyRef) antes. Depois do vínculo, as regras liberam
     // a criação/atualização segura da família e dos subdocumentos.
@@ -7979,7 +7997,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.64 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v75.75.65 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8110,7 +8128,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.64 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v75.75.65 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -9391,9 +9409,11 @@ function renderCurrentState() {
   setText(wakeActionLabel, sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca");
   setText(stateLabel, sleeping ? "Dormindo há" : nightWakeActive ? "Despertar noturno há" : "Acordado há");
   setText(stateClock, formatDuration(elapsed));
-  const crossedMidnight = sleeping && Number(state.activeStartedAt) < getDayStart();
+  const crossedMidnight = Number(state.activeStartedAt) < getDayStart();
   setText(stateHint, crossedMidnight
-    ? `Sono continuado de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Acordou, o Ninou fecha o sono com a duração total.`
+    ? sleeping
+      ? `Sono continuado de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Acordou, o Ninou fecha o sono com a duração total.`
+      : `Acordado desde ontem, às ${formatTime(state.activeStartedAt)}. O contador segue a partir do último registro.`
     : getWakeWindowText());
   setWakeActionIcon();
   renderActiveTimerCard();
@@ -13394,9 +13414,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.64 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.65 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "75.75.64";
+  const VERSION = "75.75.65";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13451,9 +13471,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.64 — guarda de estabilidade + preparação multi-família. */
+/* Ninou v75.75.65 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.64";
+  const VERSION = "75.75.65";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -13515,9 +13535,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 })();
 
 
-/* Ninou v75.75.64 — centro de privacidade, termos e solicitações de dados. */
+/* Ninou v75.75.65 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.64";
+  const LEGAL_VERSION = "75.75.65";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -13747,9 +13767,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderLegalCenter();
 })();
 
-/* Ninou v75.75.64 — suporte e monitoramento simples para beta comercial. */
+/* Ninou v75.75.65 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.64";
+  const SUPPORT_VERSION = "75.75.65";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -14076,9 +14096,9 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   renderSupportCenter();
 })();
 
-/* Ninou v75.75.64 — revisão comercial final: restrição visual por permissão. */
+/* Ninou v75.75.65 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.64";
+  const REVIEW_VERSION = "75.75.65";
 
   function currentEffectiveRole() {
     try {
