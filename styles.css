@@ -30726,7 +30726,7 @@ body.day-theme .data-section-heading strong {
   font-weight: 950 !important;
 }
 
-/* Ninou v75.75.61 — hierarquia premium: Home, ações, Diário, gráfico e avatar.
+/* Ninou v75.75.62 — hierarquia premium: Home, ações, Diário, gráfico e avatar.
    Escopo: não adiciona recurso; corrige acabamento observado na v75.75.60. */
 :root {
   --ninou-v61-ink: #2e214a;
@@ -31359,4 +31359,278 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
   .avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
   #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb,
   .avatar-preset-thumb { width: 66px !important; height: 66px !important; }
+}
+
+/* v75.75.62 — correção fina de acabamento e ações */
+
+/* 1) FAB: corrige símbolo de +, reposiciona e evita leitura de ícone estranho */
+.fab.icon-button-add {
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  right: max(16px, calc((100vw - 430px) / 2 + 16px)) !important;
+  bottom: calc(98px + env(safe-area-inset-bottom, 0px)) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(135deg, #e59667, #d98b5f) !important;
+  box-shadow: 0 18px 36px rgba(191, 117, 73, 0.28) !important;
+}
+.fab.icon-button-add::before {
+  content: "+" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+  border-radius: 0 !important;
+  transform: translate(-50%, -54%) !important;
+  color: #fff !important;
+  font-size: 2.5rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+}
+.fab.icon-button-add::after {
+  display: none !important;
+}
+@media (max-width: 380px) {
+  .fab.icon-button-add {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+    right: 14px !important;
+    bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .fab.icon-button-add::before {
+    font-size: 2.35rem !important;
+  }
+}
+
+/* 2) Botões de ação secundária: Perfil / Ver diário mais visíveis */
+.today-topline .ghost-link,
+.today-overview-head .ghost-link,
+.chart-title .ghost-link,
+.section-title .ghost-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(112, 184, 151, 0.36) !important;
+  background: rgba(244, 255, 247, 0.72) !important;
+  color: #40a886 !important;
+  font-weight: 900 !important;
+  font-size: 0.98rem !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.78), 0 10px 24px rgba(112, 184, 151, 0.08) !important;
+}
+body.day-theme .today-topline .ghost-link,
+body.day-theme .today-overview-head .ghost-link,
+body.day-theme .chart-title .ghost-link,
+body.day-theme .section-title .ghost-link {
+  background: linear-gradient(180deg, rgba(251,255,251,0.96), rgba(241,250,243,0.92)) !important;
+  border-color: rgba(112, 184, 151, 0.34) !important;
+  color: #42a582 !important;
+}
+body:not(.day-theme) .today-topline .ghost-link,
+body:not(.day-theme) .today-overview-head .ghost-link,
+body:not(.day-theme) .chart-title .ghost-link,
+body:not(.day-theme) .section-title .ghost-link {
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  color: #8eeccd !important;
+}
+
+/* 3) Avatar: remove arco/anel excedente e simplifica o recorte */
+.screen[data-screen="profile"] #profilePhoto,
+.avatar-modal .baby-avatar-preview,
+#babyAvatarTestCard .baby-avatar-preview,
+.avatar-modal .avatar-face-thumb,
+#babyAvatarTestCard .avatar-face-thumb {
+  display: block !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+}
+.screen[data-screen="profile"] #profilePhoto {
+  width: 112px !important;
+  height: 112px !important;
+  background: #fff !important;
+}
+.avatar-modal .minimal-preview-panel,
+#babyAvatarTestCard .minimal-preview-panel {
+  border-radius: 28px !important;
+  border: 1px solid rgba(220, 212, 241, 0.92) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,244,255,0.94)) !important;
+  box-shadow: 0 14px 28px rgba(91, 70, 146, 0.10) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice {
+  display: grid !important;
+  align-content: start !important;
+  justify-items: center !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected {
+  transform: translateY(-4px) !important;
+}
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice small {
+  text-align: center !important;
+}
+
+/* 4) Sheet de registro: evita sobreposição e melhora leitura dos tipos */
+.record-sheet .record-types {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  overflow: visible !important;
+  padding-bottom: 2px !important;
+}
+.record-sheet .record-types button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 108px !important;
+  padding: 12px 8px 10px !important;
+  border-radius: 22px !important;
+  display: grid !important;
+  justify-items: center !important;
+  align-content: start !important;
+  gap: 8px !important;
+}
+.record-sheet .record-types .type-icon,
+.record-sheet .record-types .type-icon img,
+.record-sheet .record-types .type-icon svg {
+  width: 48px !important;
+  height: 48px !important;
+}
+.record-sheet .record-types button > span:last-child {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: 0.84rem !important;
+  line-height: 1.1 !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+}
+@media (max-width: 390px) {
+  .record-sheet .record-types {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .record-sheet .record-types button {
+    min-height: 100px !important;
+    padding: 10px 6px 8px !important;
+  }
+  .record-sheet .record-types .type-icon,
+  .record-sheet .record-types .type-icon img,
+  .record-sheet .record-types .type-icon svg {
+    width: 42px !important;
+    height: 42px !important;
+  }
+  .record-sheet .record-types button > span:last-child {
+    font-size: 0.78rem !important;
+  }
+}
+.breast-timer-head button,
+#resetBreastTimerButton {
+  min-width: max-content !important;
+  white-space: nowrap !important;
+  padding: 0 14px !important;
+  border-radius: 16px !important;
+}
+
+/* 5) Gráficos zerados: ancora no piso do gráfico em vez de flutuar no meio */
+.data-chart-card[data-has-real-data="false"] .bars.premium-bars > span::before,
+.data-chart-card[data-has-data="false"] .bars.premium-bars > span::before,
+.data-chart-card[data-has-real-data="false"] .data-bars > span::before,
+.data-chart-card[data-has-data="false"] .data-bars > span::before,
+.data-chart-card[data-has-real-data="false"] .data-bars-sleep > span::before,
+.data-chart-card[data-has-data="false"] .data-bars-sleep > span::before {
+  height: 4px !important;
+  min-height: 4px !important;
+  margin-top: auto !important;
+  align-self: end !important;
+  border-radius: 999px !important;
+  opacity: 0.42 !important;
+}
+.data-chart-card[data-has-real-data="false"] .bars.premium-bars,
+.data-chart-card[data-has-data="false"] .bars.premium-bars,
+.data-chart-card[data-has-real-data="false"] .data-bars,
+.data-chart-card[data-has-data="false"] .data-bars,
+.data-chart-card[data-has-real-data="false"] .data-bars-sleep,
+.data-chart-card[data-has-data="false"] .data-bars-sleep {
+  align-items: end !important;
+}
+
+/* 6) Home principal: contador e ações com acabamento mais limpo */
+body.day-theme .state-orbit {
+  overflow: hidden !important;
+  border-radius: 34px !important;
+}
+body.day-theme .orbit-event::before,
+body.day-theme .orbit-event::after,
+.orbit-event b {
+  display: none !important;
+}
+body.day-theme .state-orbit > span {
+  color: #61546f !important;
+  font-weight: 900 !important;
+  letter-spacing: .03em !important;
+}
+body.day-theme .state-orbit strong {
+  color: #2f2250 !important;
+  font-size: clamp(3.2rem, 10vw, 4.8rem) !important;
+}
+body.day-theme .state-orbit p {
+  color: #6d607f !important;
+  font-weight: 850 !important;
+  font-size: 1rem !important;
+}
+.start-choice button,
+#wakeAction.primary-action {
+  min-height: 92px !important;
+  border-radius: 28px !important;
+}
+.start-choice button .action-icon,
+#wakeAction.primary-action .action-icon {
+  width: 56px !important;
+  height: 56px !important;
+}
+.start-choice button > span:last-child,
+#wakeAction.primary-action > span:last-child {
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+}
+
+/* 7) Diário: ações dos cards mais delicadas e legíveis */
+.timeline .event-card,
+.event-card {
+  border-radius: 26px !important;
+  padding: 14px !important;
+}
+.timeline .event-action-button,
+.event-action-button {
+  min-height: 50px !important;
+  border-radius: 18px !important;
+  font-weight: 900 !important;
+}
+body.day-theme .timeline .event-action-button,
+body.day-theme .event-action-button {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.64), 0 8px 18px rgba(111, 81, 134, 0.06) !important;
+}
+
+/* 8) Avatar footer/modal: evita sensação de corte */
+.avatar-modal .avatar-editor-actions,
+#babyAvatarTestCard .avatar-editor-actions {
+  margin-top: 14px !important;
+}
+.avatar-modal #babyAvatarStatus,
+#babyAvatarTestCard #babyAvatarStatus {
+  margin-top: 12px !important;
+  margin-bottom: 0 !important;
 }

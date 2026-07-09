@@ -1,0 +1,11 @@
+Ninou v75.75.62 — correção fina de acabamento e ações
+
+- corrige o símbolo do botão flutuante para um + real
+- reposiciona o FAB para reduzir sobreposição com a barra inferior
+- transforma Perfil e Ver diário em botões com aparência mais acionável
+- remove o arco visual excedente ao redor do avatar
+- melhora o modal de avatar com seleção mais estável e cartões melhor alinhados
+- reorganiza os tipos de registro em grade no modal para evitar sobreposição
+- corrige o botão Zerar da amamentação para não cortar texto
+- ancora gráficos zerados na base do gráfico, sem barras “boiando” no meio
+- reforça acabamento do contador principal e dos cards do diário

@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.61",
-  "/app.js?v=75.75.61",
-  "/js/app.legacy.js?v=75.75.61",
+  "/styles.css?v=75.75.62",
+  "/app.js?v=75.75.62",
+  "/js/app.legacy.js?v=75.75.62",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
