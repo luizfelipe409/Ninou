@@ -1,0 +1,10 @@
+Ninou v75.75.66 — correção por seletores reais
+
+- Avatar: mira os elementos reais .avatar-face-wrap, .avatar-face-thumb e small.
+- Remove o quadrado/fundo extra atrás do avatar selecionado; seleção fica no aro do avatar.
+- Rodapé do modal de avatar deixa de cobrir a grade e o status antigo fica oculto.
+- Linha do tempo inteligente: o container recebe estado vazio em JS e o ::before é removido quando vazio.
+- Gráficos: barras/labels passam a ser posicionados dentro de uma coluna fixa por dia.
+- Dropdown da data do diário: mira .date-filter .diary-date-icon real.
+- Assistente/Janela acordado: protege contra horários corrompidos/antigos demais para não exibir 49544h.
+- Mantém CSS único e não altera Firebase/regras.

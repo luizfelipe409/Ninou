@@ -149,15 +149,17 @@ export function renderLiveAssistant({
   let tone = "neutral";
 
   const activeStartedAt = Number(state?.activeStartedAt);
-  if (state?.mode === "sleeping" && Number.isFinite(activeStartedAt)) {
-    const sleepingMs = Math.max(0, now - activeStartedAt);
+  const activeElapsedMs = Number.isFinite(activeStartedAt) ? now - activeStartedAt : NaN;
+  const hasSaneActiveTimer = Number.isFinite(activeElapsedMs) && activeElapsedMs >= 0 && activeElapsedMs <= 36 * HOUR;
+  if (state?.mode === "sleeping" && hasSaneActiveTimer) {
+    const sleepingMs = Math.max(0, activeElapsedMs);
     kicker = "Sono em andamento";
     title = "Quando acordar, registre o despertar";
     text = `O sono está em andamento há ${formatShortDuration(sleepingMs)}. Ao acordar, toque em Acordou para fechar o ciclo.`;
     badge = "🌙";
     tone = "sleep";
-  } else if (state?.mode === "awake" && Number.isFinite(activeStartedAt)) {
-    const awakeMs = Math.max(0, now - activeStartedAt);
+  } else if (state?.mode === "awake" && hasSaneActiveTimer) {
+    const awakeMs = Math.max(0, activeElapsedMs);
     const targetMs = Math.max(30, Number(wakeWindowMinutes) || 70) * 60000;
     const remainingMs = targetMs - awakeMs;
     kicker = "Janela acordado";
@@ -175,6 +177,12 @@ export function renderLiveAssistant({
       text = `Já passou da janela de referência em ${formatShortDuration(Math.abs(remainingMs))}. Sem pressa: observe os sinais do bebê.`;
       tone = "attention";
     }
+  } else if (state?.mode === "awake" && Number.isFinite(activeStartedAt) && !hasSaneActiveTimer) {
+    kicker = "Janela acordado";
+    title = "Revise o último despertar";
+    text = "O Ninou encontrou um horário antigo demais para calcular a janela acordado. Registre Acordou novamente para continuar com precisão.";
+    badge = "🌤️";
+    tone = "neutral";
   } else if (!events.length) {
     kicker = "Dia pronto para começar";
     title = "Primeiro cuidado do dia";
@@ -329,9 +337,14 @@ export function renderIntelligentTimeline({
   const visibleEvents = orderedEvents.slice(0, safeLimit);
 
   if (!visibleEvents.length) {
+    container.classList.add("is-empty");
+    container.dataset.empty = "true";
     container.innerHTML = `<article class="timeline-empty">Ainda não há registros suficientes. Comece com sono, mamada, fralda ou medicamento para montar a linha do tempo inteligente.</article>`;
     return;
   }
+
+  container.classList.remove("is-empty");
+  delete container.dataset.empty;
 
   const itemsMarkup = visibleEvents.map((event) => {
     const config = getEventConfig(event.type);

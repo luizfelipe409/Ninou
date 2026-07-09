@@ -13419,7 +13419,7 @@ body.record-sheet-open::-webkit-scrollbar {
 
 
 /* ===== CSS principal original sem @import ===== */
-/* Ninou v75.75.65 - fluxo familiar completo. */
+/* Ninou v75.75.66 - fluxo familiar completo. */
 /* Ninou v75.57 â€” Perfil Familiar + Convite */
 .profile-family-stack {
   display: grid;
@@ -21004,7 +21004,7 @@ body.day-theme #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.75.65 — refinamento atento da apresentação dos avatares */
+/* v75.75.66 — refinamento atento da apresentação dos avatares */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 314px !important;
   padding: 40px 24px 42px !important;
@@ -21161,7 +21161,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.75.65 — equilíbrio fino do nome e do avatar principal */
+/* v75.75.66 — equilíbrio fino do nome e do avatar principal */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 292px !important;
   padding: 34px 22px 38px !important;
@@ -21225,7 +21225,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.65 — avatar do perfil igual à prévia, com rosto um pouco maior */
+/* v75.75.66 — avatar do perfil igual à prévia, com rosto um pouco maior */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   width: 142px !important;
   height: 142px !important;
@@ -21269,7 +21269,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.65 — avatar do perfil com presença da prévia, sem aro gigante */
+/* v75.75.66 — avatar do perfil com presença da prévia, sem aro gigante */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   width: 126px !important;
   height: 126px !important;
@@ -21312,7 +21312,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.65 — avatar do perfil com presença igual/maior que a prévia */
+/* v75.75.66 — avatar do perfil com presença igual/maior que a prévia */
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   width: 120px !important;
   height: 120px !important;
@@ -21355,7 +21355,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.65 — estado pendente de sincronização */
+/* v75.75.66 — estado pendente de sincronização */
 .sync-pill.pending {
   color: #3d2d10 !important;
   background: linear-gradient(135deg, rgba(255, 211, 122, .96), rgba(255, 244, 184, .92)) !important;
@@ -21372,7 +21372,7 @@ body:not(.day-theme) .sync-pill.pending {
 }
 
 
-/* v75.75.65 — atalhos iniciais e próxima soneca mais confiáveis */
+/* v75.75.66 — atalhos iniciais e próxima soneca mais confiáveis */
 .start-choice {
   display: none !important;
 }
@@ -21425,7 +21425,7 @@ body.day-theme .next-card.is-overdue p {
 }
 
 
-/* v75.75.65 — atalhos principais compactos, sem linha e com títulos centralizados */
+/* v75.75.66 — atalhos principais compactos, sem linha e com títulos centralizados */
 .quick-actions-heading {
   margin-top: clamp(14px, 3.4vw, 18px) !important;
   margin-bottom: clamp(8px, 2vw, 10px) !important;
@@ -21489,7 +21489,7 @@ body.day-theme .next-card.is-overdue p {
   }
 }
 
-/* v75.75.65 — perfil deslogado mais objetivo */
+/* v75.75.66 — perfil deslogado mais objetivo */
 body.profile-guest-focused .screen[data-screen="profile"] > .profile-card,
 body.profile-guest-focused .screen[data-screen="profile"] .profile-family-stack,
 body.profile-guest-focused .screen[data-screen="profile"] #premiumTrustCard,
@@ -21606,7 +21606,7 @@ body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
   }
 }
 
-/* v75.75.65 — fluxo familiar completo */
+/* v75.75.66 — fluxo familiar completo */
 .profile-state-notice-card,
 .family-access-summary-card {
   width: min(100%, 920px);
@@ -21794,7 +21794,7 @@ body:not(.day-theme) .family-access-summary-grid article {
   }
 }
 
-/* Ninou v75.75.65 — revisão de registros respeitando a paleta do app */
+/* Ninou v75.75.66 — revisão de registros respeitando a paleta do app */
 .routine-correction-card {
   position: relative;
   display: grid;
@@ -21891,7 +21891,7 @@ body:not(.day-theme) .family-access-summary-grid article {
 }
 
 
-/* Ninou v75.75.65 — convite familiar simplificado, respeitando a paleta do app */
+/* Ninou v75.75.66 — convite familiar simplificado, respeitando a paleta do app */
 .screen[data-screen="profile"] .profile-sharing-card .profile-invite-area {
   display: none !important;
 }
@@ -22034,7 +22034,7 @@ body:not(.day-theme) .join-family-code-field input {
 }
 
 
-/* Ninou v75.75.65 — membros, permissões e segurança familiar */
+/* Ninou v75.75.66 — membros, permissões e segurança familiar */
 .family-danger-button,
 .danger-soft-button {
   border-color: rgba(180, 86, 90, 0.28) !important;
@@ -22064,7 +22064,7 @@ body:not(.day-theme) .join-family-code-field input {
 .admin-audit-item span { color: rgba(104, 72, 88, 0.82); }
 .admin-audit-item small { color: rgba(104, 72, 88, 0.58); }
 
-/* Ninou v75.75.65 — diagnóstico, mensagens e estabilidade familiar
+/* Ninou v75.75.66 — diagnóstico, mensagens e estabilidade familiar
    Mantém a paleta do app: lavanda, creme, verde suave e contraste roxo. */
 .family-health-panel {
   margin-top: 16px;
@@ -22193,7 +22193,7 @@ body:not(.day-theme) .join-family-code-field input {
   }
 }
 
-/* Ninou v75.75.65 — responsividade e admin adaptativo
+/* Ninou v75.75.66 — responsividade e admin adaptativo
    Foco: telas menores que iPhone 14 Pro Max e painel admin em desktop, respeitando a paleta lavanda/creme/verde do app. */
 :root {
   --ninou-admin-max-width: 1180px;
@@ -22557,7 +22557,7 @@ body.admin-family-preview .screen[data-screen="profile"] {
   }
 }
 
-/* Ninou v75.75.65 — polimento visual e estados vazios
+/* Ninou v75.75.66 — polimento visual e estados vazios
    Mantém lavanda, creme, verde suave e roxo; reduz textos técnicos e deixa telas sem dados com orientação clara. */
 :root {
   --ninou-empty-bg: linear-gradient(145deg, rgba(255, 250, 243, .94), rgba(246, 239, 255, .9));
@@ -22762,7 +22762,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.65 — relatórios e PDF mais profissional */
+/* Ninou v75.75.66 — relatórios e PDF mais profissional */
 .export-card {
   position: relative;
 }
@@ -22805,7 +22805,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.65 — Teste real de uso familiar */
+/* Ninou v75.75.66 — Teste real de uso familiar */
 .family-real-test-panel {
   margin-top: 1rem;
   padding: 1rem;
@@ -22892,7 +22892,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.65 — escopo familiar no admin */
+/* Ninou v75.75.66 — escopo familiar no admin */
 .admin-family-client-card .admin-selected-family-note,
 .family-real-test-intro {
   word-break: break-word;
@@ -22902,7 +22902,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.65 — offline e sincronização real */
+/* Ninou v75.75.66 — offline e sincronização real */
 .sync-pill.pending {
   white-space: nowrap;
 }
@@ -22927,7 +22927,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
   }
 }
 
-/* Ninou v75.75.65 — observações rápidas */
+/* Ninou v75.75.66 — observações rápidas */
 .quick-observations-panel {
   display: grid;
   gap: 10px;
@@ -23025,7 +23025,7 @@ body.day-theme .quick-observations-panel {
 }
 
 
-/* v75.75.65 — Limpeza de interface e modo simples.
+/* v75.75.66 — Limpeza de interface e modo simples.
    Mantém a paleta do Ninou usando as cores já existentes: lavanda, creme, verde suave e roxo. */
 .admin-mode-toolbar {
   display: grid;
@@ -23134,7 +23134,7 @@ body.ninou-advanced-mode [data-advanced-only] {
   }
 }
 
-/* Ninou v75.75.65 — painel admin desktop lapidado
+/* Ninou v75.75.66 — painel admin desktop lapidado
    Corrige cards estreitos, textos quebrando letra por letra e navegação sobrepondo o conteúdo no desktop. */
 :root {
   --ninou-admin-desktop-max: 1220px;
@@ -23423,7 +23423,7 @@ body.admin-family-preview .diagnostics-grid strong {
   }
 }
 
-/* Ninou v75.75.65 — revisão minuciosa do painel admin desktop
+/* Ninou v75.75.66 — revisão minuciosa do painel admin desktop
    Corrige de forma mais agressiva o layout do painel no PC: nada de cards estreitos,
    e-mails quebrando letra por letra ou conteúdo administrativo preso em grade de celular. */
 body.global-admin-mode.admin-panel-only .phone-shell,
@@ -23662,7 +23662,7 @@ body.global-admin-mode.admin-panel-only .admin-support-item strong {
 
 
 /* ===== Camada premium segura consolidada ===== */
-/* Ninou v75.75.65 — premium seguro
+/* Ninou v75.75.66 — premium seguro
    Objetivo: melhorar o acabamento sem esconder funções.
    Importante: esta camada NÃO usa display:none para cards de Perfil/Admin. */
 
@@ -24072,7 +24072,7 @@ body.day-theme .family-real-test-checklist li {
 
 
 
-/* ===== Ninou v75.75.65 — ajustes finais de responsividade e diagnóstico ===== */
+/* ===== Ninou v75.75.66 — ajustes finais de responsividade e diagnóstico ===== */
 :root {
   --ninou-v32-desktop-shell: 1240px;
   --ninou-v32-side-nav: 86px;
@@ -24246,7 +24246,7 @@ body.day-theme .admin-diagnostics-card strong {
 }
 
 
-/* Ninou v75.75.65 — ajuste visual do diagnóstico familiar e respiro da barra inferior */
+/* Ninou v75.75.66 — ajuste visual do diagnóstico familiar e respiro da barra inferior */
 .family-health-panel {
   background: linear-gradient(180deg, #fbf7ff 0%, #f4edff 100%) !important;
   border-color: rgba(93, 71, 139, .22) !important;
@@ -24310,7 +24310,7 @@ body:not(.day-theme) .family-health-status {
 }
 
 
-/* v75.75.65 — avatar centralizado + bloqueio de zoom automático do iOS
+/* v75.75.66 — avatar centralizado + bloqueio de zoom automático do iOS
    Mantém CSS único e corrige somente a apresentação. */
 @media (max-width: 820px) {
   input,
@@ -24486,7 +24486,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
   }
 }
 
-/* v75.75.65 — gráficos premium com CSS único */
+/* v75.75.66 — gráficos premium com CSS único */
 .screen[data-screen="trends"] .trend-summary,
 .screen[data-screen="trends"] .trend-kpis,
 .screen[data-screen="trends"] .report-stack {
@@ -24844,7 +24844,7 @@ body.day-theme .weight-chart-topline strong {
 }
 
 
-/* v75.75.65 — reconstrução premium real da tela Dados/Gráficos.
+/* v75.75.66 — reconstrução premium real da tela Dados/Gráficos.
    Mantém CSS único e melhora hierarquia, curvas, cards, mobile e estados vazios. */
 .screen[data-screen="trends"] {
   gap: 16px !important;
@@ -25506,7 +25506,7 @@ body.day-theme .bars.premium-bars i {
 }
 
 
-/* v75.75.65 — revisão final de estabilidade e responsividade geral.
+/* v75.75.66 — revisão final de estabilidade e responsividade geral.
    Mantém CSS único. Não cria novas funções e não esconde cards funcionais. */
 :root {
   --ninou-safe-bottom: max(118px, calc(104px + env(safe-area-inset-bottom, 0px)));
@@ -25812,7 +25812,7 @@ textarea {
 }
 
 
-/* v75.75.65 — experiência familiar premium por aparelho.
+/* v75.75.66 — experiência familiar premium por aparelho.
    Mantém CSS único. Foco: identidade local do cuidador e assinatura clara dos registros. */
 .today-caregiver-card {
   display: grid;
@@ -26069,7 +26069,7 @@ body.day-theme .today-caregiver-main p {
 }
 
 
-/* v75.75.65 — inteligência real da rotina.
+/* v75.75.66 — inteligência real da rotina.
    Melhora sugestões, resumo diário e lembretes sem alterar Firebase. */
 .live-assistant-card {
   position: relative;
@@ -26309,7 +26309,7 @@ body.day-theme .notification-center-list li i {
 }
 
 
-/* v75.75.65 — acabamento visual premium geral.
+/* v75.75.66 — acabamento visual premium geral.
    Escopo: Hoje, atalhos, sheet de registro, Diário, Perfil e Admin desktop.
    Mantém CSS único e não oculta funções essenciais. */
 
@@ -27132,7 +27132,7 @@ body.day-theme .record-types button {
 }
 
 
-/* v75.75.65 — tela inicial comercial multi-família.
+/* v75.75.66 — tela inicial comercial multi-família.
    Caminhos: criar família, entrar com convite ou acessar conta existente. */
 .commercial-family-entry-card,
 .commercial-entry-dialog {
@@ -27373,7 +27373,7 @@ body.day-theme .commercial-modal-option.primary {
   }
 }
 
-/* v75.75.65 — criação real de nova família comercial */
+/* v75.75.66 — criação real de nova família comercial */
 .create-family-wizard,
 .commercial-create-family-panel {
   display: grid;
@@ -27516,7 +27516,7 @@ body.day-theme .create-family-grid select {
   }
 }
 
-/* v75.75.65 — Convites por família
+/* v75.75.66 — Convites por família
    Campos de convite no perfil, presos ao familyId atual. Mantém CSS único. */
 .family-invite-form {
   display: grid;
@@ -27650,7 +27650,7 @@ body.day-theme .family-invite-form select {
 }
 
 
-/* v75.75.65 — papéis familiares e permissões comerciais */
+/* v75.75.66 — papéis familiares e permissões comerciais */
 .family-roles-guide-card {
   display: grid;
   gap: 14px;
@@ -27790,7 +27790,7 @@ body.day-theme .family-access-role-badge[data-role="cuidador"] {
   .member-role-select-label { min-width: 0 !important; }
 }
 
-/* v75.75.65 — painel admin comercial */
+/* v75.75.66 — painel admin comercial */
 .admin-commercial-dashboard,
 .admin-family-monitor-section {
   position: relative;
@@ -27961,7 +27961,7 @@ body.day-theme .admin-commercial-insight {
 }
 
 
-/* v75.75.65 — revisão comercial final para beta multi-família.
+/* v75.75.66 — revisão comercial final para beta multi-família.
    Escopo: cards de confiança, checklist comercial do admin e avisos de uso responsável. */
 .commercial-beta-card,
 .admin-commercial-readiness-section {
@@ -28140,7 +28140,7 @@ body.day-theme .admin-commercial-insight {
 }
 
 
-/* v75.75.65 — privacidade, termos e prontidão legal para beta. */
+/* v75.75.66 — privacidade, termos e prontidão legal para beta. */
 .legal-readiness-card,
 .admin-legal-readiness-section {
   border: 1px solid rgba(124, 229, 194, .24);
@@ -28325,7 +28325,7 @@ body.dark-mode .legal-consent-badge[data-state="accepted"] {
   }
 }
 
-/* v75.75.65 — suporte e monitoramento simples do beta.
+/* v75.75.66 — suporte e monitoramento simples do beta.
    Escopo: Perfil, modal de suporte e painel admin comercial. Mantém CSS único. */
 .support-beta-card,
 .admin-support-beta-section {
@@ -28505,7 +28505,7 @@ body.dark-mode .support-report-description {
   }
 }
 
-/* v75.75.65 — revisão comercial final em sequência.
+/* v75.75.66 — revisão comercial final em sequência.
    Restringe visualmente ações sensíveis e exibe roteiro de liberação beta. */
 .commercial-final-sequence-card,
 .admin-commercial-sequence-section {
@@ -28640,7 +28640,7 @@ body.day-theme .admin-commercial-sequence-section {
   }
 }
 
-/* v75.75.65 — identidade por e-mail dos pais + correção dark do botão Editar avatar */
+/* v75.75.66 — identidade por e-mail dos pais + correção dark do botão Editar avatar */
 .screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-editor-panel,
 .screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-quick-grid,
 .screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-device-explain,
@@ -28669,7 +28669,7 @@ body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button svg {
   text-shadow: none !important;
 }
 
-/* v75.75.65 — seletor de ações do registro sempre completo.
+/* v75.75.66 — seletor de ações do registro sempre completo.
    Correção: no iPhone, o sheet estava preso em uma linha de 3 botões
    (Acordou/Soneca/Noite), ocultando Amamentação, Mamadeira e Fralda. */
 .record-sheet .record-types {
@@ -28735,7 +28735,7 @@ body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button svg {
 }
 
 
-/* v75.75.65 — revisão visual real: tema claro, primeiro acesso, dados e perfil familiar. */
+/* v75.75.66 — revisão visual real: tema claro, primeiro acesso, dados e perfil familiar. */
 body.day-theme {
   --ninou-light-text: #332451;
   --ninou-light-muted: rgba(61, 49, 86, .72);
@@ -29067,13 +29067,13 @@ body.day-theme textarea::placeholder { color: rgba(61,49,86,.48) !important; }
   .first-routine-card { padding: 20px; border-radius: 28px 28px 24px 24px; }
 }
 
-/* v75.75.65 — identidade automática dos pais: sem botão Trocar no uso normal. */
+/* v75.75.66 — identidade automática dos pais: sem botão Trocar no uso normal. */
 .today-caregiver-card.caregiver-auto-locked .today-caregiver-edit,
 .today-caregiver-card[data-auto-locked="true"] .today-caregiver-edit {
   display: none !important;
 }
 
-/* v75.75.65 — restauração premium da Home, Diário e gráficos reais.
+/* v75.75.66 — restauração premium da Home, Diário e gráficos reais.
    Escopo: relógio diurno proporcional ao noturno, Home limpa sem card de cuidador,
    cards do Diário menos poluídos e gráficos de Dados legíveis. */
 
@@ -29467,7 +29467,7 @@ body.day-theme .data-chart-card[data-has-real-data="false"] .bars.premium-bars::
   }
 }
 
-/* v75.75.65 — revisão geral do tema claro: legibilidade, topo limpo, sol natural e gráficos úteis. */
+/* v75.75.66 — revisão geral do tema claro: legibilidade, topo limpo, sol natural e gráficos úteis. */
 body.day-theme {
   --ninou-light-text: #2f214b;
   --ninou-light-muted: rgba(65, 48, 86, .82);
@@ -29821,7 +29821,7 @@ body.day-theme .bars.premium-bars i {
 }
 
 
-/* v75.75.65 — restauração real do acabamento premium light.
+/* v75.75.66 — restauração real do acabamento premium light.
    Escopo: tema claro, relógio diurno, Home, Diário, Perfil e gráficos reais.
    Mantém a estrutura multi-família das versões comerciais. */
 body.day-theme {
@@ -30217,7 +30217,7 @@ body.day-theme .bars.premium-bars i {
   }
 }
 
-/* v75.75.65 — refino cirúrgico: light premium, diário, gráfico de peso e FAB sem sobreposição.
+/* v75.75.66 — refino cirúrgico: light premium, diário, gráfico de peso e FAB sem sobreposição.
    Escopo fechado: visual/legibilidade. Mantém multi-família, regras e fluxos existentes. */
 body.day-theme {
   --ninou-v60-ink: #2b2048;
@@ -30726,8 +30726,8 @@ body.day-theme .data-section-heading strong {
   font-weight: 950 !important;
 }
 
-/* Ninou v75.75.65 — hierarquia premium: Home, ações, Diário, gráfico e avatar.
-   Escopo: não adiciona recurso; corrige acabamento observado na v75.75.65. */
+/* Ninou v75.75.66 — hierarquia premium: Home, ações, Diário, gráfico e avatar.
+   Escopo: não adiciona recurso; corrige acabamento observado na v75.75.66. */
 :root {
   --ninou-v61-ink: #2e214a;
   --ninou-v61-muted: rgba(55, 42, 75, .74);
@@ -31361,7 +31361,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
   .avatar-preset-thumb { width: 66px !important; height: 66px !important; }
 }
 
-/* v75.75.65 — correção fina de acabamento e ações */
+/* v75.75.66 — correção fina de acabamento e ações */
 
 /* 1) FAB: corrige símbolo de +, reposiciona e evita leitura de ícone estranho */
 .fab.icon-button-add {
@@ -31636,7 +31636,7 @@ body.day-theme .event-action-button {
 }
 
 
-/* v75.75.65 — correção real sem remendo visual */
+/* v75.75.66 — correção real sem remendo visual */
 
 /* FAB novo com classe própria; ignora todas as regras antigas de icon-button-add */
 .fab.fab-real-plus,
@@ -31866,7 +31866,7 @@ body.day-theme .orbit-event i {
 
 
 /* ==========================================================================
-   Ninou v75.75.65 — CONSOLIDAÇÃO DO CSS ÚNICO
+   Ninou v75.75.66 — CONSOLIDAÇÃO DO CSS ÚNICO
    --------------------------------------------------------------------------
    Esta seção é a camada canônica final do styles.css.
    Objetivo: reduzir conflito de regras antigas sem separar o CSS agora.
@@ -32181,13 +32181,13 @@ body.day-theme .form-status {
   color: var(--ninou-text-muted-light) !important;
 }
 
-/* Fim da consolidação v75.75.65
+/* Fim da consolidação v75.75.66
    As regras acima são a referência final para as áreas críticas.
    ========================================================================== */
 
 
 /* ==========================================================================
-   Ninou v75.75.65 — ajustes finos pós-teste real
+   Ninou v75.75.66 — ajustes finos pós-teste real
    --------------------------------------------------------------------------
    Ajustes cirúrgicos:
    - avatar selecionado sem card quadrado exagerado e conteúdo centralizado;
@@ -32466,5 +32466,317 @@ button.fab.fab-real-plus > span {
   }
 }
 
-/* Fim dos ajustes v75.75.65
+/* Fim dos ajustes v75.75.66
+   ========================================================================== */
+
+
+/* ========================================================================== 
+   Ninou v75.75.66 — correção por seletores reais
+   --------------------------------------------------------------------------
+   Auditoria real:
+   - Avatar usa .avatar-face-wrap + .avatar-face-thumb + small.
+   - Linha vazia vem do .intelligent-timeline::before.
+   - Dropdown real é .date-filter .diary-date-icon.
+   - Gráficos precisam de posicionamento absoluto por coluna.
+   ========================================================================== */
+
+/* 1. Avatar real: remove o quadrado atrás do avatar e centraliza no card */
+#babyAvatarTestCard .avatar-option-grid.icon-grid,
+.avatar-modal .avatar-option-grid.icon-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: start !important;
+}
+
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice,
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice {
+  min-height: 136px !important;
+  padding: 12px 8px 11px !important;
+  display: grid !important;
+  grid-template-rows: 78px auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  align-content: center !important;
+  gap: 8px !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,.56) !important;
+  border: 1px solid rgba(91,75,116,.10) !important;
+  box-shadow: 0 8px 18px rgba(91,75,116,.055) !important;
+  transform: none !important;
+}
+
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"],
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"],
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice.selected,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"],
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice.selected,
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice[aria-pressed="true"] {
+  background: rgba(255,255,255,.56) !important;
+  border-color: rgba(91,75,116,.10) !important;
+  box-shadow: 0 8px 18px rgba(91,75,116,.055) !important;
+  transform: none !important;
+}
+
+#babyAvatarTestCard .avatar-face-wrap,
+.avatar-modal .avatar-face-wrap,
+body.day-theme #babyAvatarTestCard .avatar-face-wrap,
+body.day-theme .avatar-modal .avatar-face-wrap {
+  width: 76px !important;
+  height: 76px !important;
+  min-width: 76px !important;
+  min-height: 76px !important;
+  display: grid !important;
+  place-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+#babyAvatarTestCard .avatar-choice.selected .avatar-face-wrap,
+#babyAvatarTestCard .avatar-choice[aria-pressed="true"] .avatar-face-wrap,
+.avatar-modal .avatar-choice.selected .avatar-face-wrap,
+.avatar-modal .avatar-choice[aria-pressed="true"] .avatar-face-wrap {
+  box-shadow: 0 0 0 3px rgba(143,124,255,.22) !important;
+}
+
+#babyAvatarTestCard .avatar-face-thumb,
+.avatar-modal .avatar-face-thumb,
+#babyAvatarTestCard .avatar-preset-thumb,
+.avatar-modal .avatar-preset-thumb {
+  width: 76px !important;
+  height: 76px !important;
+  min-width: 76px !important;
+  min-height: 76px !important;
+  display: block !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice small,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-choice small,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice small,
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice small {
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  color: #5f5474 !important;
+  font-size: .82rem !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+/* Rodapé do modal sem cobrir a grade e sem texto vazando */
+#babyAvatarTestCard .avatar-picker-section,
+.avatar-modal .avatar-picker-section {
+  padding-bottom: 18px !important;
+}
+#babyAvatarTestCard .avatar-editor-actions,
+.avatar-modal .avatar-editor-actions {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 10 !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+  padding: 14px 0 0 !important;
+  background: linear-gradient(180deg, rgba(255,250,245,.86), rgba(255,250,245,.98)) !important;
+}
+#babyAvatarStatus,
+#babyAvatarTestCard .form-status,
+.avatar-modal .form-status {
+  display: none !important;
+}
+
+/* 2. Linha do tempo inteligente: remove a linha vertical no estado vazio real */
+.intelligent-timeline:has(.timeline-empty)::before,
+.intelligent-timeline.is-empty::before,
+.intelligent-timeline.empty::before,
+.intelligent-timeline[data-empty="true"]::before {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+}
+#intelligentTimeline .timeline-empty,
+#intelligentTimeline .timeline-empty.polished-inline-empty,
+.intelligent-timeline .timeline-empty {
+  position: relative !important;
+  z-index: 1 !important;
+  display: block !important;
+  border: 2px dashed rgba(97,84,111,.16) !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.42) !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
+#intelligentTimeline .timeline-empty::before,
+#intelligentTimeline .timeline-empty::after,
+.intelligent-timeline .timeline-empty::before,
+.intelligent-timeline .timeline-empty::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* 3. Gráficos: uma coluna fixa por dia, barra e valor centralizados no próprio dia */
+.data-chart-card .data-bars,
+.data-chart-card .data-bars-sleep,
+.data-chart-card .bars.premium-bars {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  gap: 0 !important;
+  height: 240px !important;
+  min-height: 240px !important;
+  padding: 34px 0 38px !important;
+  overflow: hidden !important;
+}
+.data-chart-card .data-bars > span,
+.data-chart-card .data-bars-sleep > span,
+.data-chart-card .bars.premium-bars > span {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.data-chart-card .data-bars > span::before,
+.data-chart-card .data-bars-sleep > span::before,
+.data-chart-card .bars.premium-bars > span::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 28px !important;
+  width: min(34px, 56%) !important;
+  max-width: 38px !important;
+  height: var(--h, 7%) !important;
+  min-height: 8px !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  justify-self: auto !important;
+  border-radius: 999px 999px 10px 10px !important;
+}
+.data-chart-card .data-bars > span.has-value::before,
+.data-chart-card .data-bars-sleep > span.has-value::before,
+.data-chart-card .bars.premium-bars > span.has-value::before {
+  min-height: 18px !important;
+}
+.data-chart-card .data-bars > span.is-empty::before,
+.data-chart-card .data-bars-sleep > span.is-empty::before,
+.data-chart-card .bars.premium-bars > span.is-empty::before {
+  width: 20px !important;
+  height: 3px !important;
+  min-height: 3px !important;
+  bottom: 28px !important;
+  opacity: .25 !important;
+}
+.data-chart-card .data-bars > span b,
+.data-chart-card .data-bars-sleep > span b,
+.data-chart-card .bars.premium-bars > span b {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(28px + var(--h, 7%) + 8px) !important;
+  top: auto !important;
+  transform: translateX(-50%) !important;
+  max-width: 58px !important;
+  white-space: nowrap !important;
+  z-index: 2 !important;
+}
+.data-chart-card .data-bars > span.is-empty b,
+.data-chart-card .data-bars-sleep > span.is-empty b,
+.data-chart-card .bars.premium-bars > span.is-empty b {
+  display: none !important;
+}
+.data-chart-card .data-bars > span i,
+.data-chart-card .data-bars-sleep > span i,
+.data-chart-card .bars.premium-bars > span i {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  transform: none !important;
+}
+
+/* 4. Dropdown real do diário: corrigir o SVG existente */
+.date-filter::after,
+body.day-theme .date-filter::after {
+  content: none !important;
+  display: none !important;
+}
+.date-filter {
+  position: relative !important;
+}
+.date-filter #diaryDateInput {
+  padding-right: 64px !important;
+}
+.date-filter .diary-date-icon,
+body.day-theme .date-filter .diary-date-icon,
+svg.select-control-icon.diary-date-icon {
+  position: absolute !important;
+  right: 18px !important;
+  top: auto !important;
+  bottom: 18px !important;
+  width: 38px !important;
+  height: 38px !important;
+  padding: 9px !important;
+  transform: none !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+  display: block !important;
+  color: #2f8067 !important;
+  background: rgba(244,255,247,.78) !important;
+  border: 1px solid rgba(47,128,103,.20) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.74) !important;
+}
+.date-filter .diary-date-icon path,
+body.day-theme .date-filter .diary-date-icon path,
+svg.select-control-icon.diary-date-icon path {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.3 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+/* 5. Evita mensagem absurda de janela acordado quando houver estado antigo corrompido */
+.next-card strong,
+.next-card p,
+.live-assistant-card strong,
+.live-assistant-card p {
+  overflow-wrap: normal !important;
+}
+
+/* Fim v75.75.66
    ========================================================================== */
