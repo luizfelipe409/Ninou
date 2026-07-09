@@ -33836,3 +33836,242 @@ button.avatar-choice[aria-pressed="true"]::after {
     inset 0 1px 0 rgba(255,255,255,.42) !important;
   z-index: 10 !important;
 }
+
+
+/* v75.75.81 mobile 2-col premium avatar picker */
+
+/* Layout e acabamento premium revisados para os 2 temas.
+   Objetivo: 2 cards por fileira em celulares, cards maiores,
+   sem corte lateral e com seleção premium no card inteiro. */
+
+/* Base premium - tema escuro/noite */
+.avatar-modal .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid {
+  gap: 12px !important;
+  padding: 4px 4px 10px !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
+button.avatar-choice[data-avatar-value] {
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 144px !important;
+  padding: 12px 10px 12px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: linear-gradient(180deg, rgba(52,42,84,.94), rgba(33,26,57,.96)) !important;
+  box-shadow: 0 10px 24px rgba(4,2,16,.28), inset 0 1px 0 rgba(255,255,255,.04) !important;
+  color: #f7f3ff !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small,
+button.avatar-choice[data-avatar-value] small {
+  color: rgba(244,240,255,.96) !important;
+  font-weight: 850 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.02em !important;
+  text-align: center !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-wrap,
+button.avatar-choice[data-avatar-value] .avatar-face-wrap {
+  width: 84px !important;
+  height: 84px !important;
+  min-width: 84px !important;
+  min-height: 84px !important;
+  display: grid !important;
+  place-items: center !important;
+  margin: 0 auto !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-thumb,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice .avatar-preset-thumb,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice img,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice .avatar-preset-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice img,
+button.avatar-choice[data-avatar-value] img {
+  width: 78px !important;
+  height: 78px !important;
+  max-width: 78px !important;
+  max-height: 78px !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  transform: none !important;
+}
+
+/* Tema claro/dia */
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
+body.day-theme button.avatar-choice[data-avatar-value] {
+  border: 1px solid rgba(94, 77, 134, .10) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(247,242,255,.96)) !important;
+  box-shadow: 0 10px 22px rgba(79,61,116,.08), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  color: #2f2843 !important;
+}
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small,
+body.day-theme button.avatar-choice[data-avatar-value] small {
+  color: #5d5078 !important;
+}
+
+/* Seleção premium no card inteiro - escuro */
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+button.avatar-choice.selected,
+button.avatar-choice[aria-pressed="true"] {
+  transform: translateY(-1px) !important;
+  border: 2px solid rgba(124,229,194,.96) !important;
+  background: linear-gradient(180deg, rgba(70,58,103,.98), rgba(38,30,64,.98)) !important;
+  box-shadow: 0 0 0 4px rgba(124,229,194,.14), 0 14px 28px rgba(4,2,16,.30), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected,
+body.day-theme .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+body.day-theme button.avatar-choice.selected,
+body.day-theme button.avatar-choice[aria-pressed="true"] {
+  border: 2px solid rgba(124,229,194,.98) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.99), rgba(242,251,245,.98)) !important;
+  box-shadow: 0 0 0 4px rgba(124,229,194,.16), 0 14px 28px rgba(79,61,116,.14), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+
+/* Neutraliza qualquer destaque no wrap da foto */
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+button.avatar-choice.selected > span.avatar-face-wrap,
+button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
+button.avatar-choice.selected > span.avatar-face-wrap img,
+button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Check premium discreto */
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
+button.avatar-choice.selected::after,
+button.avatar-choice[aria-pressed="true"]::after {
+  content: "✓" !important;
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  background: linear-gradient(135deg, #7ce5c2, #8b5cf6) !important;
+  box-shadow: 0 6px 12px rgba(81,68,115,.20) !important;
+  z-index: 4 !important;
+}
+
+/* Melhor ajuste do preview e cabeçalho em telas pequenas */
+@media (max-width: 520px) {
+  .avatar-modal .avatar-test-header {
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .avatar-modal .avatar-copy-column strong {
+    font-size: 1.15rem !important;
+    line-height: 1.05 !important;
+  }
+  .avatar-modal .avatar-copy-column p {
+    font-size: .84rem !important;
+    line-height: 1.28 !important;
+  }
+  .avatar-modal .minimal-preview-panel {
+    width: 92px !important;
+    height: 92px !important;
+    min-height: 92px !important;
+    border-radius: 24px !important;
+    padding: 8px !important;
+  }
+  .avatar-modal .baby-avatar-preview {
+    width: 72px !important;
+    height: 72px !important;
+  }
+  .avatar-modal .avatar-editor-actions {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Mobile real: 2 cards por fileira */
+@media (max-width: 430px) {
+  .ninou-modal {
+    padding: 10px !important;
+  }
+  .ninou-modal-card {
+    width: min(100%, 372px) !important;
+    max-width: 372px !important;
+    border-radius: 30px !important;
+    padding: 18px 16px 16px !important;
+    max-height: 86vh !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    max-height: 360px !important;
+    padding: 4px 2px 12px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
+  button.avatar-choice[data-avatar-value] {
+    min-height: 156px !important;
+    padding: 14px 10px 12px !important;
+    border-radius: 24px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-wrap,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-wrap,
+  button.avatar-choice[data-avatar-value] .avatar-face-wrap {
+    width: 92px !important;
+    height: 92px !important;
+    min-width: 92px !important;
+    min-height: 92px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice img,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice img,
+  button.avatar-choice[data-avatar-value] img {
+    width: 84px !important;
+    height: 84px !important;
+    max-width: 84px !important;
+    max-height: 84px !important;
+  }
+  .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small,
+  button.avatar-choice[data-avatar-value] small {
+    font-size: .92rem !important;
+  }
+}
