@@ -1,0 +1,7 @@
+Versão v75.75.73
+
+- Reenquadramento por altura visual fixa dos 12 avatares, usando Bebê clássico e Cacheadinho como referência.
+- Corrige o problema em que Laço/Tiara ficavam menores por causa da largura do acessório.
+- Cards individuais sem transform/scale específico por avatar; todos centralizados no mesmo slot.
+- Preview superior mantém âncora inferior.
+- Cache e versionamento atualizados para 75.75.73.

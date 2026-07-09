@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-72-avatar-assets-normalized";
+const CACHE_NAME = "ninou-v75-75-73-avatar-uniform-scale";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.72",
-  "/app.js?v=75.75.72",
-  "/js/app.legacy.js?v=75.75.72",
+  "/styles.css?v=75.75.73",
+  "/app.js?v=75.75.73",
+  "/js/app.legacy.js?v=75.75.73",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
