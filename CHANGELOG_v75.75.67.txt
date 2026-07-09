@@ -1,0 +1,8 @@
+Ninou v75.75.67 — avatares normalizados
+
+- Normaliza o enquadramento dos PNGs em icons/baby-avatars.
+- Mantém o Bebê clássico como referência visual.
+- Reposiciona os demais avatares para ficarem mais centralizados e consistentes no card.
+- Adiciona guarda final no CSS para avatar-face-wrap/avatar-face-thumb.
+- Mantém CSS único: styles.css.
+- Não altera Firebase, regras, família, convites, dados, PDF, WhatsApp, CSV ou JSON.

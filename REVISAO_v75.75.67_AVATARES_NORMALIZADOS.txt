@@ -1,0 +1,10 @@
+Revisão v75.75.67
+
+Motivo:
+Após a v75.75.66, o card melhorou, mas os PNGs dos avatares ainda tinham enquadramentos diferentes.
+O Bebê clássico estava no padrão correto; os demais foram reenquadrados para seguir essa referência.
+
+Alterações:
+1. Backup dos PNGs originais em icons/baby-avatars-original.
+2. Normalização dos PNGs em icons/baby-avatars.
+3. CSS final para impedir corte/deslocamento diferente nos thumbnails.
