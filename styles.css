@@ -34891,3 +34891,124 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-pan
   position: relative !important;
   z-index: 1 !important;
 }
+
+
+/* v75.75.89 preview neon refinado nos dois temas */
+
+/* Refinamento final do preview:
+   Tema claro: lavanda translúcido, glow roxo suave.
+   Tema escuro: grafite arroxeado com verde neon suave.
+   Remove sensação de arco preto/pesado e deixa o acabamento mais premium. */
+
+.avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel,
+#babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 28px !important;
+}
+
+/* Tema claro — roxo/lavanda premium suave */
+body.day-theme .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel,
+body.day-theme #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  background:
+    radial-gradient(
+      circle at 34% 18%,
+      rgba(255,255,255,.98) 0%,
+      rgba(255,255,255,.78) 24%,
+      rgba(188,165,255,.32) 56%,
+      rgba(139,92,246,.14) 100%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.98),
+      rgba(248,244,255,.96)
+    ) !important;
+  border: 1px solid rgba(167,139,250,.30) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 0 0 4px rgba(139,92,246,.045),
+    0 0 24px rgba(139,92,246,.16),
+    0 14px 28px rgba(76,59,112,.12) !important;
+}
+
+/* brilho interno claro, sem arco pesado */
+body.day-theme .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before,
+body.day-theme #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 6px !important;
+  border-radius: 22px !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: .64 !important;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(188,165,255,.22),
+      rgba(255,255,255,0) 48%,
+      rgba(139,92,246,.12)
+    ) !important;
+}
+
+/* Tema escuro — grafite arroxeado + verde neon suave */
+body:not(.day-theme) .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel,
+body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  background:
+    radial-gradient(
+      circle at 34% 18%,
+      rgba(124,229,194,.24) 0%,
+      rgba(84,211,169,.14) 30%,
+      rgba(43,35,66,.88) 66%,
+      rgba(34,28,53,.98) 100%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(43,35,66,.96),
+      rgba(28,23,45,.98)
+    ) !important;
+  border: 1px solid rgba(124,229,194,.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 0 0 4px rgba(124,229,194,.045),
+    0 0 22px rgba(124,229,194,.16),
+    0 16px 32px rgba(0,0,0,.34) !important;
+}
+
+/* brilho interno escuro, verde discreto, sem aro preto */
+body:not(.day-theme) .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before,
+body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 6px !important;
+  border-radius: 22px !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: .72 !important;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,229,194,.18),
+      rgba(255,255,255,0) 50%,
+      rgba(124,229,194,.10)
+    ) !important;
+}
+
+.avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel .baby-avatar-preview,
+#babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel .baby-avatar-preview {
+  position: relative !important;
+  z-index: 1 !important;
+  filter: none !important;
+}
+
+/* Mantém boa legibilidade no escuro */
+body:not(.day-theme) .avatar-modal .avatar-copy-column strong,
+body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column strong,
+body:not(.day-theme) .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
+body:not(.day-theme) #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small {
+  color: rgba(255,255,255,.96) !important;
+}
+
+body:not(.day-theme) .avatar-modal .avatar-copy-column p,
+body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column p {
+  color: rgba(235,229,247,.90) !important;
+}

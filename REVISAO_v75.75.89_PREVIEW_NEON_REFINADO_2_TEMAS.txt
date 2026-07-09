@@ -1,0 +1,20 @@
+Versão v75.75.89
+
+Ajuste solicitado no container:
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel
+
+Tema claro:
+- Aplicado lavanda/roxo translúcido premium.
+- Glow roxo suave, sem excesso de neon.
+- Fundo interno mais limpo e sem arco escuro.
+
+Tema escuro:
+- Aplicado grafite arroxeado translúcido.
+- Verde neon suave apenas como detalhe premium.
+- Removida a sensação de arco preto pesado.
+
+Mantido:
+- Fade real no fim da grade.
+- Correção de foco/aria do modal.
+- Grid mobile em 2 colunas.
+- Cache/versionamento atualizado para 75.75.89.
