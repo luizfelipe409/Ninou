@@ -34690,3 +34690,132 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-editor-actions {
     padding-top: 22px !important;
   }
 }
+
+
+/* v75.75.87 fade real no fim da grade de avatares */
+
+/* Correção do corte seco mostrado no vídeo:
+   O fade anterior estava preso ao rodapé/botões. Agora existe uma camada real
+   sobre o final da grade rolável, criando transição suave antes dos botões. */
+
+.avatar-modal .avatar-picker-section,
+#babyAvatarTestCard .avatar-picker-section {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Dá espaço interno para a última linha não ficar escondida atrás do fade */
+.avatar-modal .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid {
+  padding-bottom: 54px !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* Camada de esfumado no fim da grade - tema claro */
+body.day-theme .avatar-modal .avatar-picker-section::after,
+body.day-theme #babyAvatarTestCard .avatar-picker-section::after {
+  content: "" !important;
+  position: absolute !important;
+  left: -2px !important;
+  right: -2px !important;
+  bottom: -1px !important;
+  height: 64px !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(253,250,252,0) 0%,
+      rgba(253,250,252,.30) 24%,
+      rgba(253,250,252,.72) 58%,
+      rgba(253,250,252,.96) 86%,
+      rgba(253,250,252,1) 100%
+    ) !important;
+}
+
+/* Camada de esfumado no fim da grade - tema escuro */
+body:not(.day-theme) .avatar-modal .avatar-picker-section::after,
+body:not(.day-theme) #babyAvatarTestCard .avatar-picker-section::after {
+  content: "" !important;
+  position: absolute !important;
+  left: -2px !important;
+  right: -2px !important;
+  bottom: -1px !important;
+  height: 64px !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(34,28,53,0) 0%,
+      rgba(34,28,53,.30) 24%,
+      rgba(34,28,53,.72) 58%,
+      rgba(34,28,53,.96) 86%,
+      rgba(34,28,53,1) 100%
+    ) !important;
+}
+
+/* O rodapé fica limpo e integrado ao fade, sem linha dura no topo */
+.avatar-modal .avatar-editor-actions,
+#babyAvatarTestCard .avatar-editor-actions {
+  margin-top: -38px !important;
+  padding: 42px 0 0 !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 7 !important;
+  border-top: 0 !important;
+}
+
+/* Tema claro do rodapé sem corte seco */
+body.day-theme .avatar-modal .avatar-editor-actions,
+body.day-theme #babyAvatarTestCard .avatar-editor-actions {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(253,250,252,0) 0%,
+      rgba(253,250,252,.58) 30%,
+      rgba(253,250,252,.94) 62%,
+      rgba(253,250,252,1) 100%
+    ) !important;
+}
+
+/* Tema escuro do rodapé sem corte seco */
+body:not(.day-theme) .avatar-modal .avatar-editor-actions,
+body:not(.day-theme) #babyAvatarTestCard .avatar-editor-actions {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(34,28,53,0) 0%,
+      rgba(34,28,53,.58) 30%,
+      rgba(34,28,53,.94) 62%,
+      rgba(34,28,53,1) 100%
+    ) !important;
+}
+
+.avatar-modal .avatar-save-button,
+.avatar-modal .avatar-skip-button,
+#babyAvatarTestCard .avatar-save-button,
+#babyAvatarTestCard .avatar-skip-button {
+  position: relative !important;
+  z-index: 8 !important;
+}
+
+/* Em telas baixas, mantém o esfumado sem roubar área demais */
+@media (max-height: 760px) {
+  .avatar-modal .avatar-picker-section::after,
+  #babyAvatarTestCard .avatar-picker-section::after {
+    height: 52px !important;
+  }
+
+  .avatar-modal .avatar-editor-actions,
+  #babyAvatarTestCard .avatar-editor-actions {
+    margin-top: -32px !important;
+    padding-top: 36px !important;
+  }
+
+  .avatar-modal .avatar-option-grid.icon-grid,
+  #babyAvatarTestCard .avatar-option-grid.icon-grid {
+    padding-bottom: 48px !important;
+  }
+}

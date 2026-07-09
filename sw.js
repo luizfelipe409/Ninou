@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-86-avatar-modal-focus-aria-fix";
+const CACHE_NAME = "ninou-v75-75-87-avatar-grid-real-bottom-fade";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.86",
-  "/app.js?v=75.75.86",
-  "/js/app.legacy.js?v=75.75.86",
+  "/styles.css?v=75.75.87",
+  "/app.js?v=75.75.87",
+  "/js/app.legacy.js?v=75.75.87",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest?v=75.75.86",
+  "/manifest.webmanifest?v=75.75.87",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",

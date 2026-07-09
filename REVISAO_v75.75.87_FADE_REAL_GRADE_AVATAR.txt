@@ -1,0 +1,10 @@
+Versão v75.75.87
+
+Correção feita após o vídeo da v75.75.86:
+- O corte seco ficava no fim visual da grade, não apenas no rodapé dos botões.
+- Adicionada uma camada real de fade no fim da avatar-picker-section.
+- A grade ganhou padding inferior para os últimos cards não ficarem escondidos pelo fade.
+- O rodapé agora sobrepõe a grade com transição gradual, sem linha dura.
+- Fade revisado para tema claro e tema escuro.
+- Mantida a correção de foco/aria da v75.75.86.
+- Cache/versionamento atualizado para 75.75.87.
