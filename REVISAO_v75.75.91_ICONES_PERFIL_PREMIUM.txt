@@ -1,0 +1,12 @@
+Versão v75.75.91
+
+Ajuste solicitado nos ícones de perfil:
+- Ícones do perfil receberam acabamento premium glass.
+- Tema claro: lavanda/roxo translúcido com glow suave.
+- Tema escuro: verde mint/neon suave com fundo glass.
+- SVGs padronizados com traço limpo, arredondado e sem preenchimento pesado.
+- Mini avatares/cuidadores receberam acabamento coerente com os ícones.
+- Botão Editar avatar harmonizado com a paleta dos temas.
+- Melhorada a leitura de labels próximas aos ícones no tema escuro.
+- Mantidos os ajustes anteriores: preview neon, fade real da grade, foco/aria e grid mobile.
+- Cache/versionamento atualizado para 75.75.91.

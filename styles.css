@@ -35151,3 +35151,164 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
   border: 1px solid rgba(255,255,255,.32) !important;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.08) !important;
 }
+
+
+/* v75.75.91 icones do perfil premium glass */
+
+/* Ícones do perfil com acabamento premium:
+   - Tema claro: lavanda/roxo translúcido.
+   - Tema escuro: mint/verde neon suave.
+   - Ícones lineares, container glass, borda delicada e glow discreto. */
+
+/* Containers de ícones nas linhas do perfil */
+.screen[data-screen="profile"] .setting-icon,
+.screen[data-screen="profile"] .profile-card-head .icon,
+.screen[data-screen="profile"] .profile-card-head svg,
+.screen[data-screen="profile"] .profile-section-icon,
+.screen[data-screen="profile"] .caregiver-avatar-mini,
+.screen[data-screen="profile"] .admin-avatar,
+.profile-setting-line .setting-icon,
+.profile-family-card .setting-icon {
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    color .18s ease,
+    transform .18s ease !important;
+}
+
+/* Base glass para o ícone pequeno do perfil */
+.screen[data-screen="profile"] .setting-icon,
+.profile-setting-line .setting-icon,
+.profile-family-card .setting-icon {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 14px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* SVGs premium: traço limpo, sem peso exagerado */
+.screen[data-screen="profile"] .setting-icon svg,
+.profile-setting-line .setting-icon svg,
+.profile-family-card .setting-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.05 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+/* Tema claro: lavanda translúcido premium */
+body.day-theme .screen[data-screen="profile"] .setting-icon,
+body.day-theme .profile-setting-line .setting-icon,
+body.day-theme .profile-family-card .setting-icon {
+  color: #7c5cff !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,.96), rgba(255,255,255,0) 42%),
+    linear-gradient(145deg, rgba(139,92,246,.105), rgba(167,139,250,.055)) !important;
+  border: 1px solid rgba(139,92,246,.16) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.86),
+    0 8px 18px rgba(93,70,140,.075) !important;
+}
+
+/* Tema escuro: mint neon suave premium */
+body:not(.day-theme) .screen[data-screen="profile"] .setting-icon,
+body:not(.day-theme) .profile-setting-line .setting-icon,
+body:not(.day-theme) .profile-family-card .setting-icon {
+  color: #7ce5c2 !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(124,229,194,.18), rgba(255,255,255,0) 46%),
+    linear-gradient(145deg, rgba(124,229,194,.115), rgba(124,229,194,.045)) !important;
+  border: 1px solid rgba(124,229,194,.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 0 18px rgba(124,229,194,.075),
+    0 10px 22px rgba(0,0,0,.18) !important;
+}
+
+/* Estados de toque sem parecer botão duro */
+.screen[data-screen="profile"] .profile-setting-line:active .setting-icon,
+.profile-setting-line:active .setting-icon {
+  transform: scale(.96) !important;
+}
+
+/* Ícone do cabeçalho dos cards do perfil, caso exista como wrapper */
+.screen[data-screen="profile"] .profile-card-head > span,
+.screen[data-screen="profile"] .profile-card-head .profile-section-icon {
+  border-radius: 16px !important;
+}
+
+/* Ícones/avatares mini de cuidadores com a mesma direção premium */
+.screen[data-screen="profile"] .caregiver-avatar-mini {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 18px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 1.44rem !important;
+  font-weight: 950 !important;
+}
+
+body.day-theme .screen[data-screen="profile"] .caregiver-avatar-mini {
+  color: #6f4dff !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,.96), rgba(255,255,255,0) 46%),
+    linear-gradient(145deg, rgba(139,92,246,.12), rgba(255,255,255,.78)) !important;
+  border: 1px solid rgba(139,92,246,.16) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.86),
+    0 10px 22px rgba(93,70,140,.08) !important;
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] .caregiver-avatar-mini {
+  color: #7ce5c2 !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(124,229,194,.22), rgba(255,255,255,0) 46%),
+    linear-gradient(145deg, rgba(124,229,194,.13), rgba(43,35,66,.52)) !important;
+  border: 1px solid rgba(124,229,194,.20) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 0 18px rgba(124,229,194,.08),
+    0 10px 24px rgba(0,0,0,.20) !important;
+}
+
+/* Botão editar avatar: harmonizado com os ícones premium */
+.screen[data-screen="profile"] .edit-avatar-badge {
+  border: 1px solid rgba(255,255,255,.22) !important;
+}
+
+body.day-theme .screen[data-screen="profile"] .edit-avatar-badge {
+  background: linear-gradient(135deg, #7c5cff, #a78bfa) !important;
+  color: #fff !important;
+  box-shadow:
+    0 10px 22px rgba(124,92,255,.26),
+    0 0 20px rgba(139,92,246,.14) !important;
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] .edit-avatar-badge {
+  background: linear-gradient(135deg, #7ce5c2, #58c9a4) !important;
+  color: #17132f !important;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.28),
+    0 0 20px rgba(124,229,194,.18) !important;
+}
+
+/* Melhora leitura das labels próximas aos ícones no tema escuro */
+body:not(.day-theme) .screen[data-screen="profile"] .setting-label,
+body:not(.day-theme) .profile-setting-line .setting-label {
+  color: rgba(247,243,255,.94) !important;
+}
+
+body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card p,
+body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card small {
+  color: rgba(226,218,244,.84) !important;
+}
