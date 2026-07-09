@@ -1,0 +1,12 @@
+Versão v75.75.77
+
+Correção feita com base no DevTools enviado:
+- A estrutura real do modal usa #babyAvatarTestCard e .avatar-modal .avatar-option-grid.icon-grid.
+- Havia um <style> aplicando 72px/56px diretamente nos avatares.
+- Agora o CSS mira exatamente os seletores reais:
+  #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice
+  .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice
+- O card mantém 112x136, mas recebe o acabamento visual da identity:
+  fundo claro/esverdeado, borda branca grossa, radius arredondado e sombra suave.
+- Mantido o tamanho atual da imagem em 72px, como estava no app.
+- Cache/versionamento atualizado para 75.75.77.

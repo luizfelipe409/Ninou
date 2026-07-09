@@ -33338,3 +33338,138 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] {
   object-position: center center !important;
   transform: none !important;
 }
+
+
+/* v75.75.77 override real: #babyAvatarTestCard avatar-option-grid */
+
+/* O DevTools mostrou que a tela real usa:
+   .avatar-modal .avatar-option-grid.icon-grid
+   #babyAvatarTestCard .avatar-option-grid.icon-grid
+   e que existia um <style> limitando as imagens para 72px/56px.
+   Este bloco mira exatamente nesses seletores reais. */
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid,
+#babyAvatarTestCard .avatar-option-grid.icon-grid,
+.avatar-modal .avatar-option-grid.icon-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px 14px !important;
+  align-items: stretch !important;
+}
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
+button.avatar-choice[data-avatar-value] {
+  width: 112px !important;
+  min-width: 112px !important;
+  max-width: 112px !important;
+  height: 136px !important;
+  min-height: 136px !important;
+  max-height: 136px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+
+  padding: 8px 6px 7px !important;
+  text-align: center !important;
+  overflow: hidden !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  border-radius: 28px !important;
+  border: 5px solid rgba(255, 255, 255, .96) !important;
+  background:
+    radial-gradient(circle at 34% 22%,
+      rgba(255,255,255,.98) 0%,
+      rgba(255,255,255,.86) 38%,
+      rgba(237,247,230,.80) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 2px 0 rgba(255,255,255,.58),
+    0 12px 24px rgba(81, 68, 115, .16) !important;
+}
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-wrap,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-wrap,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-face-wrap,
+button.avatar-choice[data-avatar-value] .avatar-face-wrap {
+  width: 76px !important;
+  height: 76px !important;
+  min-width: 76px !important;
+  min-height: 76px !important;
+
+  display: grid !important;
+  place-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-preset-thumb,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice img,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-face-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-preset-thumb,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice img,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-face-thumb,
+.avatar-modal .avatar-option-grid.icon-grid .avatar-preset-thumb,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice img,
+button.avatar-choice[data-avatar-value] img {
+  width: 72px !important;
+  height: 72px !important;
+  min-width: 72px !important;
+  min-height: 72px !important;
+  max-width: 72px !important;
+  max-height: 72px !important;
+
+  display: block !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+  transform: none !important;
+}
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
+button.avatar-choice[data-avatar-value] small {
+  width: 100% !important;
+  display: block !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  text-align: center !important;
+  line-height: 1.05 !important;
+  color: #5f5678 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.035em !important;
+}
+
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
+#babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected,
+.avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
+button.avatar-choice[data-avatar-value].selected,
+button.avatar-choice[data-avatar-value][aria-pressed="true"] {
+  border-color: rgba(124, 229, 194, .96) !important;
+  box-shadow:
+    0 0 0 4px rgba(124, 229, 194, .18),
+    inset 0 1px 0 rgba(255,255,255,.96),
+    0 12px 24px rgba(81, 68, 115, .20) !important;
+}
