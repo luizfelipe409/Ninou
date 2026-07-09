@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.69";
+const NINOU_RUNTIME_VERSION = "75.75.67";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -405,7 +405,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "75.75.69-avatar-menu-alinhado";
+const NINOU_FAMILY_SCOPE_VERSION = "75.75.67-premium-hierarchy-actions-avatar";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -897,10 +897,10 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const NINOU_AVATAR_ASSET_VERSION = "75.75.69";
+const BABY_AVATAR_ASSET_VERSION = "75.75.70";
 
-function avatarAsset(path = "") {
-  return `${path}?v=${NINOU_AVATAR_ASSET_VERSION}`;
+function avatarAsset(path) {
+  return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
 }
 
 const babyAvatarHairOptions = Object.freeze([
@@ -2290,8 +2290,12 @@ function renderAvatarOptionButton(container, options, type, avatar = pendingBaby
 
 
 function applyAvatarPreview(avatar = pendingBabyAvatar) {
-  const src = getBabyAvatarDataUrl(avatar);
-  if (babyAvatarPreview) babyAvatarPreview.src = src;
+  const normalized = normalizeAvatarDraft(avatar);
+  const src = getBabyAvatarDataUrl(normalized);
+  if (babyAvatarPreview) {
+    babyAvatarPreview.src = src;
+    babyAvatarPreview.dataset.avatarId = normalized.hair || "avatar-01";
+  }
   if (!isGlobalAppAdmin() || window.__ninouAdminFamilyDataOpen) {
     updateProfilePhoto(src);
   }
