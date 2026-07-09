@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-91-profile-icons-premium-glass";
+const CACHE_NAME = "ninou-v75-75-92-profile-icons-hard-override";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.91",
-  "/app.js?v=75.75.91",
-  "/js/app.legacy.js?v=75.75.91",
+  "/styles.css?v=75.75.92",
+  "/app.js?v=75.75.92",
+  "/js/app.legacy.js?v=75.75.92",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest?v=75.75.91",
+  "/manifest.webmanifest?v=75.75.92",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
