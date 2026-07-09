@@ -1,0 +1,9 @@
+Versão v75.75.88
+
+Ajuste visual premium no preview do avatar:
+- Aplicado roxo neon suave no tema claro.
+- Aplicado verde neon suave no tema escuro.
+- Ajuste feito especificamente em .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel.
+- Brilho mantido sutil para não ficar infantilizado ou exagerado.
+- Mantido fade real da grade e correção foco/aria das versões anteriores.
+- Cache/versionamento atualizado para 75.75.88.

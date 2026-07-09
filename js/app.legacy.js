@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.87";
+const BABY_AVATAR_ASSET_VERSION = "75.75.88";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
