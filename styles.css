@@ -36225,3 +36225,632 @@ html body:not(.day-theme) .app-bottom-nav {
     padding-bottom: 12px !important;
   }
 }
+
+
+/* v75.75.101 correcao legibilidade sheet e fab */
+
+/* v75.75.101 — correção de legibilidade + menu de registro + FAB.
+   Corrige:
+   - textos pouco legíveis no tema claro/escuro;
+   - botão + muito chamativo no tema escuro;
+   - menu de registrar ações com cards quebrados e texto difícil de ler.
+*/
+
+/* =========================================================
+   1) Legibilidade geral por tema — sem afetar botões especiais
+   ========================================================= */
+
+/* Tema claro: roxo escuro consistente */
+html body.day-theme,
+html body.day-theme .phone-shell,
+html body.day-theme .screen {
+  color: #2f2843 !important;
+}
+
+html body.day-theme .screen strong,
+html body.day-theme .screen h1,
+html body.day-theme .screen h2,
+html body.day-theme .screen h3,
+html body.day-theme .card-header strong,
+html body.day-theme .section-title strong,
+html body.day-theme .profile-card strong,
+html body.day-theme .profile-family-card strong,
+html body.day-theme .timeline .event-text strong {
+  color: #2f2843 !important;
+  -webkit-text-fill-color: #2f2843 !important;
+}
+
+html body.day-theme .screen p,
+html body.day-theme .screen small,
+html body.day-theme .screen label,
+html body.day-theme .screen label > span,
+html body.day-theme .screen .setting-label,
+html body.day-theme .screen .section-title span,
+html body.day-theme .screen .card-header span,
+html body.day-theme .screen .profile-card span,
+html body.day-theme .screen .profile-family-card > p,
+html body.day-theme .screen .timeline .event-text p {
+  color: rgba(87, 76, 111, .86) !important;
+  -webkit-text-fill-color: rgba(87, 76, 111, .86) !important;
+}
+
+/* Tema escuro: textos secundários mais claros sem ficarem brancos demais */
+html body:not(.day-theme),
+html body:not(.day-theme) .phone-shell,
+html body:not(.day-theme) .screen {
+  color: #f7f3ff !important;
+}
+
+html body:not(.day-theme) .screen strong,
+html body:not(.day-theme) .screen h1,
+html body:not(.day-theme) .screen h2,
+html body:not(.day-theme) .screen h3,
+html body:not(.day-theme) .card-header strong,
+html body:not(.day-theme) .section-title strong,
+html body:not(.day-theme) .profile-card strong,
+html body:not(.day-theme) .profile-family-card strong,
+html body:not(.day-theme) .timeline .event-text strong {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html body:not(.day-theme) .screen p,
+html body:not(.day-theme) .screen small,
+html body:not(.day-theme) .screen label,
+html body:not(.day-theme) .screen label > span,
+html body:not(.day-theme) .screen .setting-label,
+html body:not(.day-theme) .screen .section-title span,
+html body:not(.day-theme) .screen .card-header span,
+html body:not(.day-theme) .screen .profile-card span,
+html body:not(.day-theme) .screen .profile-family-card > p,
+html body:not(.day-theme) .screen .timeline .event-text p {
+  color: rgba(226, 218, 244, .88) !important;
+  -webkit-text-fill-color: rgba(226, 218, 244, .88) !important;
+}
+
+/* Inputs/selects com leitura consistente */
+html body.day-theme input,
+html body.day-theme select,
+html body.day-theme textarea {
+  color: #302747 !important;
+  -webkit-text-fill-color: #302747 !important;
+}
+
+html body:not(.day-theme) input,
+html body:not(.day-theme) select,
+html body:not(.day-theme) textarea {
+  color: #f8f5ff !important;
+  -webkit-text-fill-color: #f8f5ff !important;
+}
+
+html body:not(.day-theme) input::placeholder,
+html body:not(.day-theme) textarea::placeholder {
+  color: rgba(220, 212, 244, .62) !important;
+  -webkit-text-fill-color: rgba(220, 212, 244, .62) !important;
+}
+
+html body.day-theme input::placeholder,
+html body.day-theme textarea::placeholder {
+  color: rgba(88, 77, 112, .58) !important;
+  -webkit-text-fill-color: rgba(88, 77, 112, .58) !important;
+}
+
+/* Evita que o reset acima estrague textos dentro de botões primários */
+html body.day-theme .profile-primary-button,
+html body.day-theme .avatar-save-button,
+html body.day-theme .save-button,
+html body.day-theme button.fab,
+html body.day-theme button.fab-real-plus,
+html body.day-theme button[data-open-sheet] {
+  -webkit-text-fill-color: currentColor !important;
+}
+
+html body:not(.day-theme) .profile-primary-button,
+html body:not(.day-theme) .avatar-save-button,
+html body:not(.day-theme) .save-button,
+html body:not(.day-theme) button.fab,
+html body:not(.day-theme) button.fab-real-plus,
+html body:not(.day-theme) button[data-open-sheet] {
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* =========================================================
+   2) Botão + no tema escuro — premium discreto, não chamativo
+   ========================================================= */
+
+html body:not(.day-theme) .fab,
+html body:not(.day-theme) .fab-real-plus,
+html body:not(.day-theme) button[data-open-sheet],
+html body:not(.day-theme) .floating-action-button,
+html body:not(.day-theme) .round-action.fab {
+  background:
+    radial-gradient(circle at 28% 18%, rgba(124,229,194,.22), rgba(124,229,194,0) 38%),
+    linear-gradient(145deg, rgba(50, 42, 77, .98), rgba(30, 25, 48, .98)) !important;
+  color: #7ce5c2 !important;
+  -webkit-text-fill-color: #7ce5c2 !important;
+  border: 1px solid rgba(124,229,194,.28) !important;
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.28),
+    0 0 18px rgba(124,229,194,.10),
+    inset 0 1px 0 rgba(255,255,255,.07) !important;
+  filter: none !important;
+}
+
+html body:not(.day-theme) .fab svg,
+html body:not(.day-theme) .fab-real-plus svg,
+html body:not(.day-theme) button[data-open-sheet] svg,
+html body:not(.day-theme) .round-action.fab svg {
+  color: #7ce5c2 !important;
+  stroke: currentColor !important;
+}
+
+/* Tema claro mantém premium sem ficar berrante */
+html body.day-theme .fab,
+html body.day-theme .fab-real-plus,
+html body.day-theme button[data-open-sheet],
+html body.day-theme .floating-action-button,
+html body.day-theme .round-action.fab {
+  background:
+    linear-gradient(135deg, #8f72ee 0%, #b59bf7 50%, #efbe96 100%) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,.42) !important;
+  box-shadow:
+    0 10px 22px rgba(139,92,246,.16),
+    0 6px 14px rgba(239,190,150,.10),
+    inset 0 1px 0 rgba(255,255,255,.34) !important;
+}
+
+/* =========================================================
+   3) Menu Registrar — layout estável e textos legíveis
+   ========================================================= */
+
+.record-sheet,
+.orbit-cluster-sheet {
+  width: min(calc(100vw - 14px), 430px) !important;
+  height: min(86svh, 700px) !important;
+  max-height: calc(100svh - max(10px, env(safe-area-inset-top, 0px)) - max(10px, env(safe-area-inset-bottom, 0px))) !important;
+  min-height: auto !important;
+  display: grid !important;
+  grid-template-rows: 14px 58px 110px minmax(0, 1fr) auto !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  border-radius: 30px !important;
+  padding: 0 14px max(12px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+html body.day-theme .record-sheet,
+html body.day-theme .orbit-cluster-sheet {
+  background:
+    radial-gradient(circle at 16% 4%, rgba(188,165,255,.12), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,246,255,.97)) !important;
+  border: 1px solid rgba(139,92,246,.11) !important;
+  box-shadow:
+    0 24px 62px rgba(75, 58, 128, .18),
+    inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+
+html body:not(.day-theme) .record-sheet,
+html body:not(.day-theme) .orbit-cluster-sheet {
+  background:
+    radial-gradient(circle at 18% 4%, rgba(124,229,194,.10), transparent 34%),
+    linear-gradient(180deg, rgba(36,29,59,.99), rgba(24,19,43,.99)) !important;
+  border: 1px solid rgba(201,192,255,.14) !important;
+  box-shadow:
+    0 26px 68px rgba(7,4,25,.50),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+/* Cabeçalho do sheet */
+.record-sheet .section-title,
+.orbit-cluster-sheet .section-title {
+  height: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 38px !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.record-sheet .section-title span,
+.orbit-cluster-sheet .section-title span {
+  font-size: .72rem !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: .07em !important;
+  text-transform: uppercase !important;
+}
+
+.record-sheet .section-title strong,
+.orbit-cluster-sheet .section-title strong {
+  font-size: 1.18rem !important;
+  line-height: 1.08 !important;
+  font-weight: 950 !important;
+  overflow: visible !important;
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+}
+
+html body.day-theme .record-sheet .section-title span,
+html body.day-theme .orbit-cluster-sheet .section-title span {
+  color: rgba(87,76,111,.74) !important;
+  -webkit-text-fill-color: rgba(87,76,111,.74) !important;
+}
+
+html body.day-theme .record-sheet .section-title strong,
+html body.day-theme .orbit-cluster-sheet .section-title strong {
+  color: #2f2843 !important;
+  -webkit-text-fill-color: #2f2843 !important;
+}
+
+html body:not(.day-theme) .record-sheet .section-title span,
+html body:not(.day-theme) .orbit-cluster-sheet .section-title span {
+  color: rgba(226,218,244,.78) !important;
+  -webkit-text-fill-color: rgba(226,218,244,.78) !important;
+}
+
+html body:not(.day-theme) .record-sheet .section-title strong,
+html body:not(.day-theme) .orbit-cluster-sheet .section-title strong {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Cards de tipo: tamanho fixo, texto sem quebrar de forma feia */
+.record-types {
+  height: 110px !important;
+  min-height: 110px !important;
+  max-height: 110px !important;
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 9px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 10px 2px 12px !important;
+  margin: 0 -2px !important;
+  scrollbar-width: none !important;
+  scroll-snap-type: x proximity !important;
+}
+
+.record-types::-webkit-scrollbar {
+  display: none !important;
+}
+
+.record-types button,
+.record-types button[data-sheet-type="amamentacao"],
+.record-types button[data-sheet-type="medicamento"] {
+  width: 94px !important;
+  min-width: 94px !important;
+  max-width: 94px !important;
+  height: 86px !important;
+  min-height: 86px !important;
+  max-height: 86px !important;
+  display: grid !important;
+  grid-template-rows: 44px 20px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 7px !important;
+  padding: 10px 7px 8px !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  scroll-snap-align: start !important;
+  text-align: center !important;
+}
+
+/* Texto do card: legível e sem corte estranho */
+.record-types button > span:last-child {
+  width: 100% !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  display: block !important;
+  text-align: center !important;
+  font-size: .72rem !important;
+  line-height: 20px !important;
+  font-weight: 950 !important;
+  letter-spacing: -.015em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+.record-types .type-icon,
+.record-types .type-icon img,
+.record-types .type-icon svg {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  display: grid !important;
+  place-items: center !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+}
+
+/* Tema claro dos cards do sheet */
+html body.day-theme .record-types button {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,244,255,.94)) !important;
+  border: 1px solid rgba(139,92,246,.11) !important;
+  color: #40345b !important;
+  -webkit-text-fill-color: #40345b !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    0 8px 18px rgba(76,59,112,.07) !important;
+}
+
+html body.day-theme .record-types button.active {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,1), rgba(243,253,247,.96)) !important;
+  border: 1.5px solid rgba(124,229,194,.56) !important;
+  box-shadow:
+    0 0 0 3px rgba(124,229,194,.10),
+    0 10px 20px rgba(76,59,112,.08) !important;
+}
+
+html body.day-theme .record-types button > span:last-child {
+  color: #40345b !important;
+  -webkit-text-fill-color: #40345b !important;
+}
+
+/* Tema escuro dos cards do sheet */
+html body:not(.day-theme) .record-types button {
+  background:
+    linear-gradient(180deg, rgba(58,47,88,.98), rgba(40,32,67,.98)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: rgba(247,243,255,.94) !important;
+  -webkit-text-fill-color: rgba(247,243,255,.94) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 10px 22px rgba(0,0,0,.20) !important;
+}
+
+html body:not(.day-theme) .record-types button.active {
+  background:
+    linear-gradient(180deg, rgba(58,51,82,.98), rgba(42,35,65,.98)) !important;
+  border: 1.5px solid rgba(124,229,194,.54) !important;
+  box-shadow:
+    0 0 0 3px rgba(124,229,194,.10),
+    0 12px 24px rgba(0,0,0,.26) !important;
+}
+
+html body:not(.day-theme) .record-types button > span:last-child {
+  color: rgba(255,255,255,.96) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.96) !important;
+}
+
+/* Formulário do sheet: cartões estáveis e sem texto invisível */
+.record-form {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 8px 3px 14px !important;
+  margin: 0 -3px !important;
+  scroll-padding-bottom: 20px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.record-form label,
+.record-form .select-label,
+.record-form .amount-field,
+#sheetAmountField,
+#sheetEndTimeField,
+#breastTimerPanel,
+#sleepDurationPreview {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.record-form label > span:first-child,
+.record-form .select-label > span:first-child,
+#sheetAmountField > span:first-child,
+#sheetStartLabel,
+#sheetEndLabel,
+#sheetDetailLabel {
+  display: block !important;
+  line-height: 1.1 !important;
+  font-size: .72rem !important;
+  font-weight: 950 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+}
+
+html body.day-theme .record-form label,
+html body.day-theme .record-form .select-label,
+html body.day-theme .record-form label > span:first-child,
+html body.day-theme .record-form .select-label > span:first-child,
+html body.day-theme #sheetStartLabel,
+html body.day-theme #sheetEndLabel,
+html body.day-theme #sheetDetailLabel {
+  color: rgba(87,76,111,.84) !important;
+  -webkit-text-fill-color: rgba(87,76,111,.84) !important;
+}
+
+html body:not(.day-theme) .record-form label,
+html body:not(.day-theme) .record-form .select-label,
+html body:not(.day-theme) .record-form label > span:first-child,
+html body:not(.day-theme) .record-form .select-label > span:first-child,
+html body:not(.day-theme) #sheetStartLabel,
+html body:not(.day-theme) #sheetEndLabel,
+html body:not(.day-theme) #sheetDetailLabel {
+  color: rgba(226,218,244,.88) !important;
+  -webkit-text-fill-color: rgba(226,218,244,.88) !important;
+}
+
+.record-form input:not([type="range"]),
+.record-form select,
+.record-form .select-control-wrap,
+.record-form textarea {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  border-radius: 18px !important;
+  font-size: 16px !important;
+}
+
+.record-form input:not([type="range"]),
+.record-form select,
+.record-form .select-control-wrap select {
+  min-height: 52px !important;
+  height: 52px !important;
+  flex: 0 0 52px !important;
+}
+
+.record-form textarea {
+  min-height: 94px !important;
+  height: 94px !important;
+  max-height: 120px !important;
+  resize: none !important;
+  line-height: 1.3 !important;
+}
+
+html body.day-theme .record-form input:not([type="range"]),
+html body.day-theme .record-form select,
+html body.day-theme .record-form .select-control-wrap,
+html body.day-theme .record-form textarea {
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid rgba(139,92,246,.12) !important;
+  color: #302747 !important;
+  -webkit-text-fill-color: #302747 !important;
+}
+
+html body:not(.day-theme) .record-form input:not([type="range"]),
+html body:not(.day-theme) .record-form select,
+html body:not(.day-theme) .record-form .select-control-wrap,
+html body:not(.day-theme) .record-form textarea {
+  background: rgba(255,255,255,.07) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #f8f5ff !important;
+  -webkit-text-fill-color: #f8f5ff !important;
+}
+
+/* Cards especiais do formulário */
+.breast-timer-panel,
+.milk-slider-card,
+.sleep-duration-preview {
+  border-radius: 22px !important;
+}
+
+html body.day-theme .breast-timer-panel,
+html body.day-theme .milk-slider-card,
+html body.day-theme .sleep-duration-preview {
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,244,255,.92)) !important;
+  border: 1px solid rgba(139,92,246,.10) !important;
+  color: #302747 !important;
+}
+
+html body:not(.day-theme) .breast-timer-panel,
+html body:not(.day-theme) .milk-slider-card,
+html body:not(.day-theme) .sleep-duration-preview {
+  background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.045)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: #f7f3ff !important;
+}
+
+/* Rodapé do menu registrar */
+.record-actions-footer {
+  position: relative !important;
+  z-index: 5 !important;
+  display: grid !important;
+  gap: 8px !important;
+  padding: 10px 3px 0 !important;
+  margin: 0 !important;
+  border-radius: 0 0 28px 28px !important;
+}
+
+html body.day-theme .record-actions-footer {
+  background:
+    linear-gradient(180deg, rgba(250,246,255,0), rgba(250,246,255,.86) 34%, rgba(250,246,255,.98) 100%) !important;
+}
+
+html body:not(.day-theme) .record-actions-footer {
+  background:
+    linear-gradient(180deg, rgba(24,19,43,0), rgba(24,19,43,.88) 34%, rgba(24,19,43,1) 100%) !important;
+}
+
+.record-actions-footer .save-button {
+  width: 100% !important;
+  min-height: 56px !important;
+  height: 56px !important;
+  border-radius: 20px !important;
+  font-size: 1rem !important;
+  font-weight: 950 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: static !important;
+  margin: 0 !important;
+}
+
+html body.day-theme .record-actions-footer .save-button {
+  background: linear-gradient(135deg, #7c5cff, #a65cf4) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 14px 26px rgba(124,92,255,.20), inset 0 1px 0 rgba(255,255,255,.25) !important;
+}
+
+html body:not(.day-theme) .record-actions-footer .save-button {
+  background: linear-gradient(135deg, #7ce5c2, #ffd37a) !important;
+  color: #17132f !important;
+  -webkit-text-fill-color: #17132f !important;
+  box-shadow: 0 14px 28px rgba(124,229,194,.18), inset 0 1px 0 rgba(255,255,255,.44) !important;
+}
+
+/* Evita botão de salvar duplicar pseudo-fade antigo */
+.record-actions-footer .save-button::before,
+.record-actions-footer .save-button::after,
+.record-form .save-button::before,
+.record-form .save-button::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Ajuste em telas baixas */
+@media (max-height: 740px) {
+  .record-sheet,
+  .orbit-cluster-sheet {
+    height: min(88svh, 670px) !important;
+    grid-template-rows: 12px 54px 104px minmax(0, 1fr) auto !important;
+  }
+
+  .record-types {
+    height: 104px !important;
+    min-height: 104px !important;
+    max-height: 104px !important;
+  }
+
+  .record-types button,
+  .record-types button[data-sheet-type="amamentacao"],
+  .record-types button[data-sheet-type="medicamento"] {
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+  }
+
+  .record-form textarea {
+    min-height: 82px !important;
+    height: 82px !important;
+  }
+
+  .record-actions-footer .save-button {
+    min-height: 54px !important;
+    height: 54px !important;
+  }
+}

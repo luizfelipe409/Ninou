@@ -1,0 +1,14 @@
+Versão v75.75.101
+
+Correções após avaliação do vídeo:
+- Corrigida legibilidade geral de textos no tema claro e no tema escuro.
+- Reduzido o impacto do botão + no tema escuro: agora é glass escuro com mint suave, menos chamativo.
+- Menu de registrar ações no diário foi revisado:
+  - cards dos tipos de registro com tamanho estável;
+  - textos dos cards legíveis e sem quebras ruins;
+  - formulário com contraste correto;
+  - inputs/selects/textarea legíveis nos dois temas;
+  - rodapé e botão Registrar ajustados;
+  - layout mais estável em telas baixas.
+- Mantidos os ajustes já aprovados do perfil e dos avatares.
+- Cache/versionamento atualizado para 75.75.101.
