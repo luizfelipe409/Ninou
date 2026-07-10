@@ -1,0 +1,9 @@
+Versão v75.75.104
+
+Correção do contador principal:
+- O "Estado atual" já mostrava corretamente "Acordado há 24h..." porque usava inferência por eventos.
+- O contador circular principal continuava em 00:00:00 porque ainda dependia de state.activeStartedAt.
+- Agora o contador principal adota a mesma origem de tempo do resumo quando existe um "Acordou" aberto, inclusive vindo do dia anterior.
+- Se o bebê acordou ontem e não houve novo registro de sono, o relógio principal continua rodando hoje.
+- Mantidas as correções anteriores de tempo acordado na virada do dia, timer de amamentação, legibilidade, menu Registrar, temas e avatares.
+- Cache/versionamento atualizado para 75.75.104.

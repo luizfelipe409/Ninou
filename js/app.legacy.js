@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.103";
+const BABY_AVATAR_ASSET_VERSION = "75.75.104";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -9566,6 +9566,38 @@ function renderCurrentState() {
     return;
   }
 
+  // v75.75.104: o resumo do dia já inferia corretamente um "Acordou" de ontem,
+  // mas o contador principal ainda dependia de state.activeStartedAt. Aqui fazemos
+  // o contador principal adotar a mesma origem de tempo do resumo quando a rotina
+  // está acordada e aberta, inclusive atravessando a virada do dia.
+  const awakeCarryInfo = getTodayAwakeCalculation(Date.now());
+  if (state.mode !== "sleeping"
+    && awakeCarryInfo?.hasWake
+    && awakeCarryInfo?.isOpen
+    && Number.isFinite(Number(awakeCarryInfo.wakeAt))) {
+    const carriedStart = Number(awakeCarryInfo.wakeAt);
+    const currentStart = Number(state.activeStartedAt);
+    const shouldAdoptCarry = state.mode !== "awake"
+      || !Number.isFinite(currentStart)
+      || currentStart > carriedStart + 60000
+      || currentStart < carriedStart - 60000;
+
+    if (shouldAdoptCarry) {
+      state = normalizeDayState({
+        ...state,
+        mode: "awake",
+        activeStartedAt: carriedStart,
+        activeType: awakeCarryInfo.wakeEvent?.type || "acordou",
+        activeDetail: carriedStart < getDayStart() ? "Continuado de ontem" : "",
+        activeNotes: awakeCarryInfo.wakeEvent?.notes || "",
+      });
+      syncSelectedDayIntoFamilyCache();
+      saveLocalDayState(getSelectedDayId());
+      timelineRenderSignature = "";
+      orbitRenderSignature = "";
+    }
+  }
+
   if (state.mode === "idle") {
     if (continueOpenSleepFromPreviousDayIfNeeded()) {
       renderCurrentState();
@@ -9587,6 +9619,21 @@ function renderCurrentState() {
   syncStartChoiceVisibility(false);
   const elapsed = Date.now() - Number(state.activeStartedAt || Date.now());
   if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 48 * hour) {
+    const carriedRoutine = getRoutineCarryFromEventsAcrossMidnight(getCurrentDayId(), state, Date.now());
+    if (carriedRoutine && Number.isFinite(Number(carriedRoutine.start)) && Date.now() - Number(carriedRoutine.start) <= 72 * hour) {
+      state = normalizeDayState({
+        ...state,
+        mode: carriedRoutine.mode === "sleeping" ? "sleeping" : "awake",
+        activeStartedAt: Number(carriedRoutine.start),
+        activeType: carriedRoutine.type || (carriedRoutine.mode === "sleeping" ? "sono" : "acordou"),
+        activeDetail: carriedRoutine.detail || (Number(carriedRoutine.start) < getDayStart() ? "Continuado de ontem" : ""),
+        activeNotes: carriedRoutine.notes || "",
+      });
+      syncSelectedDayIntoFamilyCache();
+      saveLocalDayState(getSelectedDayId());
+      renderCurrentState();
+      return;
+    }
     state = createEmptyDayState();
     saveLocalDayState();
     renderCurrentState();
