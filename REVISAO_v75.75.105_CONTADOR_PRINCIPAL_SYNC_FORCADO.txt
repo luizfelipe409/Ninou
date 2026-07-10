@@ -1,0 +1,9 @@
+Versão v75.75.105
+
+Correção final do contador principal:
+- O print mostrou que a lógica do "Estado atual" estava correta, mas o relógio circular principal ainda ficava em 00:00:00.
+- Agora o contador circular é sincronizado diretamente pela mesma função que calcula o "Estado atual".
+- O renderLiveTick também força essa sincronização a cada segundo.
+- Mesmo se state.activeStartedAt ficar stale/zerado após carregar cache/Firebase, o relógio principal adota o horário do último "Acordou" aberto.
+- Mantidas as correções anteriores.
+- Cache/versionamento atualizado para 75.75.105.

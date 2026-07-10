@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.104";
+const BABY_AVATAR_ASSET_VERSION = "75.75.105";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -9498,6 +9498,52 @@ function setWakeActionIcon() {
   wakeActionIcon.innerHTML = iconMarkup(iconKey);
 }
 
+function getOpenAwakeInfoForMainClock(now = Date.now()) {
+  if (getSelectedDayId() !== getCurrentDayId()) return null;
+  const info = getTodayAwakeCalculation(now);
+  if (!info?.hasWake || !info?.isOpen || !Number.isFinite(Number(info.wakeAt))) return null;
+  const wakeAt = Number(info.wakeAt);
+  const elapsed = Math.max(0, Number(now) - wakeAt);
+  if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 72 * hour) return null;
+  return { ...info, wakeAt, elapsed };
+}
+
+function syncMainClockFromOpenAwake(now = Date.now()) {
+  const info = getOpenAwakeInfoForMainClock(now);
+  if (!info) return false;
+
+  const crossedMidnight = info.wakeAt < getDayStart();
+  document.body.classList.remove("ninou-empty-profile-state", "ninou-reviewing-past-state", "ninou-daily-empty-state");
+  setHidden(wakeAction, false);
+  syncStartChoiceVisibility(false);
+  setText(wakeActionLabel, "Iniciar soneca");
+  if (wakeActionIcon && wakeActionIcon.dataset.iconKey !== "sono") {
+    wakeActionIcon.dataset.iconKey = "sono";
+    wakeActionIcon.innerHTML = iconMarkup("sono");
+  }
+  setText(stateLabel, "Acordado há");
+  setText(stateClock, formatDuration(info.elapsed));
+  setText(stateHint, crossedMidnight
+    ? `Acordado desde ontem, às ${formatTime(info.wakeAt)}. O contador segue a partir do último registro.`
+    : getWakeWindowText());
+
+  if (state.mode !== "awake" || Math.abs(Number(state.activeStartedAt || 0) - info.wakeAt) > 60000) {
+    state = normalizeDayState({
+      ...state,
+      mode: "awake",
+      activeStartedAt: info.wakeAt,
+      activeType: info.wakeEvent?.type || "acordou",
+      activeDetail: crossedMidnight ? "Continuado de ontem" : "",
+      activeNotes: info.wakeEvent?.notes || "",
+    });
+    syncSelectedDayIntoFamilyCache();
+    saveLocalDayState(getSelectedDayId());
+  }
+
+  renderActiveTimerCard();
+  return true;
+}
+
 function getActiveTimerDetails() {
   return buildActiveTimerDetails({ state, wakeWindowMinutes, typeConfig, formatTimeLabel: formatTime });
 }
@@ -9596,6 +9642,10 @@ function renderCurrentState() {
       timelineRenderSignature = "";
       orbitRenderSignature = "";
     }
+  }
+
+  if (syncMainClockFromOpenAwake(Date.now())) {
+    return;
   }
 
   if (state.mode === "idle") {
@@ -11159,9 +11209,24 @@ function renderLiveTick() {
   updateTheme();
 
   if (!canUsePrivateFeatures()) return;
+
+  // v75.75.105: atualiza o contador principal diretamente pela mesma lógica
+  // do "Estado atual", mesmo quando state.activeStartedAt ficou stale/zerado.
+  if (syncMainClockFromOpenAwake(Date.now())) {
+    const currentMinute = Math.floor(Date.now() / 60000);
+    if (currentMinute !== liveTickMinute) {
+      liveTickMinute = currentMinute;
+      renderSummary();
+      renderIntelligentHomeSections();
+      renderQuickCorrectionCard();
+      renderProductExperienceSections();
+    }
+    return;
+  }
+
   if (state.mode === "idle" || !Number.isFinite(state.activeStartedAt)) return;
   const liveElapsed = Date.now() - Number(state.activeStartedAt || Date.now());
-  if (!Number.isFinite(liveElapsed) || liveElapsed < 0 || liveElapsed > 48 * hour) {
+  if (!Number.isFinite(liveElapsed) || liveElapsed < 0 || liveElapsed > 72 * hour) {
     state = createEmptyDayState();
     saveLocalDayState();
     renderAll();
