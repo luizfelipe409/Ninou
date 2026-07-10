@@ -35658,3 +35658,182 @@ html body:not(.day-theme) .screen[data-screen="profile"] img#profilePhoto {
     0 0 22px rgba(124,229,194,.14),
     0 16px 34px rgba(0,0,0,.30) !important;
 }
+
+
+/* v75.75.97 perfil tema claro premium harmonizado */
+
+/* v75.75.97 — Perfil tema claro premium.
+   Harmonização geral do tema claro: menos amarelo, mais champagne/lavanda,
+   cards mais refinados, FAB mais coerente, status mais suave e bottom nav glass. */
+
+html body.day-theme {
+  background:
+    radial-gradient(circle at 18% 6%, rgba(255, 221, 171, .42) 0%, rgba(255, 221, 171, 0) 34%),
+    radial-gradient(circle at 88% 12%, rgba(188, 165, 255, .34) 0%, rgba(188, 165, 255, 0) 32%),
+    linear-gradient(180deg, #fff3d8 0%, #fff8ef 42%, #f8f1ff 100%) !important;
+}
+
+html body.day-theme .phone-shell,
+html body.day-theme main.phone-shell,
+html body.day-theme .screen[data-screen="profile"] {
+  background:
+    radial-gradient(circle at 12% 5%, rgba(255, 221, 171, .50), rgba(255, 221, 171, 0) 34%),
+    radial-gradient(circle at 92% 9%, rgba(188, 165, 255, .32), rgba(188, 165, 255, 0) 30%),
+    linear-gradient(180deg, #fff2d7 0%, #fff8ef 46%, #f8f1ff 100%) !important;
+}
+
+html body.day-theme .app-header,
+html body.day-theme .profile-daily-header,
+html body.day-theme .top-bar {
+  background: rgba(255, 248, 239, .72) !important;
+  backdrop-filter: blur(16px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.08) !important;
+  border-bottom: 1px solid rgba(139, 92, 246, .08) !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] .profile-card {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(188,165,255,.16), rgba(188,165,255,0) 44%),
+    linear-gradient(145deg, rgba(255,255,255,.97), rgba(250,246,255,.93)) !important;
+  border: 1px solid rgba(139, 92, 246, .10) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    0 18px 38px rgba(76, 59, 112, .09),
+    0 4px 12px rgba(126, 94, 50, .045) !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] .profile-family-card,
+html body.day-theme .screen[data-screen="profile"] .profile-setting-line,
+html body.day-theme .screen[data-screen="profile"] .diary-profile-card,
+html body.day-theme .screen[data-screen="profile"] .profile-weight-card,
+html body.day-theme .screen[data-screen="profile"] .family-member-card,
+html body.day-theme .screen[data-screen="profile"] .support-card,
+html body.day-theme .screen[data-screen="profile"] .privacy-note,
+html body.day-theme .screen[data-screen="profile"] .export-card {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.96), rgba(250,246,255,.91)) !important;
+  border: 1px solid rgba(139, 92, 246, .085) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.88),
+    0 10px 24px rgba(76, 59, 112, .055) !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] input,
+html body.day-theme .screen[data-screen="profile"] select,
+html body.day-theme .screen[data-screen="profile"] textarea,
+html body.day-theme .screen[data-screen="profile"] .select-control-wrap {
+  background: rgba(255,255,255,.88) !important;
+  border-color: rgba(139,92,246,.12) !important;
+  color: #302747 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.82),
+    0 4px 12px rgba(76,59,112,.035) !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] .profile-card span,
+html body.day-theme .screen[data-screen="profile"] .profile-card-head span,
+html body.day-theme .screen[data-screen="profile"] .setting-label,
+html body.day-theme .screen[data-screen="profile"] label span {
+  color: rgba(86, 74, 111, .78) !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] .profile-card strong,
+html body.day-theme .screen[data-screen="profile"] .profile-card-head strong,
+html body.day-theme .screen[data-screen="profile"] #profileBabyName,
+html body.day-theme .screen[data-screen="profile"] #profileBabyAge {
+  color: #2f2843 !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] p,
+html body.day-theme .screen[data-screen="profile"] small {
+  color: rgba(91, 80, 116, .82) !important;
+}
+
+/* Badge Sincronizado: mint mais discreto e premium */
+html body.day-theme .sync-badge,
+html body.day-theme .sync-status,
+html body.day-theme [class*="sync"][class*="badge"],
+html body.day-theme [class*="sincronizado"],
+html body.day-theme .cloud-sync-pill {
+  background: rgba(124,229,194,.18) !important;
+  color: #267a62 !important;
+  border: 1px solid rgba(124,229,194,.34) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.70),
+    0 8px 18px rgba(38,122,98,.08) !important;
+}
+
+/* Botão flutuante +: roxo/pêssego em vez de laranja puro */
+html body.day-theme .fab,
+html body.day-theme .fab-real-plus,
+html body.day-theme button[data-open-sheet],
+html body.day-theme .floating-action-button,
+html body.day-theme .round-action.fab {
+  background:
+    linear-gradient(135deg, #8b5cf6 0%, #a78bfa 44%, #f4b183 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,.48) !important;
+  box-shadow:
+    0 14px 30px rgba(139,92,246,.24),
+    0 8px 18px rgba(244,177,131,.18),
+    inset 0 1px 0 rgba(255,255,255,.42) !important;
+}
+
+/* Bottom nav: glass premium */
+html body.day-theme .bottom-nav,
+html body.day-theme nav.bottom-nav,
+html body.day-theme .app-bottom-nav {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,250,245,.90)) !important;
+  backdrop-filter: blur(18px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.08) !important;
+  border: 1px solid rgba(139,92,246,.10) !important;
+  box-shadow:
+    0 -10px 28px rgba(76,59,112,.10),
+    inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+
+html body.day-theme .bottom-nav button.active,
+html body.day-theme .bottom-nav [aria-current="page"],
+html body.day-theme .bottom-nav .active {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,244,255,.92)) !important;
+  color: #3d2f60 !important;
+  box-shadow:
+    0 8px 18px rgba(139,92,246,.12),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+html body.day-theme .bottom-nav svg,
+html body.day-theme .bottom-nav i {
+  color: #6f5b91 !important;
+  stroke: currentColor !important;
+}
+
+html body.day-theme .profile-primary-button,
+html body.day-theme .avatar-save-button,
+html body.day-theme .save-button {
+  background: linear-gradient(135deg, #7c5cff, #a65cf4) !important;
+  color: #fff !important;
+  border: 1px solid rgba(139,92,246,.22) !important;
+  box-shadow:
+    0 12px 24px rgba(124,92,255,.22),
+    inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+
+html body.day-theme .profile-secondary-button,
+html body.day-theme .avatar-skip-button {
+  background: rgba(255,255,255,.82) !important;
+  color: #302747 !important;
+  border: 1px solid rgba(139,92,246,.11) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.80),
+    0 8px 18px rgba(76,59,112,.055) !important;
+}
+
+html body.day-theme .screen[data-screen="profile"] hr,
+html body.day-theme .screen[data-screen="profile"] .divider,
+html body.day-theme .screen[data-screen="profile"] .profile-divider {
+  border-color: rgba(139,92,246,.10) !important;
+  background: rgba(139,92,246,.10) !important;
+}

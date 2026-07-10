@@ -1,0 +1,12 @@
+Versão v75.75.97
+
+Lapidação geral da tela Perfil no tema claro:
+- Fundo geral harmonizado para champagne rosado + lavanda suave.
+- Cards principais e cards de formulário com branco/lavanda translúcido.
+- Botão + deixou de ser laranja puro e passou para roxo/pêssego premium.
+- Badge Sincronizado suavizado para mint discreto.
+- Bottom nav recebeu acabamento glass premium.
+- Inputs e selects suavizados.
+- Tipografia do perfil ajustada para roxo escuro/lavanda mais coeso.
+- Mantidos os ajustes aprovados anteriores: arco do avatar, ícones premium, fade real, foco/aria e grid mobile.
+- Cache/versionamento atualizado para 75.75.97.
