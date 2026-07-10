@@ -35837,3 +35837,150 @@ html body.day-theme .screen[data-screen="profile"] .profile-divider {
   border-color: rgba(139,92,246,.10) !important;
   background: rgba(139,92,246,.10) !important;
 }
+
+
+/* v75.75.98 refino final do perfil claro premium */
+
+/* v75.75.98 — refino final do tema claro do Perfil
+   Ajustes pedidos:
+   1) FAB menos gritante
+   2) fundo geral com menos amarelo
+   3) cards longos com sombra mais leve e borda mais delicada
+*/
+
+/* Fundo geral: menos amarelo, mais champagne rosado/lavanda */
+html body.day-theme {
+  background:
+    radial-gradient(circle at 16% 6%, rgba(255, 225, 188, .28) 0%, rgba(255, 225, 188, 0) 32%),
+    radial-gradient(circle at 88% 10%, rgba(196, 180, 255, .26) 0%, rgba(196, 180, 255, 0) 30%),
+    linear-gradient(180deg, #fff6e8 0%, #fffaf4 42%, #faf5ff 100%) !important;
+}
+
+html body.day-theme .phone-shell,
+html body.day-theme main.phone-shell,
+html body.day-theme .screen[data-screen="profile"] {
+  background:
+    radial-gradient(circle at 12% 5%, rgba(255, 225, 188, .34), rgba(255, 225, 188, 0) 34%),
+    radial-gradient(circle at 92% 8%, rgba(196, 180, 255, .24), rgba(196, 180, 255, 0) 30%),
+    linear-gradient(180deg, #fff5e5 0%, #fffaf4 48%, #faf5ff 100%) !important;
+}
+
+/* Header com leitura mais suave */
+html body.day-theme .app-header,
+html body.day-theme .profile-daily-header,
+html body.day-theme .top-bar {
+  background: rgba(255, 250, 244, .78) !important;
+  border-bottom: 1px solid rgba(139, 92, 246, .06) !important;
+  box-shadow: 0 6px 20px rgba(76, 59, 112, .04) !important;
+}
+
+/* Card principal: levemente mais limpo */
+html body.day-theme .screen[data-screen="profile"] .profile-card {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(188,165,255,.12), rgba(188,165,255,0) 42%),
+    linear-gradient(145deg, rgba(255,255,255,.975), rgba(251,248,255,.94)) !important;
+  border: 1px solid rgba(139, 92, 246, .085) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.94),
+    0 14px 28px rgba(76, 59, 112, .07),
+    0 3px 8px rgba(126, 94, 50, .03) !important;
+}
+
+/* Cards/blocos longos: sombra mais leve e borda mais suave */
+html body.day-theme .screen[data-screen="profile"] .profile-family-card,
+html body.day-theme .screen[data-screen="profile"] .profile-setting-line,
+html body.day-theme .screen[data-screen="profile"] .diary-profile-card,
+html body.day-theme .screen[data-screen="profile"] .profile-weight-card,
+html body.day-theme .screen[data-screen="profile"] .family-member-card,
+html body.day-theme .screen[data-screen="profile"] .support-card,
+html body.day-theme .screen[data-screen="profile"] .privacy-note,
+html body.day-theme .screen[data-screen="profile"] .export-card {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.965), rgba(251,248,255,.925)) !important;
+  border: 1px solid rgba(139, 92, 246, .07) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 7px 18px rgba(76, 59, 112, .045) !important;
+}
+
+/* Inputs um pouco mais elegantes */
+html body.day-theme .screen[data-screen="profile"] input,
+html body.day-theme .screen[data-screen="profile"] select,
+html body.day-theme .screen[data-screen="profile"] textarea,
+html body.day-theme .screen[data-screen="profile"] .select-control-wrap {
+  background: rgba(255,255,255,.90) !important;
+  border-color: rgba(139,92,246,.10) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.84),
+    0 3px 10px rgba(76,59,112,.025) !important;
+}
+
+/* Badge sincronizado ainda mais refinado */
+html body.day-theme .sync-badge,
+html body.day-theme .sync-status,
+html body.day-theme [class*="sync"][class*="badge"],
+html body.day-theme [class*="sincronizado"],
+html body.day-theme .cloud-sync-pill {
+  background: rgba(124,229,194,.14) !important;
+  color: #2d7f67 !important;
+  border: 1px solid rgba(124,229,194,.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.72),
+    0 6px 14px rgba(38,122,98,.06) !important;
+}
+
+/* FAB menos gritante: reduz saturação e glow */
+html body.day-theme .fab,
+html body.day-theme .fab-real-plus,
+html body.day-theme button[data-open-sheet],
+html body.day-theme .floating-action-button,
+html body.day-theme .round-action.fab {
+  background:
+    linear-gradient(135deg, #8f72ee 0%, #b59bf7 50%, #efbe96 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,.42) !important;
+  box-shadow:
+    0 10px 22px rgba(139,92,246,.16),
+    0 6px 14px rgba(239,190,150,.10),
+    inset 0 1px 0 rgba(255,255,255,.34) !important;
+}
+
+/* FAB em estado hover/active mais fino */
+html body.day-theme .fab:hover,
+html body.day-theme .fab-real-plus:hover,
+html body.day-theme button[data-open-sheet]:hover,
+html body.day-theme .floating-action-button:hover,
+html body.day-theme .round-action.fab:hover {
+  filter: saturate(.98) brightness(1.01) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Bottom nav um pouco mais leve */
+html body.day-theme .bottom-nav,
+html body.day-theme nav.bottom-nav,
+html body.day-theme .app-bottom-nav {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,250,246,.92)) !important;
+  border: 1px solid rgba(139,92,246,.085) !important;
+  box-shadow:
+    0 -8px 22px rgba(76,59,112,.085),
+    inset 0 1px 0 rgba(255,255,255,.84) !important;
+}
+
+html body.day-theme .bottom-nav button.active,
+html body.day-theme .bottom-nav [aria-current="page"],
+html body.day-theme .bottom-nav .active {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,244,255,.93)) !important;
+  box-shadow:
+    0 6px 14px rgba(139,92,246,.09),
+    inset 0 1px 0 rgba(255,255,255,.90) !important;
+}
+
+/* Pequeno refinamento da tipografia cinza/lilás */
+html body.day-theme .screen[data-screen="profile"] p,
+html body.day-theme .screen[data-screen="profile"] small,
+html body.day-theme .screen[data-screen="profile"] .setting-label,
+html body.day-theme .screen[data-screen="profile"] label span {
+  color: rgba(88, 77, 112, .80) !important;
+}
