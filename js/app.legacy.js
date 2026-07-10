@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.102";
+const BABY_AVATAR_ASSET_VERSION = "75.75.103";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -2899,6 +2899,27 @@ function getTodayAwakeCalculation(now = Date.now(), sourceEvents = null) {
     .find((event) => event.type === "acordou" && getEventOrderTime(event) >= todayStart && getEventOrderTime(event) <= upperLimit);
 
   if (!wakeEvent) {
+    const carriedRoutine = getRoutineCarryFromEventsAcrossMidnight(getCurrentDayId(), getFamilyDayState(getCurrentDayId()), now);
+    if (carriedRoutine && carriedRoutine.mode === "awake" && Number.isFinite(Number(carriedRoutine.start))) {
+      const wakeAt = Number(carriedRoutine.start);
+      const durationMs = Math.max(0, now - wakeAt);
+      const continuedFromYesterday = wakeAt < todayStart;
+      return {
+        hasWake: true,
+        isOpen: true,
+        wakeEvent: carriedRoutine.sourceEvent || { type: "acordou", start: wakeAt, end: wakeAt, eventTime: wakeAt, detail: carriedRoutine.detail || "Continuado" },
+        wakeAt,
+        endEvent: null,
+        endAt: now,
+        durationMs,
+        sinceLabel: `${continuedFromYesterday ? "ontem, " : ""}${formatTime(wakeAt)}`,
+        durationLabel: formatAwakeDuration(durationMs),
+        lastActionLabel: continuedFromYesterday
+          ? `Acordado desde ontem às ${formatTime(wakeAt)}`
+          : `Acordado desde ${formatTime(wakeAt)}`,
+      };
+    }
+
     return {
       hasWake: false,
       isOpen: false,
@@ -3444,6 +3465,98 @@ function getPreviousDayId(dayId = getCurrentDayId()) {
   return toDateInputValue(base - day);
 }
 
+function getRoutineCarryFromEventsAcrossMidnight(dayId = getCurrentDayId(), currentDayState = null, now = Date.now()) {
+  const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
+  const todayStart = getDayStartFromId(safeDayId);
+  const previousDayId = getPreviousDayId(safeDayId);
+  const previousStart = todayStart - day;
+  const upperLimit = Math.min(todayStart + day, Number(now) + 2 * 60000);
+
+  const previousState = sanitizeDayStateForDay(
+    familyDayStatesCache[previousDayId] || loadLocalDayState(previousDayId),
+    previousDayId,
+    { preserveLive: true },
+  );
+  const todayState = sanitizeDayStateForDay(
+    currentDayState || familyDayStatesCache[safeDayId] || loadLocalDayState(safeDayId),
+    safeDayId,
+    { preserveLive: true },
+  );
+
+  const events = dedupeEventsByDisplayKey([
+    ...getVisibleEventsFromState(previousState),
+    ...getVisibleEventsFromState(todayState),
+  ])
+    .filter((event) => {
+      const time = Number(getEventOrderTime(event));
+      return Number.isFinite(time) && time >= previousStart && time <= upperLimit;
+    })
+    .sort((a, b) => Number(getEventOrderTime(a)) - Number(getEventOrderTime(b)));
+
+  let live = null;
+
+  events.forEach((event) => {
+    const orderTime = Number(getEventOrderTime(event));
+    const start = Number(event.start);
+    const end = Number(event.end);
+
+    if (event.type === "acordou") {
+      live = {
+        dayId: orderTime < todayStart ? previousDayId : safeDayId,
+        mode: "awake",
+        start: orderTime,
+        type: "acordou",
+        detail: event.detail || "Continuado do último registro",
+        notes: event.notes || "",
+        sourceEvent: event,
+      };
+      return;
+    }
+
+    if (event.type === "despertar-noturno") {
+      live = {
+        dayId: orderTime < todayStart ? previousDayId : safeDayId,
+        mode: "awake",
+        start: orderTime,
+        type: "despertar-noturno",
+        detail: event.detail || "Despertar em andamento",
+        notes: event.notes || "",
+        sourceEvent: event,
+      };
+      return;
+    }
+
+    if (!isSleepEvent(event) || !Number.isFinite(start) || start > upperLimit) return;
+
+    if (Number.isFinite(end) && end > start && end <= upperLimit) {
+      live = {
+        dayId: end < todayStart ? previousDayId : safeDayId,
+        mode: "awake",
+        start: end,
+        type: "acordou",
+        detail: event.type === "dormir" ? "Após sono noturno" : "Após soneca",
+        notes: "",
+        sourceEvent: event,
+      };
+      return;
+    }
+
+    live = {
+      dayId: start < todayStart ? previousDayId : safeDayId,
+      mode: "sleeping",
+      start,
+      type: event.type || "sono",
+      detail: event.detail || "Sono em andamento",
+      notes: event.notes || "",
+      sourceEvent: event,
+    };
+  });
+
+  if (!live || !Number.isFinite(Number(live.start))) return null;
+  if (Number(live.start) < todayStart - 48 * hour || Number(live.start) > Number(now) + 2 * 60000) return null;
+  return live;
+}
+
 function getOpenRoutineFromPreviousDay(dayId = getCurrentDayId(), now = Date.now()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const previousDayId = getPreviousDayId(safeDayId);
@@ -3451,22 +3564,37 @@ function getOpenRoutineFromPreviousDay(dayId = getCurrentDayId(), now = Date.now
   const start = Number(previousState.activeStartedAt);
   const todayStart = getDayStartFromId(safeDayId);
   const previousMode = String(previousState.mode || "idle");
-  if (!["awake", "sleeping", "night-wake"].includes(previousMode) || !Number.isFinite(start)) return null;
-  if (start >= todayStart || start < todayStart - 36 * hour || start > now + 2 * 60000) return null;
 
-  const fallbackType = previousMode === "sleeping"
-    ? "sono"
-    : previousMode === "night-wake"
-      ? "despertar-noturno"
-      : "acordou";
+  if (["awake", "sleeping", "night-wake"].includes(previousMode)
+    && Number.isFinite(start)
+    && start < todayStart
+    && start >= todayStart - 48 * hour
+    && start <= now + 2 * 60000) {
+    const fallbackType = previousMode === "sleeping"
+      ? "sono"
+      : previousMode === "night-wake"
+        ? "despertar-noturno"
+        : "acordou";
 
+    return {
+      dayId: previousDayId,
+      mode: previousMode,
+      start,
+      type: previousState.activeType || fallbackType,
+      detail: previousState.activeDetail || "Continuado de ontem",
+      notes: previousState.activeNotes || "",
+    };
+  }
+
+  const inferred = getRoutineCarryFromEventsAcrossMidnight(safeDayId, null, now);
+  if (!inferred || Number(inferred.start) >= todayStart) return null;
   return {
-    dayId: previousDayId,
-    mode: previousMode,
-    start,
-    type: previousState.activeType || fallbackType,
-    detail: previousState.activeDetail || "Continuado de ontem",
-    notes: previousState.activeNotes || "",
+    dayId: inferred.dayId || previousDayId,
+    mode: inferred.mode,
+    start: Number(inferred.start),
+    type: inferred.type || (inferred.mode === "sleeping" ? "sono" : "acordou"),
+    detail: inferred.detail || "Continuado de ontem",
+    notes: inferred.notes || "",
   };
 }
 
@@ -4813,6 +4941,18 @@ function rebuildRoutineModeAfterMutation(dayState = state, dayId = getSelectedDa
 
   const boundary = getLatestAwakeBoundaryFromEvents(nextState, safeDayId, Date.now());
   if (!Number.isFinite(Number(boundary))) {
+    const carriedRoutine = getRoutineCarryFromEventsAcrossMidnight(safeDayId, nextState, Date.now());
+    if (carriedRoutine && Number.isFinite(Number(carriedRoutine.start))) {
+      return normalizeDayState({
+        ...nextState,
+        mode: carriedRoutine.mode === "sleeping" ? "sleeping" : "awake",
+        activeStartedAt: Number(carriedRoutine.start),
+        activeType: carriedRoutine.type || (carriedRoutine.mode === "sleeping" ? "sono" : "acordou"),
+        activeDetail: carriedRoutine.detail || (Number(carriedRoutine.start) < getDayStartFromId(safeDayId) ? "Continuado de ontem" : ""),
+        activeNotes: carriedRoutine.notes || "",
+      });
+    }
+
     return normalizeDayState({
       ...nextState,
       mode: "idle",

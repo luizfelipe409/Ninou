@@ -1,0 +1,10 @@
+Versão v75.75.103
+
+Correção do tempo acordado atravessando a virada do dia:
+- Se o último registro de ontem foi "Acordou", o contador de "Acordado há" agora continua rodando hoje.
+- O app agora infere estado ativo também pelos eventos do dia anterior, não apenas pelo activeStartedAt salvo.
+- Isso corrige casos em que o registro "Acordou" existia no diário, mas o estado ao abrir o dia atual aparecia como "Começar hoje".
+- O contador continua até surgir um registro de sono/soneca/sono noturno ou outro estado ativo coerente.
+- O resumo "Estado atual" também passa a considerar esse acordado continuado de ontem.
+- Mantidas as correções anteriores de contador de amamentação, legibilidade, menu Registrar, temas e avatares.
+- Cache/versionamento atualizado para 75.75.103.
