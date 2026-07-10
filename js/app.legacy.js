@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.101";
+const BABY_AVATAR_ASSET_VERSION = "75.75.102";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -10154,7 +10154,16 @@ function resetBreastTimer() {
 }
 
 function toggleBreastTimer(side) {
-  if (!breastTimerPanel || breastTimerPanel.hidden) return;
+  if (!breastTimerPanel) return;
+
+  // v75.75.102: evita timer travado em 00:00 caso CSS antigo tenha deixado
+  // o painel visível enquanto o atributo hidden ainda estava ativo.
+  const isBreastfeedingType = currentSheetType === "amamentacao";
+  if (breastTimerPanel.hidden && isBreastfeedingType) {
+    breastTimerPanel.hidden = false;
+  }
+  if (breastTimerPanel.hidden) return;
+
   if (breastTimerState.activeSide === side) {
     stopBreastTimer();
     return;

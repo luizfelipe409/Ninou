@@ -36854,3 +36854,172 @@ html body:not(.day-theme) .record-actions-footer .save-button {
     height: 54px !important;
   }
 }
+
+
+/* v75.75.102 correcao contador amamentacao hidden */
+
+/* v75.75.102 — Correção do contador da amamentação.
+   Causa: na v75.75.101 alguns campos com atributo hidden receberam display:flex !important.
+   Isso podia deixar o painel visualmente aparente, mas ainda com breastTimerPanel.hidden=true.
+   Como o JS protege o timer quando hidden=true, o contador ficava parado em 00:00.
+*/
+
+/* O atributo hidden precisa vencer sempre */
+.record-sheet [hidden],
+.record-form [hidden],
+#breastTimerPanel[hidden],
+#sheetAmountField[hidden],
+#sheetEndTimeField[hidden],
+#sleepDurationPreview[hidden],
+#recordScrollHint[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* O timer só vira layout visível quando o JS realmente remove o hidden */
+#breastTimerPanel:not([hidden]).breast-timer-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 14px !important;
+  margin: 0 !important;
+  border-radius: 22px !important;
+  overflow: visible !important;
+  visibility: visible !important;
+}
+
+/* Layout interno estável do timer */
+#breastTimerPanel:not([hidden]) .breast-timer-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#breastTimerPanel:not([hidden]) .breast-timer-head span {
+  display: block !important;
+  font-size: .72rem !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+}
+
+#breastTimerPanel:not([hidden]) .breast-timer-head strong {
+  display: block !important;
+  margin-top: 4px !important;
+  font-size: 1.58rem !important;
+  line-height: 1 !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -.035em !important;
+}
+
+#breastTimerPanel:not([hidden]) #resetBreastTimerButton {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  font-size: .82rem !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+#breastTimerPanel:not([hidden]) .breast-side-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+#breastTimerPanel:not([hidden]) .breast-side-grid button {
+  min-height: 86px !important;
+  display: grid !important;
+  grid-template-rows: 20px 28px 18px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 4px !important;
+  border-radius: 20px !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+#breastTimerPanel:not([hidden]) .breast-side-grid button strong {
+  font-size: 1.18rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+}
+
+#breastTimerPanel:not([hidden]) .breast-side-grid button small {
+  font-size: .76rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+}
+
+#breastTimerPanel:not([hidden]) p {
+  margin: 0 !important;
+  font-size: .86rem !important;
+  line-height: 1.28 !important;
+}
+
+/* Tema claro do timer */
+html body.day-theme #breastTimerPanel:not([hidden]).breast-timer-panel {
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,244,255,.92)) !important;
+  border: 1px solid rgba(139,92,246,.12) !important;
+  color: #302747 !important;
+}
+
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-timer-head span,
+html body.day-theme #breastTimerPanel:not([hidden]) p,
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-side-grid button small {
+  color: rgba(87,76,111,.82) !important;
+  -webkit-text-fill-color: rgba(87,76,111,.82) !important;
+}
+
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-timer-head strong,
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-side-grid button strong,
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-side-grid button span {
+  color: #302747 !important;
+  -webkit-text-fill-color: #302747 !important;
+}
+
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-side-grid button {
+  background: rgba(255,255,255,.88) !important;
+  border: 1px solid rgba(139,92,246,.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.90), 0 8px 18px rgba(76,59,112,.06) !important;
+}
+
+html body.day-theme #breastTimerPanel:not([hidden]) .breast-side-grid button.active {
+  border-color: rgba(124,229,194,.62) !important;
+  box-shadow: 0 0 0 3px rgba(124,229,194,.12), 0 10px 20px rgba(76,59,112,.08) !important;
+}
+
+/* Tema escuro do timer */
+html body:not(.day-theme) #breastTimerPanel:not([hidden]).breast-timer-panel {
+  background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.045)) !important;
+  border: 1px solid rgba(255,255,255,.11) !important;
+  color: #f7f3ff !important;
+}
+
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-timer-head span,
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) p,
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid button small {
+  color: rgba(226,218,244,.88) !important;
+  -webkit-text-fill-color: rgba(226,218,244,.88) !important;
+}
+
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-timer-head strong,
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid button strong,
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid button span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid button {
+  background: linear-gradient(180deg, rgba(58,47,88,.98), rgba(40,32,67,.98)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 22px rgba(0,0,0,.20) !important;
+}
+
+html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid button.active {
+  border-color: rgba(124,229,194,.58) !important;
+  box-shadow: 0 0 0 3px rgba(124,229,194,.12), 0 12px 24px rgba(0,0,0,.26) !important;
+}
