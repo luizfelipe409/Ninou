@@ -35451,341 +35451,136 @@ html body:not(.day-theme) span.setting-icon[aria-hidden="true"] {
 }
 
 
-/* v75.75.93 arcos premium dos avatares do perfil */
+/* v75.75.95 arcos avatar perfil clean premium */
 
-/* Arcos/molduras dos avatares do perfil:
-   - Tema claro: lavanda + champagne.
-   - Tema escuro: mint neon suave + roxo profundo.
-   Remove a sensação de aro preto pesado e deixa o avatar com acabamento premium. */
+/* v75.75.95 — correção visual dos arcos do avatar do perfil.
+   Remove a ideia de arco chamativo/conic e volta para uma moldura premium limpa:
+   delicada, com sombra suave, sem aparência pesada ou artificial. */
 
-/* Avatar principal do perfil */
-html body .screen[data-screen="profile"] .avatar-wrapper {
-  position: relative !important;
+/* Garante que qualquer pseudo-arco antigo não apareça */
+html body .screen[data-screen="profile"] .profile-card .avatar-wrapper::before,
+html body .screen[data-screen="profile"] .profile-card .avatar-wrapper::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Wrapper volta a ser simples e equilibrado */
+html body .screen[data-screen="profile"] .profile-card .avatar-wrapper {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 auto 12px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  position: relative !important;
+  overflow: visible !important;
 }
 
-html body .screen[data-screen="profile"] #profilePhoto {
+/* Avatar principal: moldura limpa, sem arco exagerado */
+html body .screen[data-screen="profile"] .profile-card img#profilePhoto,
+html body .screen[data-screen="profile"] img#profilePhoto {
   width: 116px !important;
   height: 116px !important;
   padding: 4px !important;
   border-radius: 36px !important;
-  border: 3px solid transparent !important;
+  border: 1px solid transparent !important;
   object-fit: contain !important;
   object-position: center center !important;
-  transition:
-    transform .22s ease,
-    box-shadow .22s ease,
-    background .22s ease !important;
-}
-
-/* Tema claro: lavanda premium + champagne/dourado suave */
-html body.day-theme .screen[data-screen="profile"] #profilePhoto {
-  background:
-    radial-gradient(circle at 30% 18%,
-      rgba(255,255,255,1) 0%,
-      rgba(255,255,255,.78) 24%,
-      rgba(245,213,141,.32) 48%,
-      rgba(167,139,250,.42) 76%,
-      rgba(124,92,255,.24) 100%
-    ),
-    linear-gradient(135deg, #a78bfa 0%, #f4d58d 100%) !important;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.84),
-    0 0 0 5px rgba(167,139,250,.075),
-    0 14px 30px rgba(124,92,255,.18),
-    0 8px 18px rgba(128,100,56,.08),
-    inset 0 0 0 4px #ffffff !important;
-}
-
-/* Tema escuro: mint neon suave + roxo profundo, sem arco preto */
-html body:not(.day-theme) .screen[data-screen="profile"] #profilePhoto {
-  background:
-    radial-gradient(circle at 30% 18%,
-      rgba(124,229,194,.42) 0%,
-      rgba(124,229,194,.24) 30%,
-      rgba(109,93,252,.28) 62%,
-      rgba(43,35,66,.96) 100%
-    ),
-    linear-gradient(135deg, #7ce5c2 0%, #6d5dfc 100%) !important;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.08),
-    0 0 0 5px rgba(124,229,194,.07),
-    0 0 24px rgba(124,229,194,.18),
-    0 16px 34px rgba(0,0,0,.34),
-    inset 0 0 0 4px #2b2342 !important;
-}
-
-/* Se houver miniaturas de avatar do bebê em outros pontos do perfil, herdam a mesma linguagem */
-html body .screen[data-screen="profile"] .identity img,
-html body .screen[data-screen="profile"] img.avatar-face-thumb,
-html body .screen[data-screen="profile"] img.avatar-preset-thumb {
-  object-fit: contain !important;
-  object-position: center center !important;
-}
-
-/* Mini/identity no tema claro */
-html body.day-theme .screen[data-screen="profile"] .identity img {
-  background:
-    radial-gradient(circle at 30% 18%,
-      rgba(255,255,255,1) 0%,
-      rgba(255,255,255,.78) 26%,
-      rgba(245,213,141,.24) 50%,
-      rgba(167,139,250,.30) 100%
-    ),
-    linear-gradient(135deg, rgba(167,139,250,.92), rgba(244,213,141,.92)) !important;
-  box-shadow:
-    0 10px 22px rgba(124,92,255,.14),
-    inset 0 0 0 3px #ffffff !important;
-}
-
-/* Mini/identity no tema escuro */
-html body:not(.day-theme) .screen[data-screen="profile"] .identity img {
-  background:
-    radial-gradient(circle at 30% 18%,
-      rgba(124,229,194,.34) 0%,
-      rgba(109,93,252,.24) 58%,
-      rgba(43,35,66,.94) 100%
-    ),
-    linear-gradient(135deg, rgba(124,229,194,.92), rgba(109,93,252,.92)) !important;
-  box-shadow:
-    0 0 18px rgba(124,229,194,.14),
-    0 12px 24px rgba(0,0,0,.28),
-    inset 0 0 0 3px #2b2342 !important;
-}
-
-/* Preview do modal alinhado com o mesmo conceito dos arcos do perfil */
-html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
-.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
-  background:
-    radial-gradient(circle at 30% 18%,
-      rgba(255,255,255,1) 0%,
-      rgba(255,255,255,.78) 24%,
-      rgba(245,213,141,.24) 48%,
-      rgba(167,139,250,.36) 78%,
-      rgba(124,92,255,.18) 100%
-    ),
-    linear-gradient(135deg, rgba(167,139,250,.92), rgba(244,213,141,.88)) !important;
-  border: 1.5px solid rgba(167,139,250,.42) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.95),
-    0 0 0 4px rgba(167,139,250,.06),
-    0 0 24px rgba(139,92,246,.18),
-    0 14px 28px rgba(76,59,112,.13) !important;
-}
-
-html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
-.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
-  background:
-    radial-gradient(circle at 32% 18%,
-      rgba(124,229,194,.34) 0%,
-      rgba(124,229,194,.20) 30%,
-      rgba(109,93,252,.24) 62%,
-      rgba(43,35,66,.96) 100%
-    ),
-    linear-gradient(135deg, rgba(124,229,194,.90), rgba(109,93,252,.86)) !important;
-  border: 1.5px solid rgba(124,229,194,.38) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.07),
-    0 0 0 4px rgba(124,229,194,.06),
-    0 0 24px rgba(124,229,194,.18),
-    0 16px 32px rgba(0,0,0,.36) !important;
-}
-
-
-/* v75.75.94 HARD OVERRIDE arco visivel avatar perfil */
-
-/* HARD OVERRIDE REAL DOS ARCOS DO AVATAR DO PERFIL
-   Na versão anterior a alteração ficou sutil/oculta porque o próprio img e regras antigas
-   continuavam dominando visualmente. Agora o arco é desenhado no wrapper, por trás da imagem,
-   e fica visível independentemente do background interno do avatar. */
-
-/* Prepara o wrapper para receber arco real */
-html body .screen[data-screen="profile"] .profile-card .avatar-wrapper {
-  width: 132px !important;
-  height: 132px !important;
-  margin: 0 auto 14px !important;
-  position: relative !important;
-  display: grid !important;
-  place-items: center !important;
-  overflow: visible !important;
-  isolation: isolate !important;
-}
-
-/* Arco externo base */
-html body .screen[data-screen="profile"] .profile-card .avatar-wrapper::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  border-radius: 40px !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Brilho interno/acento do arco */
-html body .screen[data-screen="profile"] .profile-card .avatar-wrapper::after {
-  content: "" !important;
-  position: absolute !important;
-  inset: 7px !important;
-  border-radius: 34px !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-/* A imagem fica menor para o arco aparecer de verdade */
-html body .screen[data-screen="profile"] .profile-card .avatar-wrapper > img#profilePhoto {
-  position: relative !important;
-  z-index: 2 !important;
-  width: 112px !important;
-  height: 112px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 34px !important;
-  border: 0 !important;
-  object-fit: contain !important;
-  object-position: center center !important;
-  background: transparent !important;
-  box-shadow: none !important;
   transform: none !important;
 }
 
-/* Tema claro: arco lavanda/champagne visível */
-html body.day-theme .screen[data-screen="profile"] .profile-card .avatar-wrapper::before {
+/* Tema claro: lavanda/champagne bem suave, sem parecer aro artificial */
+html body.day-theme .screen[data-screen="profile"] .profile-card img#profilePhoto,
+html body.day-theme .screen[data-screen="profile"] img#profilePhoto {
   background:
-    conic-gradient(
-      from 210deg,
-      rgba(167,139,250,1) 0deg,
-      rgba(244,213,141,1) 86deg,
-      rgba(255,255,255,.92) 132deg,
-      rgba(167,139,250,.95) 214deg,
-      rgba(244,213,141,.86) 292deg,
-      rgba(167,139,250,1) 360deg
+    linear-gradient(135deg,
+      rgba(183,162,255,.92) 0%,
+      rgba(244,216,154,.82) 100%
     ) !important;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.92),
-    0 0 0 6px rgba(167,139,250,.075),
-    0 18px 34px rgba(124,92,255,.20),
-    0 8px 18px rgba(126,94,50,.10) !important;
+    inset 0 0 0 4px rgba(255,255,255,.96),
+    0 14px 30px rgba(124,92,255,.16),
+    0 2px 0 rgba(255,255,255,.70) !important;
 }
 
-html body.day-theme .screen[data-screen="profile"] .profile-card .avatar-wrapper::after {
+/* Tema escuro: mint + roxo profundo, premium e discreto, sem preto chapado */
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-card img#profilePhoto,
+html body:not(.day-theme) .screen[data-screen="profile"] img#profilePhoto {
   background:
-    linear-gradient(145deg, rgba(255,255,255,.96), rgba(255,255,255,.70)) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(167,139,250,.14),
-    inset 0 1px 0 rgba(255,255,255,.98) !important;
-}
-
-/* Tema escuro: arco mint/roxo profundo visível, sem preto puro */
-html body:not(.day-theme) .screen[data-screen="profile"] .profile-card .avatar-wrapper::before {
-  background:
-    conic-gradient(
-      from 210deg,
-      rgba(124,229,194,1) 0deg,
-      rgba(109,93,252,.96) 92deg,
-      rgba(43,35,66,1) 152deg,
-      rgba(124,229,194,.92) 226deg,
-      rgba(109,93,252,.88) 304deg,
-      rgba(124,229,194,1) 360deg
+    linear-gradient(135deg,
+      rgba(124,229,194,.92) 0%,
+      rgba(109,93,252,.82) 100%
     ) !important;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.075),
-    0 0 0 6px rgba(124,229,194,.075),
-    0 0 28px rgba(124,229,194,.20),
-    0 20px 38px rgba(0,0,0,.40) !important;
+    inset 0 0 0 4px rgba(36,29,59,.96),
+    0 0 22px rgba(124,229,194,.14),
+    0 16px 34px rgba(0,0,0,.30) !important;
 }
 
-html body:not(.day-theme) .screen[data-screen="profile"] .profile-card .avatar-wrapper::after {
-  background:
-    linear-gradient(145deg, rgba(43,35,66,.96), rgba(28,23,45,.98)) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(124,229,194,.14),
-    inset 0 1px 0 rgba(255,255,255,.06) !important;
+/* Pequena interação premium */
+html body .screen[data-screen="profile"] .profile-card img#profilePhoto:active {
+  transform: scale(.97) !important;
 }
 
-/* Garante que regras antigas do #profilePhoto não recriem aro preto/inset pesado */
-html body.day-theme .screen[data-screen="profile"] img#profilePhoto,
-html body:not(.day-theme) .screen[data-screen="profile"] img#profilePhoto,
-html body .screen[data-screen="profile"] .profile-card img#profilePhoto {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: 0 !important;
-  padding: 0 !important;
-}
-
-/* Preview do modal segue a mesma linguagem, com arco visível */
+/* Preview do modal: acompanha a moldura clean, sem arco chamativo */
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
-  position: relative !important;
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  padding: 7px !important;
+  border-radius: 28px !important;
   overflow: hidden !important;
-  border-radius: 30px !important;
+  position: relative !important;
+  isolation: isolate !important;
 }
 
-html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
-.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
-  background:
-    conic-gradient(
-      from 210deg,
-      rgba(167,139,250,1),
-      rgba(244,213,141,.92),
-      rgba(255,255,255,.9),
-      rgba(167,139,250,.96),
-      rgba(244,213,141,.86),
-      rgba(167,139,250,1)
-    ) !important;
-  border: 0 !important;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.85),
-    0 0 0 4px rgba(167,139,250,.06),
-    0 0 24px rgba(139,92,246,.18),
-    0 14px 28px rgba(76,59,112,.13) !important;
-}
-
-html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
-.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
-  background:
-    conic-gradient(
-      from 210deg,
-      rgba(124,229,194,1),
-      rgba(109,93,252,.96),
-      rgba(43,35,66,1),
-      rgba(124,229,194,.92),
-      rgba(109,93,252,.88),
-      rgba(124,229,194,1)
-    ) !important;
-  border: 0 !important;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.07),
-    0 0 0 4px rgba(124,229,194,.06),
-    0 0 24px rgba(124,229,194,.18),
-    0 16px 32px rgba(0,0,0,.36) !important;
-}
-
-/* Cria “miolo” no preview para não ficar arco preenchido demais */
+/* Remove camadas conic/fortes antigas do preview */
+html body .ninou-modal.avatar-modal#babyAvatarTestCard
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before,
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::after {
-  content: "" !important;
-  position: absolute !important;
-  inset: 7px !important;
-  border-radius: 23px !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-  border: 1px solid rgba(255,255,255,.24) !important;
+  content: none !important;
+  display: none !important;
 }
 
 html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
-.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::after {
-  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(255,255,255,.72)) !important;
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  background:
+    linear-gradient(135deg,
+      rgba(183,162,255,.78) 0%,
+      rgba(244,216,154,.68) 100%
+    ) !important;
+  border: 1px solid rgba(167,139,250,.22) !important;
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,.88),
+    0 0 20px rgba(139,92,246,.13),
+    0 12px 24px rgba(76,59,112,.11) !important;
 }
 
 html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
-.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::after {
-  background: linear-gradient(145deg, rgba(43,35,66,.96), rgba(28,23,45,.98)) !important;
+.avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
+  background:
+    linear-gradient(135deg,
+      rgba(124,229,194,.82) 0%,
+      rgba(109,93,252,.72) 100%
+    ) !important;
+  border: 1px solid rgba(124,229,194,.22) !important;
+  box-shadow:
+    inset 0 0 0 4px rgba(36,29,59,.92),
+    0 0 20px rgba(124,229,194,.14),
+    0 14px 28px rgba(0,0,0,.30) !important;
 }
 
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel img.baby-avatar-preview {
+  width: 82px !important;
+  height: 82px !important;
   position: relative !important;
   z-index: 2 !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
 }

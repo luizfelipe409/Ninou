@@ -1,0 +1,11 @@
+Versão v75.75.95
+
+Correção após reprovação visual da v75.75.94:
+- Removido o arco conic/forte que deixou o avatar com aparência artificial.
+- Voltamos para uma moldura clean premium, mais discreta e elegante.
+- Tema claro: lavanda + champagne suave.
+- Tema escuro: mint + roxo profundo, sem preto pesado.
+- O avatar principal voltou ao tamanho/proporção anterior para não parecer forçado.
+- Preview do modal também recebeu a moldura clean.
+- Base usada: v75.75.92, preservando os ícones premium que ficaram bons.
+- Cache/versionamento atualizado para 75.75.95.
