@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-93-avatar-profile-premium-arcs";
+const CACHE_NAME = "ninou-v75-75-94-avatar-profile-visible-arcs";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.93",
-  "/app.js?v=75.75.93",
-  "/js/app.legacy.js?v=75.75.93",
+  "/styles.css?v=75.75.94",
+  "/app.js?v=75.75.94",
+  "/js/app.legacy.js?v=75.75.94",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest?v=75.75.93",
+  "/manifest.webmanifest?v=75.75.94",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",

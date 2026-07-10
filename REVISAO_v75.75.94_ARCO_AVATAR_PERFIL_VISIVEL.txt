@@ -1,0 +1,10 @@
+Versão v75.75.94
+
+Correção após a v75.75.93 parecer igual:
+- O arco agora é desenhado no .avatar-wrapper com ::before e ::after, não apenas no background do img.
+- A imagem do avatar foi levemente reduzida para o arco aparecer de verdade.
+- Tema claro: arco visível lavanda + champagne.
+- Tema escuro: arco visível mint + roxo profundo, sem preto puro.
+- Regras antigas do #profilePhoto foram neutralizadas com override forte.
+- Preview do modal também recebeu o mesmo conceito de arco visível.
+- Cache/versionamento atualizado para 75.75.94.
