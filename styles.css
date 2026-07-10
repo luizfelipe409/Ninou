@@ -35984,3 +35984,244 @@ html body.day-theme .screen[data-screen="profile"] .setting-label,
 html body.day-theme .screen[data-screen="profile"] label span {
   color: rgba(88, 77, 112, .80) !important;
 }
+
+
+/* v75.75.99 ajuste espaco vazio final perfil */
+
+/* v75.75.99 — Correção do espaço vazio no final da página Perfil.
+   O tema claro ficou bom como direção, mas a página estava com respiro final excessivo.
+   Mantém área segura para a bottom nav sem criar um vazio grande sem função. */
+
+/* Reduz o padding inferior geral apenas na tela Perfil */
+html body .screen[data-screen="profile"] {
+  padding-bottom: 88px !important;
+}
+
+/* Em alguns aparelhos o espaçamento vem do stack interno */
+html body .screen[data-screen="profile"] .profile-family-stack,
+html body .screen[data-screen="profile"] .profile-diary-stack {
+  padding-bottom: 12px !important;
+  margin-bottom: 0 !important;
+}
+
+/* Último bloco do perfil não precisa deixar um vão enorme depois dele */
+html body .screen[data-screen="profile"] .profile-family-stack > :last-child,
+html body .screen[data-screen="profile"] .profile-diary-stack > :last-child,
+html body .screen[data-screen="profile"] .profile-family-card:last-child,
+html body .screen[data-screen="profile"] article:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Se existir espaçador/safe-area extra no fim, limita ao necessário para a nav */
+html body .screen[data-screen="profile"] .safe-bottom,
+html body .screen[data-screen="profile"] .bottom-spacer,
+html body .screen[data-screen="profile"] .profile-bottom-spacer {
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+}
+
+/* Bottom nav continua glass, mas sem parecer que empurra demais o conteúdo */
+html body.day-theme .bottom-nav,
+html body.day-theme nav.bottom-nav,
+html body.day-theme .app-bottom-nav {
+  margin-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+}
+
+/* iPhones altos: preserva conforto sem criar área morta */
+@media (min-height: 850px) {
+  html body .screen[data-screen="profile"] {
+    padding-bottom: 96px !important;
+  }
+
+  html body .screen[data-screen="profile"] .profile-family-stack,
+  html body .screen[data-screen="profile"] .profile-diary-stack {
+    padding-bottom: 16px !important;
+  }
+}
+
+/* Telas mais baixas: ainda mais compacto */
+@media (max-height: 760px) {
+  html body .screen[data-screen="profile"] {
+    padding-bottom: 78px !important;
+  }
+
+  html body .screen[data-screen="profile"] .profile-family-stack,
+  html body .screen[data-screen="profile"] .profile-diary-stack {
+    padding-bottom: 8px !important;
+  }
+}
+
+
+/* v75.75.100 refino do tema escuro do perfil */
+
+/* v75.75.100 — Tema escuro do Perfil
+   Ajustes:
+   - menos espaço vazio no final
+   - textos com contraste melhor
+   - botão + deixa de ser laranja e passa para mint/neon suave premium
+*/
+
+/* Espaço final no tema escuro: reduz área morta, mantendo safe area da bottom nav */
+html body.night-theme .screen[data-screen="profile"],
+html body[data-day-period="night"] .screen[data-screen="profile"],
+html body:not(.day-theme) .screen[data-screen="profile"] {
+  padding-bottom: 82px !important;
+}
+
+html body.night-theme .screen[data-screen="profile"] .profile-family-stack,
+html body.night-theme .screen[data-screen="profile"] .profile-diary-stack,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-family-stack,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-diary-stack,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-family-stack,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-diary-stack {
+  padding-bottom: 10px !important;
+  margin-bottom: 0 !important;
+}
+
+html body.night-theme .screen[data-screen="profile"] .profile-family-stack > :last-child,
+html body.night-theme .screen[data-screen="profile"] .profile-diary-stack > :last-child,
+html body.night-theme .screen[data-screen="profile"] article:last-child,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-family-stack > :last-child,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-diary-stack > :last-child,
+html body[data-day-period="night"] .screen[data-screen="profile"] article:last-child,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-family-stack > :last-child,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-diary-stack > :last-child,
+html body:not(.day-theme) .screen[data-screen="profile"] article:last-child {
+  margin-bottom: 0 !important;
+}
+
+html body.night-theme .screen[data-screen="profile"] .safe-bottom,
+html body.night-theme .screen[data-screen="profile"] .bottom-spacer,
+html body.night-theme .screen[data-screen="profile"] .profile-bottom-spacer,
+html body[data-day-period="night"] .screen[data-screen="profile"] .safe-bottom,
+html body[data-day-period="night"] .screen[data-screen="profile"] .bottom-spacer,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-bottom-spacer,
+html body:not(.day-theme) .screen[data-screen="profile"] .safe-bottom,
+html body:not(.day-theme) .screen[data-screen="profile"] .bottom-spacer,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-bottom-spacer {
+  height: 12px !important;
+  min-height: 12px !important;
+  max-height: 12px !important;
+}
+
+/* Contraste do texto no tema escuro */
+html body.night-theme .screen[data-screen="profile"] p,
+html body.night-theme .screen[data-screen="profile"] small,
+html body.night-theme .screen[data-screen="profile"] .setting-label,
+html body.night-theme .screen[data-screen="profile"] label span,
+html body.night-theme .screen[data-screen="profile"] .profile-card span,
+html body.night-theme .screen[data-screen="profile"] .profile-card-head span,
+html body[data-day-period="night"] .screen[data-screen="profile"] p,
+html body[data-day-period="night"] .screen[data-screen="profile"] small,
+html body[data-day-period="night"] .screen[data-screen="profile"] .setting-label,
+html body[data-day-period="night"] .screen[data-screen="profile"] label span,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-card span,
+html body[data-day-period="night"] .screen[data-screen="profile"] .profile-card-head span,
+html body:not(.day-theme) .screen[data-screen="profile"] p,
+html body:not(.day-theme) .screen[data-screen="profile"] small,
+html body:not(.day-theme) .screen[data-screen="profile"] .setting-label,
+html body:not(.day-theme) .screen[data-screen="profile"] label span,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-card span,
+html body:not(.day-theme) .screen[data-screen="profile"] .profile-card-head span {
+  color: rgba(227, 220, 247, .88) !important;
+}
+
+html body.night-theme .screen[data-screen="profile"] strong,
+html body.night-theme .screen[data-screen="profile"] h1,
+html body.night-theme .screen[data-screen="profile"] h2,
+html body.night-theme .screen[data-screen="profile"] h3,
+html body.night-theme .screen[data-screen="profile"] #profileBabyName,
+html body.night-theme .screen[data-screen="profile"] #profileBabyAge,
+html body[data-day-period="night"] .screen[data-screen="profile"] strong,
+html body[data-day-period="night"] .screen[data-screen="profile"] h1,
+html body[data-day-period="night"] .screen[data-screen="profile"] h2,
+html body[data-day-period="night"] .screen[data-screen="profile"] h3,
+html body[data-day-period="night"] .screen[data-screen="profile"] #profileBabyName,
+html body[data-day-period="night"] .screen[data-screen="profile"] #profileBabyAge,
+html body:not(.day-theme) .screen[data-screen="profile"] strong,
+html body:not(.day-theme) .screen[data-screen="profile"] h1,
+html body:not(.day-theme) .screen[data-screen="profile"] h2,
+html body:not(.day-theme) .screen[data-screen="profile"] h3,
+html body:not(.day-theme) .screen[data-screen="profile"] #profileBabyName,
+html body:not(.day-theme) .screen[data-screen="profile"] #profileBabyAge {
+  color: #ffffff !important;
+}
+
+html body.night-theme .screen[data-screen="profile"] input,
+html body.night-theme .screen[data-screen="profile"] select,
+html body.night-theme .screen[data-screen="profile"] textarea,
+html body[data-day-period="night"] .screen[data-screen="profile"] input,
+html body[data-day-period="night"] .screen[data-screen="profile"] select,
+html body[data-day-period="night"] .screen[data-screen="profile"] textarea,
+html body:not(.day-theme) .screen[data-screen="profile"] input,
+html body:not(.day-theme) .screen[data-screen="profile"] select,
+html body:not(.day-theme) .screen[data-screen="profile"] textarea {
+  color: #f8f5ff !important;
+}
+
+html body.night-theme .screen[data-screen="profile"] input::placeholder,
+html body.night-theme .screen[data-screen="profile"] textarea::placeholder,
+html body[data-day-period="night"] .screen[data-screen="profile"] input::placeholder,
+html body[data-day-period="night"] .screen[data-screen="profile"] textarea::placeholder,
+html body:not(.day-theme) .screen[data-screen="profile"] input::placeholder,
+html body:not(.day-theme) .screen[data-screen="profile"] textarea::placeholder {
+  color: rgba(220, 212, 244, .58) !important;
+}
+
+/* Botão + no tema escuro: sai do laranja e vira mint/neon suave premium */
+html body.night-theme .fab,
+html body.night-theme .fab-real-plus,
+html body.night-theme button[data-open-sheet],
+html body.night-theme .floating-action-button,
+html body.night-theme .round-action.fab,
+html body[data-day-period="night"] .fab,
+html body[data-day-period="night"] .fab-real-plus,
+html body[data-day-period="night"] button[data-open-sheet],
+html body[data-day-period="night"] .floating-action-button,
+html body[data-day-period="night"] .round-action.fab,
+html body:not(.day-theme) .fab,
+html body:not(.day-theme) .fab-real-plus,
+html body:not(.day-theme) button[data-open-sheet],
+html body:not(.day-theme) .floating-action-button,
+html body:not(.day-theme) .round-action.fab {
+  background:
+    linear-gradient(135deg, #72f2c7 0%, #92ffd8 52%, #9fd5ff 100%) !important;
+  color: #0e241d !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  box-shadow:
+    0 12px 26px rgba(114,242,199,.22),
+    0 6px 14px rgba(159,213,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+
+/* Bottom nav escura permanece premium sem empurrar o conteúdo */
+html body.night-theme .bottom-nav,
+html body.night-theme nav.bottom-nav,
+html body.night-theme .app-bottom-nav,
+html body[data-day-period="night"] .bottom-nav,
+html body[data-day-period="night"] nav.bottom-nav,
+html body[data-day-period="night"] .app-bottom-nav,
+html body:not(.day-theme) .bottom-nav,
+html body:not(.day-theme) nav.bottom-nav,
+html body:not(.day-theme) .app-bottom-nav {
+  margin-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+}
+
+/* Telas altas: ainda reduzido, mas preservando conforto */
+@media (min-height: 850px) {
+  html body.night-theme .screen[data-screen="profile"],
+  html body[data-day-period="night"] .screen[data-screen="profile"],
+  html body:not(.day-theme) .screen[data-screen="profile"] {
+    padding-bottom: 88px !important;
+  }
+
+  html body.night-theme .screen[data-screen="profile"] .profile-family-stack,
+  html body.night-theme .screen[data-screen="profile"] .profile-diary-stack,
+  html body[data-day-period="night"] .screen[data-screen="profile"] .profile-family-stack,
+  html body[data-day-period="night"] .screen[data-screen="profile"] .profile-diary-stack,
+  html body:not(.day-theme) .screen[data-screen="profile"] .profile-family-stack,
+  html body:not(.day-theme) .screen[data-screen="profile"] .profile-diary-stack {
+    padding-bottom: 12px !important;
+  }
+}

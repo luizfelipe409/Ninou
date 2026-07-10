@@ -1,0 +1,9 @@
+Versão v75.75.100
+
+Refino do tema escuro da tela Perfil:
+- Corrigido o espaço vazio grande no final da página.
+- Melhorado o contraste de frases/textos secundários no perfil.
+- Inputs/placeholders com melhor leitura.
+- Botão + deixou de ser laranja e passou para um mint/neon suave premium.
+- Mantido o restante do tema escuro já lapidado.
+- Cache/versionamento atualizado para 75.75.100.

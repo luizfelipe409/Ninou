@@ -1,0 +1,10 @@
+Versão v75.75.99
+
+Correção após avaliação da v75.75.98:
+- A direção visual do tema claro foi mantida.
+- Corrigido o espaço vazio grande no final da página Perfil.
+- Reduzido padding inferior da tela Perfil.
+- Reduzido espaçamento final do profile-family-stack/profile-diary-stack.
+- Mantida área segura suficiente para a bottom nav, sem criar área morta.
+- Ajustado comportamento em telas altas e baixas.
+- Cache/versionamento atualizado para 75.75.99.
