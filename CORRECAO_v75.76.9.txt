@@ -1,4 +1,4 @@
-Ninou v75.77.4 — órbita e registros próximos
+Ninou v75.77.5 — órbita e registros próximos
 
 - Restaurados os ícones reais dos registros na órbita do tema claro.
 - Mantidos os ícones no tema escuro, sem filtros ou opacidade indevida.
@@ -7,4 +7,4 @@ Ninou v75.77.4 — órbita e registros próximos
 - Altura do painel passa a acompanhar o conteúdo, com rolagem interna apenas quando necessário.
 - Cards, horários e textos longos não são mais cortados em iPhone.
 - Lista sempre abre no topo.
-- Cache/PWA atualizado para 75.77.4.
+- Cache/PWA atualizado para 75.77.5.

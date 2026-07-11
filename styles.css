@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.4 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.5 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.77.4 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.77.5 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.77.4 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v75.77.5 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.4 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.5 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.4 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.5 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v75.77.4 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v75.77.5 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v75.77.4 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v75.77.5 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v75.77.4 — layout premium baseado no preview aprovado ===== */
+/* ===== v75.77.5 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29890,7 +29890,7 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
 }
 
 
-/* ===== v75.77.4 — escala móvel fiel ao preview aprovado ===== */
+/* ===== v75.77.5 — escala móvel fiel ao preview aprovado ===== */
 
 html body.family-daily-surface .app-header {
   grid-template-columns: minmax(0, 1fr) 118px !important;
@@ -30152,7 +30152,7 @@ html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] 
 
 
 /* ==========================================================================
-   v75.77.4 — órbita premium + alinhamento dos registros rápidos
+   v75.77.5 — órbita premium + alinhamento dos registros rápidos
    ========================================================================== */
 
 html body.family-daily-surface .quick-actions button[data-open-sheet] {
@@ -30262,7 +30262,7 @@ html body.family-daily-surface .state-orbit .orbit-events {
 
 
 /* ========================================================================== 
-   v75.77.4 — órbita cronológica em tempo real + timeline legível
+   v75.77.5 — órbita cronológica em tempo real + timeline legível
    ========================================================================== */
 
 /* Registros rápidos: ícone e texto realmente centralizados no card. */
@@ -30390,7 +30390,7 @@ html body.family-daily-surface .state-orbit .orbit-event.active > i {
 
 
 /* ==========================================================================
-   v75.77.4 — órbita cronológica canônica de 24 horas
+   v75.77.5 — órbita cronológica canônica de 24 horas
    00:00 no início do arco; 23:59 no final; relógio em área central segura.
    ========================================================================== */
 
