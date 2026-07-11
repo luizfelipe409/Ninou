@@ -1,12 +1,12 @@
-const CACHE_NAME = "ninou-v75-76-7-day-notes-fix";
-const APP_VERSION = "75.76.7";
+const CACHE_NAME = "ninou-v75-76-8-profile-client";
+const APP_VERSION = "75.76.8";
 
 const APP_SHELL = [
   "/",
   "/index.html",
   `/styles.css?v=${APP_VERSION}`,
-  `/js/boot-v75.76.7.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v75.76.7.mjs?v=${APP_VERSION}`,
+  `/js/boot-v75.76.8.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v75.76.8.mjs?v=${APP_VERSION}`,
   "/app.js",
   "/js/app.js",
   "/js/app.legacy.js",

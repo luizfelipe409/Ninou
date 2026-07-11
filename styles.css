@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.76.7 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.76.8 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.76.7 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.76.8 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.76.7 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v75.76.8 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.76.7 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.76.8 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.76.7 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.76.8 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29044,4 +29044,268 @@ body.day-theme .day-note-modal-field input[readonly] {
     grid-column: 1 / -1 !important;
     justify-content: flex-end !important;
   }
+}
+
+/* ===== PERFIL DO CLIENTE FINAL — v75.76.8 ===== */
+/* O painel interno nunca pode aparecer na experiência da família. */
+body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
+body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
+  display: none !important;
+}
+
+/* Remove blocos de implantação, diagnóstico e permissões da tela diária da família. */
+body.family-ready .profile-sharing-card,
+body.family-ready #familyRolesGuideCard,
+body.family-ready #commercialBetaCard,
+body.family-ready #commercialFinalSequenceCard,
+body.family-ready #dataRealityCard,
+body.family-ready #postAccessCard,
+body.family-ready #accountJourneyCard,
+body.family-ready #premiumTrustCard,
+body.family-ready #firstUseChecklistCard,
+body.family-ready #familyAccessCard,
+body.family-ready #supportBetaCard,
+body.family-ready #legalReadinessCard,
+body.family-ready #profileReadyCard {
+  display: none !important;
+}
+
+/* A conta conectada vira um resumo simples, sem expor e-mail na tela principal. */
+body.family-ready .login-card .login-fields,
+body.family-ready .login-card #loginButton {
+  display: none !important;
+}
+body.family-ready .login-card .login-actions {
+  display: block !important;
+}
+body.family-ready .login-card #createAccountButton {
+  width: 100%;
+}
+body.family-ready .login-card {
+  order: 20;
+}
+body.family-ready .privacy-note-card {
+  order: 21;
+}
+body.family-ready .privacy-note-card p {
+  max-width: 62ch;
+}
+
+.client-family-card {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 760px);
+  margin: 14px auto 0;
+  padding: 20px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(99, 227, 180, .13), transparent 32%),
+    linear-gradient(160deg, rgba(45, 39, 67, .96), rgba(28, 25, 45, .98));
+  box-shadow: 0 18px 44px rgba(10, 8, 24, .22), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.client-family-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.client-family-head > div {
+  min-width: 0;
+}
+.client-family-head span:first-child {
+  display: block;
+  margin-bottom: 5px;
+  color: rgba(235, 230, 247, .68);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.client-family-head strong {
+  display: block;
+  color: #fff;
+  font-size: clamp(1.15rem, 3.6vw, 1.45rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.client-family-head .family-access-role-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: rgba(102, 232, 180, .13);
+  border: 1px solid rgba(102, 232, 180, .26);
+  color: #b9ffe0;
+  font-size: .78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.client-family-head .family-access-role-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #72e8b8;
+  box-shadow: 0 0 0 4px rgba(114, 232, 184, .12);
+}
+.client-family-copy {
+  margin: 0;
+  color: rgba(235, 230, 247, .78);
+  line-height: 1.55;
+}
+.client-family-members-list {
+  display: grid;
+  gap: 10px;
+}
+.client-family-member {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 13px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.045);
+}
+.client-family-member.is-current {
+  border-color: rgba(102,232,180,.22);
+  background: linear-gradient(135deg, rgba(102,232,180,.09), rgba(255,255,255,.035));
+}
+.client-family-member-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,.07);
+}
+.client-family-member > div {
+  min-width: 0;
+}
+.client-family-member strong,
+.client-family-member small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.client-family-member strong {
+  color: #fff;
+  font-size: .98rem;
+}
+.client-family-member small {
+  margin-top: 3px;
+  color: rgba(235,230,247,.66);
+  font-size: .82rem;
+}
+.client-family-member em {
+  justify-self: end;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(102,232,180,.10);
+  color: #b9ffe0;
+  font-size: .75rem;
+  font-style: normal;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.client-family-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.client-family-actions button {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.client-family-card .family-access-summary-status {
+  color: rgba(235,230,247,.62);
+  line-height: 1.45;
+}
+.client-family-hidden-meta {
+  display: none !important;
+}
+
+body.day-theme .client-family-card {
+  border-color: rgba(72, 54, 99, .12);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(82, 190, 146, .12), transparent 34%),
+    linear-gradient(160deg, rgba(255,255,255,.98), rgba(249,247,253,.98));
+  box-shadow: 0 18px 44px rgba(75, 55, 101, .10), inset 0 1px 0 rgba(255,255,255,.8);
+}
+body.day-theme .client-family-head span:first-child,
+body.day-theme .client-family-copy,
+body.day-theme .client-family-card .family-access-summary-status {
+  color: rgba(61, 52, 74, .66);
+}
+body.day-theme .client-family-head strong,
+body.day-theme .client-family-member strong {
+  color: #352d43;
+}
+body.day-theme .client-family-member {
+  border-color: rgba(72,54,99,.10);
+  background: rgba(94,73,126,.045);
+}
+body.day-theme .client-family-member.is-current {
+  border-color: rgba(63,164,121,.20);
+  background: linear-gradient(135deg, rgba(75,183,135,.09), rgba(94,73,126,.035));
+}
+body.day-theme .client-family-member small {
+  color: rgba(61,52,74,.64);
+}
+body.day-theme .client-family-member em,
+body.day-theme .client-family-head .family-access-role-badge {
+  color: #24734f;
+  background: rgba(70,178,130,.10);
+  border-color: rgba(70,178,130,.20);
+}
+
+@media (max-width: 560px) {
+  .client-family-card {
+    padding: 17px;
+    border-radius: 24px;
+  }
+  .client-family-head {
+    align-items: center;
+  }
+  .client-family-member {
+    grid-template-columns: 42px minmax(0,1fr);
+  }
+  .client-family-member-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+  .client-family-member em {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 2px;
+  }
+  .client-family-actions {
+    flex-direction: column;
+  }
+  .client-family-actions button {
+    width: 100%;
+    flex-basis: auto;
+  }
+}
+
+/* Evita piscar conteúdo técnico enquanto a sincronização termina. */
+body.profile-state-family-ready .profile-sharing-card,
+body.profile-state-family-ready #familyRolesGuideCard,
+body.profile-state-family-ready #commercialBetaCard,
+body.profile-state-family-ready #commercialFinalSequenceCard,
+body.profile-state-family-ready #dataRealityCard,
+body.profile-state-family-ready #postAccessCard,
+body.profile-state-family-ready #accountJourneyCard,
+body.profile-state-family-ready #premiumTrustCard,
+body.profile-state-family-ready #firstUseChecklistCard,
+body.profile-state-family-ready #familyAccessCard,
+body.profile-state-family-ready #supportBetaCard,
+body.profile-state-family-ready #legalReadinessCard,
+body.profile-state-family-ready #profileReadyCard {
+  display: none !important;
 }

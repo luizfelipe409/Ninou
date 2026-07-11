@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.76.7" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.76.8" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.76.7" />
+    <link rel="stylesheet" href="./styles.css?v=75.76.8" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -773,6 +773,37 @@
             </div>
           </article>
 
+
+
+          <section id="familyAccessSummaryCard" class="family-access-summary-card client-family-card" hidden aria-live="polite">
+          <div class="family-access-summary-head client-family-head">
+            <div>
+              <span>Minha família</span>
+              <strong id="familyAccessSummaryTitle">Família conectada</strong>
+            </div>
+            <span id="familyAccessSummaryRoleBadge" class="family-access-role-badge" data-state="connected">Conectada</span>
+          </div>
+          <p id="familyAccessSummaryMembers" class="family-access-summary-note client-family-copy">Todos os cuidadores conectados compartilham a mesma rotina, mas cada aparelho registra com seu próprio nome.</p>
+          <div id="clientFamilyMembersList" class="client-family-members-list" aria-label="Pessoas conectadas à família">
+            <article class="client-family-member is-loading">
+              <span class="client-family-member-avatar" aria-hidden="true">♡</span>
+              <div><strong>Carregando família…</strong><small>Aguarde um instante.</small></div>
+            </article>
+          </div>
+          <div class="family-access-summary-actions client-family-actions">
+            <button id="familyAccessSummaryInviteButton" class="profile-primary-button" type="button">Convidar familiar</button>
+            <button id="familyAccessSummaryProfileButton" class="profile-secondary-button" type="button">Editar meu nome</button>
+            <button id="familyLeaveButton" class="profile-secondary-button family-danger-button" type="button" hidden>Sair da família</button>
+          </div>
+          <small id="familyAccessSummaryInviteStatus" class="family-access-summary-status">Sua família está conectada. Novos convites aparecem somente quando necessário.</small>
+          <div class="client-family-hidden-meta" aria-hidden="true">
+            <span id="familyAccessSummaryUser">Conta conectada</span>
+            <span id="familyAccessSummaryFamily">Família conectada</span>
+            <span id="familyAccessSummaryDevice">Cuidador identificado</span>
+            <span id="familyAccessSummaryRole">Familiar</span>
+          </div>
+          </section>
+
           <article class="profile-family-card preferences-profile-card">
             <div class="profile-card-head">
               <div>
@@ -826,30 +857,7 @@
           </div>
         </section>
 
-        <section id="familyAccessSummaryCard" class="family-access-summary-card" hidden aria-live="polite">
-          <div class="family-access-summary-head">
-            <div>
-              <span>Meu acesso familiar</span>
-              <strong id="familyAccessSummaryTitle">Família conectada</strong>
-            </div>
-            <span id="familyAccessSummaryRoleBadge" class="family-access-role-badge">Acesso</span>
-          </div>
-          <div class="family-access-summary-grid" aria-label="Resumo do acesso familiar">
-            <article><span>Conta</span><strong id="familyAccessSummaryUser">—</strong></article>
-            <article><span>Família</span><strong id="familyAccessSummaryFamily">—</strong></article>
-            <article><span>Cuidador neste aparelho</span><strong id="familyAccessSummaryDevice">—</strong></article>
-            <article><span>Permissão</span><strong id="familyAccessSummaryRole">—</strong></article>
-          </div>
-          <p id="familyAccessSummaryMembers" class="family-access-summary-note">Os membros autorizados aparecem no painel familiar.</p>
-          <div class="family-access-summary-actions">
-            <button id="familyAccessSummaryInviteButton" class="profile-primary-button" type="button">Convidar cuidador</button>
-            <button id="familyAccessSummaryProfileButton" class="profile-secondary-button" type="button">Editar meu cuidador</button>
-            <button id="familyLeaveButton" class="profile-secondary-button family-danger-button" type="button" hidden>Sair da família</button>
-          </div>
-          <small id="familyAccessSummaryInviteStatus" class="family-access-summary-status">Convites são de uso único e devem ser enviados para o e-mail correto.</small>
-        </section>
-
-        <section id="familyRolesGuideCard" class="family-roles-guide-card" aria-label="Papéis familiares no Ninou">
+        <section id="familyRolesGuideCard" class="family-roles-guide-card" aria-label="Papéis familiares no Ninou" hidden>
           <div class="profile-card-head">
             <div>
               <span>Papéis da família</span>
@@ -977,7 +985,7 @@
         </section>
 
 
-        <section id="commercialBetaCard" class="commercial-beta-card" aria-label="Preparação comercial do Ninou">
+        <section id="commercialBetaCard" class="commercial-beta-card" aria-label="Preparação comercial do Ninou" data-global-admin-only="true" hidden>
           <div class="commercial-beta-head">
             <span>Validação comercial</span>
             <strong>Checklist interno para liberação controlada.</strong>
@@ -991,7 +999,7 @@
           </div>
           <p class="commercial-beta-note">Antes de abrir para o público geral, siga a sequência: publicar regras, testar Francisco, testar uma família piloto, validar permissões, revisar suporte e só então ampliar o beta.</p>
         </section>
-        <section id="commercialFinalSequenceCard" class="parent-identity-sleep-recalc-card" aria-label="Sequência de revisão comercial final">
+        <section id="commercialFinalSequenceCard" class="parent-identity-sleep-recalc-card" aria-label="Sequência de revisão comercial final" data-global-admin-only="true" hidden>
           <div class="parent-identity-sleep-recalc-head">
             <span>Sequência final</span>
             <strong>Sequência interna de validação comercial.</strong>
@@ -1066,13 +1074,13 @@
           </article>
 
           <article class="privacy-note-card security-device-card">
-            <span>Privacidade</span>
-            <strong>Dados familiares e avatar sem foto real</strong>
-            <p>Os dados do bebê ficam vinculados à família autorizada. O Ninou usa avatares locais, separa famílias por familyId e deve ser usado como diário familiar, não como ferramenta médica.</p>
+            <span>Conta e privacidade</span>
+            <strong>Seus dados ficam no espaço da família</strong>
+            <p>Use a opção abaixo somente ao trocar de celular, vender o aparelho ou deixar de usar esta conta. Os registros sincronizados da família não serão apagados.</p>
             <div class="security-actions-row">
               <button id="clearDeviceDataButton" class="secondary-login danger-soft-button" type="button">Sair e limpar dados deste aparelho</button>
             </div>
-            <small id="clearDeviceDataStatus" class="security-device-status">Use em celulares compartilhados ou ao trocar de família.</small>
+            <small id="clearDeviceDataStatus" class="security-device-status">Esta ação desconecta a conta e limpa apenas os dados salvos neste aparelho.</small>
           </article>
 
           <article id="legalReadinessCard" class="profile-family-card legal-readiness-card" aria-label="Privacidade, termos e dados">
@@ -1194,7 +1202,7 @@
               <button id="acceptInviteButton" class="secondary-login" type="button">Entrar com convite</button>
               <p class="invite-note">Use esse campo se a família já existe e você recebeu um código de acesso.</p>
             </div>
-            <div id="adminInvitePanel" class="admin-invite-panel admin-clean-panel" hidden>
+            <div id="adminInvitePanel" class="admin-invite-panel admin-clean-panel" data-global-admin-only="true" hidden>
               <section class="admin-clean-hero" aria-live="polite">
                 <div>
                   <span>Admin do app</span>
@@ -2019,7 +2027,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v75.76.7.mjs?v=75.76.7").catch((error) => {
+      import("./js/boot-v75.76.8.mjs?v=75.76.8").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         const notice = document.createElement("div");
         notice.style.cssText = "position:fixed;inset:14px 14px auto;z-index:2147483647;padding:16px;border-radius:18px;background:#fff3f3;color:#4a1220;font:14px/1.45 system-ui;box-shadow:0 18px 48px rgba(74,18,32,.2)";
