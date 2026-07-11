@@ -37025,205 +37025,18 @@ html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid butt
 }
 
 
-/* v75.75.107 relogio principal premium */
+/* v75.75.109 restaura relogio premium antigo e corrige soneca */
 
-/* Relógio principal premium: remove ícones orbitais com quadrados quebrados */
-.state-orbit {
-  overflow: hidden !important;
-  isolation: isolate !important;
-}
-
-.state-orbit .orbit-ring,
-.orbit-ring {
-  opacity: .62 !important;
-  filter: none !important;
-}
-
-.orbit-events {
-  pointer-events: auto !important;
-}
-
-/* Eventos da órbita viram marcadores compactos, não cards/imagens grandes */
-.orbit-events > *,
-.orbit-event,
-.orbit-group {
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  min-height: 28px !important;
-  max-width: 28px !important;
-  max-height: 28px !important;
-  padding: 0 !important;
-  border-radius: 999px !important;
-  overflow: hidden !important;
-  display: grid !important;
-  place-items: center !important;
-  background: transparent !important;
-  transform: translate(-50%, -50%) !important;
-  box-sizing: border-box !important;
-}
-
-body.day-theme .orbit-events > *,
-body.day-theme .orbit-event,
-body.day-theme .orbit-group {
-  background:
-    radial-gradient(circle at 34% 24%, rgba(255,255,255,.72), rgba(255,255,255,0) 38%),
-    linear-gradient(145deg, rgba(105,80,155,.92), rgba(64,48,102,.96)) !important;
-  border: 1px solid rgba(255,255,255,.36) !important;
-  box-shadow:
-    0 8px 16px rgba(64,48,102,.18),
-    0 0 0 4px rgba(105,80,155,.08),
-    inset 0 1px 0 rgba(255,255,255,.28) !important;
-}
-
-body:not(.day-theme) .orbit-events > *,
-body:not(.day-theme) .orbit-event,
-body:not(.day-theme) .orbit-group {
-  background:
-    radial-gradient(circle at 34% 24%, rgba(124,229,194,.34), rgba(124,229,194,0) 42%),
-    linear-gradient(145deg, rgba(55,45,86,.96), rgba(32,26,55,.98)) !important;
-  border: 1px solid rgba(124,229,194,.24) !important;
-  box-shadow:
-    0 8px 18px rgba(0,0,0,.28),
-    0 0 0 4px rgba(124,229,194,.07),
-    inset 0 1px 0 rgba(255,255,255,.08) !important;
-}
-
-/* Limpa qualquer fundo quadrado interno */
-.orbit-events *::before,
-.orbit-events *::after {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: 0 !important;
-}
-
-.orbit-events img,
-.orbit-events svg,
-.orbit-event img,
-.orbit-event svg,
-.orbit-group img,
-.orbit-group svg {
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  min-height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  object-fit: contain !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  filter: none !important;
-}
-
-.orbit-events span,
-.orbit-events .action-icon,
-.orbit-events .type-icon {
-  width: auto !important;
-  height: auto !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: grid !important;
-  place-items: center !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: 0 !important;
-}
-
-/* reduz poluição visual quando há muitos registros */
-.orbit-events > *:nth-child(n+7) {
-  opacity: .42 !important;
-  transform: translate(-50%, -50%) scale(.78) !important;
-}
-
-/* Sheet Registros próximos: não deve virar um painel enorme vazio */
-.orbit-cluster-sheet {
-  height: auto !important;
-  min-height: auto !important;
-  max-height: min(76svh, 620px) !important;
-  grid-template-rows: 14px auto minmax(0, auto) !important;
-  padding: 0 14px max(16px, env(safe-area-inset-bottom, 0px)) !important;
-}
-
-.orbit-cluster-sheet .section-title {
-  height: auto !important;
-  min-height: 72px !important;
-  padding: 0 0 8px !important;
-}
-
-#orbitClusterList,
-.orbit-cluster-list {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  max-height: min(52svh, 420px) !important;
-  overflow-y: auto !important;
-  padding: 4px 0 8px !important;
-  margin: 0 !important;
-  scrollbar-width: none !important;
-}
-
-#orbitClusterList::-webkit-scrollbar,
-.orbit-cluster-list::-webkit-scrollbar {
-  display: none !important;
-}
-
-#orbitClusterList article,
-#orbitClusterList button,
-.orbit-cluster-list article,
-.orbit-cluster-list button {
-  min-height: 86px !important;
-  border-radius: 24px !important;
-  padding: 12px 14px !important;
-  display: grid !important;
-  grid-template-columns: 64px minmax(0, 1fr) auto !important;
-  gap: 12px !important;
-  align-items: center !important;
-  overflow: hidden !important;
-}
-
-body.day-theme #orbitClusterList article,
-body.day-theme #orbitClusterList button,
-body.day-theme .orbit-cluster-list article,
-body.day-theme .orbit-cluster-list button {
-  background: rgba(255,255,255,.84) !important;
-  border: 1px solid rgba(139,92,246,.10) !important;
-  color: #2f2843 !important;
-  box-shadow: 0 8px 18px rgba(76,59,112,.055), inset 0 1px 0 rgba(255,255,255,.86) !important;
-}
-
-body:not(.day-theme) #orbitClusterList article,
-body:not(.day-theme) #orbitClusterList button,
-body:not(.day-theme) .orbit-cluster-list article,
-body:not(.day-theme) .orbit-cluster-list button {
-  background: linear-gradient(180deg, rgba(58,47,88,.98), rgba(40,32,67,.98)) !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  color: #f7f3ff !important;
-  box-shadow: 0 10px 22px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.05) !important;
-}
-
-
-/* v75.75.108 relogio clean premium definitivo */
-
-/* v75.75.108 — Relógio clean premium.
-   A órbita com mini ícones ainda estava poluída. A versão premium real fica mais limpa:
-   foco total no tempo, anel suave e sem marcadores quebrados/colados.
+/* v75.75.109
+   Restaura a direção visual do relógio da versão antiga aprovada:
+   - anel limpo;
+   - sem marcadores/bolinhas quebradas;
+   - sem quadrados orbitais;
+   - foco no contador;
+   - mantém acabamento claro/escuro premium.
 */
 
-/* Card do relógio mais limpo */
-.state-orbit {
-  overflow: hidden !important;
-  isolation: isolate !important;
-  position: relative !important;
-}
-
-/* Remove a camada de eventos da órbita: ela estava visualmente poluindo o timer */
+/* Remove qualquer tentativa posterior de colocar eventos na órbita */
 .state-orbit #orbitEvents,
 .state-orbit .orbit-events,
 #orbitEvents.orbit-events {
@@ -37232,25 +37045,43 @@ body:not(.day-theme) .orbit-cluster-list button {
   pointer-events: none !important;
 }
 
-/* Anel mais elegante: sem poluição e sem aparência de relógio quebrado */
-.state-orbit .orbit-ring,
-.orbit-ring {
-  opacity: .52 !important;
-  filter: blur(.05px) !important;
+/* Card do relógio: visual limpo, próximo da versão antiga que funcionava melhor */
+.state-orbit {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  min-height: 330px !important;
+  border-radius: 30px !important;
 }
 
-/* Camadas decorativas sutis para substituir os ícones orbitais */
+/* Anel principal mais suave e premium */
+.state-orbit .orbit-ring,
+.orbit-ring {
+  opacity: .56 !important;
+  filter: none !important;
+}
+
+/* Remove restos de marcadores/ícones orbitais de versões posteriores */
+.orbit-events > *,
+.orbit-event,
+.orbit-group,
+.orbit-events img,
+.orbit-events svg,
+.orbit-events span,
+.orbit-events .action-icon,
+.orbit-events .type-icon {
+  display: none !important;
+}
+
+/* Decorações suaves como no visual aprovado, sem parecer quebrado */
 .state-orbit::before {
   content: "" !important;
   position: absolute !important;
-  width: 84px !important;
-  height: 84px !important;
-  left: 42px !important;
+  width: 86px !important;
+  height: 86px !important;
+  left: 44px !important;
   top: 42px !important;
   border-radius: 999px !important;
-  background:
-    radial-gradient(circle at 42% 42%, rgba(255,255,255,.70), rgba(255,255,255,0) 28%),
-    radial-gradient(circle, rgba(255,211,122,.48), rgba(255,211,122,.18) 58%, rgba(255,211,122,0) 72%) !important;
   pointer-events: none !important;
   z-index: 0 !important;
 }
@@ -37260,33 +37091,33 @@ body:not(.day-theme) .orbit-cluster-list button {
   position: absolute !important;
   width: 78px !important;
   height: 78px !important;
-  right: 42px !important;
+  right: 44px !important;
   bottom: 52px !important;
   border-radius: 999px !important;
-  background:
-    radial-gradient(circle at 38% 38%, rgba(255,255,255,.46), rgba(255,255,255,0) 30%),
-    radial-gradient(circle, rgba(244,205,136,.28), rgba(244,205,136,.10) 58%, rgba(244,205,136,0) 76%) !important;
   pointer-events: none !important;
   z-index: 0 !important;
 }
 
-/* Conteúdo do timer sempre por cima das decorações */
+/* Conteúdo sempre acima da arte */
 .state-orbit #stateLabel,
 .state-orbit #stateClock,
-.state-orbit #stateHint {
+.state-orbit #stateHint,
+#stateLabel,
+#stateClock,
+#stateHint {
   position: relative !important;
   z-index: 2 !important;
 }
 
-/* Tipografia do relógio */
 #stateLabel {
-  letter-spacing: .11em !important;
+  letter-spacing: .115em !important;
+  font-weight: 950 !important;
 }
 
 #stateClock {
   font-variant-numeric: tabular-nums !important;
-  letter-spacing: -.06em !important;
-  text-wrap: balance !important;
+  letter-spacing: -.065em !important;
+  line-height: .95 !important;
 }
 
 #stateHint {
@@ -37295,19 +37126,32 @@ body:not(.day-theme) .orbit-cluster-list button {
   margin-right: auto !important;
   text-align: center !important;
   line-height: 1.18 !important;
+  font-weight: 850 !important;
 }
 
-/* Tema claro: relógio mais suave e premium */
+/* Tema claro: relógio antigo, quente e limpo */
 body.day-theme .state-orbit {
   background:
-    radial-gradient(circle at 24% 18%, rgba(255,221,171,.28), rgba(255,221,171,0) 35%),
-    radial-gradient(circle at 82% 86%, rgba(244,205,136,.18), rgba(244,205,136,0) 32%),
-    linear-gradient(145deg, rgba(255,250,242,.98), rgba(255,241,232,.92)) !important;
-  border: 1px solid rgba(255,255,255,.74) !important;
+    radial-gradient(circle at 22% 18%, rgba(255, 219, 133, .30), rgba(255, 219, 133, 0) 35%),
+    radial-gradient(circle at 82% 86%, rgba(244, 205, 136, .20), rgba(244, 205, 136, 0) 34%),
+    linear-gradient(145deg, rgba(255, 250, 241, .98), rgba(255, 239, 227, .92)) !important;
+  border: 1px solid rgba(255,255,255,.76) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.82),
-    0 18px 40px rgba(126,94,50,.08),
-    0 8px 20px rgba(124,92,255,.055) !important;
+    inset 0 1px 0 rgba(255,255,255,.86),
+    0 18px 40px rgba(126,94,50,.075),
+    0 8px 20px rgba(124,92,255,.045) !important;
+}
+
+body.day-theme .state-orbit::before {
+  background:
+    radial-gradient(circle at 42% 42%, rgba(255,255,255,.72), rgba(255,255,255,0) 28%),
+    radial-gradient(circle, rgba(255,211,122,.50), rgba(255,211,122,.18) 58%, rgba(255,211,122,0) 72%) !important;
+}
+
+body.day-theme .state-orbit::after {
+  background:
+    radial-gradient(circle at 38% 38%, rgba(255,255,255,.44), rgba(255,255,255,0) 30%),
+    radial-gradient(circle, rgba(244,205,136,.26), rgba(244,205,136,.10) 58%, rgba(244,205,136,0) 76%) !important;
 }
 
 body.day-theme #stateLabel {
@@ -37326,7 +37170,7 @@ body.day-theme #stateHint {
   -webkit-text-fill-color: rgba(101, 86, 126, .86) !important;
 }
 
-/* Tema escuro: clean, com profundidade e sem excesso de glow */
+/* Tema escuro: mesma estrutura, mais profunda e sem excesso de glow */
 body:not(.day-theme) .state-orbit {
   background:
     radial-gradient(circle at 24% 18%, rgba(124,229,194,.10), rgba(124,229,194,0) 35%),
@@ -37367,7 +37211,7 @@ body:not(.day-theme) #stateHint {
   -webkit-text-fill-color: rgba(226,218,244,.82) !important;
 }
 
-/* Sheet "Registros próximos" mais compacto e sem área morta */
+/* Sheet Registros próximos fica compacto, mas sem mexer no relógio */
 .orbit-cluster-sheet {
   height: auto !important;
   min-height: auto !important;

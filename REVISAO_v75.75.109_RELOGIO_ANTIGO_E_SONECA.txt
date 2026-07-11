@@ -1,0 +1,11 @@
+Versão v75.75.109
+
+Correção solicitada:
+- A versão antiga enviada pelo usuário tinha um relógio visualmente melhor.
+- O relógio foi restaurado para uma direção limpa semelhante: sem bolinhas, sem ícones orbitais e sem quadrados.
+- Mantido visual premium no tema claro e escuro, com foco no contador.
+- Reforçada a correção do botão Iniciar soneca:
+  - o clique agora sincroniza estado interno antes de executar;
+  - se o acordado aberto vem do diário/virada de dia, a soneca é iniciada mesmo que o state interno esteja stale.
+- Base usada: v75.75.106 com correções funcionais, sem as alterações visuais ruins de v75.75.107/v75.75.108.
+- Cache/versionamento atualizado para 75.75.109.
