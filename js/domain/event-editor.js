@@ -43,3 +43,7 @@ export function buildDeleteConfirmationText(event, { getEventConfig, formatTime 
   const title = getEventConfig(event.type).title.toLowerCase();
   return `Excluir ${title} das ${formatTime(event.start)}?`;
 }
+
+export function shouldRenderEditActions(event) {
+  return Boolean(event?.id);
+}

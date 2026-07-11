@@ -1,0 +1,8 @@
+Ninou v75.76.3
+
+- Mantém o visual verde premium e a barra inferior única.
+- Restaura o núcleo funcional da v75.75.121.
+- Remove uma vez os Service Workers e caches Ninou das versões 75.76.0–75.76.2.
+- Não apaga localStorage, registros locais, perfil ou vínculo familiar.
+- Usa um núcleo .mjs exclusivo para escapar das regras quebradas dos Service Workers anteriores.
+- Mantém app.js, js/app.js e js/app.legacy.js como entradas compatíveis para índices antigos em cache.

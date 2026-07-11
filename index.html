@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.76.2" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.76.3" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.76.2" />
+    <link rel="stylesheet" href="./styles.css?v=75.76.3" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -1967,6 +1967,14 @@
       <span aria-hidden="true">☘</span>
       <strong>Solicitar acesso</strong>
     </a>
-    <script type="module" src="./app.js?v=75.76.2"></script>
+    <script type="module">
+      import("./js/boot-v75.76.3.mjs?v=75.76.3").catch((error) => {
+        console.error("Não foi possível carregar o reparador do Ninou:", error);
+        const notice = document.createElement("div");
+        notice.style.cssText = "position:fixed;inset:14px 14px auto;z-index:2147483647;padding:16px;border-radius:18px;background:#fff3f3;color:#4a1220;font:14px/1.45 system-ui;box-shadow:0 18px 48px rgba(74,18,32,.2)";
+        notice.innerHTML = "<strong>Falha ao carregar os arquivos do Ninou.</strong><br>Atualize a publicação da Vercel com todos os arquivos desta versão.";
+        document.body.prepend(notice);
+      });
+    </script>
   </body>
 </html>

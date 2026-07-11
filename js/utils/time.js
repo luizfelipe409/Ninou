@@ -1,3 +1,4 @@
+import { day } from "../config/constants.js";
 
 export const APP_TIME_ZONE = "America/Sao_Paulo";
 
@@ -185,4 +186,11 @@ export function formatDiaryDate(timestamp) {
     month: "long",
     timeZone: APP_TIME_ZONE,
   }).format(getSafeDate(timestamp));
+}
+
+export function getDaysAlive(birthDate) {
+  const birthTimestamp = birthDate instanceof Date ? birthDate.getTime() : Number(birthDate);
+  const birthDayStart = getDayStart(Number.isFinite(birthTimestamp) ? birthTimestamp : Date.now());
+  const todayStart = getDayStart(Date.now());
+  return Math.floor((todayStart - birthDayStart) / day);
 }
