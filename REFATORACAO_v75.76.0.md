@@ -1,4 +1,4 @@
-# Ninou v75.76.0 — refatoração estrutural
+# Ninou v75.76.1 — refatoração estrutural
 
 ## Objetivo
 Eliminar código morto e camadas antigas que disputavam a interface, mantendo o visual verde premium e a lógica familiar existente.

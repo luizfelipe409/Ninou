@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-76-0-refactor-canonico";
+const CACHE_NAME = "ninou-v75-76-1-stable-recovery";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,8 +18,8 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.76.0",
-  "/js/app.js?v=75.76.0",
+  "/styles.css?v=75.76.1",
+  "/js/app.js?v=75.76.1",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -33,6 +33,8 @@ const APP_SHELL = [
   "/js/domain/weights.js",
   "/js/domain/sounds.js",
   "/js/services/firebase-service.js",
+  "/js/services/account-service.js",
+  "/js/services/export-service.js",
   "/js/services/timer-service.js",
   "/js/storage/local-storage.js",
   "/js/ui/event-formatters.js",
@@ -45,11 +47,12 @@ const APP_SHELL = [
   "/js/ui/empty-states.js",
   "/js/ui/render-utils.js",
   "/js/ui/profile.js",
+  "/js/ui/account.js",
   "/js/ui/theme.js",
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest?v=75.76.0",
+  "/manifest.webmanifest?v=75.76.1",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
