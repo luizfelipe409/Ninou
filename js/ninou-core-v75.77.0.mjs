@@ -52,6 +52,7 @@ const orbitClusterSheet = document.querySelector("#orbitClusterSheet");
 const orbitClusterTitle = document.querySelector("#orbitClusterTitle");
 const orbitClusterList = document.querySelector("#orbitClusterList");
 const closeOrbitClusterButton = document.querySelector("#closeOrbitCluster");
+const orbitClusterViewAllButton = document.querySelector("#orbitClusterViewAll");
 const closeSheetButton = document.querySelector("#closeSheet");
 const openSheetButtons = document.querySelectorAll("[data-open-sheet]");
 const sheetTypeButtons = document.querySelectorAll("[data-sheet-type]");
@@ -400,7 +401,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.76.8";
+const NINOU_RUNTIME_VERSION = "75.77.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3413,7 +3414,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.76.8 — as observações do dia também recebem um armazenamento dedicado.
+// v75.77.0 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -10214,7 +10215,10 @@ function createOrbitCluster(group) {
   button.title = `${eventList.length} registros próximos`;
   button.setAttribute("aria-label", `${eventList.length} registros próximos no arco`);
   button.innerHTML = `
-    <i><span>...</span></i>
+    <i class="orbit-cluster-icon">
+      ${config.icon}
+      <span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>
+    </i>
     <b>${eventList.length}</b>
   `;
   button.addEventListener("click", () => openOrbitCluster(eventList));
@@ -10398,13 +10402,20 @@ function openOrbitCluster(events) {
   }).join("");
 
   closeSheet();
+  if (orbitClusterViewAllButton) orbitClusterViewAllButton.textContent = `Ver todos os registros`;
   orbitClusterSheet.hidden = false;
   sheetBackdrop.hidden = false;
+  orbitClusterList.scrollTop = 0;
+  requestAnimationFrame(() => {
+    orbitClusterSheet.scrollTop = 0;
+    orbitClusterList.scrollTop = 0;
+  });
 }
 
 function closeOrbitCluster() {
   orbitClusterSheet.hidden = true;
   orbitClusterList.innerHTML = "";
+  if (orbitClusterViewAllButton) orbitClusterViewAllButton.blur();
   if (sheet.hidden) {
     sheetBackdrop.hidden = true;
   }
@@ -13667,6 +13678,12 @@ window.addEventListener("resize", scheduleRecordScrollHintUpdate, { passive: tru
 
 closeSheetButton.addEventListener("click", closeSheet);
 closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);
+if (orbitClusterViewAllButton) {
+  orbitClusterViewAllButton.addEventListener("click", () => {
+    closeOrbitCluster();
+    showScreen("diary");
+  });
+}
 sheetBackdrop.addEventListener("click", () => {
   closeSheet();
   closeOrbitCluster();
@@ -14382,7 +14399,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=75.76.8", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=75.77.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
