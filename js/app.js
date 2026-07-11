@@ -386,7 +386,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.76.1";
+const NINOU_RUNTIME_VERSION = "75.76.2";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -7335,6 +7335,8 @@ function renderFamilyAccessPanel() {
 async function readAccountAccessFromCloud(user = cloudUser) {
   if (!user) return null;
   const services = await getFirebaseServices();
+  const cachedAccess = familyAccess?.familyId ? { ...familyAccess } : null;
+  let accessLookupFailed = false;
 
   try {
     const familyAccessSnapshot = await services.getDocs(services.collection(services.db, "users", user.uid, "families"));
@@ -7357,12 +7359,19 @@ async function readAccountAccessFromCloud(user = cloudUser) {
       : (availableAccesses.find((access) => getFamilyScopeType(access.familyId) === "client_family") || availableAccesses[0]);
     if (selectedAccess) return saveFamilyAccess(selectedAccess);
   } catch (error) {
+    accessLookupFailed = true;
     console.warn("Não foi possível ler famílias do usuário:", error);
   }
 
   const accessRef = services.doc(services.db, "users", user.uid, "access", "ninou");
-  const snapshot = await services.getDoc(accessRef);
-  if (snapshot.exists()) {
+  let snapshot = null;
+  try {
+    snapshot = await services.getDoc(accessRef);
+  } catch (error) {
+    accessLookupFailed = true;
+    console.warn("Não foi possível ler o vínculo principal da conta:", error);
+  }
+  if (snapshot?.exists()) {
     const data = snapshot.data() || {};
     if (["inactive", "revoked", "removed"].includes(String(data.status || "active"))) return null;
     return saveFamilyAccess({
@@ -7396,8 +7405,16 @@ async function readAccountAccessFromCloud(user = cloudUser) {
         acceptedAt: data.acceptedAt || data.joinedAt || data.createdAt || "",
       });
     } catch (error) {
+      accessLookupFailed = true;
       console.warn("Não foi possível confirmar o membro familiar já vinculado:", familyId, error);
     }
+  }
+
+  // Uma falha de rede ou permissão transitória não deve apagar o vínculo já confirmado
+  // neste aparelho. O acesso só é removido quando a nuvem responde normalmente e confirma
+  // que não existe mais vínculo ativo.
+  if (accessLookupFailed && cachedAccess?.familyId) {
+    return saveFamilyAccess(cachedAccess);
   }
   return null;
 }
@@ -9327,6 +9344,21 @@ async function initFirebaseAuthState() {
     showScreen("profile");
 
     const isCurrentAuthRun = () => authRunId === authFlowRunId && cloudUser?.uid === user.uid;
+    const authBootstrapWatchdog = window.setTimeout(() => {
+      if (!isCurrentAuthRun() || !authAccessLoading) return;
+      setAuthAccessLoading(false);
+      if (familyAccess?.familyId) {
+        familyBootstrapReady = true;
+        setSyncStatus("pending", user.email || "", "Conexão lenta. A rotina local continua disponível e será sincronizada quando o Firebase responder.");
+        loginHelper.textContent = "Conexão lenta. Você pode continuar usando a rotina salva neste aparelho.";
+        renderAuthControls();
+        renderAll();
+      } else {
+        setSyncStatus("error", user.email || "", "Não foi possível confirmar a família agora. Toque no status para tentar novamente.");
+        loginHelper.textContent = "A conta foi reconhecida, mas o Firebase demorou para confirmar a família. Atualize para tentar novamente.";
+        renderAuthControls();
+      }
+    }, 18000);
 
     try {
       if (isGlobalAppAdmin(user)) {
@@ -9340,6 +9372,7 @@ async function initFirebaseAuthState() {
         if (!isCurrentAuthRun()) return;
         await loadAdminAccountProfileFromCloud(user);
         if (!isCurrentAuthRun()) return;
+        window.clearTimeout(authBootstrapWatchdog);
         setAuthAccessLoading(false);
         setSyncStatus("online", user.email || "");
         loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
@@ -9348,13 +9381,14 @@ async function initFirebaseAuthState() {
         return;
       }
 
+      const cachedAccessBeforeLookup = familyAccess?.familyId ? { ...familyAccess } : null;
       let restoredAccess = null;
       try {
         restoredAccess = await readAccountAccessFromCloud(user);
         if (!isCurrentAuthRun()) return;
       } catch (error) {
         console.error("Erro ao ler acesso familiar:", error);
-        restoredAccess = null;
+        restoredAccess = cachedAccessBeforeLookup ? saveFamilyAccess(cachedAccessBeforeLookup) : null;
       }
       if (!restoredAccess) saveFamilyAccess(null);
       await loadCurrentAccountIdentityFromCloud(user);
@@ -9366,6 +9400,7 @@ async function initFirebaseAuthState() {
       }
 
       if (!hasFamilyAccess()) {
+        window.clearTimeout(authBootstrapWatchdog);
         setAuthAccessLoading(false);
         loginHelper.textContent = "Conta autenticada, mas sem família vinculada. Crie sua família se você for o primeiro responsável ou aceite um convite familiar.";
         setSyncStatus("offline", user.email || "");
@@ -9376,19 +9411,31 @@ async function initFirebaseAuthState() {
 
       await connectCurrentAccount();
       if (!isCurrentAuthRun()) return;
+      window.clearTimeout(authBootstrapWatchdog);
       setAuthAccessLoading(false);
       setSyncStatus("online", user.email || "");
       loginHelper.textContent = `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
       renderAuthControls();
       renderAll();
     } catch (error) {
+      window.clearTimeout(authBootstrapWatchdog);
       console.error("Erro ao conectar família:", error);
-      familyBootstrapReady = false;
-      document.body.classList.remove("family-ready", "sync-bootstrap");
+      document.body.classList.remove("sync-bootstrap");
       setAuthAccessLoading(false);
-      setSyncStatus("offline", user.email || "");
-      loginHelper.textContent = "Conta conectada, mas a sincronização ainda precisa das regras corretas do Firestore.";
-      renderAuthControls();
+
+      if (familyAccess?.familyId) {
+        familyBootstrapReady = true;
+        setSyncStatus("pending", user.email || "", "A rotina local continua disponível. Toque no status para tentar reconectar ao Firebase.");
+        loginHelper.textContent = "A conta e a família foram mantidas neste aparelho. A sincronização será retomada quando o Firebase responder.";
+        renderAuthControls();
+        renderAll();
+      } else {
+        familyBootstrapReady = false;
+        setSyncStatus("error", user.email || "", "Não foi possível confirmar o vínculo familiar agora.");
+        loginHelper.textContent = "Conta conectada, mas não foi possível confirmar a família. Toque no status para tentar novamente.";
+        renderAuthControls();
+        showScreen("profile");
+      }
     }
   });
 }
@@ -13827,24 +13874,22 @@ updateDiaryChipsMoreButton();
 initSleepSounds();
 setInterval(renderLiveTick, 1000);
 
-function initFirebaseWithStartupGuard(timeoutMs = 15000) {
-  let timeoutId = 0;
-  const timeout = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error("firebase-startup-timeout")), timeoutMs);
-  });
-
-  return Promise.race([initFirebaseAuthState(), timeout])
-    .finally(() => window.clearTimeout(timeoutId));
-}
-
-initFirebaseWithStartupGuard().catch((error) => {
+initFirebaseAuthState().catch((error) => {
   console.error("Firebase não iniciou:", error);
   setAuthAccessLoading(false);
-  setSyncStatus("offline");
-  loginHelper.textContent = error?.message === "firebase-startup-timeout"
-    ? "A conexão demorou demais. O app abriu em modo local; atualize a página para tentar novamente."
-    : "O app abriu em modo local. Verifique Firebase quando quiser sincronizar.";
+  setSyncStatus("error", localStorage.getItem(storageKeys.email) || "", "Falha ao carregar o Firebase. Toque no status para tentar novamente.");
+  loginHelper.textContent = "Não foi possível iniciar a conexão. A página continua navegável; toque em Erro para tentar novamente.";
   renderAuthControls();
+  showScreen("profile");
+});
+
+syncPill?.addEventListener("click", () => {
+  const retryable = syncPill.classList.contains("offline")
+    || syncPill.textContent === "Erro"
+    || (syncPill.textContent === "Pendente" && !familyBootstrapReady);
+  if (!retryable) return;
+  syncPill.textContent = "Reconectando";
+  window.setTimeout(() => window.location.reload(), 80);
 });
 
 function showAppUpdateNotice(registration) {
@@ -13892,7 +13937,7 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no núcleo do app */
 (() => {
   const VERSION = "75.75.67";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
@@ -14661,3 +14706,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   setTimeout(applyPermissionVisibility, 120);
   setInterval(applyPermissionVisibility, 5000);
 })();
+
+
+window.__NINOU_APP_READY__ = true;
+document.documentElement.dataset.ninouAppReady = "true";
