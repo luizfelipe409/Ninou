@@ -1,4 +1,4 @@
-Ninou v75.77.1 — correção de escala do layout premium
+Ninou v75.77.2 — correção de escala do layout premium
 
 - Cabeçalho ajustado para não sobrepor Sincronizado e título.
 - Órbita, relógio e ícones reduzidos para a proporção real de iPhone.
