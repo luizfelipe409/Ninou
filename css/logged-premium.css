@@ -971,8 +971,10 @@ html body.family-daily-surface .record-actions-footer {
   background: var(--ui-surface) !important;
 }
 
-html body.family-daily-surface .record-actions-footer .save-button { width: 100% !important; height: 54px !important; }
+
 html body.family-daily-surface .record-actions-footer .save-button {
+  width: 100% !important;
+  height: 54px !important;
   border: 1px solid var(--ui-accent) !important;
   background: var(--ui-accent) !important;
   color: var(--ui-accent-ink) !important;
