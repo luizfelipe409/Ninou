@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.111";
+const BABY_AVATAR_ASSET_VERSION = "75.75.113";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -9508,7 +9508,12 @@ function getOpenAwakeInfoForMainClock(now = Date.now()) {
   return { ...info, wakeAt, elapsed };
 }
 
-function syncMainClockFromOpenAwake(now = Date.now()) {
+function syncMainClockFromOpenAwake(now = Date.now(), options = {}) {
+  // v75.75.112: não sobrescrever um sono/soneca já iniciado.
+  // A falha do botão "Iniciar soneca" vinha do live tick chamando esta função
+  // e voltando o estado para "awake" logo após startSleep().
+  if (state.mode === "sleeping" && options.force !== true) return false;
+
   const info = getOpenAwakeInfoForMainClock(now);
   if (!info) return false;
 
@@ -9516,11 +9521,7 @@ function syncMainClockFromOpenAwake(now = Date.now()) {
   document.body.classList.remove("ninou-empty-profile-state", "ninou-reviewing-past-state", "ninou-daily-empty-state");
   setHidden(wakeAction, false);
   syncStartChoiceVisibility(false);
-  setText(wakeActionLabel, "Iniciar soneca");
-  if (wakeActionIcon && wakeActionIcon.dataset.iconKey !== "sono") {
-    wakeActionIcon.dataset.iconKey = "sono";
-    wakeActionIcon.innerHTML = iconMarkup("sono");
-  }
+  applyMainRoutineActionContext(now);
   setText(stateLabel, "Acordado há");
   setText(stateClock, formatDuration(info.elapsed));
   setText(stateHint, crossedMidnight
@@ -9570,10 +9571,72 @@ function renderActiveTimerCard() {
   if (activeTimerProgress) activeTimerProgress.style.width = `${details.progress}%`;
 }
 
+function isNightRoutinePeriod(now = Date.now()) {
+  const hourValue = new Date(Number(now) || Date.now()).getHours();
+  return hourValue >= 19 || hourValue < 6;
+}
+
+function isNightSleepState(now = Date.now()) {
+  const type = String(state.activeType || "");
+  return type === "dormir" || type === "despertar-noturno" || isNightRoutinePeriod(now);
+}
+
+function getMainRoutineActionContext(now = Date.now()) {
+  const nightWakeActive = getActiveNightWakeEvent();
+
+  if (state.mode === "sleeping") {
+    return isNightSleepState(now)
+      ? { label: "Despertar noturno", iconKey: "despertar-noturno", action: "night-wake" }
+      : { label: "Acordou", iconKey: "acordou", action: "wake" };
+  }
+
+  if (nightWakeActive) {
+    return { label: "Voltou a dormir", iconKey: "dormir", action: "start-night-sleep", sleepType: "dormir" };
+  }
+
+  if (isNightRoutinePeriod(now)) {
+    return { label: "Iniciar noite", iconKey: "dormir", action: "start-night-sleep", sleepType: "dormir" };
+  }
+
+  return { label: "Iniciar soneca", iconKey: "sono", action: "start-nap", sleepType: "sono" };
+}
+
+function applyMainRoutineActionContext(now = Date.now()) {
+  const context = getMainRoutineActionContext(now);
+  setText(wakeActionLabel, context.label);
+  if (wakeActionIcon && wakeActionIcon.dataset.iconKey !== context.iconKey) {
+    wakeActionIcon.dataset.iconKey = context.iconKey;
+    wakeActionIcon.innerHTML = iconMarkup(context.iconKey);
+  }
+  return context;
+}
+
+function startNightWakeFromMainAction() {
+  if (!requireLogin("registrar despertar noturno")) return;
+  if (state.mode !== "sleeping") return;
+
+  const startedAt = Date.now();
+  const activeStartedAt = Number(state.activeStartedAt);
+  if (Number.isFinite(activeStartedAt) && startedAt - activeStartedAt > 14 * hour) {
+    const ok = window.confirm("Esse sono passou de 14 horas. Deseja registrar despertar noturno mesmo assim?");
+    if (!ok) return;
+  }
+
+  markRoutineMutationSnapshot("registrou despertar noturno");
+  startLiveAwakeFromManualNightWake(startedAt, "Despertar noturno", "");
+  timelineRenderSignature = "";
+  orbitRenderSignature = "";
+  saveDayState();
+}
+
+function startSleepFromMainAction() {
+  const context = getMainRoutineActionContext(Date.now());
+  startSleep(context.sleepType || "sono", context.label);
+}
+
 function runActiveTimerAction() {
-  // v75.75.111: ação principal usa a lógica antiga de sono,
-  // mas sincroniza antes caso o acordado venha da virada do dia/cache.
-  syncMainClockFromOpenAwake(Date.now());
+  // v75.75.113: a ação principal agora entende madrugada/noite.
+  if (state.mode !== "sleeping") syncMainClockFromOpenAwake(Date.now(), { force: true });
 
   if (state.mode === "idle") {
     const info = getOpenAwakeInfoForMainClock(Date.now());
@@ -9596,10 +9659,15 @@ function runActiveTimerAction() {
     return;
   }
 
+  const context = getMainRoutineActionContext(Date.now());
   if (state.mode === "sleeping") {
-    finishSleep();
+    if (context.action === "night-wake") {
+      startNightWakeFromMainAction();
+    } else {
+      finishSleep();
+    }
   } else {
-    startSleep();
+    startSleepFromMainAction();
   }
   renderAll();
 }
@@ -9715,16 +9783,17 @@ function renderCurrentState() {
   }
   const sleeping = state.mode === "sleeping";
   const nightWakeActive = getActiveNightWakeEvent();
-  setText(wakeActionLabel, sleeping ? "Acordou" : nightWakeActive ? "Voltou a dormir" : "Iniciar soneca");
-  setText(stateLabel, sleeping ? "Dormindo há" : nightWakeActive ? "Despertar noturno há" : "Acordado há");
+  const mainActionContext = applyMainRoutineActionContext(Date.now());
+  setText(stateLabel, sleeping ? (mainActionContext.action === "night-wake" ? "Sono noturno há" : "Dormindo há") : nightWakeActive ? "Despertar noturno há" : "Acordado há");
   setText(stateClock, formatDuration(elapsed));
   const crossedMidnight = Number(state.activeStartedAt) < getDayStart();
   setText(stateHint, crossedMidnight
     ? sleeping
-      ? `Sono continuado de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Acordou, o Ninou fecha o sono com a duração total.`
+      ? mainActionContext.action === "night-wake"
+        ? `Noite continuada de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Despertar noturno, o Ninou registra a acordada da madrugada.`
+        : `Sono continuado de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Acordou, o Ninou fecha o sono com a duração total.`
       : `Acordado desde ontem, às ${formatTime(state.activeStartedAt)}. O contador segue a partir do último registro.`
     : getWakeWindowText());
-  setWakeActionIcon();
   renderActiveTimerCard();
 }
 
@@ -11236,7 +11305,7 @@ function renderLiveTick() {
 
   // v75.75.105: atualiza o contador principal diretamente pela mesma lógica
   // do "Estado atual", mesmo quando state.activeStartedAt ficou stale/zerado.
-  if (syncMainClockFromOpenAwake(Date.now())) {
+  if (state.mode !== "sleeping" && syncMainClockFromOpenAwake(Date.now())) {
     const currentMinute = Math.floor(Date.now() / 60000);
     if (currentMinute !== liveTickMinute) {
       liveTickMinute = currentMinute;
@@ -11292,10 +11361,10 @@ function finishSleep() {
   saveDayState();
 }
 
-function startSleep() {
+function startSleep(preferredType = "sono", sourceLabel = "") {
   if (!requireLogin("salvar a rotina")) return;
 
-  syncMainClockFromOpenAwake(Date.now());
+  if (state.mode !== "sleeping") syncMainClockFromOpenAwake(Date.now(), { force: true });
 
   if (state.mode === "sleeping") {
     window.alert("Já existe um sono em andamento. Finalize ou corrija o registro atual antes de iniciar outro.");
@@ -11324,8 +11393,15 @@ function startSleep() {
     return;
   }
 
-  markRoutineMutationSnapshot("iniciou sono");
-  state = startSleepTimer(state, Date.now());
+  const sleepType = preferredType === "dormir" || isNightRoutinePeriod(Date.now()) || getActiveNightWakeEvent()
+    ? "dormir"
+    : "sono";
+  markRoutineMutationSnapshot(sleepType === "dormir" ? "iniciou noite" : "iniciou soneca");
+  if (sleepType === "dormir") {
+    startLiveSleepFromManualEvent("dormir", Date.now(), getActiveNightWakeEvent() ? "Após despertar noturno" : "Sono noturno", "");
+  } else {
+    state = startSleepTimer(state, Date.now());
+  }
   saveDayState();
 }
 

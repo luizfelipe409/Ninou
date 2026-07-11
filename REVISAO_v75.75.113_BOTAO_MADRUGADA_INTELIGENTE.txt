@@ -1,0 +1,9 @@
+Versão v75.75.113
+
+Ajuste de lógica da madrugada:
+- Entre 19h e 06h, quando o bebê está acordado, o botão principal passa de "Iniciar soneca" para "Iniciar noite".
+- Se existe um despertar noturno ativo, o botão indica "Voltou a dormir".
+- Se o bebê está em sono noturno, o botão indica "Despertar noturno" em vez de "Acordou".
+- Ao iniciar sono pela madrugada, o registro agora é tratado como "dormir/noite", não como "sono/soneca".
+- Mantido o relógio antigo, modo escuro estrelado, tema claro com sol e eventos orbitais.
+- Mantida a correção para o live tick não desfazer a soneca/noite.

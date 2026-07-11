@@ -37387,3 +37387,42 @@ html body .orbit-event *::after {
   border: 0 !important;
   box-shadow: none !important;
 }
+
+
+/* v75.75.112 reforco icones orbitais tema claro */
+
+/* Reforço visual dos ícones orbitais no tema claro.
+   Mantém o relógio antigo, mas garante que os eventos registrados apareçam também no claro. */
+html body.day-theme .orbit-event {
+  color: #5a465b !important;
+  opacity: 1 !important;
+  display: grid !important;
+  visibility: visible !important;
+}
+
+html body.day-theme .orbit-event i {
+  background: rgba(55, 38, 76, 0.76) !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  box-shadow:
+    0 8px 18px rgba(90, 70, 91, 0.22),
+    0 0 0 2px rgba(255, 211, 122, 0.10) !important;
+}
+
+html body.day-theme .orbit-event.active i {
+  background: linear-gradient(135deg, rgba(143, 124, 255, 0.92), rgba(255, 154, 118, 0.92)) !important;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.28),
+    0 0 18px rgba(214, 154, 60, 0.22),
+    0 8px 18px rgba(90, 70, 91, 0.18) !important;
+}
+
+html body.day-theme .orbit-cluster i {
+  border-color: rgba(255, 154, 118, 0.82) !important;
+  background: radial-gradient(circle, rgba(255, 154, 118, 0.42), rgba(65, 45, 86, 0.92)) !important;
+}
+
+
+/* v75.75.113 botao madrugada inteligente */
+html body .main-action-area .primary-action .action-icon {
+  overflow: hidden !important;
+}

@@ -1,0 +1,10 @@
+Versão v75.75.112
+
+Correções:
+- Mantido o relógio antigo restaurado.
+- Corrigido o bug em que "Iniciar soneca" não funcionava:
+  - o live tick estava sincronizando o acordado aberto e sobrescrevendo o estado sleeping logo após iniciar a soneca.
+  - agora syncMainClockFromOpenAwake não sobrescreve sono/soneca já iniciado.
+- Reforçados os ícones orbitais no tema claro para aparecerem como no tema escuro.
+- Mantidos céu estrelado no escuro e sol no claro.
+- Cache/versionamento atualizado para 75.75.112.
