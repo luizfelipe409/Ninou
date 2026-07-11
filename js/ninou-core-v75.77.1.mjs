@@ -401,7 +401,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.77.0";
+const NINOU_RUNTIME_VERSION = "75.77.1";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3414,7 +3414,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.77.0 — as observações do dia também recebem um armazenamento dedicado.
+// v75.77.1 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -10115,7 +10115,7 @@ function renderCurrentState() {
   renderActiveTimerCard();
 }
 
-const ORBIT_RADIUS = 132;
+const ORBIT_RADIUS = 116;
 // .orbit-ring is visually rotated 17deg via CSS (transform: rotate(17deg)).
 // Event icons are positioned in an unrotated coordinate space, so without
 // adding this same offset here, every icon lands 17deg off the drawn arc.
@@ -14399,7 +14399,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=75.77.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=75.77.1", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

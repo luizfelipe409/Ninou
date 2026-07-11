@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.0 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.1 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.77.0 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.77.1 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.77.0 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v75.77.1 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.0 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.1 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.0 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.1 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v75.77.0 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v75.77.1 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v75.77.0 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v75.77.1 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v75.77.0 — layout premium baseado no preview aprovado ===== */
+/* ===== v75.77.1 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29886,5 +29886,266 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
   html body.family-daily-surface .today-overview-head,
   html body.family-daily-surface .today-topline {
     flex-wrap: wrap !important;
+  }
+}
+
+
+/* ===== v75.77.1 — escala móvel fiel ao preview aprovado ===== */
+
+html body.family-daily-surface .app-header {
+  grid-template-columns: minmax(0, 1fr) 118px !important;
+  gap: 10px !important;
+}
+
+html body.family-daily-surface .app-header .identity {
+  grid-template-columns: 50px minmax(0, 1fr) !important;
+  gap: 10px !important;
+}
+
+html body.family-daily-surface .app-header .identity img {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 16px !important;
+}
+
+html body.family-daily-surface .app-header .identity span {
+  font-size: 0.78rem !important;
+  letter-spacing: 0.09em !important;
+}
+
+html body.family-daily-surface .app-header .identity strong {
+  display: block !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  font-size: clamp(1.22rem, 5.1vw, 1.48rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.035em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+html body.family-daily-surface .sync-pill {
+  width: 118px !important;
+  min-width: 118px !important;
+  max-width: 118px !important;
+  min-height: 42px !important;
+  padding: 0 11px !important;
+  font-size: 0.86rem !important;
+  white-space: nowrap !important;
+}
+
+html body.family-daily-surface .today-topline {
+  flex-wrap: nowrap !important;
+  margin-top: 0 !important;
+}
+
+html body.family-daily-surface .today-topline span {
+  min-width: 0 !important;
+  font-size: clamp(0.82rem, 3.7vw, 0.98rem) !important;
+  letter-spacing: 0.07em !important;
+  white-space: nowrap !important;
+}
+
+html body.family-daily-surface .today-topline .ghost-link,
+html body.family-daily-surface button[data-target-shortcut="profile"].ghost-link {
+  flex: 0 0 auto !important;
+  min-height: 42px !important;
+  padding: 0 17px !important;
+  font-size: 0.92rem !important;
+}
+
+html body.family-daily-surface.regular-family-mode .state-orbit,
+html body.family-daily-surface .screen[data-screen="today"] > .state-orbit {
+  min-height: 332px !important;
+  padding: 18px 14px !important;
+  border-radius: 28px !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-ring,
+html body.family-daily-surface .orbit-ring {
+  width: min(69vw, 282px) !important;
+  height: min(69vw, 282px) !important;
+}
+
+html body.family-daily-surface #stateLabel,
+html body.family-daily-surface .state-orbit > span {
+  font-size: 0.88rem !important;
+  letter-spacing: 0.075em !important;
+}
+
+html body.family-daily-surface #stateClock,
+html body.family-daily-surface .state-orbit strong {
+  font-size: clamp(2.75rem, 12vw, 3.65rem) !important;
+  letter-spacing: -0.055em !important;
+}
+
+html body.family-daily-surface #stateHint,
+html body.family-daily-surface .state-orbit p {
+  max-width: 240px !important;
+  margin-top: 7px !important;
+  font-size: 0.98rem !important;
+  line-height: 1.24 !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event i {
+  width: 31px !important;
+  height: 31px !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster .orbit-cluster-icon {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+html body.family-daily-surface .main-action-area .primary-action {
+  min-height: 76px !important;
+  padding: 12px 20px !important;
+  border-radius: 24px !important;
+  gap: 13px !important;
+  font-size: clamp(1.12rem, 4.7vw, 1.34rem) !important;
+}
+
+html body.family-daily-surface .main-action-area .primary-action .action-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 17px !important;
+}
+
+html body.day-theme.family-daily-surface .main-action-area .primary-action {
+  background: linear-gradient(135deg, #76ddbd, #84e4c5) !important;
+  border-color: #76ddbd !important;
+  color: #173b31 !important;
+  -webkit-text-fill-color: #173b31 !important;
+}
+
+html body.day-theme.family-daily-surface[data-day-period="night"] .state-orbit,
+html body.day-theme.family-daily-surface[data-routine-mode="sleeping"] .state-orbit,
+html body.day-theme.family-daily-surface .state-orbit {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(183, 157, 255, 0.16), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.95), rgba(244,239,255,0.94)) !important;
+}
+
+html body.family-daily-surface .today-overview-card {
+  padding: 18px !important;
+  border-radius: 26px !important;
+}
+
+html body.family-daily-surface .today-overview-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+html body.family-daily-surface .today-overview-head > div {
+  min-width: 0 !important;
+}
+
+html body.family-daily-surface .today-overview-head strong,
+html body.family-daily-surface #todayOverviewTitle {
+  font-size: clamp(1.5rem, 6.1vw, 1.82rem) !important;
+  line-height: 1.02 !important;
+  white-space: normal !important;
+}
+
+html body.family-daily-surface .today-overview-head .ghost-link {
+  min-height: 42px !important;
+  padding: 0 15px !important;
+  font-size: 0.9rem !important;
+}
+
+html body.family-daily-surface .today-overview-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+html body.family-daily-surface .today-overview-grid article {
+  min-height: 82px !important;
+  padding: 11px !important;
+  border-radius: 16px !important;
+}
+
+html body.family-daily-surface .today-overview-grid article span {
+  font-size: 0.74rem !important;
+  line-height: 1.15 !important;
+}
+
+html body.family-daily-surface .today-overview-grid article strong {
+  margin-top: 6px !important;
+  font-size: clamp(0.96rem, 3.8vw, 1.12rem) !important;
+  line-height: 1.08 !important;
+  overflow-wrap: anywhere !important;
+}
+
+html body.family-daily-surface .today-overview-suggestion {
+  margin-top: 10px !important;
+  font-size: 0.88rem !important;
+  line-height: 1.35 !important;
+}
+
+html body.family-daily-surface .quick-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] {
+  display: grid !important;
+  grid-template-columns: 46px minmax(0, 1fr) !important;
+  align-items: center !important;
+  justify-items: start !important;
+  gap: 11px !important;
+  min-height: 78px !important;
+  padding: 12px !important;
+  border-radius: 20px !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] .action-icon,
+html body.family-daily-surface .quick-actions button[data-open-sheet] .type-icon {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] > span:last-child {
+  display: block !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  color: var(--ui-text) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+  white-space: normal !important;
+}
+
+html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] > span:last-child {
+  color: #332849 !important;
+  -webkit-text-fill-color: #332849 !important;
+}
+
+@media (max-width: 370px) {
+  html body.family-daily-surface .app-header {
+    grid-template-columns: minmax(0, 1fr) 104px !important;
+  }
+  html body.family-daily-surface .sync-pill {
+    width: 104px !important;
+    min-width: 104px !important;
+    max-width: 104px !important;
+    font-size: 0.78rem !important;
+  }
+  html body.family-daily-surface .today-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }

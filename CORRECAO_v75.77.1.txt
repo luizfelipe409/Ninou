@@ -1,0 +1,9 @@
+Ninou v75.77.1 — correção de escala do layout premium
+
+- Cabeçalho ajustado para não sobrepor Sincronizado e título.
+- Órbita, relógio e ícones reduzidos para a proporção real de iPhone.
+- Tema claro da órbita voltou ao lavanda do preview aprovado.
+- Botão principal mais compacto e com verde menta no tema claro.
+- Resumo do dia compactado em três colunas, sem título excessivo.
+- Textos dos atalhos rápidos restaurados e protegidos contra ocultação.
+- Mantidos tema claro, tema escuro, Firebase e funcionalidades existentes.
