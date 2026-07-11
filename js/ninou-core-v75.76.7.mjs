@@ -285,7 +285,6 @@ const growthHistoryMini = document.querySelector("#growthHistoryMini");
 const auditCard = document.querySelector(".audit-card");
 const auditTrailList = document.querySelector("#auditTrailList");
 const dayNotesTextarea = document.querySelector("#dayNotesTextarea");
-const saveDayNotesButton = document.querySelector("#saveDayNotesButton");
 const dayNotesStatus = document.querySelector("#dayNotesStatus");
 const dayNotesEpisodes = document.querySelector("#dayNotesEpisodes");
 const dayNotesAutosaveBadge = document.querySelector("#dayNotesAutosaveBadge");
@@ -400,7 +399,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.76.6";
+const NINOU_RUNTIME_VERSION = "75.76.7";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3286,7 +3285,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.76.6 — as observações do dia também recebem um armazenamento dedicado.
+// v75.76.7 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -11423,6 +11422,17 @@ function renderDayNoteEpisodes(entries = []) {
   `).join("");
 }
 
+function getDayNotesStatusLabel(model = {}) {
+  const entriesCount = normalizeDayNoteEntries(model?.entries || []).length;
+  const hasFreeform = Boolean(normalizeSafeDayNotes(model?.freeform || "").trim());
+  if (!entriesCount && !hasFreeform) return "Nenhuma observação registrada neste dia.";
+  if (!entriesCount && hasFreeform) return "Nota livre salva automaticamente.";
+  const episodeLabel = `${entriesCount} ${entriesCount === 1 ? "episódio" : "episódios"}`;
+  return hasFreeform
+    ? `${episodeLabel} • nota livre salva automaticamente.`
+    : `${episodeLabel} salvo${entriesCount === 1 ? "" : "s"} automaticamente.`;
+}
+
 function saveDayNotesModel(model = {}, options = {}) {
   const selectedDayId = isDateId(model?.dayId) ? model.dayId : getSelectedDayId();
   const normalizedModel = normalizeDayNotesModel({ ...model, dayId: selectedDayId, updatedAt: Date.now() });
@@ -11441,11 +11451,9 @@ function saveDayNotesModel(model = {}, options = {}) {
   renderDayNotesPanel();
 
   if (dayNotesStatus) {
-    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - normalizedModel.freeform.length);
-    const hasContent = Boolean(normalizedModel.entries.length || normalizedModel.freeform.trim());
     dayNotesStatus.textContent = savedLocally
-      ? (hasContent ? `${normalizedModel.entries.length} episódio(s) e nota livre salvos neste dia. ${remaining} caracteres livres restantes.` : "Nenhuma observação salva. Os episódios e a nota livre são salvos automaticamente.")
-      : "Não foi possível salvar no aparelho. Verifique o armazenamento do navegador.";
+      ? getDayNotesStatusLabel(normalizedModel)
+      : "Não foi possível salvar neste aparelho.";
   }
   updateDayNotesAutosaveBadge(savedLocally ? formatDayNotesAutosaveLabel(normalizedModel.updatedAt) : "Falha ao salvar");
   if (!options?.silentToast) showToast?.(savedLocally ? (options?.toastMessage || "Observação salva.") : "Falha ao salvar a observação neste aparelho.");
@@ -11462,22 +11470,8 @@ function renderDayNotesPanel() {
   }
   if (document.activeElement !== dayNotesTextarea) dayNotesTextarea.value = model.freeform;
   renderDayNoteEpisodes(model.entries);
-  if (dayNotesStatus) {
-    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - model.freeform.length);
-    if (model.entries.length || model.freeform.trim()) {
-      dayNotesStatus.textContent = `${model.entries.length} episódio(s) e nota livre salvos neste dia. ${remaining} caracteres livres restantes.`;
-    } else {
-      dayNotesStatus.textContent = "Nenhuma observação salva. Os episódios e a nota livre são salvos automaticamente.";
-    }
-  }
+  if (dayNotesStatus) dayNotesStatus.textContent = getDayNotesStatusLabel(model);
   updateDayNotesAutosaveBadge(model.updatedAt ? formatDayNotesAutosaveLabel(model.updatedAt) : "Salvo automaticamente");
-}
-
-function saveDayNotes() {
-  if (!requireLogin("salvar observações do dia")) return;
-  const model = getCurrentDayNotesModel(getSelectedDayId());
-  model.freeform = normalizeSafeDayNotes(dayNotesTextarea?.value || "");
-  saveDayNotesModel(model, { toastMessage: "Nota livre salva." });
 }
 
 function getCurrentActorLabel() {
@@ -11526,7 +11520,10 @@ function openDayNoteEntryModal(options = {}) {
 
   setSelectedDayNoteIcon(iconValue || "✦");
   updateDayNoteModalCounter();
+  dayNoteEpisodeModal.style.removeProperty("display");
   dayNoteEpisodeModal.hidden = false;
+  dayNoteEpisodeModal.inert = false;
+  dayNoteEpisodeModal.removeAttribute("aria-hidden");
   document.body.classList.add("day-note-episode-modal-open");
   window.setTimeout(() => dayNoteModalTextInput?.focus({ preventScroll: true }), 60);
 }
@@ -11534,6 +11531,9 @@ function openDayNoteEntryModal(options = {}) {
 function closeDayNoteEntryModal() {
   if (!dayNoteEpisodeModal) return;
   dayNoteEpisodeModal.hidden = true;
+  dayNoteEpisodeModal.inert = true;
+  dayNoteEpisodeModal.setAttribute("aria-hidden", "true");
+  dayNoteEpisodeModal.style.setProperty("display", "none", "important");
   document.body.classList.remove("day-note-episode-modal-open");
   editingDayNoteEntryId = "";
   selectedDayNoteIcon = "✦";
@@ -11572,8 +11572,16 @@ function saveDayNoteEntryFromModal() {
     return;
   }
 
-  saveDayNotesModel(model, { toastMessage: editingDayNoteEntryId ? "Episódio atualizado." : "Episódio salvo." });
+  const wasEditing = Boolean(editingDayNoteEntryId);
   closeDayNoteEntryModal();
+  try {
+    const saved = saveDayNotesModel(model, { silentToast: true });
+    if (!saved) showToast?.("Não foi possível salvar o episódio neste aparelho.");
+    else updateDayNotesAutosaveBadge(formatDayNotesAutosaveLabel(Date.now()));
+  } catch (error) {
+    console.error("Falha ao salvar episódio da observação:", error);
+    showToast?.(wasEditing ? "Não foi possível atualizar o episódio." : "Não foi possível salvar o episódio.");
+  }
 }
 
 function removeDayNoteEntry(entryId = "", options = {}) {
@@ -11596,8 +11604,7 @@ function scheduleDayNotesAutosave() {
   if (!requireLogin("editar observações do dia")) return;
   if (!dayNotesTextarea) return;
   const value = normalizeSafeDayNotes(dayNotesTextarea.value || "");
-  const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - value.length);
-  if (dayNotesStatus) dayNotesStatus.textContent = `Salvando automaticamente… ${remaining} caracteres livres restantes.`;
+  if (dayNotesStatus) dayNotesStatus.textContent = "Salvando automaticamente…";
   updateDayNotesAutosaveBadge("Salvando…");
   clearTimeout(dayNotesAutosaveTimer);
   dayNotesAutosaveTimer = window.setTimeout(() => {
@@ -13539,7 +13546,6 @@ saveButton.addEventListener("click", () => withButtonBusy(saveButton, "Salvando.
 resetDataButton.addEventListener("click", () => withButtonBusy(resetDataButton, "Limpando...", resetDayData));
 exportJsonButton.addEventListener("click", () => withButtonBusy(exportJsonButton, "Gerando...", () => exportRoutine("json")));
 exportCsvButton.addEventListener("click", () => withButtonBusy(exportCsvButton, "Gerando...", () => exportRoutine("csv")));
-if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
 if (dayNotesTextarea) {
   dayNotesTextarea.addEventListener("input", scheduleDayNotesAutosave);
 }
@@ -13563,7 +13569,7 @@ quickObservationButtons.forEach((button) => {
 if (openDayNoteModalButton) openDayNoteModalButton.addEventListener("click", () => openDayNoteEntryModal());
 if (closeDayNoteModalButton) closeDayNoteModalButton.addEventListener("click", closeDayNoteEntryModal);
 if (cancelDayNoteModalButton) cancelDayNoteModalButton.addEventListener("click", closeDayNoteEntryModal);
-if (saveDayNoteEntryButton) saveDayNoteEntryButton.addEventListener("click", () => withButtonBusy(saveDayNoteEntryButton, "Salvando...", saveDayNoteEntryFromModal));
+if (saveDayNoteEntryButton) saveDayNoteEntryButton.addEventListener("click", saveDayNoteEntryFromModal);
 if (deleteDayNoteEntryButton) deleteDayNoteEntryButton.addEventListener("click", () => {
   if (editingDayNoteEntryId) removeDayNoteEntry(editingDayNoteEntryId);
 });
@@ -14247,7 +14253,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=75.76.6", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=75.76.7", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

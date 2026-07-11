@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.76.6 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.76.7 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.76.6 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.76.7 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.76.6 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v75.76.7 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.76.6 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.76.7 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28965,4 +28965,83 @@ body.day-theme .day-note-modal-field input[readonly] {
   .day-note-delete-button { grid-column: 1 / -1; order: 3; }
   .day-note-episode-card { grid-template-columns: auto minmax(0,1fr); }
   .day-note-episode-actions { grid-column: 1 / -1; justify-content: flex-end; }
+}
+
+
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.76.7 ===== */
+#dayNoteEpisodeModal[hidden],
+.day-note-episode-modal[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.premium-day-notes-actions,
+.day-notes-actions.premium-day-notes-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  grid-template-columns: none !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+#dayNotesStatus {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  line-height: 1.4 !important;
+}
+.day-notes-autosave-badge {
+  align-self: flex-start !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+}
+.day-note-episode-main,
+.day-note-episode-text,
+.day-note-episode-tag,
+.day-note-modal-header > div:nth-child(2),
+.day-note-modal-header p,
+.day-note-modal-field,
+.day-note-modal-field input,
+.day-note-modal-field textarea {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+.day-note-modal-actions .day-note-save-button,
+.day-note-modal-actions .profile-secondary-button,
+.day-note-delete-button {
+  min-width: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.2 !important;
+  padding-inline: 12px !important;
+}
+@media (max-width: 420px) {
+  .day-note-modal-actions {
+    grid-template-columns: 1fr !important;
+  }
+  .day-note-delete-button {
+    grid-column: auto !important;
+    order: 3;
+  }
+  .day-note-episode-modal-card {
+    max-height: calc(100dvh - 20px) !important;
+    overflow-y: auto !important;
+  }
+  .day-note-modal-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .day-note-episode-card {
+    grid-template-columns: 42px minmax(0,1fr) !important;
+  }
+  .day-note-episode-actions {
+    grid-column: 1 / -1 !important;
+    justify-content: flex-end !important;
+  }
 }
