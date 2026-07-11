@@ -287,9 +287,23 @@ const auditTrailList = document.querySelector("#auditTrailList");
 const dayNotesTextarea = document.querySelector("#dayNotesTextarea");
 const saveDayNotesButton = document.querySelector("#saveDayNotesButton");
 const dayNotesStatus = document.querySelector("#dayNotesStatus");
+const dayNotesEpisodes = document.querySelector("#dayNotesEpisodes");
+const dayNotesAutosaveBadge = document.querySelector("#dayNotesAutosaveBadge");
 const quickObservationButtons = document.querySelectorAll("[data-quick-observation]");
-const quickObservationInput = document.querySelector("#quickObservationInput");
-const addQuickObservationButton = document.querySelector("#addQuickObservationButton");
+const openDayNoteModalButton = document.querySelector("#openDayNoteModalButton");
+const dayNoteEpisodeModal = document.querySelector("#dayNoteEpisodeModal");
+const closeDayNoteModalButton = document.querySelector("#closeDayNoteModalButton");
+const cancelDayNoteModalButton = document.querySelector("#cancelDayNoteModalButton");
+const saveDayNoteEntryButton = document.querySelector("#saveDayNoteEntryButton");
+const deleteDayNoteEntryButton = document.querySelector("#deleteDayNoteEntryButton");
+const dayNoteModalTimeInput = document.querySelector("#dayNoteModalTimeInput");
+const dayNoteModalActorInput = document.querySelector("#dayNoteModalActorInput");
+const dayNoteModalTextInput = document.querySelector("#dayNoteModalTextInput");
+const dayNoteModalCounter = document.querySelector("#dayNoteModalCounter");
+const dayNoteModalIconPreview = document.querySelector("#dayNoteModalIconPreview");
+const dayNoteEpisodeModalEyebrow = document.querySelector("#dayNoteEpisodeModalEyebrow");
+const dayNoteEpisodeModalTitle = document.querySelector("#dayNoteEpisodeModalTitle");
+const dayNoteIconButtons = document.querySelectorAll("[data-day-note-icon]");
 const familyWelcomeCard = document.querySelector("#familyWelcomeCard");
 const familyWelcomeTitle = document.querySelector("#familyWelcomeTitle");
 const familyWelcomeText = document.querySelector("#familyWelcomeText");
@@ -386,7 +400,12 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.76.4";
+const NINOU_RUNTIME_VERSION = "75.76.6";
+const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
+let dayNotesAutosaveTimer = null;
+let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
+let editingDayNoteEntryId = "";
+let selectedDayNoteIcon = "✦";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -3267,13 +3286,94 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.76.4 — as observações do dia também recebem um armazenamento dedicado.
+// v75.76.6 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const scope = sanitizeLocalStorageSegment(familyId ? `family.${familyId}` : getActiveFamilyCacheScope());
   return `${storageKeys.dayState}.notes.${scope}.${safeDayId}`;
+}
+
+function normalizeDayNoteTimeValue(value = "") {
+  const match = String(value || "").trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return formatTime(Date.now());
+  const hours = Math.max(0, Math.min(23, Number(match[1]) || 0));
+  const minutes = Math.max(0, Math.min(59, Number(match[2]) || 0));
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+function createDayNoteEntryId() {
+  return `note-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function inferDayNoteIcon(text = "") {
+  const value = String(text || "").toLowerCase();
+  if (/(cólica|colica|gases|dor na barriga)/.test(value)) return "💛";
+  if (/(regurg|golf|vomit)/.test(value)) return "💧";
+  if (/(banho|banhou)/.test(value)) return "🛁";
+  if (/(medic|remédio|remedio|dose)/.test(value)) return "💊";
+  if (/(febre|temperatura)/.test(value)) return "🌡️";
+  if (/(consulta|pediatra|orientação profissional|orientacao profissional)/.test(value)) return "🩺";
+  return "✦";
+}
+
+function normalizeDayNoteEntry(entry = {}) {
+  const text = String(entry?.text || entry?.label || entry?.title || "").replace(/\s+/g, " ").trim();
+  if (!text) return null;
+  const actor = String(entry?.actor || entry?.by || entry?.author || "").replace(/\s+/g, " ").trim();
+  const icon = String(entry?.icon || inferDayNoteIcon(text) || "✦").trim() || "✦";
+  return {
+    id: String(entry?.id || createDayNoteEntryId()),
+    time: normalizeDayNoteTimeValue(entry?.time || entry?.hour || entry?.timestampLabel || ""),
+    text,
+    actor,
+    icon,
+  };
+}
+
+function normalizeDayNoteEntries(entries = []) {
+  return (Array.isArray(entries) ? entries : []).map((entry) => normalizeDayNoteEntry(entry)).filter(Boolean);
+}
+
+function splitDayNotesText(text = "") {
+  const lines = normalizeSafeDayNotes(text).split("\n").map((line) => line.trim()).filter(Boolean);
+  const entries = [];
+  const freeformLines = [];
+  lines.forEach((line) => {
+    const match = line.match(DAY_NOTE_ENTRY_PATTERN);
+    if (match) {
+      const normalized = normalizeDayNoteEntry({ time: match[1], text: match[2], actor: match[3] || "" });
+      if (normalized) entries.push(normalized);
+      return;
+    }
+    freeformLines.push(line);
+  });
+  return {
+    entries,
+    freeform: normalizeSafeDayNotes(freeformLines.join("\n")),
+  };
+}
+
+function buildDayNotesTextFromModel(model = {}) {
+  const entries = normalizeDayNoteEntries(model?.entries || []);
+  const freeform = normalizeSafeDayNotes(model?.freeform || "");
+  return normalizeSafeDayNotes([
+    ...entries.map((entry) => `${entry.time} — ${entry.text}${entry.actor ? ` (${entry.actor})` : ""}`),
+    freeform,
+  ].filter(Boolean).join("\n"));
+}
+
+function normalizeDayNotesModel(model = {}) {
+  const entries = normalizeDayNoteEntries(model?.entries || []);
+  const freeform = normalizeSafeDayNotes(model?.freeform || "");
+  return {
+    dayId: isDateId(model?.dayId) ? model.dayId : getSelectedDayId(),
+    entries,
+    freeform,
+    text: buildDayNotesTextFromModel({ entries, freeform }),
+    updatedAt: Number(model?.updatedAt) || 0,
+  };
 }
 
 function loadLocalDayNotes(dayId = getCurrentDayId()) {
@@ -3285,24 +3385,33 @@ function loadLocalDayNotes(dayId = getCurrentDayId()) {
     if (!parsed || typeof parsed !== "object") return null;
     if (!payloadBelongsToActiveFamily(parsed)) return null;
     if (parsed.dayId && parsed.dayId !== safeDayId) return null;
+    const legacyModel = splitDayNotesText(parsed.text || "");
+    const freeform = typeof parsed.freeform === "string" ? normalizeSafeDayNotes(parsed.freeform) : legacyModel.freeform;
+    const entries = Array.isArray(parsed.entries) ? normalizeDayNoteEntries(parsed.entries) : legacyModel.entries;
     return {
-      text: normalizeSafeDayNotes(parsed.text || ""),
+      text: normalizeSafeDayNotes(parsed.text || buildDayNotesTextFromModel({ entries, freeform })),
       updatedAt: Number(parsed.updatedAt) || 0,
       cleared: parsed.cleared === true,
+      entries,
+      freeform,
     };
   } catch {
     return null;
   }
 }
 
-function saveLocalDayNotes(dayId = getCurrentDayId(), text = "", updatedAt = Date.now()) {
+function saveLocalDayNotes(dayId = getCurrentDayId(), text = "", updatedAt = Date.now(), options = {}) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
-  const safeText = normalizeSafeDayNotes(text);
+  const freeform = normalizeSafeDayNotes(options?.freeform || "");
+  const entries = normalizeDayNoteEntries(options?.entries || []);
+  const safeText = normalizeSafeDayNotes(text || buildDayNotesTextFromModel({ entries, freeform }));
   const safeUpdatedAt = Number(updatedAt) || Date.now();
   const payload = stampFamilyData({
     dayId: safeDayId,
     date: safeDayId,
     text: safeText,
+    freeform,
+    entries,
     cleared: !safeText,
     updatedAt: safeUpdatedAt,
   });
@@ -11262,79 +11371,240 @@ function renderAuditTrail() {
 }
 
 
+function getCurrentDayNotesModel(dayId = getSelectedDayId()) {
+  const safeDayId = isDateId(dayId) ? dayId : getSelectedDayId();
+  if (currentDayNotesModel.dayId === safeDayId) return currentDayNotesModel;
+
+  const persisted = loadLocalDayNotes(safeDayId);
+  const sourceText = normalizeSafeDayNotes(getValidDayNotesForDay(state, safeDayId));
+  const parsedState = splitDayNotesText(sourceText);
+  const model = normalizeDayNotesModel({
+    dayId: safeDayId,
+    entries: persisted?.entries?.length ? persisted.entries : parsedState.entries,
+    freeform: typeof persisted?.freeform === "string" ? persisted.freeform : parsedState.freeform,
+    updatedAt: Number(persisted?.updatedAt || state.dayNotesUpdatedAt || 0),
+  });
+  currentDayNotesModel = model;
+  return currentDayNotesModel;
+}
+
+function formatDayNotesAutosaveLabel(updatedAt = 0) {
+  const time = Number(updatedAt) > 0 ? formatTime(updatedAt) : "agora";
+  return `Salvo automaticamente • ${time}`;
+}
+
+function updateDayNotesAutosaveBadge(label = "Salvo automaticamente") {
+  if (!dayNotesAutosaveBadge) return;
+  dayNotesAutosaveBadge.textContent = label;
+}
+
+function renderDayNoteEpisodes(entries = []) {
+  if (!dayNotesEpisodes) return;
+  const normalizedEntries = normalizeDayNoteEntries(entries);
+  if (!normalizedEntries.length) {
+    dayNotesEpisodes.innerHTML = `<article class="day-note-episode-card is-empty"><span>Nenhum episódio registrado ainda. Toque em um atalho ou em “Novo episódio” para registrar horário, tipo e responsável.</span></article>`;
+    return;
+  }
+  dayNotesEpisodes.innerHTML = normalizedEntries.map((entry) => `
+    <article class="day-note-episode-card" data-day-note-entry="${escapeHtml(entry.id)}">
+      <span class="day-note-episode-icon" aria-hidden="true">${escapeHtml(entry.icon || inferDayNoteIcon(entry.text))}</span>
+      <div class="day-note-episode-main">
+        <div class="day-note-episode-topline">
+          <span class="day-note-episode-time">${escapeHtml(entry.time)}</span>
+          <span class="day-note-episode-tag">👤 ${escapeHtml(entry.actor || "Responsável")}</span>
+        </div>
+        <strong class="day-note-episode-text">${escapeHtml(entry.text)}</strong>
+      </div>
+      <div class="day-note-episode-actions">
+        <button class="day-note-episode-edit" type="button" aria-label="Editar episódio" title="Editar episódio" data-edit-day-note-entry="${escapeHtml(entry.id)}">✎</button>
+        <button class="day-note-episode-remove" type="button" aria-label="Remover episódio" title="Remover episódio" data-remove-day-note-entry="${escapeHtml(entry.id)}">×</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function saveDayNotesModel(model = {}, options = {}) {
+  const selectedDayId = isDateId(model?.dayId) ? model.dayId : getSelectedDayId();
+  const normalizedModel = normalizeDayNotesModel({ ...model, dayId: selectedDayId, updatedAt: Date.now() });
+  currentDayNotesModel = normalizedModel;
+
+  state.dayNotes = normalizedModel.text;
+  state.dayNotesDayId = normalizedModel.text ? selectedDayId : "";
+  state.dayNotesUpdatedAt = normalizedModel.updatedAt;
+
+  const savedLocally = saveLocalDayNotes(selectedDayId, normalizedModel.text, normalizedModel.updatedAt, {
+    entries: normalizedModel.entries,
+    freeform: normalizedModel.freeform,
+  });
+  state = sanitizeDayStateForDay(state, selectedDayId, { preserveLive: true });
+  saveDayState();
+  renderDayNotesPanel();
+
+  if (dayNotesStatus) {
+    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - normalizedModel.freeform.length);
+    const hasContent = Boolean(normalizedModel.entries.length || normalizedModel.freeform.trim());
+    dayNotesStatus.textContent = savedLocally
+      ? (hasContent ? `${normalizedModel.entries.length} episódio(s) e nota livre salvos neste dia. ${remaining} caracteres livres restantes.` : "Nenhuma observação salva. Os episódios e a nota livre são salvos automaticamente.")
+      : "Não foi possível salvar no aparelho. Verifique o armazenamento do navegador.";
+  }
+  updateDayNotesAutosaveBadge(savedLocally ? formatDayNotesAutosaveLabel(normalizedModel.updatedAt) : "Falha ao salvar");
+  if (!options?.silentToast) showToast?.(savedLocally ? (options?.toastMessage || "Observação salva.") : "Falha ao salvar a observação neste aparelho.");
+  return savedLocally;
+}
+
 function renderDayNotesPanel() {
   if (!dayNotesTextarea) return;
   const selectedDayId = getSelectedDayId();
-  const value = normalizeSafeDayNotes(getValidDayNotesForDay(state, selectedDayId));
-  if (state.dayNotes !== value) {
-    state.dayNotes = value;
-    state.dayNotesDayId = value ? selectedDayId : "";
+  const model = getCurrentDayNotesModel(selectedDayId);
+  if (state.dayNotes !== model.text) {
+    state.dayNotes = model.text;
+    state.dayNotesDayId = model.text ? selectedDayId : "";
   }
-  if (document.activeElement !== dayNotesTextarea) {
-    dayNotesTextarea.value = value;
-  }
+  if (document.activeElement !== dayNotesTextarea) dayNotesTextarea.value = model.freeform;
+  renderDayNoteEpisodes(model.entries);
   if (dayNotesStatus) {
-    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - value.length);
-    dayNotesStatus.textContent = value.trim() ? `Observação salva neste dia. ${remaining} caracteres restantes.` : "Nenhuma observação salva. Use este espaço para lembretes importantes da família.";
+    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - model.freeform.length);
+    if (model.entries.length || model.freeform.trim()) {
+      dayNotesStatus.textContent = `${model.entries.length} episódio(s) e nota livre salvos neste dia. ${remaining} caracteres livres restantes.`;
+    } else {
+      dayNotesStatus.textContent = "Nenhuma observação salva. Os episódios e a nota livre são salvos automaticamente.";
+    }
   }
+  updateDayNotesAutosaveBadge(model.updatedAt ? formatDayNotesAutosaveLabel(model.updatedAt) : "Salvo automaticamente");
 }
 
 function saveDayNotes() {
   if (!requireLogin("salvar observações do dia")) return;
-  const selectedDayId = getSelectedDayId();
-  const savedAt = Date.now();
-  state.dayNotes = normalizeSafeDayNotes(dayNotesTextarea?.value || "");
-  if (dayNotesTextarea) dayNotesTextarea.value = state.dayNotes;
-  state.dayNotesDayId = state.dayNotes ? selectedDayId : "";
-  state.dayNotesUpdatedAt = savedAt;
-
-  const savedLocally = saveLocalDayNotes(selectedDayId, state.dayNotes, savedAt);
-  state = sanitizeDayStateForDay(state, selectedDayId, { preserveLive: true });
-  saveDayState();
-  renderDayNotesPanel();
-
-  if (dayNotesStatus) {
-    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - state.dayNotes.length);
-    dayNotesStatus.textContent = savedLocally
-      ? `Observação salva neste dia. ${remaining} caracteres restantes.`
-      : "Não foi possível salvar no aparelho. Verifique o armazenamento do navegador.";
-  }
-  showToast?.(savedLocally ? "Observação salva." : "Falha ao salvar a observação neste aparelho.");
+  const model = getCurrentDayNotesModel(getSelectedDayId());
+  model.freeform = normalizeSafeDayNotes(dayNotesTextarea?.value || "");
+  saveDayNotesModel(model, { toastMessage: "Nota livre salva." });
 }
 
-function buildQuickObservationText(rawText = "") {
-  const text = String(rawText || "").trim().replace(/\s+/g, " ");
-  if (!text) return "";
+function getCurrentActorLabel() {
   const actor = getCurrentActorProfile();
-  const actorLabel = actor?.displayName || actor?.label || actor?.email || "Responsável";
-  return `${formatTime(Date.now())} — ${text} (${actorLabel})`;
+  return actor?.displayName || actor?.label || actor?.email || "Responsável";
 }
 
-function appendQuickObservation(rawText = "") {
-  if (!requireLogin("adicionar observação rápida")) return;
-  if (!dayNotesTextarea) return;
-  const noteLine = buildQuickObservationText(rawText);
-  if (!noteLine) {
-    quickObservationInput?.focus();
+function setSelectedDayNoteIcon(icon = "✦") {
+  selectedDayNoteIcon = String(icon || "✦").trim() || "✦";
+  if (dayNoteModalIconPreview) dayNoteModalIconPreview.textContent = selectedDayNoteIcon;
+  dayNoteIconButtons.forEach((button) => {
+    const selected = button.dataset.dayNoteIcon === selectedDayNoteIcon;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", selected ? "true" : "false");
+  });
+}
+
+function updateDayNoteModalCounter() {
+  if (!dayNoteModalTextInput || !dayNoteModalCounter) return;
+  const remaining = Math.max(0, 180 - String(dayNoteModalTextInput.value || "").length);
+  dayNoteModalCounter.textContent = `${remaining} caracteres disponíveis`;
+}
+
+function openDayNoteEntryModal(options = {}) {
+  if (!requireLogin(options.entryId ? "editar episódio da observação" : "adicionar episódio à observação")) return;
+  if (!dayNoteEpisodeModal) return;
+
+  const model = getCurrentDayNotesModel(getSelectedDayId());
+  const entry = options.entryId
+    ? normalizeDayNoteEntries(model.entries).find((item) => item.id === String(options.entryId))
+    : null;
+
+  editingDayNoteEntryId = entry?.id || "";
+  const actorLabel = entry?.actor || getCurrentActorLabel();
+  const textValue = entry?.text || String(options.text || "").trim();
+  const timeValue = entry?.time || normalizeDayNoteTimeValue(formatTime(Date.now()));
+  const iconValue = entry?.icon || options.icon || inferDayNoteIcon(textValue);
+
+  if (dayNoteModalTimeInput) dayNoteModalTimeInput.value = normalizeDayNoteTimeValue(timeValue);
+  if (dayNoteModalActorInput) dayNoteModalActorInput.value = actorLabel;
+  if (dayNoteModalTextInput) dayNoteModalTextInput.value = textValue;
+  if (dayNoteEpisodeModalEyebrow) dayNoteEpisodeModalEyebrow.textContent = entry ? "Editar episódio" : "Novo episódio";
+  if (dayNoteEpisodeModalTitle) dayNoteEpisodeModalTitle.textContent = entry ? "Ajustar observação" : "Adicionar observação";
+  if (saveDayNoteEntryButton) saveDayNoteEntryButton.textContent = entry ? "Salvar alterações" : "Salvar episódio";
+  if (deleteDayNoteEntryButton) deleteDayNoteEntryButton.hidden = !entry;
+
+  setSelectedDayNoteIcon(iconValue || "✦");
+  updateDayNoteModalCounter();
+  dayNoteEpisodeModal.hidden = false;
+  document.body.classList.add("day-note-episode-modal-open");
+  window.setTimeout(() => dayNoteModalTextInput?.focus({ preventScroll: true }), 60);
+}
+
+function closeDayNoteEntryModal() {
+  if (!dayNoteEpisodeModal) return;
+  dayNoteEpisodeModal.hidden = true;
+  document.body.classList.remove("day-note-episode-modal-open");
+  editingDayNoteEntryId = "";
+  selectedDayNoteIcon = "✦";
+}
+
+function saveDayNoteEntryFromModal() {
+  if (!requireLogin(editingDayNoteEntryId ? "editar episódio da observação" : "adicionar episódio à observação")) return;
+  const textValue = String(dayNoteModalTextInput?.value || "").trim().replace(/\s+/g, " ");
+  if (!textValue) {
+    showToast?.("Descreva o episódio antes de salvar.");
+    dayNoteModalTextInput?.focus();
     return;
   }
-  const current = normalizeSafeDayNotes(dayNotesTextarea.value || state.dayNotes || "");
-  const next = normalizeSafeDayNotes([current, noteLine].filter(Boolean).join("\n"));
-  if (next.length >= MAX_DAY_NOTES_LENGTH && next !== [current, noteLine].filter(Boolean).join("\n")) {
-    showToast?.("Observação atingiu o limite de caracteres do dia.");
+
+  const model = getCurrentDayNotesModel(getSelectedDayId());
+  const existingEntries = normalizeDayNoteEntries(model.entries);
+  const actorLabel = String(dayNoteModalActorInput?.value || getCurrentActorLabel()).trim() || "Responsável";
+  const entry = normalizeDayNoteEntry({
+    id: editingDayNoteEntryId || createDayNoteEntryId(),
+    time: dayNoteModalTimeInput?.value || formatTime(Date.now()),
+    text: textValue,
+    actor: actorLabel,
+    icon: selectedDayNoteIcon || inferDayNoteIcon(textValue),
+  });
+
+  if (!entry) return;
+  if (editingDayNoteEntryId) {
+    model.entries = existingEntries.map((item) => item.id === editingDayNoteEntryId ? entry : item);
+  } else {
+    model.entries = [...existingEntries, entry];
   }
-  dayNotesTextarea.value = next;
-  const selectedDayId = getSelectedDayId();
-  const savedAt = Date.now();
-  state.dayNotes = next;
-  state.dayNotesDayId = next ? selectedDayId : "";
-  state.dayNotesUpdatedAt = savedAt;
-  saveLocalDayNotes(selectedDayId, next, savedAt);
-  state = sanitizeDayStateForDay(state, selectedDayId, { preserveLive: true });
-  saveDayState();
-  renderDayNotesPanel();
-  if (quickObservationInput) quickObservationInput.value = "";
-  dayNotesTextarea.focus({ preventScroll: true });
+  model.freeform = normalizeSafeDayNotes(dayNotesTextarea?.value || model.freeform || "");
+  const projected = buildDayNotesTextFromModel(model);
+  if (projected.length > MAX_DAY_NOTES_LENGTH + 500) {
+    showToast?.("As observações deste dia atingiram o limite disponível.");
+    return;
+  }
+
+  saveDayNotesModel(model, { toastMessage: editingDayNoteEntryId ? "Episódio atualizado." : "Episódio salvo." });
+  closeDayNoteEntryModal();
+}
+
+function removeDayNoteEntry(entryId = "", options = {}) {
+  if (!requireLogin("remover episódio da observação")) return;
+  const safeEntryId = String(entryId || "").trim();
+  if (!safeEntryId) return;
+  if (options.confirm !== false && !window.confirm("Remover este episódio das observações do dia?")) return;
+
+  const model = getCurrentDayNotesModel(getSelectedDayId());
+  const entries = normalizeDayNoteEntries(model.entries);
+  const nextEntries = entries.filter((entry) => entry.id !== safeEntryId);
+  if (nextEntries.length === entries.length) return;
+  model.entries = nextEntries;
+  model.freeform = normalizeSafeDayNotes(dayNotesTextarea?.value || model.freeform || "");
+  saveDayNotesModel(model, { toastMessage: "Episódio removido." });
+  if (editingDayNoteEntryId === safeEntryId) closeDayNoteEntryModal();
+}
+
+function scheduleDayNotesAutosave() {
+  if (!requireLogin("editar observações do dia")) return;
+  if (!dayNotesTextarea) return;
+  const value = normalizeSafeDayNotes(dayNotesTextarea.value || "");
+  const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - value.length);
+  if (dayNotesStatus) dayNotesStatus.textContent = `Salvando automaticamente… ${remaining} caracteres livres restantes.`;
+  updateDayNotesAutosaveBadge("Salvando…");
+  clearTimeout(dayNotesAutosaveTimer);
+  dayNotesAutosaveTimer = window.setTimeout(() => {
+    const model = getCurrentDayNotesModel(getSelectedDayId());
+    model.freeform = value;
+    saveDayNotesModel(model, { silentToast: true });
+  }, 500);
 }
 
 function renderProductExperienceSections() {
@@ -13271,25 +13541,48 @@ exportJsonButton.addEventListener("click", () => withButtonBusy(exportJsonButton
 exportCsvButton.addEventListener("click", () => withButtonBusy(exportCsvButton, "Gerando...", () => exportRoutine("csv")));
 if (saveDayNotesButton) saveDayNotesButton.addEventListener("click", saveDayNotes);
 if (dayNotesTextarea) {
-  dayNotesTextarea.addEventListener("input", () => {
-    if (!dayNotesStatus) return;
-    const value = normalizeSafeDayNotes(dayNotesTextarea.value || "");
-    const remaining = Math.max(0, MAX_DAY_NOTES_LENGTH - value.length);
-    dayNotesStatus.textContent = `Alterações ainda não salvas. ${remaining} caracteres restantes.`;
+  dayNotesTextarea.addEventListener("input", scheduleDayNotesAutosave);
+}
+if (dayNotesEpisodes) {
+  dayNotesEpisodes.addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-edit-day-note-entry]");
+    if (editButton) {
+      openDayNoteEntryModal({ entryId: editButton.dataset.editDayNoteEntry || "" });
+      return;
+    }
+    const removeButton = event.target.closest("[data-remove-day-note-entry]");
+    if (removeButton) removeDayNoteEntry(removeButton.dataset.removeDayNoteEntry || "");
   });
 }
 quickObservationButtons.forEach((button) => {
-  button.addEventListener("click", () => appendQuickObservation(button.dataset.quickObservation || button.textContent || ""));
+  button.addEventListener("click", () => openDayNoteEntryModal({
+    text: button.dataset.quickObservation || button.textContent || "",
+    icon: button.dataset.observationIcon || inferDayNoteIcon(button.dataset.quickObservation || button.textContent || ""),
+  }));
 });
-if (addQuickObservationButton) addQuickObservationButton.addEventListener("click", () => appendQuickObservation(quickObservationInput?.value || ""));
-if (quickObservationInput) {
-  quickObservationInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+if (openDayNoteModalButton) openDayNoteModalButton.addEventListener("click", () => openDayNoteEntryModal());
+if (closeDayNoteModalButton) closeDayNoteModalButton.addEventListener("click", closeDayNoteEntryModal);
+if (cancelDayNoteModalButton) cancelDayNoteModalButton.addEventListener("click", closeDayNoteEntryModal);
+if (saveDayNoteEntryButton) saveDayNoteEntryButton.addEventListener("click", () => withButtonBusy(saveDayNoteEntryButton, "Salvando...", saveDayNoteEntryFromModal));
+if (deleteDayNoteEntryButton) deleteDayNoteEntryButton.addEventListener("click", () => {
+  if (editingDayNoteEntryId) removeDayNoteEntry(editingDayNoteEntryId);
+});
+if (dayNoteModalTextInput) {
+  dayNoteModalTextInput.addEventListener("input", updateDayNoteModalCounter);
+  dayNoteModalTextInput.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       event.preventDefault();
-      appendQuickObservation(quickObservationInput.value || "");
+      saveDayNoteEntryFromModal();
     }
   });
 }
+dayNoteIconButtons.forEach((button) => {
+  button.addEventListener("click", () => setSelectedDayNoteIcon(button.dataset.dayNoteIcon || "✦"));
+});
+document.querySelectorAll("[data-close-day-note-modal]").forEach((element) => element.addEventListener("click", closeDayNoteEntryModal));
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && dayNoteEpisodeModal && !dayNoteEpisodeModal.hidden) closeDayNoteEntryModal();
+});
 if (saveCaregiverIdentityButton) saveCaregiverIdentityButton.addEventListener("click", () => withButtonBusy(saveCaregiverIdentityButton, "Salvando...", saveCaregiverIdentityFromForm));
 caregiverPresetButtons.forEach((button) => {
   button.addEventListener("click", () => applyCaregiverPresetFromButton(button));
@@ -13954,7 +14247,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=75.76.4", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=75.76.6", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

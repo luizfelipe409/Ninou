@@ -1,4 +1,4 @@
-Ninou v75.76.4 — correção do campo Observações do dia
+Ninou v75.76.6 — correção do campo Observações do dia
 
 Problema corrigido
 - O texto aparecia como salvo na tela, mas podia desaparecer após renderização, troca de dia, atualização ou sincronização.
@@ -13,7 +13,7 @@ Correções
 - Salvamento rápido e botão Salvar observação persistem primeiro a nota e depois o estado completo.
 - Indicador mostra quando há alterações ainda não salvas.
 - Feedback visual de sucesso ou falha local.
-- Cache/PWA atualizado para v75.76.4.
+- Cache/PWA atualizado para v75.76.6.
 
 Dados preservados
 - Perfil, família, registros, pesos e configurações locais não são apagados.

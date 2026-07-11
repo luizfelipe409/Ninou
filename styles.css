@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.76.4 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.76.6 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.76.4 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.76.6 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28499,3 +28499,470 @@ html body .bottom-bar[hidden] {
   }
 }
 
+
+
+/* ===== OBSERVAÇÕES PREMIUM — v75.76.6 ===== */
+
+.day-notes-card {
+  position: relative;
+  overflow: hidden;
+}
+.day-notes-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(111,230,192,.18), rgba(111,230,192,.04), transparent);
+  pointer-events: none;
+}
+.premium-observation-composer {
+  display: grid;
+  grid-template-columns: 112px minmax(0,1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+.quick-observation-time {
+  min-height: 48px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: var(--text-primary, #f4f1fb);
+  padding: 0 14px;
+  font: inherit;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.quick-observation-time::-webkit-calendar-picker-indicator { filter: invert(1) opacity(.75); }
+.day-notes-actor-hint {
+  margin-top: 10px;
+  font-size: .86rem;
+  color: rgba(225, 219, 242, .78);
+}
+.day-notes-episodes {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 16px;
+}
+.day-note-episode-card {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 14px 13px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 10px 28px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.day-note-episode-card.is-empty {
+  grid-template-columns: 1fr;
+  color: rgba(225, 219, 242, .8);
+  font-size: .95rem;
+}
+.day-note-episode-time {
+  min-width: 64px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(111,230,192,.14);
+  color: #b8ffe6;
+  border: 1px solid rgba(111,230,192,.24);
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+.day-note-episode-body {
+  min-width: 0;
+}
+.day-note-episode-text {
+  display: block;
+  color: var(--text-primary, #fff);
+  font-weight: 650;
+  line-height: 1.35;
+}
+.day-note-episode-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 7px;
+  color: rgba(225, 219, 242, .82);
+  font-size: .84rem;
+}
+.day-note-episode-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.day-note-episode-remove {
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.88);
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease;
+}
+.day-note-episode-remove:hover,
+.day-note-episode-remove:focus-visible {
+  background: rgba(255,107,107,.12);
+  border-color: rgba(255,107,107,.32);
+  transform: translateY(-1px);
+}
+.day-notes-freeform-label {
+  display: inline-flex;
+  margin: 6px 0 8px;
+  color: rgba(255,255,255,.92);
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+.premium-day-notes-actions {
+  align-items: center;
+  gap: 12px;
+}
+.day-notes-action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.day-notes-autosave-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(111,230,192,.12);
+  border: 1px solid rgba(111,230,192,.24);
+  color: #caffea;
+  font-size: .86rem;
+  font-weight: 700;
+}
+.day-notes-autosave-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px rgba(111,230,192,.12);
+}
+@media (max-width: 680px) {
+  .premium-observation-composer {
+    grid-template-columns: 1fr 1fr;
+  }
+  .premium-observation-composer #quickObservationInput {
+    grid-column: 1 / -1;
+  }
+  .premium-observation-composer #addQuickObservationButton {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .day-note-episode-card {
+    grid-template-columns: 1fr auto;
+  }
+  .day-note-episode-time {
+    grid-column: 1 / 2;
+    justify-self: start;
+  }
+  .day-note-episode-body {
+    grid-column: 1 / 2;
+  }
+  .day-note-episode-remove {
+    grid-column: 2 / 3;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+  }
+}
+
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.76.6 ===== */
+.premium-observation-chips button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.premium-observation-chips button > span {
+  font-size: 1.05em;
+  line-height: 1;
+}
+.premium-new-episode-button {
+  width: 100%;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(111, 230, 192, .22);
+  background: linear-gradient(135deg, rgba(111,230,192,.12), rgba(111,230,192,.055));
+  color: #effff9;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 12px 28px rgba(0,0,0,.1);
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.premium-new-episode-button:hover,
+.premium-new-episode-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(111,230,192,.42);
+  background: linear-gradient(135deg, rgba(111,230,192,.18), rgba(111,230,192,.075));
+}
+.premium-new-episode-button > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+.premium-new-episode-button strong {
+  color: #f5fff9;
+  font-size: .98rem;
+}
+.premium-new-episode-button small {
+  color: rgba(228, 247, 240, .72);
+  font-size: .82rem;
+}
+.premium-new-episode-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(111,230,192,.16);
+  border: 1px solid rgba(111,230,192,.28);
+  color: #9cf5d7;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+.day-note-episode-card {
+  grid-template-columns: auto minmax(0,1fr) auto;
+}
+.day-note-episode-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.09);
+  font-size: 1.25rem;
+}
+.day-note-episode-main {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+.day-note-episode-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.day-note-episode-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.day-note-episode-edit,
+.day-note-episode-remove {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 13px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.045);
+  color: rgba(255,255,255,.9);
+  font: inherit;
+  cursor: pointer;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease;
+}
+.day-note-episode-edit:hover,
+.day-note-episode-edit:focus-visible {
+  transform: translateY(-1px);
+  background: rgba(111,230,192,.12);
+  border-color: rgba(111,230,192,.28);
+}
+.day-note-episode-remove:hover,
+.day-note-episode-remove:focus-visible {
+  transform: translateY(-1px);
+  background: rgba(255,107,107,.12);
+  border-color: rgba(255,107,107,.32);
+}
+.day-note-episode-modal-open {
+  overflow: hidden;
+}
+.day-note-episode-modal {
+  z-index: 1600;
+}
+.day-note-episode-modal-card {
+  width: min(100%, 540px);
+  padding: 22px !important;
+  gap: 16px;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(111,230,192,.12), transparent 36%),
+    linear-gradient(180deg, rgba(43,34,78,.99), rgba(24,17,50,.99));
+}
+.day-note-modal-header {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  gap: 13px;
+  align-items: start;
+}
+.day-note-modal-header > div:nth-child(2) {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.day-note-modal-header span {
+  color: #8de8cb;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.day-note-modal-header strong {
+  color: #fff;
+  font-size: 1.23rem;
+  line-height: 1.2;
+}
+.day-note-modal-header p {
+  margin: 2px 0 0;
+  color: rgba(230,225,244,.72);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.day-note-modal-icon-preview {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(111,230,192,.18), rgba(111,230,192,.07));
+  border: 1px solid rgba(111,230,192,.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+  font-size: 1.45rem;
+}
+.day-note-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0,1fr));
+  gap: 8px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.day-note-icon-picker button {
+  min-width: 0;
+  min-height: 42px;
+  border-radius: 13px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font-size: 1.18rem;
+  cursor: pointer;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease;
+}
+.day-note-icon-picker button:hover,
+.day-note-icon-picker button:focus-visible,
+.day-note-icon-picker button.is-selected {
+  transform: translateY(-1px);
+  background: rgba(111,230,192,.12);
+  border-color: rgba(111,230,192,.25);
+}
+.day-note-modal-grid {
+  display: grid;
+  grid-template-columns: 138px minmax(0,1fr);
+  gap: 12px;
+}
+.day-note-modal-field {
+  display: grid;
+  gap: 7px;
+}
+.day-note-modal-field > span {
+  color: rgba(248,245,255,.9);
+  font-size: .83rem;
+  font-weight: 750;
+}
+.day-note-modal-field input,
+.day-note-modal-field textarea {
+  width: 100%;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.11) !important;
+  background: rgba(255,255,255,.05) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+.day-note-modal-field input[readonly] {
+  color: rgba(241,238,249,.76) !important;
+  background: rgba(255,255,255,.035) !important;
+}
+.day-note-modal-field textarea {
+  resize: vertical;
+  min-height: 104px !important;
+}
+.day-note-modal-field small {
+  color: rgba(226,221,239,.64);
+  text-align: right;
+  font-size: .78rem;
+}
+.day-note-modal-actions {
+  display: grid;
+  grid-template-columns: auto 1fr 1.35fr;
+  gap: 10px;
+  align-items: center;
+}
+.day-note-delete-button {
+  min-height: 46px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,116,116,.23);
+  background: rgba(255,116,116,.08);
+  color: #ffc8c8;
+  font-weight: 750;
+  cursor: pointer;
+}
+.day-note-save-button {
+  min-height: 46px;
+  background: linear-gradient(135deg, #55cfa9, #3ca382) !important;
+  color: #071d16 !important;
+  box-shadow: 0 12px 28px rgba(44,147,116,.24);
+}
+body.day-theme .premium-new-episode-button {
+  color: #315f52;
+  background: linear-gradient(135deg, rgba(47,128,103,.1), rgba(47,128,103,.04));
+  border-color: rgba(47,128,103,.18);
+}
+body.day-theme .premium-new-episode-button strong { color: #2f584d; }
+body.day-theme .premium-new-episode-button small { color: rgba(47,72,65,.68); }
+body.day-theme .day-note-episode-modal-card {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(47,128,103,.1), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,.99), rgba(247,242,255,.99));
+}
+body.day-theme .day-note-modal-header strong,
+body.day-theme .day-note-modal-field > span { color: #2f2843; }
+body.day-theme .day-note-modal-header p,
+body.day-theme .day-note-modal-field small { color: rgba(63,52,88,.65); }
+body.day-theme .day-note-modal-field input,
+body.day-theme .day-note-modal-field textarea {
+  background: rgba(102,78,140,.055) !important;
+  border-color: rgba(95,75,135,.13) !important;
+  color: #2f2843 !important;
+}
+body.day-theme .day-note-modal-field input[readonly] {
+  color: rgba(47,40,67,.7) !important;
+}
+@media (max-width: 620px) {
+  .day-note-episode-modal { padding: 10px; }
+  .day-note-episode-modal-card { padding: 18px !important; border-radius: 26px !important; }
+  .day-note-icon-picker { grid-template-columns: repeat(7, minmax(36px,1fr)); overflow-x: auto; }
+  .day-note-modal-grid { grid-template-columns: 1fr 1fr; }
+  .day-note-modal-actions { grid-template-columns: 1fr 1fr; }
+  .day-note-delete-button { grid-column: 1 / -1; order: 3; }
+  .day-note-episode-card { grid-template-columns: auto minmax(0,1fr); }
+  .day-note-episode-actions { grid-column: 1 / -1; justify-content: flex-end; }
+}

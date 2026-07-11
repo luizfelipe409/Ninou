@@ -1,4 +1,4 @@
-const NINOU_VERSION = "75.76.4";
+const NINOU_VERSION = "75.76.6";
 const REPAIR_KEY = `ninou:pwa-repair:${NINOU_VERSION}`;
 
 function safeStorageGet(key) {
@@ -107,7 +107,7 @@ async function bootNinou() {
       }
     }
 
-    await import(`./ninou-core-v75.76.4.mjs?v=${NINOU_VERSION}`);
+    await import(`./ninou-core-v75.76.6.mjs?v=${NINOU_VERSION}`);
     window.__NINOU_APP_READY__ = true;
     document.documentElement.dataset.ninouAppReady = "true";
   })();

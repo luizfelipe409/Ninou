@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=75.76.4" />
+    <link rel="manifest" href="./manifest.webmanifest?v=75.76.6" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,7 +20,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=75.76.4" />
+    <link rel="stylesheet" href="./styles.css?v=75.76.6" />
   </head>
   <body>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
@@ -356,23 +356,29 @@
               <span>Atalhos rápidos</span>
               <strong>Toque para adicionar uma nota</strong>
             </div>
-            <div class="quick-observation-chips" role="list" aria-label="Sugestões de observação">
-              <button type="button" data-quick-observation="Teve cólica">Cólica</button>
-              <button type="button" data-quick-observation="Regurgitou">Regurgitou</button>
-              <button type="button" data-quick-observation="Tomou banho">Banho</button>
-              <button type="button" data-quick-observation="Medicamento registrado/administrado">Medicamento</button>
-              <button type="button" data-quick-observation="Teve febre ou temperatura elevada">Febre</button>
-              <button type="button" data-quick-observation="Consulta ou orientação profissional">Consulta</button>
+            <div class="quick-observation-chips premium-observation-chips" role="list" aria-label="Sugestões de observação">
+              <button type="button" data-quick-observation="Teve cólica" data-observation-icon="💛"><span aria-hidden="true">💛</span>Cólica</button>
+              <button type="button" data-quick-observation="Regurgitou" data-observation-icon="💧"><span aria-hidden="true">💧</span>Regurgitou</button>
+              <button type="button" data-quick-observation="Tomou banho" data-observation-icon="🛁"><span aria-hidden="true">🛁</span>Banho</button>
+              <button type="button" data-quick-observation="Medicamento registrado/administrado" data-observation-icon="💊"><span aria-hidden="true">💊</span>Medicamento</button>
+              <button type="button" data-quick-observation="Teve febre ou temperatura elevada" data-observation-icon="🌡️"><span aria-hidden="true">🌡️</span>Febre</button>
+              <button type="button" data-quick-observation="Consulta ou orientação profissional" data-observation-icon="🩺"><span aria-hidden="true">🩺</span>Consulta</button>
             </div>
-            <div class="quick-observation-custom">
-              <input id="quickObservationInput" type="text" maxlength="180" placeholder="Escrever observação rápida" autocomplete="off" />
-              <button id="addQuickObservationButton" class="secondary-login" type="button">Adicionar</button>
-            </div>
+            <button id="openDayNoteModalButton" class="premium-new-episode-button" type="button">
+              <span class="premium-new-episode-icon" aria-hidden="true">＋</span>
+              <span><strong>Novo episódio</strong><small>Escolha horário, tipo e responsável</small></span>
+            </button>
+            <div id="dayNotesActorHint" class="day-notes-actor-hint" aria-live="polite">O cuidador identificado neste aparelho será incluído automaticamente.</div>
           </div>
-          <textarea id="dayNotesTextarea" rows="4" maxlength="1200" placeholder="Ex.: Dormiu melhor após o banho, teve mais cólica pela manhã, aceitou menos mamadeira à noite."></textarea>
-          <div class="day-notes-actions">
-            <small id="dayNotesStatus">Nenhuma observação salva. Use este espaço para lembretes importantes da família.</small>
-            <button id="saveDayNotesButton" class="secondary-login" type="button">Salvar observação</button>
+          <div id="dayNotesEpisodes" class="day-notes-episodes" aria-live="polite"></div>
+          <label class="day-notes-freeform-label" for="dayNotesTextarea">Nota livre do dia (opcional)</label>
+          <textarea id="dayNotesTextarea" rows="4" maxlength="1200" placeholder="Ex.: Dormiu melhor após o banho, aceitou menos mamadeira à noite, pediatra orientou observar a temperatura."></textarea>
+          <div class="day-notes-actions premium-day-notes-actions">
+            <small id="dayNotesStatus">Nenhuma observação salva. Os episódios e a nota livre são salvos automaticamente.</small>
+            <div class="day-notes-action-group">
+              <span id="dayNotesAutosaveBadge" class="day-notes-autosave-badge" aria-live="polite">Salvo automaticamente</span>
+              <button id="saveDayNotesButton" class="secondary-login" type="button">Salvar agora</button>
+            </div>
           </div>
         </section>
 
@@ -1790,6 +1796,54 @@
       </div>
     </section>
 
+    <section id="dayNoteEpisodeModal" class="ninou-modal day-note-episode-modal" aria-label="Adicionar episódio às observações" hidden>
+      <div class="ninou-modal-backdrop" data-close-day-note-modal="true"></div>
+      <div class="ninou-modal-card day-note-episode-modal-card" role="dialog" aria-modal="true" aria-labelledby="dayNoteEpisodeModalTitle">
+        <div class="day-note-modal-header">
+          <div class="day-note-modal-icon-preview" id="dayNoteModalIconPreview" aria-hidden="true">✦</div>
+          <div>
+            <span id="dayNoteEpisodeModalEyebrow">Novo episódio</span>
+            <strong id="dayNoteEpisodeModalTitle">Adicionar observação</strong>
+            <p>Registre um acontecimento do dia com horário e responsável.</p>
+          </div>
+          <button id="closeDayNoteModalButton" class="guest-modal-close" type="button" aria-label="Fechar observação">×</button>
+        </div>
+
+        <div class="day-note-icon-picker" role="group" aria-label="Tipo do episódio">
+          <button type="button" data-day-note-icon="💛" aria-label="Cólica">💛</button>
+          <button type="button" data-day-note-icon="💧" aria-label="Regurgitou">💧</button>
+          <button type="button" data-day-note-icon="🛁" aria-label="Banho">🛁</button>
+          <button type="button" data-day-note-icon="💊" aria-label="Medicamento">💊</button>
+          <button type="button" data-day-note-icon="🌡️" aria-label="Febre">🌡️</button>
+          <button type="button" data-day-note-icon="🩺" aria-label="Consulta">🩺</button>
+          <button type="button" data-day-note-icon="✦" aria-label="Outro">✦</button>
+        </div>
+
+        <div class="day-note-modal-grid">
+          <label class="day-note-modal-field day-note-time-field">
+            <span>Horário</span>
+            <input id="dayNoteModalTimeInput" type="time" />
+          </label>
+          <label class="day-note-modal-field day-note-actor-field">
+            <span>Responsável</span>
+            <input id="dayNoteModalActorInput" type="text" readonly aria-readonly="true" />
+          </label>
+        </div>
+
+        <label class="day-note-modal-field">
+          <span>O que aconteceu?</span>
+          <textarea id="dayNoteModalTextInput" rows="3" maxlength="180" placeholder="Ex.: Regurgitou após a mamadeira, tomou banho e relaxou..."></textarea>
+          <small id="dayNoteModalCounter">180 caracteres disponíveis</small>
+        </label>
+
+        <div class="day-note-modal-actions">
+          <button id="deleteDayNoteEntryButton" class="day-note-delete-button" type="button" hidden>Excluir episódio</button>
+          <button id="cancelDayNoteModalButton" class="profile-secondary-button" type="button">Cancelar</button>
+          <button id="saveDayNoteEntryButton" class="profile-primary-button day-note-save-button" type="button">Salvar episódio</button>
+        </div>
+      </div>
+    </section>
+
     <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
     <section id="recordSheet" class="record-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-label="Novo registro" hidden>
       <div class="sheet-handle"></div>
@@ -1968,7 +2022,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v75.76.4.mjs?v=75.76.4").catch((error) => {
+      import("./js/boot-v75.76.6.mjs?v=75.76.6").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         const notice = document.createElement("div");
         notice.style.cssText = "position:fixed;inset:14px 14px auto;z-index:2147483647;padding:16px;border-radius:18px;background:#fff3f3;color:#4a1220;font:14px/1.45 system-ui;box-shadow:0 18px 48px rgba(74,18,32,.2)";
