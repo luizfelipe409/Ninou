@@ -37207,3 +37207,190 @@ body:not(.day-theme) .orbit-cluster-list button {
   color: #f7f3ff !important;
   box-shadow: 0 10px 22px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.05) !important;
 }
+
+
+/* v75.75.108 relogio clean premium definitivo */
+
+/* v75.75.108 — Relógio clean premium.
+   A órbita com mini ícones ainda estava poluída. A versão premium real fica mais limpa:
+   foco total no tempo, anel suave e sem marcadores quebrados/colados.
+*/
+
+/* Card do relógio mais limpo */
+.state-orbit {
+  overflow: hidden !important;
+  isolation: isolate !important;
+  position: relative !important;
+}
+
+/* Remove a camada de eventos da órbita: ela estava visualmente poluindo o timer */
+.state-orbit #orbitEvents,
+.state-orbit .orbit-events,
+#orbitEvents.orbit-events {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Anel mais elegante: sem poluição e sem aparência de relógio quebrado */
+.state-orbit .orbit-ring,
+.orbit-ring {
+  opacity: .52 !important;
+  filter: blur(.05px) !important;
+}
+
+/* Camadas decorativas sutis para substituir os ícones orbitais */
+.state-orbit::before {
+  content: "" !important;
+  position: absolute !important;
+  width: 84px !important;
+  height: 84px !important;
+  left: 42px !important;
+  top: 42px !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(circle at 42% 42%, rgba(255,255,255,.70), rgba(255,255,255,0) 28%),
+    radial-gradient(circle, rgba(255,211,122,.48), rgba(255,211,122,.18) 58%, rgba(255,211,122,0) 72%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.state-orbit::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 78px !important;
+  height: 78px !important;
+  right: 42px !important;
+  bottom: 52px !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(circle at 38% 38%, rgba(255,255,255,.46), rgba(255,255,255,0) 30%),
+    radial-gradient(circle, rgba(244,205,136,.28), rgba(244,205,136,.10) 58%, rgba(244,205,136,0) 76%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Conteúdo do timer sempre por cima das decorações */
+.state-orbit #stateLabel,
+.state-orbit #stateClock,
+.state-orbit #stateHint {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Tipografia do relógio */
+#stateLabel {
+  letter-spacing: .11em !important;
+}
+
+#stateClock {
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -.06em !important;
+  text-wrap: balance !important;
+}
+
+#stateHint {
+  max-width: 310px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  line-height: 1.18 !important;
+}
+
+/* Tema claro: relógio mais suave e premium */
+body.day-theme .state-orbit {
+  background:
+    radial-gradient(circle at 24% 18%, rgba(255,221,171,.28), rgba(255,221,171,0) 35%),
+    radial-gradient(circle at 82% 86%, rgba(244,205,136,.18), rgba(244,205,136,0) 32%),
+    linear-gradient(145deg, rgba(255,250,242,.98), rgba(255,241,232,.92)) !important;
+  border: 1px solid rgba(255,255,255,.74) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.82),
+    0 18px 40px rgba(126,94,50,.08),
+    0 8px 20px rgba(124,92,255,.055) !important;
+}
+
+body.day-theme #stateLabel {
+  color: rgba(86, 74, 111, .86) !important;
+  -webkit-text-fill-color: rgba(86, 74, 111, .86) !important;
+}
+
+body.day-theme #stateClock {
+  color: #2c2345 !important;
+  -webkit-text-fill-color: #2c2345 !important;
+  text-shadow: 0 2px 0 rgba(255,255,255,.44) !important;
+}
+
+body.day-theme #stateHint {
+  color: rgba(101, 86, 126, .86) !important;
+  -webkit-text-fill-color: rgba(101, 86, 126, .86) !important;
+}
+
+/* Tema escuro: clean, com profundidade e sem excesso de glow */
+body:not(.day-theme) .state-orbit {
+  background:
+    radial-gradient(circle at 24% 18%, rgba(124,229,194,.10), rgba(124,229,194,0) 35%),
+    radial-gradient(circle at 82% 86%, rgba(109,93,252,.12), rgba(109,93,252,0) 32%),
+    linear-gradient(145deg, rgba(44,36,69,.98), rgba(25,20,43,.98)) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 20px 42px rgba(0,0,0,.34),
+    0 0 22px rgba(124,229,194,.055) !important;
+}
+
+body:not(.day-theme) .state-orbit::before {
+  background:
+    radial-gradient(circle at 42% 42%, rgba(255,255,255,.30), rgba(255,255,255,0) 28%),
+    radial-gradient(circle, rgba(124,229,194,.20), rgba(124,229,194,.07) 58%, rgba(124,229,194,0) 72%) !important;
+}
+
+body:not(.day-theme) .state-orbit::after {
+  background:
+    radial-gradient(circle at 38% 38%, rgba(255,255,255,.22), rgba(255,255,255,0) 30%),
+    radial-gradient(circle, rgba(109,93,252,.18), rgba(109,93,252,.06) 58%, rgba(109,93,252,0) 76%) !important;
+}
+
+body:not(.day-theme) #stateLabel {
+  color: rgba(226,218,244,.84) !important;
+  -webkit-text-fill-color: rgba(226,218,244,.84) !important;
+}
+
+body:not(.day-theme) #stateClock {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 10px 26px rgba(0,0,0,.28) !important;
+}
+
+body:not(.day-theme) #stateHint {
+  color: rgba(226,218,244,.82) !important;
+  -webkit-text-fill-color: rgba(226,218,244,.82) !important;
+}
+
+/* Sheet "Registros próximos" mais compacto e sem área morta */
+.orbit-cluster-sheet {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: min(72svh, 560px) !important;
+  grid-template-rows: 14px auto minmax(0, auto) !important;
+  padding: 0 14px max(16px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.orbit-cluster-sheet .section-title {
+  height: auto !important;
+  min-height: 70px !important;
+  padding: 0 0 8px !important;
+}
+
+#orbitClusterList,
+.orbit-cluster-list {
+  max-height: min(48svh, 390px) !important;
+  overflow-y: auto !important;
+  padding-bottom: 8px !important;
+  scrollbar-width: none !important;
+}
+
+#orbitClusterList::-webkit-scrollbar,
+.orbit-cluster-list::-webkit-scrollbar {
+  display: none !important;
+}
