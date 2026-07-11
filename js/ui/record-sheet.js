@@ -1,5 +1,3 @@
-import { escapeHtml } from "../utils/text.js";
-
 export function isTypeWithManualEnd(type) {
   return type === "sono" || type === "dormir" || type === "despertar-noturno";
 }
@@ -168,14 +166,4 @@ export function getRecordSheetDetailValue({
     return getBreastTimerDetail(detailSelect?.value || "");
   }
   return detailSelect?.value || "";
-}
-
-export function getRecordSheetDebugSnapshot({ type, editingEventId, detailSelect, amountInput, notesInput }) {
-  return {
-    type,
-    editingEventId: editingEventId || null,
-    detail: detailSelect?.value || "",
-    amount: amountInput?.value || "",
-    hasNotes: Boolean(notesInput?.value?.trim()),
-  };
 }

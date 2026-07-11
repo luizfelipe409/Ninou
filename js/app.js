@@ -2,28 +2,27 @@ import { storageKeys, hour, day } from "./config/constants.js";
 import { countBreastfeedingEvents, countFeedingEvents, createBreastTimerState, formatBreastTimer as formatBreastTimerValue, getBreastTimerDetail as buildBreastTimerDetail, getBreastTimerSnapshot as buildBreastTimerSnapshot, normalizeBottleAmount, parseAmountMl, resetBreastTimerState, startBreastTimerSide, stopBreastTimerState, sumBottleAmountMl } from "./domain/feeding.js";
 import { countDiaperEvents } from "./domain/diaper.js";
 import { countMedicationEvents } from "./domain/medication.js";
-import { canUseManualTimeForLiveState as canUseManualLiveTime, closeActiveNightWake as closeActiveNightWakeInState, finishActiveSleep, getActiveNightWakeEvent as findActiveNightWakeEvent, getAwakeMsForRange as calculateAwakeMsForRange, getLiveElapsedMs, getOverlapDuration as calculateOverlapDuration, getRoutineStartForRange as calculateRoutineStartForRange, getSleepMsForRange as calculateSleepMsForRange, startLiveAwakeFromManualNightWake as startLiveAwakeFromManualNightWakeInState, startLiveSleepFromManualEvent as startLiveSleepFromManualEventInState, startRoutineTimer, startSleepTimer, shouldStartLiveAwakeFromManualNightWake as shouldStartLiveAwakeDecision, shouldStartLiveSleepFromManualEvent as shouldStartLiveSleepDecision } from "./domain/sleep.js";
-import { getActiveTimerDetails as buildActiveTimerDetails, getWakeWindowText as buildWakeWindowText } from "./services/timer-service.js";
+import { canUseManualTimeForLiveState as canUseManualLiveTime, finishActiveSleep, getActiveNightWakeEvent as findActiveNightWakeEvent, getAwakeMsForRange as calculateAwakeMsForRange, getSleepMsForRange as calculateSleepMsForRange, startLiveAwakeFromManualNightWake as startLiveAwakeFromManualNightWakeInState, startLiveSleepFromManualEvent as startLiveSleepFromManualEventInState, startRoutineTimer, startSleepTimer, shouldStartLiveAwakeFromManualNightWake as shouldStartLiveAwakeDecision, shouldStartLiveSleepFromManualEvent as shouldStartLiveSleepDecision } from "./domain/sleep.js";
+import { getWakeWindowText as buildWakeWindowText } from "./services/timer-service.js";
 import { setHidden } from "./dom/dom.js";
-import { getEventConfig, iconMarkup, isSleepEvent, preloadActionIcons, typeConfig } from "./domain/record-types.js";
+import { getEventConfig, iconMarkup, isSleepEvent, preloadActionIcons } from "./domain/record-types.js";
 import { escapeHtml, pluralize } from "./utils/text.js";
 import { formatDiaryDate, formatDuration, formatShortDuration, formatTime, getDayLabel, getDayStart, parseLocalDate, toDateInputValue, toDateTimeInputValue } from "./utils/time.js";
 import { getFirebaseServices as loadFirebaseServices, getFirebaseErrorMessage as resolveFirebaseErrorMessage } from "./services/firebase-service.js";
 import { getDefaultBabyProfile as createDefaultBabyProfile, getCloudProfileVersion as readCloudProfileVersion, hasProfileContent as profileHasContent, loadBabyProfile as loadStoredBabyProfile, normalizeBabyProfile as normalizeStoredBabyProfile, saveBabyProfile as persistBabyProfile } from "./domain/baby-profile.js";
 import { loadLocalWeights as loadStoredWeights, normalizeWeights as normalizeStoredWeights, persistLocalWeights as persistStoredWeights, removeWeightById, upsertWeight } from "./domain/weights.js";
-import { buildExportEvents } from "./services/export-service.js";
-import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventOrderTime, getEventsForDay, getLatestEvent, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, updateEventKeepingDuration } from "./domain/records.js";
+import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventOrderTime, getLatestEvent, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, updateEventKeepingDuration } from "./domain/records.js";
 import { formatEventMeta as formatRoutineEventMeta, getEventCardMarkup, getEventRenderSignature as buildEventRenderSignature, getMiniEventMarkup, getTimelineRenderSignature as buildTimelineSignature } from "./ui/event-formatters.js";
 import { renderHomeSummary as renderHomeSummaryPanel, renderTodayLastEvents as renderTodayLastEventsPanel } from "./ui/home.js";
 import { renderDailyRhythm, renderDayStory, renderIntelligentTimeline, renderLiveAssistant, renderSmartInsight, renderTrendKpis, renderWeeklyOverview } from "./ui/intelligence.js";
-import { formatNumber as formatChartNumber, getReportDays as buildReportDays, getSleepReportDays as buildSleepReportDays, renderBarChart as renderSharedBarChart, renderTodayMiniChart as renderTodayMiniChartPanel } from "./ui/charts.js";
+import { formatNumber as formatChartNumber, renderBarChart as renderSharedBarChart, renderTodayMiniChart as renderTodayMiniChartPanel } from "./ui/charts.js";
 import { applyRecordSheetType as renderRecordSheetType, closeRecordSheet as closeRecordSheetPanel, getRecordSheetDetailValue as resolveRecordSheetDetailValue, hydrateRecordSheetFromEvent as hydrateRecordSheetFromEventPanel, prepareRecordSheetForOpen, resetRecordSheet, isTypeWithManualEnd } from "./ui/record-sheet.js";
 import { buildDeleteConfirmationText, buildManualEventPayload, clearRecordFormAfterSave } from "./domain/event-editor.js";
 import { bindShortcutNavigation } from "./ui/navigation.js";
 import { bindBottomNavigation, bindSyncPillNavigation, createHorizontalScrollToggle, updateScreenVisibility } from "./ui/app-navigation.js";
 import { createEmptyTimelineItem, getDiaryEmptyRecordMarkup, getLatestEmptyRecordMarkup } from "./ui/empty-states.js";
 import { setHtml } from "./ui/render-utils.js";
-import { applyProfilePhotoToImages, clearWeightForm, getBabyAgeTextFromProfile, getBabyNameFromProfile, getBabyReferenceFromProfile, getDiaryTitleFromProfile, hydrateWeightForm, readWeightFormValue, renderBabyIdentityPanel, renderWeightProfilePanel, resizeProfileImage, syncBabyProfileFormPanel } from "./ui/profile.js";
+import { applyProfilePhotoToImages, clearWeightForm, getBabyNameFromProfile, getBabyReferenceFromProfile, hydrateWeightForm, readWeightFormValue, renderBabyIdentityPanel, renderWeightProfilePanel, syncBabyProfileFormPanel } from "./ui/profile.js";
 import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
@@ -37,14 +36,6 @@ const startModeButtons = document.querySelectorAll("[data-start-mode]");
 const stateLabel = document.querySelector("#stateLabel");
 const stateClock = document.querySelector("#stateClock");
 const stateHint = document.querySelector("#stateHint");
-const activeTimerCard = document.querySelector("#activeTimerCard");
-const activeTimerIcon = document.querySelector("#activeTimerIcon");
-const activeTimerKicker = document.querySelector("#activeTimerKicker");
-const activeTimerTitle = document.querySelector("#activeTimerTitle");
-const activeTimerElapsed = document.querySelector("#activeTimerElapsed");
-const activeTimerProgress = document.querySelector("#activeTimerProgress");
-const activeTimerMeta = document.querySelector("#activeTimerMeta");
-const activeTimerAction = document.querySelector("#activeTimerAction");
 const orbitEvents = document.querySelector("#orbitEvents");
 const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
@@ -92,7 +83,6 @@ const babyNameInput = document.querySelector("#babyNameInput");
 const babyArticleInput = document.querySelector("#babyArticleInput");
 const babyBirthInput = document.querySelector("#babyBirthInput");
 const profilePhoto = document.querySelector("#profilePhoto");
-const profilePhotoInput = document.querySelector("#profilePhotoInput");
 const profileImages = document.querySelectorAll("#profilePhoto, .identity img");
 const babyAvatarPreview = document.querySelector("#babyAvatarPreview");
 const avatarModalHint = document.querySelector("#avatarModalHint");
@@ -230,11 +220,9 @@ const adminPendingInviteList = document.querySelector("#adminPendingInviteList")
 const adminMembersList = document.querySelector("#adminMembersList");
 const adminFamilyAuditList = document.querySelector("#adminFamilyAuditList");
 const adminKnownUsersList = document.querySelector("#adminKnownUsersList");
-const adminUsersCount = document.querySelector("#adminUsersCount");
 const adminFamiliesCount = document.querySelector("#adminFamiliesCount");
 const adminKnownUsersStat = document.querySelector("#adminKnownUsersStat");
 const adminPendingInvitesCount = document.querySelector("#adminPendingInvitesCount");
-const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesCount");
 const adminLastMigrationStatus = document.querySelector("#adminLastMigrationStatus");
 const adminStatsHint = document.querySelector("#adminStatsHint");
 const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
@@ -386,7 +374,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.75.67";
+const NINOU_RUNTIME_VERSION = "75.76.0";
 const INVITE_TTL_MS = 7 * day;
 const INVITE_MAX_USES = 1;
 const MAX_DAY_NOTES_LENGTH = 1200;
@@ -458,10 +446,6 @@ function getAutomaticCaregiverIdentityForEmail(email = getCurrentIdentityEmail?.
     };
   }
   return null;
-}
-
-function isCaregiverIdentityAutomatic() {
-  return Boolean(getAutomaticCaregiverIdentityForEmail(getCurrentIdentityEmail?.() || cloudUser?.email || familyAccess?.email || ""));
 }
 
 function getDefaultFamilyLabelsForAccount(user = cloudUser) {
@@ -656,28 +640,15 @@ function getAdminAccountLabel(user = cloudUser) {
   return user?.displayName || (email ? email : "Administrador");
 }
 
-function loadAdminAccountPhoto(user = cloudUser) {
-  try {
-    return localStorage.getItem(getAdminAccountPhotoKey(user)) || "";
-  } catch {
-    return "";
-  }
-}
-
 function setAdminAccountPhoto(_dataUrl = "", user = cloudUser) {
   adminAccountPhoto = getCaregiverAvatarDataUrl(getAdminAccountLabel(), user?.email || GLOBAL_APP_ADMIN_EMAIL, "admin");
   try { localStorage.removeItem(getAdminAccountPhotoKey(user)); } catch {}
-}
-
-function isAdminPanelOnlyContext() {
-  return Boolean(isGlobalAppAdmin() && activeScreenName === "profile" && !window.__ninouAdminFamilyDataOpen);
 }
 
 const FAMILY_ROLE_OWNER = "owner";
 const FAMILY_ROLE_ADMIN = "admin_familiar";
 const FAMILY_ROLE_CAREGIVER = "cuidador";
 const FAMILY_ROLE_VIEWER = "visualizacao";
-const FAMILY_ROLE_LEGACY_RESPONSIBLE = "responsavel";
 const FAMILY_ROLE_GLOBAL_ADMIN = "admin";
 
 function normalizeRole(value = FAMILY_ROLE_ADMIN) {
@@ -732,21 +703,6 @@ function normalizeInviteRole(value = FAMILY_ROLE_CAREGIVER) {
 function normalizeAssignableMemberRole(value = FAMILY_ROLE_CAREGIVER) {
   const role = normalizeInviteRole(value);
   return role === FAMILY_ROLE_OWNER ? FAMILY_ROLE_ADMIN : role;
-}
-
-function getAssignableFamilyRoles() {
-  return [FAMILY_ROLE_ADMIN, FAMILY_ROLE_CAREGIVER, FAMILY_ROLE_VIEWER];
-}
-
-function getRoleRank(role = FAMILY_ROLE_VIEWER) {
-  const ranks = {
-    [FAMILY_ROLE_GLOBAL_ADMIN]: 100,
-    [FAMILY_ROLE_OWNER]: 90,
-    [FAMILY_ROLE_ADMIN]: 70,
-    [FAMILY_ROLE_CAREGIVER]: 40,
-    [FAMILY_ROLE_VIEWER]: 10,
-  };
-  return ranks[normalizeRole(role)] || 0;
 }
 
 function limitText(value = "", maxLength = MAX_DAY_NOTES_LENGTH) {
@@ -841,11 +797,9 @@ let familyDayStatesCache = {};
 let familyDayIdsCacheAt = 0;
 let wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
 let babyProfile = loadBabyProfile();
-let currentProfilePhoto = "";
 let adminAccountPhoto = "";
 let profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
 let firebaseServices = null;
-let firebaseServicesPromise = null;
 let cloudUser = null;
 let authAccessLoading = false;
 let personalFamilyActivationInFlight = false;
@@ -875,7 +829,6 @@ let applyingCloudState = false;
 const pendingCloudSyncStorageKey = "ninou.sync.pendingCloudReason";
 const pendingProfileSyncStorageKey = "ninou.sync.pendingProfile";
 const pendingDaySyncStorageKey = "ninou.sync.pendingDays";
-let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
 let lastRoutineUndoSnapshot = null;
@@ -1066,11 +1019,6 @@ function canManageFamilyAccess() {
   return isFamilyManagerRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
 }
 
-function canEditFamilyProfile() {
-  if (!hasFamilyAccess()) return false;
-  return isFamilyManagerRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
-}
-
 function updateProfileStateClasses() {
   const stateName = getProfileAccessState();
   document.body.dataset.profileAccessState = stateName;
@@ -1081,7 +1029,7 @@ function updateProfileStateClasses() {
 }
 
 function renderProfileStateNotice() {
-  const stateName = updateProfileStateClasses();
+  updateProfileStateClasses();
   const show = Boolean(profileStateNoticeCard && ["account-no-family", "invite-pending"].includes(stateName));
   setProfileElementHidden(profileStateNoticeCard, !show);
   if (!show) return;
@@ -1099,7 +1047,7 @@ function renderProfileStateNotice() {
 }
 
 function renderFamilyAccessSummary() {
-  const stateName = updateProfileStateClasses();
+  updateProfileStateClasses();
   const authorized = hasFamilyAccess();
   const appAdminPanel = isGlobalAppAdmin() && !window.__ninouAdminFamilyDataOpen;
   const show = Boolean(familyAccessSummaryCard && authorized && !appAdminPanel);
@@ -1707,7 +1655,6 @@ function renderGuestPremiumContent() {
   });
   activeScreen.prepend(card);
 }
-
 
 
 function setPostStatusState(key, state = "pending") {
@@ -2361,7 +2308,6 @@ function saveBabyAvatarFromDraft() {
     avatar: normalizeAvatarDraft(pendingBabyAvatar),
     avatarConfigured: true,
   });
-  currentProfilePhoto = "";
   localStorage.removeItem(storageKeys.photo);
   markProfileLocallyChanged();
   saveBabyProfile();
@@ -2371,7 +2317,6 @@ function saveBabyAvatarFromDraft() {
   closeAvatarEditor("Avatar salvo com sucesso.");
   if (loginHelper) loginHelper.textContent = "Avatar salvo com sucesso.";
 }
-
 
 
 function createEmptyDayState() {
@@ -2631,14 +2576,6 @@ function getCurrentActorProfile() {
   };
 }
 
-function getCurrentActorName() {
-  return getCurrentActorProfile().label;
-}
-
-function getCurrentActorRelationship() {
-  return getCurrentActorProfile().relationshipLabel;
-}
-
 function getActiveBabyId() {
   return String(
     babyProfile?.babyId ||
@@ -2711,11 +2648,6 @@ function getCaregiverIdentityKey() {
 
 function getLegacyCaregiverIdentityKey(email = getCurrentIdentityEmail()) {
   return `${caregiverIdentityStoragePrefix}.${normalizeEmail(email || "local")}`;
-}
-
-function clearCaregiverIdentityForEmail(_email = getCurrentIdentityEmail()) {
-  // v75.56.2.1.1: não limpamos a identificação local do aparelho ao trocar/logout de conta.
-  // Ela pertence ao celular, não ao e-mail compartilhado da família.
 }
 
 function getCaregiverRelationLabel(value = "") {
@@ -3095,7 +3027,6 @@ function closeCaregiverEditor() {
 }
 
 function renderCaregiverIdentityPanel() {
-  const logged = Boolean(cloudUser);
   const familyReady = canUsePrivateFeatures();
   setProfileFamilyStackVisible(familyReady);
   if (!familyReady) {
@@ -3598,15 +3529,6 @@ function getOpenRoutineFromPreviousDay(dayId = getCurrentDayId(), now = Date.now
   };
 }
 
-function getOpenSleepFromPreviousDay(dayId = getCurrentDayId(), now = Date.now()) {
-  const openRoutine = getOpenRoutineFromPreviousDay(dayId, now);
-  if (!openRoutine || openRoutine.mode !== "sleeping") return null;
-  return {
-    ...openRoutine,
-    type: isSleepEvent({ type: openRoutine.type }) ? openRoutine.type : "sono",
-  };
-}
-
 function todayHasPersistentRoutineContent() {
   return (Array.isArray(state.events) && state.events.length > 0) || String(state.dayNotes || "").trim();
 }
@@ -3687,7 +3609,7 @@ function getFirstRoutinePromptKey() {
   return `ninou:first-routine-state:${familyId || "local"}:${getCurrentDayId()}`;
 }
 
-function parseFirstRoutineTimeValue(mode = "awake") {
+function parseFirstRoutineTimeValue() {
   const input = document.querySelector("#firstRoutineTimeInput");
   const value = String(input?.value || "").trim();
   const now = Date.now();
@@ -3868,33 +3790,6 @@ function clearGenericVisibleContext() {
   });
 }
 
-function restoreVisibleContextForOwner(email = "") {
-  const ownerEmail = normalizeEmail(email);
-  clearGenericVisibleContext();
-
-  let restoredAny = false;
-  if (ownerEmail) {
-    visibleContextKeys.forEach((key) => {
-      try {
-        const value = localStorage.getItem(getAccountCacheKey(ownerEmail, key));
-        if (value !== null && typeof value !== "undefined") {
-          localStorage.setItem(key, value);
-          restoredAny = true;
-        }
-      } catch {}
-    });
-  }
-
-  wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
-  babyProfile = loadBabyProfile();
-  currentProfilePhoto = "";
-  localStorage.removeItem(storageKeys.photo);
-  profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || 0;
-  state = loadLocalDayState(getSelectedDayId());
-  setVisibleDataOwnerEmail(ownerEmail);
-  return restoredAny;
-}
-
 function refreshVisibleContextUi() {
   updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
   syncBabyProfileForm();
@@ -3930,7 +3825,6 @@ function prepareVisibleContextForAccount(user = cloudUser) {
   autoSelectedLatestFamilyDay = false;
   wakeWindowMinutes = 70;
   babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
-  currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
   loadedStateDayId = getCurrentDayId();
@@ -3950,7 +3844,6 @@ function resetVisibleContextForGuest() {
   autoSelectedLatestFamilyDay = false;
   wakeWindowMinutes = 70;
   babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
-  currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
   updateProfilePhoto(getBabyAvatarDataUrl(babyProfile.avatar || pendingBabyAvatar));
@@ -3968,7 +3861,6 @@ function prepareAdminPanelContext(user = cloudUser) {
   window.__ninouAdminFamilyDataOpen = false;
   wakeWindowMinutes = 70;
   babyProfile = normalizeBabyProfile({ themeMode: localStorage.getItem(storageKeys.themeMode) || "dark" });
-  currentProfilePhoto = "";
   profileClientUpdatedAt = 0;
   state = createEmptyDayState();
   setAdminAccountPhoto("", user);
@@ -3998,23 +3890,6 @@ async function loadAdminAccountProfileFromCloud(user = cloudUser) {
     setAdminAccountPhoto("", user);
     renderBabyIdentity();
     return null;
-  }
-}
-
-async function saveAdminAccountProfileToCloud() {
-  if (!cloudUser || !isGlobalAppAdmin()) return false;
-  try {
-    const services = await getFirebaseServices();
-    await services.setDoc(services.doc(services.db, "users", cloudUser.uid, "account", "profile"), {
-      email: normalizeEmail(cloudUser.email || GLOBAL_APP_ADMIN_EMAIL),
-      avatarType: "initials",
-      photo: "",
-      updatedAt: services.serverTimestamp(),
-    }, { merge: true });
-    return true;
-  } catch (error) {
-    console.warn("Não foi possível salvar o avatar pessoal do admin:", error);
-    return false;
   }
 }
 
@@ -4530,17 +4405,6 @@ function getRoleDescription(role = FAMILY_ROLE_ADMIN) {
     [FAMILY_ROLE_ADMIN]: "gerencia perfil, rotina, membros, convites e relatórios da família",
     [FAMILY_ROLE_CAREGIVER]: "registra rotina, observações, mamadas, fraldas e sono",
     [FAMILY_ROLE_VIEWER]: "acompanha a rotina e relatórios sem alterar registros",
-  };
-  return descriptions[normalizeRole(role)] || descriptions[FAMILY_ROLE_ADMIN];
-}
-
-function getRoleShortDescription(role = FAMILY_ROLE_ADMIN) {
-  const descriptions = {
-    [FAMILY_ROLE_OWNER]: "dono da família",
-    [FAMILY_ROLE_ADMIN]: "gerencia família",
-    [FAMILY_ROLE_CAREGIVER]: "registra rotina",
-    [FAMILY_ROLE_VIEWER]: "somente acompanha",
-    [FAMILY_ROLE_GLOBAL_ADMIN]: "suporte global",
   };
   return descriptions[normalizeRole(role)] || descriptions[FAMILY_ROLE_ADMIN];
 }
@@ -5144,11 +5008,9 @@ function updateGuestWhatsappButton() {
 }
 
 function setAdminStatsPlaceholder(message = "Entre como admin para visualizar o painel.") {
-  setText(adminUsersCount, "--");
   setText(adminFamiliesCount, "--");
   setText(adminKnownUsersStat, "--");
   setText(adminPendingInvitesCount, "--");
-  setText(adminAcceptedInvitesCount, "--");
   setText(adminLastMigrationStatus, "--");
   setText(adminStatsHint, message);
   renderAdminCommercialDashboard(null);
@@ -5238,11 +5100,6 @@ function getRestorableContexts() {
     .map(readCachedContextForOwner)
     .filter(Boolean)
     .sort((a, b) => b.score - a.score || String(a.email).localeCompare(String(b.email)));
-}
-
-function getBestRestorableContext() {
-  const currentEmail = normalizeEmail(cloudUser?.email || "");
-  return getRestorableContexts().find((context) => context.email !== currentEmail) || null;
 }
 
 
@@ -5470,10 +5327,6 @@ function normalizeLegacyProfileData(...sources) {
   return profile;
 }
 
-function getLegacyPhoto(..._sources) {
-  return "";
-}
-
 function getLegacyWakeWindow(...sources) {
   for (const source of sources) {
     if (!source || typeof source !== "object") continue;
@@ -5596,40 +5449,6 @@ function getLegacyUidFromPath(path = "") {
 function getFamilyIdFromProfilePath(path = "") {
   const match = String(path || "").match(/^families\/([^/]+)\/profile\//);
   return match ? match[1] : "";
-}
-
-async function readMaybeCollectionGroup(services, groupName) {
-  if (!services.collectionGroup) return [];
-  try {
-    const snap = await services.getDocs(services.collectionGroup(services.db, groupName));
-    const docs = [];
-    snap.forEach((docSnap) => docs.push({
-      id: docSnap.id,
-      path: docSnap.ref?.path || "",
-      uid: getLegacyUidFromPath(docSnap.ref?.path || ""),
-      data: docSnap.data() || {},
-    }));
-    return docs;
-  } catch (error) {
-    console.warn("Não foi possível consultar collectionGroup legado:", groupName, error);
-    return [];
-  }
-}
-
-async function collectLegacyUidsByCollectionGroups(services) {
-  const groups = ["activities", "days", "profile", "access", "weights", "pesos"];
-  const uids = new Set();
-  const counts = {};
-
-  for (const group of groups) {
-    const docs = await readMaybeCollectionGroup(services, group);
-    counts[group] = docs.length;
-    docs.forEach((item) => {
-      if (item.uid) uids.add(item.uid);
-    });
-  }
-
-  return { uids: Array.from(uids), counts };
 }
 
 async function addQueryResultsToUidMap(services, uidMap, queryRef, reason = "") {
@@ -5759,63 +5578,6 @@ async function buildLegacyCloudContextFromUser(services, userDoc) {
   };
 }
 
-async function scanLegacyCloudSources(options = {}) {
-  if (!isFamilyAdmin()) return [];
-  if (legacyCloudScanState === "loading") return legacyCloudContexts;
-
-  legacyCloudScanState = "loading";
-  legacyCloudScanError = "";
-  renderFamilyMigrationPanel({ skipScan: true });
-
-  try {
-    const services = await getFirebaseServices();
-    const uidMap = new Map();
-    const addUid = (uid, reason = "") => {
-      const clean = String(uid || "").trim();
-      if (!clean) return;
-      if (!uidMap.has(clean)) uidMap.set(clean, new Set());
-      if (reason) uidMap.get(clean).add(reason);
-    };
-
-    // 1) Tenta listar users/{uid}. Isso só encontra documentos raiz existentes.
-    try {
-      const usersSnapshot = await services.getDocs(services.collection(services.db, "users"));
-      (usersSnapshot.docs || []).forEach((docSnap) => addUid(docSnap.id, "users"));
-    } catch (error) {
-      console.warn("Não foi possível listar users. Tentando collectionGroup.", error);
-    }
-
-    // 2) Tenta collectionGroup. Isso ajuda quando users/{uid} é um documento fantasma
-    // com subcoleções, situação comum no Firestore Console.
-    const groupScan = await collectLegacyUidsByCollectionGroups(services);
-    groupScan.uids.forEach((uid) => addUid(uid, "collectionGroup"));
-
-    // 3) Inclui UID manual, quando o admin cola o UID antigo visível no Console.
-    const manualUid = normalizeMigrationUid(adminMigrationUidInput?.value || "");
-    if (manualUid) addUid(manualUid, "manual");
-
-    const contexts = [];
-    for (const uid of uidMap.keys()) {
-      const context = await buildLegacyCloudContextFromUser(services, { id: uid, data: () => ({}) });
-      if (context) {
-        context.discovery = Array.from(uidMap.get(uid) || []);
-        contexts.push(context);
-      }
-    }
-
-    legacyCloudContexts = contexts.sort(compareMigrationContexts);
-    legacyCloudScanState = "done";
-    renderFamilyMigrationPanel({ skipScan: true });
-    return legacyCloudContexts;
-  } catch (error) {
-    console.error("Erro ao buscar dados antigos no Firebase:", error);
-    legacyCloudScanState = "error";
-    legacyCloudScanError = getFirebaseErrorMessage(error);
-    renderFamilyMigrationPanel({ skipScan: true });
-    return [];
-  }
-}
-
 function normalizeMigrationUid(value = "") {
   return String(value || "")
     .trim()
@@ -5935,7 +5697,6 @@ async function scanLegacySourceByManualUid() {
 
 function getMigrationContextPriority(context = {}) {
   const email = normalizeEmail(context.email || "");
-  const name = normalizeEmail(context.profile?.name || "");
   const discoveries = Array.isArray(context.discovery) ? context.discovery : [];
   const isManual = discoveries.includes("manual");
   const isEmailSearch = discoveries.includes("email") || Boolean(context.manualEmail);
@@ -6159,7 +5920,6 @@ function applyMigrationContextToCurrentView(context) {
 
   wakeWindowMinutes = Number(localStorage.getItem(storageKeys.wakeWindow)) || 70;
   babyProfile = loadBabyProfile();
-  currentProfilePhoto = "";
   localStorage.removeItem(storageKeys.photo);
   profileClientUpdatedAt = Number(localStorage.getItem(storageKeys.profileVersion)) || Date.now();
   state = loadLocalDayState(visibleDayId || getSelectedDayId());
@@ -6322,11 +6082,6 @@ async function uploadMigrationContextToFamily(context) {
   };
 }
 
-async function uploadCurrentContextToFamily() {
-  await saveProfileToCloud();
-  await saveDayToCloud();
-}
-
 async function restoreFamilyDataFromBestSource(options = {}) {
   if (!isFamilyAdmin()) return false;
   if (legacyCloudScanState === "idle" && !legacyCloudContexts.length) {
@@ -6387,22 +6142,6 @@ Os dados antigos não serão apagados.`);
       restoreFamilyDataButton.textContent = "Migrar dados encontrados";
     }
   }
-}
-
-async function autoSeedFamilyFromLocalCache() {
-  if (!isFamilyAdmin()) return false;
-  const cloudContent = await familyCloudHasContent();
-  if (cloudContent.profile || cloudContent.day) {
-    renderFamilyMigrationPanel();
-    return false;
-  }
-  await scanLegacyCloudSources({ silent: true });
-  return restoreFamilyDataFromBestSource({ silent: true });
-}
-
-function getFamilyDisplayName(stats = null) {
-  const raw = stats?.familyName || stats?.profileName || babyProfile?.name || "Família";
-  return escapeHtml(raw || "Família");
 }
 
 function getPendingInviteText(count = 0) {
@@ -6546,7 +6285,6 @@ function renderKnownUsersList(stats = null) {
 
   const rows = users.slice(0, 18).map((user) => {
     const email = escapeHtml(user.email || "E-mail não identificado");
-    const uid = escapeHtml(user.uid || "");
     const source = escapeHtml(getKnownUserSourceLabel(user));
     const status = escapeHtml(getKnownUserStatusLabel(user));
     const canLink = Boolean(user.uid && !user.isMember && !user.isAppAdmin);
@@ -6947,12 +6685,9 @@ function renderAdminStats(stats = null) {
     renderAdminDiagnostics();
     return;
   }
-
-  setText(adminUsersCount, String(stats.membersCount ?? 0));
   setText(adminFamiliesCount, String(stats.familiesCount ?? 0));
   setText(adminKnownUsersStat, String(stats.knownUsersCount ?? 0));
   setText(adminPendingInvitesCount, String(stats.pendingInvitesCount ?? 0));
-  setText(adminAcceptedInvitesCount, String(stats.acceptedInvitesCount ?? 0));
   setText(adminLastMigrationStatus, lastMigrationResult ? "Concluída" : "Sem migração");
   setText(
     adminStatsHint,
@@ -7228,7 +6963,6 @@ function renderFamilyAccessPanel() {
   const roleLabel = authorized ? getRoleLabel(effectiveRole) : "";
   const baby = getBabyDisplayName();
   const pendingCode = normalizeInviteCode(pendingInviteCode || inviteCodeInput?.value || "");
-  const canInvite = authorized && !appAdmin && canManageFamilyAccess();
   const showFamilyAccessCard = !authorized || appAdmin;
   if (familyAccessCard) {
     familyAccessCard.hidden = !showFamilyAccessCard;
@@ -8433,11 +8167,6 @@ function persistLocalWeights(weights) {
 }
 
 
-function getDefaultBabyProfile() {
-  return createDefaultBabyProfile();
-}
-
-
 function normalizeBabyProfile(profile = {}) {
   return normalizeStoredBabyProfile(profile);
 }
@@ -8523,14 +8252,6 @@ function getBabyName() {
 
 function getBabyReference() {
   return getBabyReferenceFromProfile(babyProfile);
-}
-
-function getDiaryTitle() {
-  return getDiaryTitleFromProfile(babyProfile);
-}
-
-function getBabyAgeText() {
-  return getBabyAgeTextFromProfile(babyProfile);
 }
 
 function renderBabyIdentity() {
@@ -8732,7 +8453,6 @@ function clearLocalAccountData() {
   window.__ninouAdminFamilyDataOpen = false;
   resetMigrationSearchState();
   cloudUser = null;
-  pendingProfilePhotoSave = false;
   if (loginPassword) loginPassword.value = "";
   renderAuthControls();
   renderAll();
@@ -8797,7 +8517,6 @@ async function signOutAndClearDeviceData() {
     clearPendingInviteCode();
     window.__ninouAdminFamilyDataOpen = false;
     resetMigrationSearchState();
-    pendingProfilePhotoSave = false;
     if (loginEmail) loginEmail.value = "";
     if (loginPassword) loginPassword.value = "";
     setSyncStatus("offline");
@@ -8917,7 +8636,7 @@ async function connectCurrentAccount() {
   }
 }
 
-function getProfilePayload(options = {}) {
+function getProfilePayload() {
   const payload = stampFamilyData({
     ...normalizeBabyProfile(babyProfile),
     wakeWindowMinutes,
@@ -8941,7 +8660,6 @@ function applyCloudProfile(data = {}) {
   const cloudWeights = normalizeWeights(data.weights || profileSource.weights || []);
   const localWeights = normalizeWeights(babyProfile.weights || loadLocalWeights());
   const shouldAcceptCloudWeights = cloudWeights.length > 0 && localWeights.length === 0;
-  const shouldAcceptCloudPhoto = false;
 
   if (!cloudHasContent && localHasContent) {
     saveProfileToCloud();
@@ -8958,7 +8676,6 @@ function applyCloudProfile(data = {}) {
 
     babyProfile = normalizeBabyProfile({ ...profileSource, weights: cloudWeights.length ? cloudWeights : profileSource.weights });
     pendingBabyAvatar = normalizeAvatarDraft(babyProfile.avatar || pendingBabyAvatar);
-    currentProfilePhoto = "";
 
     if (Number.isFinite(Number(data.wakeWindowMinutes))) {
       wakeWindowMinutes = Math.min(240, Math.max(20, Number(data.wakeWindowMinutes)));
@@ -9023,14 +8740,13 @@ function scheduleProfileCloudSave(options = {}) {
   if (applyingCloudState) return;
   if (cloudUser && hasFamilyAccess()) markProfileSyncQueued();
   if (!cloudUser || !firebaseServices || !hasFamilyAccess()) return;
-  pendingProfilePhotoSave = false;
 
   window.clearTimeout(profileCloudSaveTimer);
   setSyncStatus(isBrowserOnline() ? "saving" : "pending", cloudUser.email || "", getPendingSyncSummary());
   profileCloudSaveTimer = window.setTimeout(() => saveProfileToCloud(options), 600);
 }
 
-async function saveProfileToCloud(options = {}) {
+async function saveProfileToCloud() {
   const profileRef = getCloudProfileRef();
   if (!profileRef || applyingCloudState) return;
   if (!isBrowserOnline()) {
@@ -9039,7 +8755,6 @@ async function saveProfileToCloud(options = {}) {
     return;
   }
 
-  const includePhoto = false;
   const payload = getProfilePayload();
   const savedProfileVersion = payload.clientUpdatedAt;
 
@@ -9047,7 +8762,6 @@ async function saveProfileToCloud(options = {}) {
     setSyncStatus("syncing", cloudUser.email || "", "Enviando perfil para a família...");
     await firebaseServices.setDoc(profileRef, payload, { merge: true });
     clearProfileSyncQueued();
-    if (includePhoto) pendingProfilePhotoSave = false;
     if (savedProfileVersion === profileClientUpdatedAt) {
       markCloudSynced();
       setSyncStatus(hasPendingCloudSyncItems() ? "pending" : "online", cloudUser.email, getPendingSyncSummary());
@@ -9136,7 +8850,7 @@ function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}, dayId
   }, safeDayId, { preserveLive: true });
 }
 
-async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
+async function saveDayToCloud(dayId = getSelectedDayId()) {
   const safeDayId = isDateId(dayId) ? dayId : getCurrentDayId();
   const dayRef = getCloudDayRef(safeDayId);
   if (!dayRef || applyingCloudState) return;
@@ -9489,15 +9203,6 @@ function getWakeWindowText() {
   return buildWakeWindowText({ state, formatShortDuration, formatTimeLabel: formatTime });
 }
 
-function setWakeActionIcon() {
-  const nightWakeActive = state.mode !== "sleeping" && getActiveNightWakeEvent();
-  const iconKey = state.mode === "sleeping" ? "acordou" : nightWakeActive ? "dormir" : "sono";
-  if (wakeActionIcon.dataset.iconKey === iconKey) return;
-
-  wakeActionIcon.dataset.iconKey = iconKey;
-  wakeActionIcon.innerHTML = iconMarkup(iconKey);
-}
-
 function getOpenAwakeInfoForMainClock(now = Date.now()) {
   if (getSelectedDayId() !== getCurrentDayId()) return null;
   const info = getTodayAwakeCalculation(now);
@@ -9540,35 +9245,7 @@ function syncMainClockFromOpenAwake(now = Date.now(), options = {}) {
     syncSelectedDayIntoFamilyCache();
     saveLocalDayState(getSelectedDayId());
   }
-
-  renderActiveTimerCard();
   return true;
-}
-
-function getActiveTimerDetails() {
-  return buildActiveTimerDetails({ state, wakeWindowMinutes, typeConfig, formatTimeLabel: formatTime });
-}
-
-function renderActiveTimerCard() {
-  if (!activeTimerCard) return;
-
-  const details = getActiveTimerDetails();
-  if (!details) {
-    setHidden(activeTimerCard, true);
-    return;
-  }
-
-  setHidden(activeTimerCard, false);
-  if (activeTimerIcon && activeTimerIcon.dataset.iconKey !== details.iconKey) {
-    activeTimerIcon.dataset.iconKey = details.iconKey;
-    activeTimerIcon.innerHTML = iconMarkup(details.iconKey);
-  }
-  setText(activeTimerKicker, details.kicker);
-  setText(activeTimerTitle, details.title);
-  setText(activeTimerElapsed, formatDuration(details.elapsed));
-  setText(activeTimerMeta, details.meta);
-  setText(activeTimerAction, details.actionLabel);
-  if (activeTimerProgress) activeTimerProgress.style.width = `${details.progress}%`;
 }
 
 function isNightRoutinePeriod(now = Date.now()) {
@@ -9688,7 +9365,6 @@ function renderCurrentState() {
     setText(stateLabel, "Entre para registrar");
     setText(stateClock, "--:--");
     setText(stateHint, "A rotina fica protegida na família. Entre, crie uma família ou aceite um convite para começar.");
-    renderActiveTimerCard();
     return;
   }
 
@@ -9700,7 +9376,6 @@ function renderCurrentState() {
     setText(stateLabel, "Dia em revisão");
     setText(stateClock, "--:--");
     setText(stateHint, "Você está vendo uma data anterior. Use o botão + para incluir ou corrigir registros desse dia.");
-    renderActiveTimerCard();
     return;
   }
 
@@ -9752,7 +9427,6 @@ function renderCurrentState() {
     setText(stateLabel, "Começar hoje");
     setText(stateClock, "00:00:00");
     setText(stateHint, `Ainda não há registros hoje. Informe como ${getBabyReference()} estava quando você começou a acompanhar.`);
-    renderActiveTimerCard();
     return;
   }
 
@@ -9794,7 +9468,6 @@ function renderCurrentState() {
         : `Sono continuado de ontem, desde ${formatTime(state.activeStartedAt)}. Ao tocar em Acordou, o Ninou fecha o sono com a duração total.`
       : `Acordado desde ontem, às ${formatTime(state.activeStartedAt)}. O contador segue a partir do último registro.`
     : getWakeWindowText());
-  renderActiveTimerCard();
 }
 
 const ORBIT_RADIUS = 132;
@@ -10093,19 +9766,10 @@ function closeOrbitCluster() {
   }
 }
 
-function getOverlapDuration(start, end, windowStart, windowEnd) {
-  return calculateOverlapDuration(start, end, windowStart, windowEnd);
-}
-
 function getSleepMsForRange(windowStart, windowEnd) {
   const events = getFamilyEventsForWindow(windowStart, windowEnd);
   const rangeState = getDayIdFromStart(windowStart) === getSelectedDayId() ? state : { ...createEmptyDayState(), events };
   return calculateSleepMsForRange(events, rangeState, windowStart, windowEnd, isSleepEvent);
-}
-
-function getRoutineStartForRange(windowStart, windowEnd) {
-  const events = getFamilyEventsForWindow(windowStart, windowEnd);
-  return calculateRoutineStartForRange(events, { ...createEmptyDayState(), events }, windowStart, windowEnd);
 }
 
 function getAwakeMsForRange(windowStart, windowEnd) {
@@ -10330,7 +9994,6 @@ function renderSupplementalReports() {
 }
 
 
-
 function normalizeSummaryRangeMode(value) {
   return Object.prototype.hasOwnProperty.call(summaryRangeOptions, value) ? value : "7d";
 }
@@ -10361,10 +10024,6 @@ function setSummaryRangeMode(mode) {
 function expandIntelligentTimeline() {
   intelligentTimelineLimit += 7;
   renderIntelligentHomeSections();
-}
-
-function resetIntelligentTimelineLimit() {
-  intelligentTimelineLimit = 7;
 }
 
 function renderTodayLastEvents() {
@@ -10616,10 +10275,6 @@ function getLatestEventByTypes(events = [], types = []) {
   return sortEventsByStartDesc(events.filter((event) => typeSet.has(event.type)))[0] || null;
 }
 
-function getLatestSleepEvent(events = []) {
-  return sortEventsByStartDesc(events.filter((event) => isSleepEvent(event) && Number(event.end) > Number(event.start)))[0] || null;
-}
-
 function getDayStartFromId(dayId = getSelectedDayId()) {
   if (!isDateId(dayId)) return getDayStart();
   const parsedDate = parseLocalDate(dayId);
@@ -10656,30 +10311,6 @@ function getLatestAwakeBoundaryFromEvents(dayState = state, dayId = getSelectedD
 
   if (!candidates.length) return null;
   return Math.max(...candidates);
-}
-
-function reconcileAwakeStateForDay(dayState = state, dayId = getSelectedDayId(), now = Date.now()) {
-  const nextState = normalizeDayState(dayState || createEmptyDayState());
-  if (nextState.mode === "sleeping") return nextState;
-
-  const boundary = getLatestAwakeBoundaryFromEvents(nextState, dayId, now);
-  if (!Number.isFinite(Number(boundary))) return nextState;
-
-  const currentStart = Number(nextState.activeStartedAt);
-  const shouldUpdate = nextState.mode !== "awake"
-    || !Number.isFinite(currentStart)
-    || Number(boundary) > currentStart + 60000;
-
-  if (!shouldUpdate) return nextState;
-
-  return normalizeDayState({
-    ...nextState,
-    mode: "awake",
-    activeStartedAt: Number(boundary),
-    activeType: "sono",
-    activeDetail: "",
-    activeNotes: "",
-  });
 }
 
 function reconcileCurrentAwakeStateFromEvents(options = {}) {
@@ -10724,9 +10355,7 @@ function renderTodayOverview() {
   const baby = getBabyDisplayName();
   const lastBottle = getLatestEventByTypes(events, ["mamadeira"]);
   const lastDiaper = getLatestEventByTypes(events, ["fralda"]);
-  const lastSleep = getLatestSleepEvent(events);
   const awakeInfo = getTodayAwakeCalculation(now, events);
-  const awakeText = awakeInfo.hasWake ? awakeInfo.durationLabel : "—";
   const sleepTotalText = formatShortDuration(getSleepMsForRange(todayStart, todayStart + day));
   const bottleCount = events.filter((event) => event.type === "mamadeira").length;
   const bottleTotal = sumBottleAmountMl(events);
@@ -10979,18 +10608,6 @@ function formatKg(value) {
   const kg = getWeightKgValue(value);
   if (kg === null) return "Sem peso";
   return `${kg.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg`;
-}
-
-function parseWeightInputValue(value = "") {
-  const normalized = String(value || "").trim().replace(",", ".");
-  const parsed = Number(normalized);
-  if (!Number.isFinite(parsed)) return null;
-  return parsed > 40 ? parsed / 1000 : parsed;
-}
-
-function isValidBabyWeightValue(value = "") {
-  const kg = parseWeightInputValue(value);
-  return Number.isFinite(kg) && kg > 0 && kg <= 30;
 }
 
 function formatWeightDelta(diff) {
@@ -11355,7 +10972,6 @@ function renderLiveTick() {
   }
 
   setText(stateClock, formatDuration(liveElapsed));
-  renderActiveTimerCard();
 
   const currentMinute = Math.floor(Date.now() / 60000);
   if (currentMinute === liveTickMinute) return;
@@ -11389,7 +11005,7 @@ function finishSleep() {
   saveDayState();
 }
 
-function startSleep(preferredType = "sono", sourceLabel = "") {
+function startSleep(preferredType = "sono") {
   if (!requireLogin("salvar a rotina")) return;
 
   if (state.mode !== "sleeping") syncMainClockFromOpenAwake(Date.now(), { force: true });
@@ -11474,10 +11090,6 @@ function startRoutine(mode, forcedStartedAt = null, sourceLabel = "") {
 
 function updateDiaryChipsMoreButton() {
   diaryFilterScroller.update();
-}
-
-function scrollDiaryFilters() {
-  diaryFilterScroller.scroll();
 }
 
 function showScreen(target) {
@@ -12401,10 +12013,6 @@ function getActiveNightWakeEvent() {
   return findActiveNightWakeEvent(state);
 }
 
-function closeActiveNightWake(end = Date.now()) {
-  return closeActiveNightWakeInState(state, end);
-}
-
 function startLiveAwakeFromManualNightWake(start, detail, notes) {
   state = startLiveAwakeFromManualNightWakeInState(state, makeEvent, start, detail, notes);
 }
@@ -12630,10 +12238,6 @@ function deleteEvent(eventId) {
   }
 }
 
-function getExportEvents() {
-  return buildExportEvents(state.events, getEventConfig);
-}
-
 function getCustomExportRange(selectedDayId = getSelectedDayId()) {
   const startText = exportStartDateInput?.value || selectedDayId;
   const endText = exportEndDateInput?.value || selectedDayId;
@@ -12649,7 +12253,7 @@ function getCustomExportRange(selectedDayId = getSelectedDayId()) {
   };
 }
 
-function getEffectiveExportRangeMode(selectedDayId = getSelectedDayId()) {
+function getEffectiveExportRangeMode() {
   const selectedMode = exportRangeSelect?.value || "day";
   const startText = exportStartDateInput?.value || "";
   const endText = exportEndDateInput?.value || "";
@@ -13082,11 +12686,6 @@ function updateProfilePhoto(dataUrl) {
   applyProfilePhotoToImages(profileImages, dataUrl);
 }
 
-function resizeImage(file) {
-  // v75.56.2.1.1: fotos foram removidas. Mantido apenas para compatibilidade defensiva.
-  return resizeProfileImage(file, { size: 120, quality: 0.5 });
-}
-
 bindBottomNavigation(navButtons, showScreen);
 window.addEventListener("online", () => {
   if (cloudUser && firebaseServices && hasFamilyAccess()) {
@@ -13145,7 +12744,6 @@ startModeButtons.forEach((button) => {
 });
 
 wakeAction.addEventListener("click", runActiveTimerAction);
-if (activeTimerAction) activeTimerAction.addEventListener("click", runActiveTimerAction);
 
 openSheetButtons.forEach((button) => {
   button.addEventListener("click", () => openSheet(button.dataset.openSheet));
@@ -13401,10 +12999,6 @@ if (skipBabyAvatarButton) skipBabyAvatarButton.addEventListener("click", () => {
   closeAvatarEditor();
 });
 
-if (profilePhotoInput) profilePhotoInput.addEventListener("change", () => {
-  profilePhotoInput.value = "";
-  if (loginHelper) loginHelper.textContent = "O Ninou agora usa somente avatars ilustrados prontos. Fotos antigas e novos uploads não são usados.";
-});
 
 loginButton.addEventListener("click", () => withButtonBusy(loginButton, "Entrando...", signInAccount, { restoreDisabled: false, afterFinish: renderAuthControls }));
 createAccountButton.addEventListener("click", () => withButtonBusy(createAccountButton, isLoggedIn() ? "Saindo..." : "Criando...", createAccount, { restoreDisabled: false, afterFinish: renderAuthControls }));
@@ -13878,9 +13472,9 @@ sheetEndTimeInput?.addEventListener("input", updateSleepDurationPreview);
 sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 
-/* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
+/* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.js */
 (() => {
-  const VERSION = "75.75.67";
+  const VERSION = "75.76.0";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -13937,7 +13531,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "75.75.67";
+  const VERSION = "75.76.0";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -14001,7 +13595,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "75.75.67";
+  const LEGAL_VERSION = "75.76.0";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -14233,7 +13827,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "75.75.67";
+  const SUPPORT_VERSION = "75.76.0";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -14562,7 +14156,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "75.75.67";
+  const REVIEW_VERSION = "75.76.0";
 
   function currentEffectiveRole() {
     try {

@@ -1,4 +1,3 @@
-import { formatShortDuration } from "../utils/time.js";
 
 export const feedingTypes = Object.freeze(["amamentacao", "mamadeira"]);
 
@@ -18,10 +17,6 @@ export function countBreastfeedingEvents(events = []) {
   return events.filter(isBreastfeedingEvent).length;
 }
 
-export function countBottleEvents(events = []) {
-  return events.filter(isBottleEvent).length;
-}
-
 export function countFeedingEvents(events = []) {
   return events.filter(isFeedingEvent).length;
 }
@@ -39,11 +34,6 @@ export function normalizeBottleAmount(value, { min = 0, max = 350, step = 5 } = 
   const numericValue = Number(value) || 0;
   const rounded = Math.round(numericValue / step) * step;
   return Math.min(max, Math.max(min, rounded));
-}
-
-export function formatMilkAmount(value) {
-  const ml = normalizeBottleAmount(value);
-  return ml ? `${ml} ml` : "";
 }
 
 export function createBreastTimerState(overrides = {}) {
@@ -119,23 +109,4 @@ export function getBreastTimerDetail(snapshot = {}, fallbackDetail = "") {
 
   if (leftMs > 0) return `Esquerdo • E ${formatBreastTimer(leftMs)}`;
   return `Direito • D ${formatBreastTimer(rightMs)}`;
-}
-
-export function getBreastfeedingSummary(event = {}) {
-  const detail = String(event.detail || "").trim();
-  const hasLeft = /\bE\s+\d{2}:\d{2}/.test(detail);
-  const hasRight = /\bD\s+\d{2}:\d{2}/.test(detail);
-  const totalMatch = detail.match(/E\s+(\d{2}:\d{2}).*D\s+(\d{2}:\d{2})/);
-
-  return {
-    side: hasLeft && hasRight ? "Mista" : detail || "Amamentação",
-    detail,
-    hasTimer: Boolean(totalMatch),
-  };
-}
-
-export function getFeedingReportValue(events = [], type = "count") {
-  if (type === "breastfeeding") return countBreastfeedingEvents(events);
-  if (type === "bottleMl") return sumBottleAmountMl(events);
-  return countFeedingEvents(events);
 }

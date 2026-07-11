@@ -6,16 +6,6 @@ export function setHtml(element, value) {
   }
 }
 
-export function clearElement(element) {
-  if (!element) return;
-  element.replaceChildren();
-}
-
-export function appendChildren(element, children = []) {
-  if (!element) return;
-  children.filter(Boolean).forEach((child) => element.append(child));
-}
-
 export function createElement(tagName, { className = "", html = "", text = "", attributes = {} } = {}) {
   const element = document.createElement(tagName);
   if (className) element.className = className;

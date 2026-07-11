@@ -60,7 +60,3 @@ export function getDiaryEmptyRecordMarkup({
     action: isToday ? "O botão + também permite incluir registros específicos." : "Registros antigos podem ser ajustados com cuidado.",
   });
 }
-
-export function getSimpleEmptyMarkup(message = "Nada para mostrar ainda.") {
-  return `<p class="empty-state polished-inline-empty">${message}</p>`;
-}

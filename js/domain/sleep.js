@@ -1,4 +1,3 @@
-import { day } from "../config/constants.js";
 import { isSleepType } from "./record-types.js";
 import { getDayStart } from "../utils/time.js";
 
@@ -245,8 +244,4 @@ export function getAwakeMsForRange(events = [], state = {}, windowStart, windowE
 
   const sleepMs = getSleepMsForRange(events, state, routineStart, safeWindowEnd, isSleepEvent, now);
   return Math.max(0, safeWindowEnd - routineStart - sleepMs);
-}
-
-export function getSleepWindowDayMs() {
-  return day;
 }

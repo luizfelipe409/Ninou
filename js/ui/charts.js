@@ -24,32 +24,6 @@ export function getReportDays(events = [], { count = 7, todayStart, dayMs, getDa
   });
 }
 
-export function getSleepReportDays(events = [], { count = 7, todayStart, dayMs, getDayLabel, isSleepEvent }) {
-  return Array.from({ length: count }, (_, index) => {
-    const start = todayStart - (count - 1 - index) * dayMs;
-    const end = start + dayMs;
-    const sleepEvents = events.filter((event) => {
-      if (!isSleepEvent(event)) return false;
-      const eventStart = Number(event.start);
-      const eventEnd = Number(event.end) > eventStart ? Number(event.end) : eventStart;
-      return Number.isFinite(eventStart) && eventStart < end && eventEnd > start;
-    });
-    const sleepMs = sleepEvents.reduce((total, event) => {
-      const eventStart = Number(event.start);
-      const eventEnd = Number(event.end) > eventStart ? Number(event.end) : eventStart;
-      const overlapMs = Math.max(0, Math.min(eventEnd, end) - Math.max(eventStart, start));
-      return total + overlapMs;
-    }, 0);
-    return {
-      start,
-      end,
-      label: getDayLabel(start),
-      events: sleepEvents,
-      sleepMs,
-    };
-  });
-}
-
 export function renderBarChart(container, days, getValue, options = {}) {
   if (!container) return;
   const escapeHtml = options.escapeHtml || defaultEscapeHtml;
@@ -118,11 +92,4 @@ export function renderTodayMiniChart({
     days,
     (item) => item.events.filter((event) => trackedTypes.includes(event.type)).length,
   );
-}
-
-export function getMinutesWindowLabel(startMinutes, durationMinutes = 45) {
-  const windowStart = Math.max(0, Math.round(startMinutes / 5) * 5);
-  const windowEnd = Math.min(1439, windowStart + durationMinutes);
-  const formatMinutes = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-  return `${formatMinutes(windowStart)}-${formatMinutes(windowEnd)}`;
 }
