@@ -897,7 +897,7 @@ let avatarEditorForceOpen = false;
 let avatarModalScrollRestoreY = 0;
 let avatarModalScrollLocked = false;
 
-const BABY_AVATAR_ASSET_VERSION = "75.75.110";
+const BABY_AVATAR_ASSET_VERSION = "75.75.111";
 
 function avatarAsset(path) {
   return `${path}?v=${BABY_AVATAR_ASSET_VERSION}`;
@@ -9571,8 +9571,8 @@ function renderActiveTimerCard() {
 }
 
 function runActiveTimerAction() {
-  // v75.75.110: mantém o relógio orbital antigo e reforça a ação principal.
-  // Se a interface mostra um período acordado aberto, sincroniza o estado antes do clique.
+  // v75.75.111: ação principal usa a lógica antiga de sono,
+  // mas sincroniza antes caso o acordado venha da virada do dia/cache.
   syncMainClockFromOpenAwake(Date.now());
 
   if (state.mode === "idle") {
@@ -9595,6 +9595,7 @@ function runActiveTimerAction() {
     renderAll();
     return;
   }
+
   if (state.mode === "sleeping") {
     finishSleep();
   } else {
