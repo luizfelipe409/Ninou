@@ -401,7 +401,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.77.3";
+const NINOU_RUNTIME_VERSION = "75.77.4";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3414,7 +3414,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.77.3 — as observações do dia também recebem um armazenamento dedicado.
+// v75.77.4 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -10115,19 +10115,24 @@ function renderCurrentState() {
   renderActiveTimerCard();
 }
 
-const ORBIT_RADIUS = 116;
-// .orbit-ring is visually rotated 17deg via CSS (transform: rotate(17deg)).
-// Event icons are positioned in an unrotated coordinate space, so without
-// adding this same offset here, every icon lands 17deg off the drawn arc.
+const ORBIT_RADIUS = 132;
+const ORBIT_DAY_START_DEG = 142;
+const ORBIT_ARC_DEG = 256;
+// O anel visual possui rotação própria no CSS. Somamos o mesmo deslocamento
+// para que 00:00 comece no início do arco desenhado e 23:59 termine no fim.
 const ORBIT_RING_ROTATION_DEG = 17;
 
+function getOrbitMinutesFromMidnight(timestamp = Date.now()) {
+  const value = Number(timestamp);
+  const date = new Date(Number.isFinite(value) ? value : Date.now());
+  return (date.getHours() * 60) + date.getMinutes() + (date.getSeconds() / 60);
+}
+
 function eventPosition(timestamp) {
-  const [hourValue, minuteValue] = String(formatTime(timestamp)).split(":").map(Number);
-  const minutes = (Number.isFinite(hourValue) ? hourValue : 0) * 60 + (Number.isFinite(minuteValue) ? minuteValue : 0);
+  const minutes = Math.max(0, Math.min(1439.999, getOrbitMinutesFromMidnight(timestamp)));
   const progress = minutes / 1440;
-  const startAngle = 142 + ORBIT_RING_ROTATION_DEG;
-  const arcSize = 256;
-  const angle = ((startAngle + progress * arcSize) * Math.PI) / 180;
+  const angleDeg = ORBIT_DAY_START_DEG + ORBIT_RING_ROTATION_DEG + (progress * ORBIT_ARC_DEG);
+  const angle = (angleDeg * Math.PI) / 180;
   return {
     x: Math.round(Math.cos(angle) * ORBIT_RADIUS),
     y: Math.round(Math.sin(angle) * ORBIT_RADIUS),
@@ -10170,14 +10175,20 @@ function getOrbitGroupPosition(members) {
 }
 
 function getOrbitGroups(items) {
+  const orderedItems = [...items].sort((a, b) => Number(a.event?.start || 0) - Number(b.event?.start || 0));
   const groups = [];
-  const overlapDistance = 38;
+  const maxTimeGap = 45 * minute;
+  const maxVisualDistance = 31;
 
-  items.forEach((item) => {
-    const group = groups.find((candidate) => candidate.items.some((member) => getDistance(member.position, item.position) <= overlapDistance));
-    if (group) {
-      group.items.push(item);
-      group.position = getOrbitGroupPosition(group.items);
+  orderedItems.forEach((item) => {
+    const lastGroup = groups[groups.length - 1];
+    const lastItem = lastGroup?.items?.[lastGroup.items.length - 1];
+    const timeGap = lastItem ? Math.abs(Number(item.event?.start || 0) - Number(lastItem.event?.start || 0)) : Infinity;
+    const visualGap = lastItem ? getDistance(lastItem.position, item.position) : Infinity;
+
+    if (lastGroup && timeGap <= maxTimeGap && visualGap <= maxVisualDistance) {
+      lastGroup.items.push(item);
+      lastGroup.position = getOrbitGroupPosition(lastGroup.items);
       return;
     }
 
@@ -10207,20 +10218,23 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
 
 function createOrbitCluster(group) {
   const eventList = group.items.map((item) => item.event).sort((a, b) => a.start - b.start);
-  const config = getEventConfig(eventList[0].type);
+  const config = getEventConfig(eventList[eventList.length - 1].type);
+  const firstTime = formatTime(eventList[0].start);
+  const lastTime = formatTime(eventList[eventList.length - 1].start);
+  const timeLabel = firstTime === lastTime ? firstTime : `${firstTime}–${lastTime}`;
   const button = document.createElement("button");
   button.type = "button";
   button.className = `orbit-event orbit-cluster ${config.arcType}`;
   button.style.setProperty("--x", `${group.position.x}px`);
   button.style.setProperty("--y", `${group.position.y}px`);
-  button.title = `${eventList.length} registros próximos`;
-  button.setAttribute("aria-label", `${eventList.length} registros próximos no arco`);
+  button.title = `${eventList.length} registros entre ${firstTime} e ${lastTime}`;
+  button.setAttribute("aria-label", `${eventList.length} registros entre ${firstTime} e ${lastTime}`);
   button.innerHTML = `
     <i class="orbit-cluster-icon">
       ${config.icon}
       <span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>
     </i>
-    <b>${eventList.length}</b>
+    <b>${timeLabel}</b>
   `;
   button.addEventListener("click", () => openOrbitCluster(eventList));
   return button;
@@ -14400,7 +14414,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=75.77.3", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=75.77.4", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

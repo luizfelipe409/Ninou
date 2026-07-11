@@ -1,0 +1,7 @@
+Ninou v75.77.4 — órbita cronológica de 24 horas corrigida
+
+- 00:00 inicia o arco e 23:59 termina no fim do arco.
+- Eventos que atravessam a meia-noite entram no início do arco do dia atual.
+- Cada registro mantém o horário real; agrupamento ocorre apenas em horários muito próximos.
+- Agrupamentos exibem ícone, quantidade e intervalo de horário.
+- Relógio central reduzido e protegido por área segura para não cobrir os eventos.

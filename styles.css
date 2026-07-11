@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.3 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.4 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.77.3 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.77.4 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.77.3 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v75.77.4 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.3 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.4 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.3 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.4 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v75.77.3 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v75.77.4 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v75.77.3 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v75.77.4 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v75.77.3 — layout premium baseado no preview aprovado ===== */
+/* ===== v75.77.4 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29890,7 +29890,7 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
 }
 
 
-/* ===== v75.77.3 — escala móvel fiel ao preview aprovado ===== */
+/* ===== v75.77.4 — escala móvel fiel ao preview aprovado ===== */
 
 html body.family-daily-surface .app-header {
   grid-template-columns: minmax(0, 1fr) 118px !important;
@@ -30152,7 +30152,7 @@ html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] 
 
 
 /* ==========================================================================
-   v75.77.3 — órbita premium + alinhamento dos registros rápidos
+   v75.77.4 — órbita premium + alinhamento dos registros rápidos
    ========================================================================== */
 
 html body.family-daily-surface .quick-actions button[data-open-sheet] {
@@ -30262,7 +30262,7 @@ html body.family-daily-surface .state-orbit .orbit-events {
 
 
 /* ========================================================================== 
-   v75.77.3 — órbita cronológica em tempo real + timeline legível
+   v75.77.4 — órbita cronológica em tempo real + timeline legível
    ========================================================================== */
 
 /* Registros rápidos: ícone e texto realmente centralizados no card. */
@@ -30386,4 +30386,221 @@ html body.family-daily-surface .state-orbit .orbit-event.active > i {
 @keyframes ninouOrbitActivePulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
+}
+
+
+/* ==========================================================================
+   v75.77.4 — órbita cronológica canônica de 24 horas
+   00:00 no início do arco; 23:59 no final; relógio em área central segura.
+   ========================================================================== */
+
+html body.family-daily-surface.regular-family-mode .state-orbit,
+html body.family-daily-surface .screen[data-screen="today"] > .state-orbit {
+  min-height: 356px !important;
+  height: 356px !important;
+  padding: 20px 16px !important;
+  display: grid !important;
+  grid-template-rows: auto auto auto !important;
+  align-content: center !important;
+  justify-items: center !important;
+  overflow: hidden !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-ring,
+html body.family-daily-surface .orbit-ring {
+  width: 304px !important;
+  height: 304px !important;
+  max-width: calc(100% - 22px) !important;
+  max-height: calc(100% - 22px) !important;
+}
+
+html body.family-daily-surface .state-orbit #stateLabel,
+html body.family-daily-surface .state-orbit > span {
+  position: relative !important;
+  z-index: 2 !important;
+  width: min(210px, 62%) !important;
+  margin: 0 auto 7px !important;
+  text-align: center !important;
+  font-size: 0.9rem !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.08em !important;
+}
+
+html body.family-daily-surface .state-orbit #stateClock,
+html body.family-daily-surface .state-orbit > strong {
+  position: relative !important;
+  z-index: 2 !important;
+  width: min(236px, 68%) !important;
+  max-width: 236px !important;
+  margin: 0 auto !important;
+  font-size: clamp(2.65rem, 10.6vw, 3.15rem) !important;
+  line-height: 0.96 !important;
+  letter-spacing: -0.065em !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  text-shadow: none !important;
+}
+
+html body.family-daily-surface .state-orbit #stateHint,
+html body.family-daily-surface .state-orbit > p {
+  position: relative !important;
+  z-index: 2 !important;
+  width: min(230px, 66%) !important;
+  max-width: 230px !important;
+  margin: 9px auto 0 !important;
+  font-size: 0.9rem !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+}
+
+/* Disco central discreto: separa o relógio do arco sem esconder os eventos. */
+html body.family-daily-surface .state-orbit::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 226px !important;
+  height: 172px !important;
+  transform: translate(-50%, -48%) !important;
+  border-radius: 50% !important;
+  background: color-mix(in srgb, var(--ui-surface) 91%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--ui-line) 72%, transparent) !important;
+  box-shadow: 0 10px 30px rgba(35, 24, 56, 0.05) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+html body:not(.day-theme).family-daily-surface .state-orbit::after {
+  background: rgba(24, 20, 49, 0.88) !important;
+  border-color: rgba(215, 205, 255, 0.09) !important;
+  box-shadow: 0 12px 34px rgba(0,0,0,.16) !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-events {
+  position: absolute !important;
+  inset: 50% auto auto 50% !important;
+  z-index: 5 !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) !important;
+  display: grid !important;
+  grid-template-rows: 38px 20px !important;
+  justify-items: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: max-content !important;
+  min-width: 42px !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  z-index: 6 !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event > i,
+html body.family-daily-surface .state-orbit .orbit-cluster .orbit-cluster-icon {
+  position: relative !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event > i :is(img, svg, .icon-art),
+html body.family-daily-surface .state-orbit .orbit-cluster .orbit-cluster-icon :is(img, svg, .icon-art) {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event > b,
+html body.family-daily-surface .state-orbit .orbit-cluster > b {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 42px !important;
+  max-width: 78px !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ui-surface) 94%, transparent) !important;
+  border: 1px solid var(--ui-line) !important;
+  color: var(--ui-text) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  font-size: 0.58rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  text-shadow: none !important;
+  box-shadow: 0 4px 10px rgba(35,24,56,.08) !important;
+}
+
+html body:not(.day-theme).family-daily-surface .state-orbit .orbit-event > b,
+html body:not(.day-theme).family-daily-surface .state-orbit .orbit-cluster > b {
+  background: rgba(27,22,55,.94) !important;
+  border-color: rgba(222,212,255,.15) !important;
+  color: #f8f4ff !important;
+  -webkit-text-fill-color: #f8f4ff !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster-count {
+  position: absolute !important;
+  right: -8px !important;
+  top: -8px !important;
+  z-index: 8 !important;
+  min-width: 21px !important;
+  height: 21px !important;
+  padding: 0 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid #fff !important;
+  border-radius: 999px !important;
+  background: #8e69ef !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 0.66rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  box-shadow: 0 5px 12px rgba(63,40,106,.22) !important;
+}
+
+html body:not(.day-theme).family-daily-surface .state-orbit .orbit-cluster-count {
+  border-color: #181431 !important;
+  background: #ff9a76 !important;
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface.regular-family-mode .state-orbit,
+  html body.family-daily-surface .screen[data-screen="today"] > .state-orbit {
+    min-height: 334px !important;
+    height: 334px !important;
+  }
+
+  html body.family-daily-surface .state-orbit .orbit-ring,
+  html body.family-daily-surface .orbit-ring {
+    width: 282px !important;
+    height: 282px !important;
+  }
+
+  html body.family-daily-surface .state-orbit #stateClock,
+  html body.family-daily-surface .state-orbit > strong {
+    font-size: clamp(2.4rem, 10.2vw, 2.8rem) !important;
+    max-width: 214px !important;
+  }
+
+  html body.family-daily-surface .state-orbit::after {
+    width: 208px !important;
+    height: 158px !important;
+  }
 }
