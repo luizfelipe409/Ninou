@@ -37023,3 +37023,187 @@ html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid butt
   border-color: rgba(124,229,194,.58) !important;
   box-shadow: 0 0 0 3px rgba(124,229,194,.12), 0 12px 24px rgba(0,0,0,.26) !important;
 }
+
+
+/* v75.75.107 relogio principal premium */
+
+/* Relógio principal premium: remove ícones orbitais com quadrados quebrados */
+.state-orbit {
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+.state-orbit .orbit-ring,
+.orbit-ring {
+  opacity: .62 !important;
+  filter: none !important;
+}
+
+.orbit-events {
+  pointer-events: auto !important;
+}
+
+/* Eventos da órbita viram marcadores compactos, não cards/imagens grandes */
+.orbit-events > *,
+.orbit-event,
+.orbit-group {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  display: grid !important;
+  place-items: center !important;
+  background: transparent !important;
+  transform: translate(-50%, -50%) !important;
+  box-sizing: border-box !important;
+}
+
+body.day-theme .orbit-events > *,
+body.day-theme .orbit-event,
+body.day-theme .orbit-group {
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255,255,255,.72), rgba(255,255,255,0) 38%),
+    linear-gradient(145deg, rgba(105,80,155,.92), rgba(64,48,102,.96)) !important;
+  border: 1px solid rgba(255,255,255,.36) !important;
+  box-shadow:
+    0 8px 16px rgba(64,48,102,.18),
+    0 0 0 4px rgba(105,80,155,.08),
+    inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+
+body:not(.day-theme) .orbit-events > *,
+body:not(.day-theme) .orbit-event,
+body:not(.day-theme) .orbit-group {
+  background:
+    radial-gradient(circle at 34% 24%, rgba(124,229,194,.34), rgba(124,229,194,0) 42%),
+    linear-gradient(145deg, rgba(55,45,86,.96), rgba(32,26,55,.98)) !important;
+  border: 1px solid rgba(124,229,194,.24) !important;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.28),
+    0 0 0 4px rgba(124,229,194,.07),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+/* Limpa qualquer fundo quadrado interno */
+.orbit-events *::before,
+.orbit-events *::after {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.orbit-events img,
+.orbit-events svg,
+.orbit-event img,
+.orbit-event svg,
+.orbit-group img,
+.orbit-group svg {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.orbit-events span,
+.orbit-events .action-icon,
+.orbit-events .type-icon {
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+/* reduz poluição visual quando há muitos registros */
+.orbit-events > *:nth-child(n+7) {
+  opacity: .42 !important;
+  transform: translate(-50%, -50%) scale(.78) !important;
+}
+
+/* Sheet Registros próximos: não deve virar um painel enorme vazio */
+.orbit-cluster-sheet {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: min(76svh, 620px) !important;
+  grid-template-rows: 14px auto minmax(0, auto) !important;
+  padding: 0 14px max(16px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.orbit-cluster-sheet .section-title {
+  height: auto !important;
+  min-height: 72px !important;
+  padding: 0 0 8px !important;
+}
+
+#orbitClusterList,
+.orbit-cluster-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  max-height: min(52svh, 420px) !important;
+  overflow-y: auto !important;
+  padding: 4px 0 8px !important;
+  margin: 0 !important;
+  scrollbar-width: none !important;
+}
+
+#orbitClusterList::-webkit-scrollbar,
+.orbit-cluster-list::-webkit-scrollbar {
+  display: none !important;
+}
+
+#orbitClusterList article,
+#orbitClusterList button,
+.orbit-cluster-list article,
+.orbit-cluster-list button {
+  min-height: 86px !important;
+  border-radius: 24px !important;
+  padding: 12px 14px !important;
+  display: grid !important;
+  grid-template-columns: 64px minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+body.day-theme #orbitClusterList article,
+body.day-theme #orbitClusterList button,
+body.day-theme .orbit-cluster-list article,
+body.day-theme .orbit-cluster-list button {
+  background: rgba(255,255,255,.84) !important;
+  border: 1px solid rgba(139,92,246,.10) !important;
+  color: #2f2843 !important;
+  box-shadow: 0 8px 18px rgba(76,59,112,.055), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+
+body:not(.day-theme) #orbitClusterList article,
+body:not(.day-theme) #orbitClusterList button,
+body:not(.day-theme) .orbit-cluster-list article,
+body:not(.day-theme) .orbit-cluster-list button {
+  background: linear-gradient(180deg, rgba(58,47,88,.98), rgba(40,32,67,.98)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: #f7f3ff !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}

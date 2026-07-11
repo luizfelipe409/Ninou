@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v75-75-105-force-main-counter-sync";
+const CACHE_NAME = "ninou-v75-75-107-premium-orbit-clock";
 
 function canCacheRequest(request, response) {
   if (!request || request.method !== "GET") return false;
@@ -18,9 +18,9 @@ function safePut(cache, request, response) {
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=75.75.105",
-  "/app.js?v=75.75.105",
-  "/js/app.legacy.js?v=75.75.105",
+  "/styles.css?v=75.75.107",
+  "/app.js?v=75.75.107",
+  "/js/app.legacy.js?v=75.75.107",
   "/js/config/constants.js",
   "/js/dom/dom.js",
   "/js/domain/record-types.js",
@@ -53,7 +53,7 @@ const APP_SHELL = [
   "/js/ui/sounds.js",
   "/js/utils/text.js",
   "/js/utils/time.js",
-  "/manifest.webmanifest?v=75.75.105",
+  "/manifest.webmanifest?v=75.75.107",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",

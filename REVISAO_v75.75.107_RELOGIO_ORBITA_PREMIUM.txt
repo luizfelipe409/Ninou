@@ -1,0 +1,11 @@
+Versão v75.75.107
+
+Correção visual do relógio principal:
+- O acabamento anterior dos ícones orbitais não estava premium.
+- Removidos quadrados/fundos brancos quebrados atrás dos ícones.
+- Eventos da órbita agora aparecem como marcadores compactos premium.
+- Ícones internos foram reduzidos e limpos.
+- Eventos extras ficam mais discretos para não poluir o relógio.
+- Sheet "Registros próximos" ficou mais compacto, sem área vazia gigante quando há poucos itens.
+- Mantidas as correções anteriores.
+- Cache/versionamento atualizado para 75.75.107.

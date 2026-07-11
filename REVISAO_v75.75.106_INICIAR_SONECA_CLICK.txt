@@ -1,0 +1,9 @@
+Versão v75.75.106
+
+Correção do botão Iniciar soneca:
+- O contador principal podia estar visualmente sincronizado com o Acordou de ontem, mas o estado interno ainda podia estar idle no momento do clique.
+- Por isso, tocar em Iniciar soneca não fazia nada.
+- Agora o clique em Iniciar soneca força a sincronização do estado interno antes de tentar iniciar o sono.
+- A função startSleep também recebeu proteção para sincronizar o acordado aberto antes de criar a soneca.
+- Mantidas as correções anteriores do contador principal, virada do dia, amamentação, legibilidade, menu Registrar, temas e avatares.
+- Cache/versionamento atualizado para 75.75.106.
