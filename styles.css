@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.5 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v76.0.0 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.77.5 =====
+/* ===== BARRA INFERIOR CANÔNICA — v76.0.0 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.77.5 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v76.0.0 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.5 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v76.0.0 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.5 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v76.0.0 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v75.77.5 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v76.0.0 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v75.77.5 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v76.0.0 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v75.77.5 — layout premium baseado no preview aprovado ===== */
+/* ===== v76.0.0 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29890,7 +29890,7 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
 }
 
 
-/* ===== v75.77.5 — escala móvel fiel ao preview aprovado ===== */
+/* ===== v76.0.0 — escala móvel fiel ao preview aprovado ===== */
 
 html body.family-daily-surface .app-header {
   grid-template-columns: minmax(0, 1fr) 118px !important;
@@ -30152,7 +30152,7 @@ html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] 
 
 
 /* ==========================================================================
-   v75.77.5 — órbita premium + alinhamento dos registros rápidos
+   v76.0.0 — órbita premium + alinhamento dos registros rápidos
    ========================================================================== */
 
 html body.family-daily-surface .quick-actions button[data-open-sheet] {
@@ -30262,7 +30262,7 @@ html body.family-daily-surface .state-orbit .orbit-events {
 
 
 /* ========================================================================== 
-   v75.77.5 — órbita cronológica em tempo real + timeline legível
+   v76.0.0 — órbita cronológica em tempo real + timeline legível
    ========================================================================== */
 
 /* Registros rápidos: ícone e texto realmente centralizados no card. */
@@ -30390,7 +30390,7 @@ html body.family-daily-surface .state-orbit .orbit-event.active > i {
 
 
 /* ==========================================================================
-   v75.77.5 — órbita cronológica canônica de 24 horas
+   v76.0.0 — órbita cronológica canônica de 24 horas
    00:00 no início do arco; 23:59 no final; relógio em área central segura.
    ========================================================================== */
 
@@ -30603,4 +30603,210 @@ html body:not(.day-theme).family-daily-surface .state-orbit .orbit-cluster-count
     width: 208px !important;
     height: 158px !important;
   }
+}
+
+
+/* ==========================================================================\n   Ninou v76.0.0 — Home Premium V2 (camadas isoladas)\n   ========================================================================== */
+html body.family-daily-surface .screen[data-screen="today"] {
+  --home-orbit-size: min(78vw, 330px);
+  --home-orbit-radius: 118px;
+}
+
+html body.family-daily-surface .screen[data-screen="today"] > .state-orbit {
+  position: relative !important;
+  min-height: 360px !important;
+  padding: 24px 16px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-ring {
+  width: var(--home-orbit-size) !important;
+  height: var(--home-orbit-size) !important;
+  border-width: 26px !important;
+  z-index: 0 !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-events {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event {
+  position: absolute !important;
+  left: calc(50% + var(--x)) !important;
+  top: calc(50% + var(--y)) !important;
+  transform: translate(-50%, -50%) !important;
+  display: grid !important;
+  grid-template-rows: 38px auto !important;
+  justify-items: center !important;
+  gap: 4px !important;
+  width: auto !important;
+  min-width: 42px !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 5 !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event i,
+html body.family-daily-surface .state-orbit .orbit-cluster-icon {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: rgba(34, 27, 68, .92) !important;
+  border: 2px solid rgba(255,255,255,.78) !important;
+  box-shadow: 0 8px 18px rgba(32, 19, 64, .22) !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event i img,
+html body.family-daily-surface .state-orbit .orbit-event i svg,
+html body.family-daily-surface .state-orbit .orbit-event .icon-art {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event b {
+  display: block !important;
+  min-width: 42px !important;
+  padding: 3px 6px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ui-surface) 92%, transparent) !important;
+  color: var(--ui-text) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  font-size: .62rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 4px 10px rgba(30, 18, 60, .10) !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster-count {
+  position: absolute !important;
+  right: -8px !important;
+  top: -8px !important;
+  z-index: 7 !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  padding: 0 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+  border: 2px solid var(--ui-surface) !important;
+  background: #8d6bea !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: .66rem !important;
+  font-weight: 950 !important;
+}
+
+html body:not(.day-theme).family-daily-surface .state-orbit .orbit-cluster-count {
+  background: #ff9a76 !important;
+}
+
+/* Relógio em camada independente e protegida. */
+html body.family-daily-surface .state-orbit > #stateLabel,
+html body.family-daily-surface .state-orbit > #stateClock,
+html body.family-daily-surface .state-orbit > #stateHint {
+  position: relative !important;
+  z-index: 2 !important;
+  max-width: 250px !important;
+  margin-inline: auto !important;
+  pointer-events: none !important;
+}
+
+html body.family-daily-surface .state-orbit > #stateClock {
+  font-size: clamp(2.6rem, 10vw, 4rem) !important;
+  line-height: .96 !important;
+  letter-spacing: -.055em !important;
+  white-space: nowrap !important;
+}
+
+html body.family-daily-surface .state-orbit > #stateLabel {
+  font-size: .92rem !important;
+  letter-spacing: .08em !important;
+}
+
+html body.family-daily-surface .state-orbit > #stateHint {
+  font-size: .98rem !important;
+  line-height: 1.25 !important;
+}
+
+/* Ações rápidas: composição centralizada e previsível. */
+html body.family-daily-surface .quick-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  min-height: 116px !important;
+  padding: 16px 12px !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] .action-icon,
+html body.family-daily-surface .quick-actions button[data-open-sheet] .type-icon {
+  flex: 0 0 52px !important;
+  width: 52px !important;
+  height: 52px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] > span:last-child {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  position: static !important;
+  color: var(--ui-text) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  font-size: .92rem !important;
+  font-weight: 850 !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet]::after,
+html body.family-daily-surface .quick-actions button[data-open-sheet]::before {
+  display: none !important;
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface .screen[data-screen="today"] { --home-orbit-size: 290px; }
+  html body.family-daily-surface .screen[data-screen="today"] > .state-orbit { min-height: 338px !important; }
+  html body.family-daily-surface .state-orbit > #stateClock { font-size: clamp(2.35rem, 10.6vw, 3.3rem) !important; }
 }

@@ -1,4 +1,4 @@
-Ninou v75.77.5 — correção real da inicialização
+Ninou v76.0.0 — correção real da inicialização
 
 Causa do erro:
 - A lógica de agrupamento cronológico usava `45 * minute`, mas `minute` não existia no núcleo.
@@ -7,5 +7,5 @@ Causa do erro:
 Correções:
 - Substituído por 45 * 60 * 1000 milissegundos.
 - Mantida a órbita cronológica de 24 horas da v75.77.4.
-- Cache do Service Worker recebeu nome exclusivo da v75.77.5.
+- Cache do Service Worker recebeu nome exclusivo da v76.0.0.
 - Nenhum dado local, familiar ou do Firebase é apagado.
