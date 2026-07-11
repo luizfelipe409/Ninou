@@ -1,7 +1,18 @@
 import { escapeHtml as defaultEscapeHtml } from "../utils/text.js";
 
+const BAR_CHART_MAX_HEIGHT_PERCENT = 64;
+const BAR_CHART_MIN_FILLED_HEIGHT_PERCENT = 10;
+const BAR_CHART_EMPTY_HEIGHT_PERCENT = 7;
+
 export function formatNumber(value) {
   return Number(value || 0).toLocaleString("pt-BR", { maximumFractionDigits: 0 });
+}
+
+function getSafeBarHeightPercent(value, maxValue, minHeight = BAR_CHART_MIN_FILLED_HEIGHT_PERCENT) {
+  const numericValue = Number(value) || 0;
+  const numericMax = Math.max(Number(maxValue) || 0, 1);
+  if (numericValue <= 0) return BAR_CHART_EMPTY_HEIGHT_PERCENT;
+  return Math.max(minHeight, Math.round((numericValue / numericMax) * BAR_CHART_MAX_HEIGHT_PERCENT));
 }
 
 export function getReportDays(events = [], { count = 7, todayStart, dayMs, getDayLabel }) {
@@ -47,7 +58,7 @@ export function renderBarChart(container, days, getValue, options = {}) {
   const maxValue = Math.max(...values, 1);
   const positiveValues = values.filter((value) => value > 0);
   const averageValue = positiveValues.length ? positiveValues.reduce((total, value) => total + value, 0) / positiveValues.length : 0;
-  const averagePercent = averageValue > 0 ? Math.max(8, Math.min(92, Math.round((averageValue / maxValue) * 100))) : 0;
+  const averagePercent = averageValue > 0 ? getSafeBarHeightPercent(averageValue, maxValue, 8) : 0;
 
   const hasRealData = positiveValues.length > 0;
   container.classList.add("premium-bars");
@@ -76,7 +87,7 @@ export function renderBarChart(container, days, getValue, options = {}) {
   days.forEach((item, index) => {
     const value = values[index];
     const bar = document.createElement("span");
-    const height = value > 0 ? Math.max(10, Math.round((value / maxValue) * 100)) : 7;
+    const height = getSafeBarHeightPercent(value, maxValue);
     const formatted = formatValue(value);
     bar.style.setProperty("--h", `${height}%`);
     bar.style.setProperty("--delay", `${index * 36}ms`);

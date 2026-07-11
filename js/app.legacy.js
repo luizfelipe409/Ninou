@@ -10138,6 +10138,17 @@ function getSleepReportDays() {
   });
 }
 
+const DATA_REPORT_BAR_MAX_HEIGHT_PERCENT = 64;
+const DATA_REPORT_BAR_MIN_FILLED_HEIGHT_PERCENT = 10;
+const DATA_REPORT_BAR_EMPTY_HEIGHT_PERCENT = 7;
+
+function getDataReportBarHeightPercent(value, maxValue) {
+  const numericValue = Number(value) || 0;
+  const numericMax = Math.max(Number(maxValue) || 0, 1);
+  if (numericValue <= 0) return DATA_REPORT_BAR_EMPTY_HEIGHT_PERCENT;
+  return Math.max(DATA_REPORT_BAR_MIN_FILLED_HEIGHT_PERCENT, Math.round((numericValue / numericMax) * DATA_REPORT_BAR_MAX_HEIGHT_PERCENT));
+}
+
 function renderSleepReport() {
   if (!sleepBars) return;
   const days = getSleepReportDays();
@@ -10164,7 +10175,7 @@ function renderSleepReport() {
   sleepBars.innerHTML = "";
   days.forEach((item, index) => {
     const bar = document.createElement("span");
-    const height = Math.max(6, Math.round((item.sleepMs / maxSleep) * 100));
+    const height = getDataReportBarHeightPercent(item.sleepMs, maxSleep);
     bar.style.setProperty("--h", `${height}%`);
     bar.style.setProperty("--delay", `${index * 36}ms`);
     bar.classList.toggle("is-empty", item.sleepMs <= 0);
