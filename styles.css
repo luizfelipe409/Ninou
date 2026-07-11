@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.2 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v75.77.3 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v75.77.2 =====
+/* ===== BARRA INFERIOR CANÔNICA — v75.77.3 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v75.77.2 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v75.77.3 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.2 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v75.77.3 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.2 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v75.77.3 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v75.77.2 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v75.77.3 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v75.77.2 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v75.77.3 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v75.77.2 — layout premium baseado no preview aprovado ===== */
+/* ===== v75.77.3 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29890,7 +29890,7 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
 }
 
 
-/* ===== v75.77.2 — escala móvel fiel ao preview aprovado ===== */
+/* ===== v75.77.3 — escala móvel fiel ao preview aprovado ===== */
 
 html body.family-daily-surface .app-header {
   grid-template-columns: minmax(0, 1fr) 118px !important;
@@ -30152,7 +30152,7 @@ html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] 
 
 
 /* ==========================================================================
-   v75.77.2 — órbita premium + alinhamento dos registros rápidos
+   v75.77.3 — órbita premium + alinhamento dos registros rápidos
    ========================================================================== */
 
 html body.family-daily-surface .quick-actions button[data-open-sheet] {
@@ -30258,4 +30258,132 @@ html body.family-daily-surface .state-orbit {
 
 html body.family-daily-surface .state-orbit .orbit-events {
   isolation: isolate !important;
+}
+
+
+/* ========================================================================== 
+   v75.77.3 — órbita cronológica em tempo real + timeline legível
+   ========================================================================== */
+
+/* Registros rápidos: ícone e texto realmente centralizados no card. */
+html body.family-daily-surface .quick-actions button[data-open-sheet] {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  min-height: 104px !important;
+  padding: 14px 10px !important;
+  text-align: center !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] .action-icon,
+html body.family-daily-surface .quick-actions button[data-open-sheet] .type-icon {
+  flex: 0 0 48px !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+html body.family-daily-surface .quick-actions button[data-open-sheet] > span:last-child {
+  width: 100% !important;
+  margin: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  font-size: 0.88rem !important;
+  line-height: 1.15 !important;
+}
+
+/* Cada registro volta a ocupar sua posição real no arco de 24 horas. */
+html body.family-daily-surface .state-orbit .orbit-event {
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  justify-items: center !important;
+  gap: 5px !important;
+  overflow: visible !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event > i {
+  position: relative !important;
+  width: 36px !important;
+  height: 36px !important;
+  overflow: visible !important;
+  border-radius: 50% !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event:not(.orbit-cluster) > b {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 40px !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ui-surface) 88%, transparent) !important;
+  border: 1px solid var(--ui-line) !important;
+  color: var(--ui-text) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  font-size: 0.59rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+  white-space: nowrap !important;
+  box-shadow: 0 5px 12px rgba(35, 24, 56, 0.10) !important;
+}
+
+html body:not(.day-theme).family-daily-surface .state-orbit .orbit-event:not(.orbit-cluster) > b {
+  background: rgba(27, 22, 55, .92) !important;
+  border-color: rgba(222, 212, 255, .16) !important;
+  color: #f8f4ff !important;
+  -webkit-text-fill-color: #f8f4ff !important;
+}
+
+/* Agrupamento só ocorre quando horários próximos se sobrepõem visualmente. */
+html body.family-daily-surface .state-orbit .orbit-cluster {
+  cursor: pointer !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster > b {
+  display: none !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster .orbit-cluster-icon {
+  position: relative !important;
+  width: 40px !important;
+  height: 40px !important;
+  overflow: visible !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster .orbit-cluster-count {
+  right: -7px !important;
+  top: -7px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  padding: 0 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+  font-size: .65rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+}
+
+/* Remove a badge inventada por tipo da versão anterior. */
+html body.family-daily-surface .state-orbit .orbit-summary-count {
+  display: none !important;
+}
+
+/* O registro ativo continua destacado sem perder o horário real de início. */
+html body.family-daily-surface .state-orbit .orbit-event.active > i {
+  animation: ninouOrbitActivePulse 1.8s ease-in-out infinite !important;
+}
+
+@keyframes ninouOrbitActivePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }

@@ -1,4 +1,4 @@
-Ninou v75.77.2 — correções da Home premium
+Ninou v75.77.3 — correções da Home premium
 
 - Ícones dos registros rápidos centralizados e alinhados no centro dos cards.
 - Órbita passa a mostrar um ícone por tipo de registro com contador visível.

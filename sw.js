@@ -1,12 +1,12 @@
 const CACHE_NAME = "ninou-v75-76-9-orbit-sheet";
-const APP_VERSION = "75.77.2";
+const APP_VERSION = "75.77.3";
 
 const APP_SHELL = [
   "/",
   "/index.html",
   `/styles.css?v=${APP_VERSION}`,
-  `/js/boot-v75.77.2.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v75.77.2.mjs?v=${APP_VERSION}`,
+  `/js/boot-v75.77.3.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v75.77.3.mjs?v=${APP_VERSION}`,
   "/app.js",
   "/js/app.js",
   "/js/app.legacy.js",

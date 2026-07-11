@@ -401,7 +401,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "75.77.2";
+const NINOU_RUNTIME_VERSION = "75.77.3";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3414,7 +3414,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v75.77.2 — as observações do dia também recebem um armazenamento dedicado.
+// v75.77.3 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -10171,7 +10171,7 @@ function getOrbitGroupPosition(members) {
 
 function getOrbitGroups(items) {
   const groups = [];
-  const overlapDistance = 30;
+  const overlapDistance = 38;
 
   items.forEach((item) => {
     const group = groups.find((candidate) => candidate.items.some((member) => getDistance(member.position, item.position) <= overlapDistance));
@@ -10187,54 +10187,21 @@ function getOrbitGroups(items) {
   return groups;
 }
 
-function buildOrbitSummaryItems(dayEvents = [], activeEvent = null) {
-  const sourceEvents = Array.isArray(dayEvents) ? [...dayEvents] : [];
-  if (activeEvent) sourceEvents.push(activeEvent);
-  const grouped = new Map();
-
-  sourceEvents.forEach((event) => {
-    const type = String(event?.type || "outro").trim() || "outro";
-    const bucket = grouped.get(type) || { type, events: [], latest: null, active: false };
-    bucket.events.push(event);
-    bucket.active = bucket.active || event?.isActive === true;
-    if (!bucket.latest || Number(event?.start || 0) >= Number(bucket.latest?.start || 0) || event?.isActive) {
-      bucket.latest = event;
-    }
-    grouped.set(type, bucket);
-  });
-
-  return Array.from(grouped.values())
-    .sort((a, b) => Number(a.latest?.start || 0) - Number(b.latest?.start || 0))
-    .map((bucket) => ({
-      event: bucket.latest,
-      active: bucket.active,
-      count: bucket.events.length,
-      events: bucket.events.sort((a, b) => Number(a.start || 0) - Number(b.start || 0)),
-      position: eventPosition(Math.max(Number(bucket.latest?.start) || Date.now(), getDayStart(Date.now()))),
-    }));
-}
-
-function createOrbitEvent(event, active = false, position = eventPosition(event.start), options = {}) {
+function createOrbitEvent(event, active = false, position = eventPosition(event.start)) {
   const config = getEventConfig(event.type);
-  const count = Math.max(1, Number(options?.count) || 1);
-  const relatedEvents = Array.isArray(options?.events) ? options.events : [];
-  const item = document.createElement(relatedEvents.length ? "button" : "div");
-  if (item.tagName === "BUTTON") item.type = "button";
-  item.className = `orbit-event ${config.arcType}${active ? " active" : ""}${count > 1 ? " orbit-summary" : ""}`;
+  const item = document.createElement("div");
+  item.className = `orbit-event ${config.arcType}${active ? " active" : ""}`;
   item.style.setProperty("--x", `${position.x}px`);
   item.style.setProperty("--y", `${position.y}px`);
 
   const icon = document.createElement("i");
-  icon.innerHTML = `${config.icon}<span class="orbit-summary-count" aria-hidden="true">${count}</span>`;
+  icon.innerHTML = config.icon;
   const label = document.createElement("b");
-  label.textContent = String(count);
+  label.textContent = formatTime(event.start);
 
   item.append(icon, label);
-  item.title = count > 1 ? `${config.title} • ${count} registros` : `${config.title} • 1 registro`;
-  item.setAttribute("aria-label", count > 1 ? `${config.title}, ${count} registros` : `${config.title}, 1 registro`);
-  if (relatedEvents.length) {
-    item.addEventListener("click", () => openOrbitCluster(relatedEvents, { title: `${config.title} • ${count} ${count === 1 ? "registro" : "registros"}` }));
-  }
+  item.title = `${config.title} às ${formatTime(event.start)}`;
+  item.setAttribute("aria-label", `${config.title} às ${formatTime(event.start)}`);
   return item;
 }
 
@@ -10267,7 +10234,6 @@ function getOrbitItemSignature(item) {
   return [
     getEventRenderSignature(item.event, { active: item.active }),
     item.active ? "active" : "done",
-    item.count || 1,
     item.position.x,
     item.position.y,
   ].join("|");
@@ -10289,10 +10255,17 @@ function renderOrbit() {
     .filter((event) => eventOverlapsWindow(event, orbitStart, orbitEnd))
     .sort((a, b) => Number(a.start) - Number(b.start));
 
-  let activeEvent = null;
+  const items = dayEvents
+    .slice(-48)
+    .map((event) => ({
+      event,
+      active: false,
+      position: eventPosition(Math.max(Number(event.start) || orbitStart, orbitStart)),
+    }));
+
   if (state.mode === "sleeping") {
     const activeStartedAt = Number(state.activeStartedAt) || now;
-    activeEvent = {
+    const activeEvent = {
       id: `active-${state.activeType || "sono"}-${Math.round(activeStartedAt)}`,
       type: state.activeType || "sono",
       start: activeStartedAt,
@@ -10301,20 +10274,27 @@ function renderOrbit() {
       notes: state.activeNotes || "",
       isActive: true,
     };
+    items.push({
+      event: activeEvent,
+      active: true,
+      position: eventPosition(Math.max(activeEvent.start, orbitStart)),
+    });
   }
 
-  const items = buildOrbitSummaryItems(dayEvents, activeEvent);
   const nextSignature = getOrbitRenderSignature(items);
   if (nextSignature === orbitRenderSignature) return;
 
   orbitRenderSignature = nextSignature;
   orbitEvents.replaceChildren();
 
-  items.forEach((item) => {
-    orbitEvents.append(createOrbitEvent(item.event, item.active, item.position, {
-      count: item.count,
-      events: item.events,
-    }));
+  getOrbitGroups(items).forEach((group) => {
+    if (group.items.length > 1) {
+      orbitEvents.append(createOrbitCluster(group));
+      return;
+    }
+
+    const [item] = group.items;
+    orbitEvents.append(createOrbitEvent(item.event, item.active, item.position));
   });
 }
 
@@ -14420,7 +14400,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=75.77.2", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=75.77.3", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

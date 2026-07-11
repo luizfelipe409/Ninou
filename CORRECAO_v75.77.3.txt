@@ -1,0 +1,9 @@
+Ninou v75.77.3 — órbita cronológica restaurada
+
+- Restaura a linha do tempo real de 24 horas na órbita.
+- Cada registro volta a ser posicionado conforme o horário em que ocorreu.
+- O horário aparece abaixo de cada ícone individual.
+- Registros muito próximos são agrupados apenas para evitar sobreposição visual.
+- O agrupamento mostra quantidade e abre a lista cronológica exata.
+- Registro em andamento mantém posição pelo horário real de início.
+- Ações rápidas centralizadas em seus cartões.
