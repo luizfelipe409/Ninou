@@ -11489,6 +11489,7 @@ function showScreen(target) {
   }
 
   updateScreenVisibility({ target, navButtons, screens });
+  if (target) window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   renderBabyIdentity();
   updateBodyModeClasses();
   renderGuestPremiumContent();
