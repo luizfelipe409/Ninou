@@ -1,0 +1,50 @@
+REVISÃO v75.75.120 — Marcadores agrupados ("...") fora do arco
+=================================================================
+
+PROBLEMA RELATADO
+------------------
+No arco do "Acordado há" (tela Hoje), os marcadores individuais de
+evento (ícone de mamada, sono etc.) ficam corretamente em cima da
+linha do arco, mas os marcadores de AGRUPAMENTO ("..." — quando há
+vários registros próximos no tempo) apareciam deslocados para dentro
+do arco, fora da linha.
+
+CAUSA
+-----
+js/app.legacy.js, função getOrbitGroups(): quando dois ou mais
+registros ficam próximos o suficiente para virar um único marcador de
+agrupamento, a posição do marcador era calculada fazendo a MÉDIA
+ARITMÉTICA direta das coordenadas x/y de cada membro:
+
+  x = média(x1, x2, ...)
+  y = média(y1, y2, ...)
+
+Como cada posição individual já fica sobre uma circunferência (raio
+fixo de 132px), a média aritmética de dois ou mais pontos de uma
+circunferência NÃO fica sobre a própria circunferência — ela cai no
+meio da corda que liga os pontos, ou seja, sempre um pouco (ou muito,
+se os eventos do grupo cobrem um intervalo de horário maior) mais
+para dentro do centro do círculo. Isso é o que fazia os "..."
+aparecerem fora da linha do arco.
+
+CORREÇÃO
+--------
+Foi adicionada a função getOrbitGroupPosition(), que em vez de tirar a
+média de x/y, tira a média do ÂNGULO de cada membro do grupo (via
+atan2, com média circular usando seno/cosseno para evitar problemas de
+wrap-around) e então recalcula x/y projetando esse ângulo médio de
+volta no MESMO raio (132px) usado por todos os outros marcadores.
+Assim, o marcador de agrupamento sempre cai exatamente sobre a linha
+do arco, como qualquer evento individual.
+
+Um teste numérico rápido confirmou o problema e a correção: dois
+eventos a 10° de diferença no arco, com o cálculo antigo, resultavam
+em um ponto a ~131,5px do centro (fora do raio de 132px); com o
+cálculo novo, o ponto fica em exatamente 132,0px — ou seja, sobre a
+linha.
+
+ARQUIVOS ALTERADOS
+-------------------
+- js/app.legacy.js (getOrbitGroups, nova função
+  getOrbitGroupPosition, constante compartilhada ORBIT_RADIUS)
+- index.html / sw.js: versão de cache bumpada para 75.75.120

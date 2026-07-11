@@ -9797,6 +9797,8 @@ function renderCurrentState() {
   renderActiveTimerCard();
 }
 
+const ORBIT_RADIUS = 132;
+
 function eventPosition(timestamp) {
   const [hourValue, minuteValue] = String(formatTime(timestamp)).split(":").map(Number);
   const minutes = (Number.isFinite(hourValue) ? hourValue : 0) * 60 + (Number.isFinite(minuteValue) ? minuteValue : 0);
@@ -9804,10 +9806,9 @@ function eventPosition(timestamp) {
   const startAngle = 142;
   const arcSize = 256;
   const angle = ((startAngle + progress * arcSize) * Math.PI) / 180;
-  const radius = 132;
   return {
-    x: Math.round(Math.cos(angle) * radius),
-    y: Math.round(Math.sin(angle) * radius),
+    x: Math.round(Math.cos(angle) * ORBIT_RADIUS),
+    y: Math.round(Math.sin(angle) * ORBIT_RADIUS),
   };
 }
 
@@ -9831,6 +9832,21 @@ function getDistance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+function getOrbitGroupPosition(members) {
+  // Averaging x/y directly pulls the point toward the center of the circle
+  // (a chord midpoint), which is why clustered "..." markers used to float
+  // off the arc instead of sitting on it. Averaging the angle instead keeps
+  // the marker exactly on the ring, like every individual event.
+  const angles = members.map((member) => Math.atan2(member.position.y, member.position.x));
+  const avgSin = angles.reduce((total, angle) => total + Math.sin(angle), 0) / angles.length;
+  const avgCos = angles.reduce((total, angle) => total + Math.cos(angle), 0) / angles.length;
+  const avgAngle = Math.atan2(avgSin, avgCos);
+  return {
+    x: Math.round(Math.cos(avgAngle) * ORBIT_RADIUS),
+    y: Math.round(Math.sin(avgAngle) * ORBIT_RADIUS),
+  };
+}
+
 function getOrbitGroups(items) {
   const groups = [];
   const overlapDistance = 30;
@@ -9839,10 +9855,7 @@ function getOrbitGroups(items) {
     const group = groups.find((candidate) => candidate.items.some((member) => getDistance(member.position, item.position) <= overlapDistance));
     if (group) {
       group.items.push(item);
-      group.position = {
-        x: Math.round(group.items.reduce((total, member) => total + member.position.x, 0) / group.items.length),
-        y: Math.round(group.items.reduce((total, member) => total + member.position.y, 0) / group.items.length),
-      };
+      group.position = getOrbitGroupPosition(group.items);
       return;
     }
 
