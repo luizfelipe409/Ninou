@@ -1,4 +1,4 @@
-Ninou v76.0.0 — órbita cronológica de 24 horas corrigida
+Ninou v76.0.1 — órbita cronológica de 24 horas corrigida
 
 - 00:00 inicia o arco e 23:59 termina no fim do arco.
 - Eventos que atravessam a meia-noite entram no início do arco do dia atual.

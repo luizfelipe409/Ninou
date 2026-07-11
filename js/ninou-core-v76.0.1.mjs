@@ -401,7 +401,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "76.0.0";
+const NINOU_RUNTIME_VERSION = "76.0.1";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3414,7 +3414,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v76.0.0 — as observações do dia também recebem um armazenamento dedicado.
+// v76.0.1 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -10177,23 +10177,25 @@ function getOrbitGroupPosition(members) {
 function getOrbitGroups(items) {
   const ordered = [...items].sort((a, b) => Number(a.event?.start || 0) - Number(b.event?.start || 0));
   const groups = [];
-  const maxVisualDistance = 34;
-  const maxTimeGapMs = 35 * 60 * 1000;
+  // Diâmetro visual do ícone (38px) + folga para borda/sombra/badge.
+  // O agrupamento acontece exclusivamente quando os marcadores colidem no arco.
+  const collisionDistance = 46;
 
   ordered.forEach((item) => {
-    const previousGroup = groups[groups.length - 1];
-    const previousItem = previousGroup?.items?.[previousGroup.items.length - 1];
-    const closeInTime = previousItem && Math.abs(Number(item.event?.start || 0) - Number(previousItem.event?.start || 0)) <= maxTimeGapMs;
-    const visuallyColliding = previousItem && getDistance(previousItem.position, item.position) <= maxVisualDistance;
-    if (previousGroup && closeInTime && visuallyColliding) {
-      previousGroup.items.push(item);
-      previousGroup.position = getOrbitGroupPosition(previousGroup.items);
+    const touchingGroup = groups.find((group) =>
+      group.items.some((member) => getDistance(member.position, item.position) <= collisionDistance)
+    );
+
+    if (touchingGroup) {
+      touchingGroup.items.push(item);
+      touchingGroup.position = getOrbitGroupPosition(touchingGroup.items);
       return;
     }
+
     groups.push({ items: [item], position: item.position });
   });
 
-  return groups;
+  return groups.sort((a, b) => Number(a.items[0]?.event?.start || 0) - Number(b.items[0]?.event?.start || 0));
 }
 
 function createOrbitEvent(event, active = false, position = eventPosition(event.start)) {
@@ -10205,10 +10207,8 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
 
   const icon = document.createElement("i");
   icon.innerHTML = config.icon;
-  const label = document.createElement("b");
-  label.textContent = formatTime(event.start);
 
-  item.append(icon, label);
+  item.append(icon);
   item.title = `${config.title} às ${formatTime(event.start)}`;
   item.setAttribute("aria-label", `${config.title} às ${formatTime(event.start)}`);
   return item;
@@ -10224,14 +10224,11 @@ function createOrbitCluster(group) {
   button.style.setProperty("--y", `${group.position.y}px`);
   button.title = `${eventList.length} registros próximos`;
   button.setAttribute("aria-label", `${eventList.length} registros próximos no arco`);
-  const firstTime = formatTime(eventList[0].start);
-  const lastTime = formatTime(eventList[eventList.length - 1].start);
   button.innerHTML = `
     <i class="orbit-cluster-icon">
       ${config.icon}
       <span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>
     </i>
-    <b>${firstTime === lastTime ? firstTime : `${firstTime}–${lastTime}`}</b>
   `;
   button.addEventListener("click", () => openOrbitCluster(eventList));
   return button;
@@ -14411,7 +14408,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=76.0.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=76.0.1", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

@@ -1,4 +1,4 @@
-Ninou v76.0.0 — Home Premium Refactor
+Ninou v76.0.1 — Home Premium Refactor
 
 - Motor da órbita restaurado e isolado da camada visual.
 - Linha do tempo real de 24 horas: 00:00 no início e 23:59 no fim do arco.

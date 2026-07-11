@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v76.0.0 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v76.0.1 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v76.0.0 =====
+/* ===== BARRA INFERIOR CANÔNICA — v76.0.1 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v76.0.0 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v76.0.1 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v76.0.0 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v76.0.1 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v76.0.0 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v76.0.1 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v76.0.0 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v76.0.1 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v76.0.0 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v76.0.1 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v76.0.0 — layout premium baseado no preview aprovado ===== */
+/* ===== v76.0.1 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29890,7 +29890,7 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
 }
 
 
-/* ===== v76.0.0 — escala móvel fiel ao preview aprovado ===== */
+/* ===== v76.0.1 — escala móvel fiel ao preview aprovado ===== */
 
 html body.family-daily-surface .app-header {
   grid-template-columns: minmax(0, 1fr) 118px !important;
@@ -30152,7 +30152,7 @@ html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] 
 
 
 /* ==========================================================================
-   v76.0.0 — órbita premium + alinhamento dos registros rápidos
+   v76.0.1 — órbita premium + alinhamento dos registros rápidos
    ========================================================================== */
 
 html body.family-daily-surface .quick-actions button[data-open-sheet] {
@@ -30262,7 +30262,7 @@ html body.family-daily-surface .state-orbit .orbit-events {
 
 
 /* ========================================================================== 
-   v76.0.0 — órbita cronológica em tempo real + timeline legível
+   v76.0.1 — órbita cronológica em tempo real + timeline legível
    ========================================================================== */
 
 /* Registros rápidos: ícone e texto realmente centralizados no card. */
@@ -30390,7 +30390,7 @@ html body.family-daily-surface .state-orbit .orbit-event.active > i {
 
 
 /* ==========================================================================
-   v76.0.0 — órbita cronológica canônica de 24 horas
+   v76.0.1 — órbita cronológica canônica de 24 horas
    00:00 no início do arco; 23:59 no final; relógio em área central segura.
    ========================================================================== */
 
@@ -30606,7 +30606,7 @@ html body:not(.day-theme).family-daily-surface .state-orbit .orbit-cluster-count
 }
 
 
-/* ==========================================================================\n   Ninou v76.0.0 — Home Premium V2 (camadas isoladas)\n   ========================================================================== */
+/* ==========================================================================\n   Ninou v76.0.1 — Home Premium V2 (camadas isoladas)\n   ========================================================================== */
 html body.family-daily-surface .screen[data-screen="today"] {
   --home-orbit-size: min(78vw, 330px);
   --home-orbit-radius: 118px;
@@ -30809,4 +30809,39 @@ html body.family-daily-surface .quick-actions button[data-open-sheet]::before {
   html body.family-daily-surface .screen[data-screen="today"] { --home-orbit-size: 290px; }
   html body.family-daily-surface .screen[data-screen="today"] > .state-orbit { min-height: 338px !important; }
   html body.family-daily-surface .state-orbit > #stateClock { font-size: clamp(2.35rem, 10.6vw, 3.3rem) !important; }
+}
+
+
+/* ========================================================================== 
+   v76.0.1 — órbita proporcional sem rótulos de horário
+   ========================================================================== */
+html body.family-daily-surface .state-orbit .orbit-event {
+  display: grid !important;
+  grid-template-rows: 42px !important;
+  place-items: center !important;
+  min-width: 42px !important;
+  width: 42px !important;
+  height: 42px !important;
+  gap: 0 !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event > b {
+  display: none !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-event i,
+html body.family-daily-surface .state-orbit .orbit-cluster-icon {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster {
+  cursor: pointer !important;
+}
+
+html body.family-daily-surface .state-orbit .orbit-cluster-count {
+  right: -7px !important;
+  top: -7px !important;
+  min-width: 21px !important;
+  height: 21px !important;
 }
