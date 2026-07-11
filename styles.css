@@ -30068,3 +30068,51 @@ html body.day-theme .orbit-cluster i {
 html body .main-action-area .primary-action .action-icon {
   overflow: hidden !important;
 }
+
+/* v75.75.114 alinhamento premium do botao + com a barra de navegacao */
+/* Antes: .fab e .bottom-nav eram dois elementos fixed independentes,
+   cada um com seu proprio bottom/right calculado a mao — por isso o +
+   ficava flutuando bem acima da barra, fora do eixo dos icones.
+   Agora os dois vivem dentro de um unico wrapper flex, entao ficam
+   sempre na mesma linha, com o mesmo centro vertical, em qualquer tema
+   ou tamanho de tela. */
+html body .bottom-bar {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  transform: translateX(-50%) !important;
+  z-index: 7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: min(calc(100% - 24px), 430px) !important;
+  max-width: calc(100vw - 16px) !important;
+}
+
+html body .bottom-bar .bottom-nav {
+  position: static !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+html body .bottom-bar .fab.fab-real-plus,
+html body .bottom-bar button.fab.icon-button-add {
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  top: auto !important;
+  transform: none !important;
+  flex: 0 0 auto !important;
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+}

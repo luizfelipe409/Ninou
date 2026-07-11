@@ -9798,12 +9798,16 @@ function renderCurrentState() {
 }
 
 const ORBIT_RADIUS = 132;
+// .orbit-ring is visually rotated 17deg via CSS (transform: rotate(17deg)).
+// Event icons are positioned in an unrotated coordinate space, so without
+// adding this same offset here, every icon lands 17deg off the drawn arc.
+const ORBIT_RING_ROTATION_DEG = 17;
 
 function eventPosition(timestamp) {
   const [hourValue, minuteValue] = String(formatTime(timestamp)).split(":").map(Number);
   const minutes = (Number.isFinite(hourValue) ? hourValue : 0) * 60 + (Number.isFinite(minuteValue) ? minuteValue : 0);
   const progress = minutes / 1440;
-  const startAngle = 142;
+  const startAngle = 142 + ORBIT_RING_ROTATION_DEG;
   const arcSize = 256;
   const angle = ((startAngle + progress * arcSize) * Math.PI) / 180;
   return {
