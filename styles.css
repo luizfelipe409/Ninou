@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v76.1.0 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v76.1.1 ===== */
 
 
 * {
@@ -31066,7 +31066,8 @@ html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.liv
 }
 
 html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events {
-  inset: auto !important;
+  right: auto !important;
+  bottom: auto !important;
   z-index: 5 !important;
   pointer-events: none !important;
 }

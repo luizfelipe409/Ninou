@@ -48,6 +48,7 @@ const activeTimerAction = document.querySelector("#activeTimerAction");
 const orbitEvents = document.querySelector("#orbitEvents");
 const orbitDurationArcs = document.querySelector("#orbitDurationArcs");
 const orbitTimelineSvg = document.querySelector("#orbitTimelineSvg");
+const orbitNowDot = document.querySelector(".orbit-now-dot");
 const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
 const orbitClusterSheet = document.querySelector("#orbitClusterSheet");
@@ -403,7 +404,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "76.1.0";
+const NINOU_RUNTIME_VERSION = "76.1.1";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -10147,6 +10148,13 @@ function eventPosition(timestamp) {
   return orbitPointForMinute(getOrbitMinuteOfDay(timestamp));
 }
 
+function updateOrbitNowDot(timestamp = Date.now()) {
+  if (!orbitNowDot) return;
+  const position = eventPosition(timestamp);
+  orbitNowDot.setAttribute("cx", position.svgX.toFixed(2));
+  orbitNowDot.setAttribute("cy", position.svgY.toFixed(2));
+}
+
 function getOrbitPixelScale() {
   const box = orbitTimelineSvg?.getBoundingClientRect?.();
   const width = Number(box?.width);
@@ -10305,6 +10313,7 @@ function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, l
 function renderOrbit() {
   if (!orbitEvents) return;
   const now = Date.now();
+  updateOrbitNowDot(now);
   const orbitStart = getDayStart(now);
   const orbitEnd = orbitStart + day;
   const dayEvents = getFamilyEventsForWindow(orbitStart, orbitEnd)
@@ -11895,6 +11904,7 @@ function renderAll() {
 function renderLiveTick() {
   reconcileCurrentAwakeStateFromEvents();
   updateTheme();
+  updateOrbitNowDot(Date.now());
 
   if (!canUsePrivateFeatures()) return;
 
@@ -11928,6 +11938,7 @@ function renderLiveTick() {
   if (currentMinute === liveTickMinute) return;
 
   liveTickMinute = currentMinute;
+  if (state.mode === "sleeping") renderOrbit();
   setText(stateHint, getWakeWindowText());
   renderSummary();
   renderIntelligentHomeSections();
@@ -14457,7 +14468,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=76.1.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=76.1.1", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
