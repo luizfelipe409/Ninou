@@ -1,12 +1,12 @@
-const CACHE_NAME = "ninou-v76-1-1-live-orbit-fix";
-const APP_VERSION = "76.1.1";
+const CACHE_NAME = "ninou-v76-1-4-orbit-count-sun";
+const APP_VERSION = "76.1.4";
 
 const APP_SHELL = [
   "/",
   "/index.html",
   `/styles.css?v=${APP_VERSION}`,
-  `/js/boot-v76.1.1.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v76.1.1.mjs?v=${APP_VERSION}`,
+  `/js/boot-v76.1.4.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v76.1.4.mjs?v=${APP_VERSION}`,
   "/app.js",
   "/js/app.js",
   "/js/app.legacy.js",

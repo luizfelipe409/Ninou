@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v76.1.1 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v76.1.4 ===== */
 
 
 * {
@@ -31262,3 +31262,170 @@ html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.liv
     min-height: 39px !important;
   }
 }
+
+/* ========================================================================== 
+   v76.1.4 — CONTADOR DE AGRUPAMENTO VISÍVEL + SOL REAL NO TEMA CLARO
+   Regra final e autoritativa para a órbita viva. O contador fica fora da arte
+   do ícone (sem disputar espaço com o detalhe decorativo dos PNGs) e o fundo
+   claro passa a ter disco solar e raios reconhecíveis, sem cobrir a timeline.
+   ========================================================================== */
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker.orbit-cluster {
+  position: absolute !important;
+  overflow: visible !important;
+  isolation: isolate !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker.orbit-cluster > .orbit-cluster-icon {
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: hidden !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker.orbit-cluster > .orbit-cluster-count {
+  position: absolute !important;
+  top: -10px !important;
+  right: -12px !important;
+  z-index: 40 !important;
+  min-width: 25px !important;
+  height: 25px !important;
+  padding: 0 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  border: 2px solid #7655c5 !important;
+  border-radius: 999px !important;
+  background: #fffdfb !important;
+  color: #4d347d !important;
+  -webkit-text-fill-color: #4d347d !important;
+  font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif !important;
+  font-size: 0.76rem !important;
+  font-weight: 1000 !important;
+  font-variant-numeric: tabular-nums !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  box-shadow:
+    0 5px 12px rgba(48, 31, 91, 0.28),
+    0 0 0 2px rgba(255, 255, 255, 0.72) !important;
+}
+
+html body:not(.day-theme).family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker.orbit-cluster > .orbit-cluster-count {
+  border-color: #7be6c5 !important;
+  background: #b8f4df !important;
+  color: #17132f !important;
+  -webkit-text-fill-color: #17132f !important;
+  box-shadow:
+    0 6px 14px rgba(5, 4, 24, 0.42),
+    0 0 0 2px rgba(19, 15, 43, 0.9) !important;
+}
+
+html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit {
+  background:
+    radial-gradient(circle at 15% 16%, rgba(255, 205, 94, 0.20) 0 12%, transparent 31%),
+    radial-gradient(circle at 84% 82%, rgba(129, 102, 214, 0.10), transparent 37%),
+    linear-gradient(158deg, #fffdf7 0%, #fbf8ff 53%, #f3efff 100%) !important;
+  border-color: rgba(126, 97, 190, 0.13) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 18px 42px rgba(91, 64, 126, 0.11) !important;
+}
+
+html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: auto !important;
+  top: 20px !important;
+  left: 18px !important;
+  width: 66px !important;
+  height: 66px !important;
+  z-index: 0 !important;
+  display: block !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 236, 0.98) 0 8%, transparent 9%),
+    radial-gradient(circle at 50% 50%, #ffeaa9 0 30%, #ffd36f 58%, #f7b642 100%) !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  box-shadow:
+    0 0 0 9px rgba(255, 211, 116, 0.14),
+    0 0 28px 10px rgba(255, 191, 73, 0.30),
+    inset -7px -8px 14px rgba(223, 145, 34, 0.14),
+    inset 6px 5px 10px rgba(255, 255, 235, 0.45) !important;
+  animation: ninouSunPulse 7s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+}
+
+html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: auto !important;
+  top: -2px !important;
+  left: -4px !important;
+  width: 112px !important;
+  height: 112px !important;
+  z-index: 0 !important;
+  display: block !important;
+  border-radius: 50% !important;
+  background: repeating-conic-gradient(
+    from 8deg,
+    rgba(246, 177, 52, 0.48) 0 7deg,
+    transparent 7deg 27deg
+  ) !important;
+  -webkit-mask: radial-gradient(circle, transparent 0 38%, #000 39% 57%, transparent 58%) !important;
+  mask: radial-gradient(circle, transparent 0 38%, #000 39% 57%, transparent 58%) !important;
+  opacity: 0.42 !important;
+  mix-blend-mode: multiply !important;
+  filter: none !important;
+  animation: ninouSunRays 32s linear infinite !important;
+  pointer-events: none !important;
+}
+
+@keyframes ninouSunPulse {
+  from { transform: scale(0.98); filter: saturate(0.98); }
+  to { transform: scale(1.035); filter: saturate(1.06); }
+}
+
+@keyframes ninouSunRays {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker.orbit-cluster > .orbit-cluster-count {
+    top: -9px !important;
+    right: -11px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    font-size: 0.72rem !important;
+  }
+
+  html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::before {
+    top: 18px !important;
+    left: 16px !important;
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::after {
+    top: -1px !important;
+    left: -3px !important;
+    width: 98px !important;
+    height: 98px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::before,
+  html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::after {
+    animation: none !important;
+  }
+}
+

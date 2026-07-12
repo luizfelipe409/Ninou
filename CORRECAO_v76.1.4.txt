@@ -1,0 +1,7 @@
+NINOU v76.1.4 — ÓRBITA CLARA E CONTADOR DE AGRUPAMENTO
+
+1. O contador de ações agrupadas foi retirado de dentro da arte do ícone.
+2. A quantidade agora aparece em um badge externo, maior, com contraste forte e sem corte.
+3. A distância de colisão subiu de 46 para 54 unidades para agrupar antes de os ícones se sobreporem.
+4. O tema claro recebeu um sol reconhecível: disco, brilho e raios sutis no fundo do relógio.
+5. Cache/PWA atualizado para 76.1.4, evitando reaproveitar CSS e JavaScript antigos.
