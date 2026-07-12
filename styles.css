@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v76.0.1 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v76.1.0 ===== */
 
 
 * {
@@ -28239,7 +28239,7 @@ html body.family-daily-surface .record-scroll-hint {
 
 /* Ao abrir um sheet, somente a barra de ação do próprio modal permanece visível. */
 
-/* ===== BARRA INFERIOR CANÔNICA — v76.0.1 =====
+/* ===== BARRA INFERIOR CANÔNICA — v76.1.0 =====
    Única implementação de navegação do projeto. A barra, os cinco atalhos e o
    botão de novo registro pertencem ao mesmo componente e à mesma superfície. */
 
@@ -28501,7 +28501,7 @@ html body .bottom-bar[hidden] {
 
 
 
-/* ===== OBSERVAÇÕES PREMIUM — v76.0.1 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — v76.1.0 ===== */
 
 .day-notes-card {
   position: relative;
@@ -28681,7 +28681,7 @@ html body .bottom-bar[hidden] {
   }
 }
 
-/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v76.0.1 ===== */
+/* ===== MODAL PREMIUM DE OBSERVAÇÕES — v76.1.0 ===== */
 .premium-observation-chips button {
   display: inline-flex;
   align-items: center;
@@ -28968,7 +28968,7 @@ body.day-theme .day-note-modal-field input[readonly] {
 }
 
 
-/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v76.0.1 ===== */
+/* ===== OBSERVAÇÕES PREMIUM — CORREÇÕES v76.1.0 ===== */
 #dayNoteEpisodeModal[hidden],
 .day-note-episode-modal[hidden] {
   display: none !important;
@@ -29046,7 +29046,7 @@ body.day-theme .day-note-modal-field input[readonly] {
   }
 }
 
-/* ===== PERFIL DO CLIENTE FINAL — v76.0.1 ===== */
+/* ===== PERFIL DO CLIENTE FINAL — v76.1.0 ===== */
 /* O painel interno nunca pode aparecer na experiência da família. */
 body:not(.global-admin-mode.admin-panel-only) #adminInvitePanel,
 body:not(.global-admin-mode.admin-panel-only) [data-global-admin-only="true"] {
@@ -29312,7 +29312,7 @@ body.profile-state-family-ready #profileReadyCard {
 
 
 /* ========================================================================== 
-   v76.0.1 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
+   v76.1.0 — ÍCONES DA ÓRBITA + SHEET DE REGISTROS PRÓXIMOS
    Corrige a ocultação involuntária dos PNGs no tema claro e separa o layout
    do orbit-cluster-sheet do grid usado pelo formulário de novo registro.
    ========================================================================== */
@@ -29544,7 +29544,7 @@ html body.family-daily-surface .orbit-cluster-sheet .cluster-card time {
 }
 
 
-/* ===== v76.0.1 — layout premium baseado no preview aprovado ===== */
+/* ===== v76.1.0 — layout premium baseado no preview aprovado ===== */
 
 html body.family-daily-surface .screen[data-screen="today"] {
   gap: 18px !important;
@@ -29890,7 +29890,7 @@ html body:not(.day-theme).family-daily-surface .orbit-cluster-sheet {
 }
 
 
-/* ===== v76.0.1 — escala móvel fiel ao preview aprovado ===== */
+/* ===== v76.1.0 — escala móvel fiel ao preview aprovado ===== */
 
 html body.family-daily-surface .app-header {
   grid-template-columns: minmax(0, 1fr) 118px !important;
@@ -30152,7 +30152,7 @@ html body.day-theme.family-daily-surface .quick-actions button[data-open-sheet] 
 
 
 /* ==========================================================================
-   v76.0.1 — órbita premium + alinhamento dos registros rápidos
+   v76.1.0 — órbita premium + alinhamento dos registros rápidos
    ========================================================================== */
 
 html body.family-daily-surface .quick-actions button[data-open-sheet] {
@@ -30262,7 +30262,7 @@ html body.family-daily-surface .state-orbit .orbit-events {
 
 
 /* ========================================================================== 
-   v76.0.1 — órbita cronológica em tempo real + timeline legível
+   v76.1.0 — órbita cronológica em tempo real + timeline legível
    ========================================================================== */
 
 /* Registros rápidos: ícone e texto realmente centralizados no card. */
@@ -30390,7 +30390,7 @@ html body.family-daily-surface .state-orbit .orbit-event.active > i {
 
 
 /* ==========================================================================
-   v76.0.1 — órbita cronológica canônica de 24 horas
+   v76.1.0 — órbita cronológica canônica de 24 horas
    00:00 no início do arco; 23:59 no final; relógio em área central segura.
    ========================================================================== */
 
@@ -30606,7 +30606,7 @@ html body:not(.day-theme).family-daily-surface .state-orbit .orbit-cluster-count
 }
 
 
-/* ==========================================================================\n   Ninou v76.0.1 — Home Premium V2 (camadas isoladas)\n   ========================================================================== */
+/* ==========================================================================\n   Ninou v76.1.0 — Home Premium V2 (camadas isoladas)\n   ========================================================================== */
 html body.family-daily-surface .screen[data-screen="today"] {
   --home-orbit-size: min(78vw, 330px);
   --home-orbit-radius: 118px;
@@ -30813,7 +30813,7 @@ html body.family-daily-surface .quick-actions button[data-open-sheet]::before {
 
 
 /* ========================================================================== 
-   v76.0.1 — órbita proporcional sem rótulos de horário
+   v76.1.0 — órbita proporcional sem rótulos de horário
    ========================================================================== */
 html body.family-daily-surface .state-orbit .orbit-event {
   display: grid !important;
@@ -30844,4 +30844,207 @@ html body.family-daily-surface .state-orbit .orbit-cluster-count {
   top: -7px !important;
   min-width: 21px !important;
   height: 21px !important;
+}
+
+
+/* ==========================================================================\n   v76.1.0 — LINHA DO TEMPO VIVA PREMIUM\n   ========================================================================== */
+html body.family-daily-surface .live-timeline-orbit {
+  position: relative !important;
+  min-height: 390px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 18px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--ui-surface) 92%, transparent) 0 34%, transparent 35%),
+    var(--ui-surface) !important;
+}
+
+html body.family-daily-surface .orbit-timeline-svg {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: min(86vw, 342px) !important;
+  height: min(86vw, 342px) !important;
+  transform: translate(-50%, -50%) !important;
+  overflow: visible !important;
+  z-index: 1 !important;
+}
+
+html body.family-daily-surface .orbit-track {
+  fill: none !important;
+  stroke: color-mix(in srgb, var(--ui-accent) 20%, var(--ui-line)) !important;
+  stroke-width: 18 !important;
+  stroke-linecap: round !important;
+}
+
+html body.family-daily-surface .orbit-duration-segment {
+  fill: none !important;
+  stroke: color-mix(in srgb, var(--ui-accent) 76%, white 24%) !important;
+  stroke-width: 18 !important;
+  stroke-linecap: round !important;
+  filter: drop-shadow(0 4px 7px color-mix(in srgb, var(--ui-accent) 22%, transparent)) !important;
+}
+
+html body.family-daily-surface .orbit-duration-segment.active {
+  stroke: #75dfbd !important;
+  stroke-dasharray: 96 4 !important;
+  animation: ninouLiveArc 2.2s linear infinite !important;
+}
+
+@keyframes ninouLiveArc {
+  to { stroke-dashoffset: -20; }
+}
+
+html body.family-daily-surface .orbit-now-dot {
+  fill: #75dfbd !important;
+  stroke: var(--ui-surface) !important;
+  stroke-width: 3 !important;
+  opacity: .9 !important;
+}
+
+html body.family-daily-surface .live-orbit-events {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: 5 !important;
+}
+
+html body.family-daily-surface .live-orbit-marker {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  transform: translate(calc(var(--x) - 25px), calc(var(--y) - 25px)) !important;
+  overflow: visible !important;
+  cursor: pointer !important;
+}
+
+html body.family-daily-surface .live-orbit-marker > i,
+html body.family-daily-surface .live-orbit-marker .orbit-cluster-icon {
+  position: relative !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 2px solid color-mix(in srgb, var(--ui-accent) 76%, white 24%) !important;
+  border-radius: 50% !important;
+  background: var(--ui-surface) !important;
+  box-shadow:
+    0 7px 18px rgba(20, 13, 46, .18),
+    0 0 0 4px color-mix(in srgb, var(--ui-accent) 12%, transparent) !important;
+  overflow: visible !important;
+}
+
+html body.family-daily-surface .live-orbit-marker i img,
+html body.family-daily-surface .live-orbit-marker i svg,
+html body.family-daily-surface .live-orbit-marker i .icon-art {
+  width: 42px !important;
+  height: 42px !important;
+  display: block !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+html body.family-daily-surface .orbit-cluster-count {
+  position: absolute !important;
+  top: -8px !important;
+  right: -8px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  padding: 0 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid var(--ui-surface) !important;
+  border-radius: 999px !important;
+  background: var(--ui-accent) !important;
+  color: var(--ui-accent-text, #fff) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: .7rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  box-shadow: 0 5px 12px rgba(31, 18, 67, .25) !important;
+}
+
+html body.family-daily-surface .orbit-center-safe {
+  position: relative !important;
+  z-index: 3 !important;
+  width: min(58vw, 220px) !important;
+  min-height: 158px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 20px 12px !important;
+  border-radius: 50% !important;
+  background: color-mix(in srgb, var(--ui-surface) 93%, transparent) !important;
+  box-shadow: 0 0 42px 24px color-mix(in srgb, var(--ui-surface) 88%, transparent) !important;
+  pointer-events: none !important;
+}
+
+html body.family-daily-surface .orbit-center-safe #stateClock {
+  max-width: 100% !important;
+  font-size: clamp(2.35rem, 10vw, 3.8rem) !important;
+  line-height: .98 !important;
+  letter-spacing: -.055em !important;
+  white-space: nowrap !important;
+}
+
+html body.family-daily-surface .orbit-center-safe #stateLabel {
+  font-size: .9rem !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+html body.family-daily-surface .orbit-center-safe #stateHint {
+  max-width: 190px !important;
+  margin-top: 8px !important;
+  font-size: .92rem !important;
+  line-height: 1.25 !important;
+}
+
+html body.family-daily-surface .orbit-time-anchor {
+  position: absolute !important;
+  z-index: 2 !important;
+  color: var(--ui-muted) !important;
+  font-size: .68rem !important;
+  font-weight: 800 !important;
+  opacity: .72 !important;
+  pointer-events: none !important;
+}
+html body.family-daily-surface .orbit-time-anchor-midnight { left: 50%; bottom: 14px; transform: translateX(-50%); }
+html body.family-daily-surface .orbit-time-anchor-morning { left: 14px; top: 50%; transform: translateY(-50%); }
+html body.family-daily-surface .orbit-time-anchor-noon { left: 50%; top: 14px; transform: translateX(-50%); }
+html body.family-daily-surface .orbit-time-anchor-evening { right: 14px; top: 50%; transform: translateY(-50%); }
+
+html body.day-theme.family-daily-surface .live-timeline-orbit {
+  background:
+    radial-gradient(circle at 16% 12%, rgba(255, 214, 123, .22), transparent 25%),
+    radial-gradient(circle at 50% 48%, rgba(255,255,255,.96) 0 34%, transparent 35%),
+    linear-gradient(180deg, #fff, #f7f2ff) !important;
+}
+
+html body:not(.day-theme).family-daily-surface .live-timeline-orbit {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(96, 74, 179, .12), transparent 37%),
+    linear-gradient(180deg, rgba(24, 19, 53, .96), rgba(13, 11, 32, .98)) !important;
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface .live-timeline-orbit { min-height: 350px !important; padding: 12px !important; }
+  html body.family-daily-surface .orbit-timeline-svg { width: min(84vw, 306px) !important; height: min(84vw, 306px) !important; }
+  html body.family-daily-surface .live-orbit-marker { width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important; transform: translate(calc(var(--x) - 22px), calc(var(--y) - 22px)) scale(.92) !important; }
+  html body.family-daily-surface .orbit-center-safe { width: min(56vw, 194px) !important; min-height: 140px !important; }
 }

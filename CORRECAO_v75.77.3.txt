@@ -1,4 +1,4 @@
-Ninou v76.0.1 — órbita cronológica restaurada
+Ninou v76.1.0 — órbita cronológica restaurada
 
 - Restaura a linha do tempo real de 24 horas na órbita.
 - Cada registro volta a ser posicionado conforme o horário em que ocorreu.

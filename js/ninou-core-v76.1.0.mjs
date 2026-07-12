@@ -46,6 +46,8 @@ const activeTimerProgress = document.querySelector("#activeTimerProgress");
 const activeTimerMeta = document.querySelector("#activeTimerMeta");
 const activeTimerAction = document.querySelector("#activeTimerAction");
 const orbitEvents = document.querySelector("#orbitEvents");
+const orbitDurationArcs = document.querySelector("#orbitDurationArcs");
+const orbitTimelineSvg = document.querySelector("#orbitTimelineSvg");
 const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
 const orbitClusterSheet = document.querySelector("#orbitClusterSheet");
@@ -401,7 +403,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "76.0.1";
+const NINOU_RUNTIME_VERSION = "76.1.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -3414,7 +3416,7 @@ function getLocalDayStateStorageKey(dayId = getCurrentDayId(), familyId = "") {
   return `${storageKeys.dayState}.${scope}.${safeDayId}`;
 }
 
-// v76.0.1 — as observações do dia também recebem um armazenamento dedicado.
+// v76.1.0 — as observações do dia também recebem um armazenamento dedicado.
 // Isso impede que uma atualização do estado da rotina, uma leitura antiga da nuvem
 // ou uma sanitização de compatibilidade apague silenciosamente o texto digitado.
 function getLocalDayNotesStorageKey(dayId = getCurrentDayId(), familyId = "") {
@@ -10115,33 +10117,45 @@ function renderCurrentState() {
   renderActiveTimerCard();
 }
 
-const ORBIT_RADIUS = 118;
-// .orbit-ring is visually rotated 17deg via CSS (transform: rotate(17deg)).
-// Event icons are positioned in an unrotated coordinate space, so without
-// adding this same offset here, every icon lands 17deg off the drawn arc.
-const ORBIT_RING_ROTATION_DEG = 17;
-const ORBIT_DAY_START_DEG = 142;
-const ORBIT_ARC_DEG = 256;
+const ORBIT_RADIUS = 126;
+const ORBIT_CENTER = 160;
+const ORBIT_COLLISION_DISTANCE = 34;
+const ORBIT_DAY_MINUTES = 1440;
 
 function getOrbitMinuteOfDay(timestamp = Date.now()) {
-  const date = new Date(Number(timestamp));
-  if (Number.isNaN(date.getTime())) return 0;
-  return (date.getHours() * 60) + date.getMinutes() + (date.getSeconds() / 60);
+  const date = new Date(Number(timestamp) || Date.now());
+  return date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
 }
 
-function eventPosition(timestamp) {
-  const minutes = Math.max(0, Math.min(1439.999, getOrbitMinuteOfDay(timestamp)));
-  const progress = minutes / 1440;
-  const angle = ((ORBIT_DAY_START_DEG + ORBIT_RING_ROTATION_DEG + progress * ORBIT_ARC_DEG) * Math.PI) / 180;
+function getOrbitAngleForMinute(minuteOfDay = 0) {
+  // 00:00 embaixo; 06:00 à esquerda; 12:00 em cima; 18:00 à direita.
+  return 90 + (Math.max(0, Math.min(ORBIT_DAY_MINUTES, Number(minuteOfDay) || 0)) / ORBIT_DAY_MINUTES) * 360;
+}
+
+function orbitPointForMinute(minuteOfDay = 0, radius = ORBIT_RADIUS) {
+  const angle = (getOrbitAngleForMinute(minuteOfDay) * Math.PI) / 180;
   return {
-    x: Math.round(Math.cos(angle) * ORBIT_RADIUS),
-    y: Math.round(Math.sin(angle) * ORBIT_RADIUS),
+    x: Math.round(Math.cos(angle) * radius),
+    y: Math.round(Math.sin(angle) * radius),
+    svgX: ORBIT_CENTER + Math.cos(angle) * radius,
+    svgY: ORBIT_CENTER + Math.sin(angle) * radius,
+    angle,
   };
 }
 
+function eventPosition(timestamp) {
+  return orbitPointForMinute(getOrbitMinuteOfDay(timestamp));
+}
+
 function getOrbitEventEnd(event) {
-  if (event.isActive) return Date.now();
-  return event.end;
+  if (event?.isActive) return Date.now();
+  return Number(event?.end) || Number(event?.start) || Date.now();
+}
+
+function isOrbitDurationEvent(event = {}) {
+  const type = String(event?.type || "").toLowerCase();
+  return (type.includes("sono") || type === "dormir" || type.includes("soneca"))
+    && getOrbitEventEnd(event) > Number(event?.start || 0) + 60 * 1000;
 }
 
 function getOrbitEventRange(event) {
@@ -10160,10 +10174,6 @@ function getDistance(a, b) {
 }
 
 function getOrbitGroupPosition(members) {
-  // Averaging x/y directly pulls the point toward the center of the circle
-  // (a chord midpoint), which is why clustered "..." markers used to float
-  // off the arc instead of sitting on it. Averaging the angle instead keeps
-  // the marker exactly on the ring, like every individual event.
   const angles = members.map((member) => Math.atan2(member.position.y, member.position.x));
   const avgSin = angles.reduce((total, angle) => total + Math.sin(angle), 0) / angles.length;
   const avgCos = angles.reduce((total, angle) => total + Math.cos(angle), 0) / angles.length;
@@ -10175,62 +10185,81 @@ function getOrbitGroupPosition(members) {
 }
 
 function getOrbitGroups(items) {
-  const ordered = [...items].sort((a, b) => Number(a.event?.start || 0) - Number(b.event?.start || 0));
   const groups = [];
-  // Diâmetro visual do ícone (38px) + folga para borda/sombra/badge.
-  // O agrupamento acontece exclusivamente quando os marcadores colidem no arco.
-  const collisionDistance = 46;
-
-  ordered.forEach((item) => {
-    const touchingGroup = groups.find((group) =>
-      group.items.some((member) => getDistance(member.position, item.position) <= collisionDistance)
-    );
-
-    if (touchingGroup) {
-      touchingGroup.items.push(item);
-      touchingGroup.position = getOrbitGroupPosition(touchingGroup.items);
-      return;
+  [...items].sort((a, b) => Number(a.event?.start || 0) - Number(b.event?.start || 0)).forEach((item) => {
+    const group = groups.find((candidate) => candidate.items.some((member) => getDistance(member.position, item.position) <= ORBIT_COLLISION_DISTANCE));
+    if (group) {
+      group.items.push(item);
+      group.position = getOrbitGroupPosition(group.items);
+    } else {
+      groups.push({ items: [item], position: item.position });
     }
-
-    groups.push({ items: [item], position: item.position });
   });
+  return groups;
+}
 
-  return groups.sort((a, b) => Number(a.items[0]?.event?.start || 0) - Number(b.items[0]?.event?.start || 0));
+function polarToCartesian(cx, cy, radius, angleDeg) {
+  const angle = (angleDeg * Math.PI) / 180;
+  return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+}
+
+function describeOrbitArc(startMinute, endMinute, radius = ORBIT_RADIUS) {
+  let start = Math.max(0, Math.min(ORBIT_DAY_MINUTES, Number(startMinute) || 0));
+  let end = Math.max(0, Math.min(ORBIT_DAY_MINUTES, Number(endMinute) || 0));
+  if (end <= start) end = Math.min(ORBIT_DAY_MINUTES, start + 1);
+  const startAngle = getOrbitAngleForMinute(start);
+  const endAngle = getOrbitAngleForMinute(end);
+  const startPoint = polarToCartesian(ORBIT_CENTER, ORBIT_CENTER, radius, startAngle);
+  const endPoint = polarToCartesian(ORBIT_CENTER, ORBIT_CENTER, radius, endAngle);
+  const largeArcFlag = end - start > ORBIT_DAY_MINUTES / 2 ? 1 : 0;
+  return `M ${startPoint.x.toFixed(2)} ${startPoint.y.toFixed(2)} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endPoint.x.toFixed(2)} ${endPoint.y.toFixed(2)}`;
+}
+
+function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
+  if (!orbitDurationArcs) return;
+  orbitDurationArcs.replaceChildren();
+  const dayEnd = orbitStart + day;
+  events.filter(isOrbitDurationEvent).forEach((event) => {
+    const startTs = Math.max(Number(event.start) || orbitStart, orbitStart);
+    const endTs = Math.min(getOrbitEventEnd(event), dayEnd);
+    if (endTs <= startTs) return;
+    const startMinute = (startTs - orbitStart) / 60000;
+    const endMinute = (endTs - orbitStart) / 60000;
+    const config = getEventConfig(event.type);
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", describeOrbitArc(startMinute, endMinute));
+    path.setAttribute("class", `orbit-duration-segment ${config.arcType}${event.isActive ? " active" : ""}`);
+    path.setAttribute("pathLength", "100");
+    orbitDurationArcs.append(path);
+  });
 }
 
 function createOrbitEvent(event, active = false, position = eventPosition(event.start)) {
   const config = getEventConfig(event.type);
-  const item = document.createElement("div");
-  item.className = `orbit-event ${config.arcType}${active ? " active" : ""}`;
-  item.style.setProperty("--x", `${position.x}px`);
-  item.style.setProperty("--y", `${position.y}px`);
-
-  const icon = document.createElement("i");
-  icon.innerHTML = config.icon;
-
-  item.append(icon);
-  item.title = `${config.title} às ${formatTime(event.start)}`;
-  item.setAttribute("aria-label", `${config.title} às ${formatTime(event.start)}`);
-  return item;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `orbit-event live-orbit-marker ${config.arcType}${active ? " active" : ""}`;
+  button.style.setProperty("--x", `${position.x}px`);
+  button.style.setProperty("--y", `${position.y}px`);
+  button.innerHTML = `<i>${config.icon}</i>`;
+  button.title = `${config.title} às ${formatTime(event.start)}`;
+  button.setAttribute("aria-label", `${config.title} às ${formatTime(event.start)}`);
+  button.addEventListener("click", () => openOrbitCluster([event], { title: config.title }));
+  return button;
 }
 
 function createOrbitCluster(group) {
   const eventList = group.items.map((item) => item.event).sort((a, b) => a.start - b.start);
-  const config = getEventConfig(eventList[0].type);
+  const config = getEventConfig(eventList[eventList.length - 1].type);
   const button = document.createElement("button");
   button.type = "button";
-  button.className = `orbit-event orbit-cluster ${config.arcType}`;
+  button.className = `orbit-event live-orbit-marker orbit-cluster ${config.arcType}`;
   button.style.setProperty("--x", `${group.position.x}px`);
   button.style.setProperty("--y", `${group.position.y}px`);
-  button.title = `${eventList.length} registros próximos`;
-  button.setAttribute("aria-label", `${eventList.length} registros próximos no arco`);
-  button.innerHTML = `
-    <i class="orbit-cluster-icon">
-      ${config.icon}
-      <span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>
-    </i>
-  `;
-  button.addEventListener("click", () => openOrbitCluster(eventList));
+  button.title = `${eventList.length} ações próximas`;
+  button.setAttribute("aria-label", `${eventList.length} ações agrupadas na linha do tempo`);
+  button.innerHTML = `<i class="orbit-cluster-icon">${config.icon}<span class="orbit-cluster-count">${eventList.length}</span></i>`;
+  button.addEventListener("click", () => openOrbitCluster(eventList, { title: `${eventList.length} ações agrupadas` }));
   return button;
 }
 
@@ -10241,7 +10270,7 @@ function getEventRenderSignature(event, options = {}) {
 function getOrbitItemSignature(item) {
   return [
     getEventRenderSignature(item.event, { active: item.active }),
-    item.active ? "active" : "done",
+    item.active ? `active-${Math.floor(Date.now() / 60000)}` : "done",
     item.position.x,
     item.position.y,
   ].join("|");
@@ -10256,53 +10285,44 @@ function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, l
 }
 
 function renderOrbit() {
+  if (!orbitEvents) return;
   const now = Date.now();
   const orbitStart = getDayStart(now);
-  const orbitEnd = Math.min(now, orbitStart + day);
+  const orbitEnd = orbitStart + day;
   const dayEvents = getFamilyEventsForWindow(orbitStart, orbitEnd)
     .filter((event) => eventOverlapsWindow(event, orbitStart, orbitEnd))
     .sort((a, b) => Number(a.start) - Number(b.start));
 
-  const items = dayEvents
-    .slice(-48)
-    .map((event) => ({
-      event,
-      active: false,
-      position: eventPosition(Math.max(Number(event.start) || orbitStart, orbitStart)),
-    }));
+  const displayEvents = dayEvents.slice(-72).map((event) => ({
+    event,
+    active: false,
+    position: eventPosition(Math.max(Number(event.start) || orbitStart, orbitStart)),
+  }));
 
+  let activeEvent = null;
   if (state.mode === "sleeping") {
     const activeStartedAt = Number(state.activeStartedAt) || now;
-    const activeEvent = {
+    activeEvent = {
       id: `active-${state.activeType || "sono"}-${Math.round(activeStartedAt)}`,
       type: state.activeType || "sono",
       start: activeStartedAt,
       end: now,
-      detail: state.activeDetail || "Timer",
+      detail: state.activeDetail || "Em andamento",
       notes: state.activeNotes || "",
       isActive: true,
     };
-    items.push({
-      event: activeEvent,
-      active: true,
-      position: eventPosition(Math.max(activeEvent.start, orbitStart)),
-    });
+    displayEvents.push({ event: activeEvent, active: true, position: eventPosition(activeStartedAt) });
   }
 
-  const nextSignature = getOrbitRenderSignature(items);
-  if (nextSignature === orbitRenderSignature) return;
+  renderOrbitDurationArcs([...dayEvents, ...(activeEvent ? [activeEvent] : [])], orbitStart);
 
+  const nextSignature = getOrbitRenderSignature(displayEvents);
+  if (nextSignature === orbitRenderSignature) return;
   orbitRenderSignature = nextSignature;
   orbitEvents.replaceChildren();
 
-  getOrbitGroups(items).forEach((group) => {
-    if (group.items.length > 1) {
-      orbitEvents.append(createOrbitCluster(group));
-      return;
-    }
-
-    const [item] = group.items;
-    orbitEvents.append(createOrbitEvent(item.event, item.active, item.position));
+  getOrbitGroups(displayEvents).forEach((group) => {
+    orbitEvents.append(group.items.length > 1 ? createOrbitCluster(group) : createOrbitEvent(group.items[0].event, group.items[0].active, group.position));
   });
 }
 
@@ -14408,7 +14428,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=76.0.1", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=76.1.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
