@@ -31048,3 +31048,70 @@ html body:not(.day-theme).family-daily-surface .live-timeline-orbit {
   html body.family-daily-surface .live-orbit-marker { width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important; transform: translate(calc(var(--x) - 22px), calc(var(--y) - 22px)) scale(.92) !important; }
   html body.family-daily-surface .orbit-center-safe { width: min(56vw, 194px) !important; min-height: 140px !important; }
 }
+
+/* v76.1.1 - keep live orbit markers locked to the SVG 24h ring. */
+html body.family-daily-surface .state-orbit.live-timeline-orbit {
+  --live-orbit-size: min(86vw, 342px);
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit .orbit-timeline-svg,
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: var(--live-orbit-size) !important;
+  height: var(--live-orbit-size) !important;
+  transform: translate(-50%, -50%) !important;
+  overflow: visible !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events {
+  inset: auto !important;
+  z-index: 5 !important;
+  pointer-events: none !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker {
+  position: absolute !important;
+  left: calc(50% + var(--x)) !important;
+  top: calc(50% + var(--y)) !important;
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+  transform: translate(-50%, -50%) !important;
+  display: grid !important;
+  place-items: center !important;
+  grid-template-rows: none !important;
+  pointer-events: auto !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker > i,
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker .orbit-cluster-icon {
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface .state-orbit.live-timeline-orbit {
+    --live-orbit-size: min(84vw, 306px);
+  }
+
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    transform: translate(-50%, -50%) scale(.92) !important;
+  }
+
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker > i,
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker .orbit-cluster-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+}

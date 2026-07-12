@@ -10147,6 +10147,26 @@ function eventPosition(timestamp) {
   return orbitPointForMinute(getOrbitMinuteOfDay(timestamp));
 }
 
+function getOrbitPixelScale() {
+  const box = orbitTimelineSvg?.getBoundingClientRect?.();
+  const width = Number(box?.width);
+  return Number.isFinite(width) && width > 0 ? width / (ORBIT_CENTER * 2) : 1;
+}
+
+function getScaledOrbitPosition(position = {}) {
+  const scale = getOrbitPixelScale();
+  return {
+    x: (Number(position.x) || 0) * scale,
+    y: (Number(position.y) || 0) * scale,
+  };
+}
+
+function applyOrbitMarkerPosition(element, position) {
+  const scaled = getScaledOrbitPosition(position);
+  element.style.setProperty("--x", `${scaled.x.toFixed(2)}px`);
+  element.style.setProperty("--y", `${scaled.y.toFixed(2)}px`);
+}
+
 function getOrbitEventEnd(event) {
   if (event?.isActive) return Date.now();
   return Number(event?.end) || Number(event?.start) || Date.now();
@@ -10239,8 +10259,7 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
   const button = document.createElement("button");
   button.type = "button";
   button.className = `orbit-event live-orbit-marker ${config.arcType}${active ? " active" : ""}`;
-  button.style.setProperty("--x", `${position.x}px`);
-  button.style.setProperty("--y", `${position.y}px`);
+  applyOrbitMarkerPosition(button, position);
   button.innerHTML = `<i>${config.icon}</i>`;
   button.title = `${config.title} às ${formatTime(event.start)}`;
   button.setAttribute("aria-label", `${config.title} às ${formatTime(event.start)}`);
@@ -10254,8 +10273,7 @@ function createOrbitCluster(group) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = `orbit-event live-orbit-marker orbit-cluster ${config.arcType}`;
-  button.style.setProperty("--x", `${group.position.x}px`);
-  button.style.setProperty("--y", `${group.position.y}px`);
+  applyOrbitMarkerPosition(button, group.position);
   button.title = `${eventList.length} ações próximas`;
   button.setAttribute("aria-label", `${eventList.length} ações agrupadas na linha do tempo`);
   button.innerHTML = `<i class="orbit-cluster-icon">${config.icon}<span class="orbit-cluster-count">${eventList.length}</span></i>`;
@@ -10277,7 +10295,7 @@ function getOrbitItemSignature(item) {
 }
 
 function getOrbitRenderSignature(items) {
-  return items.map(getOrbitItemSignature).join("||");
+  return [`scale:${getOrbitPixelScale().toFixed(4)}`, items.map(getOrbitItemSignature).join("||")].join("::");
 }
 
 function getTimelineRenderSignature(selectedStart, selectedEnd, visibleEvents, latest) {
@@ -10324,6 +10342,15 @@ function renderOrbit() {
   getOrbitGroups(displayEvents).forEach((group) => {
     orbitEvents.append(group.items.length > 1 ? createOrbitCluster(group) : createOrbitEvent(group.items[0].event, group.items[0].active, group.position));
   });
+}
+
+let orbitLayoutTimer = 0;
+function scheduleOrbitLayoutRender() {
+  window.clearTimeout(orbitLayoutTimer);
+  orbitLayoutTimer = window.setTimeout(() => {
+    orbitRenderSignature = "";
+    renderOrbit();
+  }, 120);
 }
 
 
@@ -13704,6 +13731,8 @@ if (recordForm) {
 }
 if (recordScrollHint) recordScrollHint.addEventListener("click", scrollRecordFormForward);
 window.addEventListener("resize", scheduleRecordScrollHintUpdate, { passive: true });
+window.addEventListener("resize", scheduleOrbitLayoutRender, { passive: true });
+window.addEventListener("orientationchange", scheduleOrbitLayoutRender, { passive: true });
 
 closeSheetButton.addEventListener("click", closeSheet);
 closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);
