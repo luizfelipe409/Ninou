@@ -10120,7 +10120,7 @@ function renderCurrentState() {
 
 const ORBIT_RADIUS = 126;
 const ORBIT_CENTER = 160;
-const ORBIT_COLLISION_DISTANCE = 34;
+const ORBIT_COLLISION_DISTANCE = 46;
 const ORBIT_DAY_MINUTES = 1440;
 
 function getOrbitMinuteOfDay(timestamp = Date.now()) {

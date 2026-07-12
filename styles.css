@@ -31201,3 +31201,64 @@ html body.family-daily-surface .orbit-time-anchor-evening { right: 4px !importan
 @media (max-width: 390px) {
   html body.family-daily-surface .live-timeline-orbit { min-height: 366px !important; padding: 16px !important; }
 }
+
+/* ==========================================================================
+   v76.1.3 — marcadores da orbita menores e mais discretos (menos halo),
+   pra não parecerem grandes/infantis e para o cluster (número de ações
+   agrupadas) realmente aparecer antes dos ícones se tocarem.
+   Seletor ancorado no #orbitEvents para vencer qualquer regra antiga
+   duplicada de gerações anteriores (.orbit-event solto), que tinha
+   especificidade parecida e ainda deixava os ícones em ~50-58px visuais
+   por causa do halo extra.
+   ========================================================================== */
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker > i,
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker .orbit-cluster-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-width: 1.5px !important;
+  box-shadow:
+    0 5px 12px rgba(20, 13, 46, .16),
+    0 0 0 2px color-mix(in srgb, var(--ui-accent) 10%, transparent) !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker i img,
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker i svg,
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker i .icon-art {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .orbit-cluster-count {
+  min-width: 21px !important;
+  height: 21px !important;
+  top: -6px !important;
+  right: -6px !important;
+  font-size: .64rem !important;
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker {
+    width: 39px !important;
+    height: 39px !important;
+    min-width: 39px !important;
+    min-height: 39px !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker > i,
+  html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.live-orbit-events .live-orbit-marker .orbit-cluster-icon {
+    width: 39px !important;
+    height: 39px !important;
+    min-width: 39px !important;
+    min-height: 39px !important;
+  }
+}
