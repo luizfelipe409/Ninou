@@ -31116,3 +31116,88 @@ html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.liv
     min-height: 44px !important;
   }
 }
+
+/* ==========================================================================
+   v76.1.2 — orbita: cores premium por tema, traço mais grosso,
+   badge de cluster e rótulos de hora sem sobreposição.
+   ========================================================================== */
+
+/* Gradiente teal->roxo (mesma identidade do peso/gráficos de barra),
+   ajustado por tema para manter contraste e "premium" nos dois modos. */
+html body:not(.day-theme).family-daily-surface .orbit-gradient-stop-a { stop-color: #79f3cf; }
+html body:not(.day-theme).family-daily-surface .orbit-gradient-stop-b { stop-color: #a68cff; }
+html body:not(.day-theme).family-daily-surface .orbit-gradient-active-a { stop-color: #8dffe0; }
+html body:not(.day-theme).family-daily-surface .orbit-gradient-active-b { stop-color: #75dfbd; }
+
+html body.day-theme.family-daily-surface .orbit-gradient-stop-a { stop-color: #2f9c82; }
+html body.day-theme.family-daily-surface .orbit-gradient-stop-b { stop-color: #6f55c8; }
+html body.day-theme.family-daily-surface .orbit-gradient-active-a { stop-color: #21a381; }
+html body.day-theme.family-daily-surface .orbit-gradient-active-b { stop-color: #178a6c; }
+
+/* Trilho base: mais grosso e com leve tingimento da identidade da marca,
+   mas discreto o bastante para não competir com os segmentos preenchidos. */
+html body.family-daily-surface .orbit-track {
+  stroke: color-mix(in srgb, var(--ui-accent) 26%, var(--ui-line)) !important;
+  stroke-width: 21 !important;
+}
+
+/* Segmentos preenchidos (sono/soneca/acordado) usam o gradiente da marca
+   em vez de uma cor sólida — combina com peso/gráficos e fica legível
+   tanto no tema claro quanto no escuro. */
+html body.family-daily-surface .orbit-duration-segment {
+  stroke: url(#orbitSegmentGradient) !important;
+  stroke-width: 21 !important;
+  filter: drop-shadow(0 4px 8px color-mix(in srgb, var(--ui-accent) 26%, transparent)) !important;
+}
+
+html body.family-daily-surface .orbit-duration-segment.active {
+  stroke: url(#orbitActiveGradient) !important;
+  stroke-dasharray: 96 4 !important;
+}
+
+html body:not(.day-theme).family-daily-surface .orbit-now-dot {
+  fill: #8dffe0 !important;
+}
+html body.day-theme.family-daily-surface .orbit-now-dot {
+  fill: #21a381 !important;
+}
+
+/* Badge do cluster: número em pill com o mesmo gradiente da marca. */
+html body.family-daily-surface .orbit-cluster-count {
+  min-width: 24px !important;
+  height: 24px !important;
+  padding: 0 7px !important;
+  background: linear-gradient(135deg, #79f3cf, #a68cff) !important;
+  color: #1c1533 !important;
+  font-weight: 950 !important;
+  box-shadow: 0 6px 14px rgba(31, 18, 67, .3), 0 0 0 1px rgba(255,255,255,.5) inset !important;
+}
+html body.day-theme.family-daily-surface .orbit-cluster-count {
+  background: linear-gradient(135deg, #2f9c82, #6f55c8) !important;
+  color: #fff !important;
+}
+
+/* Mais espaço radial para os marcadores nunca disputarem pixel com
+   00/06/12/18h — o anel cresce um pouco e os rótulos ganham um chip
+   sólido, sempre acima dos marcadores. */
+html body.family-daily-surface .live-timeline-orbit {
+  min-height: 408px !important;
+  padding: 22px !important;
+}
+
+html body.family-daily-surface .orbit-time-anchor {
+  z-index: 6 !important;
+  padding: 3px 7px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ui-surface) 88%, transparent) !important;
+  box-shadow: 0 3px 8px rgba(20, 13, 46, .16) !important;
+  opacity: .92 !important;
+}
+html body.family-daily-surface .orbit-time-anchor-midnight { bottom: 4px !important; }
+html body.family-daily-surface .orbit-time-anchor-morning { left: 4px !important; }
+html body.family-daily-surface .orbit-time-anchor-noon { top: 4px !important; }
+html body.family-daily-surface .orbit-time-anchor-evening { right: 4px !important; }
+
+@media (max-width: 390px) {
+  html body.family-daily-surface .live-timeline-orbit { min-height: 366px !important; padding: 16px !important; }
+}

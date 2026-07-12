@@ -69,6 +69,16 @@
 
         <section class="state-orbit live-timeline-orbit" aria-label="Linha do tempo viva de hoje em uma órbita de 24 horas">
           <svg id="orbitTimelineSvg" class="orbit-timeline-svg" viewBox="0 0 320 320" aria-hidden="true">
+            <defs>
+              <linearGradient id="orbitSegmentGradient" x1="8%" y1="0%" x2="92%" y2="100%">
+                <stop class="orbit-gradient-stop-a" offset="0%"></stop>
+                <stop class="orbit-gradient-stop-b" offset="100%"></stop>
+              </linearGradient>
+              <linearGradient id="orbitActiveGradient" x1="8%" y1="0%" x2="92%" y2="100%">
+                <stop class="orbit-gradient-active-a" offset="0%"></stop>
+                <stop class="orbit-gradient-active-b" offset="100%"></stop>
+              </linearGradient>
+            </defs>
             <circle class="orbit-track" cx="160" cy="160" r="126"></circle>
             <g id="orbitDurationArcs" class="orbit-duration-arcs"></g>
             <circle class="orbit-now-dot" cx="160" cy="286" r="4"></circle>
