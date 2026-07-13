@@ -1,0 +1,12 @@
+{
+  "name": "ninou-app",
+  "private": true,
+  "version": "78.1.0",
+  "type": "module",
+  "scripts": {
+    "check": "node tests/validate-project.mjs",
+    "test:architecture": "node tests/architecture.test.mjs",
+    "test": "npm run test:architecture && npm run check",
+    "build": "node scripts/build-production.mjs"
+  }
+}

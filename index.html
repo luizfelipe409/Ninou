@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=76.1.4" />
+    <link rel="manifest" href="./manifest.webmanifest?v=78.1.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -20,9 +20,45 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles.css?v=76.1.4" />
+    <link rel="stylesheet" href="./styles.css?v=78.1.0" />
+    <style id="ninouBootCriticalStyle">
+      html.ninou-booting, html.ninou-booting body { min-height: 100%; overflow: hidden; }
+      html.ninou-booting body > :not(#ninouBootScreen):not(script):not(style) { visibility: hidden !important; }
+      #ninouBootScreen { position: fixed; inset: 0; z-index: 2147483646; display: grid; place-items: center; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); background: radial-gradient(circle at 18% 12%, rgba(255,214,142,.45), transparent 34%), radial-gradient(circle at 84% 84%, rgba(108,218,194,.22), transparent 38%), linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); color:#29233d; font-family:Inter,ui-rounded,-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",sans-serif; transition: opacity .34s ease, visibility .34s ease; }
+      #ninouBootScreen[hidden] { display:none !important; }
+      #ninouBootScreen.is-leaving { opacity:0; visibility:hidden; pointer-events:none; }
+      .ninou-boot-card { width:min(100%,360px); text-align:center; }
+      .ninou-boot-mark { width:94px; height:94px; margin:0 auto 22px; border-radius:30px; display:grid; place-items:center; background:rgba(255,255,255,.8); box-shadow:0 24px 60px rgba(74,55,118,.16), inset 0 0 0 1px rgba(255,255,255,.9); animation:ninouBootFloat 2.4s ease-in-out infinite; }
+      .ninou-boot-mark img { width:72px; height:72px; border-radius:24px; display:block; }
+      .ninou-boot-brand { display:block; margin:0 0 7px; color:#6e55b7; font-size:13px; font-weight:900; letter-spacing:.18em; text-transform:uppercase; }
+      .ninou-boot-title { margin:0; font-size:25px; line-height:1.12; font-weight:850; letter-spacing:-.035em; }
+      .ninou-boot-status { min-height:22px; margin:12px 0 22px; color:#716b80; font-size:14px; font-weight:650; }
+      .ninou-boot-progress { width:174px; height:6px; margin:0 auto; overflow:hidden; border-radius:999px; background:rgba(96,76,145,.12); }
+      .ninou-boot-progress::after { content:""; display:block; width:42%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#6f55bb,#73d8c0); animation:ninouBootProgress 1.25s ease-in-out infinite; }
+      .ninou-boot-slow { min-height:18px; margin:14px 0 0; color:#918a9e; font-size:12px; opacity:0; transition:opacity .25s ease; }
+      .ninou-boot-slow.is-visible { opacity:1; }
+      @keyframes ninouBootFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+      @keyframes ninouBootProgress { 0%{transform:translateX(-120%)} 55%{transform:translateX(115%)} 100%{transform:translateX(260%)} }
+      @media (prefers-reduced-motion: reduce) { .ninou-boot-mark,.ninou-boot-progress::after{animation:none} }
+      @media (prefers-color-scheme: dark) {
+        #ninouBootScreen { background:radial-gradient(circle at 18% 10%,rgba(116,87,190,.28),transparent 34%),radial-gradient(circle at 82% 85%,rgba(68,179,157,.15),transparent 38%),linear-gradient(155deg,#17132b,#21183d 58%,#142b2a); color:#fff; }
+        .ninou-boot-mark{background:rgba(34,27,61,.82);box-shadow:0 24px 62px rgba(0,0,0,.3),inset 0 0 0 1px rgba(255,255,255,.1)}
+        .ninou-boot-status{color:#c7c1d5}.ninou-boot-slow{color:#a9a2b8}.ninou-boot-progress{background:rgba(255,255,255,.12)}
+      }
+    </style>
   </head>
   <body>
+    <script>document.documentElement.classList.add("ninou-booting");</script>
+    <section id="ninouBootScreen" role="status" aria-live="polite" aria-label="Carregando o Ninou">
+      <div class="ninou-boot-card">
+        <div class="ninou-boot-mark" aria-hidden="true"><img src="./icons/icon-192.png" alt="" /></div>
+        <span class="ninou-boot-brand">Ninou</span>
+        <h1 class="ninou-boot-title">Preparando o diário do bebê</h1>
+        <p id="ninouBootStatus" class="ninou-boot-status">Carregando suas informações com segurança…</p>
+        <div class="ninou-boot-progress" aria-hidden="true"></div>
+        <p id="ninouBootSlow" class="ninou-boot-slow">A conexão está demorando um pouco. Seus dados locais serão usados para abrir o app.</p>
+      </div>
+    </section>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
       <header class="app-header">
         <div class="identity">
@@ -2048,7 +2084,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v76.1.4.mjs?v=76.1.4").catch((error) => {
+      import("./js/boot-v78.1.0.mjs?v=78.1.0").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         const notice = document.createElement("div");
         notice.style.cssText = "position:fixed;inset:14px 14px auto;z-index:2147483647;padding:16px;border-radius:18px;background:#fff3f3;color:#4a1220;font:14px/1.45 system-ui;box-shadow:0 18px 48px rgba(74,18,32,.2)";

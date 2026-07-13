@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v76.1.4 ===== */
+/* ===== NINOU — ESTILOS CONSOLIDADOS v78.1.0 ===== */
 
 
 * {
@@ -31264,7 +31264,7 @@ html body.family-daily-surface .state-orbit.live-timeline-orbit #orbitEvents.liv
 }
 
 /* ========================================================================== 
-   v76.1.4 — CONTADOR DE AGRUPAMENTO VISÍVEL + SOL REAL NO TEMA CLARO
+   v77.0.0 — CONTADOR DE AGRUPAMENTO VISÍVEL + SOL REAL NO TEMA CLARO
    Regra final e autoritativa para a órbita viva. O contador fica fora da arte
    do ícone (sem disputar espaço com o detalhe decorativo dos PNGs) e o fundo
    claro passa a ter disco solar e raios reconhecíveis, sem cobrir a timeline.
@@ -31429,3 +31429,675 @@ html body.day-theme.family-daily-surface .state-orbit.live-timeline-orbit::after
   }
 }
 
+
+/* ===== NINOU v77.0.0 — BARREIRA DE INICIALIZAÇÃO ===== */
+html:not(.ninou-booting) .phone-shell { animation: ninouAppReveal .34s ease both; }
+@keyframes ninouAppReveal { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) { html:not(.ninou-booting) .phone-shell { animation:none; } }
+
+/* ========================================================================== 
+   NINOU v77.0.0 — ETAPA 1/4: FUNDAÇÃO VISUAL + HOME PREMIUM
+   Passagem de acabamento sem alterar a lógica de registros.
+   ========================================================================== */
+:root {
+  --ninou-space-1: 4px;
+  --ninou-space-2: 8px;
+  --ninou-space-3: 12px;
+  --ninou-space-4: 16px;
+  --ninou-space-5: 20px;
+  --ninou-space-6: 24px;
+  --ninou-radius-sm: 14px;
+  --ninou-radius-md: 20px;
+  --ninou-radius-lg: 28px;
+  --ninou-radius-pill: 999px;
+  --ninou-shadow-soft: 0 10px 30px rgba(72, 52, 88, .08);
+  --ninou-shadow-card: 0 18px 42px rgba(72, 52, 88, .11);
+  --ninou-shadow-float: 0 20px 48px rgba(72, 52, 88, .16);
+  --ninou-line: rgba(105, 83, 128, .10);
+  --ninou-ease-premium: cubic-bezier(.22, 1, .36, 1);
+}
+
+html body.family-daily-surface .phone-shell.premium-final-shell {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(255, 224, 171, .22), transparent 27%),
+    radial-gradient(circle at 90% 14%, rgba(116, 216, 193, .13), transparent 25%),
+    linear-gradient(180deg, #fffdfb 0%, #fbf8ff 48%, #f8f7fb 100%);
+}
+
+html body.family-daily-surface .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  min-height: 72px;
+  padding: 14px 18px 12px;
+  background: rgba(255, 253, 251, .82);
+  border-bottom: 1px solid rgba(112, 87, 133, .08);
+  box-shadow: 0 8px 24px rgba(73, 53, 87, .045);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  backdrop-filter: blur(22px) saturate(1.25);
+}
+html body.family-daily-surface .app-header .identity { gap: 11px; }
+html body.family-daily-surface .app-header .identity img {
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(83, 61, 116, .16), inset 0 0 0 1px rgba(255,255,255,.7);
+}
+html body.family-daily-surface .app-header .identity span {
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .72;
+}
+html body.family-daily-surface .app-header .identity strong {
+  display: block;
+  margin-top: 1px;
+  font-size: 17px;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+html body.family-daily-surface .sync-pill {
+  min-height: 34px;
+  padding-inline: 12px;
+  border-radius: var(--ninou-radius-pill);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: .01em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.42), 0 6px 18px rgba(64, 51, 80, .08);
+}
+
+html body.family-daily-surface [data-screen="today"] {
+  padding-top: 8px;
+  padding-inline: 16px;
+}
+html body.family-daily-surface .today-topline {
+  min-height: 36px;
+  margin: 2px 2px 8px;
+  padding: 0 2px;
+}
+html body.family-daily-surface .today-topline > span {
+  font-size: 13px;
+  font-weight: 690;
+  letter-spacing: -.01em;
+}
+html body.family-daily-surface .ghost-link {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: var(--ninou-radius-pill);
+  font-weight: 760;
+  transition: transform .2s var(--ninou-ease-premium), background .2s ease;
+}
+html body.family-daily-surface .ghost-link:active { transform: scale(.96); }
+
+html body.family-daily-surface .state-orbit.live-timeline-orbit {
+  margin-top: 2px !important;
+  margin-bottom: 14px !important;
+  filter: drop-shadow(0 22px 34px rgba(76, 54, 91, .10));
+  transform: translateZ(0);
+}
+html body.family-daily-surface .state-orbit.live-timeline-orbit .orbit-center-safe {
+  width: 52%;
+  min-width: 154px;
+  padding: 18px 14px 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.94), rgba(255,255,255,.70) 72%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.76), 0 12px 32px rgba(80,61,99,.08);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+html body.family-daily-surface .state-orbit #stateLabel {
+  font-size: 12px;
+  font-weight: 780;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+}
+html body.family-daily-surface .state-orbit #stateClock {
+  margin-top: 4px;
+  font-size: clamp(31px, 9vw, 42px);
+  line-height: .98;
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+}
+html body.family-daily-surface .state-orbit #stateHint {
+  max-width: 190px;
+  margin: 9px auto 0;
+  font-size: 12px;
+  line-height: 1.38;
+  opacity: .76;
+}
+html body.family-daily-surface .orbit-time-anchor span {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: var(--ninou-radius-pill);
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 6px 16px rgba(72,53,87,.10), inset 0 0 0 1px rgba(113,87,131,.09);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+html body.family-daily-surface .main-action-area { margin: 0 0 18px; }
+html body.family-daily-surface .primary-action {
+  min-height: 62px;
+  border-radius: 22px;
+  font-size: 16px;
+  font-weight: 820;
+  letter-spacing: -.015em;
+  box-shadow: 0 16px 34px rgba(89, 64, 137, .22), inset 0 1px 0 rgba(255,255,255,.35);
+  transition: transform .22s var(--ninou-ease-premium), box-shadow .22s ease;
+}
+html body.family-daily-surface .primary-action:active {
+  transform: translateY(1px) scale(.985);
+  box-shadow: 0 9px 22px rgba(89, 64, 137, .18), inset 0 1px 0 rgba(255,255,255,.32);
+}
+html body.family-daily-surface .start-choice {
+  gap: 10px;
+  padding: 5px;
+  border-radius: 25px;
+  background: rgba(255,255,255,.66);
+  box-shadow: var(--ninou-shadow-soft), inset 0 0 0 1px rgba(106,83,128,.08);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+html body.family-daily-surface .start-choice button {
+  min-height: 58px;
+  border-radius: 19px;
+  transition: transform .2s var(--ninou-ease-premium), box-shadow .2s ease, background .2s ease;
+}
+html body.family-daily-surface .start-choice button:active { transform: scale(.975); }
+
+html body.family-daily-surface .today-overview-card,
+html body.family-daily-surface .smart-insight-card,
+html body.family-daily-surface .routine-correction-card,
+html body.family-daily-surface .growth-card,
+html body.family-daily-surface .last-card {
+  border-radius: var(--ninou-radius-lg) !important;
+  border: 1px solid var(--ninou-line) !important;
+  box-shadow: var(--ninou-shadow-card) !important;
+  overflow: hidden;
+}
+html body.family-daily-surface .today-overview-card {
+  position: relative;
+  padding: 20px;
+  background:
+    radial-gradient(circle at 92% 5%, rgba(255,215,153,.18), transparent 34%),
+    linear-gradient(145deg, rgba(255,255,255,.97), rgba(250,247,255,.94));
+}
+html body.family-daily-surface .today-overview-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #8a6bd8, #73d7c0);
+  opacity: .88;
+}
+html body.family-daily-surface .today-overview-head { margin-bottom: 15px; }
+html body.family-daily-surface .today-overview-head span {
+  font-size: 11px;
+  font-weight: 790;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+html body.family-daily-surface .today-overview-head strong {
+  margin-top: 3px;
+  font-size: 21px;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+html body.family-daily-surface .today-overview-grid {
+  gap: 10px;
+}
+html body.family-daily-surface .today-overview-grid article {
+  min-height: 82px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.72);
+  box-shadow: inset 0 0 0 1px rgba(104,80,126,.075), 0 8px 18px rgba(75,55,91,.045);
+}
+html body.family-daily-surface .today-overview-grid article span {
+  font-size: 11px;
+  line-height: 1.25;
+  opacity: .68;
+}
+html body.family-daily-surface .today-overview-grid article strong {
+  margin-top: 7px;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+}
+html body.family-daily-surface .today-overview-suggestion {
+  margin: 14px 0 0;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: rgba(112, 91, 160, .075);
+  line-height: 1.45;
+}
+
+html body.family-daily-surface .bottom-nav {
+  left: 12px;
+  right: 12px;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: auto;
+  min-height: 72px;
+  padding: 8px 7px;
+  border: 1px solid rgba(112,89,132,.12);
+  border-radius: 25px;
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 20px 48px rgba(64,48,78,.17), inset 0 1px 0 rgba(255,255,255,.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.25);
+  backdrop-filter: blur(24px) saturate(1.25);
+}
+html body.family-daily-surface .bottom-nav button {
+  min-height: 54px;
+  border-radius: 18px;
+  gap: 3px;
+  transition: transform .22s var(--ninou-ease-premium), background .22s ease, color .22s ease;
+}
+html body.family-daily-surface .bottom-nav button:active { transform: scale(.94); }
+html body.family-daily-surface .bottom-nav button.active {
+  background: linear-gradient(145deg, rgba(126,99,195,.16), rgba(87,192,169,.12));
+  box-shadow: inset 0 0 0 1px rgba(113,88,171,.10);
+}
+html body.family-daily-surface .bottom-nav .nav-symbol {
+  font-size: 20px;
+  line-height: 1;
+}
+html body.family-daily-surface .bottom-nav button > span:last-child {
+  font-size: 10px;
+  font-weight: 780;
+  letter-spacing: .01em;
+}
+
+/* Tema escuro: mantém a mesma hierarquia e profundidade sem clarear demais. */
+html body.dark-theme.family-daily-surface .phone-shell.premium-final-shell {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(136,101,214,.15), transparent 28%),
+    radial-gradient(circle at 90% 14%, rgba(74,190,165,.08), transparent 26%),
+    linear-gradient(180deg, #17142a 0%, #1d1832 50%, #161725 100%);
+}
+html body.dark-theme.family-daily-surface .app-header,
+html body.dark-theme.family-daily-surface .bottom-nav {
+  background: rgba(28,24,47,.82);
+  border-color: rgba(255,255,255,.08);
+}
+html body.dark-theme.family-daily-surface .state-orbit.live-timeline-orbit .orbit-center-safe {
+  background: radial-gradient(circle at 50% 28%, rgba(45,37,72,.94), rgba(31,27,51,.76) 72%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.075), 0 14px 34px rgba(0,0,0,.22);
+}
+html body.dark-theme.family-daily-surface .orbit-time-anchor span {
+  background: rgba(34,29,54,.88);
+  box-shadow: 0 6px 18px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.07);
+}
+html body.dark-theme.family-daily-surface .today-overview-card {
+  background:
+    radial-gradient(circle at 92% 5%, rgba(224,176,101,.09), transparent 34%),
+    linear-gradient(145deg, rgba(38,32,61,.97), rgba(29,26,48,.96));
+}
+html body.dark-theme.family-daily-surface .today-overview-grid article {
+  background: rgba(255,255,255,.045);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.055), 0 8px 18px rgba(0,0,0,.10);
+}
+html body.dark-theme.family-daily-surface .today-overview-suggestion {
+  background: rgba(151,124,218,.10);
+}
+
+@media (max-width: 390px) {
+  html body.family-daily-surface [data-screen="today"] { padding-inline: 12px; }
+  html body.family-daily-surface .today-overview-card { padding: 17px; }
+  html body.family-daily-surface .today-overview-grid article { min-height: 76px; padding: 12px; }
+  html body.family-daily-surface .bottom-nav { left: 8px; right: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body.family-daily-surface .ghost-link,
+  html body.family-daily-surface .primary-action,
+  html body.family-daily-surface .start-choice button,
+  html body.family-daily-surface .bottom-nav button { transition: none !important; }
+}
+
+/* ========================================================================== 
+   NINOU v78.1.0 — ETAPA 2/4: EXPERIÊNCIA DE USO E MICROINTERAÇÕES
+   ========================================================================== */
+:root {
+  --ninou-motion-fast: 160ms;
+  --ninou-motion-base: 280ms;
+  --ninou-motion-slow: 420ms;
+  --ninou-ease-premium: cubic-bezier(.22,.8,.26,1);
+  --ninou-ease-spring: cubic-bezier(.2,1.2,.32,1);
+}
+
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--mint, #7ce5c2) 62%, white);
+  outline-offset: 3px;
+}
+
+.ninou-press-feedback { animation: ninouPressFeedback 340ms var(--ninou-ease-spring) both; }
+@keyframes ninouPressFeedback {
+  0% { transform: scale(1); }
+  38% { transform: scale(.965); }
+  100% { transform: scale(1); }
+}
+
+.screen.active.ninou-screen-entered {
+  animation: ninouScreenEnter var(--ninou-motion-slow) var(--ninou-ease-premium) both;
+}
+@keyframes ninouScreenEnter {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); filter: blur(2px); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
+}
+
+.bottom-nav button .nav-symbol,
+.bottom-nav button > span:last-child {
+  transition: transform var(--ninou-motion-base) var(--ninou-ease-spring), opacity var(--ninou-motion-fast) ease;
+}
+.bottom-nav button.active .nav-symbol { transform: translateY(-2px) scale(1.09); }
+.bottom-nav button.active > span:last-child { transform: translateY(-1px); }
+
+.quick-actions button,
+.primary-action,
+.fab,
+.start-choice button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.quick-actions button::after,
+.primary-action::after,
+.fab::after,
+.start-choice button::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.42);
+  opacity: 0;
+  transform: translate(-50%,-50%) scale(0);
+  pointer-events: none;
+  z-index: -1;
+}
+.quick-actions button.ninou-press-feedback::after,
+.primary-action.ninou-press-feedback::after,
+.fab.ninou-press-feedback::after,
+.start-choice button.ninou-press-feedback::after {
+  animation: ninouRipple 520ms ease-out both;
+}
+@keyframes ninouRipple {
+  0% { opacity: .52; transform: translate(-50%,-50%) scale(0); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(26); }
+}
+
+.record-sheet, .orbit-cluster-sheet, .ninou-modal-card {
+  will-change: transform, opacity;
+}
+.record-sheet.ninou-surface-opening,
+.orbit-cluster-sheet.ninou-surface-opening {
+  animation: ninouSheetOpen var(--ninou-motion-slow) var(--ninou-ease-premium) both;
+}
+.ninou-modal.ninou-surface-opening .ninou-modal-card {
+  animation: ninouModalOpen var(--ninou-motion-slow) var(--ninou-ease-spring) both;
+}
+.ninou-modal.ninou-surface-opening .ninou-modal-backdrop,
+.sheet-backdrop:not([hidden]) {
+  animation: ninouBackdropIn var(--ninou-motion-base) ease both;
+}
+@keyframes ninouSheetOpen {
+  from { opacity: .25; transform: translate3d(0, 36px, 0) scale(.985); }
+  to { opacity: 1; transform: translate3d(0,0,0) scale(1); }
+}
+@keyframes ninouModalOpen {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(.96); }
+  to { opacity: 1; transform: translate3d(0,0,0) scale(1); }
+}
+@keyframes ninouBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+
+html.ninou-overlay-open body { overscroll-behavior: none; }
+
+.state-orbit { transition: transform var(--ninou-motion-base) var(--ninou-ease-premium), filter var(--ninou-motion-base) ease; }
+.orbit-now-dot { transform-origin: center; animation: ninouNowPulse 2.4s ease-in-out infinite; }
+@keyframes ninouNowPulse {
+  0%,100% { opacity: .72; transform: scale(.86); }
+  50% { opacity: 1; transform: scale(1.22); }
+}
+#orbitEvents.ninou-orbit-updated { animation: ninouOrbitUpdate 680ms var(--ninou-ease-spring) both; }
+@keyframes ninouOrbitUpdate {
+  0% { transform: scale(1); filter: brightness(1); }
+  44% { transform: scale(1.018); filter: brightness(1.1); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+#orbitEvents.ninou-orbit-updated .orbit-event:last-child,
+#orbitEvents.ninou-orbit-updated .live-orbit-marker:last-child {
+  animation: ninouMarkerArrival 620ms var(--ninou-ease-spring) both;
+}
+@keyframes ninouMarkerArrival {
+  from { opacity: 0; transform: translate(-50%,-50%) scale(.45) rotate(-10deg); }
+  to { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0); }
+}
+
+.routine-correction-card.ninou-confirm-enter {
+  animation: ninouConfirmCard 760ms var(--ninou-ease-spring) both;
+}
+@keyframes ninouConfirmCard {
+  0% { opacity: 0; transform: translateY(10px) scale(.98); }
+  48% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ninou-action-pending { pointer-events: none; position: relative; }
+.ninou-action-pending::before {
+  content: "";
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  right: 14px;
+  top: 50%;
+  margin-top: -9px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ninouSpin .65s linear infinite;
+  opacity: .78;
+}
+@keyframes ninouSpin { to { transform: rotate(360deg); } }
+
+html.ninou-has-scrolled .app-header,
+html.ninou-has-scrolled .topbar {
+  box-shadow: 0 10px 28px rgba(42,35,31,.08);
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .quick-actions button:hover,
+  .start-choice button:hover,
+  .primary-action:hover { transform: translateY(-2px); }
+  .bottom-nav button:hover .nav-symbol { transform: translateY(-2px) scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ========================================================================== 
+   NINOU v78.1.0 — ETAPA 3/4: CONSISTÊNCIA VISUAL E DE COMPONENTES
+   ========================================================================== */
+:root {
+  --ninou-control-h: 48px;
+  --ninou-control-h-compact: 42px;
+  --ninou-radius-control: 15px;
+  --ninou-radius-card: 22px;
+  --ninou-radius-overlay: 26px;
+  --ninou-border-soft: rgba(82, 69, 96, .12);
+  --ninou-text-main: #342d42;
+  --ninou-text-muted: #746d7d;
+  --ninou-surface: rgba(255,255,255,.92);
+  --ninou-surface-soft: rgba(255,255,255,.68);
+  --ninou-shadow-control: 0 8px 18px rgba(75, 61, 91, .10);
+  --ninou-shadow-card: 0 14px 34px rgba(75, 61, 91, .10);
+  --ninou-shadow-overlay: 0 24px 70px rgba(44, 35, 56, .22);
+}
+
+html body.dark-theme {
+  --ninou-border-soft: rgba(255,255,255,.10);
+  --ninou-text-main: #f5efff;
+  --ninou-text-muted: #b9b0c6;
+  --ninou-surface: rgba(34,29,54,.94);
+  --ninou-surface-soft: rgba(255,255,255,.055);
+  --ninou-shadow-control: 0 8px 20px rgba(0,0,0,.18);
+  --ninou-shadow-card: 0 16px 38px rgba(0,0,0,.20);
+  --ninou-shadow-overlay: 0 26px 76px rgba(0,0,0,.42);
+}
+
+/* Controles: mesma altura, tipografia e resposta em todas as telas. */
+button[data-ninou-control],
+a[data-ninou-control] {
+  min-height: var(--ninou-control-h-compact);
+  border-radius: var(--ninou-radius-control);
+  font-family: inherit;
+  font-weight: 750;
+  letter-spacing: -.01em;
+  line-height: 1.15;
+  text-decoration: none;
+  transition: transform var(--ninou-motion-fast) var(--ninou-ease-premium),
+              box-shadow var(--ninou-motion-base) ease,
+              border-color var(--ninou-motion-fast) ease,
+              background-color var(--ninou-motion-fast) ease,
+              opacity var(--ninou-motion-fast) ease;
+}
+button[data-ninou-control="primary"],
+a[data-ninou-control="primary"] {
+  min-height: var(--ninou-control-h);
+  box-shadow: var(--ninou-shadow-control);
+}
+button[data-ninou-control="secondary"],
+a[data-ninou-control="secondary"],
+button[data-ninou-control="neutral"],
+a[data-ninou-control="neutral"] {
+  border-color: var(--ninou-border-soft);
+}
+button[data-ninou-control="danger"],
+a[data-ninou-control="danger"] {
+  border-color: rgba(190,68,88,.22);
+  color: #a83e55;
+}
+button[data-ninou-control]:disabled,
+a[data-ninou-control][aria-disabled="true"] {
+  opacity: .48;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Campos: elimina diferenças entre perfil, relatórios, convites e registros. */
+input[data-ninou-field],
+select[data-ninou-field],
+textarea[data-ninou-field] {
+  width: 100%;
+  min-height: var(--ninou-control-h);
+  padding: 12px 14px;
+  border: 1px solid var(--ninou-border-soft);
+  border-radius: var(--ninou-radius-control);
+  background: var(--ninou-surface-soft);
+  color: var(--ninou-text-main);
+  font: 650 16px/1.35 inherit;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+  transition: border-color var(--ninou-motion-fast) ease, box-shadow var(--ninou-motion-fast) ease, background var(--ninou-motion-fast) ease;
+}
+textarea[data-ninou-field] { min-height: 112px; resize: vertical; }
+input[data-ninou-field]::placeholder,
+textarea[data-ninou-field]::placeholder { color: var(--ninou-text-muted); opacity: .76; }
+input[data-ninou-field]:focus,
+select[data-ninou-field]:focus,
+textarea[data-ninou-field]:focus {
+  border-color: color-mix(in srgb, var(--lavender, #9679d8) 54%, white);
+  background: var(--ninou-surface);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--lavender, #9679d8) 15%, transparent);
+  outline: none;
+}
+
+/* Cards e overlays passam a compartilhar o mesmo acabamento estrutural. */
+[data-ninou-surface="card"] {
+  border-radius: var(--ninou-radius-card);
+  border-color: var(--ninou-border-soft);
+}
+[data-ninou-surface="overlay"] {
+  border-radius: var(--ninou-radius-overlay);
+  border: 1px solid var(--ninou-border-soft);
+  box-shadow: var(--ninou-shadow-overlay);
+}
+.ninou-modal-card,
+.record-sheet,
+.orbit-cluster-sheet {
+  color: var(--ninou-text-main);
+}
+.ninou-modal-card > span:first-of-type,
+.record-sheet-kicker,
+.profile-section-kicker {
+  color: var(--ninou-text-muted);
+  font-weight: 800;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+/* Linhas de ação previsíveis: primária sempre primeiro, secundária com o mesmo peso. */
+.profile-actions-row,
+.support-modal-actions,
+.legal-modal-actions {
+  gap: 10px;
+  align-items: stretch;
+}
+.profile-actions-row > button,
+.profile-actions-row > a,
+.support-modal-actions > button,
+.legal-modal-actions > button { flex: 1 1 0; }
+
+/* Estados vazios e mensagens com hierarquia única. */
+.empty-state,
+[class*="empty-state"],
+.join-family-feedback,
+.profile-helper,
+.field-helper {
+  color: var(--ninou-text-muted);
+  line-height: 1.48;
+}
+
+/* Fechar modal: alvo de toque e aparência consistentes. */
+.guest-modal-close,
+button[aria-label^="Fechar"] {
+  min-width: 42px;
+  min-height: 42px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 14px;
+}
+
+/* Desktop/tablet: evita botões exageradamente largos em formulários. */
+@media (min-width: 700px) {
+  .profile-actions-row,
+  .support-modal-actions,
+  .legal-modal-actions { justify-content: flex-end; }
+  .profile-actions-row > button,
+  .profile-actions-row > a,
+  .support-modal-actions > button,
+  .legal-modal-actions > button { flex: 0 1 auto; min-width: 148px; }
+}
+
+@media (max-width: 390px) {
+  :root { --ninou-control-h: 46px; --ninou-control-h-compact: 40px; }
+  .profile-actions-row,
+  .support-modal-actions,
+  .legal-modal-actions { flex-direction: column; }
+  .profile-actions-row > button,
+  .support-modal-actions > button,
+  .legal-modal-actions > button { width: 100%; }
+}

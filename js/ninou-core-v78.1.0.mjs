@@ -404,7 +404,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "76.1.4";
+const NINOU_RUNTIME_VERSION = "78.1.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -14469,7 +14469,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=76.1.4", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=78.1.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

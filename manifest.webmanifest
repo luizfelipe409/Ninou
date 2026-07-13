@@ -1,7 +1,7 @@
 {
   "name": "Ninou",
   "short_name": "Ninou",
-  "description": "Diário sincronizado de sono, mamadas, fraldas e rotina do bebê.",
+  "description": "Diário familiar do bebê com rotina, sono, alimentação e sincronização segura.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -21,5 +21,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "version": "78.1.0"
 }
