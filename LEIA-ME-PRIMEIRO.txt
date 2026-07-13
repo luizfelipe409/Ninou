@@ -1,11 +1,11 @@
-NINOU v78.4.1 — CORREÇÃO BASEADA NO VÍDEO DE 13/07/2026
+NINOU v79.0.0 — CORREÇÃO BASEADA NO VÍDEO DE 13/07/2026
 
 USE ESTA PASTA COMO PROJETO PRINCIPAL.
 
 1. Substitua integralmente o conteúdo antigo do projeto pelo conteúdo desta pasta.
 2. Não copie por cima mantendo arquivos versionados antigos.
 3. Faça commit e aguarde o deploy da Vercel terminar.
-4. Na primeira abertura da v78.4.1, o Ninou faz uma migração única do runtime:
+4. Na primeira abertura da v79.0.0, o Ninou faz uma migração única do runtime:
    - remove somente Service Workers e caches antigos do próprio Ninou;
    - preserva perfil, família e registros locais;
    - pode recarregar a página uma vez.

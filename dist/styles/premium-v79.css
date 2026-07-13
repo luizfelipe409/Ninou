@@ -1,0 +1,1897 @@
+/*
+  Ninou v79.0.0 — autoridade visual única da experiência familiar.
+  Esta folha é carregada depois do legado e concentra Home, Diário, Perfil,
+  folha de registro, navegação e responsividade. Novas correções visuais
+  devem ser feitas somente aqui.
+*/
+
+:root {
+  --n79-font: Inter, ui-rounded, -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Segoe UI", sans-serif;
+  --n79-safe-top: env(safe-area-inset-top, 0px);
+  --n79-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --n79-nav-height: 78px;
+  --n79-page-max: 540px;
+  --n79-radius-xl: 28px;
+  --n79-radius-lg: 22px;
+  --n79-radius-md: 16px;
+  --n79-radius-sm: 12px;
+  --n79-space-1: 4px;
+  --n79-space-2: 8px;
+  --n79-space-3: 12px;
+  --n79-space-4: 16px;
+  --n79-space-5: 20px;
+  --n79-space-6: 24px;
+  --n79-space-7: 30px;
+  --n79-fast: 160ms;
+  --n79-normal: 260ms;
+}
+
+html.ninou-v790,
+html.ninou-v790 body {
+  min-width: 100%;
+  min-height: 100%;
+  font-family: var(--n79-font);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+html.ninou-v790 body.family-daily-surface {
+  --n79-bg: #100d1d;
+  --n79-shell: #181329;
+  --n79-surface: #211a35;
+  --n79-surface-2: #29213f;
+  --n79-surface-3: #31284a;
+  --n79-field: #2b2342;
+  --n79-text: #faf8ff;
+  --n79-text-2: #ded8e9;
+  --n79-muted: #aaa2bb;
+  --n79-label: #8f86a3;
+  --n79-line: rgba(255,255,255,.095);
+  --n79-line-strong: rgba(124,229,194,.35);
+  --n79-accent: #7ce5c2;
+  --n79-accent-2: #9b7bf2;
+  --n79-accent-3: #ffd37a;
+  --n79-danger: #f3a596;
+  --n79-shadow: 0 18px 46px rgba(5,3,14,.32);
+  --n79-shadow-soft: 0 10px 28px rgba(5,3,14,.22);
+  --n79-glass: rgba(24,19,41,.82);
+  color-scheme: dark;
+  margin: 0 !important;
+  background:
+    radial-gradient(circle at 12% -8%, rgba(143,108,239,.18), transparent 34%),
+    radial-gradient(circle at 95% 18%, rgba(124,229,194,.10), transparent 30%),
+    var(--n79-bg) !important;
+  color: var(--n79-text) !important;
+}
+
+html.ninou-v790 body.family-daily-surface.day-theme {
+  --n79-bg: #eeedf3;
+  --n79-shell: #f7f6fa;
+  --n79-surface: #ffffff;
+  --n79-surface-2: #fbfaff;
+  --n79-surface-3: #f3effb;
+  --n79-field: #f6f4fa;
+  --n79-text: #292437;
+  --n79-text-2: #4a4358;
+  --n79-muted: #716a7d;
+  --n79-label: #8a8296;
+  --n79-line: rgba(52,42,73,.11);
+  --n79-line-strong: rgba(87,65,163,.28);
+  --n79-accent: #24745f;
+  --n79-accent-2: #7457c6;
+  --n79-accent-3: #d48a43;
+  --n79-danger: #a45248;
+  --n79-shadow: 0 18px 42px rgba(56,43,83,.12);
+  --n79-shadow-soft: 0 9px 24px rgba(56,43,83,.08);
+  --n79-glass: rgba(247,246,250,.86);
+  color-scheme: light;
+  background:
+    radial-gradient(circle at 10% -5%, rgba(143,108,239,.12), transparent 34%),
+    radial-gradient(circle at 100% 18%, rgba(90,190,163,.10), transparent 28%),
+    var(--n79-bg) !important;
+  color: var(--n79-text) !important;
+}
+
+html.ninou-v790 [hidden] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+html.ninou-v790 *,
+html.ninou-v790 *::before,
+html.ninou-v790 *::after {
+  box-sizing: border-box;
+}
+
+html.ninou-v790 button,
+html.ninou-v790 input,
+html.ninou-v790 select,
+html.ninou-v790 textarea {
+  font: inherit;
+}
+
+html.ninou-v790 button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ==============================
+   Estrutura principal e cabeçalho
+   ============================== */
+html.ninou-v790 body.family-daily-surface.regular-family-mode .phone-shell {
+  width: min(100%, var(--n79-page-max)) !important;
+  max-width: var(--n79-page-max) !important;
+  min-height: 100dvh !important;
+  margin: 0 auto !important;
+  padding:
+    max(14px, var(--n79-safe-top))
+    14px
+    calc(var(--n79-nav-height) + 42px + var(--n79-safe-bottom)) !important;
+  overflow: visible !important;
+  background: var(--n79-shell) !important;
+  color: var(--n79-text) !important;
+  border-inline: 1px solid color-mix(in srgb, var(--n79-line) 60%, transparent) !important;
+  box-shadow: 0 0 70px rgba(6,4,17,.18) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .app-header {
+  position: sticky !important;
+  top: max(8px, var(--n79-safe-top)) !important;
+  z-index: 40 !important;
+  min-height: 66px !important;
+  margin: 0 0 14px !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 22px !important;
+  background: var(--n79-glass) !important;
+  box-shadow: var(--n79-shadow-soft) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .identity {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: 42px minmax(0,1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .identity > img {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: 15px !important;
+  box-shadow: 0 7px 18px rgba(7,4,22,.20) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .identity > div {
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .identity span {
+  display: block !important;
+  margin-bottom: 2px !important;
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .68rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  letter-spacing: .13em !important;
+  text-transform: uppercase !important;
+}
+
+html.ninou-v790 body.family-daily-surface .identity strong {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .98rem !important;
+  line-height: 1.15 !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+html.ninou-v790 body.family-daily-surface .sync-pill {
+  flex: 0 0 auto !important;
+  min-height: 34px !important;
+  padding: 0 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent) 30%, transparent) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--n79-accent) 11%, var(--n79-surface)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+  font-size: .72rem !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .screen {
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .screen.active {
+  display: grid !important;
+  align-content: start !important;
+  gap: 14px !important;
+  padding: 0 0 20px !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+html.ninou-v790 body.family-daily-surface .screen:not(.active) {
+  display: none !important;
+}
+
+/* ==============================
+   Superfícies, textos e controles
+   ============================== */
+html.ninou-v790 body.family-daily-surface :is(
+  .today-caregiver-card,
+  .today-overview-card,
+  .routine-correction-card,
+  .smart-insight-card,
+  .gentle-alert-card,
+  .notification-center-card,
+  .live-assistant-card,
+  .next-card,
+  .day-summary-card,
+  .growth-card,
+  .routine-progress-card,
+  .intelligent-timeline-card,
+  .weekly-overview-card,
+  .day-story-card,
+  .last-card,
+  .chart-card,
+  .day-notes-card,
+  .audit-card,
+  .profile-card,
+  .profile-family-card,
+  .family-access-summary-card,
+  .profile-ready-card,
+  .profile-state-notice-card,
+  .settings-list > article,
+  .export-card,
+  .support-card,
+  .danger-card,
+  .sounds-hero,
+  .sound-player-card,
+  .sound-note,
+  .sound-option,
+  .data-premium-hero,
+  .data-premium-metric,
+  .data-premium-kpis > article,
+  .insights > article
+) {
+  min-width: 0 !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: var(--n79-radius-lg) !important;
+  background: linear-gradient(155deg, var(--n79-surface-2), var(--n79-surface)) !important;
+  color: var(--n79-text) !important;
+  box-shadow: var(--n79-shadow-soft) !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(
+  .today-overview-card,
+  .routine-correction-card,
+  .smart-insight-card,
+  .gentle-alert-card,
+  .notification-center-card,
+  .live-assistant-card,
+  .next-card,
+  .day-summary-card,
+  .growth-card,
+  .routine-progress-card,
+  .intelligent-timeline-card,
+  .weekly-overview-card,
+  .day-story-card,
+  .last-card,
+  .chart-card,
+  .day-notes-card,
+  .profile-family-card,
+  .family-access-summary-card,
+  .settings-list > article,
+  .export-card,
+  .support-card,
+  .danger-card
+) {
+  padding: 16px !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(p, small, em, .section-helper, .chart-helper, .form-status) {
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(
+  .section-title,
+  .drawer-section-title,
+  .profile-card-head,
+  .chart-title,
+  .data-card-title,
+  .summary-range-head
+) {
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(
+  .section-title,
+  .drawer-section-title,
+  .profile-card-head,
+  .chart-title,
+  .data-card-title,
+  .summary-range-head
+) span {
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(
+  .section-title,
+  .drawer-section-title,
+  .profile-card-head,
+  .chart-title,
+  .data-card-title,
+  .summary-range-head
+) strong {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(input, select, textarea) {
+  width: 100% !important;
+  min-height: 50px !important;
+  padding: 12px 13px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 14px !important;
+  background: var(--n79-field) !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  box-shadow: none !important;
+  font-size: 16px !important;
+  outline: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface textarea {
+  min-height: 104px !important;
+  resize: vertical !important;
+  line-height: 1.42 !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(input, select, textarea):focus {
+  border-color: var(--n79-line-strong) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--n79-accent) 13%, transparent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(input, textarea)::placeholder {
+  color: color-mix(in srgb, var(--n79-muted) 65%, transparent) !important;
+  -webkit-text-fill-color: color-mix(in srgb, var(--n79-muted) 65%, transparent) !important;
+  opacity: 1 !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(.ghost-link, .profile-secondary-button, .secondary-login) {
+  min-height: 42px !important;
+  padding: 0 13px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 13px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text-2) !important;
+  -webkit-text-fill-color: var(--n79-text-2) !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(.profile-primary-button, .save-button, #loginButton, #exportPdfButton) {
+  min-height: 48px !important;
+  border: 0 !important;
+  border-radius: 15px !important;
+  background: linear-gradient(135deg, var(--n79-accent), color-mix(in srgb, var(--n79-accent) 68%, var(--n79-accent-3))) !important;
+  color: #11221d !important;
+  -webkit-text-fill-color: #11221d !important;
+  font-weight: 900 !important;
+  box-shadow: 0 10px 25px color-mix(in srgb, var(--n79-accent) 18%, transparent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface.day-theme :is(.profile-primary-button, .save-button, #loginButton, #exportPdfButton) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  background: linear-gradient(135deg, #7256c7, #9676dd) !important;
+}
+
+/* ==============================
+   Home premium
+   ============================== */
+html.ninou-v790 body.family-daily-surface .today-topline {
+  min-height: 38px !important;
+  padding: 0 3px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  color: var(--n79-muted) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-topline > span {
+  min-width: 0 !important;
+  font-size: .82rem !important;
+  font-weight: 750 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+html.ninou-v790 body.family-daily-surface .state-orbit.live-timeline-orbit {
+  position: relative !important;
+  width: min(100%, 370px) !important;
+  aspect-ratio: 1 / 1 !important;
+  min-height: 0 !important;
+  margin: 2px auto 0 !important;
+  padding: 14px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 34px !important;
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--n79-accent-2) 18%, transparent), transparent 38%),
+    radial-gradient(circle at 22% 18%, color-mix(in srgb, var(--n79-accent) 15%, transparent), transparent 32%),
+    linear-gradient(155deg, var(--n79-surface-3), var(--n79-surface)) !important;
+  box-shadow: var(--n79-shadow) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-timeline-svg {
+  position: absolute !important;
+  inset: 13px !important;
+  width: calc(100% - 26px) !important;
+  height: calc(100% - 26px) !important;
+  display: block !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-track {
+  fill: none !important;
+  stroke: color-mix(in srgb, var(--n79-text) 10%, transparent) !important;
+  stroke-width: 12 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-now-dot {
+  fill: var(--n79-accent-3) !important;
+  stroke: var(--n79-surface) !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--n79-accent-3) 60%, transparent)) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-center-safe {
+  position: absolute !important;
+  inset: 50% auto auto 50% !important;
+  width: min(68%, 242px) !important;
+  min-width: 0 !important;
+  min-height: 156px !important;
+  margin: 0 !important;
+  padding: 16px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  border: 1px solid color-mix(in srgb, var(--n79-line) 95%, transparent) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--n79-surface) 82%, transparent) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 13px 34px rgba(4,2,14,.20) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  text-align: center !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-center-safe > * {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  text-align: center !important;
+}
+
+html.ninou-v790 body.family-daily-surface #stateLabel {
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .74rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+}
+
+html.ninou-v790 body.family-daily-surface #stateClock {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: clamp(2.18rem, 10vw, 3.1rem) !important;
+  line-height: .95 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.05em !important;
+  font-variant-numeric: tabular-nums !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+html.ninou-v790 body.family-daily-surface #stateHint {
+  max-width: 205px !important;
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  font-size: .75rem !important;
+  line-height: 1.28 !important;
+  overflow-wrap: anywhere !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-time-anchor {
+  position: absolute !important;
+  z-index: 4 !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  background: var(--n79-surface-2) !important;
+  color: var(--n79-muted) !important;
+  font-size: .66rem !important;
+  font-weight: 850 !important;
+  box-shadow: 0 5px 14px rgba(4,2,12,.16) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .orbit-time-anchor-midnight { top: 8px !important; left: 50% !important; transform: translateX(-50%) !important; }
+html.ninou-v790 body.family-daily-surface .orbit-time-anchor-morning { top: 50% !important; right: 8px !important; transform: translateY(-50%) !important; }
+html.ninou-v790 body.family-daily-surface .orbit-time-anchor-noon { bottom: 8px !important; left: 50% !important; transform: translateX(-50%) !important; }
+html.ninou-v790 body.family-daily-surface .orbit-time-anchor-evening { top: 50% !important; left: 8px !important; transform: translateY(-50%) !important; }
+
+html.ninou-v790 body.family-daily-surface .main-action-area {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .primary-action {
+  width: 100% !important;
+  min-height: 68px !important;
+  padding: 10px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  border: 0 !important;
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, var(--n79-accent), color-mix(in srgb, var(--n79-accent) 62%, var(--n79-accent-3))) !important;
+  color: #10221d !important;
+  -webkit-text-fill-color: #10221d !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  box-shadow: 0 15px 32px color-mix(in srgb, var(--n79-accent) 20%, transparent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface.day-theme .primary-action {
+  background: linear-gradient(135deg, #7557ca, #a17be2) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+html.ninou-v790 body.family-daily-surface .primary-action .action-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border-radius: 14px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .primary-action .action-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-overview-head,
+html.ninou-v790 body.family-daily-surface .drawer-section-title,
+html.ninou-v790 body.family-daily-surface .chart-title,
+html.ninou-v790 body.family-daily-surface .profile-card-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-overview-grid {
+  margin-top: 13px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-overview-grid article {
+  min-width: 0 !important;
+  min-height: 78px !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 15px !important;
+  background: var(--n79-surface-3) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-overview-grid span {
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .72rem !important;
+  line-height: 1.2 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-overview-grid strong {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .92rem !important;
+  line-height: 1.2 !important;
+  overflow-wrap: anywhere !important;
+}
+
+html.ninou-v790 body.family-daily-surface .today-overview-suggestion {
+  margin: 12px 0 0 !important;
+  padding: 11px 12px !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--n79-accent) 8%, var(--n79-surface-3)) !important;
+  color: var(--n79-text-2) !important;
+  -webkit-text-fill-color: var(--n79-text-2) !important;
+  font-size: .82rem !important;
+  line-height: 1.4 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-actions-heading {
+  margin: 5px 2px -2px !important;
+  color: var(--n79-text) !important;
+}
+
+html.ninou-v790 body.family-daily-surface #quickActions.quick-actions,
+html.ninou-v790 body.family-daily-surface .screen[data-screen="today"] > .quick-actions {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  grid-auto-rows: 124px !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-actions > button[data-open-sheet] {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 124px !important;
+  min-width: 0 !important;
+  min-height: 124px !important;
+  max-height: 124px !important;
+  margin: 0 !important;
+  padding: 14px 10px 13px !important;
+  display: grid !important;
+  grid-template-rows: 58px minmax(20px,auto) !important;
+  place-items: center !important;
+  align-content: center !important;
+  gap: 9px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 21px !important;
+  background: linear-gradient(155deg, var(--n79-surface-3), var(--n79-surface)) !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  box-shadow: var(--n79-shadow-soft) !important;
+  text-align: center !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-actions > button[data-open-sheet] > .action-icon {
+  position: static !important;
+  inset: auto !important;
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+  max-width: 58px !important;
+  max-height: 58px !important;
+  margin: 0 !important;
+  padding: 3px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--n79-accent-2) 10%, var(--n79-surface-2)) !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-actions > button[data-open-sheet] > .action-icon :is(img,svg) {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-actions > button[data-open-sheet] > span:last-child {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  display: block !important;
+  color: var(--n79-text-2) !important;
+  -webkit-text-fill-color: var(--n79-text-2) !important;
+  font-size: .84rem !important;
+  line-height: 1.14 !important;
+  font-weight: 850 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+/* ==============================
+   Diário e observações
+   ============================== */
+html.ninou-v790 body.family-daily-surface .date-filter {
+  padding: 14px !important;
+  display: grid !important;
+  gap: 8px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: var(--n79-radius-lg) !important;
+  background: var(--n79-surface) !important;
+  color: var(--n79-label) !important;
+  font-size: .78rem !important;
+  font-weight: 800 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .chips-shell {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+html.ninou-v790 body.family-daily-surface .chips {
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 2px 1px 5px !important;
+  scrollbar-width: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .chips::-webkit-scrollbar { display: none !important; }
+
+html.ninou-v790 body.family-daily-surface .chips button {
+  flex: 0 0 auto !important;
+  min-height: 38px !important;
+  padding: 0 13px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 999px !important;
+  background: var(--n79-surface) !important;
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  font-weight: 800 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .chips button.active {
+  border-color: color-mix(in srgb, var(--n79-accent) 32%, transparent) !important;
+  background: color-mix(in srgb, var(--n79-accent) 12%, var(--n79-surface)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .timeline {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .event-card {
+  min-width: 0 !important;
+  padding: 14px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 18px !important;
+  background: var(--n79-surface) !important;
+  box-shadow: var(--n79-shadow-soft) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observations-panel {
+  width: 100% !important;
+  margin-top: 14px !important;
+  padding: 14px !important;
+  display: grid !important;
+  gap: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 18px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observations-title {
+  display: grid !important;
+  gap: 3px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observations-title span {
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .72rem !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observations-title strong {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .94rem !important;
+  line-height: 1.2 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observation-chips {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+  gap: 8px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observation-chips button {
+  min-width: 0 !important;
+  min-height: 64px !important;
+  padding: 8px 5px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 14px !important;
+  background: var(--n79-surface) !important;
+  color: var(--n79-text-2) !important;
+  -webkit-text-fill-color: var(--n79-text-2) !important;
+  font-size: .7rem !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+html.ninou-v790 body.family-daily-surface .quick-observation-chips button > span {
+  font-size: 1.18rem !important;
+  line-height: 1 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .premium-new-episode-button {
+  width: 100% !important;
+  min-height: 66px !important;
+  padding: 10px 13px !important;
+  display: grid !important;
+  grid-template-columns: 42px minmax(0,1fr) !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: 11px !important;
+  overflow: hidden !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent) 28%, transparent) !important;
+  border-radius: 16px !important;
+  background: color-mix(in srgb, var(--n79-accent) 9%, var(--n79-surface)) !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  text-align: left !important;
+}
+
+html.ninou-v790 body.family-daily-surface .premium-new-episode-icon {
+  width: 42px !important;
+  height: 42px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 13px !important;
+  background: var(--n79-accent) !important;
+  color: #10221d !important;
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .premium-new-episode-button > span:last-child {
+  min-width: 0 !important;
+  display: grid !important;
+  gap: 3px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .premium-new-episode-button :is(strong,small) {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  text-align: left !important;
+}
+
+html.ninou-v790 body.family-daily-surface .premium-new-episode-button strong {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .9rem !important;
+}
+
+html.ninou-v790 body.family-daily-surface .premium-new-episode-button small {
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  font-size: .72rem !important;
+  line-height: 1.2 !important;
+}
+
+/* ==============================
+   Perfil e família
+   ============================== */
+html.ninou-v790 body.family-daily-surface .profile-card {
+  min-height: 188px !important;
+  padding: 22px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  text-align: center !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--n79-accent-2) 20%, transparent), transparent 45%),
+    linear-gradient(155deg, var(--n79-surface-2), var(--n79-surface)) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .avatar-wrapper {
+  width: 94px !important;
+  height: 94px !important;
+  min-width: 94px !important;
+  min-height: 94px !important;
+  margin: 0 auto 3px !important;
+  padding: 4px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent-2) 35%, transparent) !important;
+  border-radius: 30px !important;
+  background: var(--n79-surface-3) !important;
+  box-shadow: 0 16px 34px rgba(5,3,16,.24) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .avatar-wrapper > img,
+html.ninou-v790 body.family-daily-surface #profilePhoto {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: 25px !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface #profileBabyName {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: 1.28rem !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+}
+
+html.ninou-v790 body.family-daily-surface #profileBabyAge {
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  font-size: .82rem !important;
+  font-weight: 700 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .profile-family-stack,
+html.ninou-v790 body.family-daily-surface .settings-list {
+  display: grid !important;
+  gap: 14px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .profile-edit-grid {
+  margin-top: 13px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 11px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .profile-setting-line,
+html.ninou-v790 body.family-daily-surface .weight-input-row label,
+html.ninou-v790 body.family-daily-surface .family-invite-form label,
+html.ninou-v790 body.family-daily-surface .export-period-grid label,
+html.ninou-v790 body.family-daily-surface .export-personal-message {
+  min-width: 0 !important;
+  display: grid !important;
+  gap: 7px !important;
+  color: var(--n79-label) !important;
+  font-size: .76rem !important;
+  font-weight: 800 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .weight-input-row,
+html.ninou-v790 body.family-daily-surface .export-period-grid,
+html.ninou-v790 body.family-daily-surface .family-invite-form {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-members-list {
+  margin-top: 13px !important;
+  display: grid !important;
+  gap: 9px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 68px !important;
+  padding: 10px !important;
+  display: grid !important;
+  grid-template-columns: 48px minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 11px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 16px !important;
+  background: var(--n79-surface-3) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member-avatar {
+  position: static !important;
+  inset: auto !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  margin: 0 !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: 15px !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member > div {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member :is(strong,small) {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member strong {
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .9rem !important;
+  line-height: 1.2 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member small {
+  margin-top: 4px !important;
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  font-size: .72rem !important;
+}
+
+html.ninou-v790 body.family-daily-surface .client-family-member > em {
+  flex: 0 0 auto !important;
+  padding: 6px 9px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--n79-accent) 10%, var(--n79-surface)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+  font-size: .66rem !important;
+  font-style: normal !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+}
+
+html.ninou-v790 body.family-daily-surface .family-access-summary-actions,
+html.ninou-v790 body.family-daily-surface .profile-actions-row,
+html.ninou-v790 body.family-daily-surface .export-actions,
+html.ninou-v790 body.family-daily-surface .login-actions,
+html.ninou-v790 body.family-daily-surface .security-actions-row {
+  margin-top: 12px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 9px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .family-access-summary-actions > *,
+html.ninou-v790 body.family-daily-surface .profile-actions-row > *,
+html.ninou-v790 body.family-daily-surface .export-actions > *,
+html.ninou-v790 body.family-daily-surface .login-actions > * {
+  flex: 1 1 150px !important;
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .profile-soft-row,
+html.ninou-v790 body.family-daily-surface .sync-detail-grid > div {
+  min-width: 0 !important;
+  padding: 11px 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  border-bottom: 1px solid var(--n79-line) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .profile-soft-row strong,
+html.ninou-v790 body.family-daily-surface .sync-detail-grid strong {
+  min-width: 0 !important;
+  max-width: 62% !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  text-align: right !important;
+}
+
+/* ==============================
+   Gráficos e dados
+   ============================== */
+html.ninou-v790 body.family-daily-surface .weight-sparkline,
+html.ninou-v790 body.family-daily-surface .weight-sparkline-large,
+html.ninou-v790 body.family-daily-surface .data-weight-chart {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin-top: 12px !important;
+  padding: 12px 8px 8px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 17px !important;
+  background: var(--n79-surface-3) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .weight-sparkline svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+html.ninou-v790 body.family-daily-surface .weight-axis-label,
+html.ninou-v790 body.family-daily-surface .weight-date-label {
+  fill: var(--n79-muted) !important;
+  font-size: 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .weight-main-path {
+  color: var(--n79-accent) !important;
+  stroke: var(--n79-accent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bars,
+html.ninou-v790 body.family-daily-surface .mini-chart {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bars span,
+html.ninou-v790 body.family-daily-surface .mini-chart span {
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bars b,
+html.ninou-v790 body.family-daily-surface .mini-chart b {
+  font-size: .64rem !important;
+  white-space: nowrap !important;
+}
+
+/* ==============================
+   Folha de registro
+   ============================== */
+html.ninou-v790.record-sheet-open,
+html.ninou-v790.record-sheet-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+html.ninou-v790 body.record-sheet-open {
+  position: fixed !important;
+  inset: var(--record-sheet-scroll-y, 0) 0 auto 0 !important;
+  width: 100% !important;
+}
+
+html.ninou-v790 body.family-daily-surface .sheet-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1000 !important;
+  display: block !important;
+  background: rgba(4,2,12,.72) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet,
+html.ninou-v790 body.family-daily-surface .orbit-cluster-sheet {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: max(8px, var(--n79-safe-bottom)) !important;
+  z-index: 1010 !important;
+  width: min(calc(100vw - 14px), 520px) !important;
+  height: min(90dvh, 780px) !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - max(12px, var(--n79-safe-top)) - max(8px, var(--n79-safe-bottom))) !important;
+  margin: 0 !important;
+  padding: 0 14px max(12px, var(--n79-safe-bottom)) !important;
+  display: grid !important;
+  grid-template-rows: 16px auto auto minmax(0,1fr) auto !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  contain: layout paint !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 30px !important;
+  background: linear-gradient(180deg, var(--n79-surface-2), var(--n79-surface)) !important;
+  color: var(--n79-text) !important;
+  box-shadow: 0 28px 80px rgba(3,2,10,.58) !important;
+  transform: translateX(-50%) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet > .sheet-handle {
+  width: 42px !important;
+  height: 5px !important;
+  margin: 7px auto 4px !important;
+  align-self: start !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--n79-text) 22%, transparent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet .section-title {
+  min-height: 58px !important;
+  padding: 4px 0 8px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) 42px !important;
+  align-items: center !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet .section-title > div {
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet .section-title span {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .68rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet .section-title strong {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: 1.12rem !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-sheet .round-action {
+  position: static !important;
+  inset: auto !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 14px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0,1fr)) !important;
+  grid-auto-rows: 72px !important;
+  gap: 7px !important;
+  overflow: visible !important;
+  scroll-snap-type: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types button,
+html.ninou-v790 body.family-daily-surface .record-types button[data-sheet-type] {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  margin: 0 !important;
+  padding: 7px 4px 6px !important;
+  display: grid !important;
+  grid-template-rows: 38px minmax(16px,auto) !important;
+  place-items: center !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 15px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  box-shadow: none !important;
+  text-align: center !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types button.active {
+  border-color: color-mix(in srgb, var(--n79-accent) 45%, transparent) !important;
+  background: color-mix(in srgb, var(--n79-accent) 12%, var(--n79-surface-3)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--n79-accent) 8%, transparent) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types .type-icon {
+  position: static !important;
+  inset: auto !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+  margin: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types .type-icon :is(img,svg) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types button > span:last-child {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 1px !important;
+  display: block !important;
+  overflow: hidden !important;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  font-size: .63rem !important;
+  line-height: 1.05 !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-form {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 2px 2px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-form::-webkit-scrollbar { display:none !important; }
+
+html.ninou-v790 body.family-daily-surface .record-form > * {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-form label,
+html.ninou-v790 body.family-daily-surface .record-form .select-label,
+html.ninou-v790 body.family-daily-surface .record-form .amount-field {
+  display: grid !important;
+  gap: 7px !important;
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .74rem !important;
+  font-weight: 800 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-form :is(input:not([type="range"]), select, textarea, .select-control-wrap) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-form :is(input:not([type="range"]), select) {
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-form textarea {
+  min-height: 104px !important;
+  height: 104px !important;
+  max-height: 140px !important;
+  resize: vertical !important;
+}
+
+html.ninou-v790 body.family-daily-surface :is(.breast-timer-panel, .milk-slider-card, .sleep-duration-preview) {
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 13px !important;
+  overflow: visible !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 17px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+}
+
+html.ninou-v790 body.family-daily-surface #breastTimerPanel:not([hidden]) {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .breast-timer-head {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .breast-side-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  gap: 9px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .breast-side-grid button {
+  min-height: 92px !important;
+  padding: 10px !important;
+  display: grid !important;
+  place-items: center !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 15px !important;
+  background: var(--n79-surface) !important;
+  color: var(--n79-text) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-actions-footer {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  min-height: 70px !important;
+  margin: 0 !important;
+  padding: 10px 2px 0 !important;
+  display: grid !important;
+  gap: 8px !important;
+  overflow: visible !important;
+  border-top: 1px solid var(--n79-line) !important;
+  border-radius: 0 !important;
+  background: var(--n79-surface) !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-actions-footer::before,
+html.ninou-v790 body.family-daily-surface .record-actions-footer::after,
+html.ninou-v790 body.family-daily-surface .record-actions-footer .save-button::before,
+html.ninou-v790 body.family-daily-surface .record-actions-footer .save-button::after {
+  display: none !important;
+  content: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-actions-footer .save-button {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  height: 54px !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* ==============================
+   Barra inferior
+   ============================== */
+html.ninou-v790 body.family-daily-surface .bottom-bar {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: max(9px, var(--n79-safe-bottom)) !important;
+  z-index: 90 !important;
+  width: min(calc(100vw - 18px), 520px) !important;
+  height: var(--n79-nav-height) !important;
+  margin: 0 !important;
+  padding: 7px 66px 7px 7px !important;
+  display: block !important;
+  overflow: visible !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 25px !important;
+  background: var(--n79-glass) !important;
+  box-shadow: 0 18px 45px rgba(4,2,13,.38) !important;
+  backdrop-filter: blur(22px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(135%) !important;
+  transform: translateX(-50%) !important;
+  transition: opacity var(--n79-normal) ease, transform var(--n79-normal) ease !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bottom-nav {
+  width: 100% !important;
+  height: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(5,minmax(0,1fr)) !important;
+  align-items: stretch !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bottom-nav button {
+  min-width: 0 !important;
+  min-height: 60px !important;
+  padding: 6px 2px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 17px !important;
+  background: transparent !important;
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bottom-nav button.active {
+  background: color-mix(in srgb, var(--n79-accent-2) 13%, var(--n79-surface)) !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bottom-nav .nav-symbol {
+  font-size: 1.08rem !important;
+  line-height: 1 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .bottom-nav button > span:last-child {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  font-size: .59rem !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+html.ninou-v790 body.family-daily-surface .fab {
+  position: absolute !important;
+  right: 9px !important;
+  top: 9px !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+  margin: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 19px !important;
+  background: linear-gradient(135deg, var(--n79-accent-2), color-mix(in srgb, var(--n79-accent-2) 60%, var(--n79-accent))) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: 0 12px 27px color-mix(in srgb, var(--n79-accent-2) 28%, transparent) !important;
+  transform: none !important;
+}
+
+html.ninou-v790 body.family-daily-surface .fab > span {
+  font-size: 1.55rem !important;
+  line-height: 1 !important;
+}
+
+html.ninou-v790 body.record-sheet-open .bottom-bar,
+html.ninou-v790 body.modal-open .bottom-bar,
+html.ninou-v790 body.avatar-modal-open .bottom-bar,
+html.ninou-v790 body.day-note-episode-modal-open .bottom-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translate(-50%, 24px) !important;
+}
+
+/* ==============================
+   Modais gerais
+   ============================== */
+html.ninou-v790 body.family-daily-surface .ninou-modal,
+html.ninou-v790 body.family-daily-surface .join-family-modal,
+html.ninou-v790 body.family-daily-surface .guest-login-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1100 !important;
+  padding: max(14px, var(--n79-safe-top)) 12px max(14px, var(--n79-safe-bottom)) !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow-y: auto !important;
+}
+
+html.ninou-v790 body.family-daily-surface .ninou-modal-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(4,2,12,.75) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+html.ninou-v790 body.family-daily-surface .ninou-modal-card,
+html.ninou-v790 body.family-daily-surface .join-family-dialog,
+html.ninou-v790 body.family-daily-surface .guest-login-dialog {
+  position: relative !important;
+  z-index: 1 !important;
+  width: min(100%, 500px) !important;
+  max-height: calc(100dvh - 28px - var(--n79-safe-top) - var(--n79-safe-bottom)) !important;
+  padding: 18px !important;
+  overflow-y: auto !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 26px !important;
+  background: var(--n79-surface) !important;
+  color: var(--n79-text) !important;
+  box-shadow: 0 28px 80px rgba(3,2,10,.58) !important;
+}
+
+/* ==============================
+   Responsividade
+   ============================== */
+@media (max-width: 390px) {
+  html.ninou-v790 body.family-daily-surface.regular-family-mode .phone-shell {
+    padding-inline: 10px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .app-header {
+    padding-inline: 10px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .state-orbit.live-timeline-orbit {
+    width: min(100%, 350px) !important;
+    border-radius: 29px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface #stateClock {
+    font-size: clamp(2rem, 10.5vw, 2.7rem) !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface #quickActions.quick-actions,
+  html.ninou-v790 body.family-daily-surface .screen[data-screen="today"] > .quick-actions {
+    grid-auto-rows: 116px !important;
+    gap: 9px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .quick-actions > button[data-open-sheet] {
+    height: 116px !important;
+    min-height: 116px !important;
+    max-height: 116px !important;
+    padding-inline: 7px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .quick-actions > button[data-open-sheet] > .action-icon {
+    width: 53px !important;
+    height: 53px !important;
+    min-width: 53px !important;
+    min-height: 53px !important;
+    max-width: 53px !important;
+    max-height: 53px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .quick-observation-chips {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .record-sheet {
+    width: calc(100vw - 8px) !important;
+    bottom: max(4px, var(--n79-safe-bottom)) !important;
+    border-radius: 26px !important;
+    padding-inline: 10px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .record-types {
+    gap: 5px !important;
+    grid-auto-rows: 68px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .record-types button,
+  html.ninou-v790 body.family-daily-surface .record-types button[data-sheet-type] {
+    height: 68px !important;
+    min-height: 68px !important;
+    max-height: 68px !important;
+    grid-template-rows: 35px minmax(15px,auto) !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .record-types .type-icon {
+    width: 35px !important;
+    height: 35px !important;
+    min-width: 35px !important;
+    min-height: 35px !important;
+    max-width: 35px !important;
+    max-height: 35px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .record-types button > span:last-child {
+    font-size: .57rem !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .bottom-bar {
+    width: calc(100vw - 10px) !important;
+    padding-left: 5px !important;
+    padding-right: 63px !important;
+  }
+}
+
+@media (min-width: 700px) {
+  html.ninou-v790 body.family-daily-surface.regular-family-mode .phone-shell {
+    padding-inline: 20px !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .profile-edit-grid,
+  html.ninou-v790 body.family-daily-surface .weight-input-row,
+  html.ninou-v790 body.family-daily-surface .export-period-grid,
+  html.ninou-v790 body.family-daily-surface .family-invite-form {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.ninou-v790 body.family-daily-surface button {
+    transition: transform var(--n79-fast) ease, opacity var(--n79-fast) ease, border-color var(--n79-fast) ease, background-color var(--n79-fast) ease !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface button:active {
+    transform: scale(.975) !important;
+  }
+
+  html.ninou-v790 body.family-daily-surface .screen.active {
+    animation: n79-screen-in 260ms ease both !important;
+  }
+}
+
+@keyframes n79-screen-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ninou-v790 *,
+  html.ninou-v790 *::before,
+  html.ninou-v790 *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* v79.0.0 — correções verificadas por geometria após renderização real. */
+html.ninou-v790 body.family-daily-surface .drawer-section-title {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-rows: auto auto !important;
+  align-items: start !important;
+  gap: 3px 10px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .drawer-section-title > div {
+  min-width: 0 !important;
+  grid-column: 1 !important;
+  grid-row: 1 / 3 !important;
+  display: grid !important;
+  gap: 3px !important;
+}
+
+html.ninou-v790 body.family-daily-surface .drawer-section-title > span:first-child {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .drawer-section-title > strong {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  min-width: 0 !important;
+  line-height: 1.2 !important;
+}
+
+html.ninou-v790 body.family-daily-surface .drawer-section-title > :is(button, em, .ghost-link) {
+  grid-column: 2 !important;
+  grid-row: 1 / 3 !important;
+  align-self: center !important;
+}
+
+html.ninou-v790 body.family-daily-surface .record-types {
+  grid-auto-flow: row !important;
+  grid-auto-columns: auto !important;
+  grid-template-rows: repeat(2, 72px) !important;
+}
+
+@media (max-width: 390px) {
+  html.ninou-v790 body.family-daily-surface .record-types {
+    grid-template-rows: repeat(2, 68px) !important;
+  }
+}
