@@ -1,5 +1,5 @@
-const NINOU_VERSION = "78.4.0";
-const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v78.4.0";
+const NINOU_VERSION = "78.4.1";
+const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v78.4.1";
 const BOOT_STARTED_AT = performance.now();
 const MIN_SPLASH_MS = 1500;
 const MAX_BOOT_WAIT_MS = 8500;
@@ -22,6 +22,10 @@ function safeStorageSet(key, value) { try { window.localStorage.setItem(key, val
 function safeStorageRemove(key) { try { window.localStorage.removeItem(key); } catch (_) {}
 }
 function sleep(ms) { return new Promise((resolve) => window.setTimeout(resolve, ms)); }
+function clearBootWatchdog() {
+  window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
+  window.__NINOU_BOOT_WATCHDOG__ = 0;
+}
 function withTimeout(promise, ms, label) {
   let timer;
   return Promise.race([
@@ -82,14 +86,20 @@ window.addEventListener("ninou:resume", () => {
 window.addEventListener("ninou:auth-ready", () => hideLoadingOverlay({ reason: "auth-ready" }), { passive: true });
 
 async function waitForStyleSheets() {
-  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="78.4.0"]')];
-  await Promise.all(links.map((link) => {
-    if (link.sheet) return Promise.resolve();
+  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="78.4.1"]')];
+  const results = await Promise.allSettled(links.map((link) => {
+    if (link.sheet) return Promise.resolve(link.getAttribute("href"));
     return withTimeout(new Promise((resolve, reject) => {
-      link.addEventListener("load", resolve, { once: true });
+      link.addEventListener("load", () => resolve(link.getAttribute("href")), { once: true });
       link.addEventListener("error", () => reject(new Error(`Falha ao carregar ${link.getAttribute("href")}.`)), { once: true });
     }), 6000, "Folha de estilos");
   }));
+  const failed = results.filter((result) => result.status === "rejected");
+  if (failed.length) {
+    document.documentElement.dataset.ninouStyleFallback = String(failed.length);
+    console.warn("Algumas folhas de estilo não responderam; o Ninou continuará com a base disponível.", failed.map((item) => item.reason));
+  }
+  return results;
 }
 
 async function preloadCriticalImages() {
@@ -176,6 +186,7 @@ function updateVisibleVersion() {
 }
 
 async function revealApp(reason = "ready") {
+  clearBootWatchdog();
   const elapsed = performance.now() - BOOT_STARTED_AT;
   if (elapsed < MIN_SPLASH_MS) await sleep(MIN_SPLASH_MS - elapsed);
   if (reason === "timeout") {
@@ -199,7 +210,7 @@ async function cleanLegacyRuntimeOnce() {
   if ("caches" in window) {
     try {
       const names = await caches.keys();
-      const legacy = names.filter((name) => name.toLowerCase().includes("ninou") && !name.includes("78-4-0"));
+      const legacy = names.filter((name) => name.toLowerCase().includes("ninou") && !name.includes("78-4-1"));
       const results = await Promise.all(legacy.map((name) => caches.delete(name)));
       changed = results.some(Boolean);
     } catch (error) { console.warn("Não foi possível limpar caches legados:", error); }
@@ -221,20 +232,23 @@ async function hardRepair() {
 }
 
 function showBootFailure(error) {
+  clearBootWatchdog();
   console.error("Falha real ao iniciar o Ninou:", error);
   document.documentElement.dataset.ninouBootFailed = "true";
   setBootStatus("Não foi possível concluir a inicialização.");
   showSlowConnectionHint();
   document.querySelector("[data-ninou-boot-error]")?.remove();
+
   const panel = document.createElement("section");
   panel.dataset.ninouBootError = "true";
+  panel.className = "ninou-boot-error";
   panel.setAttribute("role", "alert");
-  panel.style.cssText = "position:fixed;inset:auto 18px max(24px,env(safe-area-inset-bottom));z-index:2147483647;padding:16px;border-radius:18px;background:#fffaf7;color:#3c2720;box-shadow:0 18px 48px rgba(48,35,28,.24);font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
   const message = String(error?.message || error || "Erro desconhecido");
   const escaped = message.replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
-  panel.innerHTML = `<strong style="display:block;font-size:16px;margin-bottom:5px">Falha ao iniciar o Ninou</strong><span>Seus registros locais não serão apagados.</span><button type="button" data-ninou-hard-repair style="display:block;width:100%;margin-top:12px;padding:11px 14px;border:0;border-radius:12px;background:#376f61;color:#fff;font:700 14px system-ui;cursor:pointer">Reparar cache e abrir novamente</button><details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650">Detalhe técnico</summary><code style="display:block;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere">${escaped}</code></details>`;
-  panel.querySelector("[data-ninou-hard-repair]")?.addEventListener("click", async () => {
-    const button = panel.querySelector("[data-ninou-hard-repair]");
+  panel.innerHTML = `<strong>Falha ao iniciar o Ninou</strong><span>Seus registros locais não foram apagados.</span><details style="margin-top:9px"><summary style="cursor:pointer;font-weight:750">Detalhe técnico</summary><code style="display:block;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px">${escaped}</code></details><div class="ninou-boot-error-actions"><button type="button" data-ninou-repair>Reparar e recarregar</button><button type="button" data-ninou-open-anyway>Abrir interface disponível</button></div>`;
+
+  panel.querySelector("[data-ninou-repair]")?.addEventListener("click", async () => {
+    const button = panel.querySelector("[data-ninou-repair]");
     if (button) { button.disabled = true; button.textContent = "Reparando…"; }
     safeStorageRemove(LEGACY_REPAIR_KEY);
     await hardRepair();
@@ -242,7 +256,18 @@ function showBootFailure(error) {
     url.searchParams.set("ninouRecovery", `${NINOU_VERSION}-${Date.now()}`);
     window.location.replace(url.toString());
   }, { once: true });
-  document.body.append(panel);
+
+  panel.querySelector("[data-ninou-open-anyway]")?.addEventListener("click", () => {
+    document.documentElement.dataset.ninouInitialPaint = "forced-after-error";
+    document.documentElement.classList.remove("ninou-booting", "ninou-loading-overlay");
+    const splash = document.querySelector("#ninouBootScreen");
+    splash?.classList.add("is-leaving");
+    window.setTimeout(() => { if (splash) splash.hidden = true; }, 380);
+  }, { once: true });
+
+  const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
+  if (card) card.append(panel);
+  else document.body.append(panel);
 }
 
 async function bootNinou() {
@@ -250,29 +275,57 @@ async function bootNinou() {
   window.__NINOU_BOOT_PROMISE__ = (async () => {
     performance.mark("ninou-boot-start");
     setBootStatus("Verificando a versão do aplicativo…");
-    if (window.__NINOU_EARLY_MIGRATION__) await window.__NINOU_EARLY_MIGRATION__;
+
+    if (window.__NINOU_EARLY_MIGRATION__) {
+      try {
+        await withTimeout(window.__NINOU_EARLY_MIGRATION__, 6500, "Migração do runtime");
+      } catch (error) {
+        console.warn("A limpeza inicial demorou; o app continuará sem bloquear a abertura.", error);
+      }
+    }
     await cleanLegacyRuntimeOnce();
+
     setBootStatus("Preparando a interface premium…");
-    await Promise.all([waitForStyleSheets(), preloadCriticalImages(), document.fonts?.ready || Promise.resolve()]);
+    await Promise.allSettled([
+      waitForStyleSheets(),
+      preloadCriticalImages(),
+      document.fonts?.ready || Promise.resolve(),
+    ]);
+
+    let architecture = null;
     setBootStatus("Preparando a arquitetura do aplicativo…");
-    const architectureModule = await withTimeout(import(`./runtime/architecture-v78.4.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Arquitetura do aplicativo");
-    const architecture = architectureModule.default;
-    architecture.state.setState({ version: NINOU_VERSION, bootPhase: "loading-core" }, { source: "boot" });
+    try {
+      const architectureModule = await withTimeout(import(`./runtime/architecture-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Arquitetura do aplicativo");
+      architecture = architectureModule.default;
+      architecture?.state?.setState?.({ version: NINOU_VERSION, bootPhase: "loading-core" }, { source: "boot" });
+    } catch (error) {
+      document.documentElement.dataset.ninouArchitectureFallback = "true";
+      console.warn("A camada de arquitetura não carregou; o núcleo continuará em modo compatível.", error);
+    }
+
     setBootStatus("Carregando o diário do bebê…");
-    await withTimeout(import(`./ninou-core-v78.4.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Núcleo do aplicativo");
-    await withTimeout(Promise.all([
-      import(`./ninou-ux-v78.4.0.mjs?v=${NINOU_VERSION}`),
-      import(`./ninou-consistency-v78.4.0.mjs?v=${NINOU_VERSION}`),
-      import(`./ninou-stability-v78.4.0.mjs?v=${NINOU_VERSION}`),
-      import(`./runtime/diagnostics-v78.4.0.mjs?v=${NINOU_VERSION}`),
-      import(`./runtime/visual-guard-v78.4.0.mjs?v=${NINOU_VERSION}`),
-    ]), MODULE_TIMEOUT_MS, "Camadas de interface");
+    await withTimeout(import(`./ninou-core-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Núcleo do aplicativo");
+
+    const layerResults = await Promise.allSettled([
+      withTimeout(import(`./ninou-ux-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Experiência de uso"),
+      withTimeout(import(`./ninou-consistency-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Consistência visual"),
+      withTimeout(import(`./ninou-stability-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Estabilidade"),
+      withTimeout(import(`./runtime/diagnostics-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Diagnóstico"),
+      withTimeout(import(`./runtime/visual-guard-v78.4.1.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Guarda visual"),
+    ]);
+    const failedLayers = layerResults.filter((result) => result.status === "rejected");
+    if (failedLayers.length) {
+      document.documentElement.dataset.ninouLayerFallback = String(failedLayers.length);
+      console.warn("Camadas complementares falharam, mas não bloquearão a abertura.", failedLayers.map((item) => item.reason));
+    }
+
     window.__NINOU_APP_READY__ = true;
     document.documentElement.dataset.ninouAppReady = "true";
-    architecture.state.setState({ version: NINOU_VERSION, ready: true, bootPhase: "ready" }, { source: "boot" });
-    architecture.bus.emit("app:ready", { version: NINOU_VERSION });
-    architecture.logger.info("app_ready", { version: NINOU_VERSION });
+    architecture?.state?.setState?.({ version: NINOU_VERSION, ready: true, bootPhase: "ready" }, { source: "boot" });
+    architecture?.bus?.emit?.("app:ready", { version: NINOU_VERSION });
+    architecture?.logger?.info?.("app_ready", { version: NINOU_VERSION });
     window.__NINOU_VISUAL_GUARD__?.apply?.();
+
     const reason = await waitForStableFirstPaint();
     await revealApp(reason);
     try { performance.mark("ninou-boot-end"); performance.measure("ninou-boot", "ninou-boot-start", "ninou-boot-end"); } catch (_) {}

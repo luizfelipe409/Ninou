@@ -9,9 +9,9 @@ const cssModules = ["legacy", "tokens", "foundation", "home", "components", "mot
 const required = [
   "index.html", "styles.css", "sw.js", "manifest.webmanifest", "firestore.rules",
   ...cssModules.map((name) => `styles/${name}.css`),
-  "js/boot-v78.4.0.mjs", "js/ninou-core-v78.4.0.mjs", "js/ninou-ux-v78.4.0.mjs",
-  "js/ninou-consistency-v78.4.0.mjs", "js/ninou-stability-v78.4.0.mjs",
-  "js/runtime/architecture-v78.4.0.mjs", "js/runtime/diagnostics-v78.4.0.mjs", "js/runtime/visual-guard-v78.4.0.mjs",
+  "js/boot-v78.4.1.mjs", "js/ninou-core-v78.4.1.mjs", "js/ninou-ux-v78.4.1.mjs",
+  "js/ninou-consistency-v78.4.1.mjs", "js/ninou-stability-v78.4.1.mjs",
+  "js/runtime/architecture-v78.4.1.mjs", "js/runtime/diagnostics-v78.4.1.mjs", "js/runtime/visual-guard-v78.4.1.mjs",
   "js/core/event-bus.js", "js/core/app-state.js", "js/core/logger.js",
   "js/repositories/json-repository.js", "js/repositories/routine-repository.js", "js/repositories/profile-repository.js",
   "js/storage/local-storage.js", "js/utils/security.js",
@@ -35,7 +35,7 @@ for (const file of scripts) {
   if (result.status !== 0) failures.push(`Sintaxe inválida em ${relative(root, file)}: ${result.stderr.trim()}`);
 }
 
-for (const file of scripts.filter((file) => /js\/(?:core|repositories|runtime)\//.test(relative(root, file)) && !file.endsWith("diagnostics-v78.4.0.mjs") && !file.endsWith("visual-guard-v78.4.0.mjs"))) {
+for (const file of scripts.filter((file) => /js\/(?:core|repositories|runtime)\//.test(relative(root, file)) && !file.endsWith("diagnostics-v78.4.1.mjs") && !file.endsWith("visual-guard-v78.4.1.mjs"))) {
   const source = await readFile(file, "utf8");
   if (/\blocalStorage\b/.test(source)) failures.push(`Acesso direto a localStorage em ${relative(root, file)}`);
 }
@@ -45,8 +45,8 @@ const ids = [...html.matchAll(/\sid=["']([^"']+)["']/g)].map((match) => match[1]
 const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
 if (duplicates.length) failures.push(`IDs duplicados no HTML: ${duplicates.join(", ")}`);
 if (/77\.3\.0|78\.0\.0|78\.1\.1/.test(html)) failures.push("index.html ainda referencia uma versão antiga");
-if (!html.includes("boot-v78.4.0.mjs?v=78.4.0")) failures.push("Boot v78.4.0 não está ligado ao index.html");
-for (const module of cssModules) if (!html.includes(`styles/${module}.css?v=78.4.0`)) failures.push(`CSS ${module} não está ligado ao HTML`);
+if (!html.includes("boot-v78.4.1.mjs?v=78.4.1")) failures.push("Boot v78.4.1 não está ligado ao index.html");
+for (const module of cssModules) if (!html.includes(`styles/${module}.css?v=78.4.1`)) failures.push(`CSS ${module} não está ligado ao HTML`);
 
 const sw = await readFile(join(root, "sw.js"), "utf8");
 for (const asset of required.filter((file) => file.startsWith("js/"))) {
@@ -69,7 +69,7 @@ const sizes = {};
 for (const name of cssModules) sizes[name] = (await stat(join(root, `styles/${name}.css`))).size;
 const totalCss = Object.values(sizes).reduce((a,b) => a+b,0);
 if (totalCss >= 800 * 1024) failures.push(`CSS total ainda está grande demais: ${(totalCss/1024).toFixed(1)} KB`);
-console.log(`Ninou v78.4.0: ${files.length} arquivos, ${scripts.length} scripts, CSS total ${(totalCss/1024).toFixed(1)} KB, !important premium ${premiumImportant}.`);
+console.log(`Ninou v78.4.1: ${files.length} arquivos, ${scripts.length} scripts, CSS total ${(totalCss/1024).toFixed(1)} KB, !important premium ${premiumImportant}.`);
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join("\n"));
   process.exit(1);

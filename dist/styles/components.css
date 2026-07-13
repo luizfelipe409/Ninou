@@ -1,5 +1,5 @@
-/* Ninou v78.4.0 — componentes globais consolidados */
-html.ninou-v784 body.family-daily-surface .bottom-bar {
+/* Ninou v78.4.1 — componentes globais consolidados */
+html.ninou-v7841 body.family-daily-surface .bottom-bar {
   position: fixed !important;
   left: 50% !important;
   bottom: max(10px, env(safe-area-inset-bottom)) !important;
@@ -19,7 +19,7 @@ html.ninou-v784 body.family-daily-surface .bottom-bar {
   box-shadow: var(--n-shadow-float), inset 0 1px 0 rgba(255,255,255,.14) !important;
   transform: translateX(-50%) !important;
 }
-html.ninou-v784 body.family-daily-surface .bottom-nav {
+html.ninou-v7841 body.family-daily-surface .bottom-nav {
   min-width: 0 !important;
   display: grid !important;
   grid-template-columns: repeat(5,minmax(0,1fr)) !important;
@@ -29,7 +29,7 @@ html.ninou-v784 body.family-daily-surface .bottom-nav {
   background: transparent !important;
   box-shadow: none !important;
 }
-html.ninou-v784 body.family-daily-surface .bottom-nav button {
+html.ninou-v7841 body.family-daily-surface .bottom-nav button {
   position: relative !important;
   min-width: 0 !important;
   min-height: 60px !important;
@@ -47,7 +47,7 @@ html.ninou-v784 body.family-daily-surface .bottom-nav button {
   font-weight: 850 !important;
   box-shadow: none !important;
 }
-html.ninou-v784 body.family-daily-surface .bottom-nav button::after {
+html.ninou-v7841 body.family-daily-surface .bottom-nav button::after {
   content: "" !important;
   position: absolute !important;
   left: 50% !important;
@@ -60,13 +60,13 @@ html.ninou-v784 body.family-daily-surface .bottom-nav button::after {
   transform: translateX(-50%) scaleX(.4) !important;
   transition: opacity var(--n-motion-fast) ease, transform var(--n-motion-base) var(--n-ease) !important;
 }
-html.ninou-v784 body.family-daily-surface .bottom-nav button.active {
+html.ninou-v7841 body.family-daily-surface .bottom-nav button.active {
   background: color-mix(in srgb,var(--n-accent) 12%,var(--n-surface-solid)) !important;
   color: var(--n-accent) !important;
 }
-html.ninou-v784 body.family-daily-surface .bottom-nav button.active::after { opacity: 1 !important; transform: translateX(-50%) scaleX(1) !important; }
-html.ninou-v784 body.family-daily-surface .nav-symbol { color: currentColor !important; font-size: 1.28rem !important; font-weight: 800 !important; line-height: 1 !important; }
-html.ninou-v784 body.family-daily-surface .fab {
+html.ninou-v7841 body.family-daily-surface .bottom-nav button.active::after { opacity: 1 !important; transform: translateX(-50%) scaleX(1) !important; }
+html.ninou-v7841 body.family-daily-surface .nav-symbol { color: currentColor !important; font-size: 1.28rem !important; font-weight: 800 !important; line-height: 1 !important; }
+html.ninou-v7841 body.family-daily-surface .fab {
   width: 62px !important;
   height: 62px !important;
   min-width: 62px !important;
@@ -80,10 +80,10 @@ html.ninou-v784 body.family-daily-surface .fab {
   color: #fff !important;
   box-shadow: 0 13px 28px rgba(92,67,174,.34), inset 0 1px 0 rgba(255,255,255,.32) !important;
 }
-html.ninou-v784 body.family-daily-surface .fab > span { color: #fff !important; font-size: 2.1rem !important; font-weight: 450 !important; line-height: 1 !important; transform: translateY(-1px) !important; }
+html.ninou-v7841 body.family-daily-surface .fab > span { color: #fff !important; font-size: 2.1rem !important; font-weight: 450 !important; line-height: 1 !important; transform: translateY(-1px) !important; }
 
-html.ninou-v784 body.family-daily-surface .record-sheet,
-html.ninou-v784 body.family-daily-surface .orbit-cluster-sheet {
+html.ninou-v7841 body.family-daily-surface .record-sheet,
+html.ninou-v7841 body.family-daily-surface .orbit-cluster-sheet {
   width: min(100%,520px) !important;
   max-height: min(88dvh,760px) !important;
   padding: 14px 16px calc(18px + env(safe-area-inset-bottom)) !important;
@@ -94,8 +94,8 @@ html.ninou-v784 body.family-daily-surface .orbit-cluster-sheet {
   color: var(--n-text) !important;
   box-shadow: var(--n-shadow-float) !important;
 }
-html.ninou-v784 body.family-daily-surface .sheet-handle { width: 48px !important; height: 5px !important; margin: 0 auto 14px !important; border-radius: var(--n-pill) !important; background: var(--n-line-strong) !important; }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types {
+html.ninou-v7841 body.family-daily-surface .sheet-handle { width: 48px !important; height: 5px !important; margin: 0 auto 14px !important; border-radius: var(--n-pill) !important; background: var(--n-line-strong) !important; }
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types {
   display: flex !important;
   grid-template-columns: none !important;
   gap: 8px !important;
@@ -110,8 +110,8 @@ html.ninou-v784 body.family-daily-surface #recordSheet .record-types {
   scrollbar-width: none !important;
   -webkit-overflow-scrolling: touch !important;
 }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types::-webkit-scrollbar { display: none !important; }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types button {
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types::-webkit-scrollbar { display: none !important; }
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types button {
   position: relative !important;
   inset: auto !important;
   flex: 0 0 calc((100% - 24px) / 4) !important;
@@ -138,13 +138,13 @@ html.ninou-v784 body.family-daily-surface #recordSheet .record-types button {
   box-shadow: none !important;
   transform: none !important;
 }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types button.active {
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types button.active {
   border-color: var(--n-line-strong) !important;
   background: color-mix(in srgb,var(--n-accent) 13%,var(--n-surface-solid)) !important;
   color: var(--n-accent) !important;
   box-shadow: 0 8px 18px color-mix(in srgb,var(--n-accent) 12%,transparent) !important;
 }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types .type-icon {
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types .type-icon {
   position: static !important;
   inset: auto !important;
   width: 42px !important;
@@ -159,13 +159,13 @@ html.ninou-v784 body.family-daily-surface #recordSheet .record-types .type-icon 
   border-radius: 13px !important;
   transform: none !important;
 }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types .type-icon :is(img,svg) {
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types .type-icon :is(img,svg) {
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
   transform: none !important;
 }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-types button > span:last-child {
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-types button > span:last-child {
   display: block !important;
   width: 100% !important;
   overflow: hidden !important;
@@ -175,31 +175,31 @@ html.ninou-v784 body.family-daily-surface #recordSheet .record-types button > sp
   line-height: 1.08 !important;
   text-align: center !important;
 }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-form { display: grid !important; gap: 12px !important; padding-bottom: 88px !important; }
-html.ninou-v784 body.family-daily-surface .record-form label { color: var(--n-muted) !important; font-size: .76rem !important; font-weight: 850 !important; text-transform: none !important; }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-actions-footer { position: sticky !important; bottom: -1px !important; z-index: 20 !important; margin: -72px -4px -4px !important; padding: 72px 4px 4px !important; background: linear-gradient(180deg,transparent 0,var(--n-surface-solid) 48%) !important; pointer-events: none !important; }
-html.ninou-v784 body.family-daily-surface #recordSheet .record-actions-footer > * { pointer-events: auto !important; }
-html.ninou-v784 body.family-daily-surface .save-button { width: 100% !important; min-height: 54px !important; border: 0 !important; border-radius: 17px !important; background: linear-gradient(135deg,var(--n-accent),#6fd9b8) !important; color: var(--n-accent-ink) !important; font-size: .98rem !important; font-weight: 950 !important; box-shadow: 0 12px 25px color-mix(in srgb,var(--n-accent) 22%,transparent) !important; }
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-form { display: grid !important; gap: 12px !important; padding-bottom: 88px !important; }
+html.ninou-v7841 body.family-daily-surface .record-form label { color: var(--n-muted) !important; font-size: .76rem !important; font-weight: 850 !important; text-transform: none !important; }
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-actions-footer { position: sticky !important; bottom: -1px !important; z-index: 20 !important; margin: -72px -4px -4px !important; padding: 72px 4px 4px !important; background: linear-gradient(180deg,transparent 0,var(--n-surface-solid) 48%) !important; pointer-events: none !important; }
+html.ninou-v7841 body.family-daily-surface #recordSheet .record-actions-footer > * { pointer-events: auto !important; }
+html.ninou-v7841 body.family-daily-surface .save-button { width: 100% !important; min-height: 54px !important; border: 0 !important; border-radius: 17px !important; background: linear-gradient(135deg,var(--n-accent),#6fd9b8) !important; color: var(--n-accent-ink) !important; font-size: .98rem !important; font-weight: 950 !important; box-shadow: 0 12px 25px color-mix(in srgb,var(--n-accent) 22%,transparent) !important; }
 
-html.ninou-v784 body.family-daily-surface .ninou-modal { z-index: 2000 !important; }
-html.ninou-v784 body.family-daily-surface .ninou-modal-backdrop,
-html.ninou-v784 body.family-daily-surface .sheet-backdrop { background: rgba(8,6,17,.58) !important; -webkit-backdrop-filter: blur(8px) !important; backdrop-filter: blur(8px) !important; }
-html.ninou-v784 body.family-daily-surface .ninou-modal-card { width: min(calc(100% - 28px),480px) !important; max-height: min(88dvh,760px) !important; overflow-y: auto !important; padding: 22px !important; border: 1px solid var(--n-line) !important; border-radius: 26px !important; background: var(--n-surface-solid) !important; color: var(--n-text) !important; box-shadow: var(--n-shadow-float) !important; }
-html.ninou-v784 body.family-daily-surface :is(.guest-modal-close,button[aria-label^="Fechar"]) { min-width: 42px !important; min-height: 42px !important; display: grid !important; place-items: center !important; border: 1px solid var(--n-line) !important; border-radius: 14px !important; background: var(--n-surface-2) !important; color: var(--n-text-2) !important; }
+html.ninou-v7841 body.family-daily-surface .ninou-modal { z-index: 2000 !important; }
+html.ninou-v7841 body.family-daily-surface .ninou-modal-backdrop,
+html.ninou-v7841 body.family-daily-surface .sheet-backdrop { background: rgba(8,6,17,.58) !important; -webkit-backdrop-filter: blur(8px) !important; backdrop-filter: blur(8px) !important; }
+html.ninou-v7841 body.family-daily-surface .ninou-modal-card { width: min(calc(100% - 28px),480px) !important; max-height: min(88dvh,760px) !important; overflow-y: auto !important; padding: 22px !important; border: 1px solid var(--n-line) !important; border-radius: 26px !important; background: var(--n-surface-solid) !important; color: var(--n-text) !important; box-shadow: var(--n-shadow-float) !important; }
+html.ninou-v7841 body.family-daily-surface :is(.guest-modal-close,button[aria-label^="Fechar"]) { min-width: 42px !important; min-height: 42px !important; display: grid !important; place-items: center !important; border: 1px solid var(--n-line) !important; border-radius: 14px !important; background: var(--n-surface-2) !important; color: var(--n-text-2) !important; }
 
-html.ninou-v784 body.family-daily-surface .screen[data-screen="diary"] .date-filter,
-html.ninou-v784 body.family-daily-surface .screen[data-screen="trends"] :is(.chart-card,.data-chart-card,.data-premium-hero),
-html.ninou-v784 body.family-daily-surface .screen[data-screen="sounds"] :is(.sounds-hero,.sound-player-card,.sound-note),
-html.ninou-v784 body.family-daily-surface .screen[data-screen="profile"] :is(.profile-card,.profile-family-card,.login-card,.export-card,.danger-card,.privacy-note-card) {
+html.ninou-v7841 body.family-daily-surface .screen[data-screen="diary"] .date-filter,
+html.ninou-v7841 body.family-daily-surface .screen[data-screen="trends"] :is(.chart-card,.data-chart-card,.data-premium-hero),
+html.ninou-v7841 body.family-daily-surface .screen[data-screen="sounds"] :is(.sounds-hero,.sound-player-card,.sound-note),
+html.ninou-v7841 body.family-daily-surface .screen[data-screen="profile"] :is(.profile-card,.profile-family-card,.login-card,.export-card,.danger-card,.privacy-note-card) {
   border: 1px solid var(--n-line) !important;
   border-radius: 22px !important;
   background: var(--n-surface) !important;
   color: var(--n-text) !important;
   box-shadow: var(--n-shadow-1) !important;
 }
-html.ninou-v784 body.family-daily-surface .timeline { gap: 11px !important; }
-html.ninou-v784 body.family-daily-surface .event-card { padding: 15px !important; border: 1px solid var(--n-line) !important; border-radius: 19px !important; background: var(--n-surface) !important; color: var(--n-text) !important; box-shadow: var(--n-shadow-1) !important; }
-html.ninou-v784 body.family-daily-surface .chips button,
-html.ninou-v784 body.family-daily-surface .summary-range-control button { min-height: 40px !important; border: 1px solid var(--n-line) !important; border-radius: 13px !important; background: var(--n-surface-2) !important; color: var(--n-text-2) !important; box-shadow: none !important; }
-html.ninou-v784 body.family-daily-surface .chips button.active,
-html.ninou-v784 body.family-daily-surface .summary-range-control button.active { border-color: var(--n-line-strong) !important; background: color-mix(in srgb,var(--n-accent) 13%,var(--n-surface-solid)) !important; color: var(--n-accent) !important; }
+html.ninou-v7841 body.family-daily-surface .timeline { gap: 11px !important; }
+html.ninou-v7841 body.family-daily-surface .event-card { padding: 15px !important; border: 1px solid var(--n-line) !important; border-radius: 19px !important; background: var(--n-surface) !important; color: var(--n-text) !important; box-shadow: var(--n-shadow-1) !important; }
+html.ninou-v7841 body.family-daily-surface .chips button,
+html.ninou-v7841 body.family-daily-surface .summary-range-control button { min-height: 40px !important; border: 1px solid var(--n-line) !important; border-radius: 13px !important; background: var(--n-surface-2) !important; color: var(--n-text-2) !important; box-shadow: none !important; }
+html.ninou-v7841 body.family-daily-surface .chips button.active,
+html.ninou-v7841 body.family-daily-surface .summary-range-control button.active { border-color: var(--n-line-strong) !important; background: color-mix(in srgb,var(--n-accent) 13%,var(--n-surface-solid)) !important; color: var(--n-accent) !important; }

@@ -1,11 +1,11 @@
-/* Ninou v78.4.0 — autoridade final para os pontos observados no iPhone. */
-html.ninou-v784,
-html.ninou-v784 body {
+/* Ninou v78.4.1 — autoridade final para os pontos observados no iPhone. */
+html.ninou-v7841,
+html.ninou-v7841 body {
   min-width: 100%;
 }
 
 /* A composição da órbita não pode herdar grade, margens ou transformações legadas. */
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit {
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit {
   position: relative !important;
   display: block !important;
   width: 100% !important;
@@ -15,7 +15,7 @@ html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit {
   box-sizing: border-box !important;
 }
 
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit .orbit-center-safe {
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit .orbit-center-safe {
   position: absolute !important;
   inset: 50% auto auto 50% !important;
   left: 50% !important;
@@ -37,9 +37,9 @@ html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit .orbi
   transform-origin: center !important;
 }
 
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stateLabel,
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stateClock,
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stateHint {
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit #stateLabel,
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit #stateClock,
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit #stateHint {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -52,7 +52,7 @@ html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stat
   box-sizing: border-box !important;
 }
 
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stateClock {
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit #stateClock {
   font-size: clamp(2.18rem, 10.2vw, 3.05rem) !important;
   font-variant-numeric: tabular-nums !important;
   letter-spacing: -.045em !important;
@@ -61,14 +61,14 @@ html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stat
   overflow: visible !important;
 }
 
-html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit #stateHint {
+html.ninou-v7841 body.family-daily-surface .state-orbit.live-timeline-orbit #stateHint {
   font-size: .8rem !important;
   line-height: 1.28 !important;
   overflow-wrap: anywhere !important;
 }
 
 /* Uma única composição para os quatro atalhos: nada fica acima ou fora do card. */
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions {
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions {
   position: relative !important;
   width: 100% !important;
   display: grid !important;
@@ -82,7 +82,7 @@ html.ninou-v784 body.family-daily-surface #quickActions.quick-actions {
   box-sizing: border-box !important;
 }
 
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] {
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] {
   position: relative !important;
   inset: auto !important;
   width: 100% !important;
@@ -103,13 +103,13 @@ html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[d
   transform: none !important;
 }
 
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet]::before,
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet]::after {
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet]::before,
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet]::after {
   pointer-events: none !important;
 }
 
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon,
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon {
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon {
   position: relative !important;
   inset: auto !important;
   top: auto !important;
@@ -135,10 +135,10 @@ html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[d
   transform: none !important;
 }
 
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon > img,
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon > svg,
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon > img,
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon > svg {
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon > img,
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon > svg,
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon > img,
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon > svg {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -152,7 +152,7 @@ html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[d
   transform: none !important;
 }
 
-html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > span:last-child {
+html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > span:last-child {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -175,26 +175,26 @@ html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[d
 }
 
 /* A barra fixa nunca reduz o último conteúdo acessível. */
-html.ninou-v784 body.family-daily-surface .phone-shell,
-html.ninou-v784 body.family-daily-surface .screen.active {
+html.ninou-v7841 body.family-daily-surface .phone-shell,
+html.ninou-v7841 body.family-daily-surface .screen.active {
   padding-bottom: max(184px, calc(152px + env(safe-area-inset-bottom, 0px))) !important;
   scroll-padding-bottom: max(184px, calc(152px + env(safe-area-inset-bottom, 0px))) !important;
 }
 
 @media (max-width: 390px) {
-  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions {
+  html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions {
     grid-auto-rows: 118px !important;
     gap: 10px !important;
   }
-  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] {
+  html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] {
     height: 118px !important;
     min-height: 118px !important;
     max-height: 118px !important;
     padding: 11px 7px 10px !important;
     gap: 8px !important;
   }
-  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon,
-  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon {
+  html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon,
+  html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon {
     flex-basis: 52px !important;
     width: 52px !important;
     height: 52px !important;
@@ -203,7 +203,7 @@ html.ninou-v784 body.family-daily-surface .screen.active {
     max-width: 52px !important;
     max-height: 52px !important;
   }
-  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > span:last-child {
+  html.ninou-v7841 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > span:last-child {
     font-size: .8rem !important;
   }
 }

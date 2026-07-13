@@ -1,4 +1,4 @@
-const UX_VERSION = "78.4.0";
+const UX_VERSION = "78.4.1";
 const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
 function vibrate(pattern = 8) {
@@ -46,39 +46,92 @@ function classifyHaptic(control) {
 
 function enhanceScreens() {
   const screens = [...document.querySelectorAll(".screen")];
-  const animate = (screen) => {
-    if (!screen.classList.contains("active")) return screen.classList.remove("ninou-screen-entered");
+  const activeState = new WeakMap();
+  const animationTimers = new WeakMap();
+
+  const animate = (screen, force = false) => {
+    const isActive = screen.classList.contains("active");
+    const wasActive = activeState.get(screen);
+    if (!force && wasActive === isActive) return;
+    activeState.set(screen, isActive);
+
+    const previousTimer = animationTimers.get(screen);
+    if (previousTimer) window.clearTimeout(previousTimer);
+
+    if (!isActive) {
+      screen.classList.remove("ninou-screen-entered");
+      return;
+    }
+
     screen.classList.remove("ninou-screen-entered");
-    requestAnimationFrame(() => requestAnimationFrame(() => screen.classList.add("ninou-screen-entered")));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      screen.classList.add("ninou-screen-entered");
+      const timer = window.setTimeout(() => {
+        screen.classList.remove("ninou-screen-entered");
+        animationTimers.delete(screen);
+      }, 460);
+      animationTimers.set(screen, timer);
+    }));
     document.documentElement.dataset.ninouScreen = screen.dataset.screen || "unknown";
     screen.querySelector("button, input, select, textarea")?.blur?.();
   };
-  screens.forEach(animate);
+
+  screens.forEach((screen) => animate(screen, true));
   const observer = new MutationObserver((mutations) => {
-    mutations.forEach(({ target }) => { if (target instanceof Element && target.matches(".screen")) animate(target); });
+    mutations.forEach(({ target, oldValue }) => {
+      if (!(target instanceof Element) || !target.matches(".screen")) return;
+      const oldActive = String(oldValue || "").split(/\s+/).includes("active");
+      const newActive = target.classList.contains("active");
+      if (oldActive !== newActive) animate(target);
+    });
   });
-  screens.forEach((screen) => observer.observe(screen, { attributes: true, attributeFilter: ["class"] }));
+  screens.forEach((screen) => observer.observe(screen, {
+    attributes: true,
+    attributeFilter: ["class"],
+    attributeOldValue: true,
+  }));
 }
 
 function enhanceSheetsAndModals() {
   const selectors = ["#recordSheet", "#orbitClusterSheet", ".ninou-modal", ".record-sheet", ".orbit-cluster-sheet"];
   const elements = [...new Set(selectors.flatMap((selector) => [...document.querySelectorAll(selector)]))];
+  const visibilityState = new WeakMap();
+  const closeTimers = new WeakMap();
   const isVisible = (element) => !element.hidden && getComputedStyle(element).display !== "none";
-  const syncRoot = () => document.documentElement.classList.toggle("ninou-overlay-open", elements.some(isVisible));
-  const sync = (element) => {
-    if (isVisible(element)) {
+
+  const syncRoot = () => {
+    document.documentElement.classList.toggle("ninou-overlay-open", elements.some(isVisible));
+  };
+
+  const sync = (element, force = false) => {
+    const visible = isVisible(element);
+    const previous = visibilityState.get(element);
+    if (!force && previous === visible) return;
+    visibilityState.set(element, visible);
+
+    const oldTimer = closeTimers.get(element);
+    if (oldTimer) window.clearTimeout(oldTimer);
+
+    if (visible) {
       element.classList.remove("ninou-surface-opening");
       requestAnimationFrame(() => element.classList.add("ninou-surface-opening"));
-      window.setTimeout(() => element.classList.remove("ninou-surface-opening"), 430);
+      const timer = window.setTimeout(() => {
+        element.classList.remove("ninou-surface-opening");
+        closeTimers.delete(element);
+      }, 430);
+      closeTimers.set(element, timer);
     } else {
       element.classList.remove("ninou-surface-opening", "ninou-surface-open");
     }
     syncRoot();
   };
-  const observer = new MutationObserver((mutations) => mutations.forEach((mutation) => sync(mutation.target)));
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => sync(mutation.target));
+  });
   elements.forEach((element) => {
     observer.observe(element, { attributes: true, attributeFilter: ["hidden", "class", "style"] });
-    sync(element);
+    sync(element, true);
   });
 }
 

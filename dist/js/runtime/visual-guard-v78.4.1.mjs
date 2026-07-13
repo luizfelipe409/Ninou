@@ -1,4 +1,4 @@
-const VERSION = "78.4.0";
+const VERSION = "78.4.1";
 
 function important(element, property, value) {
   if (element) element.style.setProperty(property, value, "important");
@@ -130,19 +130,41 @@ function applyVisualGuard() {
 }
 
 let resizeTimer = 0;
+let guardFrame = 0;
+function queueVisualGuard() {
+  if (guardFrame) return;
+  guardFrame = requestAnimationFrame(() => {
+    guardFrame = 0;
+    applyVisualGuard();
+  });
+}
+
 window.addEventListener("resize", () => {
   window.clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(applyVisualGuard, 80);
+  resizeTimer = window.setTimeout(queueVisualGuard, 80);
 }, { passive: true });
-window.addEventListener("orientationchange", applyVisualGuard, { passive: true });
-window.addEventListener("ninou:resume", applyVisualGuard, { passive: true });
-window.addEventListener("ninou:auth-ready", applyVisualGuard, { passive: true });
-window.addEventListener("ninou:boot-revealed", applyVisualGuard, { passive: true });
+window.addEventListener("orientationchange", queueVisualGuard, { passive: true });
+window.addEventListener("ninou:resume", queueVisualGuard, { passive: true });
+window.addEventListener("ninou:auth-ready", queueVisualGuard, { passive: true });
+window.addEventListener("ninou:boot-revealed", queueVisualGuard, { passive: true });
 
 const observer = new MutationObserver((mutations) => {
-  if (mutations.some((mutation) => mutation.type === "childList" || mutation.attributeName === "class")) applyVisualGuard();
+  const relevant = mutations.some((mutation) => {
+    if (mutation.type === "childList") return mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0;
+    if (mutation.type !== "attributes") return false;
+    if (mutation.target === document.documentElement && mutation.attributeName === "class") return true;
+    if (mutation.target === document.body && mutation.attributeName === "class") return true;
+    if (mutation.attributeName === "hidden") return true;
+    return mutation.target instanceof Element && mutation.target.matches(".screen");
+  });
+  if (relevant) queueVisualGuard();
 });
-observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "hidden"] });
+observer.observe(document.documentElement, {
+  subtree: true,
+  childList: true,
+  attributes: true,
+  attributeFilter: ["class", "hidden"],
+});
 
 applyVisualGuard();
 document.documentElement.dataset.ninouVisualGuard = VERSION;

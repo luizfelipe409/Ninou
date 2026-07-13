@@ -404,7 +404,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "78.4.0";
+const NINOU_RUNTIME_VERSION = "78.4.1";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -4242,7 +4242,7 @@ function prepareVisibleContextForAccount(user = cloudUser) {
   }
 
   /*
-    v78.4.0 — retomada sem tela fantasma:
+    v78.4.1 — retomada sem tela fantasma:
     quando o Firebase reconfirma a mesma conta ao abrir o Safari ou voltar do segundo plano,
     a interface estável permanece visível. O perfil e a rotina só são limpos se a conta mudou.
   */
@@ -14513,7 +14513,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=78.4.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=78.4.1", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);

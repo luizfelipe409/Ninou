@@ -1,4 +1,4 @@
-# Ninou v78.4.0 — Premium estável
+# Ninou v78.4.1 — Premium estável
 
 Esta versão corrige as regressões vistas na gravação feita no iPhone, mantendo a identidade visual e a estrutura de dados atual.
 

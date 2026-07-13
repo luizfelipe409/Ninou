@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "78.4.0";
+        const VERSION = "78.4.1";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
-        root.classList.add("ninou-booting", "ninou-v784");
+        root.classList.add("ninou-booting", "ninou-v7841");
         root.dataset.ninouVersion = VERSION;
         window.__NINOU_EARLY_VERSION__ = VERSION;
         window.__NINOU_EARLY_MIGRATION__ = (async () => {
@@ -25,8 +25,7 @@
             const url = new URL(location.href);
             if (url.searchParams.get("ninouVersion") !== VERSION) {
               url.searchParams.set("ninouVersion", VERSION);
-              location.replace(url.toString());
-              return new Promise(() => {});
+              history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
             }
             return true;
           } catch (error) {
@@ -45,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=78.4.0" />
+    <link rel="manifest" href="./manifest.webmanifest?v=78.4.1" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -55,14 +54,14 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles/legacy.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/tokens.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/foundation.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/home.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/components.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/motion.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/responsive.css?v=78.4.0" />
-    <link rel="stylesheet" href="./styles/v78.4-critical.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/legacy.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/tokens.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/foundation.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/home.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/components.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/motion.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/responsive.css?v=78.4.1" />
+    <link rel="stylesheet" href="./styles/v78.4-critical.css?v=78.4.1" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -83,6 +82,13 @@
       .ninou-boot-progress::after { content:""; display:block; width:42%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#6f55bb,#73d8c0); animation:ninouBootProgress 1.25s ease-in-out infinite; }
       .ninou-boot-slow { min-height:18px; margin:14px 0 0; color:#918a9e; font-size:12px; opacity:0; transition:opacity .25s ease; }
       .ninou-boot-slow.is-visible { opacity:1; }
+      .ninou-boot-error { margin:18px auto 0; padding:14px; border:1px solid rgba(174,82,82,.22); border-radius:16px; background:rgba(255,255,255,.76); color:#4a2630; text-align:left; box-shadow:0 12px 32px rgba(74,38,48,.10); }
+      .ninou-boot-error strong { display:block; margin-bottom:5px; font-size:15px; }
+      .ninou-boot-error span { display:block; font-size:12px; line-height:1.45; color:#765c64; }
+      .ninou-boot-error-actions { display:grid; grid-template-columns:1fr; gap:8px; margin-top:12px; }
+      .ninou-boot-error button { min-height:42px; border:0; border-radius:12px; padding:10px 12px; font:800 13px/1.2 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; cursor:pointer; }
+      .ninou-boot-error [data-ninou-repair] { background:#5f48a2; color:#fff; }
+      .ninou-boot-error [data-ninou-open-anyway] { background:rgba(95,72,162,.10); color:#4e3d81; }
       @keyframes ninouBootFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
       @keyframes ninouBootProgress { 0%{transform:translateX(-120%)} 55%{transform:translateX(115%)} 100%{transform:translateX(260%)} }
       @media (prefers-reduced-motion: reduce) { .ninou-boot-mark,.ninou-boot-progress::after{animation:none} }
@@ -104,6 +110,46 @@
         <p id="ninouBootSlow" class="ninou-boot-slow">A conexão está demorando um pouco. Seus dados locais serão usados para abrir o app.</p>
       </div>
     </section>
+    <script>
+      (() => {
+        const WATCHDOG_MS = 15000;
+        const root = document.documentElement;
+        window.__NINOU_BOOT_WATCHDOG__ = window.setTimeout(() => {
+          if (root.dataset.ninouInitialPaint || !root.classList.contains("ninou-booting")) return;
+          root.dataset.ninouBootStalled = "true";
+          const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
+          const status = document.querySelector("#ninouBootStatus");
+          const slow = document.querySelector("#ninouBootSlow");
+          if (status) status.textContent = "O carregamento demorou mais do que deveria.";
+          slow?.classList.add("is-visible");
+          if (!card || card.querySelector("[data-ninou-boot-watchdog]")) return;
+          const panel = document.createElement("div");
+          panel.className = "ninou-boot-error";
+          panel.dataset.ninouBootWatchdog = "true";
+          panel.innerHTML = '<strong>O Ninou não terminou de abrir</strong><span>Nenhum registro foi apagado. Você pode reparar os arquivos temporários ou abrir a interface com os dados que já carregaram.</span><div class="ninou-boot-error-actions"><button type="button" data-ninou-repair>Reparar e recarregar</button><button type="button" data-ninou-open-anyway>Abrir mesmo assim</button></div>';
+          panel.querySelector("[data-ninou-repair]")?.addEventListener("click", async () => {
+            try {
+              if ("serviceWorker" in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                await Promise.allSettled(registrations.map((registration) => registration.unregister()));
+              }
+              if ("caches" in window) await Promise.allSettled((await caches.keys()).map((name) => caches.delete(name)));
+            } catch (_) {}
+            const url = new URL(location.href);
+            url.searchParams.set("ninouRecovery", `78.4.1-${Date.now()}`);
+            location.replace(url.toString());
+          });
+          panel.querySelector("[data-ninou-open-anyway]")?.addEventListener("click", () => {
+            root.dataset.ninouInitialPaint = "forced";
+            root.classList.remove("ninou-booting", "ninou-loading-overlay");
+            const splash = document.querySelector("#ninouBootScreen");
+            splash?.classList.add("is-leaving");
+            window.setTimeout(() => { if (splash) splash.hidden = true; }, 380);
+          });
+          card.append(panel);
+        }, WATCHDOG_MS);
+      })();
+    </script>
     <script>
       (() => {
         let hiddenAt = 0;
@@ -1750,7 +1796,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v78.4.0</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v78.4.1</strong>
             <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -2164,12 +2210,16 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v78.4.0.mjs?v=78.4.0").catch((error) => {
+      import("./js/boot-v78.4.1.mjs?v=78.4.1").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
+        window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
+        const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
         const notice = document.createElement("div");
-        notice.style.cssText = "position:fixed;inset:14px 14px auto;z-index:2147483647;padding:16px;border-radius:18px;background:#fff3f3;color:#4a1220;font:14px/1.45 system-ui;box-shadow:0 18px 48px rgba(74,18,32,.2)";
-        notice.innerHTML = "<strong>Falha ao carregar os arquivos do Ninou.</strong><br>Atualize a publicação da Vercel com todos os arquivos desta versão.";
-        document.body.prepend(notice);
+        notice.className = "ninou-boot-error";
+        notice.dataset.ninouBootError = "module";
+        notice.innerHTML = '<strong>Falha ao carregar os arquivos do Ninou</strong><span>A publicação não entregou o módulo de inicialização desta versão. Seus dados não foram apagados.</span><div class="ninou-boot-error-actions"><button type="button" data-ninou-reload>Recarregar</button></div>';
+        notice.querySelector("[data-ninou-reload]")?.addEventListener("click", () => location.reload(), { once: true });
+        (card || document.body).append(notice);
       });
     </script>
   </body>

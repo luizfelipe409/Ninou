@@ -1,4 +1,14 @@
-# Changelog — Ninou v78.4.0
+# Ninou v78.4.1 — correção do loading infinito
+
+- removido o ciclo de MutationObserver causado pelas próprias classes de animação;
+- boot deixa de depender de camadas visuais complementares para abrir;
+- erro de inicialização agora aparece dentro do loading, em vez de ficar oculto;
+- watchdog visível após 15 segundos, com reparo e abertura controlada;
+- migração de cache sem recarga forçada ou Promise que nunca termina;
+- configuração de build Vercel consolidada em `vercel.json`;
+- dados locais, Firebase e estrutura familiar preservados.
+
+# Changelog — Ninou v78.4.1
 
 ## Estabilidade percebida no iPhone
 
@@ -20,7 +30,7 @@
 
 ## Infraestrutura
 
-- scripts, manifesto, cache e Service Worker atualizados para 78.4.0;
+- scripts, manifesto, cache e Service Worker atualizados para 78.4.1;
 - testes de regressão específicos para loading, retomada, sessão, órbita, atalhos e formulário;
 - validação de sintaxe de 55 scripts e análise estrutural dos sete módulos CSS;
 - dados locais, Firebase, famílias, cuidadores e regras do Firestore preservados.
