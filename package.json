@@ -1,13 +1,13 @@
 {
   "name": "ninou-app",
   "private": true,
-  "version": "79.0.0",
+  "version": "79.1.0",
   "type": "module",
   "scripts": {
     "check": "node tests/validate-project.mjs",
     "test:architecture": "node tests/architecture.test.mjs",
     "test": "npm run test:architecture && npm run test:regressions && npm run check",
     "build": "node scripts/build-production.mjs",
-    "test:regressions": "node tests/v79.0.0-regressions.test.mjs"
+    "test:regressions": "node tests/v79.1.0-regressions.test.mjs"
   }
 }

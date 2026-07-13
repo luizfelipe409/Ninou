@@ -1,6 +1,6 @@
 import { storageHealth } from "../storage/local-storage.js";
 
-const VERSION = "79.0.0";
+const VERSION = "79.1.0";
 const STARTED_AT = performance.now();
 const samples = [];
 

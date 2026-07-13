@@ -1,20 +1,25 @@
-NINOU v79.0.0 — CORREÇÃO BASEADA NO VÍDEO DE 13/07/2026
+NINOU v79.1.0 — AJUSTES APÓS O TESTE REAL
 
 USE ESTA PASTA COMO PROJETO PRINCIPAL.
 
-1. Substitua integralmente o conteúdo antigo do projeto pelo conteúdo desta pasta.
-2. Não copie por cima mantendo arquivos versionados antigos.
-3. Faça commit e aguarde o deploy da Vercel terminar.
-4. Na primeira abertura da v79.0.0, o Ninou faz uma migração única do runtime:
-   - remove somente Service Workers e caches antigos do próprio Ninou;
-   - preserva perfil, família e registros locais;
-   - pode recarregar a página uma vez.
-5. Depois dessa primeira migração, a tela de loading deve permanecer visível até o perfil, o relógio e a geometria da órbita estarem prontos.
+1. Preserve apenas a pasta oculta .git do projeto atual.
+2. Remova os demais arquivos antigos.
+3. Copie para a raiz o conteúdo desta pasta.
+4. Faça commit e aguarde o deploy da Vercel ficar Ready.
+5. Confirme no código-fonte publicado que aparece 79.1.0.
+
+CORREÇÕES DESTA VERSÃO
+- atalhos rápidos centralizados;
+- gráfico de peso com labels finos e curva independente em cada tela;
+- registros do Diário legíveis no tema escuro;
+- filtros do Diário sem botão auxiliar estranho;
+- Perfil restaurado para o visual anterior;
+- avatares de Minha família limitados a 48 px.
 
 VALIDAÇÃO EXECUTADA
-- npm test: aprovado.
-- npm run build: aprovado.
-- 55 scripts verificados.
-- geometria móvel 430 x 932: centro da órbita em 0 px de desvio e quatro ícones integralmente dentro dos cards.
+- npm test: aprovado;
+- npm run build: aprovado;
+- sintaxe dos scripts: aprovada;
+- integridade do ZIP: deve ser verificada após a compactação.
 
-A confirmação final no Safari/PWA depende do teste no iPhone após o novo deploy.
+A confirmação visual final continua dependendo do teste no navegador e no iPhone após o deploy.

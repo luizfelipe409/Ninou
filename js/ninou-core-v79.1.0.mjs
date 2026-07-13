@@ -404,7 +404,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "79.0.0";
+const NINOU_RUNTIME_VERSION = "79.1.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -428,7 +428,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "79.0.0-premium-consolidated";
+const NINOU_FAMILY_SCOPE_VERSION = "79.1.0-premium-consolidated";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -4242,7 +4242,7 @@ function prepareVisibleContextForAccount(user = cloudUser) {
   }
 
   /*
-    v79.0.0 — retomada sem tela fantasma:
+    v79.1.0 — retomada sem tela fantasma:
     quando o Firebase reconfirma a mesma conta ao abrir o Safari ou voltar do segundo plano,
     a interface estável permanece visível. O perfil e a rotina só são limpos se a conta mudou.
   */
@@ -8534,7 +8534,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v79.0.0 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v79.1.0 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8665,7 +8665,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v79.0.0 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v79.1.0 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -11468,6 +11468,8 @@ function renderSparkline(container, weights = []) {
     .slice(-10);
 
   container.classList.add("premium-weight-chart", "weight-chart-readable");
+  const chartKey = String(container.id || "weight-chart").replace(/[^a-z0-9_-]/gi, "-");
+  const fillGradientId = `weightPremiumFill-${chartKey}`;
 
   if (!normalized.length) {
     container.innerHTML = `
@@ -11536,17 +11538,14 @@ function renderSparkline(container, weights = []) {
     </div>
     <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolução de peso do bebê">
       <defs>
-        <linearGradient id="weightPremiumFillReadable" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="${fillGradientId}" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="currentColor" stop-opacity=".18"/>
           <stop offset="1" stop-color="currentColor" stop-opacity=".025"/>
         </linearGradient>
-        <filter id="weightGlowReadable" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="currentColor" flood-opacity=".14"/>
-        </filter>
       </defs>
       ${gridLines}
-      <path d="${areaPath}" fill="url(#weightPremiumFillReadable)" class="weight-area-path"></path>
-      <path d="${path}" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#weightGlowReadable)" class="weight-main-path"></path>
+      <path d="${areaPath}" fill="url(#${fillGradientId})" class="weight-area-path"></path>
+      <path d="${path}" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" class="weight-main-path"></path>
       ${circles}
       <g class="weight-latest-label">
         <rect x="${(latestLabelX - 42).toFixed(1)}" y="${(latestLabelY - 18).toFixed(1)}" width="84" height="26" rx="13"></rect>
@@ -14513,7 +14512,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=79.0.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=79.1.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -14541,7 +14540,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "79.0.0";
+  const VERSION = "79.1.0";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -14598,7 +14597,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "79.0.0";
+  const VERSION = "79.1.0";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -14662,7 +14661,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "79.0.0";
+  const LEGAL_VERSION = "79.1.0";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -14894,7 +14893,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "79.0.0";
+  const SUPPORT_VERSION = "79.1.0";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -15223,7 +15222,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "79.0.0";
+  const REVIEW_VERSION = "79.1.0";
 
   function currentEffectiveRole() {
     try {

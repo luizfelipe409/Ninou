@@ -1,36 +1,32 @@
-# Ninou v79.0.0 — correção do loading infinito
+# Changelog — Ninou v79.1.0
 
-- removido o ciclo de MutationObserver causado pelas próprias classes de animação;
-- boot deixa de depender de camadas visuais complementares para abrir;
-- erro de inicialização agora aparece dentro do loading, em vez de ficar oculto;
-- watchdog visível após 15 segundos, com reparo e abertura controlada;
-- migração de cache sem recarga forçada ou Promise que nunca termina;
-- configuração de build Vercel consolidada em `vercel.json`;
-- dados locais, Firebase e estrutura familiar preservados.
+## Home
 
-# Changelog — Ninou v79.0.0
+- centralização real dos quatro atalhos rápidos com `flex` vertical;
+- altura e ícones uniformes em 390 px e 430 px.
 
-## Estabilidade percebida no iPhone
+## Gráfico de peso
 
-- preserva o último perfil e a última rotina válidos enquanto o Firebase reconfirma a mesma conta;
-- impede que “Bebê”, família vazia ou conteúdo comercial apareçam durante a retomada;
-- mantém a composição da órbita protegida mesmo se alguma classe de sessão for atualizada;
-- adiciona loading inicial visível por no mínimo 1,5 segundo;
-- adiciona loading curto e controlado ao retornar do segundo plano;
-- mantém dados locais utilizáveis quando a conexão falha durante a sincronização.
+- remoção do contorno branco grosso dos rótulos do eixo;
+- tipografia reduzida para peso intermediário e contraste mais limpo;
+- IDs de gradiente separados por gráfico;
+- remoção do filtro SVG compartilhado que podia ocultar a curva em uma das telas.
 
-## Home e componentes
+## Diário
 
-- atalhos “Registre em poucos toques” corrigidos com grade 2×2, ícones inteiros e textos centralizados;
-- ícone de medicamento normalizado em relação aos PNGs;
-- espaço inferior ampliado para a barra flutuante não impedir a leitura do conteúdo;
-- faixa de tipos de registro mostra quatro opções completas e continua rolável;
-- formulário de registro possui margem segura antes do rodapé de salvamento;
-- regras de segurança impedem relógio, horários e órbita de transbordarem.
+- contraste explícito para título, horários, detalhes, responsável e edição dos registros;
+- ações Editar e Excluir organizadas lado a lado;
+- filtros passam a quebrar em linhas naturais;
+- `diaryChipsMoreButton` removido da interface.
+
+## Perfil
+
+- retirada da reconstrução compacta da v79.0.0;
+- retorno ao acabamento anterior existente no CSS legado;
+- correção mantida somente no card “Minha família”, com avatares de 48 px e texto protegido contra estouro.
 
 ## Infraestrutura
 
-- scripts, manifesto, cache e Service Worker atualizados para 79.0.0;
-- testes de regressão específicos para loading, retomada, sessão, órbita, atalhos e formulário;
-- validação de sintaxe de 55 scripts e análise estrutural dos sete módulos CSS;
-- dados locais, Firebase, famílias, cuidadores e regras do Firestore preservados.
+- scripts, manifesto, cache e Service Worker atualizados para 79.1.0;
+- build da Vercel mantido em `dist`;
+- testes de sintaxe, arquitetura, regressão e estrutura atualizados.

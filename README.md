@@ -1,22 +1,23 @@
-# Ninou v79.0.0 — Premium estável
+# Ninou v79.1.0 — ajustes visuais após validação real
 
-Esta versão corrige as regressões vistas na gravação feita no iPhone, mantendo a identidade visual e a estrutura de dados atual.
+Versão construída sobre a v79.0.0, usando como referência a gravação e as capturas de 13/07/2026.
 
-## Principais proteções
+## Alterações desta revisão
 
-- a mesma conta não perde visualmente o perfil durante a reconexão;
-- a órbita não aparece desmontada durante boot ou retomada;
-- telas de visitante não aparecem para uma conta já autenticada;
-- loading inicial e loading de retomada possuem estados separados;
-- atalhos, barra inferior e formulário foram ajustados para telas móveis reais.
+- atalhos “Registre em poucos toques” passam a usar composição vertical centralizada;
+- labels do gráfico de peso deixam de usar contorno grosso;
+- cada gráfico de peso recebe seu próprio gradiente SVG e a linha não depende mais de filtro compartilhado;
+- registros do Diário recebem contraste explícito no tema escuro;
+- filtros do Diário passam a quebrar naturalmente em mais de uma linha, sem `diaryChipsMoreButton`;
+- a tela Perfil volta a usar o acabamento anterior do projeto;
+- apenas os avatares do card “Minha família” permanecem limitados e alinhados;
+- dados locais, Firebase, famílias, registros e regras do Firestore não foram alterados.
 
-## Validar antes de publicar
+## Validação disponível no pacote
 
 ```bash
 npm test
 npm run build
 ```
 
-O projeto completo deve ser mantido no GitHub. A pasta `dist/`, gerada pelo build, contém somente o pacote de publicação.
-
-Depois de publicar uma nova versão do PWA, abra o site conectado à internet e recarregue uma vez para o Service Worker substituir o cache anterior.
+A pasta `dist/` é gerada pelo build e pode ser usada como saída da Vercel.

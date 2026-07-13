@@ -1,17 +1,17 @@
-const CACHE_NAME = "ninou-v79-0-0-premium-consolidated";
-const APP_VERSION = "79.0.0";
-const STYLE_MODULES = ["legacy", "premium-v79"];
+const CACHE_NAME = "ninou-v79-1-0-premium-consolidated";
+const APP_VERSION = "79.1.0";
+const STYLE_MODULES = ["legacy", "premium-v79.1"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
-  `/js/boot-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-ux-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-consistency-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-stability-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/architecture-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/diagnostics-v79.0.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/visual-guard-v79.0.0.mjs?v=${APP_VERSION}`,
+  `/js/boot-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-ux-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-consistency-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-stability-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/architecture-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/diagnostics-v79.1.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/visual-guard-v79.1.0.mjs?v=${APP_VERSION}`,
   "/js/core/event-bus.js", "/js/core/app-state.js", "/js/core/logger.js",
   "/js/repositories/json-repository.js", "/js/repositories/routine-repository.js", "/js/repositories/profile-repository.js",
   "/js/config/constants.js", "/js/dom/dom.js",
