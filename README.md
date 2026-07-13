@@ -1,23 +1,16 @@
-# Ninou v79.2.0 — ajustes visuais após validação real
+# Ninou v80.1.0 — Premium lapidado
 
-Versão construída sobre a v79.0.0, usando como referência a gravação e as capturas de 13/07/2026.
+Projeto completo para publicação na Vercel.
 
-## Alterações desta revisão
+## Instalação
 
-- atalhos “Registre em poucos toques” passam a usar composição vertical centralizada;
-- labels do gráfico de peso deixam de usar contorno grosso;
-- cada gráfico de peso recebe seu próprio gradiente SVG e a linha não depende mais de filtro compartilhado;
-- registros do Diário recebem contraste explícito no tema escuro;
-- filtros do Diário passam a quebrar naturalmente em mais de uma linha, sem `diaryChipsMoreButton`;
-- a tela Perfil volta a usar o acabamento anterior do projeto;
-- apenas os avatares do card “Minha família” permanecem limitados e alinhados;
-- dados locais, Firebase, famílias, registros e regras do Firestore não foram alterados.
+Preserve apenas a pasta `.git` do projeto atual, remova os demais arquivos e copie o conteúdo desta pasta para a raiz do repositório.
 
-## Validação disponível no pacote
+## Validação
 
 ```bash
 npm test
 npm run build
 ```
 
-A pasta `dist/` é gerada pelo build e pode ser usada como saída da Vercel.
+A Vercel deve usar `npm run build` e publicar a pasta `dist`.
