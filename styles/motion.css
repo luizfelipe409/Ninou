@@ -1,0 +1,65 @@
+/* Ninou v78.2.0 — microinterações perceptíveis e controladas */
+html.ninou-v782 body.family-daily-surface .screen.ninou-screen-entered { animation: ninouScreenIn var(--n-motion-slow) var(--n-ease) both !important; }
+@keyframes ninouScreenIn { from { opacity: 0; transform: translate3d(0,10px,0) scale(.992); } to { opacity: 1; transform: none; } }
+
+html.ninou-v782 body.family-daily-surface :is(button,a[role="button"],.event-card) { transform-origin: center !important; }
+html.ninou-v782 body.family-daily-surface :is(button,a[role="button"]).ninou-press-feedback { animation: ninouPress 310ms var(--n-ease) both !important; }
+@keyframes ninouPress { 0% { transform: scale(1); } 38% { transform: scale(.965); } 100% { transform: scale(1); } }
+
+html.ninou-v782 body.family-daily-surface .ninou-ripple {
+  position: absolute !important;
+  z-index: 20 !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.42) !important;
+  pointer-events: none !important;
+  transform: translate(-50%,-50%) scale(0) !important;
+  animation: ninouRipple 560ms ease-out both !important;
+}
+@keyframes ninouRipple { 0% { opacity: .55; transform: translate(-50%,-50%) scale(0); } 100% { opacity: 0; transform: translate(-50%,-50%) scale(28); } }
+
+html.ninou-v782 body.family-daily-surface .record-sheet.ninou-surface-opening,
+html.ninou-v782 body.family-daily-surface .orbit-cluster-sheet.ninou-surface-opening { animation: ninouSheetIn var(--n-motion-slow) var(--n-ease) both !important; }
+html.ninou-v782 body.family-daily-surface .ninou-modal.ninou-surface-opening .ninou-modal-card { animation: ninouModalIn var(--n-motion-slow) var(--n-spring) both !important; }
+@keyframes ninouSheetIn { from { opacity: .25; transform: translate3d(0,42px,0) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes ninouModalIn { from { opacity: 0; transform: translate3d(0,16px,0) scale(.95); } to { opacity: 1; transform: none; } }
+
+html.ninou-v782 body.family-daily-surface .orbit-now-dot { animation: ninouNowPulse 2.2s ease-in-out infinite !important; }
+@keyframes ninouNowPulse { 0%,100% { opacity: .72; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.35); } }
+html.ninou-v782 body.family-daily-surface #orbitEvents.ninou-orbit-updated { animation: ninouOrbitUpdate 700ms var(--n-spring) both !important; }
+@keyframes ninouOrbitUpdate { 0% { transform: scale(1); filter: brightness(1); } 46% { transform: scale(1.022); filter: brightness(1.12); } 100% { transform: scale(1); filter: brightness(1); } }
+html.ninou-v782 body.family-daily-surface .routine-correction-card.ninou-confirm-enter { animation: ninouConfirm 760ms var(--n-spring) both !important; }
+@keyframes ninouConfirm { 0% { opacity: 0; transform: translateY(12px) scale(.98); } 48% { opacity: 1; transform: translateY(-3px) scale(1.01); } 100% { opacity: 1; transform: none; } }
+
+html.ninou-v782 body.family-daily-surface .ninou-action-pending { pointer-events: none !important; opacity: .76 !important; }
+html.ninou-v782 body.family-daily-surface .ninou-action-pending::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 50% !important;
+  right: 14px !important;
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+  margin-top: -9px !important;
+  border: 2px solid currentColor !important;
+  border-right-color: transparent !important;
+  border-radius: 50% !important;
+  animation: ninouSpin .65s linear infinite !important;
+}
+@keyframes ninouSpin { to { transform: rotate(360deg); } }
+@keyframes ninouSunBreathe { from { transform: scale(.98); filter: saturate(.98); } to { transform: scale(1.035); filter: saturate(1.08); } }
+
+@media (hover:hover) and (pointer:fine) {
+  html.ninou-v782 body.family-daily-surface :is(.quick-actions button,.primary-action,.start-choice button,[data-ninou-control]):hover { transform: translateY(-2px) !important; }
+  html.ninou-v782 body.family-daily-surface .bottom-nav button:hover .nav-symbol { transform: translateY(-2px) scale(1.06) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ninou-v782 *, html.ninou-v782 *::before, html.ninou-v782 *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

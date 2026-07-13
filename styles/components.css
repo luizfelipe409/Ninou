@@ -1,0 +1,144 @@
+/* Ninou v78.2.0 — componentes globais consolidados */
+html.ninou-v782 body.family-daily-surface .bottom-bar {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: max(10px, env(safe-area-inset-bottom)) !important;
+  z-index: 1000 !important;
+  width: min(calc(100% - 20px), 500px) !important;
+  min-height: 78px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) 62px !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 8px !important;
+  border: 1px solid var(--n-line) !important;
+  border-radius: 25px !important;
+  background: var(--n-glass) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(145%) !important;
+  backdrop-filter: blur(24px) saturate(145%) !important;
+  box-shadow: var(--n-shadow-float), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  transform: translateX(-50%) !important;
+}
+html.ninou-v782 body.family-daily-surface .bottom-nav {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(5,minmax(0,1fr)) !important;
+  gap: 2px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html.ninou-v782 body.family-daily-surface .bottom-nav button {
+  position: relative !important;
+  min-width: 0 !important;
+  min-height: 60px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 5px 2px !important;
+  border: 0 !important;
+  border-radius: 17px !important;
+  background: transparent !important;
+  color: var(--n-muted) !important;
+  font-size: .66rem !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+html.ninou-v782 body.family-daily-surface .bottom-nav button::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 4px !important;
+  width: 18px !important;
+  height: 3px !important;
+  border-radius: var(--n-pill) !important;
+  background: var(--n-accent) !important;
+  opacity: 0 !important;
+  transform: translateX(-50%) scaleX(.4) !important;
+  transition: opacity var(--n-motion-fast) ease, transform var(--n-motion-base) var(--n-ease) !important;
+}
+html.ninou-v782 body.family-daily-surface .bottom-nav button.active {
+  background: color-mix(in srgb,var(--n-accent) 12%,var(--n-surface-solid)) !important;
+  color: var(--n-accent) !important;
+}
+html.ninou-v782 body.family-daily-surface .bottom-nav button.active::after { opacity: 1 !important; transform: translateX(-50%) scaleX(1) !important; }
+html.ninou-v782 body.family-daily-surface .nav-symbol { color: currentColor !important; font-size: 1.28rem !important; font-weight: 800 !important; line-height: 1 !important; }
+html.ninou-v782 body.family-daily-surface .fab {
+  width: 62px !important;
+  height: 62px !important;
+  min-width: 62px !important;
+  min-height: 62px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg,var(--n-accent-2),#a58bf0) !important;
+  color: #fff !important;
+  box-shadow: 0 13px 28px rgba(92,67,174,.34), inset 0 1px 0 rgba(255,255,255,.32) !important;
+}
+html.ninou-v782 body.family-daily-surface .fab > span { color: #fff !important; font-size: 2.1rem !important; font-weight: 450 !important; line-height: 1 !important; transform: translateY(-1px) !important; }
+
+html.ninou-v782 body.family-daily-surface .record-sheet,
+html.ninou-v782 body.family-daily-surface .orbit-cluster-sheet {
+  width: min(100%,520px) !important;
+  max-height: min(88dvh,760px) !important;
+  padding: 14px 16px calc(18px + env(safe-area-inset-bottom)) !important;
+  overflow-y: auto !important;
+  border: 1px solid var(--n-line) !important;
+  border-radius: 30px 30px 0 0 !important;
+  background: var(--n-surface-solid) !important;
+  color: var(--n-text) !important;
+  box-shadow: var(--n-shadow-float) !important;
+}
+html.ninou-v782 body.family-daily-surface .sheet-handle { width: 48px !important; height: 5px !important; margin: 0 auto 14px !important; border-radius: var(--n-pill) !important; background: var(--n-line-strong) !important; }
+html.ninou-v782 body.family-daily-surface .record-types { display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)) !important; gap: 8px !important; padding: 5px 0 12px !important; overflow: visible !important; }
+html.ninou-v782 body.family-daily-surface .record-types button {
+  min-width: 0 !important;
+  min-height: 78px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  padding: 7px 4px !important;
+  border: 1px solid var(--n-line) !important;
+  border-radius: 15px !important;
+  background: var(--n-surface-2) !important;
+  color: var(--n-muted) !important;
+  font-size: .64rem !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+html.ninou-v782 body.family-daily-surface .record-types button.active { border-color: var(--n-line-strong) !important; background: color-mix(in srgb,var(--n-accent) 13%,var(--n-surface-solid)) !important; color: var(--n-accent) !important; }
+html.ninou-v782 body.family-daily-surface .record-types .type-icon { width: 40px !important; height: 40px !important; border-radius: 13px !important; overflow: hidden !important; }
+html.ninou-v782 body.family-daily-surface .record-form { display: grid !important; gap: 12px !important; }
+html.ninou-v782 body.family-daily-surface .record-form label { color: var(--n-muted) !important; font-size: .76rem !important; font-weight: 850 !important; text-transform: none !important; }
+html.ninou-v782 body.family-daily-surface .record-actions-footer { position: sticky !important; bottom: -1px !important; z-index: 10 !important; margin: 8px -4px -4px !important; padding: 12px 4px 4px !important; background: linear-gradient(180deg,transparent,var(--n-surface-solid) 28%) !important; }
+html.ninou-v782 body.family-daily-surface .save-button { width: 100% !important; min-height: 54px !important; border: 0 !important; border-radius: 17px !important; background: linear-gradient(135deg,var(--n-accent),#6fd9b8) !important; color: var(--n-accent-ink) !important; font-size: .98rem !important; font-weight: 950 !important; box-shadow: 0 12px 25px color-mix(in srgb,var(--n-accent) 22%,transparent) !important; }
+
+html.ninou-v782 body.family-daily-surface .ninou-modal { z-index: 2000 !important; }
+html.ninou-v782 body.family-daily-surface .ninou-modal-backdrop,
+html.ninou-v782 body.family-daily-surface .sheet-backdrop { background: rgba(8,6,17,.58) !important; -webkit-backdrop-filter: blur(8px) !important; backdrop-filter: blur(8px) !important; }
+html.ninou-v782 body.family-daily-surface .ninou-modal-card { width: min(calc(100% - 28px),480px) !important; max-height: min(88dvh,760px) !important; overflow-y: auto !important; padding: 22px !important; border: 1px solid var(--n-line) !important; border-radius: 26px !important; background: var(--n-surface-solid) !important; color: var(--n-text) !important; box-shadow: var(--n-shadow-float) !important; }
+html.ninou-v782 body.family-daily-surface :is(.guest-modal-close,button[aria-label^="Fechar"]) { min-width: 42px !important; min-height: 42px !important; display: grid !important; place-items: center !important; border: 1px solid var(--n-line) !important; border-radius: 14px !important; background: var(--n-surface-2) !important; color: var(--n-text-2) !important; }
+
+html.ninou-v782 body.family-daily-surface .screen[data-screen="diary"] .date-filter,
+html.ninou-v782 body.family-daily-surface .screen[data-screen="trends"] :is(.chart-card,.data-chart-card,.data-premium-hero),
+html.ninou-v782 body.family-daily-surface .screen[data-screen="sounds"] :is(.sounds-hero,.sound-player-card,.sound-note),
+html.ninou-v782 body.family-daily-surface .screen[data-screen="profile"] :is(.profile-card,.profile-family-card,.login-card,.export-card,.danger-card,.privacy-note-card) {
+  border: 1px solid var(--n-line) !important;
+  border-radius: 22px !important;
+  background: var(--n-surface) !important;
+  color: var(--n-text) !important;
+  box-shadow: var(--n-shadow-1) !important;
+}
+html.ninou-v782 body.family-daily-surface .timeline { gap: 11px !important; }
+html.ninou-v782 body.family-daily-surface .event-card { padding: 15px !important; border: 1px solid var(--n-line) !important; border-radius: 19px !important; background: var(--n-surface) !important; color: var(--n-text) !important; box-shadow: var(--n-shadow-1) !important; }
+html.ninou-v782 body.family-daily-surface .chips button,
+html.ninou-v782 body.family-daily-surface .summary-range-control button { min-height: 40px !important; border: 1px solid var(--n-line) !important; border-radius: 13px !important; background: var(--n-surface-2) !important; color: var(--n-text-2) !important; box-shadow: none !important; }
+html.ninou-v782 body.family-daily-surface .chips button.active,
+html.ninou-v782 body.family-daily-surface .summary-range-control button.active { border-color: var(--n-line-strong) !important; background: color-mix(in srgb,var(--n-accent) 13%,var(--n-surface-solid)) !important; color: var(--n-accent) !important; }

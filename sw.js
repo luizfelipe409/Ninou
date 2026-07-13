@@ -1,15 +1,16 @@
-const CACHE_NAME = "ninou-v78-1-0-consolidated";
-const APP_VERSION = "78.1.0";
+const CACHE_NAME = "ninou-v78-2-0-premium-consolidated";
+const APP_VERSION = "78.2.0";
+const STYLE_MODULES = ["legacy", "tokens", "foundation", "home", "components", "motion", "responsive"];
 const APP_SHELL = [
   "/", "/index.html",
-  `/styles.css?v=${APP_VERSION}`,
-  `/js/boot-v78.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v78.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-ux-v78.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-consistency-v78.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-stability-v78.1.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/architecture-v78.1.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/diagnostics-v78.1.0.mjs?v=${APP_VERSION}`,
+  ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
+  `/js/boot-v78.2.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v78.2.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-ux-v78.2.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-consistency-v78.2.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-stability-v78.2.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/architecture-v78.2.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/diagnostics-v78.2.0.mjs?v=${APP_VERSION}`,
   "/js/core/event-bus.js", "/js/core/app-state.js", "/js/core/logger.js",
   "/js/repositories/json-repository.js", "/js/repositories/routine-repository.js", "/js/repositories/profile-repository.js",
   "/js/config/constants.js", "/js/dom/dom.js",
@@ -31,6 +32,7 @@ const APP_SHELL = [
 function canStore(response) {
   return Boolean(response && response.ok && response.status === 200 && response.type !== "opaque");
 }
+
 async function cacheShellSafely() {
   const cache = await caches.open(CACHE_NAME);
   await Promise.allSettled(APP_SHELL.map(async (url) => {
@@ -39,6 +41,7 @@ async function cacheShellSafely() {
     if (canStore(response)) await cache.put(request, response);
   }));
 }
+
 async function fetchWithTimeout(request, timeoutMs = 4500) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -50,6 +53,7 @@ self.addEventListener("install", (event) => {
   event.waitUntil(cacheShellSafely());
   self.skipWaiting();
 });
+
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
@@ -57,9 +61,11 @@ self.addEventListener("activate", (event) => {
     await self.clients.claim();
   })());
 });
+
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -67,10 +73,7 @@ self.addEventListener("fetch", (event) => {
   const externalFirebase = /(^|\.)googleapis\.com$/.test(url.hostname)
     || /(^|\.)firebaseio\.com$/.test(url.hostname)
     || /(^|\.)gstatic\.com$/.test(url.hostname);
-  if (externalFirebase) return;
-
-  const sameOrigin = url.origin === self.location.origin;
-  if (!sameOrigin) return;
+  if (externalFirebase || url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
     event.respondWith((async () => {
