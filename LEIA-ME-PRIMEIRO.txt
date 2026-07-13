@@ -1,4 +1,4 @@
-NINOU v79.1.0 — AJUSTES APÓS O TESTE REAL
+NINOU v79.1.1 — CORREÇÃO PWA DO PERFIL E DA NAVEGAÇÃO
 
 USE ESTA PASTA COMO PROJETO PRINCIPAL.
 
@@ -6,9 +6,14 @@ USE ESTA PASTA COMO PROJETO PRINCIPAL.
 2. Remova os demais arquivos antigos.
 3. Copie para a raiz o conteúdo desta pasta.
 4. Faça commit e aguarde o deploy da Vercel ficar Ready.
-5. Confirme no código-fonte publicado que aparece 79.1.0.
+5. Confirme no código-fonte publicado que aparece 79.1.1.
 
 CORREÇÕES DESTA VERSÃO
+- respiro superior correto no Perfil instalado como web app;
+- menu inferior fixo e legível no Perfil em tema claro e escuro;
+- menu correto também para visitante/usuário bloqueado;
+- timer de amamentação não permanece sobre outras telas;
+- estrelas da órbita mantêm movimento lento no iPhone/PWA;
 - atalhos rápidos centralizados;
 - gráfico de peso com labels finos e curva independente em cada tela;
 - registros do Diário legíveis no tema escuro;

@@ -1,8 +1,8 @@
-# Auditoria técnica — Ninou v79.1.0
+# Auditoria técnica — Ninou v79.2.0
 
 ## Escopo desta correção
 
-A v79.1.0 foi criada a partir da gravação de 13/07/2026, com foco nos três defeitos confirmados em aparelho móvel:
+A v79.2.0 foi criada a partir da gravação de 13/07/2026, com foco nos três defeitos confirmados em aparelho móvel:
 
 - loading não aparecia antes da interface instável;
 - centro e relógio da órbita podiam surgir fora do eixo;
@@ -11,7 +11,7 @@ A v79.1.0 foi criada a partir da gravação de 13/07/2026, com foco nos três de
 ## Estratégia aplicada
 
 - folha `styles/v78.4-critical.css` carregada por último, com autoridade explícita somente sobre os componentes afetados;
-- módulo `js/runtime/visual-guard-v79.1.0.mjs`, que mede a geometria renderizada e reaplica a composição quando necessário;
+- módulo `js/runtime/visual-guard-v79.2.0.mjs`, que mede a geometria renderizada e reaplica a composição quando necessário;
 - boot não libera a Home enquanto perfil salvo, relógio e geometria mínima não estiverem coerentes;
 - migração única e segura de Service Worker/cache para impedir a reutilização do runtime 78.3.0, sem apagar registros locais;
 - loading de abertura e loading de retomada tratados separadamente.

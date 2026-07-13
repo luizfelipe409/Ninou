@@ -404,7 +404,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "79.1.0";
+const NINOU_RUNTIME_VERSION = "79.2.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
@@ -428,7 +428,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "79.1.0-premium-consolidated";
+const NINOU_FAMILY_SCOPE_VERSION = "79.2.0-premium-consolidated";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -4242,7 +4242,7 @@ function prepareVisibleContextForAccount(user = cloudUser) {
   }
 
   /*
-    v79.1.0 — retomada sem tela fantasma:
+    v79.2.0 — retomada sem tela fantasma:
     quando o Firebase reconfirma a mesma conta ao abrir o Safari ou voltar do segundo plano,
     a interface estável permanece visível. O perfil e a rotina só são limpos se a conta mudou.
   */
@@ -8534,7 +8534,7 @@ async function createFamilyInvite() {
     console.error("Erro ao criar convite:", error);
     if (inviteResult) {
       inviteResult.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para criar convite. Publique as regras Firestore da v79.1.0 e confirme que está logado com luizfelipe.dasilva@gmail.com."
+        ? "Sem permissão para criar convite. Publique as regras Firestore da v79.2.0 e confirme que está logado com luizfelipe.dasilva@gmail.com."
         : getFirebaseErrorMessage(error);
     }
   } finally {
@@ -8665,7 +8665,7 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     console.error("Erro ao aceitar convite:", error);
     if (!options.silent && loginHelper) {
       loginHelper.textContent = error?.code === "permission-denied"
-        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v79.1.0 e confirme se o convite é para este e-mail."
+        ? "Sem permissão para aceitar convite. Publique as regras Firestore da v79.2.0 e confirme se o convite é para este e-mail."
         : getFirebaseErrorMessage(error);
     }
     return false;
@@ -12103,6 +12103,11 @@ function scrollDiaryFilters() {
 }
 
 function showScreen(target) {
+  // Navegar nunca pode deixar a folha de registro ou o timer sobre outra tela.
+  if (sheet && !sheet.hidden) closeSheet();
+  if (orbitClusterSheet && !orbitClusterSheet.hidden) closeOrbitCluster();
+  if (breastTimerPanel) breastTimerPanel.hidden = true;
+
   // Visitantes podem navegar pelas telas para conhecer o Ninou.
   // O bloqueio acontece apenas nas ações que gravam/alteram dados via requireLogin().
   activeScreenName = target || activeScreenName;
@@ -12934,6 +12939,7 @@ function resetSheetState() {
       endInput: sheetEndTimeInput,
       durationPreview: sleepDurationPreview,
       notesInput: sheetNotesInput,
+      breastTimerPanel,
     },
     resetBreastTimer,
     syncBottleAmount,
@@ -12991,7 +12997,11 @@ function openSheet(type = "sono", eventId = null) {
   });
 }
 
+try { Object.defineProperty(window, "NinouOpenRecordSheet", { value: (type) => openSheet(type), configurable: true }); } catch (_) { window.NinouOpenRecordSheet = (type) => openSheet(type); }
+
 function closeSheet() {
+  stopBreastTimer();
+  if (breastTimerPanel) breastTimerPanel.hidden = true;
   sheet?.classList?.remove?.("record-has-more", "record-at-bottom");
   if (recordScrollHint) {
     recordScrollHint.hidden = true;
@@ -14512,7 +14522,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=79.1.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=79.2.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -14540,7 +14550,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "79.1.0";
+  const VERSION = "79.2.0";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -14597,7 +14607,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "79.1.0";
+  const VERSION = "79.2.0";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -14661,7 +14671,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "79.1.0";
+  const LEGAL_VERSION = "79.2.0";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -14893,7 +14903,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "79.1.0";
+  const SUPPORT_VERSION = "79.2.0";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -15222,7 +15232,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "79.1.0";
+  const REVIEW_VERSION = "79.2.0";
 
   function currentEffectiveRole() {
     try {

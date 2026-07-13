@@ -1,4 +1,4 @@
-# Ninou v79.1.0 — ajustes visuais após validação real
+# Ninou v79.2.0 — ajustes visuais após validação real
 
 Versão construída sobre a v79.0.0, usando como referência a gravação e as capturas de 13/07/2026.
 

@@ -1,4 +1,13 @@
-# Changelog — Ninou v79.1.0
+# Changelog — Ninou v79.2.0
+
+## Correções PWA e Perfil
+
+- safe area superior aplicada ao Perfil no modo instalado, evitando o cabeçalho colado à barra do iPhone;
+- barra inferior volta a ser fixa e legível no Perfil, tanto no tema escuro quanto no claro;
+- mesma navegação preservada para conta conectada, visitante e estado bloqueado;
+- timer de amamentação é encerrado e ocultado ao fechar a folha ou mudar de tela;
+- proteção CSS impede que formulário, backdrop ou timer permaneçam sobre Home, Diário, Dados, Sons ou Perfil;
+- estrelas e brilho da órbita mantêm movimento lento no PWA mesmo quando o aparelho informa “Reduzir Movimento”.
 
 ## Home
 
@@ -27,6 +36,6 @@
 
 ## Infraestrutura
 
-- scripts, manifesto, cache e Service Worker atualizados para 79.1.0;
+- scripts, manifesto, cache e Service Worker atualizados para 79.2.0;
 - build da Vercel mantido em `dist`;
 - testes de sintaxe, arquitetura, regressão e estrutura atualizados.

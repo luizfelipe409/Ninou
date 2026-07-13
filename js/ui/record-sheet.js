@@ -65,6 +65,7 @@ export function resetRecordSheet({
   if (elements.endInput) elements.endInput.value = "";
   if (elements.durationPreview) elements.durationPreview.hidden = true;
   if (elements.notesInput) elements.notesInput.value = "";
+  if (elements.breastTimerPanel) elements.breastTimerPanel.hidden = true;
   resetBreastTimer?.();
   syncBottleAmount?.(defaultBottleAmount);
 }
@@ -114,6 +115,7 @@ export function prepareRecordSheetForOpen({
   if (elements.endInput) elements.endInput.value = "";
   if (elements.durationPreview) elements.durationPreview.hidden = true;
   if (elements.notesInput) elements.notesInput.value = "";
+  if (elements.breastTimerPanel) elements.breastTimerPanel.hidden = true;
   resetBreastTimer?.();
   syncBottleAmount?.(defaultBottleAmount);
 
