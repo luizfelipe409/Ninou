@@ -1,9 +1,0 @@
-Versão v75.75.74
-
-- Menu dos 12 avatares passa a usar um contêiner visual inspirado no card/ícone da div identity.
-- Mantido o tamanho atual dos avatares dentro dos cards.
-- Removidos deslocamentos e escalas individuais que causavam desalinhamento.
-- Card individual centraliza o slot do avatar e centraliza a imagem dentro desse slot.
-- Prévia superior também foi neutralizada para não herdar deslocamentos antigos.
-- Manifest ajustado para start_url limpo: "/".
-- Versionamento/cache atualizado para 75.75.74.

@@ -1,6 +1,0 @@
-Versão v75.75.72
-
-- Normalizados os 12 avatares com base visual dos aprovados: Bebê clássico e Cacheadinho.
-- Todos os assets foram reenquadrados para a mesma caixa visual interna.
-- Mantida a prévia superior ancorada mais embaixo.
-- Atualizado versionamento para 75.75.72 e cache do service worker.

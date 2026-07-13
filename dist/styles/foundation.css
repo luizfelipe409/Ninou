@@ -1,27 +1,27 @@
-/* Ninou v78.3.0 — fundação visual canônica */
-html.ninou-v783 { background: var(--n-bg, #efedf4); }
-html.ninou-v783 body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+/* Ninou v78.4.0 — fundação visual canônica */
+html.ninou-v784 { background: var(--n-bg, #efedf4); }
+html.ninou-v784 body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 
 /* Segurança visual durante restauração de sessão: nunca exibir órbita desmontada. */
-html.ninou-v783 .state-orbit.live-timeline-orbit {
+html.ninou-v784 .state-orbit.live-timeline-orbit {
   position: relative !important;
   width: 100% !important;
   min-height: 350px !important;
   overflow: hidden !important;
   isolation: isolate !important;
 }
-html.ninou-v783 .state-orbit.live-timeline-orbit::before,
-html.ninou-v783 .state-orbit.live-timeline-orbit::after {
+html.ninou-v784 .state-orbit.live-timeline-orbit::before,
+html.ninou-v784 .state-orbit.live-timeline-orbit::after {
   position: absolute !important;
   pointer-events: none !important;
   border-radius: 50% !important;
 }
-html.ninou-v783 .state-orbit.live-timeline-orbit::before {
+html.ninou-v784 .state-orbit.live-timeline-orbit::before {
   inset: 11% !important;
   width: auto !important;
   height: auto !important;
 }
-html.ninou-v783 .orbit-timeline-svg {
+html.ninou-v784 .orbit-timeline-svg {
   position: absolute !important;
   left: 50% !important;
   top: 50% !important;
@@ -29,35 +29,35 @@ html.ninou-v783 .orbit-timeline-svg {
   height: min(82%, 342px) !important;
   transform: translate(-50%, -50%) !important;
 }
-html.ninou-v783 .orbit-center-safe {
+html.ninou-v784 .orbit-center-safe {
   position: absolute !important;
   left: 50% !important;
   top: 50% !important;
   transform: translate(-50%, -50%) !important;
   text-align: center !important;
 }
-html.ninou-v783 .orbit-time-anchor { position: absolute !important; transform: translate(-50%, -50%) !important; }
-html.ninou-v783 .orbit-time-anchor-midnight { left: 50% !important; top: calc(100% - 22px) !important; }
-html.ninou-v783 .orbit-time-anchor-morning { left: 22px !important; top: 50% !important; }
-html.ninou-v783 .orbit-time-anchor-noon { left: 50% !important; top: 22px !important; }
-html.ninou-v783 .orbit-time-anchor-evening { left: calc(100% - 22px) !important; top: 50% !important; }
-html.ninou-v783 #stateClock {
+html.ninou-v784 .orbit-time-anchor { position: absolute !important; transform: translate(-50%, -50%) !important; }
+html.ninou-v784 .orbit-time-anchor-midnight { left: 50% !important; top: calc(100% - 22px) !important; }
+html.ninou-v784 .orbit-time-anchor-morning { left: 22px !important; top: 50% !important; }
+html.ninou-v784 .orbit-time-anchor-noon { left: 50% !important; top: 22px !important; }
+html.ninou-v784 .orbit-time-anchor-evening { left: calc(100% - 22px) !important; top: 50% !important; }
+html.ninou-v784 #stateClock {
   max-width: 100% !important;
   font-size: clamp(2rem, 11vw, 3.25rem) !important;
   line-height: 1 !important;
   white-space: nowrap !important;
 }
-html.ninou-v783 body.auth-validating main.phone-shell,
-html.ninou-v783 body.auth-refreshing-stable main.phone-shell { visibility: visible !important; }
-html.ninou-v783 body { scroll-padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important; }
+html.ninou-v784 body.auth-validating main.phone-shell,
+html.ninou-v784 body.auth-refreshing-stable main.phone-shell { visibility: visible !important; }
+html.ninou-v784 body { scroll-padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important; }
 
-html.ninou-v783 body.family-daily-surface {
+html.ninou-v784 body.family-daily-surface {
   margin: 0;
   background: var(--n-bg) !important;
   color: var(--n-text) !important;
 }
 
-html.ninou-v783 body.family-daily-surface .phone-shell {
+html.ninou-v784 body.family-daily-surface .phone-shell {
   width: min(100%, 520px) !important;
   max-width: 520px !important;
   min-height: 100dvh !important;
@@ -68,7 +68,7 @@ html.ninou-v783 body.family-daily-surface .phone-shell {
   color: var(--n-text) !important;
 }
 
-html.ninou-v783 body.family-daily-surface .app-header {
+html.ninou-v784 body.family-daily-surface .app-header {
   position: sticky !important;
   top: 0 !important;
   z-index: 120 !important;
@@ -86,7 +86,7 @@ html.ninou-v783 body.family-daily-surface .app-header {
   transition: background var(--n-motion-base) ease, border-color var(--n-motion-base) ease, box-shadow var(--n-motion-base) ease, transform var(--n-motion-base) var(--n-ease) !important;
 }
 
-html.ninou-v783.ninou-has-scrolled body.family-daily-surface .app-header {
+html.ninou-v784.ninou-has-scrolled body.family-daily-surface .app-header {
   border-color: var(--n-line) !important;
   background: var(--n-glass) !important;
   -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
@@ -94,27 +94,27 @@ html.ninou-v783.ninou-has-scrolled body.family-daily-surface .app-header {
   box-shadow: var(--n-shadow-1) !important;
 }
 
-html.ninou-v783 body.family-daily-surface .identity {
+html.ninou-v784 body.family-daily-surface .identity {
   min-width: 0 !important;
   display: grid !important;
   grid-template-columns: 50px minmax(0,1fr) !important;
   gap: 11px !important;
   align-items: center !important;
 }
-html.ninou-v783 body.family-daily-surface .identity img {
+html.ninou-v784 body.family-daily-surface .identity img {
   width: 50px !important;
   height: 50px !important;
   border-radius: 17px !important;
   box-shadow: 0 9px 22px rgba(63,42,98,.18), 0 0 0 1px rgba(255,255,255,.38) !important;
 }
-html.ninou-v783 body.family-daily-surface .identity span {
+html.ninou-v784 body.family-daily-surface .identity span {
   color: var(--n-muted) !important;
   font-size: .68rem !important;
   font-weight: 900 !important;
   letter-spacing: .13em !important;
   text-transform: uppercase !important;
 }
-html.ninou-v783 body.family-daily-surface .identity strong {
+html.ninou-v784 body.family-daily-surface .identity strong {
   display: block !important;
   max-width: 100% !important;
   margin-top: 1px !important;
@@ -128,7 +128,7 @@ html.ninou-v783 body.family-daily-surface .identity strong {
   white-space: nowrap !important;
 }
 
-html.ninou-v783 body.family-daily-surface .sync-pill {
+html.ninou-v784 body.family-daily-surface .sync-pill {
   min-width: 104px !important;
   min-height: 42px !important;
   padding: 0 14px !important;
@@ -140,14 +140,14 @@ html.ninou-v783 body.family-daily-surface .sync-pill {
   font-weight: 900 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12) !important;
 }
-html.ninou-v783 body.family-daily-surface .sync-pill.offline {
+html.ninou-v784 body.family-daily-surface .sync-pill.offline {
   border-color: color-mix(in srgb, var(--n-danger) 38%, transparent) !important;
   background: color-mix(in srgb, var(--n-danger) 10%, var(--n-surface-solid)) !important;
   color: var(--n-danger) !important;
 }
 
-html.ninou-v783 body.family-daily-surface .screen { display: none !important; }
-html.ninou-v783 body.family-daily-surface .screen.active {
+html.ninou-v784 body.family-daily-surface .screen { display: none !important; }
+html.ninou-v784 body.family-daily-surface .screen.active {
   display: grid !important;
   gap: 14px !important;
   padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
@@ -155,19 +155,19 @@ html.ninou-v783 body.family-daily-surface .screen.active {
   isolation: isolate !important;
 }
 
-html.ninou-v783 body.family-daily-surface :is(button, a, input, select, textarea) { font-family: inherit !important; }
-html.ninou-v783 body.family-daily-surface :is(button, a[role="button"]) {
+html.ninou-v784 body.family-daily-surface :is(button, a, input, select, textarea) { font-family: inherit !important; }
+html.ninou-v784 body.family-daily-surface :is(button, a[role="button"]) {
   -webkit-tap-highlight-color: transparent !important;
   touch-action: manipulation !important;
 }
-html.ninou-v783 body.family-daily-surface :is(button, a[role="button"]):focus-visible,
-html.ninou-v783 body.family-daily-surface :is(input, select, textarea):focus-visible {
+html.ninou-v784 body.family-daily-surface :is(button, a[role="button"]):focus-visible,
+html.ninou-v784 body.family-daily-surface :is(input, select, textarea):focus-visible {
   outline: 3px solid color-mix(in srgb, var(--n-accent-2) 26%, transparent) !important;
   outline-offset: 2px !important;
 }
 
-html.ninou-v783 body.family-daily-surface :is(input, select, textarea)[data-ninou-field],
-html.ninou-v783 body.family-daily-surface :is(input, select, textarea) {
+html.ninou-v784 body.family-daily-surface :is(input, select, textarea)[data-ninou-field],
+html.ninou-v784 body.family-daily-surface :is(input, select, textarea) {
   width: 100% !important;
   min-width: 0 !important;
   min-height: var(--n-control) !important;
@@ -182,48 +182,48 @@ html.ninou-v783 body.family-daily-surface :is(input, select, textarea) {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
   transition: border-color var(--n-motion-fast) ease, background var(--n-motion-fast) ease, box-shadow var(--n-motion-fast) ease !important;
 }
-html.ninou-v783 body.family-daily-surface :is(input, select, textarea):focus {
+html.ninou-v784 body.family-daily-surface :is(input, select, textarea):focus {
   border-color: var(--n-line-strong) !important;
   background: var(--n-surface-solid) !important;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--n-accent) 13%, transparent) !important;
 }
-html.ninou-v783 body.family-daily-surface textarea { min-height: 112px !important; resize: vertical !important; }
+html.ninou-v784 body.family-daily-surface textarea { min-height: 112px !important; resize: vertical !important; }
 
-html.ninou-v783 body.family-daily-surface [data-ninou-control] {
+html.ninou-v784 body.family-daily-surface [data-ninou-control] {
   min-height: 44px !important;
   border-radius: var(--n-radius-sm) !important;
   font-weight: 850 !important;
   line-height: 1.15 !important;
   transition: transform var(--n-motion-fast) var(--n-ease), box-shadow var(--n-motion-base) ease, border-color var(--n-motion-fast) ease, background var(--n-motion-fast) ease, opacity var(--n-motion-fast) ease !important;
 }
-html.ninou-v783 body.family-daily-surface [data-ninou-control="primary"] {
+html.ninou-v784 body.family-daily-surface [data-ninou-control="primary"] {
   border-color: transparent !important;
   background: linear-gradient(135deg, var(--n-accent), color-mix(in srgb, var(--n-accent) 72%, #5fdbc0)) !important;
   color: var(--n-accent-ink) !important;
   box-shadow: 0 12px 26px color-mix(in srgb, var(--n-accent) 22%, transparent) !important;
 }
-html.ninou-v783 body.family-daily-surface [data-ninou-control="secondary"],
-html.ninou-v783 body.family-daily-surface [data-ninou-control="neutral"] {
+html.ninou-v784 body.family-daily-surface [data-ninou-control="secondary"],
+html.ninou-v784 body.family-daily-surface [data-ninou-control="neutral"] {
   border: 1px solid var(--n-line) !important;
   background: var(--n-surface-2) !important;
   color: var(--n-text-2) !important;
   box-shadow: none !important;
 }
-html.ninou-v783 body.family-daily-surface [data-ninou-control="danger"] {
+html.ninou-v784 body.family-daily-surface [data-ninou-control="danger"] {
   border: 1px solid color-mix(in srgb, var(--n-danger) 28%, transparent) !important;
   background: color-mix(in srgb, var(--n-danger) 9%, var(--n-surface-solid)) !important;
   color: var(--n-danger) !important;
 }
-html.ninou-v783 body.family-daily-surface [data-ninou-control]:disabled { opacity: .48 !important; transform: none !important; box-shadow: none !important; }
+html.ninou-v784 body.family-daily-surface [data-ninou-control]:disabled { opacity: .48 !important; transform: none !important; box-shadow: none !important; }
 
-html.ninou-v783 body.family-daily-surface [data-ninou-surface="card"] {
+html.ninou-v784 body.family-daily-surface [data-ninou-surface="card"] {
   border-color: var(--n-line) !important;
   border-radius: var(--n-radius-md) !important;
   background: var(--n-surface) !important;
   color: var(--n-text) !important;
   box-shadow: var(--n-shadow-1) !important;
 }
-html.ninou-v783 body.family-daily-surface [data-ninou-surface="overlay"] {
+html.ninou-v784 body.family-daily-surface [data-ninou-surface="overlay"] {
   border: 1px solid var(--n-line) !important;
   border-radius: var(--n-radius-lg) !important;
   background: var(--n-surface-solid) !important;
@@ -231,21 +231,21 @@ html.ninou-v783 body.family-daily-surface [data-ninou-surface="overlay"] {
   box-shadow: var(--n-shadow-float) !important;
 }
 
-html.ninou-v783 body.family-daily-surface :is(.section-title, .drawer-section-title, .profile-card-head, .chart-title) span {
+html.ninou-v784 body.family-daily-surface :is(.section-title, .drawer-section-title, .profile-card-head, .chart-title) span {
   color: var(--n-muted) !important;
   font-size: .70rem !important;
   font-weight: 900 !important;
   letter-spacing: .075em !important;
   text-transform: uppercase !important;
 }
-html.ninou-v783 body.family-daily-surface :is(.section-title, .drawer-section-title, .profile-card-head, .chart-title) strong {
+html.ninou-v784 body.family-daily-surface :is(.section-title, .drawer-section-title, .profile-card-head, .chart-title) strong {
   color: var(--n-text) !important;
   font-size: 1.06rem !important;
   font-weight: 900 !important;
   line-height: 1.16 !important;
   letter-spacing: -.025em !important;
 }
-html.ninou-v783 body.family-daily-surface :is(p, small, em, .section-helper, .chart-helper, .form-status) {
+html.ninou-v784 body.family-daily-surface :is(p, small, em, .section-helper, .chart-helper, .form-status) {
   color: var(--n-muted) !important;
   line-height: 1.45 !important;
 }

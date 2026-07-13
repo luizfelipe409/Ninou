@@ -1,9 +1,0 @@
-Ninou v75.75.21 — Offline e sincronização real
-
-- Registros e perfil ficam salvos no aparelho quando a conexão cai.
-- Fila local de sincronização para perfil e dias alterados.
-- Ao voltar a conexão, o app tenta enviar automaticamente as pendências.
-- Indicador de status mais claro: Salvando, Sincronizando, Pendente, Offline e Sincronizado.
-- Mostra quantidade de itens pendentes junto ao último salvamento.
-- Mantém App Check opcional e preserva as cores do Ninou.
-- Atualizado runtime/cache para 75.75.21.

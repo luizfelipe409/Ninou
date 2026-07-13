@@ -1,9 +1,0 @@
-Ninou v75.72.4 — avatar em modal e cuidador corrigido
-
-Alterações:
-- botão Editar adicionado como badge logo abaixo da foto/avatar do perfil;
-- seleção de avatares movida para modal com botões Salvar e Fechar;
-- removidos os cards antigos de edição de avatar no meio da tela de Perfil;
-- cuidador local voltou a ter visual de imagem/emoji em squircle, sem quadrado gigante vazio;
-- ajuste de CSS e JS para abrir/fechar o modal corretamente;
-- cache/app atualizado para 75.72.4.

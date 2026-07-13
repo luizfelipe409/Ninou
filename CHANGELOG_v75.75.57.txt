@@ -1,9 +1,0 @@
-Ninou v75.75.57 — restauração premium da Home, Diário e gráficos
-
-- Remove o card de cuidador da tela inicial; Felipe e Maria são identificados automaticamente pelo e-mail conectado.
-- Restaura o relógio diurno com sol mais orgânico e arco proporcional ao relógio noturno.
-- Mantém o estado "dormindo" com aparência diurna no tema claro, evitando visual noturno indevido.
-- Reorganiza os cards do Diário para um visual mais limpo e menos poluído.
-- Reordena as linhas do card: título, horário/detalhe e assinatura do responsável.
-- Reforça os gráficos da tela Dados com barras visíveis, escala clara e estado vazio explícito.
-- Mantém CSS único: styles.css.

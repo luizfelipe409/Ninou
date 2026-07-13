@@ -1,7 +1,0 @@
-Ninou v76.1.0 — layout premium baseado no preview aprovado
-
-- Tela Hoje refinada para ficar mais próxima do preview aprovado.
-- Header com identidade mais forte, pílulas de Sincronizado e Perfil e tipografia premium.
-- Órbita, ação principal e cartão “Hoje com o bebê” redesenhados com melhor hierarquia visual.
-- Sheet “Registros próximos” ganhou acabamento premium e botão “Ver todos os registros”.
-- Compatível com tema claro e escuro.

@@ -1,8 +1,0 @@
-Ninou v75.75.28 — acabamento premium completo
-
-- adiciona camada visual premium final via css/js dedicados;
-- melhora responsividade desktop do admin com navegação lateral e shell amplo;
-- protege e-mails contra quebra feia no desktop;
-- encurta rótulos longos de ações do painel admin;
-- melhora contraste dos cards de diagnóstico/saúde no tema claro;
-- atualiza service worker/cache para forçar recarga da nova camada.

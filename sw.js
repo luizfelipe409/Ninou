@@ -1,16 +1,17 @@
-const CACHE_NAME = "ninou-v78-3-0-premium-consolidated";
-const APP_VERSION = "78.3.0";
-const STYLE_MODULES = ["legacy", "tokens", "foundation", "home", "components", "motion", "responsive"];
+const CACHE_NAME = "ninou-v78-4-0-premium-consolidated";
+const APP_VERSION = "78.4.0";
+const STYLE_MODULES = ["legacy", "tokens", "foundation", "home", "components", "motion", "responsive", "v78.4-critical"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
-  `/js/boot-v78.3.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v78.3.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-ux-v78.3.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-consistency-v78.3.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-stability-v78.3.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/architecture-v78.3.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/diagnostics-v78.3.0.mjs?v=${APP_VERSION}`,
+  `/js/boot-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-ux-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-consistency-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-stability-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/architecture-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/diagnostics-v78.4.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/visual-guard-v78.4.0.mjs?v=${APP_VERSION}`,
   "/js/core/event-bus.js", "/js/core/app-state.js", "/js/core/logger.js",
   "/js/repositories/json-repository.js", "/js/repositories/routine-repository.js", "/js/repositories/profile-repository.js",
   "/js/config/constants.js", "/js/dom/dom.js",
@@ -78,7 +79,7 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     event.respondWith((async () => {
       try {
-        const response = await fetchWithTimeout(request);
+        const response = await fetchWithTimeout(new Request(request, { cache: "no-store" }));
         if (canStore(response)) (await caches.open(CACHE_NAME)).put("/index.html", response.clone());
         return response;
       } catch (_) {

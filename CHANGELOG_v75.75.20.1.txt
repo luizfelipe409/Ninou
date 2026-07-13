@@ -1,9 +1,0 @@
-Ninou v75.75.20.1 — Teste familiar escopado por família
-
-- Renomeado o painel para "Teste da minha família".
-- Usuários/famílias comuns veem apenas diagnóstico, membros, convites, histórico e backup da própria família.
-- Diagnóstico global, criação/listagem geral de famílias e revisão técnica ficam exclusivos do admin global.
-- O checklist de uso familiar passou a validar o fluxo da família atual, sem sugerir acesso a outras famílias.
-- Backup JSON de família comum agora registra escopo familiar, não global.
-- Mantida a paleta visual do Ninou e a responsividade da versão anterior.
-- Atualizado runtime/cache para 75.75.20.1.

@@ -1,6 +1,0 @@
-Ninou v75.75.3 — avatar do perfil alinhado com a prévia
-
-- reduzi a espessura do aro do avatar principal;
-- aumentei a presença do bebê dentro do círculo do perfil;
-- deixei a foto do perfil com leitura igual ou ligeiramente maior que a prévia do modal;
-- mantive a mesma linguagem visual da prévia, sem arco exagerado.

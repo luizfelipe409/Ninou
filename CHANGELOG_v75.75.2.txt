@@ -1,8 +1,0 @@
-Ninou v75.75.3 — atalhos iniciais e próxima soneca refinados
-
-- Acordou/Iniciar soneca abaixo do botão principal ficam reservados ao início da rotina, quando o dia ainda está zerado.
-- Reforcei o bloqueio visual desses botões para eles não aparecerem com a rotina em andamento.
-- Mantive os atalhos principais para Amamentação, Fralda, Mamadeira e Medicamento e refinei o visual deles.
-- Corrigi o card Próxima soneca para não exibir durações absurdas como milhares de horas.
-- Quando a janela fica antiga demais, o app orienta recalcular com a próxima soneca em vez de mostrar número quebrado.
-- Mantido o tratamento de sincronização pendente da v75.75.0.

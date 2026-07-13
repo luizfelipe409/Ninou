@@ -1,6 +1,0 @@
-Versão v75.75.71
-
-- Corrigida a centralização dos avatares dentro dos cards individuais.
-- Removido o deslocamento vertical geral que desalinava os bonecos após a troca da menina do laço.
-- Mantida a prévia superior ancorada mais embaixo no círculo.
-- Atualizado cache/versionamento para 75.75.71.

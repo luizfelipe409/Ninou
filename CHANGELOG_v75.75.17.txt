@@ -1,9 +1,0 @@
-Ninou v75.75.17 — Responsividade e admin adaptativo
-
-- Revisado layout responsivo do painel admin.
-- Admin em desktop usa grade controlada com largura máxima e cards alinhados.
-- Admin em telas pequenas vira lista de cards, com botões empilhados e sem overflow horizontal.
-- Tabelas/listas de membros, convites e auditoria ficam protegidas contra texto longo.
-- Diagnóstico, saúde da família e ações de backup foram adaptados para mobile/tablet/desktop.
-- Mantida a paleta visual do Ninou: lavanda, creme, verde suave e roxo.
-- Atualizado cache/runtime para 75.75.17.

@@ -1,8 +1,0 @@
-Ninou v75.75.35 — gráficos premium
-
-- Mantém CSS único em styles.css.
-- Reestiliza gráficos de barras com grid sutil, linha média, animação suave e melhor contraste.
-- Reestiliza gráfico de peso com SVG maior, área preenchida, pontos destacados, rótulos de data e delta do período.
-- Melhora cards da tela Dados em tema claro e escuro.
-- Mantém a estrutura e as funções existentes sem remover botões ou telas.
-- Atualiza app.js, index.html, sw.js e manifest para v75.75.35.

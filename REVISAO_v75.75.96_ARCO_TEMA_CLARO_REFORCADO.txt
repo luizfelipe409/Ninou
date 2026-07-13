@@ -1,9 +1,0 @@
-Versão v75.75.96
-
-Correção após validação da v75.75.95:
-- O tema escuro foi preservado, pois ficou aprovado.
-- O tema claro recebeu reforço visual no arco do avatar do perfil.
-- A moldura clara agora usa lavanda/champagne mais perceptível, mas ainda clean.
-- Adicionado glow roxo suave no tema claro.
-- Preview do modal também foi alinhado ao mesmo ajuste.
-- Cache/versionamento atualizado para 75.75.96.

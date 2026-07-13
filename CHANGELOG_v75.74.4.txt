@@ -1,6 +1,0 @@
-Ninou v75.74.4 — atualização completa dos avatares
-
-- substituídos os 12 avatares por ilustrações refinadas e consistentes;
-- mantido o mesmo estilo visual nos cards do seletor, na prévia do avatar e no avatar principal do perfil;
-- padronização dos arquivos avatar-01 até avatar-12 para manter a mesma família visual;
-- atualização de cache/app para 75.74.4.

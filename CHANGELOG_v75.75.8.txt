@@ -1,4 +1,0 @@
-v75.75.8
-- Corrige SyntaxError por declaracao duplicada de setText no app principal.
-- Protege o Service Worker para nao tentar cachear requisicoes chrome-extension ou esquemas nao HTTP/HTTPS.
-- Atualiza cache/runtime para 75.75.8.

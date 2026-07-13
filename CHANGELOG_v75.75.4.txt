@@ -1,7 +1,0 @@
-Ninou v75.75.4 — criação de família idempotente
-
-- Corrige o botão “Criar minha família” para não gerar uma nova família a cada clique.
-- Usa um ID estável por conta para a família pessoal, mantendo o mesmo documento no Firestore.
-- Bloqueia cliques repetidos enquanto a criação está em andamento.
-- Reordena a gravação no Firestore: primeiro cria o vínculo/membro, depois salva o perfil familiar, respeitando as regras atuais.
-- Se a conta já tiver uma família vinculada, o app reutiliza o acesso existente em vez de criar outra.

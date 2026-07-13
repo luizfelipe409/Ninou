@@ -1,6 +1,0 @@
-v75.75.11
-
-- App Check/reCAPTCHA Enterprise agora fica opcional durante desenvolvimento e testes.
-- Desativa a inicialização automática do App Check no cliente para evitar chamadas 401 do reCAPTCHA atrapalhando o fluxo principal.
-- Mantém Firebase Authentication e Firestore Rules como proteção principal.
-- Atualiza cache/runtime para 75.75.11.

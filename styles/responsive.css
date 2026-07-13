@@ -1,28 +1,28 @@
-/* Ninou v78.3.0 — responsividade final */
+/* Ninou v78.4.0 — responsividade final */
 @media (max-width: 390px) {
-  html.ninou-v783 body.family-daily-surface .phone-shell { padding-left: 12px !important; padding-right: 12px !important; }
-  html.ninou-v783 body.family-daily-surface .app-header { margin-left: 0 !important; margin-right: 0 !important; padding-left: 6px !important; padding-right: 6px !important; }
-  html.ninou-v783 body.family-daily-surface .identity { grid-template-columns: 44px minmax(0,1fr) !important; gap: 9px !important; }
-  html.ninou-v783 body.family-daily-surface .identity img { width: 44px !important; height: 44px !important; border-radius: 15px !important; }
-  html.ninou-v783 body.family-daily-surface .sync-pill { min-width: 94px !important; padding: 0 10px !important; font-size: .76rem !important; }
-  html.ninou-v783 body.family-daily-surface .state-orbit.live-timeline-orbit { min-height: 342px !important; padding: 12px !important; border-radius: 27px !important; }
-  html.ninou-v783 body.family-daily-surface .orbit-center-safe { width: min(60%,205px) !important; min-height: 142px !important; }
-  html.ninou-v783 body.family-daily-surface #stateClock { font-size: clamp(2rem,10.7vw,2.85rem) !important; }
-  html.ninou-v783 body.family-daily-surface #stateHint { font-size: .77rem !important; }
-  html.ninou-v783 body.family-daily-surface #quickActions.quick-actions { grid-auto-rows: 116px !important; gap: 10px !important; }
-  html.ninou-v783 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] { height: 116px !important; min-height: 116px !important; padding: 12px 7px 10px !important; gap: 7px !important; }
-  html.ninou-v783 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon,
-  html.ninou-v783 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon { width: 52px !important; height: 52px !important; min-width: 52px !important; min-height: 52px !important; }
-  html.ninou-v783 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > span:last-child { font-size: .81rem !important; }
-  html.ninou-v783 body.family-daily-surface .bottom-bar { width: calc(100% - 12px) !important; grid-template-columns: minmax(0,1fr) 58px !important; padding: 6px !important; border-radius: 23px !important; }
-  html.ninou-v783 body.family-daily-surface .bottom-nav button { min-height: 57px !important; font-size: .61rem !important; }
-  html.ninou-v783 body.family-daily-surface .fab { width: 58px !important; height: 58px !important; min-width: 58px !important; min-height: 58px !important; border-radius: 18px !important; }
-  html.ninou-v783 body.family-daily-surface #recordSheet .record-types { gap: 6px !important; }
-  html.ninou-v783 body.family-daily-surface #recordSheet .record-types button { flex-basis: calc((100% - 18px) / 4) !important; width: calc((100% - 18px) / 4) !important; min-height: 76px !important; font-size: .57rem !important; }
+  html.ninou-v784 body.family-daily-surface .phone-shell { padding-left: 12px !important; padding-right: 12px !important; }
+  html.ninou-v784 body.family-daily-surface .app-header { margin-left: 0 !important; margin-right: 0 !important; padding-left: 6px !important; padding-right: 6px !important; }
+  html.ninou-v784 body.family-daily-surface .identity { grid-template-columns: 44px minmax(0,1fr) !important; gap: 9px !important; }
+  html.ninou-v784 body.family-daily-surface .identity img { width: 44px !important; height: 44px !important; border-radius: 15px !important; }
+  html.ninou-v784 body.family-daily-surface .sync-pill { min-width: 94px !important; padding: 0 10px !important; font-size: .76rem !important; }
+  html.ninou-v784 body.family-daily-surface .state-orbit.live-timeline-orbit { min-height: 342px !important; padding: 12px !important; border-radius: 27px !important; }
+  html.ninou-v784 body.family-daily-surface .orbit-center-safe { width: min(60%,205px) !important; min-height: 142px !important; }
+  html.ninou-v784 body.family-daily-surface #stateClock { font-size: clamp(2rem,10.7vw,2.85rem) !important; }
+  html.ninou-v784 body.family-daily-surface #stateHint { font-size: .77rem !important; }
+  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions { grid-auto-rows: 116px !important; gap: 10px !important; }
+  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] { height: 116px !important; min-height: 116px !important; padding: 12px 7px 10px !important; gap: 7px !important; }
+  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .action-icon,
+  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > .type-icon { width: 52px !important; height: 52px !important; min-width: 52px !important; min-height: 52px !important; }
+  html.ninou-v784 body.family-daily-surface #quickActions.quick-actions > button[data-open-sheet] > span:last-child { font-size: .81rem !important; }
+  html.ninou-v784 body.family-daily-surface .bottom-bar { width: calc(100% - 12px) !important; grid-template-columns: minmax(0,1fr) 58px !important; padding: 6px !important; border-radius: 23px !important; }
+  html.ninou-v784 body.family-daily-surface .bottom-nav button { min-height: 57px !important; font-size: .61rem !important; }
+  html.ninou-v784 body.family-daily-surface .fab { width: 58px !important; height: 58px !important; min-width: 58px !important; min-height: 58px !important; border-radius: 18px !important; }
+  html.ninou-v784 body.family-daily-surface #recordSheet .record-types { gap: 6px !important; }
+  html.ninou-v784 body.family-daily-surface #recordSheet .record-types button { flex-basis: calc((100% - 18px) / 4) !important; width: calc((100% - 18px) / 4) !important; min-height: 76px !important; font-size: .57rem !important; }
 }
 
 @media (min-width: 700px) {
-  html.ninou-v783 body.family-daily-surface { padding: 24px !important; }
-  html.ninou-v783 body.family-daily-surface .phone-shell { min-height: calc(100dvh - 48px) !important; border: 1px solid var(--n-line) !important; border-radius: 34px !important; box-shadow: var(--n-shadow-float) !important; }
-  html.ninou-v783 body.family-daily-surface .bottom-bar { bottom: 28px !important; }
+  html.ninou-v784 body.family-daily-surface { padding: 24px !important; }
+  html.ninou-v784 body.family-daily-surface .phone-shell { min-height: calc(100dvh - 48px) !important; border: 1px solid var(--n-line) !important; border-radius: 34px !important; box-shadow: var(--n-shadow-float) !important; }
+  html.ninou-v784 body.family-daily-surface .bottom-bar { bottom: 28px !important; }
 }

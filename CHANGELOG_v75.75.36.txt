@@ -1,9 +1,0 @@
-Ninou v75.75.36 — reconstrução premium real da tela Dados
-
-- Reestrutura a tela Dados como painel inteligente: hero, métricas principais, peso e tendências.
-- Mantém CSS único: somente styles.css.
-- Redesenha o card de peso com curva suave, histórico em chips e melhor leitura mobile.
-- Redesenha os gráficos de sono, amamentação, mamadeira, fraldas e medicamentos com barras premium.
-- Melhora contraste no tema escuro e claro.
-- Mantém login, família, convites, sair/limpar dados, PDF/WhatsApp e rotinas sem alteração de regra.
-- Atualiza app.js, index.html, sw.js, manifest e runtime para 75.75.36.

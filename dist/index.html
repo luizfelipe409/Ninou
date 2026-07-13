@@ -2,7 +2,41 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <script>document.documentElement.classList.add("ninou-booting", "ninou-v783");</script>
+    <script>
+      (() => {
+        const VERSION = "78.4.0";
+        const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
+        const root = document.documentElement;
+        root.classList.add("ninou-booting", "ninou-v784");
+        root.dataset.ninouVersion = VERSION;
+        window.__NINOU_EARLY_VERSION__ = VERSION;
+        window.__NINOU_EARLY_MIGRATION__ = (async () => {
+          try {
+            if (localStorage.getItem(MIGRATION_KEY) === "done") return false;
+            if ("serviceWorker" in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations();
+              await Promise.allSettled(registrations.map((registration) => registration.unregister()));
+            }
+            if ("caches" in window) {
+              const names = await caches.keys();
+              await Promise.allSettled(names.filter((name) => name.toLowerCase().startsWith("ninou-")).map((name) => caches.delete(name)));
+            }
+            localStorage.setItem(MIGRATION_KEY, "done");
+            const url = new URL(location.href);
+            if (url.searchParams.get("ninouVersion") !== VERSION) {
+              url.searchParams.set("ninouVersion", VERSION);
+              location.replace(url.toString());
+              return new Promise(() => {});
+            }
+            return true;
+          } catch (error) {
+            console.warn("Migração segura do runtime não concluída:", error);
+            try { localStorage.setItem(MIGRATION_KEY, "done"); } catch (_) {}
+            return false;
+          }
+        })();
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Ninou</title>
     <meta name="theme-color" content="#f8f6fc" />
@@ -11,7 +45,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=78.3.0" />
+    <link rel="manifest" href="./manifest.webmanifest?v=78.4.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -21,16 +55,20 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles/legacy.css?v=78.3.0" />
-    <link rel="stylesheet" href="./styles/tokens.css?v=78.3.0" />
-    <link rel="stylesheet" href="./styles/foundation.css?v=78.3.0" />
-    <link rel="stylesheet" href="./styles/home.css?v=78.3.0" />
-    <link rel="stylesheet" href="./styles/components.css?v=78.3.0" />
-    <link rel="stylesheet" href="./styles/motion.css?v=78.3.0" />
-    <link rel="stylesheet" href="./styles/responsive.css?v=78.3.0" />
+    <link rel="stylesheet" href="./styles/legacy.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/tokens.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/foundation.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/home.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/components.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/motion.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/responsive.css?v=78.4.0" />
+    <link rel="stylesheet" href="./styles/v78.4-critical.css?v=78.4.0" />
     <style id="ninouBootCriticalStyle">
+      html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
-      html.ninou-booting body > :not(#ninouBootScreen):not(script):not(style) { visibility: hidden !important; opacity: 0 !important; }
+      html.ninou-booting body > :not(#ninouBootScreen):not(script):not(style),
+      body[data-profile-access-state="booting"] > main.phone-shell { visibility: hidden !important; opacity: 0 !important; }
+      body[data-profile-access-state="booting"] #ninouBootScreen { display:grid !important; visibility:visible !important; opacity:1 !important; }
       html.ninou-booting #ninouBootScreen, html.ninou-loading-overlay #ninouBootScreen { display: grid !important; visibility: visible !important; opacity: 1; }
       #ninouBootScreen { position: fixed; inset: 0; z-index: 2147483646; display: grid; place-items: center; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); background: radial-gradient(circle at 18% 12%, rgba(255,214,142,.45), transparent 34%), radial-gradient(circle at 84% 84%, rgba(108,218,194,.22), transparent 38%), linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); color:#29233d; font-family:Inter,ui-rounded,-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",sans-serif; transition: opacity .34s ease, visibility .34s ease; }
       #ninouBootScreen[hidden] { display:none !important; }
@@ -66,6 +104,41 @@
         <p id="ninouBootSlow" class="ninou-boot-slow">A conexão está demorando um pouco. Seus dados locais serão usados para abrir o app.</p>
       </div>
     </section>
+    <script>
+      (() => {
+        let hiddenAt = 0;
+        let lastShownAt = 0;
+        let autoHideTimer = 0;
+        const showEarlyResumeLoading = () => {
+          if (!window.__NINOU_APP_READY__) return;
+          const now = Date.now();
+          if (now - lastShownAt < 700) return;
+          lastShownAt = now;
+          const splash = document.querySelector("#ninouBootScreen");
+          if (!splash) return;
+          clearTimeout(autoHideTimer);
+          splash.hidden = false;
+          splash.classList.remove("is-leaving");
+          document.documentElement.classList.add("ninou-loading-overlay");
+          const status = document.querySelector("#ninouBootStatus");
+          if (status) status.textContent = "Atualizando perfil e rotina…";
+          autoHideTimer = window.setTimeout(() => {
+            if (document.documentElement.classList.contains("ninou-loading-overlay")) {
+              splash.classList.add("is-leaving");
+              document.documentElement.classList.remove("ninou-loading-overlay");
+              window.setTimeout(() => { splash.hidden = true; }, 380);
+            }
+          }, 2600);
+        };
+        window.__NINOU_EARLY_SHOW_LOADING__ = showEarlyResumeLoading;
+        window.addEventListener("pageshow", (event) => { if (event.persisted) showEarlyResumeLoading(); }, { passive: true });
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") { hiddenAt = Date.now(); return; }
+          if (hiddenAt && Date.now() - hiddenAt > 350) showEarlyResumeLoading();
+          hiddenAt = 0;
+        }, { passive: true });
+      })();
+    </script>
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
       <header class="app-header">
         <div class="identity">
@@ -1677,7 +1750,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v78.3.0</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v78.4.0</strong>
             <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -2091,7 +2164,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v78.3.0.mjs?v=78.3.0").catch((error) => {
+      import("./js/boot-v78.4.0.mjs?v=78.4.0").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         const notice = document.createElement("div");
         notice.style.cssText = "position:fixed;inset:14px 14px auto;z-index:2147483647;padding:16px;border-radius:18px;background:#fff3f3;color:#4a1220;font:14px/1.45 system-ui;box-shadow:0 18px 48px rgba(74,18,32,.2)";

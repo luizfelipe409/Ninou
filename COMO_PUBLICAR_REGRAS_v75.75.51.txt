@@ -1,8 +1,0 @@
-Como publicar as regras da v75.75.51
-
-1. Abra Firebase Console.
-2. Vá em Firestore Database.
-3. Abra Rules.
-4. Substitua tudo pelo conteúdo do arquivo firestore.rules desta versão.
-5. Clique em Publish.
-6. Teste login admin, pai, mãe, família nova, cuidador, visualização e o Centro de confiança.

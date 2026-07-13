@@ -1,7 +1,0 @@
-Ninou v75.75.3 — ajuste fino do avatar principal
-
-- reduzi o peso visual do nome principal para nomes longos ficarem mais elegantes;
-- diminui o anel do avatar principal e deixei o conjunto mais equilibrado;
-- aumentei a presença do bebê dentro do círculo, com menos excesso de moldura;
-- reduzi a sensação de card inflado no topo do perfil;
-- mantive a linguagem visual refinada da versão anterior, mas com melhor proporção.

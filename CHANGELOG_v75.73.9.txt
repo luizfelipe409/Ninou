@@ -1,7 +1,0 @@
-Ninou v75.74.1 — indicador por ícone e data do diário padronizada
-
-Alterações:
-- trocado o texto do indicador de rolagem do modal por um ícone de dropdown no mesmo estilo dos selects do app;
-- mantido o comportamento do indicador: aparece quando há mais conteúdo e some ao final;
-- padronizado o campo "Data do diário" com o mesmo ícone visual de dropdown usado em "Aparência do app" e demais selects;
-- atualização de cache/app para 75.74.1.

@@ -1,9 +1,0 @@
-Ninou v75.75.18 — Polimento visual e estados vazios
-
-- Melhorados os textos de estado vazio no Hoje, Diário, observações, convites, membros e histórico familiar.
-- Estados sem dados agora aparecem como orientação amigável, não como erro ou área quebrada.
-- Card inicial do dia ficou mais claro para usuário novo ou antigo sem registros hoje.
-- Linha do tempo e último cuidado receberam layout vazio mais acolhedor, respeitando lavanda, creme, verde suave e roxo.
-- Estados vazios do painel admin foram suavizados e protegidos para mobile/desktop.
-- Mantida responsividade da v75.75.17, com ajustes finos em cards, textos longos e placeholders.
-- Atualizado cache/runtime para 75.75.18.

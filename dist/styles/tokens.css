@@ -1,4 +1,4 @@
-/* Ninou v78.3.0 — design tokens canônicos */
+/* Ninou v78.4.0 — design tokens canônicos */
 :root {
   --n-space-1: 4px;
   --n-space-2: 8px;
@@ -21,7 +21,7 @@
   --n-spring: cubic-bezier(.18,1.25,.32,1);
 }
 
-html.ninou-v783 body.family-daily-surface {
+html.ninou-v784 body.family-daily-surface {
   --n-bg: #12101f;
   --n-shell: #1a172b;
   --n-surface: rgba(38, 34, 58, .92);
@@ -45,7 +45,7 @@ html.ninou-v783 body.family-daily-surface {
   --n-orbit-bg: radial-gradient(circle at 18% 14%, rgba(150,112,236,.20), transparent 29%), radial-gradient(circle at 84% 82%, rgba(72,213,181,.14), transparent 34%), linear-gradient(155deg,#211b3e 0%,#17142e 54%,#102527 100%);
 }
 
-html.ninou-v783 body.family-daily-surface.day-theme {
+html.ninou-v784 body.family-daily-surface.day-theme {
   --n-bg: #efedf4;
   --n-shell: #f8f7fb;
   --n-surface: rgba(255,255,255,.92);

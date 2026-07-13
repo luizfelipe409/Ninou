@@ -1,6 +1,0 @@
-Ninou v75.75.3 — avatar do perfil maior por dentro, com aro mais discreto
-
-- reduzi o aro/anel do avatar principal para ele não parecer exagerado;
-- aumentei a presença do bebê dentro do círculo, aproximando a leitura da prévia do modal;
-- deixei o avatar principal mais limpo, com foco maior no rostinho;
-- mantive o restante do visual da tela.

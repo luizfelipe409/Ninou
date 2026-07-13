@@ -1,4 +1,4 @@
-# Changelog — Ninou v78.3.0
+# Changelog — Ninou v78.4.0
 
 ## Estabilidade percebida no iPhone
 
@@ -20,7 +20,7 @@
 
 ## Infraestrutura
 
-- scripts, manifesto, cache e Service Worker atualizados para 78.3.0;
+- scripts, manifesto, cache e Service Worker atualizados para 78.4.0;
 - testes de regressão específicos para loading, retomada, sessão, órbita, atalhos e formulário;
-- validação de sintaxe de 54 scripts e análise estrutural dos sete módulos CSS;
+- validação de sintaxe de 55 scripts e análise estrutural dos sete módulos CSS;
 - dados locais, Firebase, famílias, cuidadores e regras do Firestore preservados.

@@ -1,8 +1,0 @@
-Ninou v75.75.34 — Avatar centralizado e zoom do iPhone corrigido
-
-- Mantém CSS único no arquivo styles.css.
-- Corrige centralização dos ícones/avatares dentro dos cards do menu de avatar.
-- Remove corte visual causado por object-fit cover e transform scale nos thumbs.
-- Ajusta tamanho dos cards de avatar no iPhone para não cortar rosto nem legenda.
-- Força inputs/selects/textareas com 16px no mobile/iOS para impedir zoom automático do Safari ao digitar.
-- Atualiza app.js, index.html, sw.js, manifest e runtime para 75.75.34.

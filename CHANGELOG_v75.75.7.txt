@@ -1,6 +1,0 @@
-Ninou v75.75.7 — correção loader iPhone/PWA
-
-- O index.html agora carrega js/app.legacy.js diretamente como módulo.
-- Remove o loader intermediário como caminho principal para evitar falso aviso "Não foi possível carregar o Ninou" em iPhone/PWA.
-- Atualiza cache, manifest e service worker para 75.75.7.
-- Mantém app.js apenas como compatibilidade para páginas antigas em cache.

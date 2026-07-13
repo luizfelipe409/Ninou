@@ -1,9 +1,0 @@
-Ninou v75.72.3 — modernização visual do Perfil
-
-Alterações:
-- removido o texto automático "Perfil do diário" gerado via ::before no card de avatar/foto do perfil;
-- substituídos caracteres/emoji de configuração por ícones SVG lineares;
-- adicionado anel gradiente premium na foto do perfil;
-- refinado avatar do cuidador com SVG e gradiente;
-- adicionados ajustes de feedback tátil em elementos tocáveis;
-- cache/app atualizado para 75.72.3.

@@ -1,9 +1,0 @@
-Versão v75.75.78
-
-- Removido o destaque pesado focado na foto do avatar selecionado.
-- O estado selecionado agora valoriza o card inteiro:
-  borda mint, halo externo suave, elevação discreta e fundo premium.
-- Adicionado check pequeno e elegante no canto superior direito.
-- Imagem do avatar não recebe mais escurecimento, escala ou halo próprio.
-- Mantido o tamanho atual dos cards e avatares.
-- Cache/versionamento atualizado para 75.75.78.

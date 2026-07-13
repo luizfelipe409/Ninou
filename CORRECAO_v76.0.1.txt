@@ -1,7 +1,0 @@
-Ninou v76.1.0 — órbita proporcional
-
-- Registros posicionados proporcionalmente ao horário real entre 00:00 e 23:59.
-- Horários não ficam escritos junto aos ícones.
-- Marcadores só são agrupados quando há colisão visual real.
-- Agrupamento usa um único ícone com badge numérico indicando a quantidade.
-- Toque no agrupamento abre os registros envolvidos.

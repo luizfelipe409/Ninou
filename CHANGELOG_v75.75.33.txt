@@ -1,7 +1,0 @@
-Ninou v75.75.33 — diagnóstico familiar legível e checagem básica segura
-
-- Corrige contraste do card Saúde da família no tema escuro e claro.
-- Evita mensagem pesada de erro quando a checagem completa do Firebase não responde.
-- O botão Verificar família passa a exibir uma verificação básica local quando a checagem completa falha/expira.
-- Aumenta o respiro inferior no mobile para a barra de navegação não cobrir Backup/Relatório.
-- Mantém CSS único em styles.css e preserva todas as funções do Perfil/Admin.

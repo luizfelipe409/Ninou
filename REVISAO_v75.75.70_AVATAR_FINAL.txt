@@ -1,8 +1,0 @@
-Versão v75.75.70
-
-- Menina do laço (avatar-03) substituída por nova versão.
-- Todos os avatares ativos carregados em WebP com versionamento ?v=75.75.70.
-- Ajuste final de CSS para ancorar os avatares mais embaixo no círculo dos cards e na prévia.
-- Correção específica para avatar-03 na grade e na prévia.
-- Removidos arquivos não utilizados: PNGs antigos ativos e pasta icons/baby-avatars-original.
-- Cache do service worker atualizado.

@@ -1,9 +1,0 @@
-Ninou v75.72.7 — revisão dos selects e avatar
-
-Alterações:
-- removido o efeito visual de X/triângulo gigante nos campos select;
-- todos os selects principais agora usam chevron SVG real à direita;
-- Período do relatório ganhou ícone para ficar claro que é um menu;
-- mantido o botão Editar avatar no card de Perfil do diário, fora da foto principal;
-- o modal de avatar agora reabre com texto correto, sem exibir “Editor fechado.”;
-- cache/app atualizado para 75.72.7.

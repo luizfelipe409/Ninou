@@ -1,9 +1,0 @@
-Versão v75.75.84
-
-Correção após avaliação visual:
-- O preview superior deixou de copiar o avatar grande do perfil de forma pesada.
-- Agora o preview é uma versão premium compacta e refinada, melhor integrada ao cabeçalho.
-- Removido o aro/moldura exagerada que dava aspecto de mal acabado.
-- Tema escuro revisado para garantir leitura de título, descrição, nomes dos cards e status.
-- Mantido o grid mobile em 2 colunas e a seleção premium no card inteiro.
-- Cache/versionamento atualizado para 75.75.84.

@@ -1,6 +1,0 @@
-Ninou v75.75.3 — atalhos principais compactos
-
-- voltei os atalhos principais para um tamanho mais próximo do anterior;
-- removi a linha visual abaixo do nome dos atalhos;
-- centralizei os títulos dos atalhos;
-- mantive os ajustes da versão anterior: Acordou/Iniciar soneca aparecem apenas no início da rotina e correção da Próxima soneca.

@@ -1,6 +1,0 @@
-Ninou v76.1.0 — correções da Home premium
-
-- Ícones dos registros rápidos centralizados e alinhados no centro dos cards.
-- Órbita passa a mostrar um ícone por tipo de registro com contador visível.
-- Toque em um ícone da órbita abre a lista daquele tipo de registro.
-- Visual das badges de quantidade refinado para tema claro e escuro.

@@ -1,9 +1,0 @@
-Versão v75.75.93
-
-Ajuste solicitado nos arcos/molduras das imagens de avatar do perfil:
-- Tema claro: arco lavanda + champagne/dourado suave.
-- Tema escuro: arco mint neon suave + roxo profundo.
-- Removida a sensação de aro preto pesado.
-- Aplicado também ao preview do modal para manter consistência visual.
-- Mantidos os ajustes anteriores: ícones premium, fade real, correção foco/aria e grid mobile.
-- Cache/versionamento atualizado para 75.75.93.

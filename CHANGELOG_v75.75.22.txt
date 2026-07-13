@@ -1,9 +1,0 @@
-Ninou v75.75.22 — Observações rápidas
-
-- Adicionado bloco de Observações rápidas dentro das Observações do dia.
-- Atalhos: Cólica, Regurgitou, Banho, Medicamento, Febre e Consulta.
-- Adicionado campo para observação livre rápida.
-- Cada observação rápida entra com horário e cuidador responsável.
-- Observações respeitam o limite do dia e continuam no relatório/PDF.
-- Visual mantido na paleta do Ninou, com chips suaves e responsivos.
-- Atualizado runtime/cache para 75.75.22.

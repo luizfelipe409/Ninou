@@ -1,6 +1,0 @@
-Ninou v75.74.1 — contraste do vínculo do cuidador
-
-Alterações:
-- corrigida a cor do texto do chip de vínculo, como "Pai", no card Cuidador local;
-- no modo escuro, o texto do chip agora fica preto/escuro para manter contraste com o fundo claro em degradê;
-- mantida a identidade visual do card especial do cuidador.

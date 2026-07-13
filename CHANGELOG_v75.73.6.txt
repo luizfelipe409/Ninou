@@ -1,9 +1,0 @@
-Ninou v75.74.1 — base do modal de ações mais natural
-
-Alterações:
-- modal de ações deixou de parecer cortado na parte inferior;
-- bottom sheet agora tem pequena margem inferior e cantos arredondados também embaixo;
-- adicionado respiro visual no fim do formulário;
-- suavizado o fim do conteúdo rolável para não parecer seco/cortado;
-- mantidas as melhorias de fundo travado, scrollbar oculta e abas com respiro;
-- cache/versionamento atualizado para 75.74.1.

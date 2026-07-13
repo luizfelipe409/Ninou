@@ -1,9 +1,0 @@
-Versão v75.75.81
-
-- Layout do seletor de avatar ajustado para 2 cards por fileira em celulares (<= 430px).
-- Cards aumentados no mobile para melhor acabamento e legibilidade.
-- Revisado acabamento premium do tema escuro/noite e do tema claro/dia.
-- Seleção premium mantida no card inteiro, sem destaque mint na foto.
-- Modal recebeu ajuste de largura/padding para evitar corte lateral.
-- Preview superior e header ajustados para telas pequenas.
-- Cache/versionamento atualizados para 75.75.81.

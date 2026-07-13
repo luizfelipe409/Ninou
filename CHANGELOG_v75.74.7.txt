@@ -1,6 +1,0 @@
-Ninou v75.75.3 — avatar do perfil alinhado com a prévia
-
-- deixei o avatar principal do perfil com a mesma linguagem visual da prévia do modal;
-- usei a mesma bolha circular, mesma moldura e mesma leitura visual;
-- aumentei levemente o enquadramento do rostinho para ele aparecer um pouco maior;
-- preservei o restante do refinamento da versão anterior.
