@@ -1,0 +1,19 @@
+NINOU v77.1.0 — ETAPA 2/4: EXPERIÊNCIA DE USO
+
+Implementado:
+- microinterações de toque com resposta visual sem atrasar as ações;
+- feedback tátil progressivo em navegação, registros rápidos e ações principais;
+- transições suaves e acessíveis entre Hoje, Diário, Dados, Sons e Perfil;
+- abertura premium de folhas e modais;
+- animação de confirmação quando um novo registro aparece na órbita;
+- entrada refinada do card de correção/desfazer;
+- indicador curto de processamento nos botões de salvamento;
+- foco de teclado visível e melhor acessibilidade;
+- respeito automático à preferência “reduzir movimento”;
+- atualização de cache e Service Worker para v77.1.0.
+
+Cuidados técnicos:
+- a lógica dos registros não foi reescrita;
+- IDs, banco local e sincronização Firebase foram preservados;
+- o módulo de UX trabalha como uma camada isolada e removível;
+- nenhum tempo fixo foi adicionado ao fluxo real de salvamento.

@@ -1,0 +1,8 @@
+NINOU v76.1.5 — ABERTURA SEGURA COM TELA DE CARREGAMENTO
+
+1. A interface principal fica invisível durante a inicialização, impedindo a exibição da órbita preta, cronômetro zerado e dados genéricos.
+2. Nova tela premium de carregamento com logo Ninou, animação suave e mensagens de progresso.
+3. A tela só é retirada após o núcleo carregar e o primeiro estado de autenticação/sincronização estabilizar.
+4. Em conexão lenta, após 8 segundos o app abre com os dados locais disponíveis, sem ficar preso indefinidamente.
+5. Falhas reais mantêm a tela protegida e exibem opção segura de reparação de cache.
+6. Cache, Service Worker, manifest e arquivos de entrada atualizados para v76.1.5.
