@@ -7,18 +7,25 @@ export function initActionLauncher() {
   if (!launcher || !openButton || launcher.dataset.bound === "true") return;
   launcher.dataset.bound = "true";
 
+  let openedFromKeyboard = false;
   const close = () => {
     launcher.hidden = true;
     document.body?.classList.remove("action-launcher-open");
     document.documentElement?.classList.remove("action-launcher-open");
     openButton.setAttribute("aria-expanded", "false");
+    if (openedFromKeyboard) requestAnimationFrame(() => openButton.focus({ preventScroll: true }));
+    openedFromKeyboard = false;
   };
-  const open = () => {
+  const open = (event) => {
+    openedFromKeyboard = Boolean(event?.detail === 0);
     launcher.hidden = false;
     document.body?.classList.add("action-launcher-open");
     document.documentElement?.classList.add("action-launcher-open");
     openButton.setAttribute("aria-expanded", "true");
-    requestAnimationFrame(() => launcher.querySelector("[data-launch-record]")?.focus({ preventScroll: true }));
+    // No iPhone/PWA, focar automaticamente o primeiro card pode deslocar o
+    // painel, esconder o botão fechar e causar saltos de texto. Mantemos o
+    // foco automático apenas para abertura por teclado.
+    if (openedFromKeyboard) requestAnimationFrame(() => closeButton?.focus({ preventScroll: true }));
   };
 
   openButton.addEventListener("click", open);

@@ -5,7 +5,7 @@ const root = new URL("../", import.meta.url).pathname;
 const output = join(root, "dist");
 const include = [
   "index.html", "styles.css", "styles", "app.js", "sw.js", "manifest.webmanifest", "vercel.json",
-  "firestore.rules", "icons", "audio", "js",
+  "firestore.rules", "icons", "audio", "assets", "js",
 ];
 
 await rm(output, { recursive: true, force: true });
@@ -13,4 +13,4 @@ await mkdir(output, { recursive: true });
 for (const entry of include) await cp(join(root, entry), join(output, entry), { recursive: true });
 
 const files = await readdir(output);
-console.log(`Build de produção v80.1.0 concluído em dist/ (${files.length} entradas principais).`);
+console.log(`Build de produção v80.1.2 concluído em dist/ (${files.length} entradas principais).`);

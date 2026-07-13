@@ -26119,15 +26119,15 @@ html body:not(.day-theme) .orbit-cluster-sheet {
 /* Cabeçalho do sheet */
 .record-sheet .section-title,
 .orbit-cluster-sheet .section-title {
-  min-height: 58px !important;
+  min-height: var(--n80-cluster-title-min-height, 58px) !important;
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) 38px !important;
   align-items: center !important;
   margin: 0 !important;
-  padding: 0 !important;
-  height: 58px !important;
-  max-height: 58px !important;
-  overflow: hidden !important;
+  padding: var(--n80-cluster-title-padding, 0) !important;
+  height: var(--n80-cluster-title-height, 58px) !important;
+  max-height: var(--n80-cluster-title-max-height, 58px) !important;
+  overflow: var(--n80-cluster-title-overflow, hidden) !important;
   gap: 12px !important;
 }
 

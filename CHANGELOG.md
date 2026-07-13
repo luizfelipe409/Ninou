@@ -1,21 +1,20 @@
-# Ninou v80.1.0 — Céu vivo e órbita corrigida
+# Ninou v80.1.2 — Relógio Céu Vivo em dois temas
 
-- Corrige o mapeamento da órbita: 00 no topo, 06 à direita, 12 embaixo e 18 à esquerda.
-- O marcador do horário atual usa a hora local do aparelho e acompanha a órbita de 24 horas.
-- Tema claro ganha céu vivo dinâmico, sol ilustrado, halo, nuvens, estrelas discretas e vidro premium.
-- Luz e posição do sol variam de acordo com o horário local, com tratamento especial para o entardecer.
-- Movimento decorativo permanece suave no iPhone, inclusive com Reduzir Movimento.
-- Tema escuro foi preservado.
+## Tema claro
 
-# Ninou v80.1.0
+- Novo fundo vetorial com céu azul, nuvens em tons pêssego e lilás e brilho solar.
+- Raios de luz lentos e delicados acompanham a posição do sol.
+- Pequenos pontos luminosos funcionam como reflexos do céu, sem transformar o tema claro em noite estrelada.
+- Órbita branca e translúcida, painel central em vidro e marcadores com contraste reforçado.
 
-Lapidação visual baseada na validação real da v79.2.0 em iPhone/PWA.
+## Tema escuro
 
-- menu do botão + preservado com todas as ações na mesma tela;
-- botão X sempre visível e fixo no topo do modal;
-- ícones do menu e do seletor de registros sem cortes;
-- amamentação com mais respiro, timer maior e rodapé de registro estável;
-- marcador/ícone da órbita visível no tema claro;
-- botão + oculto na tela Perfil, mantendo a navegação inferior;
-- preservadas as correções de safe area, estrelas da órbita e fechamento de modais;
-- versão, cache, Service Worker, build e testes atualizados para 80.1.0.
+- Novo fundo vetorial em azul-marinho e violeta com nebulosas, lua crescente e estrelas.
+- Duas camadas de estrelas criam profundidade e movimento discreto.
+- Órbita violeta iluminada, painel central escuro e eventos com brilho coerente com o céu noturno.
+
+## Estabilidade preservada
+
+- Mantidas as correções da v80.1.1 para o menu +, botão X, ícones, eventos agrupados e textos estáveis.
+- Mantida a posição correta da bolinha de horário pela hora local do aparelho.
+- Service Worker, cache, testes e build atualizados para 80.1.2.

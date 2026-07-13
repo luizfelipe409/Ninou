@@ -1,17 +1,17 @@
-const CACHE_NAME = "ninou-v79-2-0-premium-consolidated";
-const APP_VERSION = "80.1.0";
-const STYLE_MODULES = ["legacy", "premium-v80.1.0"];
+const CACHE_NAME = "ninou-v80-1-2-ceu-vivo-dual-theme";
+const APP_VERSION = "80.1.2";
+const STYLE_MODULES = ["legacy", "premium-v80.1.2"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
-  `/js/boot-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-ux-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-consistency-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-stability-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/architecture-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/diagnostics-v80.1.0.mjs?v=${APP_VERSION}`,
-  `/js/runtime/visual-guard-v80.1.0.mjs?v=${APP_VERSION}`,
+  `/js/boot-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/ninou-ux-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/ninou-consistency-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/ninou-stability-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/runtime/architecture-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/runtime/diagnostics-v80.1.2.mjs?v=${APP_VERSION}`,
+  `/js/runtime/visual-guard-v80.1.2.mjs?v=${APP_VERSION}`,
   "/js/core/event-bus.js", "/js/core/app-state.js", "/js/core/logger.js",
   "/js/repositories/json-repository.js", "/js/repositories/routine-repository.js", "/js/repositories/profile-repository.js",
   "/js/config/constants.js", "/js/dom/dom.js",
@@ -28,6 +28,7 @@ const APP_SHELL = [
   "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png",
   "/icons/actions/acordou.png", "/icons/actions/amamentacao.png", "/icons/actions/despertar-noturno.png",
   "/icons/actions/dormir.png", "/icons/actions/fralda.png", "/icons/actions/mamadeira.png", "/icons/actions/soneca.png",
+  "/assets/clock-themes/day-sky.svg", "/assets/clock-themes/night-sky.svg",
 ];
 
 function canStore(response) {
