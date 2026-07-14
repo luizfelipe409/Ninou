@@ -4430,3 +4430,153 @@ html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] > span:
     min-height: 52px !important;
   }
 }
+
+/* ============================================================
+   v82.0.3 — período das ações na órbita
+   Corrige o preenchimento preto nativo do SVG e substitui a
+   “barra de arrasto” por um arco fino, luminoso e não interativo.
+   ============================================================ */
+html.ninou-v8203 .orbit-duration-arcs {
+  pointer-events: none !important;
+}
+
+html.ninou-v8203 .orbit-duration-segment {
+  fill: none !important;
+  stroke: rgba(151, 120, 231, .60) !important;
+  stroke-width: 3.4 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  vector-effect: non-scaling-stroke !important;
+  opacity: .78 !important;
+  filter: drop-shadow(0 0 3px rgba(125, 84, 222, .30)) !important;
+  pointer-events: none !important;
+}
+
+html.ninou-v8203 body.day-theme .orbit-duration-segment {
+  stroke: rgba(108, 84, 184, .42) !important;
+  opacity: .72 !important;
+  filter: drop-shadow(0 1px 3px rgba(82, 63, 145, .18)) !important;
+}
+
+html.ninou-v8203 body:not(.day-theme) .orbit-duration-segment {
+  stroke: rgba(177, 132, 255, .68) !important;
+  opacity: .84 !important;
+  filter:
+    drop-shadow(0 0 3px rgba(170, 116, 255, .54))
+    drop-shadow(0 0 8px rgba(91, 54, 177, .28)) !important;
+}
+
+html.ninou-v8203 .orbit-duration-segment.active {
+  stroke: rgba(111, 224, 194, .84) !important;
+  stroke-width: 4.2 !important;
+  opacity: .95 !important;
+  filter: drop-shadow(0 0 4px rgba(91, 224, 190, .46)) !important;
+}
+
+html.ninou-v8203 body.day-theme .orbit-duration-segment.active {
+  stroke: rgba(94, 170, 151, .72) !important;
+}
+
+html.ninou-v8203 .orbit-duration-segment.sleep,
+html.ninou-v8203 .orbit-duration-segment.dormir {
+  stroke-linecap: round !important;
+}
+
+/* ============================================================
+   v82.0.3 — somente o header do Perfil foi equalizado
+   Mantém intactos o avatar principal, a posição da foto e os
+   cartões internos originais da tela Perfil.
+   ============================================================ */
+
+html.ninou-v8203 body[data-active-screen="profile"] .app-header {
+  position: sticky !important;
+  top: max(8px, var(--n79-safe-top)) !important;
+  z-index: 40 !important;
+  min-height: 66px !important;
+  margin: 0 0 14px !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 22px !important;
+  background: var(--n79-glass) !important;
+  box-shadow: var(--n79-shadow-soft) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+}
+
+html.ninou-v8203 body[data-active-screen="profile"] .identity {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: 42px minmax(0,1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html.ninou-v8203 body[data-active-screen="profile"] .identity > img {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: 15px !important;
+  box-shadow: 0 7px 18px rgba(7,4,22,.20) !important;
+}
+
+html.ninou-v8203 body[data-active-screen="profile"] .identity > div {
+  min-width: 0 !important;
+}
+
+html.ninou-v8203 body[data-active-screen="profile"] .identity span {
+  display: block !important;
+  margin-bottom: 2px !important;
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .68rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  letter-spacing: .13em !important;
+  text-transform: uppercase !important;
+}
+
+html.ninou-v8203 body[data-active-screen="profile"] .identity strong {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .98rem !important;
+  line-height: 1.15 !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+html.ninou-v8203 body[data-active-screen="profile"] .sync-pill {
+  flex: 0 0 auto !important;
+  min-height: 34px !important;
+  padding: 0 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent) 30%, transparent) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--n79-accent) 11%, var(--n79-surface)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+  font-size: .72rem !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 390px) {
+  html.ninou-v8203 body[data-active-screen="profile"] .app-header {
+    min-height: 62px !important;
+    padding: 9px 10px !important;
+  }
+}

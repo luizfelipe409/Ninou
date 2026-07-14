@@ -357,7 +357,7 @@ export function renderIntelligentTimeline({
     return `
       <article class="intelligent-timeline-item ${isSleepEvent(event) ? "is-duration" : ""}">
         <time>${escapeHtml(timeLabel)}</time>
-        <i class="mark care-icon ${config.arcType}">${config.icon}</i>
+        <i class="mark ${config.arcType}">${config.icon}</i>
         <div>
           <strong>${escapeHtml(config.title)}</strong>
           <span>${escapeHtml(subtitle)}</span>
@@ -518,3 +518,4 @@ export function renderTrendKpis({
     </article>
   `).join("");
 }
+

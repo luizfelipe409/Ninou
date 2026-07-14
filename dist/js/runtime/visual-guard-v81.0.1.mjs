@@ -1,4 +1,4 @@
-const VERSION = "82.0.0";
+const VERSION = "82.0.3";
 
 function verifyOrbit() {
   const orbit = document.querySelector(".state-orbit.live-timeline-orbit");

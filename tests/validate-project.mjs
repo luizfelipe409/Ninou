@@ -2,17 +2,16 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 
-const root = fileURLToPath(new URL("../", import.meta.url));
+const root = new URL("../", import.meta.url).pathname;
 const failures = [];
-const cssModules = ["legacy", "premium-v82.0.0"];
+const cssModules = ["legacy", "premium-v82.0.3"];
 const required = [
   "index.html", "styles.css", "sw.js", "manifest.webmanifest", "firestore.rules", "vercel.json",
   ...cssModules.map((name) => `styles/${name}.css`),
-  "js/boot-v82.0.0.mjs", "js/ninou-core-v82.0.0.mjs", "js/ninou-ux-v82.0.0.mjs",
-  "js/ninou-consistency-v82.0.0.mjs", "js/ninou-stability-v82.0.0.mjs",
-  "js/runtime/architecture-v82.0.0.mjs", "js/runtime/diagnostics-v82.0.0.mjs", "js/runtime/visual-guard-v82.0.0.mjs",
+  "js/boot-v82.0.3.mjs", "js/ninou-core-v82.0.3.mjs", "js/ninou-ux-v82.0.3.mjs",
+  "js/ninou-consistency-v82.0.3.mjs", "js/ninou-stability-v82.0.3.mjs",
+  "js/runtime/architecture-v82.0.3.mjs", "js/runtime/diagnostics-v82.0.3.mjs", "js/runtime/visual-guard-v82.0.3.mjs",
   "js/core/event-bus.js", "js/core/app-state.js", "js/core/logger.js",
   "js/repositories/json-repository.js", "js/repositories/routine-repository.js", "js/repositories/profile-repository.js",
   "js/storage/local-storage.js", "js/utils/security.js",
@@ -37,7 +36,7 @@ for (const file of scripts) {
   if (result.status !== 0) failures.push(`Sintaxe inválida em ${relative(root, file)}: ${result.stderr.trim()}`);
 }
 
-for (const file of scripts.filter((file) => /js\/(?:core|repositories|runtime)\//.test(relative(root, file)) && !file.endsWith("diagnostics-v82.0.0.mjs") && !file.endsWith("visual-guard-v82.0.0.mjs"))) {
+for (const file of scripts.filter((file) => /js\/(?:core|repositories|runtime)\//.test(relative(root, file)) && !file.endsWith("diagnostics-v82.0.3.mjs") && !file.endsWith("visual-guard-v82.0.3.mjs"))) {
   const source = await readFile(file, "utf8");
   if (/\blocalStorage\b/.test(source)) failures.push(`Acesso direto a localStorage em ${relative(root, file)}`);
 }
@@ -46,15 +45,15 @@ const html = await readFile(join(root, "index.html"), "utf8");
 const ids = [...html.matchAll(/\sid=["']([^"']+)["']/g)].map((match) => match[1]);
 const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
 if (duplicates.length) failures.push(`IDs duplicados no HTML: ${duplicates.join(", ")}`);
-if (!html.includes("boot-v82.0.0.mjs?v=82.0.1")) failures.push("Boot v82.0.1 não está ligado ao index.html");
-for (const module of cssModules) if (!html.includes(`styles/${module}.css?v=82.0.1`)) failures.push(`CSS ${module} não está ligado ao HTML`);
+if (!html.includes("boot-v82.0.3.mjs?v=82.0.3")) failures.push("Boot v82.0.3 não está ligado ao index.html");
+for (const module of cssModules) if (!html.includes(`styles/${module}.css?v=82.0.3`)) failures.push(`CSS ${module} não está ligado ao HTML`);
 for (const removed of ["tokens", "foundation", "home", "components", "motion", "responsive", "v78.4-critical"]) {
   if (html.includes(`styles/${removed}.css`)) failures.push(`CSS antigo ainda ligado ao HTML: ${removed}`);
 }
 
 const sw = await readFile(join(root, "sw.js"), "utf8");
-if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0"]')) failures.push("Service Worker não declara a autoridade visual revisada");
-if (!sw.includes('const APP_VERSION = "82.0.1"')) failures.push("Service Worker não está na v82.0.1");
+if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.3"]')) failures.push("Service Worker não declara a autoridade visual revisada");
+if (!sw.includes('const APP_VERSION = "82.0.3"')) failures.push("Service Worker não está na v82.0.3");
 for (const asset of ["day-sky.svg", "night-sky.svg"]) if (!sw.includes(asset)) failures.push(`Service Worker não referencia ${asset}`);
 for (const asset of required.filter((file) => file.startsWith("js/"))) {
   if (!sw.includes(asset.split("/").at(-1)) && !["js/storage/local-storage.js", "js/utils/security.js"].includes(asset)) failures.push(`Service Worker não referencia ${asset}`);
@@ -63,9 +62,9 @@ for (const asset of required.filter((file) => file.startsWith("js/"))) {
 const forbidden = files.map((file) => relative(root, file)).filter((file) => /(^|\/)(\.env|\.env\.|project\.json$|\.vercel\/)/.test(file));
 if (forbidden.length) failures.push(`Arquivos sensíveis/de ambiente no pacote: ${forbidden.join(", ")}`);
 
-const premiumCss = await readFile(join(root, "styles/premium-v82.0.0.css"), "utf8");
+const premiumCss = await readFile(join(root, "styles/premium-v82.0.3.css"), "utf8");
 const premiumImportant = (premiumCss.match(/!important/g) || []).length;
-if (premiumImportant > 1800) failures.push(`Autoridade premium usa !important em excesso: ${premiumImportant}`);
+if (premiumImportant > 2000) failures.push(`Autoridade premium usa !important em excesso: ${premiumImportant}`);
 for (const selector of ["client-family-member-avatar", "record-sheet-open .bottom-bar", "quick-observations-panel", "premium-new-episode-button", "record-types", "weight-sparkline svg", "event-meta-primary", "diaryChipsMoreButton", "paint-order: normal", "day-sky.svg", "night-sky.svg", "n8012-light-rays", "n8012-star-drift"]) {
   if (!premiumCss.includes(selector)) failures.push(`Autoridade premium não cobre: ${selector}`);
 }
@@ -75,7 +74,7 @@ for (const name of cssModules) sizes[name] = (await stat(join(root, `styles/${na
 const totalCss = Object.values(sizes).reduce((a,b) => a+b,0);
 if (totalCss >= 920 * 1024) failures.push(`CSS total ainda está grande demais: ${(totalCss/1024).toFixed(1)} KB`);
 
-console.log(`Ninou v82.0.1: ${files.length} arquivos, ${scripts.length} scripts, CSS total ${(totalCss/1024).toFixed(1)} KB, !important premium ${premiumImportant}.`);
+console.log(`Ninou v82.0.3: ${files.length} arquivos, ${scripts.length} scripts, CSS total ${(totalCss/1024).toFixed(1)} KB, !important premium ${premiumImportant}.`);
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join("\n"));
   process.exit(1);

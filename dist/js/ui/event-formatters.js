@@ -240,7 +240,7 @@ export function getEventCardMarkup(event, { empty = false } = {}) {
     ? `Editado${editedBy ? ` por ${editedBy}` : ""} às ${formatTime(editedAt)}${editReason ? ` • ${editReason}` : ""}`
     : "";
   return `
-    <i class="mark care-icon ${config.arcType}">${config.icon}</i>
+    <i class="mark ${config.arcType}">${config.icon}</i>
     <div class="event-main">
       <div class="event-text">
         <strong>${escapeHtml(config.title)}</strong>
@@ -269,7 +269,7 @@ export function getMiniEventMarkup(event) {
   const parts = getEventDisplayParts(event);
   return `
     <article class="mini-event">
-      <i class="mark care-icon ${config.arcType}">${config.icon}</i>
+      <i class="mark ${config.arcType}">${config.icon}</i>
       <div>
         <strong>${escapeHtml(config.title)}</strong>
         <span>${escapeHtml(parts.compact || parts.primary)}</span>
