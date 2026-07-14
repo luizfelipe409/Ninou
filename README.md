@@ -1,4 +1,4 @@
-# Ninou v81.0.0 — Céu Vivo com navegação corrigida
+# Ninou v81.0.1 — Céu Vivo com navegação corrigida
 
 Projeto completo para publicação na Vercel, criado sobre a v80.1.1.
 
@@ -25,6 +25,6 @@ npm run build
 A Vercel deve usar `npm run build` e publicar a pasta `dist`.
 
 
-## Correções da v81.0.0
+## Correções da v81.0.1
 
 Esta versão remove o sol HTML duplicado, corrige o X residual do painel de eventos, restaura o botão + no Perfil, compacta a barra inferior e reforça a visibilidade dos ícones no tema claro.
