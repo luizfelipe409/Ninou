@@ -4,12 +4,12 @@ import assert from "node:assert/strict";
 const root = new URL("../", import.meta.url);
 const [html, boot, core, ux, stability, premiumCss, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
-  readFile(new URL("js/boot-v80.1.2.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-core-v80.1.2.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-ux-v80.1.2.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-stability-v80.1.2.mjs", root), "utf8"),
-  readFile(new URL("styles/premium-v80.1.2.css", root), "utf8"),
-  readFile(new URL("js/runtime/visual-guard-v80.1.2.mjs", root), "utf8"),
+  readFile(new URL("js/boot-v80.1.4.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-core-v80.1.4.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-ux-v80.1.4.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-stability-v80.1.4.mjs", root), "utf8"),
+  readFile(new URL("styles/premium-v80.1.4.css", root), "utf8"),
+  readFile(new URL("js/runtime/visual-guard-v80.1.4.mjs", root), "utf8"),
   readFile(new URL("sw.js", root), "utf8"),
   readFile(new URL("scripts/build-production.mjs", root), "utf8"),
   readFile(new URL("vercel.json", root), "utf8"),
@@ -18,25 +18,25 @@ const [html, boot, core, ux, stability, premiumCss, visualGuard, sw, build, verc
 ]);
 
 const headEnd = html.indexOf("</head>");
-const bootBarrier = html.indexOf('classList.add("ninou-booting", "ninou-v8012")');
+const bootBarrier = html.indexOf('classList.add("ninou-booting", "ninou-v8014")');
 assert.ok(bootBarrier > 0 && bootBarrier < headEnd, "A barreira de boot deve começar dentro do <head>.");
 assert.match(html, /<body data-profile-access-state="booting">/);
 assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
-assert.match(html, /styles\/legacy\.css\?v=80\.1\.2/);
-assert.match(html, /styles\/premium-v80\.1\.2\.css\?v=80\.1\.2/);
+assert.match(html, /styles\/legacy\.css\?v=80\.1\.4/);
+assert.match(html, /styles\/premium-v80\.1\.4\.css\?v=80\.1\.4/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
-assert.match(html, /boot-v80\.1\.2\.mjs\?v=80\.1\.2/);
+assert.match(html, /boot-v80\.1\.4\.mjs\?v=80\.1\.4/);
 assert.match(html, /__NINOU_BOOT_WATCHDOG__/);
 assert.match(html, /history\.replaceState/);
 
-assert.match(boot, /const NINOU_VERSION = "80\.1\.2"/);
+assert.match(boot, /const NINOU_VERSION = "80\.1\.4"/);
 assert.match(boot, /const MIN_SPLASH_MS = 1500;/);
-assert.match(boot, /visual-guard-v80\.1\.2/);
-assert.match(core, /const NINOU_RUNTIME_VERSION = "80\.1\.2"/);
-assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "80\.1\.2-premium-consolidated"/);
-assert.match(ux, /const UX_VERSION = "80\.1\.2"/);
-assert.match(stability, /const STABILITY_VERSION = "80\.1\.2"/);
+assert.match(boot, /visual-guard-v80\.1\.4/);
+assert.match(core, /const NINOU_RUNTIME_VERSION = "80\.1\.4"/);
+assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "80\.1\.4-premium-consolidated"/);
+assert.match(ux, /const UX_VERSION = "80\.1\.4"/);
+assert.match(stability, /const STABILITY_VERSION = "80\.1\.4"/);
 
 assert.match(premiumCss, /autoridade visual revisada/);
 assert.match(premiumCss, /body\.family-daily-surface:not\(\[data-active-screen="profile"\]\)/);
@@ -44,7 +44,7 @@ assert.match(premiumCss, /body\[data-active-screen="profile"\] \.bottom-bar/);
 assert.match(premiumCss, /\.action-launcher-grid/);
 assert.match(premiumCss, /#closeActionLauncherButton/);
 assert.match(premiumCss, /font-variant-numeric: tabular-nums/);
-assert.match(premiumCss, /v80\.1\.2 — relógio Céu Vivo/);
+assert.match(premiumCss, /v80\.1\.4 — relógio Céu Vivo/);
 assert.match(premiumCss, /day-sky\.svg/);
 assert.match(premiumCss, /night-sky\.svg/);
 assert.match(premiumCss, /n8012-light-rays/);
@@ -63,9 +63,9 @@ assert.match(html, /class="orbit-sky"/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v80-1-2-ceu-vivo-dual-theme/);
-assert.match(sw, /const APP_VERSION = "80\.1\.2"/);
-assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v80\.1\.2"\]/);
+assert.match(sw, /ninou-v80-1-3-ajustes-orbita-menu/);
+assert.match(sw, /const APP_VERSION = "80\.1\.4"/);
+assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v80\.1\.4"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
 assert.match(build, /"assets"/);
@@ -80,8 +80,15 @@ assert.match(nightSky, /<radialGradient id="nebulaA"/);
 assert.match(nightSky, /mask id="moonCut"/);
 
 const legacySize = (await stat(new URL("styles/legacy.css", root))).size;
-const premiumSize = (await stat(new URL("styles/premium-v80.1.2.css", root))).size;
+const premiumSize = (await stat(new URL("styles/premium-v80.1.4.css", root))).size;
 assert.ok(legacySize < 800 * 1024, "O CSS legado deve permanecer abaixo de 800 KB.");
 assert.ok(premiumSize > 20 * 1024 && premiumSize < 155 * 1024, "A autoridade premium deve ser substancial sem virar outro monólito.");
 
-console.log("Regressões v80.1.2 validadas: céu claro solar, noite cósmica, órbita local, menu + e estabilidade preservados.");
+console.log("Regressões v80.1.4 validadas: céu claro solar, noite cósmica, órbita local, menu + e estabilidade preservados.");
+
+// v80.1.4: ajustes solicitados após validação visual.
+assert.doesNotMatch(html, /class="orbit-sun"/);
+assert.match(premiumCss, /#orbitClusterSheet\[hidden\]/);
+assert.match(premiumCss, /body\[data-active-screen="profile"\] \.fab-real-plus/);
+assert.match(premiumCss, /--n79-nav-height: 70px/);
+assert.match(premiumCss, /Marcadores reais com arte legível no céu claro/);

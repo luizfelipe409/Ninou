@@ -5,7 +5,7 @@ import { createLogger } from "../core/logger.js";
 import { createRoutineRepository } from "../repositories/routine-repository.js";
 import { createProfileRepository } from "../repositories/profile-repository.js";
 
-const VERSION = "80.1.2";
+const VERSION = "80.1.4";
 const bus = createEventBus();
 const logger = createLogger({ namespace: "ninou", minLevel: "info" });
 const state = createAppState({

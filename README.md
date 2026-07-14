@@ -1,4 +1,4 @@
-# Ninou v80.1.2 — Relógio Céu Vivo
+# Ninou v80.1.4 — Céu Vivo com navegação corrigida
 
 Projeto completo para publicação na Vercel, criado sobre a v80.1.1.
 
@@ -23,3 +23,8 @@ npm run build
 ```
 
 A Vercel deve usar `npm run build` e publicar a pasta `dist`.
+
+
+## Correções da v80.1.4
+
+Esta versão remove o sol HTML duplicado, corrige o X residual do painel de eventos, restaura o botão + no Perfil, compacta a barra inferior e reforça a visibilidade dos ícones no tema claro.

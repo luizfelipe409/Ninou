@@ -1,8 +1,8 @@
-# Correções baseadas na gravação — Ninou v80.1.2
+# Correções baseadas na gravação — Ninou v80.1.4
 
 ## Loading ausente
 
-A classe de boot agora é aplicada no primeiro script do `<head>`. Na primeira abertura da v80.1.2, o aplicativo remove uma única vez os caches `ninou-*` e o Service Worker anterior, preserva o armazenamento local e recarrega com a versão correta. O app principal permanece oculto até o boot liberar a primeira pintura.
+A classe de boot agora é aplicada no primeiro script do `<head>`. Na primeira abertura da v80.1.4, o aplicativo remove uma única vez os caches `ninou-*` e o Service Worker anterior, preserva o armazenamento local e recarrega com a versão correta. O app principal permanece oculto até o boot liberar a primeira pintura.
 
 ## Relógio lento e fora do centro
 
