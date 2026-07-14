@@ -1,12 +1,6 @@
-NINOU v80.1.4 — RAIOS SOLARES E PERFIL LEGÍVEL
+NINOU v81.0.0 — POLIMENTO VISUAL
 
-1. Use esta pasta como projeto completo.
-2. Publique normalmente na Vercel.
-3. Após o deploy, abra com ?ninouVersion=80.1.4.
-4. No iPhone instalado como PWA, feche e abra o app para atualizar o cache.
-
-Alterações principais:
-- raios solares mais perceptíveis no tema claro;
-- movimento otimizado para Safari/PWA do iPhone;
-- contraste revisado em todos os textos auxiliares da tela Perfil;
-- preservados os dois temas do relógio, o botão + no Perfil e a remoção de orbit-sun.
+1. Extraia o ZIP.
+2. Use esta pasta completa como projeto na Vercel.
+3. Após o deploy, abra com ?ninouVersion=81.0.0.
+4. No iPhone instalado como PWA, feche e reabra o app após a atualização.

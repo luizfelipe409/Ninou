@@ -1,5 +1,5 @@
-const NINOU_VERSION = "80.1.4";
-const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v80.1.4";
+const NINOU_VERSION = "81.0.0";
+const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v81.0.0";
 const BOOT_STARTED_AT = performance.now();
 const MIN_SPLASH_MS = 1500;
 const MAX_BOOT_WAIT_MS = 8500;
@@ -86,7 +86,7 @@ window.addEventListener("ninou:resume", () => {
 window.addEventListener("ninou:auth-ready", () => hideLoadingOverlay({ reason: "auth-ready" }), { passive: true });
 
 async function waitForStyleSheets() {
-  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="80.1.4"]')];
+  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="81.0.0"]')];
   const results = await Promise.allSettled(links.map((link) => {
     if (link.sheet) return Promise.resolve(link.getAttribute("href"));
     return withTimeout(new Promise((resolve, reject) => {
@@ -295,7 +295,7 @@ async function bootNinou() {
     let architecture = null;
     setBootStatus("Preparando a arquitetura do aplicativo…");
     try {
-      const architectureModule = await withTimeout(import(`./runtime/architecture-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Arquitetura do aplicativo");
+      const architectureModule = await withTimeout(import(`./runtime/architecture-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Arquitetura do aplicativo");
       architecture = architectureModule.default;
       architecture?.state?.setState?.({ version: NINOU_VERSION, bootPhase: "loading-core" }, { source: "boot" });
     } catch (error) {
@@ -304,14 +304,14 @@ async function bootNinou() {
     }
 
     setBootStatus("Carregando o diário do bebê…");
-    await withTimeout(import(`./ninou-core-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Núcleo do aplicativo");
+    await withTimeout(import(`./ninou-core-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Núcleo do aplicativo");
 
     const layerResults = await Promise.allSettled([
-      withTimeout(import(`./ninou-ux-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Experiência de uso"),
-      withTimeout(import(`./ninou-consistency-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Consistência visual"),
-      withTimeout(import(`./ninou-stability-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Estabilidade"),
-      withTimeout(import(`./runtime/diagnostics-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Diagnóstico"),
-      withTimeout(import(`./runtime/visual-guard-v80.1.4.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Guarda visual"),
+      withTimeout(import(`./ninou-ux-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Experiência de uso"),
+      withTimeout(import(`./ninou-consistency-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Consistência visual"),
+      withTimeout(import(`./ninou-stability-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Estabilidade"),
+      withTimeout(import(`./runtime/diagnostics-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Diagnóstico"),
+      withTimeout(import(`./runtime/visual-guard-v81.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Guarda visual"),
     ]);
     const failedLayers = layerResults.filter((result) => result.status === "rejected");
     if (failedLayers.length) {

@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "80.1.4";
+        const VERSION = "81.0.0";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
-        root.classList.add("ninou-booting", "ninou-v8014");
+        root.classList.add("ninou-booting", "ninou-v8100");
         root.dataset.ninouVersion = VERSION;
         window.__NINOU_EARLY_VERSION__ = VERSION;
         window.__NINOU_EARLY_MIGRATION__ = (async () => {
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=80.1.4" />
+    <link rel="manifest" href="./manifest.webmanifest?v=81.0.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,8 +54,8 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles/legacy.css?v=80.1.4" />
-    <link rel="stylesheet" href="./styles/premium-v80.1.4.css?v=80.1.4" />
+    <link rel="stylesheet" href="./styles/legacy.css?v=81.0.0" />
+    <link rel="stylesheet" href="./styles/premium-v81.0.0.css?v=81.0.0" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -130,7 +130,7 @@
               if ("caches" in window) await Promise.allSettled((await caches.keys()).map((name) => caches.delete(name)));
             } catch (_) {}
             const url = new URL(location.href);
-            url.searchParams.set("ninouRecovery", `80.1.4-${Date.now()}`);
+            url.searchParams.set("ninouRecovery", `81.0.0-${Date.now()}`);
             location.replace(url.toString());
           });
           panel.querySelector("[data-ninou-open-anyway]")?.addEventListener("click", () => {
@@ -1275,7 +1275,7 @@
             </div>
             <p>Consulte política, termos, aviso de uso responsável e opções de dados conforme sua permissão na família.</p>
             <div class="legal-status-grid" aria-label="Status legal do Ninou">
-              <article><span>Versão legal</span><strong id="legalVersionLabel">v80.1.4</strong><small>Privacidade + termos</small></article>
+              <article><span>Versão legal</span><strong id="legalVersionLabel">v81.0.0</strong><small>Privacidade + termos</small></article>
               <article><span>Consentimento</span><strong id="legalConsentStatus">Não confirmado</strong><small id="legalConsentDate">Aguardando aceite</small></article>
             </div>
             <div class="profile-actions-row legal-actions-row">
@@ -1301,7 +1301,7 @@
             </div>
             <p>Para testar com outras famílias, o Ninou agora junta contexto do aparelho, versão, família ativa e últimos erros locais em um relatório simples de suporte.</p>
             <div class="support-beta-grid" aria-label="Status do suporte beta">
-              <article><span>Versão</span><strong id="supportVersionLabel">v80.1.4</strong><small>Suporte + monitoramento</small></article>
+              <article><span>Versão</span><strong id="supportVersionLabel">v81.0.0</strong><small>Suporte + monitoramento</small></article>
               <article><span>Último relatório</span><strong id="supportLastReportLabel">Nenhum</strong><small id="supportLastReportDetail">Aguardando teste real</small></article>
             </div>
             <div class="profile-actions-row support-actions-row">
@@ -1529,7 +1529,7 @@
                   <em>Roteiro recomendado para liberar o beta sem pular validações.</em>
                 </div>
                 <ol class="admin-commercial-sequence-list">
-                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v80.1.4, publicar firestore.rules e limpar cache do PWA.</span></li>
+                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v81.0.0, publicar firestore.rules e limpar cache do PWA.</span></li>
                   <li><strong>2. Testar família Francisco</strong><span>Pai: luizfelipe.4092@hotmail.com. Mãe: marry@gmail.com. Ambos na mesma família.</span></li>
                   <li><strong>3. Criar família piloto</strong><span>Criar família nova com outro e-mail, gerar convite e aceitar em outro aparelho.</span></li>
                   <li><strong>4. Validar papéis</strong><span>Responsável/admin veem backup/exportação/exclusão; cuidador e visualização não veem ações sensíveis.</span></li>
@@ -1547,7 +1547,7 @@
                   <article><span>Política</span><strong>Visível no app</strong><small>Resumo claro sobre dados coletados, família e exportação.</small></article>
                   <article><span>Termos</span><strong>Uso familiar</strong><small>O app é diário de rotina, não ferramenta médica.</small></article>
                   <article><span>Exclusão</span><strong>Solicitação registrada</strong><small>Famílias podem pedir remoção de dados pelo Perfil.</small></article>
-                  <article><span>Consentimento</span><strong>Versão 80.1.4</strong><small>Aceite local e, quando possível, salvo na nuvem.</small></article>
+                  <article><span>Consentimento</span><strong>Versão 81.0.0</strong><small>Aceite local e, quando possível, salvo na nuvem.</small></article>
                 </div>
                 <ul class="commercial-readiness-list admin-legal-list">
                   <li data-state="ready"><strong>Política de privacidade</strong><span>Texto resumido disponível no Perfil e no modal legal.</span></li>
@@ -1565,7 +1565,7 @@
                 <div class="admin-legal-grid admin-support-grid" aria-label="Indicadores de suporte do beta">
                   <article><span>Relatórios locais</span><strong id="adminSupportReportsCount">0</strong><small>neste aparelho/admin</small></article>
                   <article><span>Erros capturados</span><strong id="adminSupportErrorsCount">0</strong><small>últimos registros locais</small></article>
-                  <article><span>Versão</span><strong>80.1.4</strong><small>suporte + permissões</small></article>
+                  <article><span>Versão</span><strong>81.0.0</strong><small>suporte + permissões</small></article>
                   <article><span>Status</span><strong id="adminSupportStatusLabel">Aguardando beta</strong><small>testes com famílias reais</small></article>
                 </div>
                 <ul id="adminSupportReportsList" class="admin-access-list admin-support-reports-list">
@@ -1796,7 +1796,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v80.1.4</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v81.0.0</strong>
             <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -2238,7 +2238,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v80.1.4.mjs?v=80.1.4").catch((error) => {
+      import("./js/boot-v81.0.0.mjs?v=81.0.0").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2252,7 +2252,7 @@
     </script>
 
     <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=80.1.4";
+      import { initActionLauncher } from "./js/ui/action-launcher.js?v=81.0.0";
       initActionLauncher();
     </script>
   </body>

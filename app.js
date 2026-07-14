@@ -1,1 +1,1 @@
-import "./js/boot-v80.1.4.mjs?v=80.1.4";
+import "./js/boot-v81.0.0.mjs?v=81.0.0";
