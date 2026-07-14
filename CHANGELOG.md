@@ -1,4 +1,4 @@
-# Ninou v81.0.1 — Polimento visual e experiência de registro
+# Ninou v82.0.0 — Polimento visual e experiência de registro
 
 Baseada na v80.1.4, preservando o relógio Céu Vivo e as correções de estabilidade.
 
@@ -14,7 +14,7 @@ Baseada na v80.1.4, preservando o relógio Céu Vivo e as correções de estabil
 - Números de relógios e timers configurados com largura tabular.
 - Relógio Céu Vivo, raios solares, estrelas e correções do Perfil preservados.
 
-## 81.0.1
+## 82.0.0
 - Menu de registros redesenhado com botões no estilo dos itens do Diário.
 - Ícones agora usam avatares circulares, sem quinas brancas ou cortes aparentes.
 - Botão X reconstruído integralmente em CSS para permanecer visível em Safari, PWA e Chrome.

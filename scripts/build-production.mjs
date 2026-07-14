@@ -13,4 +13,4 @@ await mkdir(output, { recursive: true });
 for (const entry of include) await cp(join(root, entry), join(output, entry), { recursive: true });
 
 const files = await readdir(output);
-console.log(`Build de produção v81.0.1 concluído em dist/ (${files.length} entradas principais).`);
+console.log(`Build de produção v82.0.0 concluído em dist/ (${files.length} entradas principais).`);

@@ -4138,3 +4138,295 @@ html.ninou-v8200 .action-launcher-label::after {
     min-height: 50px !important;
   }
 }
+
+/* ============================================================
+   v82.0.0 — unificação dos ícones e botões da Home
+   - ação principal com o mesmo acabamento do menu/diário
+   - atalhos “Registre em poucos toques” no mesmo estilo premium
+   - marcadores da órbita e ícones auxiliares sempre circulares
+   ============================================================ */
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 26px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 20px 36px rgba(15,12,38,.24), inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action::before,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.12), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 58%);
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
+  width: 100% !important;
+  min-height: 84px !important;
+  padding: 14px 16px !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0,1fr) !important;
+  align-items: center !important;
+  justify-items: start !important;
+  gap: 12px !important;
+  border-radius: 28px !important;
+  text-align: left !important;
+  background: linear-gradient(160deg, rgba(131,229,198,.96), rgba(170,236,192,.94)) !important;
+  color: #17362b !important;
+  -webkit-text-fill-color: #17362b !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action > span:last-child {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  display: block !important;
+  font-size: 1.08rem !important;
+  font-weight: 950 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.02em !important;
+  text-align: left !important;
+}
+
+html.ninou-v8200 body.day-theme .primary-action {
+  background: linear-gradient(160deg, rgba(121,91,206,.98), rgba(156,119,227,.96)) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: 0 18px 34px rgba(111,82,176,.24), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  grid-auto-rows: minmax(98px, auto) !important;
+  gap: 12px !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 96px !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 14px 14px !important;
+  display: grid !important;
+  grid-template-columns: 56px minmax(0,1fr) !important;
+  grid-template-rows: none !important;
+  align-items: center !important;
+  justify-items: start !important;
+  align-content: center !important;
+  gap: 12px !important;
+  border-radius: 24px !important;
+  text-align: left !important;
+  background: linear-gradient(155deg, rgba(47,36,83,.98), rgba(29,21,54,.98)) !important;
+  color: #f7f3ff !important;
+  -webkit-text-fill-color: #f7f3ff !important;
+}
+
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] {
+  background: linear-gradient(155deg, rgba(255,255,255,.98), rgba(250,243,255,.96)) !important;
+  border-color: rgba(111,84,166,.14) !important;
+  box-shadow: 0 16px 28px rgba(111,84,166,.10), inset 0 1px 0 rgba(255,255,255,.82) !important;
+  color: #433466 !important;
+  -webkit-text-fill-color: #433466 !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon,
+html.ninou-v8200 .event-card .mark,
+html.ninou-v8200 .last-card .mark,
+html.ninou-v8200 .cluster-card .cluster-icon,
+html.ninou-v8200 .orbit-event > i,
+html.ninou-v8200 .live-orbit-marker > i,
+html.ninou-v8200 .orbit-cluster-icon {
+  position: relative !important;
+  z-index: 1 !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255,255,255,.22), rgba(255,255,255,.06) 50%, transparent 70%),
+    linear-gradient(160deg, rgba(72,55,124,.92), rgba(30,21,61,.96)) !important;
+  box-shadow: 0 12px 24px rgba(19,14,39,.28), inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v8200 body.day-theme .primary-action .action-icon,
+html.ninou-v8200 body.day-theme .event-card .mark,
+html.ninou-v8200 body.day-theme .last-card .mark,
+html.ninou-v8200 body.day-theme .cluster-card .cluster-icon,
+html.ninou-v8200 body.day-theme .orbit-event > i,
+html.ninou-v8200 body.day-theme .live-orbit-marker > i,
+html.ninou-v8200 body.day-theme .orbit-cluster-icon {
+  border-color: rgba(255,255,255,.96) !important;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255,255,255,.34), rgba(255,255,255,.08) 48%, transparent 70%),
+    linear-gradient(160deg, rgba(117,95,186,.20), rgba(255,255,255,.80)) !important;
+  box-shadow: 0 12px 25px rgba(78,60,126,.18), inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  padding: 4px !important;
+}
+
+html.ninou-v8200 .event-card .mark,
+html.ninou-v8200 .last-card .mark,
+html.ninou-v8200 .cluster-card .cluster-icon {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+  padding: 4px !important;
+}
+
+html.ninou-v8200 .orbit-event,
+html.ninou-v8200 .live-orbit-marker {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+html.ninou-v8200 .orbit-event > i,
+html.ninou-v8200 .live-orbit-marker > i,
+html.ninou-v8200 .orbit-cluster-icon {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  padding: 2px !important;
+}
+
+html.ninou-v8200 .orbit-cluster {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+}
+
+html.ninou-v8200 .orbit-cluster > .orbit-cluster-icon {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+}
+
+html.ninou-v8200 .orbit-event > i > :is(img,svg),
+html.ninou-v8200 .live-orbit-marker > i > :is(img,svg),
+html.ninou-v8200 .orbit-cluster-icon > :is(img,svg),
+html.ninou-v8200 .quick-actions > button[data-open-sheet] > .action-icon :is(img,svg),
+html.ninou-v8200 .primary-action .action-icon :is(img,svg),
+html.ninou-v8200 .event-card .mark :is(img,svg),
+html.ninou-v8200 .last-card .mark :is(img,svg),
+html.ninou-v8200 .cluster-card .cluster-icon :is(img,svg) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+}
+
+html.ninou-v8200 .orbit-event:focus,
+html.ninou-v8200 .live-orbit-marker:focus,
+html.ninou-v8200 .orbit-event:focus-visible,
+html.ninou-v8200 .live-orbit-marker:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v8200 .orbit-event:focus-visible > i,
+html.ninou-v8200 .live-orbit-marker:focus-visible > i,
+html.ninou-v8200 .orbit-cluster:focus-visible > .orbit-cluster-icon {
+  box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 0 0 5px rgba(142,114,231,.24), 0 12px 24px rgba(19,14,39,.28) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  gap: 3px !important;
+  text-align: left !important;
+  align-content: center !important;
+  padding: 0 !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > strong,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > strong {
+  display: block !important;
+  color: #fbf8ff !important;
+  -webkit-text-fill-color: #fbf8ff !important;
+  font-size: .98rem !important;
+  line-height: 1.1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -.02em !important;
+}
+
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > strong,
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > strong {
+  color: #47356d !important;
+  -webkit-text-fill-color: #47356d !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > small,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > small {
+  display: block !important;
+  color: rgba(232,226,255,.72) !important;
+  -webkit-text-fill-color: rgba(232,226,255,.72) !important;
+  font-size: .72rem !important;
+  line-height: 1.22 !important;
+  font-weight: 700 !important;
+}
+
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > small,
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > small {
+  color: rgba(71,53,109,.62) !important;
+  -webkit-text-fill-color: rgba(71,53,109,.62) !important;
+}
+
+@media (max-width: 390px) {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
+    min-height: 80px !important;
+    grid-template-columns: 54px minmax(0,1fr) !important;
+    padding: 12px 14px !important;
+  }
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+    min-height: 92px !important;
+    grid-template-columns: 52px minmax(0,1fr) !important;
+    padding: 12px !important;
+  }
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+  }
+}
