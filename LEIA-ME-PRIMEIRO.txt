@@ -1,6 +1,6 @@
-NINOU v82.0.0 — POLIMENTO VISUAL
+NINOU v82.0.1 — ÍCONES CIRCULARES PADRONIZADOS
 
 1. Extraia o ZIP.
 2. Use esta pasta completa como projeto na Vercel.
-3. Após o deploy, abra com ?ninouVersion=82.0.0.
+3. Após o deploy, abra com ?ninouVersion=82.0.1.
 4. No iPhone instalado como PWA, feche e reabra o app após a atualização.

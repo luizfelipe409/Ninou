@@ -1,7 +1,8 @@
 import { cp, mkdir, rm, readdir } from "node:fs/promises";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("../", import.meta.url).pathname;
+const root = fileURLToPath(new URL("../", import.meta.url));
 const output = join(root, "dist");
 const include = [
   "index.html", "styles.css", "styles", "app.js", "sw.js", "manifest.webmanifest", "vercel.json",
@@ -13,4 +14,4 @@ await mkdir(output, { recursive: true });
 for (const entry of include) await cp(join(root, entry), join(output, entry), { recursive: true });
 
 const files = await readdir(output);
-console.log(`Build de produção v82.0.0 concluído em dist/ (${files.length} entradas principais).`);
+console.log(`Build de produção v82.0.1 concluído em dist/ (${files.length} entradas principais).`);

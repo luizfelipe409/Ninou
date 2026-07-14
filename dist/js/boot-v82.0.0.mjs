@@ -1,5 +1,5 @@
-const NINOU_VERSION = "82.0.0";
-const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v82.0.0";
+const NINOU_VERSION = "82.0.1";
+const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v82.0.1";
 const BOOT_STARTED_AT = performance.now();
 const MIN_SPLASH_MS = 1500;
 const MAX_BOOT_WAIT_MS = 8500;
@@ -86,7 +86,7 @@ window.addEventListener("ninou:resume", () => {
 window.addEventListener("ninou:auth-ready", () => hideLoadingOverlay({ reason: "auth-ready" }), { passive: true });
 
 async function waitForStyleSheets() {
-  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="82.0.0"]')];
+  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="82.0.1"]')];
   const results = await Promise.allSettled(links.map((link) => {
     if (link.sheet) return Promise.resolve(link.getAttribute("href"));
     return withTimeout(new Promise((resolve, reject) => {

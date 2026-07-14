@@ -1,6 +1,16 @@
-# Ninou v82.0.0 — Polimento visual e experiência de registro
+# Ninou v82.0.1 — Ícones circulares e ações alinhadas
 
 Baseada na v80.1.4, preservando o relógio Céu Vivo e as correções de estabilidade.
+
+## 82.0.1
+
+- Moldura circular compartilhada pelos ícones de cuidado no launcher, formulário, Home, Diário e órbita.
+- Quinas opacas dos PNGs recortadas de forma consistente no Safari/PWA.
+- X dos painéis convertido em SVG real e independente de fonte/pseudo-elemento.
+- Fundo e sombra quadrados removidos do botão externo dos eventos da órbita.
+- Conteúdo do botão principal centralizado.
+- Barra inferior distribuída em seis botões de tamanho e espaçamento iguais, sem conflito entre Perfil e “+”.
+- Versão e cache do Service Worker renovados para atualização segura no iPhone.
 
 ## Melhorias
 

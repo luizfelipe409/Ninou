@@ -1,5 +1,5 @@
-const CACHE_NAME = "ninou-v81-0-1-menu-diario-x";
-const APP_VERSION = "82.0.0";
+const CACHE_NAME = "ninou-v82-0-1-icones-circulares";
+const APP_VERSION = "82.0.1";
 const STYLE_MODULES = ["legacy", "premium-v82.0.0"];
 const APP_SHELL = [
   "/", "/index.html",

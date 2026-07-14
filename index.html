@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "82.0.0";
+        const VERSION = "82.0.1";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
         root.classList.add("ninou-booting", "ninou-v8200");
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=82.0.0" />
+    <link rel="manifest" href="./manifest.webmanifest?v=82.0.1" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,8 +54,8 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles/legacy.css?v=82.0.0" />
-    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.0.0" />
+    <link rel="stylesheet" href="./styles/legacy.css?v=82.0.1" />
+    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.0.1" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -130,7 +130,7 @@
               if ("caches" in window) await Promise.allSettled((await caches.keys()).map((name) => caches.delete(name)));
             } catch (_) {}
             const url = new URL(location.href);
-            url.searchParams.set("ninouRecovery", `82.0.0-${Date.now()}`);
+            url.searchParams.set("ninouRecovery", `82.0.1-${Date.now()}`);
             location.replace(url.toString());
           });
           panel.querySelector("[data-ninou-open-anyway]")?.addEventListener("click", () => {
@@ -261,20 +261,20 @@
 
         <section class="main-action-area" aria-label="Ação principal">
           <button id="wakeAction" class="primary-action" type="button" hidden>
-            <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span class="action-icon care-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span id="wakeActionLabel">Acordou</span>
           </button>
           <div id="startChoice" class="start-choice">
             <button type="button" data-start-mode="awake">
-              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span class="action-icon care-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
               <span>Acordou / acordado desde...</span>
             </button>
             <button type="button" data-start-mode="sleeping">
-              <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span class="action-icon care-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
               <span>Está dormindo desde...</span>
             </button>
             <button type="button" data-start-mode="now">
-              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+              <span class="action-icon care-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
               <span>Começar agora</span>
             </button>
           </div>
@@ -357,19 +357,19 @@
         </div>
         <section id="quickActions" class="quick-actions" aria-label="Ações rápidas">
           <button type="button" data-open-sheet="amamentacao">
-            <span class="action-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span class="action-icon care-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span class="action-copy"><strong>Amamentação</strong><small>Timer por lado</small></span>
           </button>
           <button type="button" data-open-sheet="fralda">
-            <span class="action-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span class="action-icon care-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span class="action-copy"><strong>Fralda</strong><small>Troca e detalhe</small></span>
           </button>
           <button type="button" data-open-sheet="mamadeira">
-            <span class="action-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
+            <span class="action-icon care-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
             <span class="action-copy"><strong>Mamadeira</strong><small>Volume em ml</small></span>
           </button>
           <button type="button" data-open-sheet="medicamento">
-            <span class="action-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span>
+            <span class="action-icon care-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span>
             <span class="action-copy"><strong>Medicamento</strong><small>Dose e horário</small></span>
           </button>
         </section>
@@ -520,7 +520,7 @@
         </div>
         <ol class="timeline">
           <li class="event-card">
-            <i class="mark"></i>
+            <i class="mark care-icon"></i>
             <div>
               <strong>Nenhum registro ainda</strong>
               <span>Escolha uma data, limpe o filtro ou toque no botão + para adicionar um cuidado.</span>
@@ -1275,7 +1275,7 @@
             </div>
             <p>Consulte política, termos, aviso de uso responsável e opções de dados conforme sua permissão na família.</p>
             <div class="legal-status-grid" aria-label="Status legal do Ninou">
-              <article><span>Versão legal</span><strong id="legalVersionLabel">v82.0.0</strong><small>Privacidade + termos</small></article>
+              <article><span>Versão legal</span><strong id="legalVersionLabel">v82.0.1</strong><small>Privacidade + termos</small></article>
               <article><span>Consentimento</span><strong id="legalConsentStatus">Não confirmado</strong><small id="legalConsentDate">Aguardando aceite</small></article>
             </div>
             <div class="profile-actions-row legal-actions-row">
@@ -1301,7 +1301,7 @@
             </div>
             <p>Para testar com outras famílias, o Ninou agora junta contexto do aparelho, versão, família ativa e últimos erros locais em um relatório simples de suporte.</p>
             <div class="support-beta-grid" aria-label="Status do suporte beta">
-              <article><span>Versão</span><strong id="supportVersionLabel">v82.0.0</strong><small>Suporte + monitoramento</small></article>
+              <article><span>Versão</span><strong id="supportVersionLabel">v82.0.1</strong><small>Suporte + monitoramento</small></article>
               <article><span>Último relatório</span><strong id="supportLastReportLabel">Nenhum</strong><small id="supportLastReportDetail">Aguardando teste real</small></article>
             </div>
             <div class="profile-actions-row support-actions-row">
@@ -1529,7 +1529,7 @@
                   <em>Roteiro recomendado para liberar o beta sem pular validações.</em>
                 </div>
                 <ol class="admin-commercial-sequence-list">
-                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v82.0.0, publicar firestore.rules e limpar cache do PWA.</span></li>
+                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v82.0.1, publicar firestore.rules e limpar cache do PWA.</span></li>
                   <li><strong>2. Testar família Francisco</strong><span>Pai: luizfelipe.4092@hotmail.com. Mãe: marry@gmail.com. Ambos na mesma família.</span></li>
                   <li><strong>3. Criar família piloto</strong><span>Criar família nova com outro e-mail, gerar convite e aceitar em outro aparelho.</span></li>
                   <li><strong>4. Validar papéis</strong><span>Responsável/admin veem backup/exportação/exclusão; cuidador e visualização não veem ações sensíveis.</span></li>
@@ -1547,7 +1547,7 @@
                   <article><span>Política</span><strong>Visível no app</strong><small>Resumo claro sobre dados coletados, família e exportação.</small></article>
                   <article><span>Termos</span><strong>Uso familiar</strong><small>O app é diário de rotina, não ferramenta médica.</small></article>
                   <article><span>Exclusão</span><strong>Solicitação registrada</strong><small>Famílias podem pedir remoção de dados pelo Perfil.</small></article>
-                  <article><span>Consentimento</span><strong>Versão 82.0.0</strong><small>Aceite local e, quando possível, salvo na nuvem.</small></article>
+                  <article><span>Consentimento</span><strong>Versão 82.0.1</strong><small>Aceite local e, quando possível, salvo na nuvem.</small></article>
                 </div>
                 <ul class="commercial-readiness-list admin-legal-list">
                   <li data-state="ready"><strong>Política de privacidade</strong><span>Texto resumido disponível no Perfil e no modal legal.</span></li>
@@ -1565,7 +1565,7 @@
                 <div class="admin-legal-grid admin-support-grid" aria-label="Indicadores de suporte do beta">
                   <article><span>Relatórios locais</span><strong id="adminSupportReportsCount">0</strong><small>neste aparelho/admin</small></article>
                   <article><span>Erros capturados</span><strong id="adminSupportErrorsCount">0</strong><small>últimos registros locais</small></article>
-                  <article><span>Versão</span><strong>82.0.0</strong><small>suporte + permissões</small></article>
+                  <article><span>Versão</span><strong>82.0.1</strong><small>suporte + permissões</small></article>
                   <article><span>Status</span><strong id="adminSupportStatusLabel">Aguardando beta</strong><small>testes com famílias reais</small></article>
                 </div>
                 <ul id="adminSupportReportsList" class="admin-access-list admin-support-reports-list">
@@ -1796,7 +1796,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v82.0.0</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v82.0.1</strong>
             <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -2036,24 +2036,24 @@
       <div class="action-launcher-card">
         <div class="action-launcher-head">
           <div><span>Novo cuidado</span><strong id="actionLauncherTitle">O que você quer registrar?</strong><p>Escolha uma ação. O formulário abrirá já preparado.</p></div>
-          <button id="closeActionLauncherButton" type="button" aria-label="Fechar menu de registros">×</button>
+          <button id="closeActionLauncherButton" type="button" aria-label="Fechar menu de registros"><svg class="close-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
         </div>
         <div class="action-launcher-group">
           <span class="action-launcher-label">Cuidados rápidos</span>
           <div class="action-launcher-grid">
-            <button type="button" data-launch-record="amamentacao"><span class="launcher-icon"><img src="./icons/actions/amamentacao.png" alt=""></span><strong>Amamentação</strong><small>Timer por lado</small></button>
-            <button type="button" data-launch-record="mamadeira"><span class="launcher-icon"><img src="./icons/actions/mamadeira.png" alt=""></span><strong>Mamadeira</strong><small>Volume em ml</small></button>
-            <button type="button" data-launch-record="fralda"><span class="launcher-icon"><img src="./icons/actions/fralda.png" alt=""></span><strong>Fralda</strong><small>Troca e detalhe</small></button>
-            <button type="button" data-launch-record="medicamento"><span class="launcher-icon launcher-medicine"><svg class="launcher-medicine-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="29" fill="rgba(124,229,194,.14)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><strong>Medicamento</strong><small>Dose e horário</small></button>
+            <button type="button" data-launch-record="amamentacao"><span class="launcher-icon care-icon"><img src="./icons/actions/amamentacao.png" alt=""></span><strong>Amamentação</strong><small>Timer por lado</small></button>
+            <button type="button" data-launch-record="mamadeira"><span class="launcher-icon care-icon"><img src="./icons/actions/mamadeira.png" alt=""></span><strong>Mamadeira</strong><small>Volume em ml</small></button>
+            <button type="button" data-launch-record="fralda"><span class="launcher-icon care-icon"><img src="./icons/actions/fralda.png" alt=""></span><strong>Fralda</strong><small>Troca e detalhe</small></button>
+            <button type="button" data-launch-record="medicamento"><span class="launcher-icon launcher-medicine care-icon"><svg class="launcher-medicine-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="29" fill="rgba(124,229,194,.14)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><strong>Medicamento</strong><small>Dose e horário</small></button>
           </div>
         </div>
         <div class="action-launcher-group">
           <span class="action-launcher-label">Sono e vigília</span>
           <div class="action-launcher-grid action-launcher-grid-sleep">
-            <button type="button" data-launch-record="acordou"><span class="launcher-icon"><img src="./icons/actions/acordou.png" alt=""></span><strong>Acordou</strong><small>Início da janela</small></button>
-            <button type="button" data-launch-record="sono"><span class="launcher-icon"><img src="./icons/actions/soneca.png" alt=""></span><strong>Soneca</strong><small>Início e fim</small></button>
-            <button type="button" data-launch-record="dormir"><span class="launcher-icon"><img src="./icons/actions/dormir.png" alt=""></span><strong>Sono da noite</strong><small>Rotina noturna</small></button>
-            <button type="button" data-launch-record="despertar-noturno"><span class="launcher-icon"><img src="./icons/actions/despertar-noturno.png" alt=""></span><strong>Despertar</strong><small>Acordou à noite</small></button>
+            <button type="button" data-launch-record="acordou"><span class="launcher-icon care-icon"><img src="./icons/actions/acordou.png" alt=""></span><strong>Acordou</strong><small>Início da janela</small></button>
+            <button type="button" data-launch-record="sono"><span class="launcher-icon care-icon"><img src="./icons/actions/soneca.png" alt=""></span><strong>Soneca</strong><small>Início e fim</small></button>
+            <button type="button" data-launch-record="dormir"><span class="launcher-icon care-icon"><img src="./icons/actions/dormir.png" alt=""></span><strong>Sono da noite</strong><small>Rotina noturna</small></button>
+            <button type="button" data-launch-record="despertar-noturno"><span class="launcher-icon care-icon"><img src="./icons/actions/despertar-noturno.png" alt=""></span><strong>Despertar</strong><small>Acordou à noite</small></button>
           </div>
         </div>
       </div>
@@ -2067,17 +2067,17 @@
           <span>Novo registro</span>
           <strong id="sheetTitle">Soneca</strong>
         </div>
-        <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
+        <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"><svg class="close-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
       </div>
       <div class="record-types" aria-label="Tipos de registro">
-        <button class="active" type="button" data-sheet-type="amamentacao"><span class="type-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamada</span></button>
-        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamadeira</span></button>
-        <button type="button" data-sheet-type="fralda"><span class="type-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Fralda</span></button>
-        <button type="button" data-sheet-type="medicamento"><span class="type-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><span>Remédio</span></button>
-        <button type="button" data-sheet-type="acordou"><span class="type-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
-        <button type="button" data-sheet-type="sono"><span class="type-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Soneca</span></button>
-        <button type="button" data-sheet-type="dormir"><span class="type-icon"><img class="icon-art icon-art-dormir" src="./icons/actions/dormir.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Noite</span></button>
-        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img class="icon-art icon-art-despertar-noturno" src="./icons/actions/despertar-noturno.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
+        <button class="active" type="button" data-sheet-type="amamentacao"><span class="type-icon care-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamada</span></button>
+        <button type="button" data-sheet-type="mamadeira"><span class="type-icon care-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamadeira</span></button>
+        <button type="button" data-sheet-type="fralda"><span class="type-icon care-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Fralda</span></button>
+        <button type="button" data-sheet-type="medicamento"><span class="type-icon care-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><span>Remédio</span></button>
+        <button type="button" data-sheet-type="acordou"><span class="type-icon care-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
+        <button type="button" data-sheet-type="sono"><span class="type-icon care-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Soneca</span></button>
+        <button type="button" data-sheet-type="dormir"><span class="type-icon care-icon"><img class="icon-art icon-art-dormir" src="./icons/actions/dormir.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Noite</span></button>
+        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon care-icon"><img class="icon-art icon-art-despertar-noturno" src="./icons/actions/despertar-noturno.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
       </div>
       <form class="record-form">
         <label>
@@ -2149,7 +2149,7 @@
           <span>Registros próximos</span>
           <strong id="orbitClusterTitle">Atividades no mesmo horário</strong>
         </div>
-        <button id="closeOrbitCluster" class="round-action icon-button-close" type="button" aria-label="Fechar registros próximos"></button>
+        <button id="closeOrbitCluster" class="round-action icon-button-close" type="button" aria-label="Fechar registros próximos"><svg class="close-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
       </div>
       <div id="orbitClusterList" class="cluster-list"></div>
       <button id="orbitClusterViewAll" class="orbit-cluster-view-all" type="button">Ver todos os registros</button>
@@ -2238,7 +2238,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v82.0.0.mjs?v=82.0.0").catch((error) => {
+      import("./js/boot-v82.0.0.mjs?v=82.0.1").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2252,7 +2252,7 @@
     </script>
 
     <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.0.0";
+      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.0.1";
       initActionLauncher();
     </script>
   </body>
