@@ -129,7 +129,8 @@ function appLooksStable() {
   const center = orbit?.querySelector(".orbit-center-safe");
   const clock = document.querySelector("#stateClock");
   if (!window.__NINOU_APP_READY__ || !body || !shell || !orbit || !center || !clock) return false;
-  if (body.classList.contains("sync-bootstrap")) return false;
+  const hasReadyLocalProfile = body.classList.contains("profile-daily-ready");
+  if (body.classList.contains("sync-bootstrap") && !hasReadyLocalProfile) return false;
   if (!hasResolvedAccessState(body)) return false;
 
   const accessState = String(body.dataset.profileAccessState || "");
@@ -139,7 +140,7 @@ function appLooksStable() {
   if (savedEmail && accessState === "guest") return false;
 
   const syncPill = document.querySelector(".sync-pill");
-  if (syncPill?.classList.contains("loading") || syncPill?.classList.contains("syncing")) return false;
+  if (!hasReadyLocalProfile && (syncPill?.classList.contains("loading") || syncPill?.classList.contains("syncing"))) return false;
   if (!document.documentElement.dataset.ninouUx || !document.documentElement.dataset.ninouConsistency) return false;
   if (!document.documentElement.dataset.ninouVisualGuard) return false;
 
@@ -286,7 +287,7 @@ async function bootNinou() {
     await cleanLegacyRuntimeOnce();
 
     setBootStatus("Preparando a interface premium…");
-    await Promise.allSettled([
+    const visualAssetsReady = Promise.allSettled([
       waitForStyleSheets(),
       preloadCriticalImages(),
       document.fonts?.ready || Promise.resolve(),
@@ -318,6 +319,12 @@ async function bootNinou() {
       document.documentElement.dataset.ninouLayerFallback = String(failedLayers.length);
       console.warn("Camadas complementares falharam, mas não bloquearão a abertura.", failedLayers.map((item) => item.reason));
     }
+
+    // Dados locais e módulos carregam em paralelo com fontes/imagens. Assim o
+    // primeiro quadro útil não fica esperando recursos puramente visuais.
+    await withTimeout(visualAssetsReady, 6500, "Recursos visuais").catch((error) => {
+      console.warn("A interface continuará com os recursos já disponíveis.", error);
+    });
 
     window.__NINOU_APP_READY__ = true;
     document.documentElement.dataset.ninouAppReady = "true";

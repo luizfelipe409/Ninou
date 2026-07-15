@@ -2,7 +2,8 @@
 
 /* O menu escolhe o cuidado; a folha seguinte exibe somente o formulário. */
 html.ninou-v8200 body.family-daily-surface #recordSheet {
-  --n80-sheet-grid-rows: 16px auto minmax(0, 1fr) auto;
+  --n80-sheet-grid-rows: 16px auto minmax(0, auto) auto;
+  height: auto !important;
 }
 
 html.ninou-v8200 body.family-daily-surface #recordSheet .record-types {
@@ -63,6 +64,7 @@ html.ninou-v8200 body.family-daily-surface #recordSheet .sheet-back-action span 
 
 html.ninou-v8200 body.family-daily-surface #recordSheet .record-form {
   padding-top: 8px !important;
+  max-height: calc(90dvh - 154px) !important;
 }
 
 /* X no canto direito do menu, com os textos alinhados à esquerda. */
@@ -283,13 +285,13 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] :is(.re
   bottom: max(8px, var(--n79-safe-bottom)) !important;
   z-index: 1010 !important;
   width: min(calc(100vw - 14px), 520px) !important;
-  height: var(--n80-sheet-height, min(90dvh, 780px)) !important;
+  height: auto !important;
   min-height: 0 !important;
   max-height: var(--n80-sheet-max-height, calc(100dvh - max(12px, var(--n79-safe-top)) - max(8px, var(--n79-safe-bottom)))) !important;
   margin: 0 !important;
   padding: 0 14px max(12px, var(--n79-safe-bottom)) !important;
   display: grid !important;
-  grid-template-rows: var(--n80-sheet-grid-rows, 16px auto minmax(0, 1fr) auto) !important;
+  grid-template-rows: var(--n80-sheet-grid-rows, 16px auto minmax(0, auto) auto) !important;
   gap: 0 !important;
   overflow: hidden !important;
   contain: layout paint !important;
@@ -517,4 +519,98 @@ html.ninou-v8200 body.day-theme .orbit-cluster-count {
   html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"].regular-family-mode .phone-shell {
     padding-inline: 10px !important;
   }
+}
+
+/* Ajustes observados no iPhone: o Perfil recebe a mesma entrada suave das
+   demais telas, e os formulários curtos não mantêm área vazia artificial. */
+@media (prefers-reduced-motion: no-preference) {
+  html.ninou-v8200 body.family-daily-surface .screen.active {
+    animation: n79-screen-in 260ms ease both !important;
+  }
+}
+
+html.ninou-v8200 #recordSheet .select-control-wrap {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  margin: 0 !important;
+  display: block !important;
+  transform: none !important;
+}
+
+html.ninou-v8200 #recordSheet .select-control-wrap select {
+  height: 50px !important;
+  min-height: 50px !important;
+  padding-right: 52px !important;
+}
+
+html.ninou-v8200 #recordSheet .select-control-icon {
+  position: absolute !important;
+  top: 50% !important;
+  right: 11px !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 6px !important;
+  display: block !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+}
+
+html.ninou-v8200 .action-launcher-card {
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+}
+
+html.ninou-v8200 .action-launcher-card::-webkit-scrollbar,
+html.ninou-v8200.action-launcher-open::-webkit-scrollbar,
+html.ninou-v8200 body.action-launcher-open::-webkit-scrollbar {
+  display: none !important;
+}
+
+html.ninou-v8200 body.action-launcher-open .bottom-bar,
+html.ninou-v8200 body.record-sheet-open .bottom-bar {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Perfil usa literalmente a superfície clara e o cabeçalho das outras telas. */
+html.ninou-v8200 body.family-daily-surface.day-theme[data-active-screen="profile"] {
+  --n79-glass: rgba(247,246,250,.86);
+  background:
+    radial-gradient(circle at 10% -5%, rgba(143,108,239,.12), transparent 34%),
+    radial-gradient(circle at 100% 18%, rgba(90,190,163,.10), transparent 28%),
+    var(--n79-bg) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface.day-theme[data-active-screen="profile"] :is(.phone-shell, .screen[data-screen="profile"].active) {
+  background: var(--n79-shell) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .app-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  background-image: none !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .identity {
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .identity > img {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  border-radius: 15px !important;
 }
