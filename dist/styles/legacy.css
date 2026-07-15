@@ -11731,13 +11731,17 @@ body.day-theme .caregiver-identity-note {
 }
 
 
-/* v75.74.1 — chip de vínculo legível no modo escuro */
-.caregiver-relation-chip,
 body:not(.day-theme) .caregiver-relation-chip,
-.screen[data-screen="profile"] .caregiver-identity-pass summary .caregiver-relation-chip {
-  color: #171126 !important;
-  -webkit-text-fill-color: #171126 !important;
+body:not(.day-theme) .screen[data-screen="profile"] .caregiver-identity-pass summary .caregiver-relation-chip {
+  color: #f7f3ff !important;
+  -webkit-text-fill-color: #f7f3ff !important;
+  background: rgba(143,115,255,.20) !important;
+  border: 1px solid rgba(201,192,255,.18) !important;
   text-shadow: none !important;
+}
+body:not(.day-theme) .caregiver-quick-grid button :is(strong,em) {
+  color: #f7f3ff !important;
+  -webkit-text-fill-color: #f7f3ff !important;
 }
 body.day-theme .caregiver-relation-chip,
 body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary .caregiver-relation-chip {
@@ -27234,5 +27238,3 @@ html body.day-theme .orbit-cluster i {
 html body .main-action-area .primary-action .action-icon {
   overflow: hidden !important;
 }
-
-

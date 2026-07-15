@@ -10247,6 +10247,12 @@ function isOrbitDurationEvent(event = {}) {
     && getOrbitEventEnd(event) > Number(event?.start || 0) + 60 * 1000;
 }
 
+function getOrbitMarkerTimestamp(event, orbitStart = getDayStart(), orbitEnd = orbitStart + day) {
+  const start = Math.max(Number(event?.start) || orbitStart, orbitStart);
+  if (!isSleepEvent(event) || getOrbitEventEnd(event) <= start) return Math.min(start, orbitEnd);
+  return Math.max(orbitStart, Math.min(getOrbitEventEnd(event), orbitEnd));
+}
+
 function getOrbitEventRange(event) {
   const end = getOrbitEventEnd(event);
   return end > event.start ? `${formatTime(event.start)} - ${formatTime(end)}` : formatTime(event.start);
@@ -10330,8 +10336,12 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
   button.className = `orbit-event live-orbit-marker ${config.arcType}${active ? " active" : ""}`;
   applyOrbitMarkerPosition(button, position);
   button.innerHTML = `<i>${config.icon}</i>`;
-  button.title = `${config.title} às ${formatTime(event.start)}`;
-  button.setAttribute("aria-label", `${config.title} às ${formatTime(event.start)}`);
+  const markerTime = getOrbitMarkerTimestamp(event);
+  const markerLabel = isSleepEvent(event) && markerTime > Number(event.start)
+    ? `${config.title} terminou às ${formatTime(markerTime)}`
+    : `${config.title} às ${formatTime(markerTime)}`;
+  button.title = markerLabel;
+  button.setAttribute("aria-label", markerLabel);
   button.addEventListener("click", () => openOrbitCluster([event], { title: config.title }));
   return button;
 }
@@ -10385,7 +10395,7 @@ function renderOrbit() {
   const displayEvents = dayEvents.slice(-72).map((event) => ({
     event,
     active: false,
-    position: eventPosition(Math.max(Number(event.start) || orbitStart, orbitStart)),
+    position: eventPosition(getOrbitMarkerTimestamp(event, orbitStart, orbitEnd)),
   }));
 
   let activeEvent = null;
@@ -10400,7 +10410,11 @@ function renderOrbit() {
       notes: state.activeNotes || "",
       isActive: true,
     };
-    displayEvents.push({ event: activeEvent, active: true, position: eventPosition(activeStartedAt) });
+    displayEvents.push({
+      event: activeEvent,
+      active: true,
+      position: eventPosition(getOrbitMarkerTimestamp(activeEvent, orbitStart, orbitEnd)),
+    });
   }
 
   renderOrbitDurationArcs([...dayEvents, ...(activeEvent ? [activeEvent] : [])], orbitStart);

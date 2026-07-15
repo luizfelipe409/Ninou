@@ -61,8 +61,13 @@ assert.match(premiumCss, /@keyframes n82-marker-arrival/);
 assert.match(premiumCss, /body\[data-active-screen="profile"\] \.app-header/);
 assert.match(premiumCss, /:is\(#closeSheet, #closeOrbitCluster\)\.icon-button-close/);
 assert.match(premiumCss, /@media \(max-width: 430px\)[\s\S]*\.record-types/);
+assert.match(premiumCss, /\.chips button:nth-child\(n\+4\)/);
+assert.match(premiumCss, /\.action-launcher-grid > button:is\(:active,:hover\)/);
 
 assert.match(core, /return -90 \+ .*ORBIT_DAY_MINUTES.*\* 360/s);
+assert.match(core, /function getOrbitMarkerTimestamp[\s\S]*isSleepEvent\(event\)[\s\S]*getOrbitEventEnd\(event\)/);
+assert.match(core, /position: eventPosition\(getOrbitMarkerTimestamp\(event, orbitStart, orbitEnd\)\)/);
+assert.match(core, /terminou às/);
 assert.match(core, /--orbit-celestial-x/);
 assert.match(core, /--orbit-celestial-y/);
 assert.match(html, /class="orbit-sky"/);
