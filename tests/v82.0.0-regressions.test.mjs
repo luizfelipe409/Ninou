@@ -78,7 +78,7 @@ assert.match(html, /class="orbit-sky"/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-orbit-stable-circles/);
+assert.match(sw, /ninou-v82-0-0-ios-orbit-today-launch/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -154,3 +154,9 @@ assert.match(premiumCss, /\.orbit-duration-journey\.active \.orbit-duration-glin
 assert.doesNotMatch(focusedFlowCss, /\.orbit-cluster-constellation/);
 assert.match(premiumCss, /button:not\(\.orbit-event\):not\(\.live-orbit-marker\):not\(\.orbit-cluster\):active/);
 assert.match(focusedFlowCss, /button\.orbit-event[\s\S]*box-shadow: none !important[\s\S]*transform: translate\(-50%, -50%\) !important/);
+assert.match(core, /const APP_LAUNCH_SCREEN = "today"/);
+assert.match(core, /showScreen\(isGlobalAppAdmin\(user\) \? "profile" : APP_LAUNCH_SCREEN\)/);
+assert.match(core, /showScreen\(APP_LAUNCH_SCREEN\);\s*renderAll\(\);/);
+assert.match(focusedFlowCss, /@supports \(-webkit-touch-callout: none\)/);
+assert.match(focusedFlowCss, /body\.day-theme \.orbit-sky::before[\s\S]*animation-duration:\s*7\.5s/);
+assert.match(focusedFlowCss, /body:not\(\.day-theme\) \.orbit-sky::after[\s\S]*animation-duration:\s*3\.8s/);

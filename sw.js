@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v82-0-0-orbit-stable-circles";
+const CACHE_NAME = "ninou-v82-0-0-ios-orbit-today-launch";
 const APP_VERSION = "82.0.0";
 const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const APP_SHELL = [

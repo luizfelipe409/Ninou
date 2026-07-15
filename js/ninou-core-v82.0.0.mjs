@@ -889,6 +889,7 @@ let clientFamilyMembersFetchedAt = 0;
 let clientFamilyMembersLoading = false;
 let selectedAdminFamilyId = loadSelectedAdminFamilyId();
 let activeScreenName = "today";
+const APP_LAUNCH_SCREEN = "today";
 let lastMigrationResult = null;
 let legacyCloudContexts = [];
 let legacyCloudScanState = "idle";
@@ -9688,7 +9689,7 @@ async function initFirebaseAuthState() {
 
     setSyncStatus("loading", user.email || "");
     setAuthAccessLoading(true, "Validando conta e família...");
-    showScreen("profile");
+    showScreen(isGlobalAppAdmin(user) ? "profile" : APP_LAUNCH_SCREEN);
 
     const isCurrentAuthRun = () => authRunId === authFlowRunId && cloudUser?.uid === user.uid;
 
@@ -9744,6 +9745,7 @@ async function initFirebaseAuthState() {
       setSyncStatus("online", user.email || "");
       loginHelper.textContent = `Conta conectada como ${getRoleLabel(getEffectiveRole(familyAccess.role, user.email || ""))}.`;
       renderAuthControls();
+      showScreen(APP_LAUNCH_SCREEN);
       renderAll();
     } catch (error) {
       console.error("Erro ao conectar família:", error);
@@ -9758,7 +9760,10 @@ async function initFirebaseAuthState() {
         ? "Conta conectada. Os dados deste aparelho continuam disponíveis enquanto a sincronização é retomada."
         : "Conta conectada, mas a sincronização ainda precisa das regras corretas do Firestore.";
       renderAuthControls();
-      if (keepCachedFamily) renderAll();
+      if (keepCachedFamily) {
+        showScreen(APP_LAUNCH_SCREEN);
+        renderAll();
+      }
     }
   });
 }
@@ -14609,6 +14614,7 @@ updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
 renderAuthControls();
 initAdminInterfaceMode();
+showScreen(APP_LAUNCH_SCREEN);
 renderAll();
 updateDiaryChipsMoreButton();
 initSleepSounds();
