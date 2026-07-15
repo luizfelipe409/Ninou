@@ -10422,42 +10422,19 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
   return button;
 }
 
-function setOrbitConstellationGeometry(button, position, previewCount) {
-  const radialAngle = Math.atan2(Number(position.y) || 0, Number(position.x) || 0);
-  const inwardAngle = radialAngle + Math.PI;
-  const previewAngles = previewCount > 1 ? [inwardAngle - .68, inwardAngle + .68] : [inwardAngle - .62];
-  const previewDistance = previewCount > 1 ? 34 : 36;
-  previewAngles.forEach((angle, index) => {
-    const key = index ? "b" : "a";
-    button.style.setProperty(`--cluster-preview-${key}-x`, `${(Math.cos(angle) * previewDistance).toFixed(1)}px`);
-    button.style.setProperty(`--cluster-preview-${key}-y`, `${(Math.sin(angle) * previewDistance).toFixed(1)}px`);
-    button.style.setProperty(`--cluster-line-${key}-angle`, `${angle.toFixed(4)}rad`);
-  });
-  const countAngle = previewCount > 1 ? inwardAngle : inwardAngle + .62;
-  const countDistance = previewCount > 1 ? 46 : 36;
-  button.style.setProperty("--cluster-count-x", `${(Math.cos(countAngle) * countDistance).toFixed(1)}px`);
-  button.style.setProperty("--cluster-count-y", `${(Math.sin(countAngle) * countDistance).toFixed(1)}px`);
-  button.style.setProperty("--cluster-count-angle", `${countAngle.toFixed(4)}rad`);
-}
-
-function getOrbitConstellationMarkup(eventList) {
+function getOrbitClusterMarkup(eventList) {
   const newestFirst = [...eventList].sort((a, b) => b.start - a.start);
   const primaryConfig = getEventConfig(newestFirst[0].type);
-  const previewEvents = newestFirst.slice(1, 3);
-  const previewMarkup = previewEvents.map((event, index) => {
-    const config = getEventConfig(event.type);
-    const key = index ? "b" : "a";
-    return `<span class="orbit-constellation-line line-${key}"></span><i class="orbit-cluster-preview preview-${key}">${config.icon}</i>`;
-  }).join("");
-  return `<span class="orbit-cluster-constellation" aria-hidden="true">${previewMarkup}<span class="orbit-constellation-line line-count"></span><i class="orbit-cluster-icon">${primaryConfig.icon}</i><span class="orbit-cluster-count">${eventList.length}</span></span>`;
+  return `<span class="orbit-cluster-compact" aria-hidden="true"><i class="orbit-cluster-icon">${primaryConfig.icon}</i><span class="orbit-cluster-count">${eventList.length}</span></span>`;
 }
 
 function createOrbitCluster(group) {
   const eventList = group.items.map((item) => item.event).sort((a, b) => a.start - b.start);
   const config = getEventConfig(eventList[eventList.length - 1].type);
+  const containsActiveEvent = eventList.some((event) => event.isActive);
   const button = document.createElement("button");
   button.type = "button";
-  button.className = `orbit-event live-orbit-marker orbit-cluster ${config.arcType}`;
+  button.className = `orbit-event live-orbit-marker orbit-cluster ${config.arcType}${containsActiveEvent ? " contains-active" : ""}`;
   applyOrbitMarkerPosition(button, group.position);
   button.dataset.clusterCount = String(eventList.length);
   const markerTimes = group.items.map((item) => Number(item.timestamp || getOrbitMarkerTimestamp(item.event))).sort((a, b) => a - b);
@@ -10467,9 +10444,7 @@ function createOrbitCluster(group) {
     : formatTime(markerTimes[0]);
   button.title = `${eventList.length} registros próximos · ${timeRange}`;
   button.setAttribute("aria-label", `${eventList.length} registros próximos, no período ${timeRange}`);
-  button.dataset.previewCount = String(Math.min(2, eventList.length - 1));
-  setOrbitConstellationGeometry(button, group.position, Math.min(2, eventList.length - 1));
-  button.innerHTML = getOrbitConstellationMarkup(eventList);
+  button.innerHTML = getOrbitClusterMarkup(eventList);
   button.addEventListener("click", () => openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` }));
   return button;
 }

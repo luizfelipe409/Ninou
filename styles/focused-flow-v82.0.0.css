@@ -1216,3 +1216,101 @@ html.ninou-v8200 .action-launcher-grid .launcher-icon > svg {
   box-shadow: none !important;
   transform: none !important;
 }
+
+/* Órbita limpa: um marcador por horário; proximidade vira somente contador. */
+html.ninou-v8200 .orbit-cluster {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+}
+
+html.ninou-v8200 .orbit-cluster-compact {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 1 !important;
+  width: 0 !important;
+  height: 0 !important;
+  display: block !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+
+html.ninou-v8200 .orbit-cluster .orbit-cluster-icon {
+  left: -18px !important;
+  top: -18px !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+}
+
+html.ninou-v8200 .orbit-cluster .orbit-cluster-count {
+  left: 8px !important;
+  top: 8px !important;
+  right: auto !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  padding: 0 4px !important;
+  border: 2px solid var(--n79-surface) !important;
+  background: linear-gradient(145deg, #79e5c4, #55c8a8) !important;
+  color: #173c35 !important;
+  -webkit-text-fill-color: #173c35 !important;
+  box-shadow: 0 0 0 2px rgba(121,229,196,.12), 0 5px 12px rgba(23,60,53,.24) !important;
+  font-size: .61rem !important;
+  transform: none !important;
+}
+
+html.ninou-v8200 body.day-theme .orbit-cluster .orbit-cluster-count {
+  border-color: #fff !important;
+  box-shadow: 0 0 0 2px rgba(83,198,166,.10), 0 5px 12px rgba(68,49,103,.16) !important;
+}
+
+/* Acabamento premium compartilhado fora e dentro do painel de detalhes. */
+html.ninou-v8200 :is(
+  .orbit-event:not(.orbit-cluster) > .orbit-marker-icon,
+  .orbit-cluster .orbit-cluster-icon,
+  .orbit-cluster-hero-icon,
+  #orbitClusterSheet .cluster-card .cluster-icon
+) {
+  box-sizing: border-box !important;
+  padding: 1px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(226,216,255,.82) !important;
+  border-radius: 50% !important;
+  background: linear-gradient(155deg, rgba(56,40,101,.92), rgba(22,16,52,.96)) !important;
+  box-shadow: 0 5px 13px rgba(14,9,34,.26), inset 0 1px 0 rgba(255,255,255,.16) !important;
+  clip-path: circle(50%) !important;
+  -webkit-clip-path: circle(50%) !important;
+}
+
+html.ninou-v8200 body.day-theme :is(
+  .orbit-event:not(.orbit-cluster) > .orbit-marker-icon,
+  .orbit-cluster .orbit-cluster-icon,
+  .orbit-cluster-hero-icon,
+  #orbitClusterSheet .cluster-card .cluster-icon
+) {
+  border-color: rgba(255,255,255,.98) !important;
+  background: linear-gradient(155deg, rgba(255,255,255,.99), rgba(242,236,255,.94)) !important;
+  box-shadow: 0 6px 14px rgba(73,55,122,.15), inset 0 1px 0 #fff !important;
+}
+
+html.ninou-v8200 :is(
+  .orbit-event:not(.orbit-cluster) > .orbit-marker-icon,
+  .orbit-cluster .orbit-cluster-icon
+)::after {
+  content: none !important;
+}
+
+html.ninou-v8200 .orbit-event.active > .orbit-marker-icon,
+html.ninou-v8200 .orbit-cluster.contains-active .orbit-cluster-icon {
+  border-color: rgba(128,242,207,.94) !important;
+  box-shadow: 0 0 0 2px rgba(128,242,207,.13), 0 6px 14px rgba(38,126,105,.18), inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
