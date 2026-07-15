@@ -10176,7 +10176,6 @@ function renderCurrentState() {
 }
 
 const ORBIT_RADIUS = 126;
-const ORBIT_MARKER_RADIUS = 140;
 const ORBIT_CENTER = 160;
 const ORBIT_COLLISION_DISTANCE = 54;
 const ORBIT_CLUSTER_WINDOW_MINUTES = 75;
@@ -10246,11 +10245,7 @@ function getScaledOrbitPosition(position = {}) {
 }
 
 function applyOrbitMarkerPosition(element, position) {
-  const markerRadiusScale = ORBIT_MARKER_RADIUS / ORBIT_RADIUS;
-  const scaled = getScaledOrbitPosition({
-    x: (Number(position?.x) || 0) * markerRadiusScale,
-    y: (Number(position?.y) || 0) * markerRadiusScale,
-  });
+  const scaled = getScaledOrbitPosition(position);
   element.style.setProperty("--x", `${scaled.x.toFixed(2)}px`);
   element.style.setProperty("--y", `${scaled.y.toFixed(2)}px`);
 }
@@ -10429,18 +10424,17 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
 
 function setOrbitConstellationGeometry(button, position, previewCount) {
   const radialAngle = Math.atan2(Number(position.y) || 0, Number(position.x) || 0);
-  const tangentBefore = radialAngle - Math.PI / 2;
-  const tangentAfter = radialAngle + Math.PI / 2;
-  const previewAngles = previewCount > 1 ? [tangentBefore, tangentAfter] : [tangentBefore];
-  const previewDistance = previewCount > 1 ? 30 : 32;
+  const inwardAngle = radialAngle + Math.PI;
+  const previewAngles = previewCount > 1 ? [inwardAngle - .68, inwardAngle + .68] : [inwardAngle - .62];
+  const previewDistance = previewCount > 1 ? 34 : 36;
   previewAngles.forEach((angle, index) => {
     const key = index ? "b" : "a";
     button.style.setProperty(`--cluster-preview-${key}-x`, `${(Math.cos(angle) * previewDistance).toFixed(1)}px`);
     button.style.setProperty(`--cluster-preview-${key}-y`, `${(Math.sin(angle) * previewDistance).toFixed(1)}px`);
     button.style.setProperty(`--cluster-line-${key}-angle`, `${angle.toFixed(4)}rad`);
   });
-  const countAngle = tangentAfter;
-  const countDistance = previewCount > 1 ? 45 : 32;
+  const countAngle = previewCount > 1 ? inwardAngle : inwardAngle + .62;
+  const countDistance = previewCount > 1 ? 46 : 36;
   button.style.setProperty("--cluster-count-x", `${(Math.cos(countAngle) * countDistance).toFixed(1)}px`);
   button.style.setProperty("--cluster-count-y", `${(Math.sin(countAngle) * countDistance).toFixed(1)}px`);
   button.style.setProperty("--cluster-count-angle", `${countAngle.toFixed(4)}rad`);

@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v82-0-0-launcher-icons-clean-crop";
+const CACHE_NAME = "ninou-v82-0-0-orbit-premium-line-restored";
 const APP_VERSION = "82.0.0";
 const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const APP_SHELL = [

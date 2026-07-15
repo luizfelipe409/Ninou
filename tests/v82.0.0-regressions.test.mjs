@@ -85,7 +85,7 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-launcher-icons-clean-crop/);
+assert.match(sw, /ninou-v82-0-0-orbit-premium-line-restored/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -134,13 +134,12 @@ assert.match(focusedFlowCss, /body\.action-launcher-open[\s\S]*position: fixed/)
 assert.match(focusedFlowCss, /data-active-screen="profile"[\s\S]*:is\(\.record-sheet, \.orbit-cluster-sheet\)/);
 assert.match(focusedFlowCss, /\.orbit-cluster-count[\s\S]*display: grid !important/);
 assert.match(focusedFlowCss, /:is\(\.orbit-event > i, \.live-orbit-marker > i, \.orbit-cluster-icon\)[\s\S]*background: transparent !important/);
-assert.match(core, /const ORBIT_MARKER_RADIUS = 140/);
-assert.match(core, /const tangentBefore = radialAngle - Math\.PI \/ 2/);
-assert.match(core, /const tangentAfter = radialAngle \+ Math\.PI \/ 2/);
+assert.doesNotMatch(core, /ORBIT_MARKER_RADIUS/);
+assert.match(core, /const inwardAngle = radialAngle \+ Math\.PI/);
+assert.match(core, /const previewDistance = previewCount > 1 \? 34 : 36/);
 assert.match(focusedFlowCss, /#orbitClusterSheet \.cluster-card \.cluster-icon[\s\S]*width: 40px !important/);
-assert.match(focusedFlowCss, /\.orbit-event:not\(\.orbit-cluster\) > \.orbit-marker-icon[\s\S]*width: 30px !important/);
-assert.match(focusedFlowCss, /Todos os marcos da órbita compartilham o mesmo aro circular fino/);
-assert.match(focusedFlowCss, /\.orbit-cluster \.orbit-cluster-icon,[\s\S]*\.orbit-cluster \.orbit-cluster-preview[\s\S]*border: 1px solid rgba\(226,216,255,\.82\) !important/);
+assert.match(focusedFlowCss, /\.orbit-event:not\(\.orbit-cluster\) > \.orbit-marker-icon[\s\S]*width: 36px !important/);
+assert.doesNotMatch(focusedFlowCss, /Todos os marcos da órbita compartilham o mesmo aro circular fino/);
 assert.match(focusedFlowCss, /Novo cuidado: recorta a margem clara gravada nos PNGs, sem criar aro/);
 assert.match(focusedFlowCss, /\.action-launcher-grid \.launcher-icon > img[\s\S]*transform: scale\(1\.06\) !important/);
 assert.match(actionLauncher, /NinouOpenRecordSheet[\s\S]*if \(opened !== false\) close\(\)/);
