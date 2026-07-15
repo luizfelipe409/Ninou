@@ -78,7 +78,7 @@ assert.match(html, /class="orbit-sky"/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-compact-forms-static-navigation/);
+assert.match(sw, /ninou-v82-0-0-profile-motion-close-fix/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -139,3 +139,7 @@ assert.match(focusedFlowCss, /#recordSheet \.select-control-wrap[\s\S]*position:
 assert.match(focusedFlowCss, /body\.family-daily-surface \.screen\.active[\s\S]*animation: n79-screen-in 260ms ease both !important/);
 assert.match(focusedFlowCss, /day-theme\[data-active-screen="profile"\]/);
 assert.match(focusedFlowCss, /\.action-launcher-card::\-webkit-scrollbar/);
+assert.match(focusedFlowCss, /#recordSheet\[hidden\][\s\S]*display: none !important/);
+assert.match(focusedFlowCss, /#recordSheet \.round-action[\s\S]*position: relative !important/);
+assert.match(focusedFlowCss, /screen\[data-screen="profile"\]\.active > :not\(\[hidden\]\)[\s\S]*animation: n79-screen-in/);
+assert.match(ux, /control\.matches\("\.orbit-event,\.live-orbit-marker,\.orbit-cluster"\)/);

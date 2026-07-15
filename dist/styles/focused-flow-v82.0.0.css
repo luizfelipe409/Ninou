@@ -228,6 +228,7 @@ html.ninou-v8200 .action-launcher {
 
 html.ninou-v8200 :is(.action-launcher-backdrop, .sheet-backdrop) {
   touch-action: none !important;
+  bottom: calc(-48px - env(safe-area-inset-bottom, 0px)) !important;
 }
 
 html.ninou-v8200 :is(.action-launcher-card, .record-sheet, .orbit-cluster-sheet) {
@@ -263,14 +264,29 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .app-he
 html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .screen[data-screen="profile"].active {
   width: 100% !important;
   max-width: 100% !important;
+  min-width: 0 !important;
   margin-inline: 0 !important;
   padding-inline: 0 !important;
+}
+
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] :is(.screen[data-screen="profile"].active > *, .profile-family-stack > *) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html.ninou-v8200 #recordSheet[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* O formulário conserva a mesma geometria quando é aberto sobre o Perfil. */
 html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .sheet-backdrop {
   position: fixed !important;
-  inset: 0 !important;
+  inset: 0 0 calc(-48px - env(safe-area-inset-bottom, 0px)) !important;
   z-index: 1000 !important;
   display: block !important;
   background: rgba(4,2,12,.72) !important;
@@ -344,7 +360,7 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #record
 }
 
 html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #recordSheet .round-action {
-  position: static !important;
+  position: relative !important;
   inset: auto !important;
   width: 42px !important;
   height: 42px !important;
@@ -388,7 +404,7 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #record
   font-weight: 800 !important;
 }
 
-html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #recordSheet .record-form :is(input:not([type="range"]), select, textarea, .select-control-wrap) {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #recordSheet .record-form :is(input:not([type="range"]), select, textarea) {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -470,8 +486,13 @@ html.ninou-v8200 :is(.orbit-event > i, .live-orbit-marker > i, .orbit-cluster-ic
   box-shadow: none !important;
   contain: none !important;
   animation: none !important;
-  transition: none !important;
+  transition: transform 160ms cubic-bezier(.22,1,.36,1), filter 160ms ease !important;
   transform: none !important;
+}
+
+html.ninou-v8200 :is(.orbit-event, .live-orbit-marker, .orbit-cluster):active > :is(i, .orbit-cluster-icon) {
+  filter: brightness(1.04) saturate(1.03) !important;
+  transform: scale(.94) !important;
 }
 
 html.ninou-v8200 :is(.orbit-event > i, .live-orbit-marker > i, .orbit-cluster-icon) > :is(img, svg) {
@@ -525,6 +546,14 @@ html.ninou-v8200 body.day-theme .orbit-cluster-count {
    demais telas, e os formulários curtos não mantêm área vazia artificial. */
 @media (prefers-reduced-motion: no-preference) {
   html.ninou-v8200 body.family-daily-surface .screen.active {
+    animation: n79-screen-in 260ms ease both !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .screen[data-screen="profile"].active {
+    animation: none !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .screen[data-screen="profile"].active > :not([hidden]) {
     animation: n79-screen-in 260ms ease both !important;
   }
 }
@@ -606,6 +635,7 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .identi
 }
 
 html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .identity > img {
+  display: block !important;
   width: 42px !important;
   height: 42px !important;
   min-width: 42px !important;
@@ -613,4 +643,5 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .identi
   max-width: 42px !important;
   max-height: 42px !important;
   border-radius: 15px !important;
+  object-fit: cover !important;
 }

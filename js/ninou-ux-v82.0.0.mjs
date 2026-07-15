@@ -29,6 +29,7 @@ function addRipple(control, event) {
 function addPressFeedback(event) {
   const control = findControl(event.target);
   if (!control || control.matches(":disabled,[aria-disabled='true']")) return;
+  if (control.matches(".orbit-event,.live-orbit-marker,.orbit-cluster")) return;
   control.classList.remove("ninou-press-feedback");
   void control.offsetWidth;
   control.classList.add("ninou-press-feedback");
