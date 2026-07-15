@@ -1,4 +1,4 @@
-/* ===== NINOU — ESTILOS CONSOLIDADOS v78.1.0 ===== */
+
 
 
 * {
@@ -1069,10 +1069,10 @@ body.day-theme .sleep-duration-preview {
 }
 
 
-/* Correção iOS/WebKit: evita piscadas/repaint dos ícones durante scroll e atualização do relógio. */
 
 
-/* v63: mantém noite estrelada e ajusta tema claro com sol/claridade */
+
+
 body.day-theme .summary-grid article,
 body.day-theme .next-card,
 body.day-theme .last-card,
@@ -1405,7 +1405,7 @@ body.day-theme .record-types button.active {
 }
 
 
-/* v65: ajustes de UX no diário e setas de campos */
+
 .date-filter::after,
 .select-label::after {
   display: none !important;
@@ -1429,7 +1429,7 @@ body.day-theme .record-types button.active {
 }
 
 
-/* v66: botão funcional para revelar os filtros do diário */
+
 
 
 .chips-more-button[hidden] {
@@ -1459,7 +1459,7 @@ body.day-theme .chips-more-button {
 }
 
 
-/* Sons para dormir */
+
 .screen[data-screen="sounds"] {
   gap: 14px;
 }
@@ -1633,7 +1633,7 @@ body.day-theme .chips-more-button {
 }
 
 
-/* Perfil separado por assunto */
+
 .settings-list > .weight-profile-block {
   display: grid;
   gap: 12px;
@@ -1666,7 +1666,7 @@ body.day-theme .chips-more-button {
   gap: 10px;
 }
 
-/* v75 - Assistente inteligente: produto, leitura rápida e mobile-first */
+
 .smart-insight-card,
 .live-assistant-card,
 .routine-progress-card,
@@ -1808,7 +1808,7 @@ body.day-theme .chips-more-button {
   line-height: 1.25;
 }
 
-/* v75 - Diário mais legível no iPhone */
+
 
 
 .timeline .event-meta-primary,
@@ -1826,7 +1826,7 @@ body.day-theme .chips-more-button {
 }
 
 
-/* v75 - Filtros com respiro e seta sem sobreposição */
+
 
 
 .chips-more-button {
@@ -1848,7 +1848,7 @@ body.day-theme .chips-more-button {
   padding: 0;
 }
 
-/* v75 - Sons estilo player */
+
 .sound-player-card {
   display: grid;
   gap: 16px;
@@ -1919,7 +1919,7 @@ body.day-theme .timeline .event-meta-extra {
 }
 
 
-/* v75.1 - Tela inicial mais viva, sem exagero, e menos redundância */
+
 
 
 body[data-day-period="night"]:not(.day-theme) .state-orbit::before {
@@ -2008,12 +2008,12 @@ body.day-theme[data-day-period="morning"] .orbit-ring {
 }
 
 
-/* v75.2 — evita duplicidade: o tempo atual aparece apenas no card central. */
-
-/* v75.3 - Rotina do dia: evita sobreposição de rótulos longos no iPhone */
 
 
-/* v75.4 - Acesso familiar por convite */
+
+
+
+
 
 
 .access-status-row,
@@ -2152,7 +2152,7 @@ body.day-theme .access-badge[data-role="visualizacao"] {
 }
 
 
-/* v75.6 - Contato WhatsApp sem login e contagem no painel admin */
+
 .guest-whatsapp-button {
   position: fixed;
   right: max(14px, env(safe-area-inset-right));
@@ -2268,13 +2268,13 @@ body.day-theme .guest-whatsapp-button {
 }
 
 
-/* v75.7 - acesso público controlado */
+
 .invite-accept-box[hidden] {
   display: none !important;
 }
 
 
-/* v75.9 - administração mais clara e sem vazamento visual entre contas */
+
 .admin-access-card {
   gap: 18px !important;
 }
@@ -2401,7 +2401,7 @@ body.day-theme .invite-accept-box {
 }
 
 
-/* v75.12 - Admin limpo e profissional */
+
 
 
 .admin-clean-hero,
@@ -2606,7 +2606,7 @@ body.day-theme .invite-accept-box {
 }
 
 
-/* v75.12 - Migração segura de dados locais para a família */
+
 .admin-migration-card {
   border-color: rgba(122, 236, 190, 0.26);
 }
@@ -2688,7 +2688,7 @@ body.day-theme .admin-access-item {
 }
 
 
-/* v75.13 - Admin focado e migração inteligente */
+
 body.global-admin-mode .screen:not([data-screen="profile"]) {
   display: none !important;
 }
@@ -2719,7 +2719,7 @@ body.global-admin-mode .login-card {
 }
 
 
-/* v75.14 - Migração inteligente por collectionGroup/UID */
+
 .admin-manual-migration {
   display: grid;
   gap: 10px;
@@ -2751,7 +2751,7 @@ body.global-admin-mode .login-card {
 }
 
 
-/* v75.15 - Contraste reforçado no Admin, especialmente no tema claro */
+
 body.day-theme .admin-clean-panel label,
 body.day-theme .admin-manual-migration label,
 body.day-theme .admin-create-invite-card label,
@@ -2856,7 +2856,7 @@ body.day-theme .admin-stats-grid article small {
   color: #5b4034 !important;
 }
 
-/* v75.19 - Admin responsivo: evita tela partida/zoomada por textos longos e cards fixos */
+
 
 
 body.global-admin-mode .screen[data-screen="profile"],
@@ -2935,7 +2935,7 @@ body.global-admin-mode .admin-refresh-button {
 }
 
 
-/* v75.21 - Admin separado dos dados da família */
+
 body.admin-panel-only .weight-profile-block {
   display: none !important;
 }
@@ -2950,7 +2950,7 @@ body.admin-panel-only .profile-card #profileBabyAge {
 }
 
 
-/* v75.22 - Admin isolado, responsivo e sem aparência de zoom/corte */
+
 body.global-admin-mode {
   place-items: stretch center;
   display: block !important;
@@ -3015,7 +3015,7 @@ body.day-theme .admin-clean-panel select {
 }
 
 
-/* v75.24 - Painel admin profissional, cliente isolado e checklist de migração */
+
 .admin-preview-banner {
   display: flex;
   align-items: center;
@@ -3168,7 +3168,7 @@ body.admin-family-preview .profile-card #profileBabyAge {
 }
 
 
-/* v75.25 - UX do painel admin: famílias, membros e usuários do banco separados */
+
 body.global-admin-mode .settings-list {
   padding-top: 8px;
   gap: 16px;
@@ -3276,7 +3276,7 @@ body.day-theme .admin-known-user-item {
 }
 
 
-/* v75.26 — admin como suporte, não membro da família */
+
 .admin-support-section .admin-support-item {
   border-color: rgba(255, 210, 120, 0.28);
   background: linear-gradient(145deg, rgba(255, 210, 120, 0.11), rgba(21, 17, 62, 0.44));
@@ -3304,7 +3304,7 @@ body.day-theme .admin-known-user-item {
 }
 
 
-/* v75.27 — criação de família/cliente e revisão geral de UX */
+
 
 
 .admin-create-family-card {
@@ -3409,7 +3409,7 @@ body.day-theme .admin-section-note {
   }
 }
 
-/* v75.28 — experiência da família: Hoje, alertas, crescimento, auditoria e exportações */
+
 .today-overview-card,
 .day-summary-card,
 .growth-card,
@@ -3646,7 +3646,7 @@ body.day-theme .weight-sparkline {
 }
 
 
-/* v75.29 — refinamento da tela Hoje: relógio volta a ser o protagonista */
+
 .screen[data-screen="today"] > .state-orbit {
   margin-top: 4px;
   margin-bottom: 2px;
@@ -3669,7 +3669,7 @@ body.day-theme .today-overview-head span#todayOverviewKicker {
 }
 
 
-/* v75.30 — assistente de rotina, crescimento e exportações refinadas */
+
 .smart-insight-card span {
   color: rgba(124, 229, 194, 0.92);
   font-weight: 850;
@@ -3769,7 +3769,7 @@ body.day-theme .export-personal-message small {
   color: rgba(61, 52, 74, 0.58);
 }
 
-/* v75.32 — observações, histórico e permissões mais claras */
+
 
 
 body.day-theme .day-notes-card {
@@ -3781,7 +3781,7 @@ body.day-theme .day-notes-actions small { color: rgba(61, 52, 74, 0.66); }
 body.day-theme .day-notes-card textarea { background: rgba(102, 78, 140, 0.06); color: #3d344a; }
 
 
-/* v75.33 — exportação por período e modo consulta */
+
 .export-period-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
 .export-period-grid label:first-child { grid-column: 1 / -1; }
 .export-period-grid label { display: grid; gap: 6px; padding: 10px 12px; border-radius: 18px; background: rgba(255,255,255,.065); color: rgba(245,238,255,.72); font-size: .8rem; font-weight: 800; }
@@ -3843,7 +3843,7 @@ body.day-theme .export-period-grid input, body.day-theme .export-period-grid sel
 
  .export-period-grid { grid-template-columns: 1fr; } }
 
-/* v75.34 — polimento visual dos botões e ícones */
+
 
 
 .quick-actions button::after, .start-choice button::after { content: ""; position: absolute; inset: auto 12px 10px 58px; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,.28), transparent); }
@@ -3853,7 +3853,7 @@ body.day-theme .export-period-grid input, body.day-theme .export-period-grid sel
 body.day-theme .quick-actions .action-icon, body.day-theme .start-choice .action-icon { background: rgba(102,78,140,.07); }
 
 
-/* v75.37 — central de avisos e lembretes leves */
+
 .notification-center-card { margin-top: 12px; border: 1px solid rgba(124, 229, 194, 0.24); background: linear-gradient(145deg, rgba(124,229,194,.10), rgba(255,255,255,.045)); border-radius: 26px; padding: 18px; box-shadow: 0 18px 42px rgba(8, 8, 28, 0.14); }
 
 
@@ -3867,7 +3867,7 @@ body.day-theme .notification-center-list li { background: rgba(45,111,94,.06); }
 body.day-theme .notification-center-list i { background: rgba(45,111,94,.08); }
 body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
 
-/* v75.38 — gráfico de peso refinado */
+
 
 .weight-sparkline svg {
   width: 100%;
@@ -3881,10 +3881,10 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
 }
 
 
-/* v75.31 — Diário: títulos legíveis e ações sem comprimir o texto */
 
 
-/* v75.31.4 — responsividade crítica para celulares estreitos */
+
+
 
 .weight-history-list strong {
   overflow-wrap: normal;
@@ -3900,7 +3900,7 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
   }
 }
 
-/* v75.40 — Avatar de teste: ícone, cor, fundo e acessório sem foto/storage */
+
 
 
 .avatar-test-header {
@@ -4010,7 +4010,7 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
 }
 
 
-/* v75.42 — somente avatar: remove upload de foto e diferencia avatares no admin */
+
 
 
 .admin-access-item:has(.admin-avatar) {
@@ -4050,10 +4050,10 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
   border-color: rgba(255, 183, 196, .72);
 }
 
-/* v75.42 — avatar limpo: apenas rostinhos de bebê + cor de fundo */
 
 
-/* v75.44 — avatar 3D soft moderno e editor sob demanda */
+
+
 
 
 .avatar-editor-actions {
@@ -4063,10 +4063,10 @@ body.day-theme .notification-center-list span { color: rgba(61,52,74,.66); }
 }
 
 
-/* v75.45 — refinamento de estilos menino/menina e cor de cabelo */
 
 
-/* v75.46 — bloqueio real do modo offline e ação principal abaixo do relógio */
+
+
 
 
 .primary-action,
@@ -4119,13 +4119,13 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.47 — avatares premium mais realistas */
 
 
-/* v75.48 — avatar premium realista e mais intuitivo */
 
 
-/* v75.49 — polimento premium do editor de avatar */
+
+
+
 
 
 .avatar-face-thumb {
@@ -4139,19 +4139,19 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.50 — polimento visual da referência aprovada */
 
 
-/* v75.50.1 — refinamento fino dos avatares */
 
 
-/* v75.56.2.1 — etapa 3: polimento geral do editor */
 
 
-/* v75.56.2.1 — cabelos reconstruídos */
 
 
-/* v75.56.2 — biblioteca de 12 avatares ilustrados premium */
+
+
+
+
+
 
 .avatar-preset-thumb {
   width: 88px;
@@ -4182,10 +4182,10 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.56.2 — premium layout polish */
 
 
-/* v75.56.2 — luxurious clean palette + app-store-like mobile polish */
+
+
 
 
 .profile-card {
@@ -4225,10 +4225,10 @@ body.guest-locked .state-orbit {
 }
 
 
-/* mobile polish */
 
 
-/* v75.56.2 — polimento final visual: mais minimalista e refinado */
+
+
 
 
 .profile-card::before {
@@ -4259,7 +4259,7 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.56.4.2 — restauração visual + polimento apenas dos avatares */
+
 
 
 .avatar-preset-thumb,
@@ -4270,7 +4270,7 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.56.4.4 - correções finais de diário, timeline e leitura mobile */
+
 .drawer-section-title,
 .today-overview-head {
   align-items: flex-start;
@@ -4284,10 +4284,10 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.56.4.5 — correção do alinhamento da prévia do avatar */
 
 
-/* v75.56.4.6 — polimento fino da tela de Perfil e avatares */
+
+
 
 
 .profile-card img#profilePhoto {
@@ -4306,7 +4306,7 @@ body.guest-locked .state-orbit {
 }
 
 
-/* Prévia: imagem e legenda sempre centralizadas no painel */
+
 
 
 .avatar-preview-wrap.avatar-preview-panel .baby-avatar-preview,
@@ -4324,10 +4324,10 @@ body.guest-locked .state-orbit {
 }
 
 
-/* Grade dos 12 avatares: cards com centro fixo para não “pular” ao selecionar */
 
 
-/* v75.56.4.7 — estabilidade de timeline no diário */
+
+
 
 
 .intelligent-timeline-item time,
@@ -4337,7 +4337,7 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.56.5 — release candidate: espaçamento geral, timeline e diário sem sobreposição */
+
 
 
 .today-overview-card,
@@ -4448,7 +4448,7 @@ body.guest-locked .state-orbit {
 }
 
 
-/* v75.56.7.1 — perfil: legibilidade da coleção premium e espaçamento geral */
+
 
 
 .settings-list article,
@@ -4501,7 +4501,7 @@ body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
 }
 
 
-/* v75.56.7.3 — padronização fina de espaçamentos + títulos dos avatares */
+
 
 
 .settings-list > * {
@@ -4518,7 +4518,7 @@ body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
 }
 
 
-/* v75.56.7.3 — revisão geral de espaçamentos: Perfil, Home e Diário */
+
 
 
 .screen[data-screen="today"] > *,
@@ -4666,7 +4666,7 @@ body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
   line-height: 1.42;
 }
 
-/* Diário: data, filtros, cards e observações com respiro consistente */
+
 
 
 .screen[data-screen="diary"] .date-filter {
@@ -4713,7 +4713,7 @@ body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
 }
 
 
-/* Perfil: padronização entre cards e campos */
+
 
 
 .profile-card,
@@ -4763,7 +4763,7 @@ body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
 }
 
 
-/* Avatares: títulos nunca saem do card */
+
 
 
 .avatar-minimal-header,
@@ -4781,10 +4781,10 @@ body:not(.day-theme) .avatar-preview-panel.minimal-preview-panel {
 }
 
 
-/* v75.56.7.9 — modo visitante premium + ajustes finais de perfil */
 
 
-/* Perfil: contraste corrigido no modo escuro */
+
+
 body:not(.day-theme) .screen[data-screen="profile"] .profile-card,
 body:not(.day-theme) .screen[data-screen="profile"] .avatar-compact-card,
 body:not(.day-theme) .screen[data-screen="profile"] .settings-list article {
@@ -4811,7 +4811,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .avatar-compact-card .avatar
 }
 
 
-/* Perfil: respiro revisado sem deixar buracos no final */
+
 
 
 .settings-list article {
@@ -4829,7 +4829,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .avatar-compact-card .avatar
 }
 
 
-/* Modo visitante premium: mostra uma prévia bonita em vez de esconder tudo */
+
 body.guest-locked .screen.active[data-screen="diary"],
 body.guest-locked .screen.active[data-screen="trends"],
 body.guest-locked .screen.active[data-screen="sounds"] {
@@ -4885,10 +4885,10 @@ body.guest-locked .screen.active[data-screen="sounds"]::after {
   content: "Sons para a rotina de descanso\A\AUse sons leves para criar um ambiente mais calmo na hora de dormir. Entre para personalizar a experiência do bebê.";
 }
 
-/* Visitante: botão flutuante vira CTA elegante */
 
 
-/* v75.56.7.9 — demo premium com gráficos fictícios profissionais */
+
+
 .guest-welcome-card,
 .privacy-note-card {
   position: relative;
@@ -4999,7 +4999,7 @@ body.day-theme .guest-premium-actions button:last-child {
   background: rgba(255, 255, 255, 0.58);
 }
 
-/* Card real do modo visitante: substitui o texto pseudo-elemento e permite ações */
+
 body.guest-locked .screen.active:not([data-screen="profile"])::after {
   position: sticky;
   top: 18px;
@@ -5078,7 +5078,7 @@ body.day-theme .guest-login-dialog {
   font-size: 1.25rem;
 }
 
-/* Estados vazios para usuário logado: visual mais acolhedor */
+
 .event-card.empty-event,
 .timeline-empty,
 .mini-event.empty,
@@ -5119,7 +5119,7 @@ body.day-theme .empty-state strong {
 }
 
 
-/* v75.56.7.9 — demo premium realista, sem blur bloqueando a experiência */
+
 
 
 .guest-premium-card {
@@ -5163,7 +5163,7 @@ body.day-theme .guest-premium-card {
 }
 
 
-/* v75.56.7.9 — demo App Store premium + escolha de tema inicial */
+
 
 
 body.guest-locked .screen.active:not([data-screen="profile"])::before,
@@ -5762,7 +5762,7 @@ body.day-theme .guest-welcome-actions button:last-child {
 }
 
 
-/* v75.56.7.9 — tema sem Auto + remoção do espaço excessivo após Zerar dia */
+
 
 
 .guest-theme-switch button[data-theme-choice="auto"] {
@@ -5784,7 +5784,7 @@ body:not(.global-admin-mode) .phone-shell {
 }
 
 
-/* v75.56.7.16 — fluxo guiado de criação de conta e convites */
+
 .account-journey-card,
 .admin-flow-guide {
   position: relative;
@@ -6052,7 +6052,7 @@ body.day-theme .admin-flow-actions button:not(:first-child) {
 }
 
 
-/* Ajuste final do fluxo guiado quando a conta já está conectada/liberada */
+
 .account-journey-card[data-state="connected"] .journey-actions,
 .account-journey-card[data-state="ready"] .journey-actions {
   grid-template-columns: 1fr 1fr;
@@ -6062,7 +6062,7 @@ body.day-theme .admin-flow-actions button:not(:first-child) {
 }
 
 
-/* v75.56.7.16 — pós-cadastro inteligente e convites profissionais */
+
 .post-access-card,
 .data-reality-card,
 .first-use-checklist-card,
@@ -6342,7 +6342,7 @@ body.day-theme .invite-result .invite-result-actions a {
 }
 
 
-/* v75.56.7.16 — entrega premium: refinamento final de demo, perfil e confiança */
+
 
 
 .profile-card,
@@ -6712,7 +6712,7 @@ body.day-theme .invite-message-preview::after {
   color: #2f806c;
 }
 
-/* Espaçamento final: premium sem buracos grandes no rodapé */
+
 
 
 body.guest-locked .screen.active:not([data-screen="profile"]) {
@@ -6727,7 +6727,7 @@ body.guest-locked .screen.active:not([data-screen="profile"]) {
 }
 
 
-/* v75.56.7.16 — perfil enxuto após configuração + clareza de tempos */
+
 .profile-ready-card {
   display: grid;
   gap: 16px;
@@ -6820,7 +6820,7 @@ body.profile-daily-ready #firstUseChecklistCard {
 }
 
 
-/* v75.56.7.16 — entrega premium: avatares mais nítidos, resumo por período e timeline progressiva */
+
 .summary-premium-card {
   position: relative;
   overflow: hidden;
@@ -6985,7 +6985,7 @@ body.profile-daily-ready #firstUseChecklistCard {
   font-weight: 850;
 }
 
-/* Avatares: cards maiores, detalhes mais perceptíveis e seleção clara */
+
 
 
 body.day-theme .summary-range-control {
@@ -7027,7 +7027,7 @@ body.day-theme .intelligent-timeline-item:first-child > div {
 }
 
 
-/* v75.56.7.16 — polimento de produção: textos limpos, admin recolhido e espaçamento consistente */
+
 
 
 .screen.active,
@@ -7190,7 +7190,7 @@ body.day-theme .admin-clean-note {
 }
 
 
-/* v75.56.7.16 — clareza entre Admin x identificação dos registros + tema automático */
+
 
 
 #themeModeInput option[value="auto"] {
@@ -7198,42 +7198,42 @@ body.day-theme .admin-clean-note {
 }
 
 
-/* v75.74.1 — correção de quebras de texto e estabilidade do modal de ações */
 
 
-/* Textos: quebra controlada, sem cortar palavra no meio e sem sair do card */
 
 
-/* Quando precisar limitar em 2 linhas, faz de forma elegante */
 
 
-/* Bottom sheet de ações: altura estável para o topo não subir/descer a cada tipo */
 
 
-/* Cabeçalho sempre no mesmo lugar, com altura previsível */
 
 
-/* Tipos de ação: barra horizontal fixa, labels consistentes */
 
 
-/* O formulário vira a área rolável interna; o topo fica estável */
 
 
-/* Painéis internos não devem empurrar o topo do sheet */
 
 
-/* Backdrop e safe area do modal */
 
 
-/* v75.74.1 — correção real do sheet de ações e quebras de texto observadas no vídeo */
 
 
-/* v75.74.1 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
 
 
-/* ===== CSS principal original sem @import ===== */
-/* Ninou v75.75.67 - fluxo familiar completo. */
-/* Ninou v75.57 â€” Perfil Familiar + Convite */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 .profile-card-head span,
@@ -7475,7 +7475,7 @@ body.day-theme .profile-secondary-button {
 }
 
 
-/* Ninou v75.57.1 â€” ajustes de integraÃ§Ã£o */
+
 .profile-family-stack .form-status {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.66);
@@ -7498,7 +7498,7 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* Ninou v75.58.3 â€” revisÃ£o minuciosa de espaÃ§amento, cards e mobile */
+
 
 
 .screen.active {
@@ -7644,7 +7644,7 @@ body.day-theme .ninou-modal-card > p {
   gap: var(--ninou-card-gap-polished) !important;
 }
 
-/* Perfil familiar */
+
 
 
 .profile-family-card > p,
@@ -7736,7 +7736,7 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* DiÃ¡rio e notas */
+
 .screen[data-screen="diary"] .date-filter,
 .screen[data-screen="diary"] .chips-shell,
 .screen[data-screen="diary"] .timeline,
@@ -7752,7 +7752,7 @@ body.day-theme .ninou-modal-card > p {
   overflow-wrap: anywhere;
 }
 
-/* Modais */
+
 
 
 .ninou-modal-card label {
@@ -7760,15 +7760,10 @@ body.day-theme .ninou-modal-card > p {
 }
 
 
-/* NavegaÃ§Ã£o e telas pequenas */
 
 
-/* Ninou v75.58.3 â€” revisÃ£o visual final apÃ³s anÃ¡lise do vÃ­deo
-   Ajustes focados em consistÃªncia real no iPhone/Safari:
-   - tÃ­tulos dos cards em duas linhas quando o HTML nÃ£o possui wrapper;
-   - ObservaÃ§Ãµes do dia com hierarquia correta;
-   - respiro uniforme entre texto, campo e botÃµes;
-   - prevenÃ§Ã£o de botÃµes/cards colados ou assimÃ©tricos em todas as telas. */
+
+
 
 
 .today-overview-card,
@@ -7812,8 +7807,7 @@ body.day-theme .ninou-modal-card > p {
   box-sizing: border-box;
 }
 
-/* TÃ­tulos de seÃ§Ã£o: mantÃ©m alinhamento quando hÃ¡ aÃ§Ã£o Ã  direita,
-   mas evita que cards textuais fiquem com tÃ­tulo e subtÃ­tulo espremidos. */
+
 .drawer-section-title,
 .section-title,
 .chart-title,
@@ -7839,9 +7833,7 @@ body.day-theme .ninou-modal-card > p {
   line-height: 1.14 !important;
 }
 
-/* ObservaÃ§Ãµes do dia: o vÃ­deo mostrava "ObservaÃ§Ãµes do dia" Ã  esquerda
-   e "Notas da famÃ­lia" Ã  direita. Aqui a hierarquia fica correta:
-   kicker em cima, tÃ­tulo abaixo, igual aos demais cards premium. */
+
 .day-notes-card {
   margin-top: 0 !important;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -7890,7 +7882,7 @@ body.day-theme .ninou-modal-card > p {
   border-radius: 18px !important;
 }
 
-/* DiÃ¡rio: cards de eventos com melhor respiro e botÃµes alinhados. */
+
 
 
 .timeline .event-actions {
@@ -7915,7 +7907,7 @@ body.day-theme .ninou-modal-card > p {
   border-radius: 999px !important;
 }
 
-/* Cards de perfil e famÃ­lia: evita aparÃªncia de blocos colados. */
+
 .profile-family-stack,
 .settings-list,
 .report-stack,
@@ -7960,7 +7952,7 @@ body.day-theme .ninou-modal-card > p {
   min-height: 48px !important;
 }
 
-/* RelatÃ³rios/Dados: charts e barras com respiro entre blocos. */
+
 .chart-card,
 .weekly-overview-card,
 .five-day-actions-card,
@@ -7978,7 +7970,7 @@ body.day-theme .ninou-modal-card > p {
   min-width: 0;
 }
 
-/* Sons: lista e cards com mesmo padrÃ£o dos demais. */
+
 .sound-player-card,
 .sound-note {
   display: grid;
@@ -7994,12 +7986,10 @@ body.day-theme .day-notes-card .section-helper {
 }
 
 
-/* Ninou v75.58.3 â€” correÃ§Ã£o de respiro final e sequÃªncia de cards
-   Corrige sobras no fim das pÃ¡ginas e remove o vÃ£o entre
-   Ajuda e suporte e Perfil do bebÃª. */
 
 
-/* O espaÃ§amento entre blocos deve vir do gap da tela, nÃ£o de margens soltas. */
+
+
 
 
 .screen[data-screen] > section,
@@ -8014,7 +8004,7 @@ body.day-theme .day-notes-card .section-helper {
   margin-bottom: 0 !important;
 }
 
-/* O bloco familiar nÃ£o pode empurrar o prÃ³ximo bloco do perfil. */
+
 .profile-family-stack {
   display: grid;
   gap: 12px !important;
@@ -8028,7 +8018,7 @@ body.day-theme .day-notes-card .section-helper {
   margin-top: 0 !important;
 }
 
-/* Evita espaÃ§os fantasmas de cards ocultos em fluxos de login/convite. */
+
 [hidden] {
   display: none !important;
 }
@@ -8037,7 +8027,7 @@ body.day-theme .day-notes-card .section-helper {
   margin-bottom: 0 !important;
 }
 
-/* Perfil: sequÃªncia mais compacta e consistente entre a central familiar e os dados do bebÃª. */
+
 
 
 .screen[data-screen="profile"] .profile-card,
@@ -8061,10 +8051,10 @@ body.profile-daily-ready #adminDiagnosticsCard {
   display: none !important;
 }
 
-/* Reduz leve sobra final em telas curtas sem colar no menu. */
 
 
-/* Ninou v75.58.3 â€” base multi-famÃ­lia, diagnÃ³stico e PWA confiÃ¡vel */
+
+
 
 
 .app-update-notice {
@@ -8151,10 +8141,7 @@ body.profile-daily-ready #adminDiagnosticsCard {
 }
 
 
-/* Ninou v75.74.1 â€” seguranÃ§a multi-famÃ­lia
-   Foco: impedir cortes, quebras feias e estouro horizontal em iPhone SE,
-   Android compacto, telas mÃ©dias, tablets e desktop. Esta camada nÃ£o altera
-   lÃ³gica do app; apenas tipografia, grids, botÃµes, cards, modais e navegaÃ§Ã£o. */
+
 
 
 .phone-shell,
@@ -8175,7 +8162,7 @@ div {
   max-width: 100%;
 }
 
-/* Texto: nÃ£o quebra palavra no meio sem necessidade e nÃ£o estoura o card. */
+
 body,
 button,
 input,
@@ -8221,7 +8208,7 @@ canvas {
   width: 100%;
 }
 
-/* CabeÃ§alho: evita que nome, tÃ­tulo ou pill de status empurrem a tela. */
+
 .app-header {
   justify-content: space-between;
   gap: 10px !important;
@@ -8261,7 +8248,7 @@ canvas {
   white-space: nowrap !important;
 }
 
-/* Cards e tÃ­tulos principais. */
+
 .today-overview-card,
 .smart-insight-card,
 .gentle-alert-card,
@@ -8386,7 +8373,7 @@ canvas {
   max-width: 100%;
 }
 
-/* Grids: sempre cabem no card e descem para uma coluna quando necessÃ¡rio. */
+
 .summary-grid,
 .today-overview-grid,
 .daily-rhythm,
@@ -8424,7 +8411,7 @@ canvas {
   min-width: 0;
 }
 
-/* AÃ§Ãµes rÃ¡pidas: texto de aÃ§Ã£o nÃ£o deve quebrar no meio ou vazar. */
+
 .quick-actions,
 .start-choice {
   display: grid !important;
@@ -8468,7 +8455,7 @@ canvas {
   line-height: 1.12 !important;
 }
 
-/* FormulÃ¡rios, data, chips e campos. */
+
 .date-filter,
 .record-form label,
 .settings-list label,
@@ -8500,7 +8487,7 @@ canvas {
   line-height: 1.1;
 }
 
-/* Timeline e ediÃ§Ã£o/exclusÃ£o: textos longos ficam dentro do card. */
+
 .timeline,
 .intelligent-timeline {
   width: 100%;
@@ -8543,7 +8530,7 @@ canvas {
 }
 
 
-/* ObservaÃ§Ãµes do dia: mantÃ©m hierarquia e impede heranÃ§a visual de largura. */
+
 .day-notes-card .drawer-section-title {
   display: grid !important;
   grid-template-columns: 1fr !important;
@@ -8580,7 +8567,7 @@ canvas {
   margin: 0 !important;
 }
 
-/* Perfil, famÃ­lia e botÃµes com textos maiores. */
+
 .profile-family-stack,
 .profile-family-card,
 .profile-actions-row,
@@ -8634,7 +8621,7 @@ canvas {
   text-overflow: clip !important;
 }
 
-/* Avatar e cards com nomes/opÃ§Ãµes grandes. */
+
 .avatar-option-grid,
 .theme-choice,
 .breast-side-grid,
@@ -8659,7 +8646,7 @@ canvas {
   word-break: normal !important;
 }
 
-/* Sheet de registro: suporta telas baixas/estreitas sem cortar texto. */
+
 .record-sheet,
 .orbit-cluster-sheet,
 .guest-login-dialog,
@@ -8679,7 +8666,7 @@ canvas {
   font-size: clamp(.92rem, 4vw, 1.08rem) !important;
 }
 
-/* Telas mÃ©dias/tablet: app fica mais elegante sem esticar demais. */
+
 @media (min-width: 521px) {
   .phone-shell {
     max-width: 520px !important;
@@ -8693,10 +8680,10 @@ canvas {
   }
 }
 
-/* Mobile comum. */
 
 
-/* iPhone SE / Android compacto. */
+
+
 @media (max-width: 375px) {
   :root {
     --ninou-responsive-page-x: 12px;
@@ -8748,7 +8735,7 @@ canvas {
   }
 }
 
-/* Muito estreito: prioriza nÃ£o quebrar layout. */
+
 @media (max-width: 340px) {
   
 
@@ -8794,7 +8781,7 @@ canvas {
   }
 }
 
-/* Telas baixas: sheets e modais ficam rolÃ¡veis sem cortar controles finais. */
+
 @media (max-height: 700px) {
   .record-sheet,
   .orbit-cluster-sheet,
@@ -8809,7 +8796,7 @@ canvas {
   }
 }
 
-/* Ninou v75.74.1 â€” seguranÃ§a no aparelho */
+
 .security-device-card {
   gap: 12px !important;
 }
@@ -8840,7 +8827,7 @@ body.day-theme .danger-soft-button {
 }
 
 
-/* Ninou v75.74.1 â€” Login rÃ¡pido + App Check nÃ£o bloqueante */
+
 body.auth-validating .main-action-area,
 body.auth-validating #guestWhatsappButton {
   pointer-events: none !important;
@@ -8897,7 +8884,7 @@ body.auth-validating .login-card {
 }
 
 
-/* Ninou v75.74.1 â€” perfil logado sem duplicidade visual */
+
 body.family-ready #guestWelcomeCard,
 body.family-ready #premiumTrustCard,
 body.family-ready #accountJourneyCard,
@@ -8954,7 +8941,7 @@ body.day-theme .account-sync-status {
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* v75.74.1 â€” revisÃ£o responsiva: avatar no painel e textos sem estouro em web/admin */
+
 
 
 .phone-shell,
@@ -9113,7 +9100,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   pointer-events: none;
 }
 
-/* v75.74.1 â€” perfil nÃ£o usa colunas quando o app estÃ¡ dentro de painel estreito */
+
 .screen[data-screen="profile"] .settings-list {
   grid-template-columns: 1fr !important;
 }
@@ -9155,7 +9142,7 @@ body.sync-bootstrap .screen[data-screen="diary"] .timeline {
   overflow-wrap: anywhere !important;
 }
 
-/* v75.74.1 - contraste e respiro do perfil em claro/escuro */
+
 
 
 .screen[data-screen="profile"] .profile-family-stack,
@@ -9299,7 +9286,7 @@ body.day-theme .profile-setting-line strong {
   }
 }
 
-/* v75.74.1 — Perfil com UX mais agradável + tema claro suave */
+
 
 
 .screen[data-screen="profile"] .profile-card img {
@@ -9392,7 +9379,7 @@ body.day-theme .avatar-skip-button {
 }
 
 
-/* v75.74.1 — Perfil sem rotina: fluxo natural de identidade, aparelho, família e preferências */
+
 
 
 .profile-invite-area {
@@ -9429,7 +9416,7 @@ body:not(.day-theme) .profile-invite-area {
 }
 
 
-/* v75.74.1 — Refinamento premium final: contraste, respiro, sombras e modo escuro */
+
 
 
 .screen[data-screen="profile"] {
@@ -9532,7 +9519,7 @@ body:not(.day-theme) .profile-invite-area {
   border-radius: 18px !important;
 }
 
-/* Tema claro: premium suave, sem branco estourado */
+
 
 
 body.day-theme .screen[data-screen="profile"] .profile-setting-line,
@@ -9572,7 +9559,7 @@ body.day-theme .screen[data-screen="profile"] .form-status {
   color: rgba(58, 48, 83, 0.72) !important;
 }
 
-/* Tema escuro: contraste refinado para não estourar texto nem perder leitura */
+
 
 
 body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card {
@@ -9649,7 +9636,7 @@ body:not(.day-theme) .screen[data-screen="profile"] .weight-save-button {
 }
 
 
-/* v75.74.1 — Premium soft dark inspirado no vídeo: perfil/avatar, menus e contraste refinado */
+
 
 
 body:not(.day-theme) .phone-shell {
@@ -9875,7 +9862,7 @@ body.day-theme .screen[data-screen="profile"] #familyCreateInviteButton {
 }
 
 
-/* v75.74.1 — retorno ao visual v75.63.0 Perfil do diário */
+
 
 
 .profile-diary-stack { gap: 16px; }
@@ -9946,17 +9933,16 @@ body.day-theme .profile-sharing-card .profile-sync-copy {
 }
 
 
-/* v75.74.1 — Refinamento visual geral dos modais, sheets e controles
-   Objetivo: preservar o visual afetivo da v75.63 e corrigir a sensação de modal/remendo. */
 
 
-/* Remove o botão flutuante de acesso que poluía a experiência visual. */
+
+
 .guest-whatsapp-button,
 .guest-whatsapp-button:not([hidden]) {
   display: none !important;
 }
 
-/* Backdrops mais elegantes: menos “preto chapado”, mais profundidade suave. */
+
 .sheet-backdrop,
 .ninou-modal-backdrop,
 .guest-login-modal {
@@ -9965,7 +9951,7 @@ body.day-theme .profile-sharing-card .profile-sync-copy {
   -webkit-backdrop-filter: blur(14px) saturate(1.08) !important;
 }
 
-/* Bottom sheets: aparência de cartão premium, não painel técnico. */
+
 
 
 .sheet-handle {
@@ -10015,7 +10001,7 @@ body.day-theme .guest-modal-close {
   color: var(--ninou-modal-text-light) !important;
 }
 
-/* Tipos do registro: chips horizontais mais diretos e menos “grade pesada”. */
+
 
 
 body.day-theme .record-types button {
@@ -10034,7 +10020,7 @@ body.day-theme .record-types .type-icon {
   box-shadow: inset 0 0 0 1px rgba(98, 86, 156, 0.1);
 }
 
-/* Campos dos sheets e modais: linguagem de cartão, menos formulário duro. */
+
 
 .record-form label,
 .amount-field,
@@ -10134,7 +10120,7 @@ body.day-theme .profile-secondary-button {
   color: var(--ninou-modal-text-light) !important;
 }
 
-/* Cartões internos que apareciam pesados em modais. */
+
 .breast-timer-panel,
 .milk-slider-card,
 .sleep-duration-preview,
@@ -10158,7 +10144,7 @@ body.day-theme .cluster-card {
   border-radius: 18px !important;
 }
 
-/* Modal de login/convite: menos “pop-up”, mais cartão Ninou. */
+
 .guest-login-dialog,
 .ninou-modal-card {
   width: min(calc(100vw - 28px), 390px) !important;
@@ -10203,10 +10189,10 @@ body.day-theme .ninou-modal-card p {
   color: var(--ninou-modal-muted-light) !important;
 }
 
-/* FAB de novo registro: menor interferência visual, maior área de toque. */
 
 
-/* v75.74.1 — correção da foto/avatar do perfil principal */
+
+
 .screen[data-screen="profile"] .profile-card {
   position: relative;
   overflow: hidden;
@@ -10275,7 +10261,7 @@ body:not(.day-theme) .screen[data-screen="profile"] strong#profileBabyAge {
 }
 
 
-/* v75.74.1 — Modernização do Perfil: remove tag automática e troca ícones por SVG */
+
 
 
 .setting-icon {
@@ -10333,7 +10319,7 @@ button,
 }
 
 
-/* v75.74.1 — avatar em modal + cuidador com visual de imagem */
+
 .screen[data-screen="profile"] .profile-card::before {
   content: none !important;
   display: none !important;
@@ -10442,7 +10428,7 @@ body.day-theme .avatar-modal .avatar-copy-column strong {
 }
 
 
-/* v75.74.1 — botão Editar avatar fora da foto + seletores com chevron claro */
+
 .screen[data-screen="profile"] .avatar-wrapper {
   margin-bottom: 6px !important;
 }
@@ -10463,10 +10449,10 @@ body.day-theme .avatar-modal .avatar-copy-column strong {
   display: none !important;
 }
 
-/* O antigo badge não é mais usado no avatar principal. Mantemos oculto por segurança se restar algum cache antigo. */
 
 
-/* Selects com ícone/chevron visível depois das regras que usam background shorthand. */
+
+
 .screen[data-screen="profile"] select,
 .record-form select,
 .ninou-modal-card select,
@@ -10506,10 +10492,10 @@ body.day-theme .export-card select {
     radial-gradient(circle at center, rgba(94, 73, 160, 0.10) 0 56%, transparent 57%) !important;
 }
 
-/* O card do cuidador mantém a aparência de imagem/emoji, sem virar quadrado vazio. */
 
 
-/* v75.74.1 — revisão final dos selects: remove o X/triângulo gigante e usa chevron real */
+
+
 .screen[data-screen="profile"] select,
 .record-form select,
 .ninou-modal-card select,
@@ -10578,14 +10564,14 @@ select {
   margin-bottom: 8px;
 }
 
-/* Ajuste do select no card claro do Perfil para o texto não brigar com o ícone. */
+
 .screen[data-screen="profile"] .profile-setting-line select {
   min-height: 48px !important;
   line-height: 1.15 !important;
   text-overflow: ellipsis;
 }
 
-/* Mantém o botão Editar avatar no fluxo da data/avatar, nunca em cima da foto principal. */
+
 
 
 .screen[data-screen="profile"] .avatar-edit-line {
@@ -10595,13 +10581,13 @@ select {
 }
 
 
-/* O modal de avatar não deve exibir mensagens antigas como "Editor fechado" quando estiver aberto. */
+
 .avatar-modal #babyAvatarStatus:empty {
   display: none !important;
 }
 
 
-/* v75.74.1 — paridade do tema claro: selects, ícones e controles sem X/triângulo antigo */
+
 body.day-theme .select-label::after,
 body.day-theme .date-filter::after,
 body.day-theme .profile-setting-line::after,
@@ -10710,7 +10696,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.74.1 — correção dos nomes cortados nos avatares */
+
 .avatar-modal .avatar-option-grid.icon-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
@@ -10721,13 +10707,13 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.74.1 — avatar principal maior, prévia redonda e grade alinhada */
 
 
-/* v75.74.1 — refinamento final do perfil e do modal de avatar */
 
 
-/* v75.74.1 — acabamento premium do perfil, tema claro e modal de avatar */
+
+
+
 .screen[data-screen="profile"] .profile-diary-stack {
   gap: 18px !important;
 }
@@ -10786,10 +10772,10 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
   transform: translateY(1px) scale(0.99) !important;
 }
 
-/* Card hero do bebê com mais presença */
 
 
-/* Modal avatar mais bem resolvido */
+
+
 
 
 .avatar-modal .avatar-copy-column p,
@@ -10835,7 +10821,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-c
   border-radius: 20px !important;
 }
 
-/* Tema claro: cartões com acabamento mais leve e consistente */
+
 body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   background: linear-gradient(135deg, rgba(255,250,240,0.94), rgba(247,244,255,0.98)) !important;
   box-shadow: 0 22px 48px rgba(100, 82, 143, 0.10) !important;
@@ -10867,10 +10853,10 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
 }
 
 
-/* v75.74.1 — correção de quebras de texto e estabilidade do modal de ações */
 
 
-/* Textos: quebra controlada, sem cortar palavra no meio e sem sair do card */
+
+
 .screen,
 .screen *,
 .record-sheet,
@@ -10923,7 +10909,7 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
   text-overflow: clip !important;
 }
 
-/* Quando precisar limitar em 2 linhas, faz de forma elegante */
+
 .profile-card-head strong,
 .profile-card-head span,
 .weight-profile-header strong,
@@ -10936,7 +10922,7 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
   overflow: hidden;
 }
 
-/* Bottom sheet de ações: altura estável para o topo não subir/descer a cada tipo */
+
 
 
 .record-sheet[hidden],
@@ -10944,7 +10930,7 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
   display: none !important;
 }
 
-/* Cabeçalho sempre no mesmo lugar, com altura previsível */
+
 
 
 .record-sheet .section-title > div,
@@ -10955,10 +10941,10 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
 }
 
 
-/* Tipos de ação: barra horizontal fixa, labels consistentes */
 
 
-/* O formulário vira a área rolável interna; o topo fica estável */
+
+
 
 
 .record-form label,
@@ -10975,7 +10961,7 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
   font-size: 16px !important;
 }
 
-/* Painéis internos não devem empurrar o topo do sheet */
+
 
 
 .breast-timer-head,
@@ -10989,10 +10975,10 @@ body.day-theme #babyAvatarTestCard .ninou-modal-card {
   min-width: 0 !important;
 }
 
-/* Backdrop e safe area do modal */
 
 
-/* v75.74.1 — correção real do sheet de ações e quebras de texto observadas no vídeo */
+
+
 
 @supports not (height: 1svh) {
   
@@ -11141,7 +11127,7 @@ body.day-theme .record-form .save-button::before {
 }
 
 
-/* v75.74.1 — botão Registrar legível e abas com mais respiro */
+
 
 
 .record-form .save-button::before,
@@ -11217,7 +11203,7 @@ body.day-theme .record-form .save-button {
 }
 
 
-/* v75.74.1 — bloqueio do fundo, respiro dos ícones e scrollbars ocultas */
+
 html.record-sheet-open,
 body.record-sheet-open {
   overflow: hidden !important;
@@ -11248,7 +11234,7 @@ body.record-sheet-open::-webkit-scrollbar {
 }
 
 
-/* v75.74.1 — base do modal de ações mais natural */
+
 
 body.day-theme .record-sheet,
 body.day-theme .orbit-cluster-sheet {
@@ -11293,7 +11279,7 @@ body.day-theme .orbit-cluster-sheet::after {
 }
 
 
-/* v75.74.1 — final natural do formulário de ações: observações + Registrar sem corte */
+
 
 .record-sheet::after,
 .orbit-cluster-sheet::after {
@@ -11363,7 +11349,7 @@ body.day-theme .record-actions-footer .save-button {
 }
 
 
-/* v75.74.1 — indicação premium de conteúdo rolável no modal de ações */
+
 
 .record-actions-footer::before {
   content: "";
@@ -11407,7 +11393,7 @@ body.day-theme .record-actions-footer::before {
 }
 
 
-/* v75.74.1 — indicador por ícone e padronização do dropdown da data do diário */
+
 
 
 .date-filter .diary-date-icon {
@@ -11471,7 +11457,7 @@ body.day-theme .record-scroll-hint {
 }
 
 
-/* v75.74.1 — tratamento especial do card Cuidador local */
+
 .screen[data-screen="profile"] .caregiver-device-card {
   position: relative !important;
   overflow: hidden !important;
@@ -11749,7 +11735,7 @@ body.day-theme .screen[data-screen="profile"] .caregiver-identity-pass summary .
   -webkit-text-fill-color: #171126 !important;
 }
 
-/* v75.74.4 — refinamento do modal de avatar, alinhamento e fundo travado */
+
 html.avatar-modal-open,
 body.avatar-modal-open {
   overflow: hidden !important;
@@ -11788,14 +11774,14 @@ body.day-theme #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.74.4 — estabilidade final do modal de avatar após verificação cuidadosa */
+
 .avatar-modal,
 #babyAvatarTestCard {
   overscroll-behavior: none !important;
 }
 
 
-/* v75.75.67 — refinamento atento da apresentação dos avatares */
+
 
 
 .avatar-modal .avatar-copy-column p,
@@ -11849,7 +11835,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.75.67 — equilíbrio fino do nome e do avatar principal */
+
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] {
   min-height: 292px !important;
   padding: 34px 22px 38px !important;
@@ -11873,13 +11859,13 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-face-wrap {
 }
 
 
-/* v75.75.67 — avatar do perfil igual à prévia, com rosto um pouco maior */
 
 
-/* v75.75.67 — avatar do perfil com presença da prévia, sem aro gigante */
 
 
-/* v75.75.67 — avatar do perfil com presença igual/maior que a prévia */
+
+
+
 .screen[data-screen="profile"] .profile-card[aria-label="Perfil do diário"] .avatar-wrapper {
   margin-bottom: 6px !important;
   width: 120px !important;
@@ -11917,7 +11903,7 @@ body.day-theme .screen[data-screen="profile"] .profile-card[aria-label="Perfil d
 }
 
 
-/* v75.75.67 — estado pendente de sincronização */
+
 
 body:not(.day-theme) .sync-pill.pending {
   color: #241a08 !important;
@@ -11925,7 +11911,7 @@ body:not(.day-theme) .sync-pill.pending {
 }
 
 
-/* v75.75.67 — atalhos iniciais e próxima soneca mais confiáveis */
+
 
 
 .main-action-area .start-choice:not(.is-visible) {
@@ -11945,7 +11931,7 @@ body.day-theme .next-card.is-overdue p {
 }
 
 
-/* v75.75.67 — atalhos principais compactos, sem linha e com títulos centralizados */
+
 
 
 .quick-actions button::after,
@@ -11963,7 +11949,7 @@ body.day-theme .next-card.is-overdue p {
 }
 
 
-/* v75.75.67 — perfil deslogado mais objetivo */
+
 body.profile-guest-focused .screen[data-screen="profile"] > .profile-card,
 body.profile-guest-focused .screen[data-screen="profile"] .profile-family-stack,
 body.profile-guest-focused .screen[data-screen="profile"] #premiumTrustCard,
@@ -12057,7 +12043,7 @@ body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
 }
 
 
-/* v75.75.67 — fluxo familiar completo */
+
 .profile-state-notice-card,
 .family-access-summary-card {
   width: min(100%, 920px);
@@ -12243,7 +12229,7 @@ body:not(.day-theme) .family-access-summary-grid article {
 }
 
 
-/* Ninou v75.75.67 — revisão de registros respeitando a paleta do app */
+
 .routine-correction-card {
   position: relative;
   display: grid;
@@ -12316,7 +12302,7 @@ body:not(.day-theme) .family-access-summary-grid article {
 }
 
 
-/* Ninou v75.75.67 — convite familiar simplificado, respeitando a paleta do app */
+
 .screen[data-screen="profile"] .profile-sharing-card .profile-invite-area {
   display: none !important;
 }
@@ -12450,7 +12436,7 @@ body:not(.day-theme) .join-family-code-field input {
 }
 
 
-/* Ninou v75.75.67 — membros, permissões e segurança familiar */
+
 .family-danger-button,
 .danger-soft-button {
   border-color: rgba(180, 86, 90, 0.28) !important;
@@ -12463,8 +12449,7 @@ body:not(.day-theme) .join-family-code-field input {
 .admin-audit-item span { color: rgba(104, 72, 88, 0.82); }
 .admin-audit-item small { color: rgba(104, 72, 88, 0.58); }
 
-/* Ninou v75.75.67 — diagnóstico, mensagens e estabilidade familiar
-   Mantém a paleta do app: lavanda, creme, verde suave e contraste roxo. */
+
 
 
 .family-health-header {
@@ -12561,8 +12546,7 @@ body:not(.day-theme) .join-family-code-field input {
 }
 
 
-/* Ninou v75.75.67 — responsividade e admin adaptativo
-   Foco: telas menores que iPhone 14 Pro Max e painel admin em desktop, respeitando a paleta lavanda/creme/verde do app. */
+
 
 
 body.global-admin-mode,
@@ -12681,23 +12665,22 @@ body.admin-family-preview .phone-shell {
   min-width: 0 !important;
 }
 
-/* Desktop: admin respira em grade, mas sem estourar largura. */
 
 
-/* Tablet e desktop estreito: duas colunas leves, se couber. */
 
 
-/* Celulares menores: admin vira lista de cards, sem tabelas e sem botões espremidos. */
 
 
-/* Telas muito estreitas: reduz densidade sem mexer no visual principal do app. */
 
 
-/* Desktop comum fora do modo admin: mantém a experiência de app centralizado, sem esticar demais. */
 
 
-/* Ninou v75.75.67 — polimento visual e estados vazios
-   Mantém lavanda, creme, verde suave e roxo; reduz textos técnicos e deixa telas sem dados com orientação clara. */
+
+
+
+
+
+
 
 
 body:not(.day-theme) {
@@ -12778,7 +12761,7 @@ body.day-theme .timeline-empty.polished-inline-empty {
   background: rgba(255, 250, 243, .72);
 }
 
-/* Estado inicial do dia: mais acolhedor e menos técnico. */
+
 body.ninou-daily-empty-state .state-orbit {
   border-color: rgba(124, 229, 194, .26) !important;
   box-shadow: 0 18px 46px rgba(75, 58, 120, .12) !important;
@@ -12813,7 +12796,7 @@ body.day-theme .start-choice.is-visible button {
   background: rgba(255, 250, 243, .92) !important;
 }
 
-/* Estados vazios do admin ficam com aparência de orientação, não de erro. */
+
 .polished-admin-empty,
 .admin-access-list li.polished-admin-empty {
   border: 1px dashed rgba(143, 124, 255, .22) !important;
@@ -12829,7 +12812,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
   color: rgba(247,243,255,.74) !important;
 }
 
-/* Polimento de cards e textos longos: evita sensação de tela quebrada sem alterar a estrutura principal. */
+
 .section-title strong,
 .drawer-section-title strong,
 .profile-card-head strong,
@@ -12855,13 +12838,13 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
   color: rgba(117, 105, 133, .78);
 }
 
-/* Desktop: estados vazios não ficam perdidos em cards largos. */
 
 
-/* Celular pequeno: o estado vazio vira orientação curta e confortável. */
 
 
-/* Ninou v75.75.67 — relatórios e PDF mais profissional */
+
+
+
 .export-card {
   position: relative;
 }
@@ -12897,7 +12880,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.67 — Teste real de uso familiar */
+
 .family-real-test-panel {
   margin-top: 1rem;
   padding: 1rem;
@@ -12977,7 +12960,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.67 — escopo familiar no admin */
+
 .admin-client-item small {
   display: inline-flex;
   align-items: center;
@@ -12991,7 +12974,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.67 — offline e sincronização real */
+
 .sync-pill.pending {
   color: #3d2d10 !important;
   background: linear-gradient(135deg, rgba(255, 211, 122, .96), rgba(255, 244, 184, .92)) !important;
@@ -13011,7 +12994,7 @@ body:not(.day-theme) .admin-access-list li.polished-admin-empty {
 }
 
 
-/* Ninou v75.75.67 — observações rápidas */
+
 .quick-observations-panel {
   display: grid;
   gap: 10px;
@@ -13097,8 +13080,7 @@ body.day-theme .quick-observations-panel {
 }
 
 
-/* v75.75.67 — Limpeza de interface e modo simples.
-   Mantém a paleta do Ninou usando as cores já existentes: lavanda, creme, verde suave e roxo. */
+
 .admin-mode-toolbar {
   display: grid;
   gap: 6px;
@@ -13178,8 +13160,7 @@ body.ninou-advanced-mode [data-advanced-only] {
 }
 
 
-/* Ninou v75.75.67 — painel admin desktop lapidado
-   Corrige cards estreitos, textos quebrando letra por letra e navegação sobrepondo o conteúdo no desktop. */
+
 
 
 body.global-admin-mode .screen[data-screen="profile"],
@@ -13550,9 +13531,7 @@ body.admin-family-preview .diagnostics-grid strong {
   }
 }
 
-/* Ninou v75.75.67 — revisão minuciosa do painel admin desktop
-   Corrige de forma mais agressiva o layout do painel no PC: nada de cards estreitos,
-   e-mails quebrando letra por letra ou conteúdo administrativo preso em grade de celular. */
+
 body.global-admin-mode.admin-panel-only .phone-shell,
 body.global-admin-mode .phone-shell {
   overflow-x: hidden !important;
@@ -13621,10 +13600,8 @@ body.global-admin-mode.admin-panel-only .admin-support-item strong {
 }
 
 
-/* ===== Camada premium segura consolidada ===== */
-/* Ninou v75.75.67 — premium seguro
-   Objetivo: melhorar o acabamento sem esconder funções.
-   Importante: esta camada NÃO usa display:none para cards de Perfil/Admin. */
+
+
 
 
 body,
@@ -13723,7 +13700,7 @@ li {
   font-weight: 950 !important;
 }
 
-/* Correção para evitar o esmagamento de textos nas listas vazias do Painel Admin (Desktop) */
+
 
 
 .admin-stats-grid,
@@ -13785,7 +13762,7 @@ body.day-theme .family-real-test-checklist li {
   border-color: rgba(122, 88, 146, .14) !important;
 }
 
-/* Desktop: dashboard amplo, mas preservando todos os cards e todas as funções. */
+
 
 
 @media (min-width: 1024px) and (max-width: 1160px) {
@@ -13818,7 +13795,7 @@ body.day-theme .family-real-test-checklist li {
 }
 
 
-/* ===== Ninou v75.75.67 — ajustes finais de responsividade e diagnóstico ===== */
+
 
 
 html, body {
@@ -13967,8 +13944,7 @@ body:not(.day-theme) .family-health-status {
 }
 
 
-/* v75.75.67 — avatar centralizado + bloqueio de zoom automático do iOS
-   Mantém CSS único e corrige somente a apresentação. */
+
 @media (max-width: 820px) {
   input,
 select,
@@ -14057,7 +14033,7 @@ textarea,
 }
 
 
-/* v75.75.67 — gráficos premium com CSS único */
+
 .screen[data-screen="trends"] .trend-kpis,
 .screen[data-screen="trends"] .report-stack {
   position: relative;
@@ -14368,8 +14344,7 @@ body.day-theme .weight-chart-topline strong {
 }
 
 
-/* v75.75.67 — reconstrução premium real da tela Dados/Gráficos.
-   Mantém CSS único e melhora hierarquia, curvas, cards, mobile e estados vazios. */
+
 .screen[data-screen="trends"] {
   gap: 16px !important;
 }
@@ -14858,8 +14833,7 @@ body.day-theme .weight-date-label {
 }
 
 
-/* v75.75.67 — revisão final de estabilidade e responsividade geral.
-   Mantém CSS único. Não cria novas funções e não esconde cards funcionais. */
+
 
 
 html {
@@ -15045,7 +15019,7 @@ textarea {
   text-align: center !important;
 }
 
-/* Perfil/Admin: reforço de preservação visual das funções críticas, sem mexer em hidden. */
+
 .screen[data-screen="profile"] .settings-list > .login-card:not([hidden]),
 .screen[data-screen="profile"] .settings-list > .privacy-note-card:not([hidden]),
 .screen[data-screen="profile"] .settings-list > .export-card:not([hidden]),
@@ -15056,7 +15030,7 @@ textarea {
   visibility: visible !important;
 }
 
-/* Avatar: mantém centralização dos ícones e evita corte nos cards pequenos. */
+
 .avatar-option-grid,
 .icon-grid {
   align-items: stretch;
@@ -15083,9 +15057,9 @@ textarea {
   place-items: center !important;
 }
 
-/* Bottom nav: evita cobrir conteúdo em iPhone/PWA e mantém respiro visual. */
 
-/* Modais e sheet: rolagem segura em telas pequenas. */
+
+
 .record-sheet,
 .avatar-modal,
 .guest-modal {
@@ -15099,7 +15073,7 @@ textarea {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Gráficos: proteção contra estouro lateral e barras espremidas. */
+
 .data-bars,
 .bars.premium-bars,
 .compact-bars,
@@ -15135,8 +15109,7 @@ textarea {
 }
 
 
-/* v75.75.67 — experiência familiar premium por aparelho.
-   Mantém CSS único. Foco: identidade local do cuidador e assinatura clara dos registros. */
+
 
 
 .today-caregiver-card[hidden] {
@@ -15479,8 +15452,7 @@ body.day-theme .today-caregiver-main p {
 }
 
 
-/* v75.75.67 — inteligência real da rotina.
-   Melhora sugestões, resumo diário e lembretes sem alterar Firebase. */
+
 .live-assistant-card {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) 64px !important;
@@ -15759,11 +15731,9 @@ body.day-theme .notification-center-list li i {
 }
 
 
-/* v75.75.67 — acabamento visual premium geral.
-   Escopo: Hoje, atalhos, sheet de registro, Diário, Perfil e Admin desktop.
-   Mantém CSS único e não oculta funções essenciais. */
 
-/* Base de polimento */
+
+
 
 
 .screen {
@@ -15778,7 +15748,7 @@ body.day-theme .notification-center-list li i {
   gap: 15px !important;
 }
 
-/* Hoje — visual mais acolhedor */
+
 .today-topline {
   justify-content: space-between;
   gap: 12px;
@@ -16023,7 +15993,7 @@ body.day-theme .notification-center-list li i {
   line-height: 1.12 !important;
 }
 
-/* Sheet/modal de registro */
+
 .sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -16111,7 +16081,7 @@ body.day-theme .notification-center-list li i {
   font-size: 16px !important;
 }
 
-/* Diário — linha do tempo mais elegante */
+
 .screen[data-screen="diary"] .section-title {
   margin-bottom: 0;
   padding: 4px 2px 0 !important;
@@ -16211,7 +16181,7 @@ body.day-theme .notification-center-list li i {
 }
 
 
-/* Perfil — menos técnico, mais acolhedor */
+
 .screen[data-screen="profile"] > .profile-card {
   border-radius: 32px !important;
   padding: 20px !important;
@@ -16292,10 +16262,10 @@ body.day-theme .notification-center-list li i {
   border-radius: 16px !important;
 }
 
-/* Admin desktop — dashboard final sem esconder cards */
 
 
-/* Tema claro mantendo contraste */
+
+
 
 
 body.day-theme .today-caregiver-card,
@@ -16388,11 +16358,10 @@ body.day-theme .record-types button {
   border-color: rgba(87,68,124,.12) !important;
 }
 
-/* Mobile pequeno */
 
 
-/* v75.75.67 — tela inicial comercial multi-família.
-   Caminhos: criar família, entrar com convite ou acessar conta existente. */
+
+
 .commercial-family-entry-card,
 .commercial-entry-dialog {
   position: relative;
@@ -16612,7 +16581,7 @@ body.day-theme .commercial-modal-option.primary {
 }
 
 
-/* v75.75.67 — criação real de nova família comercial */
+
 .create-family-wizard,
 .commercial-create-family-panel {
   display: grid;
@@ -16749,8 +16718,7 @@ body.day-theme .create-family-grid select {
 }
 
 
-/* v75.75.67 — Convites por família
-   Campos de convite no perfil, presos ao familyId atual. Mantém CSS único. */
+
 .family-invite-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -16915,7 +16883,7 @@ body.day-theme .family-invite-form select {
 }
 
 
-/* v75.75.67 — papéis familiares e permissões comerciais */
+
 .family-roles-guide-card {
   display: grid;
   gap: 14px;
@@ -17057,7 +17025,7 @@ body.day-theme .family-access-role-badge[data-role="cuidador"] {
 }
 
 
-/* v75.75.67 — painel admin comercial */
+
 .admin-commercial-dashboard,
 .admin-family-monitor-section {
   position: relative;
@@ -17466,8 +17434,7 @@ body.global-admin-mode .admin-flow-guide {
 }
 
 
-/* v75.75.67 — revisão comercial final para beta multi-família.
-   Escopo: cards de confiança, checklist comercial do admin e avisos de uso responsável. */
+
 .commercial-beta-card,
 .admin-commercial-readiness-section {
   border: 1px solid rgba(142, 118, 171, .18);
@@ -17972,7 +17939,7 @@ body.global-admin-mode .admin-flow-guide {
 }
 
 
-/* v75.75.67 — privacidade, termos e prontidão legal para beta. */
+
 .legal-readiness-card,
 .admin-legal-readiness-section {
   border: 1px solid rgba(124, 229, 194, .24);
@@ -18414,8 +18381,7 @@ body.global-admin-mode .admin-flow-guide {
   }
 }
 
-/* v75.75.67 — suporte e monitoramento simples do beta.
-   Escopo: Perfil, modal de suporte e painel admin comercial. Mantém CSS único. */
+
 .support-beta-card,
 .admin-support-beta-section {
   border: 1px solid rgba(122, 91, 255, 0.18);
@@ -18613,8 +18579,7 @@ body.global-admin-mode .admin-flow-guide {
   }
 }
 
-/* v75.75.67 — revisão comercial final em sequência.
-   Restringe visualmente ações sensíveis e exibe roteiro de liberação beta. */
+
 .admin-commercial-sequence-section {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 28px;
@@ -18678,7 +18643,7 @@ body.day-theme .admin-commercial-sequence-section {
 }
 
 
-/* v75.75.67 — identidade por e-mail dos pais + correção dark do botão Editar avatar */
+
 .screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-editor-panel,
 .screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-quick-grid,
 .screen[data-screen="profile"] .caregiver-identity-pass.caregiver-auto-locked .caregiver-device-explain,
@@ -18707,12 +18672,10 @@ body.day-theme .screen[data-screen="profile"] .avatar-inline-edit-button svg {
   text-shadow: none !important;
 }
 
-/* v75.75.67 — seletor de ações do registro sempre completo.
-   Correção: no iPhone, o sheet estava preso em uma linha de 3 botões
-   (Acordou/Soneca/Noite), ocultando Amamentação, Mamadeira e Fralda. */
 
 
-/* v75.75.67 — revisão visual real: tema claro, primeiro acesso, dados e perfil familiar. */
+
+
 
 
 body.day-theme .app-header,
@@ -18783,7 +18746,7 @@ body.day-theme .support-beta-card p {
   color: var(--ninou-light-muted) !important;
 }
 
-/* O relógio grande no tema claro deixa de parecer noturno. */
+
 
 
 body.day-theme .orbit-ring,
@@ -18804,7 +18767,7 @@ body.day-theme[data-day-period="night"] .state-orbit {
     linear-gradient(160deg, #fff4d8, #f8f1ff) !important;
 }
 
-/* Primeiro acesso: pergunta real antes de iniciar o diário. */
+
 .first-routine-state-prompt[hidden] { display: none !important; }
 .first-routine-state-prompt {
   position: fixed;
@@ -18915,7 +18878,7 @@ body:not(.day-theme) .first-routine-card p,
 body:not(.day-theme) .first-routine-card small,
 body:not(.day-theme) .first-routine-kicker { color: rgba(225,218,255,.72); }
 
-/* Perfil familiar: o usuário comum vê apenas o que faz sentido para o uso diário. */
+
 body.regular-family-mode #commercialBetaCard,
 body.regular-family-mode #commercialFinalSequenceCard,
 body.regular-family-mode #dataRealityCard,
@@ -18933,7 +18896,7 @@ body.regular-family-mode #familyRolesGuideCard {
   display: none !important;
 }
 
-/* Dados: deixar claro que todos os gráficos existem, mesmo antes de ter dados suficientes. */
+
 
 .data-chart-empty-hint {
   display: none;
@@ -18956,27 +18919,25 @@ body.day-theme textarea {
 body.day-theme input::placeholder,
 body.day-theme textarea::placeholder { color: rgba(61,49,86,.48) !important; }
 
-/* iPhone pequeno: evita corte dos gráficos e mantém texto legível. */
 
 
-/* v75.75.67 — identidade automática dos pais: sem botão Trocar no uso normal. */
+
+
 .today-caregiver-card.caregiver-auto-locked .today-caregiver-edit,
 .today-caregiver-card[data-auto-locked="true"] .today-caregiver-edit {
   display: none !important;
 }
 
-/* v75.75.67 — restauração premium da Home, Diário e gráficos reais.
-   Escopo: relógio diurno proporcional ao noturno, Home limpa sem card de cuidador,
-   cards do Diário menos poluídos e gráficos de Dados legíveis. */
 
-/* Home: o cuidador é automático pelos e-mails do pai/mãe e não ocupa a tela inicial. */
+
+
 .screen[data-screen="today"] #todayCaregiverCard,
 #todayCaregiverCard.home-caregiver-card-retired {
   display: none !important;
   visibility: hidden !important;
 }
 
-/* Relógio grande: proporção consistente entre tema claro e noturno. */
+
 .screen[data-screen="today"] > .state-orbit,
 .state-orbit {
   min-height: clamp(314px, 56vw, 362px) !important;
@@ -19009,10 +18970,10 @@ body.day-theme textarea::placeholder { color: rgba(61,49,86,.48) !important; }
 }
 
 
-/* Quando o bebê está dormindo durante o dia, o relógio continua diurno; o estado é sono, não modo noturno. */
 
 
-/* Diário: volta para cards mais limpos, parecidos com o acabamento antigo. */
+
+
 
 .timeline::before {
   content: "";
@@ -19127,7 +19088,7 @@ body.day-theme .event-text p {
 }
 
 
-/* Dados: barras realmente visíveis e legíveis. */
+
 
 
 .data-bars b,
@@ -19189,10 +19150,10 @@ body.day-theme .data-chart-card[data-has-real-data="false"] .bars.premium-bars::
 }
 
 
-/* v75.75.67 — revisão geral do tema claro: legibilidade, topo limpo, sol natural e gráficos úteis. */
 
 
-/* Remove a faixa branca do cabeçalho no tema claro; os elementos ficam flutuando no fundo. */
+
+
 
 
 body.day-theme .app-header .identity img {
@@ -19224,13 +19185,13 @@ body.day-theme .sync-pill.online {
   border-color: rgba(75, 191, 151, .28) !important;
 }
 
-/* Sol diurno restaurado com brilho quente e sem emoji artificial. */
 
 
-/* Sono durante o dia continua com linguagem diurna, não vira relógio noturno. */
 
 
-/* Reforço geral de leitura no tema claro. */
+
+
+
 body.day-theme h1,
 body.day-theme h2,
 body.day-theme h3,
@@ -19257,7 +19218,7 @@ body.day-theme .event-edit-note {
   color: rgba(65,48,86,.76) !important;
 }
 
-/* Diário limpo: menos poluição visual, mais próximo do acabamento antigo. */
+
 
 body.day-theme .timeline .event-card .mark,
 body.day-theme .event-card .mark {
@@ -19278,7 +19239,7 @@ body.day-theme .event-meta-primary {
 }
 
 
-/* Gráficos: leitura real mesmo com poucos registros, sem aparência quebrada. */
+
 .data-chart-card[data-has-real-data="true"] .data-chart-empty-hint,
 .data-chart-card[data-has-data="true"] .data-chart-empty-hint,
 .bars[data-has-real-data="true"] + .data-chart-empty-hint {
@@ -19292,9 +19253,7 @@ body.day-theme .bars.premium-bars > span.has-value::before {
 }
 
 
-/* v75.75.67 — restauração real do acabamento premium light.
-   Escopo: tema claro, relógio diurno, Home, Diário, Perfil e gráficos reais.
-   Mantém a estrutura multi-família das versões comerciais. */
+
 
 
 html,
@@ -19328,7 +19287,7 @@ body.day-theme .phone-shell {
   color: var(--ninou-light-ink) !important;
 }
 
-/* Cabeçalho limpo: sem faixa branca entre avatar e status. */
+
 body.day-theme .app-header,
 body.day-theme .app-header::before,
 body.day-theme .app-header::after {
@@ -19374,7 +19333,7 @@ body.day-theme .sync-pill.offline {
   border-color: rgba(207, 149, 83, .24) !important;
 }
 
-/* Relógio diurno restaurado: sol quente, arco proporcional ao noturno e menos poluição. */
+
 body.day-theme .screen[data-screen="today"] > .state-orbit,
 body.day-theme .state-orbit {
   min-height: 348px !important;
@@ -19391,7 +19350,7 @@ body.day-theme .state-orbit {
 }
 
 
-/* Home light: cards com profundidade premium sem excesso. */
+
 body.day-theme :is(.live-assistant-card,.next-card,.day-summary-card,.routine-progress-card,.notification-center-card,.gentle-alert-card,.smart-insight-card,.today-last-card,.growth-card,.five-day-actions-card,.day-notes-card,.data-premium-hero,.data-premium-metric,.profile-family-card,.login-card,.privacy-note-card,.support-card,.export-card,.danger-card) {
   background: radial-gradient(circle at 8% 0%, rgba(255,255,255,.76), transparent 36%), linear-gradient(160deg, var(--ninou-light-card-bg), var(--ninou-light-card-bg-2)) !important;
   border-color: var(--ninou-light-border-real) !important;
@@ -19405,7 +19364,7 @@ body.day-theme :is(.live-assistant-card,.next-card,.day-summary-card,.routine-pr
   color: var(--ninou-light-muted-strong) !important;
 }
 
-/* Diário: volta para o premium clean, sem excesso de ruído visual. */
+
 
 
 body.day-theme .event-main,
@@ -19427,7 +19386,7 @@ body.day-theme .event-actions {
 }
 
 
-/* Perfil de pai/mãe: menos cara administrativa no uso normal. */
+
 body:not(.global-admin-mode) :is(.commercial-beta-card,.admin-commercial-readiness-card,.admin-commercial-sequence-section,.admin-legal-readiness-section,.admin-support-beta-section,.admin-family-monitor-section) {
   display: none !important;
 }
@@ -19439,7 +19398,7 @@ body.day-theme .support-beta-card {
   background: linear-gradient(160deg, rgba(255, 250, 241, .94), rgba(255, 243, 234, .90)) !important;
 }
 
-/* Dados: painel operacional, com barras visíveis e mensagem vazia só quando não há dado real. */
+
 .screen[data-screen="trends"].active {
   padding-top: max(10px, env(safe-area-inset-top, 0px)) !important;
 }
@@ -19585,8 +19544,7 @@ body.day-theme .bars.premium-bars > span.is-empty::before {
   }
 }
 
-/* v75.75.67 — refino cirúrgico: light premium, diário, gráfico de peso e FAB sem sobreposição.
-   Escopo fechado: visual/legibilidade. Mantém multi-família, regras e fluxos existentes. */
+
 body.day-theme {
   color-scheme: light;
   --bg: #f8eadc;
@@ -19641,7 +19599,7 @@ body.day-theme {
   --ninou-v60-line: rgba(99, 72, 112, .16);
 }
 
-/* Cabeçalho e linha de idade: mais presença no tema claro. */
+
 body.day-theme .today-topline {
   align-items: center !important;
   margin: 2px 0 10px !important;
@@ -19667,7 +19625,7 @@ body.day-theme .sync-pill {
   opacity: 1 !important;
 }
 
-/* Contador principal: sol mais quente, texto mais presente e arco proporcional. */
+
 body.day-theme .state-orbit,
 body.day-theme .screen[data-screen="today"] > .state-orbit {
   min-height: 344px !important;
@@ -19737,7 +19695,7 @@ body.day-theme .state-orbit p {
   text-shadow: 0 1px 0 rgba(255,255,255,.55) !important;
 }
 
-/* Ação principal e atalhos: menores, mais elegantes e compatíveis com a referência. */
+
 
 .main-action-area .primary-action {
   width: min(100%, 242px) !important;
@@ -19850,7 +19808,7 @@ body.day-theme .start-choice button > span:last-child {
 }
 
 
-/* Diário: cards menores, mais charmosos e filtros legíveis. */
+
 body.day-theme .screen[data-screen="diary"] .section-title span,
 body.day-theme #diaryDateHint {
   color: rgba(55, 42, 75, .72) !important;
@@ -19977,7 +19935,7 @@ body.day-theme .event-action-button.delete {
   border-color: rgba(255, 154, 118, .21) !important;
 }
 
-/* Gráfico de peso: painel claro, labels legíveis, linha simples e direta. */
+
 
 .weight-chart-readable svg {
   width: 100% !important;
@@ -20031,7 +19989,7 @@ body.day-theme .weight-chart-topline-readable strong {
   font-weight: 950 !important;
 }
 
-/* Gráficos de rotina: fazer os dados aparecerem com barra real, não apenas bolhas no topo. */
+
 .data-bars,
 .data-bars-sleep,
 .bars.premium-bars {
@@ -20144,11 +20102,10 @@ body.day-theme .data-section-heading strong {
   font-weight: 950 !important;
 }
 
-/* Ninou v75.75.67 — hierarquia premium: Home, ações, Diário, gráfico e avatar.
-   Escopo: não adiciona recurso; corrige acabamento observado na v75.75.67. */
 
 
-/* Cabeçalho claro: idade/semanas e Perfil precisam ter presença. */
+
+
 body.day-theme .app-header,
 body.day-theme .app-header * {
   text-shadow: none !important;
@@ -20185,7 +20142,7 @@ body.day-theme [data-target-shortcut="profile"].ghost-link {
   text-shadow: 0 1px 0 rgba(255,255,255,.72) !important;
 }
 
-/* Relógio principal: sol mais presente, texto mais forte e arco diurno com proporção do noturno. */
+
 
 body.day-theme .state-orbit::before {
   background:
@@ -20264,7 +20221,7 @@ body.day-theme .orbit-event {
   box-shadow: 0 8px 18px rgba(58, 31, 90, .18) !important;
 }
 
-/* Botão Acordou/Iniciar soneca: volta a ter presença bonita abaixo do cronômetro. */
+
 .main-action-area {
   justify-items: center;
   margin-top: 6px !important;
@@ -20299,7 +20256,7 @@ body.day-theme .main-action-area .primary-action > span:last-child {
   letter-spacing: -.015em !important;
 }
 
-/* Correção do último registro: deixa de parecer um bloco pesado. */
+
 .routine-correction-card,
 body.day-theme .routine-correction-card {
   padding: 12px 13px !important;
@@ -20355,7 +20312,7 @@ body.day-theme .routine-correction-actions button {
   box-shadow: none !important;
 }
 
-/* Atalhos: remove ruído do título e aproxima do charme antigo. */
+
 .quick-actions-heading,
 .quick-actions-heading-clean {
   display: block !important;
@@ -20409,7 +20366,7 @@ body.day-theme .quick-actions button > span:last-child {
 }
 
 
-/* Home: reduz densidade visual dos cards secundários. */
+
 .today-overview-card,
 .smart-insight-card,
 .gentle-alert-card,
@@ -20439,7 +20396,7 @@ body.day-theme .today-overview-suggestion {
   font-weight: 780 !important;
 }
 
-/* Diário: chips e registros menores, mais charmosos, próximos da referência. */
+
 .screen[data-screen="diary"] .chips-shell {
   position: relative;
   margin-bottom: 12px;
@@ -20563,7 +20520,7 @@ body.day-theme .timeline .event-action-button {
   font-weight: 900 !important;
 }
 
-/* Gráfico de peso: menos confuso, labels maiores e ponto atual legível. */
+
 .weight-chart-readable,
 .weight-sparkline.weight-chart-readable {
   min-height: 248px !important;
@@ -20643,7 +20600,7 @@ body.day-theme .weight-chart-readable {
   font-weight: 950 !important;
 }
 
-/* Sheet de ação: selector horizontal compacto; formulário não sobrepõe campos. */
+
 
 
 .record-types button,
@@ -20689,7 +20646,7 @@ body.day-theme .record-types button.active {
 }
 
 
-/* Avatar: grade premium, alinhada, com destaque real no selecionado. */
+
 
 .avatar-modal .avatar-option-grid.icon-grid .avatar-choice,
 #babyAvatarTestCard .avatar-option-grid.icon-grid .avatar-choice,
@@ -20767,9 +20724,9 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
 }
 
 
-/* v75.75.67 — correção fina de acabamento e ações */
 
-/* 1) FAB: corrige símbolo de +, reposiciona e evita leitura de ícone estranho */
+
+
 
 
 @media (max-width: 380px) {
@@ -20936,7 +20893,7 @@ body.day-theme #babyAvatarTestCard .avatar-option-grid .avatar-choice {
   
 }
 
-/* 2) Botões de ação secundária: Perfil / Ver diário mais visíveis */
+
 
 body.day-theme .today-topline .ghost-link,
 body.day-theme .today-overview-head .ghost-link,
@@ -20948,7 +20905,7 @@ body.day-theme .section-title .ghost-link {
 }
 
 
-/* 3) Avatar: remove arco/anel excedente e simplifica o recorte */
+
 .screen[data-screen="profile"] #profilePhoto,
 .avatar-modal .baby-avatar-preview,
 #babyAvatarTestCard .baby-avatar-preview,
@@ -21013,7 +20970,7 @@ body.day-theme .section-title .ghost-link {
   color: rgba(47,36,75,.74) !important;
 }
 
-/* 4) Sheet de registro: evita sobreposição e melhora leitura dos tipos */
+
 
 
 .breast-timer-head button,
@@ -21024,7 +20981,7 @@ body.day-theme .section-title .ghost-link {
   border-radius: 16px !important;
 }
 
-/* 5) Gráficos zerados: ancora no piso do gráfico em vez de flutuar no meio */
+
 .data-chart-card[data-has-real-data="false"] .bars.premium-bars > span::before,
 .data-chart-card[data-has-data="false"] .bars.premium-bars > span::before,
 .data-chart-card[data-has-real-data="false"] .data-bars > span::before,
@@ -21047,7 +21004,7 @@ body.day-theme .section-title .ghost-link {
   align-items: end !important;
 }
 
-/* 6) Home principal: contador e ações com acabamento mais limpo */
+
 body.day-theme .state-orbit {
   background:
     radial-gradient(circle at 17% 20%, rgba(255, 218, 107, 1) 0 17px, rgba(255, 218, 107, .72) 18px 42px, rgba(255, 196, 89, .26) 43px 78px, transparent 79px),
@@ -21088,7 +21045,7 @@ body.day-theme .state-orbit p {
   font-weight: 900 !important;
 }
 
-/* 7) Diário: ações dos cards mais delicadas e legíveis */
+
 .timeline .event-card,
 .event-card {
   border-radius: 26px !important;
@@ -21119,7 +21076,7 @@ body.day-theme .event-action-button {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.64), 0 8px 18px rgba(111, 81, 134, 0.06) !important;
 }
 
-/* 8) Avatar footer/modal: evita sensação de corte */
+
 
 .avatar-modal #babyAvatarStatus,
 #babyAvatarTestCard #babyAvatarStatus {
@@ -21128,24 +21085,24 @@ body.day-theme .event-action-button {
 }
 
 
-/* v75.75.67 — correção real sem remendo visual */
-
-/* FAB novo com classe própria; ignora todas as regras antigas de icon-button-add */
 
 
-/* Modal de ação: trocar de “todos apertados” para carrossel limpo, sem sobreposição */
 
 
-/* Zerar: fixa dentro do cabeçalho, sem flutuar/cortar */
 
 
-/* Arco do contador: tema claro usa pontos limpos, sem ícone/retângulo quebrando */
 
 
-/* Gráficos: zero não aparece como bolha no meio/topo; fica só base discreta */
 
 
-/* Avatar: remove anel extra e reduz sensação de halo */
+
+
+
+
+
+
+
+
 .avatar-modal .baby-avatar-preview,
 #babyAvatarTestCard .baby-avatar-preview,
 .avatar-modal .avatar-face-thumb,
@@ -21160,16 +21117,9 @@ body.day-theme .event-action-button {
 }
 
 
-/* ==========================================================================
-   Ninou v75.75.67 — CONSOLIDAÇÃO DO CSS ÚNICO
-   --------------------------------------------------------------------------
-   Esta seção é a camada canônica final do styles.css.
-   Objetivo: reduzir conflito de regras antigas sem separar o CSS agora.
-   Não adiciona recurso novo; estabiliza FAB, modal, gráficos, avatar,
-   botões de ação e legibilidade básica.
-   ========================================================================== */
 
-/* Tokens finais de manutenção visual */
+
+
 :root {
   color-scheme: dark;
   --bg: #101029;
@@ -21314,17 +21264,13 @@ body.day-theme .event-action-button {
   --ninou-shadow-soft: 0 16px 32px rgba(111, 81, 134, .10);
 }
 
-/* --------------------------------------------------------------------------
-   1. FAB canônico — único botão de novo registro
-   -------------------------------------------------------------------------- */
 
 
-/* Bloqueia o desenho antigo do icon-button-add caso algum cache/HTML legado apareça */
 
 
-/* --------------------------------------------------------------------------
-   2. Botões de ação pequenos — Perfil / Ver diário / ações de topo
-   -------------------------------------------------------------------------- */
+
+
+
 .today-topline .ghost-link,
 .today-overview-head .ghost-link,
 .chart-title .ghost-link,
@@ -21353,9 +21299,7 @@ body:not(.day-theme) .section-title .ghost-link {
   color: #8eeccd !important;
 }
 
-/* --------------------------------------------------------------------------
-   3. Modal de registro — carrossel horizontal estável
-   -------------------------------------------------------------------------- */
+
 .record-sheet {
   border-radius: 34px 34px 0 0 !important;
   border: 1px solid rgba(255,255,255,.10) !important;
@@ -21435,7 +21379,7 @@ body:not(.day-theme) .section-title .ghost-link {
   hyphens: none !important;
 }
 
-/* Timer da amamentação */
+
 .breast-timer-head {
   display: grid !important;
   align-items: center !important;
@@ -21464,9 +21408,7 @@ body:not(.day-theme) .section-title .ghost-link {
   line-height: 1 !important;
 }
 
-/* --------------------------------------------------------------------------
-   4. Contador principal — remove artefatos no arco em tema claro
-   -------------------------------------------------------------------------- */
+
 body.day-theme .orbit-event,
 body.day-theme .orbit-event *,
 body.day-theme .orbit-event i,
@@ -21497,9 +21439,7 @@ body.day-theme .orbit-event i {
   box-shadow: 0 7px 14px rgba(96,63,87,.18), inset 0 1px 0 rgba(255,255,255,.24) !important;
 }
 
-/* --------------------------------------------------------------------------
-   5. Gráficos zerados — zero sem bolha flutuando
-   -------------------------------------------------------------------------- */
+
 .data-chart-card .bars.premium-bars > span.is-empty b,
 .data-chart-card .data-bars > span.is-empty b,
 .data-chart-card .data-bars-sleep > span.is-empty b {
@@ -21524,9 +21464,7 @@ body.day-theme .orbit-event i {
   display: inline-flex !important;
 }
 
-/* --------------------------------------------------------------------------
-   6. Avatar — remove halo/anel extra sem trocar o componente
-   -------------------------------------------------------------------------- */
+
 .avatar-modal .baby-avatar-preview,
 #babyAvatarTestCard .baby-avatar-preview,
 .avatar-modal .avatar-face-thumb,
@@ -21554,9 +21492,7 @@ body.day-theme .orbit-event i {
 }
 
 
-/* --------------------------------------------------------------------------
-   7. Guarda de legibilidade no tema claro
-   -------------------------------------------------------------------------- */
+
 body.day-theme .state-orbit > span {
   color: #61546f !important;
   font-weight: 900 !important;
@@ -21574,24 +21510,12 @@ body.day-theme .form-status {
   color: var(--ninou-text-muted-light) !important;
 }
 
-/* Fim da consolidação v75.75.67
-   As regras acima são a referência final para as áreas críticas.
-   ========================================================================== */
 
 
-/* ==========================================================================
-   Ninou v75.75.67 — ajustes finos pós-teste real
-   --------------------------------------------------------------------------
-   Ajustes cirúrgicos:
-   - avatar selecionado sem card quadrado exagerado e conteúdo centralizado;
-   - texto final do modal de avatar sem sobreposição;
-   - linha do tempo inteligente sem risco quando vazia;
-   - gráfico com barras e labels alinhados;
-   - dropdown da data do diário alinhado;
-   - FAB mais discreto para não invadir cards.
-   ========================================================================== */
 
-/* 1. Avatar: cards centralizados e seleção sem bloco quadrado pesado */
+
+
+
 .avatar-modal .avatar-option-grid,
 #babyAvatarTestCard .avatar-option-grid,
 .avatar-option-grid.icon-grid {
@@ -21638,7 +21562,7 @@ body.day-theme .form-status {
   hyphens: none !important;
 }
 
-/* Rodapé do modal de avatar sem texto vazando atrás dos botões */
+
 
 
 .avatar-modal .form-status,
@@ -21656,7 +21580,7 @@ body.day-theme .form-status {
   pointer-events: none !important;
 }
 
-/* 2. Linha do tempo inteligente: sem risco vertical quando vazia */
+
 .timeline-empty,
 .timeline-card .empty-state,
 .timeline-card [data-empty="true"] {
@@ -21677,7 +21601,7 @@ body.day-theme .form-status {
   overflow: hidden !important;
 }
 
-/* 3. Gráficos: alinhamento rígido para evitar barra torta/invadindo outro dia */
+
 .data-chart-card .bars,
 .data-chart-card .data-bars,
 .data-chart-card .data-bars-sleep,
@@ -21730,7 +21654,7 @@ body.day-theme .form-status {
   justify-self: center !important;
 }
 
-/* 4. Dropdown do diário: seta centralizada e sem inclinação visual */
+
 #diaryDateInput {
   appearance: none !important;
   -webkit-appearance: none !important;
@@ -21738,7 +21662,7 @@ body.day-theme .form-status {
 }
 
 
-/* 5. FAB um pouco menos invasivo nos cards */
+
 @media (max-width: 390px) {
   .event-main {
     display: block;
@@ -21854,21 +21778,12 @@ body.day-theme .form-status {
 }
 }
 
-/* Fim dos ajustes v75.75.67
-   ========================================================================== */
 
 
-/* ========================================================================== 
-   Ninou v75.75.67 — correção por seletores reais
-   --------------------------------------------------------------------------
-   Auditoria real:
-   - Avatar usa .avatar-face-wrap + .avatar-face-thumb + small.
-   - Linha vazia vem do .intelligent-timeline::before.
-   - Dropdown real é .date-filter .diary-date-icon.
-   - Gráficos precisam de posicionamento absoluto por coluna.
-   ========================================================================== */
 
-/* 1. Avatar real: remove o quadrado atrás do avatar e centraliza no card */
+
+
+
 #babyAvatarTestCard .avatar-option-grid.icon-grid,
 .avatar-modal .avatar-option-grid.icon-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -21977,7 +21892,7 @@ body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice small 
   hyphens: none !important;
 }
 
-/* Rodapé do modal sem cobrir a grade e sem texto vazando */
+
 #babyAvatarTestCard .avatar-picker-section,
 .avatar-modal .avatar-picker-section {
   padding-bottom: 18px !important;
@@ -22000,7 +21915,7 @@ body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice small 
   display: none !important;
 }
 
-/* 2. Linha do tempo inteligente: remove a linha vertical no estado vazio real */
+
 .intelligent-timeline:has(.timeline-empty)::before,
 .intelligent-timeline.is-empty::before,
 .intelligent-timeline.empty::before,
@@ -22029,7 +21944,7 @@ body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice small 
   display: none !important;
 }
 
-/* 3. Gráficos: uma coluna fixa por dia, barra e valor centralizados no próprio dia */
+
 .data-chart-card .data-bars,
 .data-chart-card .data-bars-sleep,
 .data-chart-card .bars.premium-bars {
@@ -22117,7 +22032,7 @@ body.day-theme .avatar-modal .avatar-option-grid.icon-grid .avatar-choice small 
   transform: none !important;
 }
 
-/* 4. Dropdown real do diário: corrigir o SVG existente */
+
 .date-filter::after,
 body.day-theme .date-filter::after {
   content: none !important;
@@ -22168,7 +22083,7 @@ svg.select-control-icon.diary-date-icon path {
   stroke-linejoin: round !important;
 }
 
-/* 5. Evita mensagem absurda de janela acordado quando houver estado antigo corrompido */
+
 .next-card strong,
 .next-card p,
 .live-assistant-card strong,
@@ -22176,16 +22091,10 @@ svg.select-control-icon.diary-date-icon path {
   overflow-wrap: normal !important;
 }
 
-/* Fim v75.75.67
-   ========================================================================== */
 
 
-/* ==========================================================================
-   Ninou v75.75.67 — normalização final dos avatares
-   --------------------------------------------------------------------------
-   Os PNGs dos avatares foram reenquadrados usando o Bebê clássico como
-   referência visual. Esta camada garante que o card não force corte diferente.
-   ========================================================================== */
+
+
 
 .avatar-modal .avatar-face-wrap,
 #babyAvatarTestCard .avatar-face-wrap,
@@ -22241,11 +22150,10 @@ svg.select-control-icon.diary-date-icon path {
   text-align: center !important;
 }
 
-/* Fim v75.75.67
-   ========================================================================== */
 
 
-/* Avatar final: alinhamento inferior, preview consistente e correção da menina do laço */
+
+
 
 .avatar-face-wrap {
   display: grid;
@@ -22286,13 +22194,13 @@ svg.select-control-icon.diary-date-icon path {
 }
 
 
-/* Avatar final v75.75.71: centralização real nos cards e preview com âncora inferior */
 
 
-/* Avatar final v75.75.72: assets normalizados seguindo Bebê clássico e Cacheadinho */
 
 
-/* Avatar final v75.75.73: escala uniforme baseada em Bebê clássico e Cacheadinho */
+
+
+
 
 
 .avatar-preview-wrap.avatar-preview-panel .baby-avatar-preview,
@@ -22306,26 +22214,23 @@ svg.select-control-icon.diary-date-icon path {
 }
 
 
-/* v75.75.74 avatar picker igual ao estilo do identity */
 
 
-/* v75.75.75 avatar picker cards: MESMO ESTILO DO IDENTITY */
-
-/* O card inteiro da opção passa a copiar o acabamento do avatar da identity:
-   quadrado arredondado, borda branca, fundo verde/creme claro e sombra suave. */
 
 
-/* Remove o “card dentro do card”. O estilo identity agora está no próprio card da opção. */
 
 
-/* A prévia superior mantém o mesmo acabamento identity também. */
 
 
-/* v75.75.76 avatar picker: formato EXATO do card identity */
 
-/* Correção definitiva: o FORMATO da opção agora é o mesmo do avatar da identity.
-   Antes o estilo ficou fraco porque regras antigas ainda controlavam o .avatar-choice.
-   Este bloco usa seletores mais fortes e substitui border-radius, fundo, borda e sombra. */
+
+
+
+
+
+
+
+
 
 
 button.avatar-choice[data-avatar-value] {
@@ -22458,13 +22363,9 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] {
 }
 
 
-/* v75.75.77 override real: #babyAvatarTestCard avatar-option-grid */
 
-/* O DevTools mostrou que a tela real usa:
-   .avatar-modal .avatar-option-grid.icon-grid
-   #babyAvatarTestCard .avatar-option-grid.icon-grid
-   e que existia um <style> limitando as imagens para 72px/56px.
-   Este bloco mira exatamente nesses seletores reais. */
+
+
 
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid,
 #babyAvatarTestCard .avatar-option-grid.icon-grid,
@@ -22578,18 +22479,18 @@ button.avatar-choice[data-avatar-value] small {
 }
 
 
-/* v75.75.78 selected avatar card: acabamento premium no card inteiro */
-
-/* Seleção premium: tira o destaque pesado em cima da imagem e trata o CARD inteiro. */
 
 
-/* Brilho interno discreto no card selecionado. */
 
 
-/* Check pequeno e elegante no canto, em vez de “marcar” a foto. */
 
 
-/* Garante que imagem e texto fiquem acima do brilho, mas sem sombra/halo próprio. */
+
+
+
+
+
+
 
 
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-thumb,
@@ -22606,7 +22507,7 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] img {
   box-shadow: none !important;
 }
 
-/* Texto do card selecionado fica mais premium sem “pular” layout. */
+
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected small,
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] small,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected small,
@@ -22619,10 +22520,9 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] small {
 }
 
 
-/* v75.75.79 card selecionado: borda mint no CARD inteiro */
 
-/* Ajuste final: remove o destaque mint da foto/slot interno e joga o estado selecionado
-   para o CARD inteiro, como na prévia aprovada. */
+
+
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
@@ -22648,7 +22548,7 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] {
   border-radius: 28px !important;
 }
 
-/* brilho suave interno do card */
+
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::before,
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::before,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::before,
@@ -22668,7 +22568,7 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"]::before {
   z-index: 0 !important;
 }
 
-/* check elegante no canto, sem marcar a foto */
+
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
@@ -22697,7 +22597,7 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"]::after {
   z-index: 3 !important;
 }
 
-/* IMPORTANTÍSSIMO: desliga qualquer mint/borda/transform no slot interno da foto */
+
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-wrap,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
@@ -22715,7 +22615,7 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] .avatar-face-wrap {
   opacity: 1 !important;
 }
 
-/* imagem e texto ficam acima do brilho do card */
+
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
 .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] .avatar-face-wrap,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected .avatar-face-wrap,
@@ -22750,13 +22650,11 @@ button.avatar-choice[data-avatar-value][aria-pressed="true"] img {
 }
 
 
-/* v75.75.80 definitivo: neutraliza selected no avatar-face-wrap */
 
-/* O DevTools confirmou que o mint vinha daqui:
-   .avatar-choice.selected .avatar-face-wrap
-   Portanto, esta regra precisa vir NO FINAL e com seletor mais forte. */
 
-/* 1) Desliga qualquer seleção no WRAP/FOTO */
+
+
+
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
 body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
@@ -22778,7 +22676,7 @@ button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap {
   filter: none !important;
 }
 
-/* 2) Garante que a imagem em si também não receba destaque */
+
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img,
 body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap img,
@@ -22800,7 +22698,7 @@ button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img {
   opacity: 1 !important;
 }
 
-/* 3) Aplica a seleção premium no CARD COMPLETO */
+
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
 body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
@@ -22826,7 +22724,7 @@ button.avatar-choice[aria-pressed="true"] {
     inset 0 1px 0 rgba(255,255,255,.98) !important;
 }
 
-/* 4) Check no canto do card, acima de tudo */
+
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
 body.day-theme .avatar-modal #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
 body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
@@ -22860,13 +22758,11 @@ button.avatar-choice[aria-pressed="true"]::after {
 }
 
 
-/* v75.75.81 mobile 2-col premium avatar picker */
 
-/* Layout e acabamento premium revisados para os 2 temas.
-   Objetivo: 2 cards por fileira em celulares, cards maiores,
-   sem corte lateral e com seleção premium no card inteiro. */
 
-/* Base premium - tema escuro/noite */
+
+
+
 
 
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-thumb,
@@ -22888,19 +22784,19 @@ button.avatar-choice[data-avatar-value] img {
   transform: none !important;
 }
 
-/* Tema claro/dia */
 
 
-/* Seleção premium no card inteiro - escuro */
 
 
-/* Neutraliza qualquer destaque no wrap da foto */
 
 
-/* Check premium discreto */
 
 
-/* Melhor ajuste do preview e cabeçalho em telas pequenas */
+
+
+
+
+
 @media (max-width: 520px) {
   .admin-clean-hero,
   .admin-clean-section {
@@ -23264,20 +23160,14 @@ button.avatar-choice[data-avatar-value] img {
 }
 }
 
-/* Mobile real: 2 cards por fileira */
 
 
-/* v75.75.82 avatar picker premium real - 2 colunas corrigidas */
 
-/* Correção premium real do seletor de avatares.
-   Problemas corrigidos:
-   - cards muito separados;
-   - terceira linha cortada pelo rodapé;
-   - aparência simples demais;
-   - falta de respiro organizado no grid;
-   - seleção ainda pouco refinada. */
 
-/* Modal mais contido e sem aparência esticada */
+
+
+
+
 .avatar-modal .ninou-modal-card,
 .ninou-modal-card.avatar-modal {
   width: min(92vw, 390px) !important;
@@ -23286,7 +23176,7 @@ button.avatar-choice[data-avatar-value] img {
   border-radius: 34px !important;
 }
 
-/* Cabeçalho mais premium e compacto */
+
 .avatar-modal .avatar-test-header {
   display: grid !important;
   justify-content: space-between;
@@ -23323,7 +23213,7 @@ button.avatar-choice[data-avatar-value] img {
   font-weight: 850 !important;
 }
 
-/* Preview superior mais alinhado ao app */
+
 .avatar-modal .minimal-preview-panel {
   width: 104px !important;
   height: 104px !important;
@@ -23345,13 +23235,13 @@ button.avatar-choice[data-avatar-value] img {
   transform: none !important;
 }
 
-/* A seção não deve deixar card entrar por baixo dos botões */
+
 .avatar-modal .avatar-picker-section {
   margin-top: 10px !important;
   padding-top: 0 !important;
 }
 
-/* Grid mobile premium: 2 colunas reais, sem vão gigante */
+
 
 
 .avatar-modal .avatar-option-grid.icon-grid::-webkit-scrollbar,
@@ -23361,7 +23251,7 @@ button.avatar-choice[data-avatar-value] img {
   display: none !important;
 }
 
-/* Cards com largura cheia da coluna */
+
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
 button.avatar-choice[data-avatar-value] {
@@ -23387,7 +23277,7 @@ button.avatar-choice[data-avatar-value] {
   isolation: isolate !important;
 }
 
-/* Tema claro: card com mais acabamento, menos “branco cru” */
+
 body.day-theme .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
 body.day-theme #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
 body.day-theme button.avatar-choice[data-avatar-value] {
@@ -23401,7 +23291,7 @@ body.day-theme button.avatar-choice[data-avatar-value] {
   color: #2f2843 !important;
 }
 
-/* Tema escuro: mantém contraste e acabamento */
+
 body:not(.day-theme) .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
 body:not(.day-theme) #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice,
 body:not(.day-theme) button.avatar-choice[data-avatar-value] {
@@ -23413,7 +23303,7 @@ body:not(.day-theme) button.avatar-choice[data-avatar-value] {
     0 12px 24px rgba(3,2,12,.30) !important;
 }
 
-/* Avatar maior, mas ainda limpo */
+
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-wrap,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice .avatar-face-wrap,
 button.avatar-choice[data-avatar-value] .avatar-face-wrap {
@@ -23448,7 +23338,7 @@ button.avatar-choice[data-avatar-value] img {
   filter: none !important;
 }
 
-/* Texto mais estável */
+
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice small,
 button.avatar-choice[data-avatar-value] small {
@@ -23476,7 +23366,7 @@ body:not(.day-theme) button.avatar-choice[data-avatar-value] small {
   color: rgba(247,243,255,.95) !important;
 }
 
-/* Seleção premium no card inteiro, não na foto */
+
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected,
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"],
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected,
@@ -23518,7 +23408,7 @@ body:not(.day-theme) button.avatar-choice[aria-pressed="true"] {
     inset 0 1px 0 rgba(255,255,255,.08) !important;
 }
 
-/* Desliga de vez seleção no avatar-face-wrap */
+
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected > span.avatar-face-wrap,
@@ -23539,7 +23429,7 @@ button.avatar-choice[aria-pressed="true"] > span.avatar-face-wrap img {
   filter: none !important;
 }
 
-/* Check elegante */
+
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
 .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice[aria-pressed="true"]::after,
 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice.selected::after,
@@ -23564,7 +23454,7 @@ button.avatar-choice[aria-pressed="true"]::after {
   line-height: 1 !important;
 }
 
-/* Rodapé: não deve cobrir cards */
+
 .avatar-modal .avatar-editor-actions {
   display: grid;
   grid-template-columns: 1fr 1fr !important;
@@ -23593,15 +23483,15 @@ body:not(.day-theme) .avatar-modal .avatar-editor-actions {
   font-weight: 950 !important;
 }
 
-/* Telas menores */
 
 
-/* Telas muito baixas: mantém 2 colunas, mas evita card por baixo do botão */
 
 
-/* v75.75.83 preview igual avatar principal + legibilidade tema escuro */
 
-/* Preview do avatar no modal com o mesmo visual do avatar principal do perfil */
+
+
+
+
 
 
 body.day-theme .avatar-modal .minimal-preview-panel .baby-avatar-preview,
@@ -23614,7 +23504,7 @@ body:not(.day-theme) #babyAvatarTestCard .minimal-preview-panel .baby-avatar-pre
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36), inset 0 0 0 4px #17132f !important;
 }
 
-/* Tipografia e leitura no tema escuro */
+
 
 
 body:not(.day-theme) .avatar-modal .avatar-copy-column p,
@@ -23638,15 +23528,12 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-option-grid.icon-grid button.av
   border-color: rgba(124,229,194,.98) !important;
 }
 
-/* Pequeno refinamento mobile para o preview não apertar o texto */
 
 
-/* v75.75.84 preview header refinado - sem aspecto mal acabado */
 
-/* Correção do preview superior:
-   A tentativa de copiar exatamente o avatar grande do perfil deixou o modal pesado.
-   Agora o preview vira uma versão premium compacta, alinhada, sem moldura exagerada
-   e sem quebrar o equilíbrio do cabeçalho. */
+
+
+
 
 .avatar-modal .avatar-test-header,
 #babyAvatarTestCard .avatar-test-header {
@@ -24657,29 +24544,26 @@ body.day-theme #babyAvatarTestCard .avatar-copy-column p {
 }
 
 
-/* v75.75.85 fade inferior suave acima dos botões do seletor */
-
-/* Acabamento premium: evita corte seco da grade antes dos botões.
-   A transição para o rodapé ganha um fade superior suave, em vez de término brusco. */
 
 
-/* Tema claro: fade superior bem sutil, sem esconder demais a última linha */
 
 
-/* Tema escuro: mesmo fade, preservando contraste e acabamento */
 
 
-/* Mantém os botões acima do fade e visualmente separados */
 
 
-/* Em telas mais baixas, o fade continua elegante sem roubar muita área útil */
 
 
-/* v75.75.87 fade real no fim da grade de avatares */
 
-/* Correção do corte seco mostrado no vídeo:
-   O fade anterior estava preso ao rodapé/botões. Agora existe uma camada real
-   sobre o final da grade rolável, criando transição suave antes dos botões. */
+
+
+
+
+
+
+
+
+
 
 .avatar-modal .avatar-picker-section,
 #babyAvatarTestCard .avatar-picker-section {
@@ -24689,7 +24573,7 @@ body.day-theme #babyAvatarTestCard .avatar-copy-column p {
   overflow: visible !important;
 }
 
-/* Dá espaço interno para a última linha não ficar escondida atrás do fade */
+
 .avatar-modal .avatar-option-grid.icon-grid,
 #babyAvatarTestCard .avatar-option-grid.icon-grid {
   gap: 12px !important;
@@ -24712,7 +24596,7 @@ body.day-theme #babyAvatarTestCard .avatar-copy-column p {
   padding-bottom: 54px !important;
 }
 
-/* Camada de esfumado no fim da grade - tema claro */
+
 body.day-theme .avatar-modal .avatar-picker-section::after,
 body.day-theme #babyAvatarTestCard .avatar-picker-section::after {
   content: "" !important;
@@ -24734,7 +24618,7 @@ body.day-theme #babyAvatarTestCard .avatar-picker-section::after {
     ) !important;
 }
 
-/* Camada de esfumado no fim da grade - tema escuro */
+
 body:not(.day-theme) .avatar-modal .avatar-picker-section::after,
 body:not(.day-theme) #babyAvatarTestCard .avatar-picker-section::after {
   content: "" !important;
@@ -24756,7 +24640,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-picker-section::after {
     ) !important;
 }
 
-/* O rodapé fica limpo e integrado ao fade, sem linha dura no topo */
+
 .avatar-modal .avatar-editor-actions,
 #babyAvatarTestCard .avatar-editor-actions {
   margin-top: -38px !important;
@@ -24772,7 +24656,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-picker-section::after {
   background-clip: padding-box !important;
 }
 
-/* Tema claro do rodapé sem corte seco */
+
 body.day-theme .avatar-modal .avatar-editor-actions,
 body.day-theme #babyAvatarTestCard .avatar-editor-actions {
   background:
@@ -24785,7 +24669,7 @@ body.day-theme #babyAvatarTestCard .avatar-editor-actions {
     ) !important;
 }
 
-/* Tema escuro do rodapé sem corte seco */
+
 body:not(.day-theme) .avatar-modal .avatar-editor-actions,
 body:not(.day-theme) #babyAvatarTestCard .avatar-editor-actions {
   background:
@@ -24806,24 +24690,17 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-editor-actions {
   z-index: 8 !important;
 }
 
-/* Em telas baixas, mantém o esfumado sem roubar área demais */
 
 
-/* v75.75.88 neon suave no preview do avatar */
-
-/* Premium neon suave no preview do avatar:
-   - Tema claro: roxo neon suave.
-   - Tema escuro: verde neon suave.
-   Aplicado especificamente no container:
-   .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel */
 
 
-/* v75.75.89 preview neon refinado nos dois temas */
 
-/* Refinamento final do preview:
-   Tema claro: lavanda translúcido, glow roxo suave.
-   Tema escuro: grafite arroxeado com verde neon suave.
-   Remove sensação de arco preto/pesado e deixa o acabamento mais premium. */
+
+
+
+
+
+
 
 .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel,
 #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
@@ -24832,7 +24709,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-editor-actions {
   border-radius: 28px !important;
 }
 
-/* Tema claro — roxo/lavanda premium suave */
+
 body.day-theme .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel,
 body.day-theme #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
   background:
@@ -24856,7 +24733,7 @@ body.day-theme #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.min
     0 14px 28px rgba(76,59,112,.12) !important;
 }
 
-/* brilho interno claro, sem arco pesado */
+
 body.day-theme .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before,
 body.day-theme #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before {
   content: "" !important;
@@ -24875,7 +24752,7 @@ body.day-theme #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.min
   z-index: 0 !important;
 }
 
-/* Tema escuro — grafite arroxeado + verde neon suave */
+
 body:not(.day-theme) .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel,
 body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
   background:
@@ -24899,7 +24776,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-pan
     0 16px 32px rgba(0,0,0,.34) !important;
 }
 
-/* brilho interno escuro, verde discreto, sem aro preto */
+
 body:not(.day-theme) .avatar-modal .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before,
 body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before {
   content: "" !important;
@@ -24925,7 +24802,7 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-preview-wrap.avatar-preview-pan
   filter: none !important;
 }
 
-/* Mantém boa legibilidade no escuro */
+
 body:not(.day-theme) .avatar-modal .avatar-copy-column strong,
 body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column strong,
 body:not(.day-theme) .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice small,
@@ -24939,13 +24816,11 @@ body:not(.day-theme) #babyAvatarTestCard .avatar-copy-column p {
 }
 
 
-/* v75.75.90 HARD OVERRIDE preview avatar neon visivel */
 
-/* OVERRIDE FINAL COM ESPECIFICIDADE ALTA.
-   Motivo: em alguns aparelhos/tema, regras antigas ainda venciam visualmente.
-   Este bloco força diferença clara no preview do avatar. */
 
-/* Base do preview */
+
+
+
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -24961,7 +24836,7 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
   isolation: isolate !important;
 }
 
-/* Tema claro — mudança visual bem perceptível: lavanda premium */
+
 html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -24983,7 +24858,7 @@ html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
     0 16px 32px rgba(76,59,112,.16) !important;
 }
 
-/* Tema claro — brilho interno */
+
 html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -25003,7 +24878,7 @@ html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
   opacity: .90 !important;
 }
 
-/* Tema escuro — mudança visual bem perceptível: grafite arroxeado + mint */
+
 html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -25024,7 +24899,7 @@ html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
     0 18px 36px rgba(0,0,0,.42) !important;
 }
 
-/* Tema escuro — brilho interno */
+
 html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -25044,7 +24919,7 @@ html body:not(.day-theme) .ninou-modal.avatar-modal#babyAvatarTestCard
   opacity: .94 !important;
 }
 
-/* Garante que a imagem fique por cima do brilho */
+
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -25062,7 +24937,7 @@ img.baby-avatar-preview {
   filter: none !important;
 }
 
-/* Mini borda glass, bem mais premium que arco preto */
+
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .ninou-modal-card.avatar-modal-card
 .avatar-test-header.avatar-minimal-header
@@ -25078,14 +24953,11 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
 }
 
 
-/* v75.75.91 icones do perfil premium glass */
 
-/* Ícones do perfil com acabamento premium:
-   - Tema claro: lavanda/roxo translúcido.
-   - Tema escuro: mint/verde neon suave.
-   - Ícones lineares, container glass, borda delicada e glow discreto. */
 
-/* Containers de ícones nas linhas do perfil */
+
+
+
 .screen[data-screen="profile"] .setting-icon,
 .screen[data-screen="profile"] .profile-card-head .icon,
 .screen[data-screen="profile"] .profile-card-head svg,
@@ -25101,7 +24973,7 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
     transform .18s ease !important;
 }
 
-/* Base glass para o ícone pequeno do perfil */
+
 .screen[data-screen="profile"] .setting-icon,
 .profile-setting-line .setting-icon,
 .profile-family-card .setting-icon {
@@ -25117,7 +24989,7 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
   position: relative !important;
 }
 
-/* SVGs premium: traço limpo, sem peso exagerado */
+
 .screen[data-screen="profile"] .setting-icon svg,
 .profile-setting-line .setting-icon svg,
 .profile-family-card .setting-icon svg {
@@ -25130,7 +25002,7 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
   stroke-linejoin: round !important;
 }
 
-/* Tema claro: lavanda translúcido premium */
+
 body.day-theme .screen[data-screen="profile"] .setting-icon,
 body.day-theme .profile-setting-line .setting-icon,
 body.day-theme .profile-family-card .setting-icon {
@@ -25144,7 +25016,7 @@ body.day-theme .profile-family-card .setting-icon {
     0 8px 18px rgba(93,70,140,.075) !important;
 }
 
-/* Tema escuro: mint neon suave premium */
+
 body:not(.day-theme) .screen[data-screen="profile"] .setting-icon,
 body:not(.day-theme) .profile-setting-line .setting-icon,
 body:not(.day-theme) .profile-family-card .setting-icon {
@@ -25159,18 +25031,18 @@ body:not(.day-theme) .profile-family-card .setting-icon {
     0 10px 22px rgba(0,0,0,.18) !important;
 }
 
-/* Estados de toque sem parecer botão duro */
+
 .screen[data-screen="profile"] .profile-setting-line:active .setting-icon,
 .profile-setting-line:active .setting-icon {
   transform: scale(.96) !important;
 }
 
-/* Ícone do cabeçalho dos cards do perfil, caso exista como wrapper */
+
 .screen[data-screen="profile"] .profile-card-head > span {
   border-radius: 16px !important;
 }
 
-/* Ícones/avatares mini de cuidadores com a mesma direção premium */
+
 .screen[data-screen="profile"] .caregiver-avatar-mini {
   width: 48px !important;
   height: 48px !important;
@@ -25213,10 +25085,10 @@ body:not(.day-theme) .screen[data-screen="profile"] .caregiver-avatar-mini {
   border: 1px solid rgba(124,229,194,.20) !important;
 }
 
-/* Botão editar avatar: harmonizado com os ícones premium */
 
 
-/* Melhora leitura das labels próximas aos ícones no tema escuro */
+
+
 body:not(.day-theme) .screen[data-screen="profile"] .setting-label,
 body:not(.day-theme) .profile-setting-line .setting-label {
   color: rgba(247,243,255,.94) !important;
@@ -25228,11 +25100,9 @@ body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card small {
 }
 
 
-/* v75.75.92 HARD OVERRIDE icones perfil visiveis */
 
-/* HARD OVERRIDE — ícones do bloco Perfil do diário.
-   A v75.75.91 ficou sutil demais ou foi vencida por regras antigas.
-   Este bloco mira diretamente os spans .setting-icon dentro de .profile-edit-grid. */
+
+
 
 html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 .profile-edit-grid .profile-setting-line .setting-label > span.setting-icon {
@@ -25251,7 +25121,7 @@ html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
   transform: translateZ(0) !important;
 }
 
-/* Tema claro — roxo/lavanda visível, premium e não preto/cinza */
+
 html body.day-theme .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 .profile-edit-grid .profile-setting-line .setting-label > span.setting-icon {
   color: #6f4dff !important;
@@ -25270,7 +25140,7 @@ html body.day-theme .screen[data-screen="profile"] .profile-family-card.diary-pr
     0 10px 22px rgba(76,59,112,.12) !important;
 }
 
-/* Tema escuro — mint neon suave visível */
+
 html body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 .profile-edit-grid .profile-setting-line .setting-label > span.setting-icon {
   color: #7ce5c2 !important;
@@ -25289,7 +25159,7 @@ html body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card.di
     0 12px 24px rgba(0,0,0,.28) !important;
 }
 
-/* Brilho glass interno */
+
 html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 .profile-edit-grid .profile-setting-line .setting-label > span.setting-icon::before {
   content: "" !important;
@@ -25303,7 +25173,7 @@ html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
   opacity: .70 !important;
 }
 
-/* SVG acima do brilho, com traço limpo */
+
 html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 .profile-edit-grid .profile-setting-line .setting-label > span.setting-icon > svg {
   width: 19px !important;
@@ -25318,7 +25188,7 @@ html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
   opacity: 1 !important;
 }
 
-/* Garante que a label se alinhe bem ao ícone maior */
+
 html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 .profile-edit-grid .profile-setting-line .setting-label {
   display: inline-flex !important;
@@ -25326,7 +25196,7 @@ html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
   gap: 0 !important;
 }
 
-/* Ícone dentro do botão Editar, para não ficar simples ao lado dos novos */
+
 html body .screen[data-screen="profile"] .profile-family-card.diary-profile-card
 #editBabyAvatarButton > svg {
   width: 17px !important;
@@ -25356,7 +25226,7 @@ html body:not(.day-theme) .screen[data-screen="profile"] .profile-family-card.di
     0 0 18px rgba(124,229,194,.18) !important;
 }
 
-/* Caso o navegador esteja usando cached/old selector genérico, este final vence */
+
 html body.day-theme span.setting-icon[aria-hidden="true"] {
   color: #6f4dff !important;
 }
@@ -25365,20 +25235,18 @@ html body:not(.day-theme) span.setting-icon[aria-hidden="true"] {
 }
 
 
-/* v75.75.95 arcos avatar perfil clean premium */
 
-/* v75.75.95 — correção visual dos arcos do avatar do perfil.
-   Remove a ideia de arco chamativo/conic e volta para uma moldura premium limpa:
-   delicada, com sombra suave, sem aparência pesada ou artificial. */
 
-/* Garante que qualquer pseudo-arco antigo não apareça */
+
+
+
 html body .screen[data-screen="profile"] .profile-card .avatar-wrapper::before,
 html body .screen[data-screen="profile"] .profile-card .avatar-wrapper::after {
   content: none !important;
   display: none !important;
 }
 
-/* Wrapper volta a ser simples e equilibrado */
+
 html body .screen[data-screen="profile"] .profile-card .avatar-wrapper {
   width: auto !important;
   height: auto !important;
@@ -25390,7 +25258,7 @@ html body .screen[data-screen="profile"] .profile-card .avatar-wrapper {
   overflow: visible !important;
 }
 
-/* Avatar principal: moldura limpa, sem arco exagerado */
+
 html body .screen[data-screen="profile"] .profile-card img#profilePhoto,
 html body .screen[data-screen="profile"] img#profilePhoto {
   width: 116px !important;
@@ -25403,7 +25271,7 @@ html body .screen[data-screen="profile"] img#profilePhoto {
   transform: none !important;
 }
 
-/* Tema claro: lavanda/champagne bem suave, sem parecer aro artificial */
+
 html body.day-theme .screen[data-screen="profile"] .profile-card img#profilePhoto,
 html body.day-theme .screen[data-screen="profile"] img#profilePhoto {
   background:
@@ -25417,15 +25285,15 @@ html body.day-theme .screen[data-screen="profile"] img#profilePhoto {
     0 2px 0 rgba(255,255,255,.70) !important;
 }
 
-/* Tema escuro: mint + roxo profundo, premium e discreto, sem preto chapado */
 
 
-/* Pequena interação premium */
+
+
 html body .screen[data-screen="profile"] .profile-card img#profilePhoto:active {
   transform: scale(.97) !important;
 }
 
-/* Preview do modal: acompanha a moldura clean, sem arco chamativo */
+
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
   width: 96px !important;
@@ -25439,7 +25307,7 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
   isolation: isolate !important;
 }
 
-/* Remove camadas conic/fortes antigas do preview */
+
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
 .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel::before,
 html body .ninou-modal.avatar-modal#babyAvatarTestCard
@@ -25476,13 +25344,11 @@ html body .ninou-modal.avatar-modal#babyAvatarTestCard
 }
 
 
-/* v75.75.96 reforco arco tema claro avatar perfil */
 
-/* Reforço específico do TEMA CLARO.
-   O tema escuro da v75.75.95 ficou bom; aqui só deixo o claro mais perceptível,
-   mantendo a linha clean premium. */
 
-/* Avatar principal no tema claro: aro lavanda/champagne mais visível */
+
+
+
 html body.day-theme .screen[data-screen="profile"] .profile-card .avatar-wrapper > img#profilePhoto,
 html body.day-theme .screen[data-screen="profile"] .profile-card img#profilePhoto,
 html body.day-theme .screen[data-screen="profile"] img#profilePhoto {
@@ -25507,12 +25373,12 @@ html body.day-theme .screen[data-screen="profile"] img#profilePhoto {
     0 3px 0 rgba(255,255,255,.75) !important;
 }
 
-/* Pequeno brilho externo no wrapper apenas no tema claro */
+
 html body.day-theme .screen[data-screen="profile"] .profile-card .avatar-wrapper {
   filter: drop-shadow(0 10px 18px rgba(139,92,246,.10)) !important;
 }
 
-/* Preview do modal no tema claro, coerente com o avatar principal */
+
 html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
 .avatar-preview-wrap.avatar-preview-panel.minimal-preview-panel {
   background:
@@ -25535,7 +25401,7 @@ html body.day-theme .ninou-modal.avatar-modal#babyAvatarTestCard
     0 12px 24px rgba(76,59,112,.13) !important;
 }
 
-/* Garante que o tema escuro não seja alterado por este ajuste */
+
 html body:not(.day-theme) .screen[data-screen="profile"] .profile-card img#profilePhoto,
 html body:not(.day-theme) .screen[data-screen="profile"] img#profilePhoto {
   background:
@@ -25550,11 +25416,9 @@ html body:not(.day-theme) .screen[data-screen="profile"] img#profilePhoto {
 }
 
 
-/* v75.75.97 perfil tema claro premium harmonizado */
 
-/* v75.75.97 — Perfil tema claro premium.
-   Harmonização geral do tema claro: menos amarelo, mais champagne/lavanda,
-   cards mais refinados, FAB mais coerente, status mais suave e bottom nav glass. */
+
+
 
 
 html body.day-theme .screen[data-screen="profile"] .profile-card span,
@@ -25576,13 +25440,13 @@ html body.day-theme .screen[data-screen="profile"] small {
   color: rgba(91, 80, 116, .82) !important;
 }
 
-/* Badge Sincronizado: mint mais discreto e premium */
 
 
-/* Botão flutuante +: roxo/pêssego em vez de laranja puro */
 
 
-/* Bottom nav: glass premium */
+
+
+
 
 html body.day-theme .profile-primary-button,
 html body.day-theme .avatar-save-button,
@@ -25611,16 +25475,11 @@ html body.day-theme .screen[data-screen="profile"] hr {
 }
 
 
-/* v75.75.98 refino final do perfil claro premium */
 
-/* v75.75.98 — refino final do tema claro do Perfil
-   Ajustes pedidos:
-   1) FAB menos gritante
-   2) fundo geral com menos amarelo
-   3) cards longos com sombra mais leve e borda mais delicada
-*/
 
-/* Fundo geral: menos amarelo, mais champagne rosado/lavanda */
+
+
+
 html body.day-theme {
   background:
     radial-gradient(circle at 16% 6%, rgba(255, 225, 188, .28) 0%, rgba(255, 225, 188, 0) 32%),
@@ -25637,7 +25496,7 @@ html body.day-theme .screen[data-screen="profile"] {
     linear-gradient(180deg, #fff5e5 0%, #fffaf4 48%, #faf5ff 100%) !important;
 }
 
-/* Header com leitura mais suave */
+
 html body.day-theme .app-header {
   background: rgba(255, 250, 244, .78) !important;
   backdrop-filter: blur(16px) saturate(1.08) !important;
@@ -25646,7 +25505,7 @@ html body.day-theme .app-header {
   box-shadow: 0 6px 20px rgba(76, 59, 112, .04) !important;
 }
 
-/* Card principal: levemente mais limpo */
+
 html body.day-theme .screen[data-screen="profile"] .profile-card {
   background:
     radial-gradient(circle at 50% 0%, rgba(188,165,255,.12), rgba(188,165,255,0) 42%),
@@ -25658,7 +25517,7 @@ html body.day-theme .screen[data-screen="profile"] .profile-card {
     0 3px 8px rgba(126, 94, 50, .03) !important;
 }
 
-/* Cards/blocos longos: sombra mais leve e borda mais suave */
+
 html body.day-theme .screen[data-screen="profile"] .profile-family-card,
 html body.day-theme .screen[data-screen="profile"] .profile-setting-line,
 html body.day-theme .screen[data-screen="profile"] .diary-profile-card,
@@ -25674,7 +25533,7 @@ html body.day-theme .screen[data-screen="profile"] .export-card {
     0 7px 18px rgba(76, 59, 112, .045) !important;
 }
 
-/* Inputs um pouco mais elegantes */
+
 html body.day-theme .screen[data-screen="profile"] input,
 html body.day-theme .screen[data-screen="profile"] select,
 html body.day-theme .screen[data-screen="profile"] textarea,
@@ -25687,7 +25546,7 @@ html body.day-theme .screen[data-screen="profile"] .select-control-wrap {
     0 3px 10px rgba(76,59,112,.025) !important;
 }
 
-/* Badge sincronizado ainda mais refinado */
+
 html body.day-theme .sync-status,
 html body.day-theme [class*="sync"][class*="badge"],
 html body.day-theme [class*="sincronizado"] {
@@ -25699,18 +25558,18 @@ html body.day-theme [class*="sincronizado"] {
     0 6px 14px rgba(38,122,98,.06) !important;
 }
 
-/* FAB menos gritante: reduz saturação e glow */
 
 
-/* FAB em estado hover/active mais fino */
+
+
 html body.day-theme button[data-open-sheet]:hover {
   filter: saturate(.98) brightness(1.01) !important;
   transform: translateY(-1px) !important;
 }
 
-/* Bottom nav um pouco mais leve */
 
-/* Pequeno refinamento da tipografia cinza/lilás */
+
+
 html body.day-theme .screen[data-screen="profile"] p,
 html body.day-theme .screen[data-screen="profile"] small,
 html body.day-theme .screen[data-screen="profile"] .setting-label,
@@ -25719,25 +25578,23 @@ html body.day-theme .screen[data-screen="profile"] label span {
 }
 
 
-/* v75.75.99 ajuste espaco vazio final perfil */
 
-/* v75.75.99 — Correção do espaço vazio no final da página Perfil.
-   O tema claro ficou bom como direção, mas a página estava com respiro final excessivo.
-   Mantém área segura para a bottom nav sem criar um vazio grande sem função. */
 
-/* Reduz o padding inferior geral apenas na tela Perfil */
+
+
+
 html body .screen[data-screen="profile"] {
   padding-bottom: 88px !important;
 }
 
-/* Em alguns aparelhos o espaçamento vem do stack interno */
+
 html body .screen[data-screen="profile"] .profile-family-stack,
 html body .screen[data-screen="profile"] .profile-diary-stack {
   padding-bottom: 12px !important;
   margin-bottom: 0 !important;
 }
 
-/* Último bloco do perfil não precisa deixar um vão enorme depois dele */
+
 html body .screen[data-screen="profile"] .profile-family-stack > :last-child,
 html body .screen[data-screen="profile"] .profile-diary-stack > :last-child,
 html body .screen[data-screen="profile"] .profile-family-card:last-child,
@@ -25745,15 +25602,15 @@ html body .screen[data-screen="profile"] article:last-child {
   margin-bottom: 0 !important;
 }
 
-/* Se existir espaçador/safe-area extra no fim, limita ao necessário para a nav */
 
 
-/* Bottom nav continua glass, mas sem parecer que empurra demais o conteúdo */
-
-/* iPhones altos: preserva conforto sem criar área morta */
 
 
-/* Telas mais baixas: ainda mais compacto */
+
+
+
+
+
 @media (max-height: 760px) {
   
   .avatar-modal .avatar-option-grid.icon-grid button.avatar-choice,
@@ -25796,9 +25653,9 @@ html body .screen[data-screen="profile"] article:last-child {
 }
 
 
-/* v75.75.100 refino do tema escuro do perfil */
 
-/* Espaço final no tema escuro: reduz área morta, mantendo safe area da bottom nav */
+
+
 html body[data-day-period="night"] .screen[data-screen="profile"],
 html body:not(.day-theme) .screen[data-screen="profile"] {
   padding-bottom: 82px !important;
@@ -25822,7 +25679,7 @@ html body:not(.day-theme) .screen[data-screen="profile"] article:last-child {
 }
 
 
-/* Contraste do texto no tema escuro */
+
 html body[data-day-period="night"] .screen[data-screen="profile"] p,
 html body[data-day-period="night"] .screen[data-screen="profile"] small,
 html body[data-day-period="night"] .screen[data-screen="profile"] .setting-label,
@@ -25881,12 +25738,12 @@ html body:not(.day-theme) .floating-action-button {
     inset 0 1px 0 rgba(255,255,255,.28) !important;
 }
 
-/* Bottom nav escura permanece premium sem empurrar o conteúdo */
+
 html body:not(.day-theme) .app-bottom-nav {
   margin-bottom: max(8px, env(safe-area-inset-bottom)) !important;
 }
 
-/* Telas altas: ainda reduzido, mas preservando conforto */
+
 @media (min-height: 850px) {
   html body .screen[data-screen="profile"] {
     padding-bottom: 96px !important;
@@ -25912,13 +25769,11 @@ html body:not(.day-theme) .screen[data-screen="profile"] .profile-diary-stack {
 }
 
 
-/* v75.75.101 correcao legibilidade sheet e fab */
 
-/* =========================================================
-   1) Legibilidade geral por tema — sem afetar botões especiais
-   ========================================================= */
 
-/* Tema claro: roxo escuro consistente */
+
+
+
 html body.day-theme,
 html body.day-theme .phone-shell,
 html body.day-theme .screen {
@@ -25950,7 +25805,7 @@ html body.day-theme .screen .timeline .event-text p {
   -webkit-text-fill-color: rgba(87, 76, 111, .86) !important;
 }
 
-/* Tema escuro: textos secundários mais claros sem ficarem brancos demais */
+
 html body:not(.day-theme),
 html body:not(.day-theme) .phone-shell,
 html body:not(.day-theme) .screen {
@@ -25984,7 +25839,7 @@ html body:not(.day-theme) .screen .timeline .event-text p {
   -webkit-text-fill-color: rgba(226, 218, 244, .88) !important;
 }
 
-/* Inputs/selects com leitura consistente */
+
 html body.day-theme input,
 html body.day-theme select,
 html body.day-theme textarea {
@@ -26011,7 +25866,7 @@ html body.day-theme textarea::placeholder {
   -webkit-text-fill-color: rgba(88, 77, 112, .58) !important;
 }
 
-/* Evita que o reset acima estrague textos dentro de botões primários */
+
 html body.day-theme .profile-primary-button,
 html body.day-theme .avatar-save-button,
 html body.day-theme .save-button,
@@ -26046,7 +25901,7 @@ html body:not(.day-theme) button[data-open-sheet] svg {
   stroke: currentColor !important;
 }
 
-/* Tema claro mantém premium sem ficar berrante */
+
 html body.day-theme button[data-open-sheet] {
   background:
     linear-gradient(135deg, #8f72ee 0%, #b59bf7 50%, #efbe96 100%) !important;
@@ -26059,9 +25914,7 @@ html body.day-theme button[data-open-sheet] {
   -webkit-text-fill-color: #ffffff !important;
 }
 
-/* =========================================================
-   3) Menu Registrar — layout estável e textos legíveis
-   ========================================================= */
+
 
 .record-sheet,
 .orbit-cluster-sheet {
@@ -26120,7 +25973,7 @@ html body:not(.day-theme) .orbit-cluster-sheet {
     inset 0 1px 0 rgba(255,255,255,.06) !important;
 }
 
-/* Cabeçalho do sheet */
+
 .record-sheet .section-title,
 .orbit-cluster-sheet .section-title {
   min-height: var(--n80-cluster-title-min-height, 58px) !important;
@@ -26183,7 +26036,7 @@ html body:not(.day-theme) .orbit-cluster-sheet .section-title strong {
   -webkit-text-fill-color: #ffffff !important;
 }
 
-/* Cards de tipo: tamanho fixo, texto sem quebrar de forma feia */
+
 .record-types {
   flex: none !important;
   min-height: 110px !important;
@@ -26233,7 +26086,7 @@ html body:not(.day-theme) .orbit-cluster-sheet .section-title strong {
   text-align: center !important;
 }
 
-/* Texto do card: legível e sem corte estranho */
+
 .record-types button > span:last-child {
   display: block !important;
   align-items: center !important;
@@ -26272,7 +26125,7 @@ html body:not(.day-theme) .orbit-cluster-sheet .section-title strong {
   margin: 0 !important;
 }
 
-/* Tema claro dos cards do sheet */
+
 html body.day-theme .record-types button {
   background:
     linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,244,255,.94)) !important;
@@ -26298,7 +26151,7 @@ html body.day-theme .record-types button > span:last-child {
   -webkit-text-fill-color: #40345b !important;
 }
 
-/* Tema escuro dos cards do sheet */
+
 html body:not(.day-theme) .record-types button {
   background:
     linear-gradient(180deg, rgba(58,47,88,.98), rgba(40,32,67,.98)) !important;
@@ -26324,7 +26177,7 @@ html body:not(.day-theme) .record-types button > span:last-child {
   -webkit-text-fill-color: rgba(255,255,255,.96) !important;
 }
 
-/* Formulário do sheet: cartões estáveis e sem texto invisível */
+
 .record-form {
   display: flex !important;
   gap: 12px !important;
@@ -26457,7 +26310,7 @@ html body:not(.day-theme) .record-form textarea {
   -webkit-text-fill-color: #f8f5ff !important;
 }
 
-/* Cards especiais do formulário */
+
 .breast-timer-panel,
 .milk-slider-card,
 .sleep-duration-preview {
@@ -26483,7 +26336,7 @@ html body:not(.day-theme) .sleep-duration-preview {
   color: #f7f3ff !important;
 }
 
-/* Rodapé do menu registrar */
+
 .record-actions-footer {
   flex: 0 0 auto !important;
   position: relative !important;
@@ -26537,7 +26390,7 @@ html body:not(.day-theme) .record-actions-footer .save-button {
   box-shadow: 0 14px 28px rgba(124,229,194,.18), inset 0 1px 0 rgba(255,255,255,.44) !important;
 }
 
-/* Evita botão de salvar duplicar pseudo-fade antigo */
+
 .record-actions-footer .save-button::before,
 .record-actions-footer .save-button::after,
 .record-form .save-button::before,
@@ -26546,7 +26399,7 @@ html body:not(.day-theme) .record-actions-footer .save-button {
   content: none !important;
 }
 
-/* Ajuste em telas baixas */
+
 @media (max-height: 740px) {
   
 
@@ -26668,15 +26521,11 @@ html body:not(.day-theme) .record-actions-footer .save-button {
 }
 
 
-/* v75.75.102 correcao contador amamentacao hidden */
 
-/* v75.75.102 — Correção do contador da amamentação.
-   Causa: na v75.75.101 alguns campos com atributo hidden receberam display:flex !important.
-   Isso podia deixar o painel visualmente aparente, mas ainda com breastTimerPanel.hidden=true.
-   Como o JS protege o timer quando hidden=true, o contador ficava parado em 00:00.
-*/
 
-/* O atributo hidden precisa vencer sempre */
+
+
+
 .record-sheet [hidden],
 .record-form [hidden],
 #breastTimerPanel[hidden],
@@ -26688,7 +26537,7 @@ html body:not(.day-theme) .record-actions-footer .save-button {
   visibility: hidden !important;
 }
 
-/* O timer só vira layout visível quando o JS realmente remove o hidden */
+
 #breastTimerPanel:not([hidden]).breast-timer-panel {
   display: flex !important;
   flex-direction: column !important;
@@ -26702,7 +26551,7 @@ html body:not(.day-theme) .record-actions-footer .save-button {
   visibility: visible !important;
 }
 
-/* Layout interno estável do timer */
+
 #breastTimerPanel:not([hidden]) .breast-timer-head {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto !important;
@@ -26772,7 +26621,7 @@ html body:not(.day-theme) .record-actions-footer .save-button {
   line-height: 1.28 !important;
 }
 
-/* Tema claro do timer */
+
 html body.day-theme #breastTimerPanel:not([hidden]).breast-timer-panel {
   background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,244,255,.92)) !important;
   border: 1px solid rgba(139,92,246,.12) !important;
@@ -26804,7 +26653,7 @@ html body.day-theme #breastTimerPanel:not([hidden]) .breast-side-grid button.act
   box-shadow: 0 0 0 3px rgba(124,229,194,.12), 0 10px 20px rgba(76,59,112,.08) !important;
 }
 
-/* Tema escuro do timer */
+
 html body:not(.day-theme) #breastTimerPanel:not([hidden]).breast-timer-panel {
   background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.045)) !important;
   border: 1px solid rgba(255,255,255,.11) !important;
@@ -26837,16 +26686,11 @@ html body:not(.day-theme) #breastTimerPanel:not([hidden]) .breast-side-grid butt
 }
 
 
-/* v75.75.111 RESTAURA RELOGIO ANTIGO 1:1 */
 
-/* RESTAURAÇÃO DO RELÓGIO ANTIGO
-   Visual baseado na v75.75.4:
-   - mantém bolinhas/ícones orbitais dos eventos;
-   - mantém céu estrelado no modo escuro;
-   - mantém sol/luz no tema claro;
-   - neutraliza os overrides novos que poluíram/alteraram o relógio. */
 
-/* Card/órbita base antiga */
+
+
+
 html body .state-orbit {
   min-height: 348px !important;
   position: relative !important;
@@ -26900,7 +26744,7 @@ html body .state-orbit::after {
   animation: orbitGlow 11s ease-in-out infinite alternate !important;
 }
 
-/* Tema claro antigo com sol */
+
 html body.day-theme .state-orbit {
   background:
     radial-gradient(circle at 18% 17%, rgba(255, 211, 122, 0.74) 0 30px, transparent 60px),
@@ -26935,7 +26779,7 @@ html body.day-theme .state-orbit::after {
   animation: orbitDayBreathe 12s ease-in-out infinite alternate !important;
 }
 
-/* Anel antigo */
+
 html body .orbit-ring,
 html body .orbit-ring::before {
   position: absolute !important;
@@ -26976,7 +26820,7 @@ html body.day-theme .orbit-ring::before {
   box-shadow: 228px 0 0 rgba(214, 154, 60, 0.2) !important;
 }
 
-/* Eventos orbitais antigos */
+
 html body .orbit-events,
 html body #orbitEvents.orbit-events {
   position: absolute !important;
@@ -27122,7 +26966,7 @@ html body .orbit-event.active i {
     0 0 18px rgba(143, 124, 255, 0.28) !important;
 }
 
-/* Tipografia antiga do relógio */
+
 html body .state-orbit strong,
 html body #stateClock {
   position: relative !important;
@@ -27190,7 +27034,7 @@ html body.day-theme #stateClock {
   100% { opacity: 0.92; transform: translate3d(0, -5px, 0); }
 }
 
-/* Limpa qualquer pseudo fundo quadrado herdado de versões novas */
+
 html body .orbit-event::before,
 html body .orbit-event::after,
 html body .orbit-event *::before,
@@ -27201,10 +27045,9 @@ html body .orbit-event *::after {
 }
 
 
-/* v75.75.112 reforco icones orbitais tema claro */
 
-/* Reforço visual dos ícones orbitais no tema claro.
-   Mantém o relógio antigo, mas garante que os eventos registrados apareçam também no claro. */
+
+
 html body.day-theme .orbit-event {
   color: #5a465b !important;
   opacity: 1 !important;
@@ -27234,7 +27077,7 @@ html body.day-theme .orbit-cluster i {
 }
 
 
-/* v75.75.113 botao madrugada inteligente */
+
 html body .main-action-area .primary-action .action-icon {
   overflow: hidden !important;
 }

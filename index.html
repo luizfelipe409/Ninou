@@ -2104,18 +2104,24 @@
             <button id="resetBreastTimerButton" type="button">Zerar</button>
           </div>
           <div class="breast-side-grid">
-            <button type="button" data-breast-side="left">
-              <span>E</span>
+            <button type="button" data-breast-side="left" aria-pressed="false" aria-label="Iniciar timer do peito esquerdo">
+              <span class="breast-side-control" aria-hidden="true">
+                <span class="breast-side-letter">E</span>
+                <span class="breast-side-play"></span>
+              </span>
               <strong id="leftBreastTimer">00:00</strong>
               <small>Esquerdo</small>
             </button>
-            <button type="button" data-breast-side="right">
-              <span>D</span>
+            <button type="button" data-breast-side="right" aria-pressed="false" aria-label="Iniciar timer do peito direito">
+              <span class="breast-side-control" aria-hidden="true">
+                <span class="breast-side-letter">D</span>
+                <span class="breast-side-play"></span>
+              </span>
               <strong id="rightBreastTimer">00:00</strong>
               <small>Direito</small>
             </button>
           </div>
-          <p>Toque em E ou D para iniciar/pausar o tempo de cada peito.</p>
+          <p>Use o play para iniciar. Toque novamente para pausar e alterne o lado quando precisar.</p>
         </section>
         <label id="sheetAmountField" class="amount-field" hidden>
           <span>Quantidade</span>
@@ -2148,6 +2154,7 @@
         </div>
         <button id="closeOrbitCluster" class="round-action icon-button-close" type="button" aria-label="Fechar registros próximos"></button>
       </div>
+      <div id="orbitClusterHero" class="orbit-cluster-hero" aria-live="polite"></div>
       <div id="orbitClusterList" class="cluster-list"></div>
       <button id="orbitClusterViewAll" class="orbit-cluster-view-all" type="button">Ver todos os registros</button>
     </section>

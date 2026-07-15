@@ -53,6 +53,7 @@ const sheet = document.querySelector("#recordSheet");
 const sheetBackdrop = document.querySelector("#sheetBackdrop");
 const orbitClusterSheet = document.querySelector("#orbitClusterSheet");
 const orbitClusterTitle = document.querySelector("#orbitClusterTitle");
+const orbitClusterHero = document.querySelector("#orbitClusterHero");
 const orbitClusterList = document.querySelector("#orbitClusterList");
 const closeOrbitClusterButton = document.querySelector("#closeOrbitCluster");
 const orbitClusterViewAllButton = document.querySelector("#orbitClusterViewAll");
@@ -909,6 +910,8 @@ let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let orbitDurationRenderSignature = "";
 let orbitCompletedJourneyKeys = new Set();
+let orbitClusterCloseTimer = 0;
+let orbitSharedFlight = null;
 let timelineRenderSignature = "";
 let growthPanelsRenderSignature = "";
 let weightProfileRenderSignature = "";
@@ -10173,6 +10176,7 @@ function renderCurrentState() {
 }
 
 const ORBIT_RADIUS = 126;
+const ORBIT_MARKER_RADIUS = 140;
 const ORBIT_CENTER = 160;
 const ORBIT_COLLISION_DISTANCE = 54;
 const ORBIT_CLUSTER_WINDOW_MINUTES = 75;
@@ -10242,7 +10246,11 @@ function getScaledOrbitPosition(position = {}) {
 }
 
 function applyOrbitMarkerPosition(element, position) {
-  const scaled = getScaledOrbitPosition(position);
+  const markerRadiusScale = ORBIT_MARKER_RADIUS / ORBIT_RADIUS;
+  const scaled = getScaledOrbitPosition({
+    x: (Number(position?.x) || 0) * markerRadiusScale,
+    y: (Number(position?.y) || 0) * markerRadiusScale,
+  });
   element.style.setProperty("--x", `${scaled.x.toFixed(2)}px`);
   element.style.setProperty("--y", `${scaled.y.toFixed(2)}px`);
 }
@@ -10333,6 +10341,13 @@ function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
   if (!orbitDurationArcs) return;
   const dayEnd = orbitStart + day;
   const durationEvents = events.filter(isOrbitDurationEvent);
+  const primaryDurationEvent = durationEvents.reduce((primary, event) => {
+    if (!primary || (event.isActive && !primary.isActive)) return event;
+    if (primary.isActive && !event.isActive) return primary;
+    const eventDuration = getOrbitEventEnd(event) - Number(event.start || 0);
+    const primaryDuration = getOrbitEventEnd(primary) - Number(primary.start || 0);
+    return eventDuration >= primaryDuration ? event : primary;
+  }, null);
   const nextSignature = durationEvents.map((event) => [
     event.id || event.type,
     event.type,
@@ -10352,11 +10367,12 @@ function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
     const startMinute = (startTs - orbitStart) / 60000;
     const endMinute = (endTs - orbitStart) / 60000;
     const config = getEventConfig(event.type);
+    const isPrimaryJourney = event === primaryDurationEvent;
     const journeyKey = `${event.id || event.type}:${Math.floor(startTs / 60000)}:${Math.floor(endTs / 60000)}`;
     const journeyArrivalClass = !event.isActive && !orbitCompletedJourneyKeys.has(journeyKey) ? " is-arriving" : "";
     if (!event.isActive) nextCompletedJourneyKeys.add(journeyKey);
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    group.setAttribute("class", `orbit-duration-journey ${config.arcType}${event.isActive ? " active" : ` complete${journeyArrivalClass}`}`);
+    group.setAttribute("class", `orbit-duration-journey ${config.arcType}${isPrimaryJourney ? " primary-journey" : " secondary-journey"}${event.isActive ? " active" : ` complete${journeyArrivalClass}`}`);
     const pathData = describeOrbitArc(startMinute, endMinute);
     ["orbit-duration-halo", "orbit-duration-segment", "orbit-duration-glint"].forEach((className) => {
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -10367,30 +10383,40 @@ function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
     });
     const startPoint = orbitPointForMinute(startMinute);
     const endPoint = orbitPointForMinute(endMinute);
-    [["orbit-duration-start", startPoint], ["orbit-duration-head", endPoint]].forEach(([className, point]) => {
+    [["orbit-duration-start-halo", startPoint, 7.5], ["orbit-duration-head-halo", endPoint, 9], ["orbit-duration-start", startPoint, 4], ["orbit-duration-head", endPoint, 5.5]].forEach(([className, point, radius]) => {
       const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       dot.setAttribute("class", className);
       dot.setAttribute("cx", point.svgX.toFixed(2));
       dot.setAttribute("cy", point.svgY.toFixed(2));
-      dot.setAttribute("r", className.endsWith("head") ? "4.5" : "3");
+      dot.setAttribute("r", String(radius));
       group.append(dot);
     });
+    if (isPrimaryJourney) {
+      const labelPoint = orbitPointForMinute(startMinute, ORBIT_RADIUS - 18);
+      const startLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      startLabel.setAttribute("class", "orbit-duration-start-label");
+      startLabel.setAttribute("x", labelPoint.svgX.toFixed(2));
+      startLabel.setAttribute("y", (labelPoint.svgY + 3).toFixed(2));
+      startLabel.setAttribute("text-anchor", "middle");
+      startLabel.textContent = formatTime(startTs);
+      group.append(startLabel);
+    }
     orbitDurationArcs.append(group);
   });
   orbitCompletedJourneyKeys = nextCompletedJourneyKeys;
 }
 
 function openOrbitEventsFromMarker(marker, events, options = {}) {
-  openOrbitCluster(events, options);
+  openOrbitCluster(events, { ...options, sourceMarker: marker });
 }
 
 function createOrbitEvent(event, active = false, position = eventPosition(event.start)) {
   const config = getEventConfig(event.type);
   const button = document.createElement("button");
   button.type = "button";
-  button.className = `orbit-event live-orbit-marker ${config.arcType}${active ? " active" : ""}`;
+  button.className = `orbit-event live-orbit-marker ${config.arcType}${active ? " active" : " complete"}${isOrbitDurationEvent(event) ? " has-duration" : ""}`;
   applyOrbitMarkerPosition(button, position);
-  button.innerHTML = `<i>${config.icon}</i>`;
+  button.innerHTML = `<i class="orbit-marker-icon">${config.icon}</i>`;
   const markerTime = getOrbitMarkerTimestamp(event);
   const markerLabel = isSleepEvent(event) && markerTime > Number(event.start)
     ? `${config.title} terminou às ${formatTime(markerTime)}`
@@ -10399,6 +10425,37 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
   button.setAttribute("aria-label", markerLabel);
   button.addEventListener("click", () => openOrbitEventsFromMarker(button, [event], { title: config.title }));
   return button;
+}
+
+function setOrbitConstellationGeometry(button, position, previewCount) {
+  const radialAngle = Math.atan2(Number(position.y) || 0, Number(position.x) || 0);
+  const tangentBefore = radialAngle - Math.PI / 2;
+  const tangentAfter = radialAngle + Math.PI / 2;
+  const previewAngles = previewCount > 1 ? [tangentBefore, tangentAfter] : [tangentBefore];
+  const previewDistance = previewCount > 1 ? 30 : 32;
+  previewAngles.forEach((angle, index) => {
+    const key = index ? "b" : "a";
+    button.style.setProperty(`--cluster-preview-${key}-x`, `${(Math.cos(angle) * previewDistance).toFixed(1)}px`);
+    button.style.setProperty(`--cluster-preview-${key}-y`, `${(Math.sin(angle) * previewDistance).toFixed(1)}px`);
+    button.style.setProperty(`--cluster-line-${key}-angle`, `${angle.toFixed(4)}rad`);
+  });
+  const countAngle = tangentAfter;
+  const countDistance = previewCount > 1 ? 45 : 32;
+  button.style.setProperty("--cluster-count-x", `${(Math.cos(countAngle) * countDistance).toFixed(1)}px`);
+  button.style.setProperty("--cluster-count-y", `${(Math.sin(countAngle) * countDistance).toFixed(1)}px`);
+  button.style.setProperty("--cluster-count-angle", `${countAngle.toFixed(4)}rad`);
+}
+
+function getOrbitConstellationMarkup(eventList) {
+  const newestFirst = [...eventList].sort((a, b) => b.start - a.start);
+  const primaryConfig = getEventConfig(newestFirst[0].type);
+  const previewEvents = newestFirst.slice(1, 3);
+  const previewMarkup = previewEvents.map((event, index) => {
+    const config = getEventConfig(event.type);
+    const key = index ? "b" : "a";
+    return `<span class="orbit-constellation-line line-${key}"></span><i class="orbit-cluster-preview preview-${key}">${config.icon}</i>`;
+  }).join("");
+  return `<span class="orbit-cluster-constellation" aria-hidden="true">${previewMarkup}<span class="orbit-constellation-line line-count"></span><i class="orbit-cluster-icon">${primaryConfig.icon}</i><span class="orbit-cluster-count">${eventList.length}</span></span>`;
 }
 
 function createOrbitCluster(group) {
@@ -10416,7 +10473,9 @@ function createOrbitCluster(group) {
     : formatTime(markerTimes[0]);
   button.title = `${eventList.length} registros próximos · ${timeRange}`;
   button.setAttribute("aria-label", `${eventList.length} registros próximos, no período ${timeRange}`);
-  button.innerHTML = `<i class="orbit-cluster-icon">${config.icon}</i><span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>`;
+  button.dataset.previewCount = String(Math.min(2, eventList.length - 1));
+  setOrbitConstellationGeometry(button, group.position, Math.min(2, eventList.length - 1));
+  button.innerHTML = getOrbitConstellationMarkup(eventList);
   button.addEventListener("click", () => openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` }));
   return button;
 }
@@ -10582,10 +10641,83 @@ function renderTimeline() {
   }
 }
 
+function getOrbitClusterHeroMarkup(events = []) {
+  const orderedEvents = [...events].sort((a, b) => a.start - b.start);
+  const iconEvents = [...orderedEvents].reverse().slice(0, 3);
+  const firstEvent = orderedEvents[0];
+  const lastEvent = orderedEvents[orderedEvents.length - 1];
+  const firstMarker = Math.min(...orderedEvents.map((event) => getOrbitMarkerTimestamp(event)));
+  const lastMarker = Math.max(...orderedEvents.map((event) => getOrbitMarkerTimestamp(event)));
+  const isSingleJourney = orderedEvents.length === 1 && isOrbitDurationEvent(firstEvent);
+  const kicker = isSingleJourney
+    ? (firstEvent.isActive ? "Percurso em andamento" : "Percurso concluído")
+    : orderedEvents.length > 1 ? "Nó de constelação" : "Momento na órbita";
+  const headline = isSingleJourney
+    ? formatShortDuration(getOrbitEventEnd(firstEvent) - firstEvent.start)
+    : orderedEvents.length > 1 ? `${orderedEvents.length} registros conectados` : formatTime(firstMarker);
+  const interval = lastMarker > firstMarker ? formatShortDuration(lastMarker - firstMarker) : "mesmo horário";
+  const detail = isSingleJourney
+    ? `${getOrbitEventRange(firstEvent)} • ${getOrbitEventSubline(firstEvent)}`
+    : orderedEvents.length > 1
+      ? (lastMarker > firstMarker ? `${formatTime(firstMarker)}–${formatTime(lastMarker)} • intervalo de ${interval}` : `${formatTime(firstMarker)} • sequência imediata`)
+      : getOrbitEventSubline(firstEvent || lastEvent);
+  const icons = iconEvents.map((event, index) => {
+    const config = getEventConfig(event.type);
+    return `<i class="orbit-cluster-hero-icon${index === 0 ? " orbit-cluster-hero-primary" : ""}" style="--hero-icon-index:${index}">${config.icon}</i>`;
+  }).join("");
+  const count = orderedEvents.length > 1 ? `<span class="orbit-cluster-hero-count">${orderedEvents.length}</span>` : "";
+  return `<div class="orbit-cluster-hero-visual" data-size="${orderedEvents.length}">${icons}${count}</div><div class="orbit-cluster-hero-copy"><span>${escapeHtml(kicker)}</span><strong>${escapeHtml(headline)}</strong><p>${escapeHtml(detail)}</p></div>`;
+}
+
+function prefersReducedOrbitMotion() {
+  return Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
+}
+
+function animateOrbitMarkerToDetails(marker) {
+  const source = marker?.querySelector?.(".orbit-cluster-icon .icon-art, .orbit-marker-icon .icon-art, i .icon-art");
+  const target = orbitClusterHero?.querySelector?.(".orbit-cluster-hero-primary .icon-art");
+  if (!source || !target || prefersReducedOrbitMotion()) return;
+  const sourceRect = source.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  if (!sourceRect.width || !targetRect.width) return;
+
+  orbitSharedFlight?.remove?.();
+  const flight = source.cloneNode(true);
+  flight.classList.add("orbit-shared-flight");
+  Object.assign(flight.style, {
+    left: `${sourceRect.left}px`,
+    top: `${sourceRect.top}px`,
+    width: `${sourceRect.width}px`,
+    height: `${sourceRect.height}px`,
+  });
+  document.body.append(flight);
+  orbitSharedFlight = flight;
+  marker.classList.add("is-transitioning");
+  const deltaX = targetRect.left - sourceRect.left;
+  const deltaY = targetRect.top - sourceRect.top;
+  const scale = targetRect.width / sourceRect.width;
+  const cleanup = () => {
+    flight.remove();
+    if (orbitSharedFlight === flight) orbitSharedFlight = null;
+    marker.classList.remove("is-transitioning");
+  };
+  const animation = flight.animate([
+    { transform: "translate3d(0,0,0) scale(1)", opacity: 1, offset: 0 },
+    { transform: `translate3d(${(deltaX * .62).toFixed(2)}px,${(deltaY * .54).toFixed(2)}px,0) scale(1.08)`, opacity: .96, offset: .58 },
+    { transform: `translate3d(${deltaX.toFixed(2)}px,${deltaY.toFixed(2)}px,0) scale(${scale.toFixed(3)})`, opacity: .18, offset: 1 },
+  ], { duration: 440, easing: "cubic-bezier(.22,1,.36,1)", fill: "forwards" });
+  animation.onfinish = cleanup;
+  animation.oncancel = cleanup;
+  window.setTimeout(cleanup, 560);
+}
+
 function openOrbitCluster(events, options = {}) {
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const orderedEvents = [...events].sort((a, b) => a.start - b.start);
+  if (!orderedEvents.length) return;
+  window.clearTimeout(orbitClusterCloseTimer);
   orbitClusterTitle.textContent = options?.title || `${orderedEvents.length} registros próximos`;
+  if (orbitClusterHero) orbitClusterHero.innerHTML = getOrbitClusterHeroMarkup(orderedEvents);
   orbitClusterList.innerHTML = orderedEvents.map((rawEvent, index) => {
     const event = decorateEventForSelectedDay(rawEvent, selectedStart);
     const config = getEventConfig(event.type);
@@ -10607,7 +10739,15 @@ function openOrbitCluster(events, options = {}) {
   closeSheet();
   if (orbitClusterViewAllButton) orbitClusterViewAllButton.textContent = `Ver todos os registros`;
   orbitClusterSheet.dataset.clusterSize = String(orderedEvents.length);
-  orbitClusterSheet.classList.remove("is-entering");
+  orbitClusterSheet.classList.remove("is-entering", "is-leaving");
+  const sourceRect = options.sourceMarker?.getBoundingClientRect?.();
+  if (sourceRect?.width) {
+    const originX = Math.max(8, Math.min(92, ((sourceRect.left + sourceRect.width / 2) / window.innerWidth) * 100));
+    orbitClusterSheet.style.setProperty("--orbit-detail-origin-x", `${originX.toFixed(2)}%`);
+    orbitClusterSheet.classList.add("from-orbit");
+  } else {
+    orbitClusterSheet.classList.remove("from-orbit");
+  }
   orbitClusterSheet.hidden = false;
   sheetBackdrop.hidden = false;
   document.body.classList.add("orbit-cluster-open");
@@ -10617,19 +10757,38 @@ function openOrbitCluster(events, options = {}) {
     orbitClusterSheet.classList.add("is-entering");
     orbitClusterSheet.scrollTop = 0;
     orbitClusterList.scrollTop = 0;
+    animateOrbitMarkerToDetails(options.sourceMarker);
   });
 }
 
-function closeOrbitCluster(options = {}) {
-  orbitClusterSheet.classList.remove("is-entering");
+function finishClosingOrbitCluster(options = {}) {
+  window.clearTimeout(orbitClusterCloseTimer);
+  orbitClusterCloseTimer = 0;
+  orbitClusterSheet.classList.remove("is-entering", "is-leaving", "from-orbit");
   document.body.classList.remove("orbit-cluster-open");
   orbitClusterSheet.hidden = true;
+  orbitClusterSheet.style.removeProperty("--orbit-detail-origin-x");
   orbitClusterList.innerHTML = "";
+  if (orbitClusterHero) orbitClusterHero.innerHTML = "";
+  orbitSharedFlight?.remove?.();
+  orbitSharedFlight = null;
   if (orbitClusterViewAllButton) orbitClusterViewAllButton.blur();
   if (sheet.hidden) {
     sheetBackdrop.hidden = true;
     if (!options.preserveViewportLock) unlockRecordSheetViewport();
   }
+}
+
+function closeOrbitCluster(options = {}) {
+  if (orbitClusterSheet.hidden) return;
+  if (options.animate && !prefersReducedOrbitMotion()) {
+    orbitClusterSheet.classList.remove("is-entering");
+    orbitClusterSheet.classList.add("is-leaving");
+    window.clearTimeout(orbitClusterCloseTimer);
+    orbitClusterCloseTimer = window.setTimeout(() => finishClosingOrbitCluster(options), 230);
+    return;
+  }
+  finishClosingOrbitCluster(options);
 }
 
 function getOverlapDuration(start, end, windowStart, windowEnd) {
@@ -11035,7 +11194,12 @@ function renderBreastTimer() {
   if (rightBreastTimer) rightBreastTimer.textContent = formatBreastTimer(snapshot.rightMs);
   if (breastTimerTotal) breastTimerTotal.textContent = formatBreastTimer(snapshot.leftMs + snapshot.rightMs);
   breastSideButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.breastSide === breastTimerState.activeSide);
+    const side = button.dataset.breastSide;
+    const isActive = side === breastTimerState.activeSide;
+    const sideLabel = side === "right" ? "direito" : "esquerdo";
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+    button.setAttribute("aria-label", `${isActive ? "Pausar" : "Iniciar"} timer do peito ${sideLabel}`);
   });
 }
 
@@ -13922,7 +14086,7 @@ window.addEventListener("orientationchange", scheduleOrbitLayoutRender, { passiv
 
 closeSheetButton.addEventListener("click", closeSheet);
 backToActionLauncherButton?.addEventListener("click", returnToActionLauncher);
-closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);
+closeOrbitClusterButton.addEventListener("click", () => closeOrbitCluster({ animate: true }));
 if (orbitClusterViewAllButton) {
   orbitClusterViewAllButton.addEventListener("click", () => {
     closeOrbitCluster();
@@ -13931,7 +14095,7 @@ if (orbitClusterViewAllButton) {
 }
 sheetBackdrop.addEventListener("click", () => {
   closeSheet();
-  closeOrbitCluster();
+  closeOrbitCluster({ animate: true });
 });
 saveButton.addEventListener("click", () => withButtonBusy(saveButton, "Salvando...", saveManualEvent));
 resetDataButton.addEventListener("click", () => withButtonBusy(resetDataButton, "Limpando...", resetDayData));
