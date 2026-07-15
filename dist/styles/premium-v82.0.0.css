@@ -2257,7 +2257,7 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
     transition: transform var(--n79-fast) ease, opacity var(--n79-fast) ease, border-color var(--n79-fast) ease, background-color var(--n79-fast) ease !important;
   }
 
-  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) button:active {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) button:not(.orbit-event):not(.live-orbit-marker):not(.orbit-cluster):active {
     transform: scale(.975) !important;
   }
 
@@ -3782,18 +3782,6 @@ html.ninou-v8200 body:not(.day-theme) .orbit-time-anchor {
   box-shadow: 0 0 14px rgba(111,68,209,.20), inset 0 1px 0 rgba(255,255,255,.08) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
-}
-
-/* Eventos recebem bolhas coerentes com cada céu. */
-html.ninou-v8200 body.day-theme :is(.orbit-event,.live-orbit-marker) {
-  border-color: rgba(255,255,255,.92) !important;
-  box-shadow: 0 9px 23px rgba(84,66,135,.20), 0 0 0 2px rgba(132,101,198,.10) !important;
-}
-
-html.ninou-v8200 body:not(.day-theme) :is(.orbit-event,.live-orbit-marker) {
-  border-color: rgba(215,180,255,.58) !important;
-  background: radial-gradient(circle at 34% 24%, rgba(255,205,164,.30), rgba(90,48,151,.88) 56%, rgba(34,22,79,.94)) !important;
-  box-shadow: 0 0 0 2px rgba(146,91,230,.18), 0 0 18px rgba(120,68,225,.44), 0 10px 24px rgba(0,0,0,.34) !important;
 }
 
 @keyframes n8012-light-rays {

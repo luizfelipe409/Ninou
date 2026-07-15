@@ -78,7 +78,7 @@ assert.match(html, /class="orbit-sky"/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-premium-orbit-journey/);
+assert.match(sw, /ninou-v82-0-0-orbit-stable-circles/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -145,10 +145,12 @@ assert.match(focusedFlowCss, /screen\[data-screen="profile"\]\.active > :not\(\[
 assert.match(ux, /control\.matches\("\.orbit-event,\.live-orbit-marker,\.orbit-cluster"\)/);
 assert.match(core, /const ORBIT_CLUSTER_WINDOW_MINUTES = 75/);
 assert.match(core, /orbit-duration-halo/);
-assert.match(core, /orbit-cluster-peek/);
+assert.doesNotMatch(core, /orbit-cluster-peek/);
 assert.match(core, /orbitClusterSheet\.classList\.add\("is-entering"\)/);
 assert.match(core, /orbitCompletedJourneyKeys/);
 assert.match(core, /--cluster-delay:/);
 assert.match(premiumCss, /body\.day-theme \.orbit-gradient-stop-a/);
 assert.match(premiumCss, /\.orbit-duration-journey\.active \.orbit-duration-glint/);
-assert.match(focusedFlowCss, /\.orbit-cluster-constellation/);
+assert.doesNotMatch(focusedFlowCss, /\.orbit-cluster-constellation/);
+assert.match(premiumCss, /button:not\(\.orbit-event\):not\(\.live-orbit-marker\):not\(\.orbit-cluster\):active/);
+assert.match(focusedFlowCss, /button\.orbit-event[\s\S]*box-shadow: none !important[\s\S]*transform: translate\(-50%, -50%\) !important/);

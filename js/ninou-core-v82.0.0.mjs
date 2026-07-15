@@ -10376,8 +10376,6 @@ function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
 }
 
 function openOrbitEventsFromMarker(marker, events, options = {}) {
-  marker.classList.add("is-opening");
-  window.setTimeout(() => marker.classList.remove("is-opening"), 440);
   openOrbitCluster(events, options);
 }
 
@@ -10406,10 +10404,6 @@ function createOrbitCluster(group) {
   button.className = `orbit-event live-orbit-marker orbit-cluster ${config.arcType}`;
   applyOrbitMarkerPosition(button, group.position);
   button.dataset.clusterCount = String(eventList.length);
-  const previewIcons = eventList.slice(-3, -1).map((event, index) => {
-    const previewConfig = getEventConfig(event.type);
-    return `<span class="orbit-cluster-peek orbit-cluster-peek-${index + 1}" aria-hidden="true">${previewConfig.icon}</span>`;
-  }).join("");
   const markerTimes = group.items.map((item) => Number(item.timestamp || getOrbitMarkerTimestamp(item.event))).sort((a, b) => a - b);
   const lastMarkerTime = markerTimes[markerTimes.length - 1];
   const timeRange = markerTimes.length > 1 && formatTime(markerTimes[0]) !== formatTime(lastMarkerTime)
@@ -10417,7 +10411,7 @@ function createOrbitCluster(group) {
     : formatTime(markerTimes[0]);
   button.title = `${eventList.length} registros próximos · ${timeRange}`;
   button.setAttribute("aria-label", `${eventList.length} registros próximos, no período ${timeRange}`);
-  button.innerHTML = `<span class="orbit-cluster-constellation" aria-hidden="true">${previewIcons}</span><i class="orbit-cluster-icon">${config.icon}</i><span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>`;
+  button.innerHTML = `<i class="orbit-cluster-icon">${config.icon}</i><span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>`;
   button.addEventListener("click", () => openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` }));
   return button;
 }
