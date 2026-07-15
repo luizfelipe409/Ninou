@@ -1,17 +1,17 @@
 const CACHE_NAME = "ninou-v81-0-1-menu-diario-x";
-const APP_VERSION = "82.0.3";
-const STYLE_MODULES = ["legacy", "premium-v82.0.3"];
+const APP_VERSION = "82.0.0";
+const STYLE_MODULES = ["legacy", "premium-v82.0.0"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
-  `/js/boot-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/ninou-core-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/ninou-ux-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/ninou-consistency-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/ninou-stability-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/runtime/architecture-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/runtime/diagnostics-v82.0.3.mjs?v=${APP_VERSION}`,
-  `/js/runtime/visual-guard-v82.0.3.mjs?v=${APP_VERSION}`,
+  `/js/boot-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-core-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-ux-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-consistency-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/ninou-stability-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/architecture-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/diagnostics-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/js/runtime/visual-guard-v82.0.0.mjs?v=${APP_VERSION}`,
   "/js/core/event-bus.js", "/js/core/app-state.js", "/js/core/logger.js",
   "/js/repositories/json-repository.js", "/js/repositories/routine-repository.js", "/js/repositories/profile-repository.js",
   "/js/config/constants.js", "/js/dom/dom.js",

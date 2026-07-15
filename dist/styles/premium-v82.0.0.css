@@ -1,5 +1,5 @@
 /*
-  Ninou v82.0.3 — autoridade visual revisada da experiência familiar.
+  Ninou v82.0.0 — autoridade visual revisada da experiência familiar.
   Esta folha é carregada depois do legado e concentra Home, Diário, Dados,
   folha de registro, navegação e responsividade. O Perfil volta a usar o
   acabamento anterior, com correção cirúrgica no card Minha família. Novas correções visuais
@@ -27,8 +27,8 @@
   --n79-normal: 260ms;
 }
 
-html.ninou-v8203,
-html.ninou-v8203 body {
+html.ninou-v8200,
+html.ninou-v8200 body {
   min-width: 100%;
   min-height: 100%;
   font-family: var(--n79-font);
@@ -36,7 +36,7 @@ html.ninou-v8203 body {
   text-rendering: optimizeLegibility;
 }
 
-html.ninou-v8203 body.family-daily-surface {
+html.ninou-v8200 body.family-daily-surface {
   --n79-bg: #100d1d;
   --n79-shell: #181329;
   --n79-surface: #211a35;
@@ -65,7 +65,7 @@ html.ninou-v8203 body.family-daily-surface {
   color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface.day-theme {
+html.ninou-v8200 body.family-daily-surface.day-theme {
   --n79-bg: #eeedf3;
   --n79-shell: #f7f6fa;
   --n79-surface: #ffffff;
@@ -93,25 +93,25 @@ html.ninou-v8203 body.family-daily-surface.day-theme {
   color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 [hidden] {
+html.ninou-v8200 [hidden] {
   display: none !important;
   visibility: hidden !important;
 }
 
-html.ninou-v8203 *,
-html.ninou-v8203 *::before,
-html.ninou-v8203 *::after {
+html.ninou-v8200 *,
+html.ninou-v8200 *::before,
+html.ninou-v8200 *::after {
   box-sizing: border-box;
 }
 
-html.ninou-v8203 button,
-html.ninou-v8203 input,
-html.ninou-v8203 select,
-html.ninou-v8203 textarea {
+html.ninou-v8200 button,
+html.ninou-v8200 input,
+html.ninou-v8200 select,
+html.ninou-v8200 textarea {
   font: inherit;
 }
 
-html.ninou-v8203 button {
+html.ninou-v8200 button {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -119,7 +119,7 @@ html.ninou-v8203 button {
 /* ==============================
    Estrutura principal e cabeçalho
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
   width: min(100%, var(--n79-page-max)) !important;
   max-width: var(--n79-page-max) !important;
   min-height: 100dvh !important;
@@ -135,7 +135,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).r
   box-shadow: 0 0 70px rgba(6,4,17,.18) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .app-header {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .app-header {
   position: sticky !important;
   top: max(8px, var(--n79-safe-top)) !important;
   z-index: 40 !important;
@@ -154,7 +154,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .identity {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .identity {
   min-width: 0 !important;
   display: grid !important;
   grid-template-columns: 42px minmax(0,1fr) !important;
@@ -162,7 +162,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   gap: 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .identity > img {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .identity > img {
   width: 42px !important;
   height: 42px !important;
   min-width: 42px !important;
@@ -175,11 +175,11 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: 0 7px 18px rgba(7,4,22,.20) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .identity > div {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .identity > div {
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .identity span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .identity span {
   display: block !important;
   margin-bottom: 2px !important;
   color: var(--n79-label) !important;
@@ -191,7 +191,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-transform: uppercase !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .identity strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .identity strong {
   display: block !important;
   max-width: 100% !important;
   overflow: hidden !important;
@@ -204,7 +204,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-overflow: ellipsis !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .sync-pill {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .sync-pill {
   flex: 0 0 auto !important;
   min-height: 34px !important;
   padding: 0 11px !important;
@@ -221,11 +221,11 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen {
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen.active {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen.active {
   display: grid !important;
   align-content: start !important;
   gap: 14px !important;
@@ -234,14 +234,14 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   background: transparent !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen:not(.active) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen:not(.active) {
   display: none !important;
 }
 
 /* ==============================
    Superfícies, textos e controles
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(
   .today-caregiver-card,
   .today-overview-card,
   .routine-correction-card,
@@ -286,7 +286,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   box-shadow: var(--n79-shadow-soft) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(
   .today-overview-card,
   .routine-correction-card,
   .smart-insight-card,
@@ -313,12 +313,12 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   padding: 16px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(p, small, em, .section-helper, .chart-helper, .form-status) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(p, small, em, .section-helper, .chart-helper, .form-status) {
   color: var(--n79-muted) !important;
   -webkit-text-fill-color: var(--n79-muted) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(
   .section-title,
   .drawer-section-title,
   .profile-card-head,
@@ -329,7 +329,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(
   .section-title,
   .drawer-section-title,
   .profile-card-head,
@@ -341,7 +341,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   -webkit-text-fill-color: var(--n79-label) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(
   .section-title,
   .drawer-section-title,
   .profile-card-head,
@@ -353,7 +353,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   -webkit-text-fill-color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(input, select, textarea) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(input, select, textarea) {
   width: 100% !important;
   min-height: 50px !important;
   padding: 12px 13px !important;
@@ -367,24 +367,24 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   outline: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) textarea {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) textarea {
   min-height: 104px !important;
   resize: vertical !important;
   line-height: 1.42 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(input, select, textarea):focus {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(input, select, textarea):focus {
   border-color: var(--n79-line-strong) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--n79-accent) 13%, transparent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(input, textarea)::placeholder {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(input, textarea)::placeholder {
   color: color-mix(in srgb, var(--n79-muted) 65%, transparent) !important;
   -webkit-text-fill-color: color-mix(in srgb, var(--n79-muted) 65%, transparent) !important;
   opacity: 1 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(.ghost-link, .profile-secondary-button, .secondary-login) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.ghost-link, .profile-secondary-button, .secondary-login) {
   min-height: 42px !important;
   padding: 0 13px !important;
   border: 1px solid var(--n79-line) !important;
@@ -396,7 +396,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   box-shadow: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(.profile-primary-button, .save-button, #loginButton, #exportPdfButton) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.profile-primary-button, .save-button, #loginButton, #exportPdfButton) {
   min-height: 48px !important;
   border: 0 !important;
   border-radius: 15px !important;
@@ -407,7 +407,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   box-shadow: 0 10px 25px color-mix(in srgb, var(--n79-accent) 18%, transparent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).day-theme :is(.profile-primary-button, .save-button, #loginButton, #exportPdfButton) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).day-theme :is(.profile-primary-button, .save-button, #loginButton, #exportPdfButton) {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   background: linear-gradient(135deg, #7256c7, #9676dd) !important;
@@ -416,7 +416,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).d
 /* ==============================
    Home premium
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-topline {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-topline {
   min-height: 38px !important;
   padding: 0 3px !important;
   display: flex !important;
@@ -426,7 +426,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   color: var(--n79-muted) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-topline > span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-topline > span {
   min-width: 0 !important;
   font-size: .82rem !important;
   font-weight: 750 !important;
@@ -435,7 +435,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-overflow: ellipsis !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
   position: relative !important;
   width: min(100%, 370px) !important;
   aspect-ratio: 1 / 1 !important;
@@ -455,7 +455,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: var(--n79-shadow) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-timeline-svg {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-timeline-svg {
   position: absolute !important;
   inset: 13px !important;
   width: calc(100% - 26px) !important;
@@ -465,20 +465,20 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-track {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-track {
   fill: none !important;
   stroke: color-mix(in srgb, var(--n79-text) 10%, transparent) !important;
   stroke-width: 12 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-now-dot {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-now-dot {
   fill: var(--n79-accent-3) !important;
   stroke: var(--n79-surface) !important;
   stroke-width: 3 !important;
   filter: drop-shadow(0 0 8px color-mix(in srgb, var(--n79-accent-3) 60%, transparent)) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe {
   position: absolute !important;
   inset: 50% auto auto 50% !important;
   width: min(68%, 242px) !important;
@@ -502,7 +502,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: translate(-50%, -50%) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe > * {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe > * {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -513,7 +513,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-align: center !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #stateLabel {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #stateLabel {
   color: var(--n79-label) !important;
   -webkit-text-fill-color: var(--n79-label) !important;
   font-size: .74rem !important;
@@ -523,7 +523,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #
   text-transform: uppercase !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #stateClock {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #stateClock {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: clamp(2.18rem, 10vw, 3.1rem) !important;
@@ -535,7 +535,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #
   overflow: visible !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #stateHint {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #stateHint {
   max-width: 205px !important;
   color: var(--n79-muted) !important;
   -webkit-text-fill-color: var(--n79-muted) !important;
@@ -544,7 +544,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #
   overflow-wrap: anywhere !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor {
   position: absolute !important;
   z-index: 4 !important;
   width: 30px !important;
@@ -559,17 +559,17 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: 0 5px 14px rgba(4,2,12,.16) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-midnight { top: 8px !important; left: 50% !important; transform: translateX(-50%) !important; }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-morning { top: 50% !important; right: 8px !important; transform: translateY(-50%) !important; }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-noon { bottom: 8px !important; left: 50% !important; transform: translateX(-50%) !important; }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-evening { top: 50% !important; left: 8px !important; transform: translateY(-50%) !important; }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-midnight { top: 8px !important; left: 50% !important; transform: translateX(-50%) !important; }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-morning { top: 50% !important; right: 8px !important; transform: translateY(-50%) !important; }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-noon { bottom: 8px !important; left: 50% !important; transform: translateX(-50%) !important; }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-time-anchor-evening { top: 50% !important; left: 8px !important; transform: translateY(-50%) !important; }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .main-action-area {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .main-action-area {
   display: grid !important;
   gap: 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
   width: 100% !important;
   min-height: 68px !important;
   padding: 10px 18px !important;
@@ -587,13 +587,13 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: 0 15px 32px color-mix(in srgb, var(--n79-accent) 20%, transparent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).day-theme .primary-action {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).day-theme .primary-action {
   background: linear-gradient(135deg, #7557ca, #a17be2) !important;
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
   width: 44px !important;
   height: 44px !important;
   min-width: 44px !important;
@@ -604,30 +604,30 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   border-radius: 14px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon img {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon img {
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-head,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chart-title,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-card-head {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-head,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chart-title,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-card-head {
   display: flex !important;
   align-items: flex-start !important;
   justify-content: space-between !important;
   gap: 12px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid {
   margin-top: 13px !important;
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0,1fr)) !important;
   gap: 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid article {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid article {
   min-width: 0 !important;
   min-height: 78px !important;
   padding: 12px !important;
@@ -640,14 +640,14 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   background: var(--n79-surface-3) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid span {
   color: var(--n79-label) !important;
   -webkit-text-fill-color: var(--n79-label) !important;
   font-size: .72rem !important;
   line-height: 1.2 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-grid strong {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: .92rem !important;
@@ -655,7 +655,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   overflow-wrap: anywhere !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-suggestion {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .today-overview-suggestion {
   margin: 12px 0 0 !important;
   padding: 11px 12px !important;
   border-radius: 14px !important;
@@ -666,13 +666,13 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   line-height: 1.4 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions-heading {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions-heading {
   margin: 5px 2px -2px !important;
   color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
   width: 100% !important;
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0,1fr)) !important;
@@ -683,7 +683,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   overflow: visible !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
   position: relative !important;
   inset: auto !important;
   width: 100% !important;
@@ -709,7 +709,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
   position: static !important;
   inset: auto !important;
   width: 58px !important;
@@ -728,7 +728,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon :is(img,svg) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon :is(img,svg) {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -740,7 +740,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -761,7 +761,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 /* ==============================
    Diário e observações
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .date-filter {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .date-filter {
   padding: 14px !important;
   display: grid !important;
   gap: 8px !important;
@@ -773,12 +773,12 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 800 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips-shell {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips-shell {
   min-width: 0 !important;
   overflow: hidden !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips {
   display: flex !important;
   gap: 8px !important;
   overflow-x: auto !important;
@@ -787,9 +787,9 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   scrollbar-width: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips::-webkit-scrollbar { display: none !important; }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips::-webkit-scrollbar { display: none !important; }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips button {
   flex: 0 0 auto !important;
   min-height: 38px !important;
   padding: 0 13px !important;
@@ -801,21 +801,21 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 800 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips button.active {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips button.active {
   border-color: color-mix(in srgb, var(--n79-accent) 32%, transparent) !important;
   background: color-mix(in srgb, var(--n79-accent) 12%, var(--n79-surface)) !important;
   color: var(--n79-accent) !important;
   -webkit-text-fill-color: var(--n79-accent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline {
   display: grid !important;
   gap: 10px !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .event-card {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .event-card {
   min-width: 0 !important;
   padding: 14px !important;
   border: 1px solid var(--n79-line) !important;
@@ -824,7 +824,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: var(--n79-shadow-soft) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-panel {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-panel {
   width: 100% !important;
   margin-top: 14px !important;
   padding: 14px !important;
@@ -838,12 +838,12 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-title {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-title {
   display: grid !important;
   gap: 3px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-title span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-title span {
   color: var(--n79-label) !important;
   -webkit-text-fill-color: var(--n79-label) !important;
   font-size: .72rem !important;
@@ -852,20 +852,20 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   letter-spacing: .08em !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-title strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observations-title strong {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: .94rem !important;
   line-height: 1.2 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0,1fr)) !important;
   gap: 8px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips button {
   min-width: 0 !important;
   min-height: 64px !important;
   padding: 8px 5px !important;
@@ -887,12 +887,12 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   white-space: normal !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips button > span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips button > span {
   font-size: 1.18rem !important;
   line-height: 1 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button {
   width: 100% !important;
   min-height: 66px !important;
   padding: 10px 13px !important;
@@ -910,7 +910,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-align: left !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-icon {
   width: 42px !important;
   height: 42px !important;
   display: grid !important;
@@ -922,13 +922,13 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   line-height: 1 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button > span:last-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button > span:last-child {
   min-width: 0 !important;
   display: grid !important;
   gap: 3px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button :is(strong,small) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button :is(strong,small) {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -938,13 +938,13 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-align: left !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button strong {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: .9rem !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button small {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .premium-new-episode-button small {
   color: var(--n79-muted) !important;
   -webkit-text-fill-color: var(--n79-muted) !important;
   font-size: .72rem !important;
@@ -954,7 +954,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 /* ==============================
    Perfil e família
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-card {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-card {
   min-height: 188px !important;
   padding: 22px 16px !important;
   display: flex !important;
@@ -969,7 +969,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
     linear-gradient(155deg, var(--n79-surface-2), var(--n79-surface)) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .avatar-wrapper {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .avatar-wrapper {
   width: 94px !important;
   height: 94px !important;
   min-width: 94px !important;
@@ -985,8 +985,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: 0 16px 34px rgba(5,3,16,.24) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .avatar-wrapper > img,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #profilePhoto {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .avatar-wrapper > img,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #profilePhoto {
   width: 100% !important;
   height: 100% !important;
   min-width: 0 !important;
@@ -999,7 +999,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #profileBabyName {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #profileBabyName {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: 1.28rem !important;
@@ -1007,31 +1007,31 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #
   font-weight: 900 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #profileBabyAge {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #profileBabyAge {
   color: var(--n79-muted) !important;
   -webkit-text-fill-color: var(--n79-muted) !important;
   font-size: .82rem !important;
   font-weight: 700 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-family-stack,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .settings-list {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-family-stack,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .settings-list {
   display: grid !important;
   gap: 14px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-edit-grid {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-edit-grid {
   margin-top: 13px !important;
   display: grid !important;
   grid-template-columns: 1fr !important;
   gap: 11px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-setting-line,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-input-row label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .family-invite-form label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .export-period-grid label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .export-personal-message {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-setting-line,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-input-row label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .family-invite-form label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .export-period-grid label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .export-personal-message {
   min-width: 0 !important;
   display: grid !important;
   gap: 7px !important;
@@ -1040,21 +1040,21 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 800 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-input-row,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .export-period-grid,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .family-invite-form {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-input-row,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .export-period-grid,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .family-invite-form {
   display: grid !important;
   grid-template-columns: 1fr !important;
   gap: 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-members-list {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-members-list {
   margin-top: 13px !important;
   display: grid !important;
   gap: 9px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member {
   width: 100% !important;
   min-width: 0 !important;
   min-height: 68px !important;
@@ -1069,7 +1069,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   background: var(--n79-surface-3) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member-avatar {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member-avatar {
   position: static !important;
   inset: auto !important;
   width: 48px !important;
@@ -1085,12 +1085,12 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member > div {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member > div {
   min-width: 0 !important;
   overflow: hidden !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member :is(strong,small) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member :is(strong,small) {
   position: static !important;
   inset: auto !important;
   display: block !important;
@@ -1103,21 +1103,21 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member strong {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: .9rem !important;
   line-height: 1.2 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member small {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member small {
   margin-top: 4px !important;
   color: var(--n79-muted) !important;
   -webkit-text-fill-color: var(--n79-muted) !important;
   font-size: .72rem !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member > em {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .client-family-member > em {
   flex: 0 0 auto !important;
   padding: 6px 9px !important;
   border-radius: 999px !important;
@@ -1130,27 +1130,27 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   white-space: nowrap !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .family-access-summary-actions,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-actions-row,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .export-actions,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .login-actions,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .security-actions-row {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .family-access-summary-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-actions-row,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .export-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .login-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .security-actions-row {
   margin-top: 12px !important;
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 9px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .family-access-summary-actions > *,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-actions-row > *,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .export-actions > *,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .login-actions > * {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .family-access-summary-actions > *,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-actions-row > *,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .export-actions > *,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .login-actions > * {
   flex: 1 1 150px !important;
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-soft-row,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .sync-detail-grid > div {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-soft-row,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .sync-detail-grid > div {
   min-width: 0 !important;
   padding: 11px 0 !important;
   display: flex !important;
@@ -1160,8 +1160,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   border-bottom: 1px solid var(--n79-line) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-soft-row strong,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .sync-detail-grid strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-soft-row strong,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .sync-detail-grid strong {
   min-width: 0 !important;
   max-width: 62% !important;
   overflow: hidden !important;
@@ -1173,9 +1173,9 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 /* ==============================
    Gráficos e dados
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-sparkline,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-sparkline-large,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .data-weight-chart {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-sparkline,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-sparkline-large,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .data-weight-chart {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
@@ -1187,7 +1187,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   background: var(--n79-surface-3) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-sparkline svg {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-sparkline svg {
   width: 100% !important;
   height: auto !important;
   max-width: 100% !important;
@@ -1195,30 +1195,30 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   overflow: visible !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-axis-label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-date-label {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-axis-label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-date-label {
   fill: var(--n79-muted) !important;
   font-size: 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-main-path {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-main-path {
   color: var(--n79-accent) !important;
   stroke: var(--n79-accent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bars,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .mini-chart {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bars,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .mini-chart {
   min-width: 0 !important;
   overflow: hidden !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bars span,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .mini-chart span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bars span,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .mini-chart span {
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bars b,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .mini-chart b {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bars b,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .mini-chart b {
   font-size: .64rem !important;
   white-space: nowrap !important;
 }
@@ -1226,19 +1226,19 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 /* ==============================
    Folha de registro
    ============================== */
-html.ninou-v8203.record-sheet-open,
-html.ninou-v8203.record-sheet-open body {
+html.ninou-v8200.record-sheet-open,
+html.ninou-v8200.record-sheet-open body {
   overflow: hidden !important;
   overscroll-behavior: none !important;
 }
 
-html.ninou-v8203 body.record-sheet-open {
+html.ninou-v8200 body.record-sheet-open {
   position: fixed !important;
   inset: var(--record-sheet-scroll-y, 0) 0 auto 0 !important;
   width: 100% !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .sheet-backdrop {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .sheet-backdrop {
   position: fixed !important;
   inset: 0 !important;
   z-index: 1000 !important;
@@ -1248,8 +1248,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   -webkit-backdrop-filter: blur(5px) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet {
   position: fixed !important;
   left: 50% !important;
   right: auto !important;
@@ -1274,7 +1274,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: translateX(-50%) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet > .sheet-handle {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet > .sheet-handle {
   width: 42px !important;
   height: 5px !important;
   margin: 7px auto 4px !important;
@@ -1283,7 +1283,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   background: color-mix(in srgb, var(--n79-text) 22%, transparent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title {
   min-height: 58px !important;
   padding: 4px 0 8px !important;
   display: grid !important;
@@ -1293,11 +1293,11 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   overflow: visible !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title > div {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title > div {
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title span {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title span {
   display: block !important;
   margin-bottom: 4px !important;
   color: var(--n79-label) !important;
@@ -1308,7 +1308,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-transform: uppercase !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title strong {
   display: block !important;
   max-width: 100% !important;
   overflow: hidden !important;
@@ -1320,7 +1320,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-overflow: ellipsis !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .round-action {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .round-action {
   position: static !important;
   inset: auto !important;
   width: 42px !important;
@@ -1335,7 +1335,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
   width: 100% !important;
   min-width: 0 !important;
   height: auto !important;
@@ -1351,8 +1351,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   scroll-snap-type: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button[data-sheet-type] {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button[data-sheet-type] {
   position: relative !important;
   inset: auto !important;
   width: 100% !important;
@@ -1378,7 +1378,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button.active {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button.active {
   border-color: color-mix(in srgb, var(--n79-accent) 45%, transparent) !important;
   background: color-mix(in srgb, var(--n79-accent) 12%, var(--n79-surface-3)) !important;
   color: var(--n79-accent) !important;
@@ -1386,7 +1386,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--n79-accent) 8%, transparent) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types .type-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types .type-icon {
   position: static !important;
   inset: auto !important;
   width: 38px !important;
@@ -1402,7 +1402,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types .type-icon :is(img,svg) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types .type-icon :is(img,svg) {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
@@ -1412,7 +1412,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button > span:last-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button > span:last-child {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -1432,7 +1432,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form {
   min-width: 0 !important;
   min-height: 0 !important;
   height: auto !important;
@@ -1448,18 +1448,18 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   scrollbar-width: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form::-webkit-scrollbar { display:none !important; }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form::-webkit-scrollbar { display:none !important; }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form > * {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form > * {
   flex: 0 0 auto !important;
   min-width: 0 !important;
   width: 100% !important;
   margin: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form .select-label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form .amount-field {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form .select-label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form .amount-field {
   display: grid !important;
   gap: 7px !important;
   color: var(--n79-label) !important;
@@ -1468,7 +1468,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 800 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form :is(input:not([type="range"]), select, textarea, .select-control-wrap) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form :is(input:not([type="range"]), select, textarea, .select-control-wrap) {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
@@ -1477,20 +1477,20 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form :is(input:not([type="range"]), select) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form :is(input:not([type="range"]), select) {
   height: 50px !important;
   min-height: 50px !important;
   max-height: 50px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-form textarea {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-form textarea {
   min-height: 104px !important;
   height: 104px !important;
   max-height: 140px !important;
   resize: vertical !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :is(.breast-timer-panel, .milk-slider-card, .sleep-duration-preview) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.breast-timer-panel, .milk-slider-card, .sleep-duration-preview) {
   width: 100% !important;
   min-width: 0 !important;
   margin: 0 !important;
@@ -1502,25 +1502,25 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) :
   color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #breastTimerPanel:not([hidden]) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #breastTimerPanel:not([hidden]) {
   display: grid !important;
   gap: 12px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .breast-timer-head {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .breast-timer-head {
   display: grid !important;
   grid-template-columns: minmax(0,1fr) auto !important;
   align-items: center !important;
   gap: 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .breast-side-grid {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .breast-side-grid {
   display: grid !important;
   grid-template-columns: repeat(2,minmax(0,1fr)) !important;
   gap: 9px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .breast-side-grid button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .breast-side-grid button {
   min-height: 92px !important;
   padding: 10px !important;
   display: grid !important;
@@ -1533,7 +1533,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer {
   position: relative !important;
   z-index: 3 !important;
   width: 100% !important;
@@ -1549,15 +1549,15 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer::before,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer::after,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer .save-button::before,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer .save-button::after {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer::before,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer::after,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer .save-button::before,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer .save-button::after {
   display: none !important;
   content: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer .save-button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-actions-footer .save-button {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -1570,8 +1570,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 /* ==============================
    Barra inferior
    ============================== */
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-bar,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-bar,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
   position: fixed !important;
   left: 50% !important;
   right: auto !important;
@@ -1593,8 +1593,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transition: opacity var(--n79-normal) ease, transform var(--n79-normal) ease !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav {
   width: 100% !important;
   height: 100% !important;
   display: grid !important;
@@ -1608,8 +1608,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: none !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav button,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav button,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button {
   min-width: 0 !important;
   min-height: 60px !important;
   padding: 6px 2px !important;
@@ -1627,21 +1627,21 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: none !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav button.active,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button.active {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav button.active,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button.active {
   background: color-mix(in srgb, var(--n79-accent-2) 13%, var(--n79-surface)) !important;
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav .nav-symbol,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav .nav-symbol {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav .nav-symbol,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav .nav-symbol {
   font-size: 1.08rem !important;
   line-height: 1 !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav button > span:last-child,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button > span:last-child {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav button > span:last-child,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button > span:last-child {
   max-width: 100% !important;
   overflow: hidden !important;
   font-size: .59rem !important;
@@ -1651,8 +1651,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-overflow: ellipsis !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .fab,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .fab {
+html.ninou-v8200 body[data-active-screen="profile"] .fab,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .fab {
   position: absolute !important;
   right: 9px !important;
   top: 9px !important;
@@ -1674,16 +1674,16 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   transform: none !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .fab > span,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .fab > span {
+html.ninou-v8200 body[data-active-screen="profile"] .fab > span,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .fab > span {
   font-size: 1.55rem !important;
   line-height: 1 !important;
 }
 
-html.ninou-v8203 body.record-sheet-open .bottom-bar,
-html.ninou-v8203 body.modal-open .bottom-bar,
-html.ninou-v8203 body.avatar-modal-open .bottom-bar,
-html.ninou-v8203 body.day-note-episode-modal-open .bottom-bar {
+html.ninou-v8200 body.record-sheet-open .bottom-bar,
+html.ninou-v8200 body.modal-open .bottom-bar,
+html.ninou-v8200 body.avatar-modal-open .bottom-bar,
+html.ninou-v8200 body.day-note-episode-modal-open .bottom-bar {
   opacity: 0 !important;
   pointer-events: none !important;
   transform: translate(-50%, 24px) !important;
@@ -1692,9 +1692,9 @@ html.ninou-v8203 body.day-note-episode-modal-open .bottom-bar {
 /* ==============================
    Modais gerais
    ============================== */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .ninou-modal,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .join-family-modal,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .guest-login-modal {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .ninou-modal,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .join-family-modal,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .guest-login-modal {
   position: fixed !important;
   inset: 0 !important;
   z-index: 1100 !important;
@@ -1704,16 +1704,16 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   overflow-y: auto !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .ninou-modal-backdrop {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .ninou-modal-backdrop {
   position: absolute !important;
   inset: 0 !important;
   background: rgba(4,2,12,.75) !important;
   backdrop-filter: blur(6px) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .ninou-modal-card,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .join-family-dialog,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .guest-login-dialog {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .ninou-modal-card,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .join-family-dialog,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .guest-login-dialog {
   position: relative !important;
   z-index: 1 !important;
   width: min(100%, 500px) !important;
@@ -1731,37 +1731,37 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
    Responsividade
    ============================== */
 @media (max-width: 390px) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
     padding-inline: 10px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .app-header {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .app-header {
     padding-inline: 10px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
     width: min(100%, 350px) !important;
     border-radius: 29px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #stateClock {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #stateClock {
     font-size: clamp(2rem, 10.5vw, 2.7rem) !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
     grid-auto-rows: 116px !important;
     gap: 9px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
     height: 116px !important;
     min-height: 116px !important;
     max-height: 116px !important;
     padding-inline: 7px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
     width: 53px !important;
     height: 53px !important;
     min-width: 53px !important;
@@ -1770,31 +1770,31 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
     max-height: 53px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-observation-chips {
     grid-template-columns: repeat(2,minmax(0,1fr)) !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet {
     width: calc(100vw - 8px) !important;
     bottom: max(4px, var(--n79-safe-bottom)) !important;
     border-radius: 26px !important;
     padding-inline: 10px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
     gap: 5px !important;
     grid-auto-rows: 68px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button[data-sheet-type] {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button[data-sheet-type] {
     height: 68px !important;
     min-height: 68px !important;
     max-height: 68px !important;
     grid-template-rows: 35px minmax(15px,auto) !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types .type-icon {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types .type-icon {
     width: 35px !important;
     height: 35px !important;
     min-width: 35px !important;
@@ -1803,12 +1803,12 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
     max-height: 35px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button > span:last-child {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button > span:last-child {
     font-size: .57rem !important;
   }
 
-  html.ninou-v8203 body[data-active-screen="profile"] .bottom-bar,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
+  html.ninou-v8200 body[data-active-screen="profile"] .bottom-bar,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
     width: calc(100vw - 10px) !important;
     padding-left: 5px !important;
     padding-right: 63px !important;
@@ -1816,28 +1816,28 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 }
 
 @media (min-width: 700px) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
     padding-inline: 20px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .profile-edit-grid,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-input-row,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .export-period-grid,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .family-invite-form {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .profile-edit-grid,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-input-row,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .export-period-grid,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .family-invite-form {
     grid-template-columns: repeat(2,minmax(0,1fr)) !important;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) button {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) button {
     transition: transform var(--n79-fast) ease, opacity var(--n79-fast) ease, border-color var(--n79-fast) ease, background-color var(--n79-fast) ease !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) button:active {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) button:active {
     transform: scale(.975) !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen.active {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen.active {
     animation: n79-screen-in 260ms ease both !important;
   }
 }
@@ -1848,9 +1848,9 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.ninou-v8203 *,
-  html.ninou-v8203 *::before,
-  html.ninou-v8203 *::after {
+  html.ninou-v8200 *,
+  html.ninou-v8200 *::before,
+  html.ninou-v8200 *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
@@ -1858,8 +1858,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   }
 }
 
-/* v82.0.3 — correções verificadas por geometria após renderização real. */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title {
+/* v82.0.0 — correções verificadas por geometria após renderização real. */
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto !important;
   grid-template-rows: auto auto !important;
@@ -1867,7 +1867,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   gap: 3px 10px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > div {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > div {
   min-width: 0 !important;
   grid-column: 1 !important;
   grid-row: 1 / 3 !important;
@@ -1875,50 +1875,50 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   gap: 3px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > span:first-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > span:first-child {
   grid-column: 1 !important;
   grid-row: 1 !important;
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > strong {
   grid-column: 1 !important;
   grid-row: 2 !important;
   min-width: 0 !important;
   line-height: 1.2 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > :is(button, em, .ghost-link) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .drawer-section-title > :is(button, em, .ghost-link) {
   grid-column: 2 !important;
   grid-row: 1 / 3 !important;
   align-self: center !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
   grid-auto-flow: row !important;
   grid-auto-columns: auto !important;
   grid-template-rows: repeat(2, 72px) !important;
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
     grid-template-rows: repeat(2, 68px) !important;
   }
 }
 
 
 /* ============================================================
-   v82.0.3 — correções solicitadas após validação real em 430 px
+   v82.0.0 — correções solicitadas após validação real em 430 px
    ============================================================ */
 
 /* Atalhos da Home: composição central, natural e sem herdar deslocamentos. */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
   grid-auto-rows: 118px !important;
   align-items: stretch !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
   height: 118px !important;
   min-height: 118px !important;
   max-height: 118px !important;
@@ -1931,7 +1931,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-align: center !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
   flex: 0 0 54px !important;
   width: 54px !important;
   height: 54px !important;
@@ -1946,7 +1946,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   justify-content: center !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
   flex: 0 0 auto !important;
   min-height: 2.15em !important;
   display: flex !important;
@@ -1958,11 +1958,11 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 }
 
 /* Diário: os cinco filtros ficam visíveis por quebra natural, sem botão flutuante. */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips-shell {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips-shell {
   overflow: visible !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips {
   display: flex !important;
   flex-wrap: wrap !important;
   align-items: center !important;
@@ -1971,25 +1971,25 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   padding: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .chips button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .chips button {
   flex: 0 0 auto !important;
   min-width: 0 !important;
 }
 
-html.ninou-v8203 #diaryChipsMoreButton,
-html.ninou-v8203 .chips-more-button {
+html.ninou-v8200 #diaryChipsMoreButton,
+html.ninou-v8200 .chips-more-button {
   display: none !important;
 }
 
 /* Registros do Diário: contraste real no tema escuro. */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-card {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-card {
   display: grid !important;
   grid-template-columns: 46px minmax(0, 1fr) !important;
   align-items: start !important;
   gap: 12px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-card > .mark {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-card > .mark {
   width: 42px !important;
   height: 42px !important;
   min-width: 42px !important;
@@ -1999,17 +1999,17 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   place-items: center !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-main,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-main,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text {
   min-width: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text {
   display: grid !important;
   gap: 5px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text > strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text > strong {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   font-size: .96rem !important;
@@ -2018,14 +2018,14 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   opacity: 1 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline :is(.event-meta-primary, .event-meta-extra, .event-author-line, .event-edit-note, .event-text p) {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline :is(.event-meta-primary, .event-meta-extra, .event-author-line, .event-edit-note, .event-text p) {
   display: block !important;
   margin: 0 !important;
   opacity: 1 !important;
   text-shadow: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-meta-primary {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-meta-primary {
   color: var(--n79-text-2) !important;
   -webkit-text-fill-color: var(--n79-text-2) !important;
   font-size: .82rem !important;
@@ -2033,7 +2033,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 750 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-meta-extra {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-meta-extra {
   color: color-mix(in srgb, var(--n79-text-2) 82%, var(--n79-muted)) !important;
   -webkit-text-fill-color: color-mix(in srgb, var(--n79-text-2) 82%, var(--n79-muted)) !important;
   font-size: .78rem !important;
@@ -2041,8 +2041,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 650 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-author-line,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-edit-note {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-author-line,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-edit-note {
   color: var(--n79-muted) !important;
   -webkit-text-fill-color: var(--n79-muted) !important;
   font-size: .73rem !important;
@@ -2050,26 +2050,26 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 650 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-edit-note {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-edit-note {
   color: color-mix(in srgb, var(--n79-accent) 72%, var(--n79-text-2)) !important;
   -webkit-text-fill-color: color-mix(in srgb, var(--n79-accent) 72%, var(--n79-text-2)) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text p {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-text p {
   color: var(--n79-text-2) !important;
   -webkit-text-fill-color: var(--n79-text-2) !important;
   font-size: .78rem !important;
   line-height: 1.4 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-actions {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-actions {
   margin-top: 11px !important;
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 8px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-action-button {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .timeline .event-action-button {
   width: 100% !important;
   min-width: 0 !important;
   min-height: 40px !important;
@@ -2077,8 +2077,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
 }
 
 /* Gráfico de peso: labels finos e linha sempre visível em qualquer tela. */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-axis-label,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-date-label {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-axis-label,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-date-label {
   fill: var(--n79-text-2) !important;
   stroke: none !important;
   stroke-width: 0 !important;
@@ -2089,7 +2089,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   opacity: .94 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-main-path {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-main-path {
   color: var(--n79-accent) !important;
   stroke: var(--n79-accent) !important;
   stroke-width: 4.2px !important;
@@ -2097,14 +2097,14 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   filter: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .weight-area-path {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .weight-area-path {
   color: var(--n79-accent) !important;
   opacity: 1 !important;
 }
 
 /* Perfil: volta ao acabamento anterior. Só Minha família recebe a correção. */
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] #clientFamilyMembersList,
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-members-list {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #clientFamilyMembersList,
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-members-list {
   width: 100% !important;
   margin-top: 12px !important;
   display: grid !important;
@@ -2112,7 +2112,7 @@ html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client
   gap: 9px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member {
   width: 100% !important;
   min-width: 0 !important;
   min-height: 68px !important;
@@ -2125,7 +2125,7 @@ html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client
   border-radius: 16px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member-avatar {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member-avatar {
   position: static !important;
   inset: auto !important;
   width: 48px !important;
@@ -2141,12 +2141,12 @@ html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member > div {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member > div {
   min-width: 0 !important;
   overflow: hidden !important;
 }
 
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member :is(strong, small) {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member :is(strong, small) {
   position: static !important;
   inset: auto !important;
   width: 100% !important;
@@ -2160,7 +2160,7 @@ html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client
   transform: none !important;
 }
 
-html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member > em {
+html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member > em {
   position: static !important;
   inset: auto !important;
   max-width: 92px !important;
@@ -2177,22 +2177,22 @@ html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
     grid-auto-rows: 112px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
     height: 112px !important;
     min-height: 112px !important;
     max-height: 112px !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member {
+  html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member {
     grid-template-columns: 44px minmax(0, 1fr) auto !important;
   }
 
-  html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client-family-member-avatar {
+  html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .client-family-member-avatar {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -2204,11 +2204,11 @@ html.ninou-v8203 body.family-daily-surface[data-active-screen="profile"] .client
 
 
 /* ============================================================
-   v82.0.3 — PWA: Perfil, navegação, safe area e órbita
+   v82.0.0 — PWA: Perfil, navegação, safe area e órbita
    ============================================================ */
 
 /* Fallback de paleta quando o Perfil estiver em modo visitante/bloqueado. */
-html.ninou-v8203 body[data-active-screen="profile"] {
+html.ninou-v8200 body[data-active-screen="profile"] {
   --n79-surface: #211a35;
   --n79-text: #faf8ff;
   --n79-muted: #aaa2bb;
@@ -2218,7 +2218,7 @@ html.ninou-v8203 body[data-active-screen="profile"] {
   --n79-glass: rgba(24,19,41,.88);
 }
 
-html.ninou-v8203 body[data-active-screen="profile"].day-theme {
+html.ninou-v8200 body[data-active-screen="profile"].day-theme {
   --n79-surface: #ffffff;
   --n79-text: #292437;
   --n79-muted: #716a7d;
@@ -2230,28 +2230,28 @@ html.ninou-v8203 body[data-active-screen="profile"].day-theme {
 
 /* O visual anterior do Perfil é preservado; apenas a estrutura PWA recebe
    respiro superior e espaço permanente para a barra inferior. */
-html.ninou-v8203 body[data-active-screen="profile"] .phone-shell {
+html.ninou-v8200 body[data-active-screen="profile"] .phone-shell {
   min-height: 100dvh !important;
   padding-top: max(14px, calc(var(--n79-safe-top) + 8px)) !important;
   padding-bottom: calc(var(--n79-nav-height) + 44px + var(--n79-safe-bottom)) !important;
   overflow: visible !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .app-header {
+html.ninou-v8200 body[data-active-screen="profile"] .app-header {
   top: max(8px, var(--n79-safe-top)) !important;
   margin-top: 0 !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile"].active {
+html.ninou-v8200 body[data-active-screen="profile"] .screen[data-screen="profile"].active {
   padding-bottom: 24px !important;
   overflow: visible !important;
 }
 
 /* Segurança: ao fechar ou trocar de tela, o formulário e o timer nunca podem
    permanecer sobre Home, Diário, Dados, Sons ou Perfil. */
-html.ninou-v8203 body:not(.record-sheet-open) #recordSheet,
-html.ninou-v8203 body:not(.record-sheet-open) #sheetBackdrop,
-html.ninou-v8203 body:not(.record-sheet-open) #breastTimerPanel {
+html.ninou-v8200 body:not(.record-sheet-open) #recordSheet,
+html.ninou-v8200 body:not(.record-sheet-open) #sheetBackdrop,
+html.ninou-v8200 body:not(.record-sheet-open) #breastTimerPanel {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -2260,33 +2260,33 @@ html.ninou-v8203 body:not(.record-sheet-open) #breastTimerPanel {
 /* O iPhone pode informar prefers-reduced-motion no modo PWA. Mantemos toda a
    interface contida, mas preservamos a pulsação decorativa lenta da órbita. */
 @media (prefers-reduced-motion: reduce) {
-  html.ninou-v8203 body:not(.day-theme) .state-orbit::before {
+  html.ninou-v8200 body:not(.day-theme) .state-orbit::before {
     animation: orbitTwinkle 18s ease-in-out infinite alternate !important;
   }
 
-  html.ninou-v8203 body:not(.day-theme) .state-orbit::after {
+  html.ninou-v8200 body:not(.day-theme) .state-orbit::after {
     animation: orbitGlow 24s ease-in-out infinite alternate !important;
   }
 
-  html.ninou-v8203 body.day-theme .state-orbit::before {
+  html.ninou-v8200 body.day-theme .state-orbit::before {
     animation: orbitSunFlares 22s ease-in-out infinite alternate !important;
   }
 
-  html.ninou-v8203 body.day-theme .state-orbit::after {
+  html.ninou-v8200 body.day-theme .state-orbit::after {
     animation: orbitDayBreathe 26s ease-in-out infinite alternate !important;
   }
 }
 
 
 /* ============================================================
-   v82.0.3 — menu de ações do botão + e amamentação com respiro
+   v82.0.0 — menu de ações do botão + e amamentação com respiro
    ============================================================ */
-html.ninou-v8203.action-launcher-open,
-html.ninou-v8203 body.action-launcher-open {
+html.ninou-v8200.action-launcher-open,
+html.ninou-v8200 body.action-launcher-open {
   overflow: hidden;
 }
 
-html.ninou-v8203 .action-launcher {
+html.ninou-v8200 .action-launcher {
   position: fixed;
   inset: 0;
   z-index: 1250;
@@ -2295,9 +2295,9 @@ html.ninou-v8203 .action-launcher {
   padding: 12px 10px max(10px, var(--n79-safe-bottom));
 }
 
-html.ninou-v8203 .action-launcher[hidden] { display: none; }
+html.ninou-v8200 .action-launcher[hidden] { display: none; }
 
-html.ninou-v8203 .action-launcher-backdrop {
+html.ninou-v8200 .action-launcher-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(7,5,17,.58);
@@ -2305,7 +2305,7 @@ html.ninou-v8203 .action-launcher-backdrop {
   -webkit-backdrop-filter: blur(8px);
 }
 
-html.ninou-v8203 .action-launcher-card {
+html.ninou-v8200 .action-launcher-card {
   position: relative;
   z-index: 1;
   width: min(100%, 520px);
@@ -2321,7 +2321,7 @@ html.ninou-v8203 .action-launcher-card {
   -webkit-overflow-scrolling: touch;
 }
 
-html.ninou-v8203 .action-launcher-head {
+html.ninou-v8200 .action-launcher-head {
   display: grid;
   grid-template-columns: minmax(0,1fr) 42px;
   align-items: start;
@@ -2329,9 +2329,9 @@ html.ninou-v8203 .action-launcher-head {
   margin-bottom: 18px;
 }
 
-html.ninou-v8203 .action-launcher-head > div { min-width: 0; }
-html.ninou-v8203 .action-launcher-head span,
-html.ninou-v8203 .action-launcher-label {
+html.ninou-v8200 .action-launcher-head > div { min-width: 0; }
+html.ninou-v8200 .action-launcher-head span,
+html.ninou-v8200 .action-launcher-label {
   display: block;
   color: var(--n79-accent);
   font-size: .68rem;
@@ -2339,20 +2339,20 @@ html.ninou-v8203 .action-launcher-label {
   letter-spacing: .12em;
   text-transform: uppercase;
 }
-html.ninou-v8203 .action-launcher-head strong {
+html.ninou-v8200 .action-launcher-head strong {
   display: block;
   margin-top: 4px;
   color: var(--n79-text);
   font-size: 1.15rem;
   line-height: 1.18;
 }
-html.ninou-v8203 .action-launcher-head p {
+html.ninou-v8200 .action-launcher-head p {
   margin: 6px 0 0;
   color: var(--n79-muted);
   font-size: .78rem;
   line-height: 1.4;
 }
-html.ninou-v8203 #closeActionLauncherButton {
+html.ninou-v8200 #closeActionLauncherButton {
   width: 42px;
   height: 42px;
   min-width: 42px;
@@ -2365,18 +2365,18 @@ html.ninou-v8203 #closeActionLauncherButton {
   line-height: 1;
 }
 
-html.ninou-v8203 .action-launcher-group + .action-launcher-group {
+html.ninou-v8200 .action-launcher-group + .action-launcher-group {
   margin-top: 18px;
   padding-top: 17px;
   border-top: 1px solid var(--n79-line);
 }
-html.ninou-v8203 .action-launcher-label { margin: 0 2px 10px; color: var(--n79-label); }
-html.ninou-v8203 .action-launcher-grid {
+html.ninou-v8200 .action-launcher-label { margin: 0 2px 10px; color: var(--n79-label); }
+html.ninou-v8200 .action-launcher-grid {
   display: grid;
   grid-template-columns: repeat(2,minmax(0,1fr));
   gap: 10px;
 }
-html.ninou-v8203 .action-launcher-grid > button {
+html.ninou-v8200 .action-launcher-grid > button {
   min-width: 0;
   min-height: 102px;
   padding: 12px 10px;
@@ -2393,8 +2393,8 @@ html.ninou-v8203 .action-launcher-grid > button {
   text-align: left;
   box-shadow: none;
 }
-html.ninou-v8203 .action-launcher-grid > button:active { transform: scale(.98); }
-html.ninou-v8203 .launcher-icon {
+html.ninou-v8200 .action-launcher-grid > button:active { transform: scale(.98); }
+html.ninou-v8200 .launcher-icon {
   grid-row: 1 / 3;
   width: 46px;
   height: 46px;
@@ -2405,8 +2405,8 @@ html.ninou-v8203 .launcher-icon {
   background: color-mix(in srgb, var(--n79-accent-2) 12%, var(--n79-surface));
   font-size: 1.45rem;
 }
-html.ninou-v8203 .launcher-icon img { width: 42px; height: 42px; object-fit: contain; }
-html.ninou-v8203 .action-launcher-grid strong {
+html.ninou-v8200 .launcher-icon img { width: 42px; height: 42px; object-fit: contain; }
+html.ninou-v8200 .action-launcher-grid strong {
   min-width: 0;
   overflow: hidden;
   color: var(--n79-text);
@@ -2415,7 +2415,7 @@ html.ninou-v8203 .action-launcher-grid strong {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-html.ninou-v8203 .action-launcher-grid small {
+html.ninou-v8200 .action-launcher-grid small {
   min-width: 0;
   overflow: hidden;
   color: var(--n79-muted);
@@ -2425,47 +2425,47 @@ html.ninou-v8203 .action-launcher-grid small {
   text-overflow: ellipsis;
 }
 
-html.ninou-v8203 body.action-launcher-open .bottom-bar {
+html.ninou-v8200 body.action-launcher-open .bottom-bar {
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, 24px);
 }
 
 /* Amamentação: painel mais respirado, hierarquia clara e sem elementos apertados. */
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) {
   max-height: min(92dvh, 820px);
   padding: 12px 14px max(14px, var(--n79-safe-bottom));
 }
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-form {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-form {
   gap: 16px;
   padding: 6px 3px 24px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel:not([hidden]) {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel:not([hidden]) {
   gap: 16px;
   padding: 17px;
   border-radius: 20px;
   background: linear-gradient(150deg, color-mix(in srgb, var(--n79-accent-2) 9%, var(--n79-surface-3)), var(--n79-surface-3));
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-timer-head {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-timer-head {
   min-height: 52px;
   gap: 14px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-timer-head > div {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-timer-head > div {
   display: grid;
   gap: 5px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-timer-head span {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-timer-head span {
   color: var(--n79-muted);
   font-size: .74rem;
   font-weight: 800;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerTotal {
+html.ninou-v8200 body.family-daily-surface #breastTimerTotal {
   color: var(--n79-text);
   font-size: 1.55rem;
   line-height: 1;
   letter-spacing: -.03em;
 }
-html.ninou-v8203 body.family-daily-surface #resetBreastTimerButton {
+html.ninou-v8200 body.family-daily-surface #resetBreastTimerButton {
   min-width: 76px;
   min-height: 42px;
   padding: 0 14px;
@@ -2474,16 +2474,16 @@ html.ninou-v8203 body.family-daily-surface #resetBreastTimerButton {
   background: var(--n79-surface);
   color: var(--n79-text-2);
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-side-grid {
   gap: 12px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid button {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-side-grid button {
   min-height: 112px;
   padding: 14px 10px;
   gap: 6px;
   border-radius: 18px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid button > span {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-side-grid button > span {
   width: 34px;
   height: 34px;
   display: grid;
@@ -2493,16 +2493,16 @@ html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid b
   color: var(--n79-accent);
   font-weight: 900;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid strong {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-side-grid strong {
   color: var(--n79-text);
   font-size: 1.35rem;
   line-height: 1;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid small {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-side-grid small {
   color: var(--n79-muted);
   font-size: .72rem;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel > p {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel > p {
   margin: 0;
   padding: 11px 12px;
   border-radius: 13px;
@@ -2514,32 +2514,32 @@ html.ninou-v8203 body.family-daily-surface #breastTimerPanel > p {
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 .action-launcher-card { padding-inline: 11px; }
-  html.ninou-v8203 .action-launcher-grid { gap: 8px; }
-  html.ninou-v8203 .action-launcher-grid > button {
+  html.ninou-v8200 .action-launcher-card { padding-inline: 11px; }
+  html.ninou-v8200 .action-launcher-grid { gap: 8px; }
+  html.ninou-v8200 .action-launcher-grid > button {
     min-height: 96px;
     padding: 10px 8px;
     grid-template-columns: 42px minmax(0,1fr);
     gap: 2px 8px;
   }
-  html.ninou-v8203 .launcher-icon { width: 42px; height: 42px; }
-  html.ninou-v8203 .launcher-icon img { width: 38px; height: 38px; }
+  html.ninou-v8200 .launcher-icon { width: 42px; height: 42px; }
+  html.ninou-v8200 .launcher-icon img { width: 38px; height: 38px; }
 }
 
 /* ============================================================
-   v82.0.3 — lapidação visual final: menu +, ícones, órbita e Perfil
+   v82.0.0 — lapidação visual final: menu +, ícones, órbita e Perfil
    ============================================================ */
 
 /* Menu +: cabeçalho sempre legível e botão fechar visível no iPhone. */
-html.ninou-v8203 .action-launcher {
+html.ninou-v8200 .action-launcher {
   padding: max(10px, var(--n79-safe-top)) 10px max(10px, var(--n79-safe-bottom));
 }
-html.ninou-v8203 .action-launcher-card {
+html.ninou-v8200 .action-launcher-card {
   max-height: min(90dvh, 790px);
   padding: 0 14px 18px;
   overflow-x: hidden;
 }
-html.ninou-v8203 .action-launcher-head {
+html.ninou-v8200 .action-launcher-head {
   position: sticky;
   top: 0;
   z-index: 8;
@@ -2550,7 +2550,7 @@ html.ninou-v8203 .action-launcher-head {
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
 }
-html.ninou-v8203 #closeActionLauncherButton {
+html.ninou-v8200 #closeActionLauncherButton {
   position: relative;
   z-index: 10;
   display: grid;
@@ -2569,8 +2569,8 @@ html.ninou-v8203 #closeActionLauncherButton {
   opacity: 1;
   visibility: visible;
 }
-html.ninou-v8203 #closeActionLauncherButton::before,
-html.ninou-v8203 #closeActionLauncherButton::after {
+html.ninou-v8200 #closeActionLauncherButton::before,
+html.ninou-v8200 #closeActionLauncherButton::after {
   content: "";
   position: absolute;
   width: 18px;
@@ -2578,18 +2578,18 @@ html.ninou-v8203 #closeActionLauncherButton::after {
   border-radius: 999px;
   background: currentColor;
 }
-html.ninou-v8203 #closeActionLauncherButton::before { transform: rotate(45deg); }
-html.ninou-v8203 #closeActionLauncherButton::after { transform: rotate(-45deg); }
+html.ninou-v8200 #closeActionLauncherButton::before { transform: rotate(45deg); }
+html.ninou-v8200 #closeActionLauncherButton::after { transform: rotate(-45deg); }
 
 /* Cards do menu: ícones nunca cortados e textos com respiro. */
-html.ninou-v8203 .action-launcher-grid > button {
+html.ninou-v8200 .action-launcher-grid > button {
   min-height: 106px;
   padding: 12px;
   grid-template-columns: 52px minmax(0,1fr);
   gap: 4px 11px;
   overflow: visible;
 }
-html.ninou-v8203 .launcher-icon {
+html.ninou-v8200 .launcher-icon {
   width: 52px;
   height: 52px;
   min-width: 52px;
@@ -2598,8 +2598,8 @@ html.ninou-v8203 .launcher-icon {
   overflow: visible;
   border-radius: 16px;
 }
-html.ninou-v8203 .launcher-icon img,
-html.ninou-v8203 .launcher-icon svg {
+html.ninou-v8200 .launcher-icon img,
+html.ninou-v8200 .launcher-icon svg {
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -2610,24 +2610,24 @@ html.ninou-v8203 .launcher-icon svg {
   transform-origin: center;
   overflow: visible;
 }
-html.ninou-v8203 .action-launcher-grid strong {
+html.ninou-v8200 .action-launcher-grid strong {
   white-space: normal;
   text-overflow: clip;
   line-height: 1.18;
 }
-html.ninou-v8203 .action-launcher-grid small {
+html.ninou-v8200 .action-launcher-grid small {
   white-space: normal;
   text-overflow: clip;
   line-height: 1.25;
 }
 
 /* Todos os ícones de seleção do formulário ficam integralmente visíveis. */
-html.ninou-v8203 .record-types .type-icon {
+html.ninou-v8200 .record-types .type-icon {
   padding: 3px;
   overflow: visible;
 }
-html.ninou-v8203 .record-types .type-icon :is(img,svg),
-html.ninou-v8203 .record-types .icon-art {
+html.ninou-v8200 .record-types .type-icon :is(img,svg),
+html.ninou-v8200 .record-types .icon-art {
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -2639,34 +2639,34 @@ html.ninou-v8203 .record-types .icon-art {
 }
 
 /* Amamentação: mais área útil e separação visual entre seleção, horário e timer. */
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) {
   max-height: min(94dvh, 850px);
   padding-top: 15px;
 }
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .section-title {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .section-title {
   margin-bottom: 5px;
 }
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-types {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-types {
   margin-bottom: 5px;
 }
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-form {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-form {
   gap: 18px;
   padding: 8px 4px 32px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel:not([hidden]) {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel:not([hidden]) {
   gap: 18px;
   padding: 19px 17px;
   border-radius: 22px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel .breast-side-grid button {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel .breast-side-grid button {
   min-height: 122px;
   padding: 16px 10px;
 }
-html.ninou-v8203 body.family-daily-surface #breastTimerPanel > p {
+html.ninou-v8200 body.family-daily-surface #breastTimerPanel > p {
   padding: 13px 14px;
   font-size: .76rem;
 }
-html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-actions-footer {
+html.ninou-v8200 body.family-daily-surface #recordSheet:has(#breastTimerPanel:not([hidden])) .record-actions-footer {
   position: sticky;
   bottom: 0;
   z-index: 12;
@@ -2675,30 +2675,30 @@ html.ninou-v8203 body.family-daily-surface #recordSheet:has(#breastTimerPanel:no
 }
 
 /* Perfil: o botão + não pertence a esta tela; navegação continua presente. */
-html.ninou-v8203 body[data-active-screen="profile"] .fab,
-html.ninou-v8203 body[data-active-screen="profile"] .fab-real-plus {
+html.ninou-v8200 body[data-active-screen="profile"] .fab,
+html.ninou-v8200 body[data-active-screen="profile"] .fab-real-plus {
   display: none;
   visibility: hidden;
   pointer-events: none;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-bar {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-bar {
   padding-right: 7px;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav {
   grid-template-columns: repeat(5,minmax(0,1fr));
 }
 
 /* Tema claro: marcador/ícone da órbita fica visível e não vira apenas um círculo. */
-html.ninou-v8203 body.day-theme .orbit-event,
-html.ninou-v8203 body.day-theme .live-orbit-marker {
+html.ninou-v8200 body.day-theme .orbit-event,
+html.ninou-v8200 body.day-theme .live-orbit-marker {
   overflow: visible;
   background: rgba(255,255,255,.96);
   border-color: rgba(93,72,148,.18);
   box-shadow: 0 8px 20px rgba(72,55,119,.18);
 }
-html.ninou-v8203 body.day-theme .orbit-event > i,
-html.ninou-v8203 body.day-theme .live-orbit-marker > i,
-html.ninou-v8203 body.day-theme .orbit-cluster-icon {
+html.ninou-v8200 body.day-theme .orbit-event > i,
+html.ninou-v8200 body.day-theme .live-orbit-marker > i,
+html.ninou-v8200 body.day-theme .orbit-cluster-icon {
   display: grid;
   place-items: center;
   width: 100%;
@@ -2708,9 +2708,9 @@ html.ninou-v8203 body.day-theme .orbit-cluster-icon {
   -webkit-text-fill-color: #4f3b82;
   opacity: 1;
 }
-html.ninou-v8203 body.day-theme .orbit-event :is(img,svg),
-html.ninou-v8203 body.day-theme .live-orbit-marker :is(img,svg),
-html.ninou-v8203 body.day-theme .orbit-cluster-icon :is(img,svg) {
+html.ninou-v8200 body.day-theme .orbit-event :is(img,svg),
+html.ninou-v8200 body.day-theme .live-orbit-marker :is(img,svg),
+html.ninou-v8200 body.day-theme .orbit-cluster-icon :is(img,svg) {
   width: 88%;
   height: 88%;
   max-width: 88%;
@@ -2721,7 +2721,7 @@ html.ninou-v8203 body.day-theme .orbit-cluster-icon :is(img,svg) {
   filter: none;
   transform: none;
 }
-html.ninou-v8203 body.day-theme .orbit-cluster-count {
+html.ninou-v8200 body.day-theme .orbit-cluster-count {
   z-index: 4;
   color: #4b3979;
   -webkit-text-fill-color: #4b3979;
@@ -2730,19 +2730,19 @@ html.ninou-v8203 body.day-theme .orbit-cluster-count {
 
 /* Resposta tátil/visual consistente sem deslocar componentes. */
 @media (hover:hover) and (pointer:fine) {
-  html.ninou-v8203 .action-launcher-grid > button:hover {
+  html.ninou-v8200 .action-launcher-grid > button:hover {
     border-color: color-mix(in srgb, var(--n79-accent) 38%, var(--n79-line));
     background: color-mix(in srgb, var(--n79-accent) 7%, var(--n79-surface-3));
   }
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 .action-launcher-grid > button {
+  html.ninou-v8200 .action-launcher-grid > button {
     min-height: 102px;
     grid-template-columns: 46px minmax(0,1fr);
     padding: 10px 9px;
   }
-  html.ninou-v8203 .launcher-icon {
+  html.ninou-v8200 .launcher-icon {
     width: 46px;
     height: 46px;
     min-width: 46px;
@@ -2751,16 +2751,16 @@ html.ninou-v8203 body.day-theme .orbit-cluster-count {
 }
 
 /* ============================================================
-   v82.0.3 — órbita canônica + céu vivo premium no tema claro
+   v82.0.0 — órbita canônica + céu vivo premium no tema claro
    ============================================================ */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
   --orbit-daylight: .7;
   --orbit-sunset: 0;
   --orbit-celestial-x: 50%;
   --orbit-celestial-y: 8%;
 }
 
-html.ninou-v8203 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
   border-color: color-mix(in srgb, #8f78c8 20%, rgba(255,255,255,.72));
   background:
     radial-gradient(circle at var(--orbit-celestial-x) var(--orbit-celestial-y), rgba(255,190,78,calc(.22 + var(--orbit-sunset) * .36)) 0 7%, transparent 25%),
@@ -2774,7 +2774,7 @@ html.ninou-v8203 body.day-theme.family-daily-surface:not([data-active-screen="pr
     inset 0 -22px 44px rgba(142,120,190,.06);
 }
 
-html.ninou-v8203 .orbit-sky {
+html.ninou-v8200 .orbit-sky {
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -2786,7 +2786,7 @@ html.ninou-v8203 .orbit-sky {
 
 
 
-html.ninou-v8203 .orbit-cloud {
+html.ninou-v8200 .orbit-cloud {
   position: absolute;
   width: 94px;
   height: 28px;
@@ -2796,45 +2796,45 @@ html.ninou-v8203 .orbit-cloud {
   filter: blur(.15px);
   opacity: .52;
 }
-html.ninou-v8203 .orbit-cloud-a { left:-22px; top:27%; animation:n801-cloud-drift-a 18s ease-in-out infinite alternate; }
-html.ninou-v8203 .orbit-cloud-b { right:-42px; bottom:19%; transform:scale(.78); animation:n801-cloud-drift-b 24s ease-in-out infinite alternate; }
+html.ninou-v8200 .orbit-cloud-a { left:-22px; top:27%; animation:n801-cloud-drift-a 18s ease-in-out infinite alternate; }
+html.ninou-v8200 .orbit-cloud-b { right:-42px; bottom:19%; transform:scale(.78); animation:n801-cloud-drift-b 24s ease-in-out infinite alternate; }
 
-html.ninou-v8203 .orbit-star {
+html.ninou-v8200 .orbit-star {
   position:absolute;
   color:#fff;
   text-shadow:0 0 9px rgba(103,83,170,.65);
   opacity:calc(.08 + (1 - var(--orbit-daylight)) * .68);
   animation:n801-star-twinkle 4.8s ease-in-out infinite alternate;
 }
-html.ninou-v8203 .orbit-star-a { left:22%; top:16%; font-size:15px; }
-html.ninou-v8203 .orbit-star-b { right:18%; top:24%; font-size:12px; animation-delay:-1.8s; }
-html.ninou-v8203 .orbit-star-c { left:18%; bottom:21%; font-size:10px; animation-delay:-3s; }
+html.ninou-v8200 .orbit-star-a { left:22%; top:16%; font-size:15px; }
+html.ninou-v8200 .orbit-star-b { right:18%; top:24%; font-size:12px; animation-delay:-1.8s; }
+html.ninou-v8200 .orbit-star-c { left:18%; bottom:21%; font-size:10px; animation-delay:-3s; }
 
-html.ninou-v8203 body.day-theme .orbit-track {
+html.ninou-v8200 body.day-theme .orbit-track {
   stroke: rgba(102,87,142,.16);
   filter: drop-shadow(0 5px 12px rgba(103,86,150,.12));
 }
-html.ninou-v8203 body.day-theme .orbit-now-dot {
+html.ninou-v8200 body.day-theme .orbit-now-dot {
   fill:#ffad3d;
   stroke:#fffaf0;
   stroke-width:3.5;
   filter:drop-shadow(0 0 5px rgba(255,147,34,.9)) drop-shadow(0 0 12px rgba(255,190,74,.48));
 }
-html.ninou-v8203 body.day-theme .orbit-center-safe {
+html.ninou-v8200 body.day-theme .orbit-center-safe {
   background:linear-gradient(155deg,rgba(255,255,255,.79),rgba(255,255,255,.55));
   border-color:rgba(255,255,255,.88);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.98),0 18px 38px rgba(78,66,116,.17),0 2px 6px rgba(75,64,110,.08);
   backdrop-filter:blur(20px) saturate(128%);
   -webkit-backdrop-filter:blur(20px) saturate(128%);
 }
-html.ninou-v8203 body.day-theme .orbit-time-anchor span {
+html.ninou-v8200 body.day-theme .orbit-time-anchor span {
   background:rgba(255,255,255,.76);
   border:1px solid rgba(255,255,255,.92);
   box-shadow:0 8px 22px rgba(83,69,122,.14),inset 0 1px 0 #fff;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-cloud { opacity:0; }
-html.ninou-v8203 body:not(.day-theme) .orbit-star { opacity:.72; }
+html.ninou-v8200 body:not(.day-theme) .orbit-cloud { opacity:0; }
+html.ninou-v8200 body:not(.day-theme) .orbit-star { opacity:.72; }
 
 
 @keyframes n801-cloud-drift-a { from{transform:translateX(-4px)} to{transform:translateX(34px)} }
@@ -2842,24 +2842,24 @@ html.ninou-v8203 body:not(.day-theme) .orbit-star { opacity:.72; }
 @keyframes n801-star-twinkle { from{transform:scale(.78);filter:blur(.2px)} to{transform:scale(1.18);filter:blur(0)} }
 
 @media (prefers-reduced-motion: reduce) {
-  html.ninou-v8203 .orbit-cloud-a { animation:n801-cloud-drift-a 34s ease-in-out infinite alternate; }
-  html.ninou-v8203 .orbit-cloud-b { animation:n801-cloud-drift-b 42s ease-in-out infinite alternate; }
-  html.ninou-v8203 .orbit-star { animation:n801-star-twinkle 8s ease-in-out infinite alternate; }
+  html.ninou-v8200 .orbit-cloud-a { animation:n801-cloud-drift-a 34s ease-in-out infinite alternate; }
+  html.ninou-v8200 .orbit-cloud-b { animation:n801-cloud-drift-b 42s ease-in-out infinite alternate; }
+  html.ninou-v8200 .orbit-star { animation:n801-star-twinkle 8s ease-in-out infinite alternate; }
 }
 
 
 /* ============================================================
-   v82.0.3 — eventos agrupados, menu + estável e tipografia móvel
+   v82.0.0 — eventos agrupados, menu + estável e tipografia móvel
    ============================================================ */
-html.ninou-v8203,
-html.ninou-v8203 body {
+html.ninou-v8200,
+html.ninou-v8200 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-synthesis: none;
 }
 
 /* Números dinâmicos mantêm a mesma largura e não fazem os textos saltarem. */
-html.ninou-v8203 :is(
+html.ninou-v8200 :is(
   #stateClock,
   #breastTimerTotal,
   #leftBreastTimer,
@@ -2875,18 +2875,18 @@ html.ninou-v8203 :is(
 }
 
 /* Menu do +: o cabeçalho continua preso ao topo e o X nunca sai da área útil. */
-html.ninou-v8203 .action-launcher-card {
+html.ninou-v8200 .action-launcher-card {
   overscroll-behavior: contain;
   scroll-padding-top: 92px;
 }
-html.ninou-v8203 .action-launcher-head {
+html.ninou-v8200 .action-launcher-head {
   position: sticky;
   top: 0;
   grid-template-columns: minmax(0,1fr);
   padding-right: 66px;
   overflow: visible;
 }
-html.ninou-v8203 #closeActionLauncherButton {
+html.ninou-v8200 #closeActionLauncherButton {
   position: absolute;
   top: 15px;
   right: 14px;
@@ -2897,22 +2897,22 @@ html.ninou-v8203 #closeActionLauncherButton {
   pointer-events: auto;
   transform: none;
 }
-html.ninou-v8203 #closeActionLauncherButton:active {
+html.ninou-v8200 #closeActionLauncherButton:active {
   transform: none;
 }
 
 /* Os PNGs já possuem acabamento próprio: removemos a segunda moldura colorida. */
-html.ninou-v8203 .action-launcher-grid > button {
+html.ninou-v8200 .action-launcher-grid > button {
   overflow: hidden;
   contain: layout paint;
   transform: none;
   transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
 }
-html.ninou-v8203 .action-launcher-grid > button:active {
+html.ninou-v8200 .action-launcher-grid > button:active {
   transform: none;
   background: color-mix(in srgb, var(--n79-accent) 8%, var(--n79-surface-3));
 }
-html.ninou-v8203 .launcher-icon {
+html.ninou-v8200 .launcher-icon {
   padding: 0;
   overflow: visible;
   border: 0;
@@ -2920,8 +2920,8 @@ html.ninou-v8203 .launcher-icon {
   background: transparent;
   box-shadow: none;
 }
-html.ninou-v8203 .launcher-icon :is(img,svg),
-html.ninou-v8203 .launcher-medicine-svg {
+html.ninou-v8200 .launcher-icon :is(img,svg),
+html.ninou-v8200 .launcher-medicine-svg {
   width: 48px;
   height: 48px;
   max-width: 48px;
@@ -2930,7 +2930,7 @@ html.ninou-v8203 .launcher-medicine-svg {
   filter: drop-shadow(0 7px 12px rgba(5,3,16,.16));
   transform: none;
 }
-html.ninou-v8203 .action-launcher-grid strong {
+html.ninou-v8200 .action-launcher-grid strong {
   min-height: 2.3em;
   display: flex;
   align-items: end;
@@ -2938,7 +2938,7 @@ html.ninou-v8203 .action-launcher-grid strong {
   line-height: 1.15;
   overflow: hidden;
 }
-html.ninou-v8203 .action-launcher-grid small {
+html.ninou-v8200 .action-launcher-grid small {
   min-height: 2.4em;
   display: flex;
   align-items: start;
@@ -2948,7 +2948,7 @@ html.ninou-v8203 .action-launcher-grid small {
 }
 
 /* O painel aberto ao tocar em um evento agrupado acompanha o conteúdo. */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet {
   --n80-sheet-height: auto;
   --n80-sheet-max-height: min(72dvh, 590px);
   --n80-sheet-grid-rows: 16px auto minmax(0, auto) auto;
@@ -2964,22 +2964,22 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   contain: layout paint;
   padding-bottom: max(14px, var(--n79-safe-bottom));
 }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title {
   min-height: 64px;
   height: auto;
   max-height: none;
   padding: 4px 0 10px;
   overflow: visible;
 }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title > div {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title > div {
   min-width: 0;
 }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title strong {
   max-height: none;
   line-height: 1.16;
   white-space: normal;
 }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #closeOrbitCluster {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #closeOrbitCluster {
   position: relative;
   display: grid;
   place-items: center;
@@ -2992,8 +2992,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #
   visibility: visible;
   opacity: 1;
 }
-html.ninou-v8203 #closeOrbitCluster::before,
-html.ninou-v8203 #closeOrbitCluster::after {
+html.ninou-v8200 #closeOrbitCluster::before,
+html.ninou-v8200 #closeOrbitCluster::after {
   content: "";
   position: absolute;
   width: 17px;
@@ -3001,9 +3001,9 @@ html.ninou-v8203 #closeOrbitCluster::after {
   border-radius: 999px;
   background: currentColor;
 }
-html.ninou-v8203 #closeOrbitCluster::before { transform: rotate(45deg); }
-html.ninou-v8203 #closeOrbitCluster::after { transform: rotate(-45deg); }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .cluster-list {
+html.ninou-v8200 #closeOrbitCluster::before { transform: rotate(45deg); }
+html.ninou-v8200 #closeOrbitCluster::after { transform: rotate(-45deg); }
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .cluster-list {
   min-height: 0;
   max-height: min(46dvh, 360px);
   margin: 0;
@@ -3016,7 +3016,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .cluster-card {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .cluster-card {
   min-width: 0;
   min-height: 68px;
   margin: 0;
@@ -3032,7 +3032,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   color: var(--n79-text);
   transform: none;
 }
-html.ninou-v8203 .cluster-card .cluster-icon {
+html.ninou-v8200 .cluster-card .cluster-icon {
   width: 42px;
   height: 42px;
   min-width: 42px;
@@ -3041,28 +3041,28 @@ html.ninou-v8203 .cluster-card .cluster-icon {
   place-items: center;
   overflow: visible;
 }
-html.ninou-v8203 .cluster-card > div {
+html.ninou-v8200 .cluster-card > div {
   min-width: 0;
   display: grid;
   gap: 3px;
 }
-html.ninou-v8203 .cluster-card :is(strong,span,p) {
+html.ninou-v8200 .cluster-card :is(strong,span,p) {
   position: static;
   margin: 0;
   transform: none;
 }
-html.ninou-v8203 .cluster-card strong {
+html.ninou-v8200 .cluster-card strong {
   color: var(--n79-text);
   font-size: .88rem;
   line-height: 1.2;
 }
-html.ninou-v8203 .cluster-card span,
-html.ninou-v8203 .cluster-card p {
+html.ninou-v8200 .cluster-card span,
+html.ninou-v8200 .cluster-card p {
   color: var(--n79-muted);
   font-size: .7rem;
   line-height: 1.3;
 }
-html.ninou-v8203 .cluster-card time {
+html.ninou-v8200 .cluster-card time {
   align-self: start;
   padding-top: 2px;
   color: var(--n79-text-2);
@@ -3071,7 +3071,7 @@ html.ninou-v8203 .cluster-card time {
   line-height: 1.2;
   white-space: nowrap;
 }
-html.ninou-v8203 #orbitClusterViewAll {
+html.ninou-v8200 #orbitClusterViewAll {
   width: 100%;
   min-height: 48px;
   margin: 2px 0 0;
@@ -3085,25 +3085,25 @@ html.ninou-v8203 #orbitClusterViewAll {
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 .action-launcher-head {
+  html.ninou-v8200 .action-launcher-head {
     padding-right: 60px;
   }
-  html.ninou-v8203 #closeActionLauncherButton {
+  html.ninou-v8200 #closeActionLauncherButton {
     right: 11px;
   }
-  html.ninou-v8203 .action-launcher-grid strong {
+  html.ninou-v8200 .action-launcher-grid strong {
     font-size: .79rem;
   }
-  html.ninou-v8203 .action-launcher-grid small {
+  html.ninou-v8200 .action-launcher-grid small {
     font-size: .62rem;
   }
 }
 
 /* ============================================================
-   v82.0.3 — relógio Céu Vivo: tema claro solar + noite cósmica
+   v82.0.0 — relógio Céu Vivo: tema claro solar + noite cósmica
    Implementação prática inspirada nas referências aprovadas.
    ============================================================ */
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
   --n8012-orbit-pad: 13px;
   border: 1px solid rgba(255,255,255,.48) !important;
   background-position: center !important;
@@ -3114,7 +3114,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
     inset 0 1px 0 rgba(255,255,255,.42) !important;
 }
 
-html.ninou-v8203 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
   background-image:
     linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,245,252,.08)),
     url("../assets/clock-themes/day-sky.svg") !important;
@@ -3125,7 +3125,7 @@ html.ninou-v8203 body.day-theme.family-daily-surface:not([data-active-screen="pr
     inset 0 1px 0 rgba(255,255,255,.96) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme).family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+html.ninou-v8200 body:not(.day-theme).family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
   background-image:
     radial-gradient(circle at 50% 48%, rgba(43,28,90,.06), rgba(2,5,18,.18) 70%),
     url("../assets/clock-themes/night-sky.svg") !important;
@@ -3136,7 +3136,7 @@ html.ninou-v8203 body:not(.day-theme).family-daily-surface:not([data-active-scre
     inset 0 1px 0 rgba(255,255,255,.08) !important;
 }
 
-html.ninou-v8203 .state-orbit.live-timeline-orbit::before {
+html.ninou-v8200 .state-orbit.live-timeline-orbit::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -3145,28 +3145,28 @@ html.ninou-v8203 .state-orbit.live-timeline-orbit::before {
   pointer-events: none;
 }
 
-html.ninou-v8203 body.day-theme .state-orbit.live-timeline-orbit::before {
+html.ninou-v8200 body.day-theme .state-orbit.live-timeline-orbit::before {
   background:
     radial-gradient(circle at var(--orbit-celestial-x) var(--orbit-celestial-y), rgba(255,255,239,.82) 0 2.4%, rgba(255,225,151,.34) 7%, rgba(255,184,82,.10) 19%, transparent 33%),
     linear-gradient(120deg, rgba(255,255,255,.16), transparent 34% 66%, rgba(255,255,255,.05));
   mix-blend-mode: screen;
 }
 
-html.ninou-v8203 body:not(.day-theme) .state-orbit.live-timeline-orbit::before {
+html.ninou-v8200 body:not(.day-theme) .state-orbit.live-timeline-orbit::before {
   background:
     radial-gradient(circle at 12% 48%, rgba(255,154,87,.11), transparent 27%),
     radial-gradient(circle at 88% 55%, rgba(116,76,255,.12), transparent 34%),
     linear-gradient(180deg, transparent 50%, rgba(0,0,10,.26));
 }
 
-html.ninou-v8203 .orbit-sky {
+html.ninou-v8200 .orbit-sky {
   z-index: 1 !important;
   overflow: hidden !important;
   opacity: 1 !important;
 }
 
-html.ninou-v8203 .orbit-sky::before,
-html.ninou-v8203 .orbit-sky::after {
+html.ninou-v8200 .orbit-sky::before,
+html.ninou-v8200 .orbit-sky::after {
   content: "";
   position: absolute;
   inset: -14%;
@@ -3175,7 +3175,7 @@ html.ninou-v8203 .orbit-sky::after {
 }
 
 /* Raios largos e delicados no tema claro. */
-html.ninou-v8203 body.day-theme .orbit-sky::before {
+html.ninou-v8200 body.day-theme .orbit-sky::before {
   background: repeating-conic-gradient(
     from -18deg at var(--orbit-celestial-x) var(--orbit-celestial-y),
     rgba(255,246,199,.00) 0deg 8deg,
@@ -3190,7 +3190,7 @@ html.ninou-v8203 body.day-theme .orbit-sky::before {
 }
 
 /* Brilhos mínimos no céu claro: são reflexos, não um céu noturno. */
-html.ninou-v8203 body.day-theme .orbit-sky::after {
+html.ninou-v8200 body.day-theme .orbit-sky::after {
   width: 3px;
   height: 3px;
   inset: 0 auto auto 0;
@@ -3210,7 +3210,7 @@ html.ninou-v8203 body.day-theme .orbit-sky::after {
 }
 
 /* Duas camadas de estrelas no tema escuro para profundidade. */
-html.ninou-v8203 body:not(.day-theme) .orbit-sky::before {
+html.ninou-v8200 body:not(.day-theme) .orbit-sky::before {
   inset: 0 auto auto 0;
   width: 2px;
   height: 2px;
@@ -3232,7 +3232,7 @@ html.ninou-v8203 body:not(.day-theme) .orbit-sky::before {
   animation: n8012-star-drift 18s ease-in-out infinite alternate;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-sky::after {
+html.ninou-v8200 body:not(.day-theme) .orbit-sky::after {
   inset: 0 auto auto 0;
   width: 4px;
   height: 4px;
@@ -3251,40 +3251,40 @@ html.ninou-v8203 body:not(.day-theme) .orbit-sky::after {
   animation: n8012-star-pulse 5.6s ease-in-out infinite alternate;
 }
 
-html.ninou-v8203 .orbit-timeline-svg {
+html.ninou-v8200 .orbit-timeline-svg {
   z-index: 2 !important;
 }
 
-html.ninou-v8203 .orbit-events,
-html.ninou-v8203 .live-orbit-events {
+html.ninou-v8200 .orbit-events,
+html.ninou-v8200 .live-orbit-events {
   z-index: 4 !important;
 }
 
-html.ninou-v8203 .orbit-time-anchor {
+html.ninou-v8200 .orbit-time-anchor {
   z-index: 6 !important;
 }
 
-html.ninou-v8203 .orbit-center-safe {
+html.ninou-v8200 .orbit-center-safe {
   z-index: 5 !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-cloud {
+html.ninou-v8200 body:not(.day-theme) .orbit-cloud {
   display: none !important;
 }
 
 /* Nuvens do HTML ficam quase imperceptíveis porque a arte já contém nuvens. */
-html.ninou-v8203 body.day-theme .orbit-cloud {
+html.ninou-v8200 body.day-theme .orbit-cloud {
   opacity: .18 !important;
   filter: blur(2px) !important;
 }
 
-html.ninou-v8203 body.day-theme .orbit-star {
+html.ninou-v8200 body.day-theme .orbit-star {
   color: #fff9dc !important;
   opacity: .40 !important;
   text-shadow: 0 0 9px rgba(255,198,88,.42) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-star {
+html.ninou-v8200 body:not(.day-theme) .orbit-star {
   color: #fff !important;
   opacity: .90 !important;
   text-shadow: 0 0 7px rgba(199,163,255,.96), 0 0 16px rgba(126,79,255,.56) !important;
@@ -3292,13 +3292,13 @@ html.ninou-v8203 body:not(.day-theme) .orbit-star {
 }
 
 /* Trilhas mais finas e luminosas, como nas referências. */
-html.ninou-v8203 body.day-theme .orbit-track {
+html.ninou-v8200 body.day-theme .orbit-track {
   stroke: rgba(255,255,255,.82) !important;
   stroke-width: 5.5 !important;
   filter: drop-shadow(0 2px 7px rgba(92,76,152,.22)) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-track {
+html.ninou-v8200 body:not(.day-theme) .orbit-track {
   stroke: rgba(155,117,255,.64) !important;
   stroke-width: 4.2 !important;
   filter:
@@ -3306,14 +3306,14 @@ html.ninou-v8203 body:not(.day-theme) .orbit-track {
     drop-shadow(0 0 12px rgba(91,51,194,.34)) !important;
 }
 
-html.ninou-v8203 body.day-theme .orbit-now-dot {
+html.ninou-v8200 body.day-theme .orbit-now-dot {
   fill: #ff9f2e !important;
   stroke: #fff9e9 !important;
   stroke-width: 4 !important;
   filter: drop-shadow(0 0 5px rgba(255,145,29,.96)) drop-shadow(0 0 14px rgba(255,190,76,.66)) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-now-dot {
+html.ninou-v8200 body:not(.day-theme) .orbit-now-dot {
   fill: #ffad4d !important;
   stroke: #fff4d3 !important;
   stroke-width: 3.5 !important;
@@ -3321,7 +3321,7 @@ html.ninou-v8203 body:not(.day-theme) .orbit-now-dot {
 }
 
 /* Painel central premium e com contraste seguro nos dois temas. */
-html.ninou-v8203 body.day-theme .orbit-center-safe {
+html.ninou-v8200 body.day-theme .orbit-center-safe {
   width: min(68%, 244px) !important;
   min-height: 158px !important;
   border: 1px solid rgba(255,255,255,.94) !important;
@@ -3334,7 +3334,7 @@ html.ninou-v8203 body.day-theme .orbit-center-safe {
   -webkit-backdrop-filter: blur(22px) saturate(135%) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-center-safe {
+html.ninou-v8200 body:not(.day-theme) .orbit-center-safe {
   width: min(68%, 244px) !important;
   min-height: 158px !important;
   border: 1px solid rgba(181,131,255,.34) !important;
@@ -3350,23 +3350,23 @@ html.ninou-v8203 body:not(.day-theme) .orbit-center-safe {
   -webkit-backdrop-filter: blur(20px) saturate(122%) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) #stateLabel {
+html.ninou-v8200 body:not(.day-theme) #stateLabel {
   color: #b78bff !important;
   -webkit-text-fill-color: #b78bff !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) #stateClock {
+html.ninou-v8200 body:not(.day-theme) #stateClock {
   color: #fffaf2 !important;
   -webkit-text-fill-color: #fffaf2 !important;
   text-shadow: 0 0 18px rgba(255,224,178,.10) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) #stateHint {
+html.ninou-v8200 body:not(.day-theme) #stateHint {
   color: #ad8ad7 !important;
   -webkit-text-fill-color: #ad8ad7 !important;
 }
 
-html.ninou-v8203 body.day-theme .orbit-time-anchor {
+html.ninou-v8200 body.day-theme .orbit-time-anchor {
   background: rgba(255,255,255,.80) !important;
   color: #44366f !important;
   border: 1px solid rgba(255,255,255,.96) !important;
@@ -3375,7 +3375,7 @@ html.ninou-v8203 body.day-theme .orbit-time-anchor {
   -webkit-backdrop-filter: blur(10px) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) .orbit-time-anchor {
+html.ninou-v8200 body:not(.day-theme) .orbit-time-anchor {
   background: linear-gradient(155deg, rgba(45,37,85,.88), rgba(15,17,43,.86)) !important;
   color: #f6efff !important;
   border: 1px solid rgba(157,116,238,.38) !important;
@@ -3385,12 +3385,12 @@ html.ninou-v8203 body:not(.day-theme) .orbit-time-anchor {
 }
 
 /* Eventos recebem bolhas coerentes com cada céu. */
-html.ninou-v8203 body.day-theme :is(.orbit-event,.live-orbit-marker) {
+html.ninou-v8200 body.day-theme :is(.orbit-event,.live-orbit-marker) {
   border-color: rgba(255,255,255,.92) !important;
   box-shadow: 0 9px 23px rgba(84,66,135,.20), 0 0 0 2px rgba(132,101,198,.10) !important;
 }
 
-html.ninou-v8203 body:not(.day-theme) :is(.orbit-event,.live-orbit-marker) {
+html.ninou-v8200 body:not(.day-theme) :is(.orbit-event,.live-orbit-marker) {
   border-color: rgba(215,180,255,.58) !important;
   background: radial-gradient(circle at 34% 24%, rgba(255,205,164,.30), rgba(90,48,151,.88) 56%, rgba(34,22,79,.94)) !important;
   box-shadow: 0 0 0 2px rgba(146,91,230,.18), 0 0 18px rgba(120,68,225,.44), 0 10px 24px rgba(0,0,0,.34) !important;
@@ -3420,18 +3420,18 @@ html.ninou-v8203 body:not(.day-theme) :is(.orbit-event,.live-orbit-marker) {
 
 /* Mantém vida visual respeitando acessibilidade: somente opacidade e microescala. */
 @media (prefers-reduced-motion: reduce) {
-  html.ninou-v8203 body.day-theme .orbit-sky::before { animation-duration: 58s !important; }
-  html.ninou-v8203 body.day-theme .orbit-sky::after { animation-duration: 12s !important; }
-  html.ninou-v8203 body:not(.day-theme) .orbit-sky::before { animation: none !important; }
-  html.ninou-v8203 body:not(.day-theme) .orbit-sky::after,
-  html.ninou-v8203 body:not(.day-theme) .orbit-star { animation-duration: 11s !important; }
+  html.ninou-v8200 body.day-theme .orbit-sky::before { animation-duration: 58s !important; }
+  html.ninou-v8200 body.day-theme .orbit-sky::after { animation-duration: 12s !important; }
+  html.ninou-v8200 body:not(.day-theme) .orbit-sky::before { animation: none !important; }
+  html.ninou-v8200 body:not(.day-theme) .orbit-sky::after,
+  html.ninou-v8200 body:not(.day-theme) .orbit-star { animation-duration: 11s !important; }
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
     border-radius: 30px !important;
   }
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe {
     width: min(69%, 238px) !important;
     min-height: 150px !important;
   }
@@ -3439,7 +3439,7 @@ html.ninou-v8203 body:not(.day-theme) :is(.orbit-event,.live-orbit-marker) {
 
 
 /* ============================================================
-   v82.0.3 — correções finais solicitadas após validação visual
+   v82.0.0 — correções finais solicitadas após validação visual
    - remove o sol HTML duplicado (o sol já existe no SVG do céu)
    - impede o X do painel de eventos de aparecer quando fechado
    - devolve o botão + ao Perfil
@@ -3450,9 +3450,9 @@ html.ninou-v8203 body:not(.day-theme) :is(.orbit-event,.live-orbit-marker) {
 /* O sol passa a existir somente na arte de fundo do tema claro. */
 
 /* O atributo hidden deve vencer qualquer display:grid herdado dos sheets. */
-html.ninou-v8203 #orbitClusterSheet[hidden],
-html.ninou-v8203 #orbitClusterSheet[hidden] #closeOrbitCluster,
-html.ninou-v8203 .sheet-backdrop[hidden] {
+html.ninou-v8200 #orbitClusterSheet[hidden],
+html.ninou-v8200 #orbitClusterSheet[hidden] #closeOrbitCluster,
+html.ninou-v8200 .sheet-backdrop[hidden] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -3460,41 +3460,41 @@ html.ninou-v8203 .sheet-backdrop[hidden] {
 }
 
 /* Barra inferior mais compacta, proporcional e idêntica em todas as telas. */
-html.ninou-v8203 {
+html.ninou-v8200 {
   --n79-nav-height: 70px;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-bar,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-bar,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
   width: min(calc(100vw - 24px), 500px) !important;
   height: 70px !important;
   padding: 6px 60px 6px 6px !important;
   border-radius: 23px !important;
   bottom: max(8px, var(--n79-safe-bottom)) !important;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav {
   grid-template-columns: repeat(5, minmax(0,1fr)) !important;
   gap: 1px !important;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav button,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav button,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button {
   min-height: 56px !important;
   padding: 5px 2px !important;
   border-radius: 16px !important;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav .nav-symbol,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav .nav-symbol {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav .nav-symbol,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav .nav-symbol {
   font-size: 1rem !important;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .bottom-nav button > span:last-child,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button > span:last-child {
+html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav button > span:last-child,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-nav button > span:last-child {
   font-size: .56rem !important;
 }
 
 /* O + volta a fazer parte da barra também no Perfil. */
-html.ninou-v8203 body[data-active-screen="profile"] .fab,
-html.ninou-v8203 body[data-active-screen="profile"] .fab-real-plus,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .fab {
+html.ninou-v8200 body[data-active-screen="profile"] .fab,
+html.ninou-v8200 body[data-active-screen="profile"] .fab-real-plus,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .fab {
   position: absolute !important;
   right: 8px !important;
   top: 8px !important;
@@ -3508,15 +3508,15 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   pointer-events: auto !important;
   border-radius: 18px !important;
 }
-html.ninou-v8203 body[data-active-screen="profile"] .fab > span,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .fab > span {
+html.ninou-v8200 body[data-active-screen="profile"] .fab > span,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .fab > span {
   font-size: 1.45rem !important;
 }
 
 /* Marcadores reais com arte legível no céu claro, sem a esfera opaca. */
-html.ninou-v8203 body.day-theme .orbit-event > i,
-html.ninou-v8203 body.day-theme .live-orbit-marker > i,
-html.ninou-v8203 body.day-theme .orbit-cluster-icon {
+html.ninou-v8200 body.day-theme .orbit-event > i,
+html.ninou-v8200 body.day-theme .live-orbit-marker > i,
+html.ninou-v8200 body.day-theme .orbit-cluster-icon {
   width: 42px !important;
   height: 42px !important;
   min-width: 42px !important;
@@ -3529,15 +3529,15 @@ html.ninou-v8203 body.day-theme .orbit-cluster-icon {
   box-shadow: 0 8px 19px rgba(73,55,122,.20) !important;
   contain: none !important;
 }
-html.ninou-v8203 body.day-theme .orbit-cluster > .orbit-cluster-icon {
+html.ninou-v8200 body.day-theme .orbit-cluster > .orbit-cluster-icon {
   width: 46px !important;
   height: 46px !important;
   min-width: 46px !important;
   min-height: 46px !important;
 }
-html.ninou-v8203 body.day-theme .orbit-event > i > :is(img,svg),
-html.ninou-v8203 body.day-theme .live-orbit-marker > i > :is(img,svg),
-html.ninou-v8203 body.day-theme .orbit-cluster-icon > :is(img,svg) {
+html.ninou-v8200 body.day-theme .orbit-event > i > :is(img,svg),
+html.ninou-v8200 body.day-theme .live-orbit-marker > i > :is(img,svg),
+html.ninou-v8200 body.day-theme .orbit-cluster-icon > :is(img,svg) {
   position: relative !important;
   z-index: 2 !important;
   width: 100% !important;
@@ -3554,13 +3554,13 @@ html.ninou-v8203 body.day-theme .orbit-cluster-icon > :is(img,svg) {
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 body[data-active-screen="profile"] .bottom-bar,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
+  html.ninou-v8200 body[data-active-screen="profile"] .bottom-bar,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .bottom-bar {
     width: calc(100vw - 18px) !important;
     padding-right: 58px !important;
   }
-  html.ninou-v8203 body[data-active-screen="profile"] .fab,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .fab {
+  html.ninou-v8200 body[data-active-screen="profile"] .fab,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .fab {
     right: 7px !important;
     width: 52px !important;
     height: 52px !important;
@@ -3570,12 +3570,12 @@ html.ninou-v8203 body.day-theme .orbit-cluster-icon > :is(img,svg) {
 }
 
 /* ============================================================
-   v82.0.3 — raios solares perceptíveis no iPhone + Perfil legível
+   v82.0.0 — raios solares perceptíveis no iPhone + Perfil legível
    ============================================================ */
 
 /* Feixes em duas camadas: uma ampla e uma concentrada. O deslocamento usa
    translate3d para permanecer fluido no Safari/PWA do iPhone. */
-html.ninou-v8203 body.day-theme .orbit-sky::before {
+html.ninou-v8200 body.day-theme .orbit-sky::before {
   inset: -20% !important;
   background:
     repeating-conic-gradient(
@@ -3601,7 +3601,7 @@ html.ninou-v8203 body.day-theme .orbit-sky::before {
 }
 
 /* Reflexo luminoso respirando junto aos raios, sem recriar o orbit-sun. */
-html.ninou-v8203 body.day-theme .state-orbit.live-timeline-orbit::before {
+html.ninou-v8200 body.day-theme .state-orbit.live-timeline-orbit::before {
   background:
     radial-gradient(circle at var(--orbit-celestial-x) var(--orbit-celestial-y), rgba(255,255,245,.94) 0 2.5%, rgba(255,226,148,.48) 8%, rgba(255,186,89,.18) 20%, transparent 37%),
     linear-gradient(118deg, rgba(255,255,255,.24), transparent 38% 65%, rgba(255,249,219,.10)) !important;
@@ -3622,10 +3622,10 @@ html.ninou-v8203 body.day-theme .state-orbit.live-timeline-orbit::before {
 
 /* No modo Reduzir Movimento, mantém apenas variação luminosa perceptível. */
 @media (prefers-reduced-motion: reduce) {
-  html.ninou-v8203 body.day-theme .orbit-sky::before {
+  html.ninou-v8200 body.day-theme .orbit-sky::before {
     animation: n8100-reduced-light 8s ease-in-out infinite alternate !important;
   }
-  html.ninou-v8203 body.day-theme .state-orbit.live-timeline-orbit::before {
+  html.ninou-v8200 body.day-theme .state-orbit.live-timeline-orbit::before {
     animation-duration: 8s !important;
   }
 }
@@ -3637,11 +3637,11 @@ html.ninou-v8203 body.day-theme .state-orbit.live-timeline-orbit::before {
 
 /* Perfil — contraste explícito para textos que antes herdavam tons próximos
    ao fundo. Abrange cards, descrições, rótulos, estados e textos auxiliares. */
-html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile"] {
+html.ninou-v8200 body[data-active-screen="profile"] .screen[data-screen="profile"] {
   color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile"] :is(
+html.ninou-v8200 body[data-active-screen="profile"] .screen[data-screen="profile"] :is(
   h1,h2,h3,h4,strong,
   .profile-card-head strong,
   .profile-setting-line,
@@ -3655,7 +3655,7 @@ html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile
   -webkit-text-fill-color: var(--n79-text) !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile"] :is(
+html.ninou-v8200 body[data-active-screen="profile"] .screen[data-screen="profile"] :is(
   p,small,em,
   .profile-card-head span,
   .profile-setting-line > span,
@@ -3672,40 +3672,40 @@ html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile
   opacity: 1 !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"].day-theme {
+html.ninou-v8200 body[data-active-screen="profile"].day-theme {
   --n79-text: #252033;
   --n79-muted: #5f586b;
   --n79-label: #6e667b;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"]:not(.day-theme) {
+html.ninou-v8200 body[data-active-screen="profile"]:not(.day-theme) {
   --n79-text: #fbf9ff;
   --n79-muted: #d2cae2;
   --n79-label: #beb4d1;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"] .screen[data-screen="profile"] :is(input,select,textarea) {
+html.ninou-v8200 body[data-active-screen="profile"] .screen[data-screen="profile"] :is(input,select,textarea) {
   color: var(--n79-text) !important;
   -webkit-text-fill-color: var(--n79-text) !important;
   caret-color: var(--n79-accent) !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"].day-theme .screen[data-screen="profile"] :is(input,select,textarea) {
+html.ninou-v8200 body[data-active-screen="profile"].day-theme .screen[data-screen="profile"] :is(input,select,textarea) {
   background: #fff !important;
   border-color: rgba(52,42,73,.18) !important;
 }
 
-html.ninou-v8203 body[data-active-screen="profile"]:not(.day-theme) .screen[data-screen="profile"] :is(input,select,textarea) {
+html.ninou-v8200 body[data-active-screen="profile"]:not(.day-theme) .screen[data-screen="profile"] :is(input,select,textarea) {
   background: rgba(255,255,255,.075) !important;
   border-color: rgba(255,255,255,.15) !important;
 }
 
 /* ============================================================
-   v82.0.3 — polimento premium do launcher e formulários
+   v82.0.0 — polimento premium do launcher e formulários
    ============================================================ */
 
 /* Launcher mais leve, com iconografia protagonista e sem “caixa dentro da caixa”. */
-html.ninou-v8203 .action-launcher-card {
+html.ninou-v8200 .action-launcher-card {
   border-radius: 32px;
   border-color: color-mix(in srgb, var(--n79-line) 72%, transparent);
   background:
@@ -3715,13 +3715,13 @@ html.ninou-v8203 .action-launcher-card {
   box-shadow: 0 30px 90px rgba(4,2,13,.52);
 }
 
-html.ninou-v8203 .action-launcher-head {
+html.ninou-v8200 .action-launcher-head {
   grid-template-columns: minmax(0,1fr) 48px;
   padding: 19px 16px 16px;
   margin-inline: -14px;
 }
 
-html.ninou-v8203 #closeActionLauncherButton {
+html.ninou-v8200 #closeActionLauncherButton {
   position: sticky;
   top: 12px;
   width: 46px;
@@ -3736,18 +3736,18 @@ html.ninou-v8203 #closeActionLauncherButton {
   -webkit-backdrop-filter: blur(18px) saturate(145%);
 }
 
-html.ninou-v8203 .action-launcher-label {
+html.ninou-v8200 .action-launcher-label {
   margin-bottom: 12px;
   color: var(--n79-text-2);
   font-size: .7rem;
   letter-spacing: .1em;
 }
 
-html.ninou-v8203 .action-launcher-grid {
+html.ninou-v8200 .action-launcher-grid {
   gap: 11px;
 }
 
-html.ninou-v8203 .action-launcher-grid > button {
+html.ninou-v8200 .action-launcher-grid > button {
   min-height: 108px;
   padding: 14px 12px;
   grid-template-columns: 58px minmax(0,1fr);
@@ -3763,12 +3763,12 @@ html.ninou-v8203 .action-launcher-grid > button {
   transition: transform 160ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
 }
 
-html.ninou-v8203 .action-launcher-grid > button:active {
+html.ninou-v8200 .action-launcher-grid > button:active {
   transform: translate3d(0,1px,0) scale(.985);
   box-shadow: 0 5px 14px rgba(4,2,13,.12);
 }
 
-html.ninou-v8203 .launcher-icon {
+html.ninou-v8200 .launcher-icon {
   width: 58px;
   height: 58px;
   min-width: 58px;
@@ -3781,8 +3781,8 @@ html.ninou-v8203 .launcher-icon {
   box-shadow: none;
 }
 
-html.ninou-v8203 .launcher-icon img,
-html.ninou-v8203 .launcher-icon svg {
+html.ninou-v8200 .launcher-icon img,
+html.ninou-v8200 .launcher-icon svg {
   width: 58px;
   height: 58px;
   max-width: 58px;
@@ -3792,11 +3792,11 @@ html.ninou-v8203 .launcher-icon svg {
   filter: drop-shadow(0 8px 12px rgba(5,3,14,.16));
 }
 
-html.ninou-v8203 .launcher-medicine-svg circle:first-child {
+html.ninou-v8200 .launcher-medicine-svg circle:first-child {
   fill: transparent;
 }
 
-html.ninou-v8203 .action-launcher-grid strong {
+html.ninou-v8200 .action-launcher-grid strong {
   min-height: 1.25em;
   color: var(--n79-text);
   font-size: .9rem;
@@ -3804,7 +3804,7 @@ html.ninou-v8203 .action-launcher-grid strong {
   line-height: 1.22;
 }
 
-html.ninou-v8203 .action-launcher-grid small {
+html.ninou-v8200 .action-launcher-grid small {
   min-height: 2.35em;
   color: var(--n79-text-2);
   font-size: .7rem;
@@ -3814,54 +3814,54 @@ html.ninou-v8203 .action-launcher-grid small {
 }
 
 /* Tema claro: cards limpos e ícones preservando as cores originais. */
-html.ninou-v8203 body.day-theme .action-launcher-grid > button {
+html.ninou-v8200 body.day-theme .action-launcher-grid > button {
   background: rgba(255,255,255,.64);
   border-color: rgba(74,57,108,.10);
   box-shadow: 0 10px 24px rgba(68,49,103,.07), inset 0 1px 0 rgba(255,255,255,.8);
 }
-html.ninou-v8203 body.day-theme .launcher-icon img,
-html.ninou-v8203 body.day-theme .launcher-icon svg {
+html.ninou-v8200 body.day-theme .launcher-icon img,
+html.ninou-v8200 body.day-theme .launcher-icon svg {
   filter: drop-shadow(0 7px 10px rgba(74,57,108,.13));
 }
 
 /* Formulário de registro: mais respiro e hierarquia do item selecionado. */
-html.ninou-v8203 body.family-daily-surface .record-sheet .section-title {
+html.ninou-v8200 body.family-daily-surface .record-sheet .section-title {
   min-height: 68px;
   padding: 4px 2px 12px;
   align-items: center;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-sheet .section-title span {
+html.ninou-v8200 body.family-daily-surface .record-sheet .section-title span {
   color: var(--n79-accent);
   font-size: .68rem;
   letter-spacing: .12em;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-sheet .section-title strong {
+html.ninou-v8200 body.family-daily-surface .record-sheet .section-title strong {
   margin-top: 5px;
   font-size: 1.22rem;
   line-height: 1.15;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-form {
+html.ninou-v8200 body.family-daily-surface .record-form {
   gap: 18px;
   padding-top: 10px;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-form > label {
+html.ninou-v8200 body.family-daily-surface .record-form > label {
   display: grid;
   gap: 8px;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-form > label > span:first-child,
-html.ninou-v8203 body.family-daily-surface .record-form label > span:first-child {
+html.ninou-v8200 body.family-daily-surface .record-form > label > span:first-child,
+html.ninou-v8200 body.family-daily-surface .record-form label > span:first-child {
   color: var(--n79-text-2);
   font-size: .76rem;
   font-weight: 820;
   letter-spacing: .01em;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-form :is(input,select,textarea) {
+html.ninou-v8200 body.family-daily-surface .record-form :is(input,select,textarea) {
   min-height: 52px;
   padding: 13px 14px;
   border-radius: 16px;
@@ -3869,16 +3869,16 @@ html.ninou-v8203 body.family-daily-surface .record-form :is(input,select,textare
   background: color-mix(in srgb, var(--n79-field) 94%, transparent);
 }
 
-html.ninou-v8203 body.family-daily-surface .record-form textarea {
+html.ninou-v8200 body.family-daily-surface .record-form textarea {
   min-height: 104px;
   line-height: 1.45;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-actions-footer {
+html.ninou-v8200 body.family-daily-surface .record-actions-footer {
   padding-top: 14px;
 }
 
-html.ninou-v8203 body.family-daily-surface .record-actions-footer .save-button {
+html.ninou-v8200 body.family-daily-surface .record-actions-footer .save-button {
   min-height: 54px;
   border-radius: 17px;
   font-size: .92rem;
@@ -3887,7 +3887,7 @@ html.ninou-v8203 body.family-daily-surface .record-actions-footer .save-button {
   box-shadow: 0 12px 28px color-mix(in srgb, var(--n79-accent) 20%, transparent);
 }
 
-html.ninou-v8203 body.family-daily-surface .record-actions-footer .save-button::before {
+html.ninou-v8200 body.family-daily-surface .record-actions-footer .save-button::before {
   content: "✓";
   position: static;
   display: inline-grid;
@@ -3903,7 +3903,7 @@ html.ninou-v8203 body.family-daily-surface .record-actions-footer .save-button::
 }
 
 /* Tipografia estável: evita saltos em relógios, timers e textos curtos. */
-html.ninou-v8203 :is(
+html.ninou-v8200 :is(
   #awakeTimer,
   #breastTimerTotal,
   #leftBreastTimer,
@@ -3916,15 +3916,15 @@ html.ninou-v8203 :is(
   font-feature-settings: "tnum" 1;
 }
 
-html.ninou-v8203 .action-launcher-head strong,
-html.ninou-v8203 .action-launcher-head p,
-html.ninou-v8203 .action-launcher-grid strong,
-html.ninou-v8203 .action-launcher-grid small {
+html.ninou-v8200 .action-launcher-head strong,
+html.ninou-v8200 .action-launcher-head p,
+html.ninou-v8200 .action-launcher-grid strong,
+html.ninou-v8200 .action-launcher-grid small {
   text-wrap: pretty;
 }
 
 @media (hover:hover) and (pointer:fine) {
-  html.ninou-v8203 .action-launcher-grid > button:hover {
+  html.ninou-v8200 .action-launcher-grid > button:hover {
     transform: translate3d(0,-2px,0);
     border-color: color-mix(in srgb, var(--n79-accent) 28%, var(--n79-line));
     box-shadow: 0 14px 30px rgba(4,2,13,.13);
@@ -3932,15 +3932,15 @@ html.ninou-v8203 .action-launcher-grid small {
 }
 
 @media (max-width:390px) {
-  html.ninou-v8203 .action-launcher-grid > button {
+  html.ninou-v8200 .action-launcher-grid > button {
     min-height: 102px;
     grid-template-columns: 52px minmax(0,1fr);
     padding: 12px 10px;
     gap: 4px 9px;
   }
-  html.ninou-v8203 .launcher-icon,
-  html.ninou-v8203 .launcher-icon img,
-  html.ninou-v8203 .launcher-icon svg {
+  html.ninou-v8200 .launcher-icon,
+  html.ninou-v8200 .launcher-icon img,
+  html.ninou-v8200 .launcher-icon svg {
     width: 52px;
     height: 52px;
     min-width: 52px;
@@ -3949,17 +3949,17 @@ html.ninou-v8203 .action-launcher-grid small {
 }
 
 /* ============================================================
-   v82.0.3 — menu + inspirado nos botões do Diário
+   v82.0.0 — menu + inspirado nos botões do Diário
    ============================================================ */
 
 /* Card do launcher mais limpo e estável. */
-html.ninou-v8203 .action-launcher-card {
+html.ninou-v8200 .action-launcher-card {
   overflow: auto;
   overscroll-behavior: contain;
   padding: 0 14px max(18px, env(safe-area-inset-bottom));
 }
 
-html.ninou-v8203 .action-launcher-head {
+html.ninou-v8200 .action-launcher-head {
   position: sticky;
   top: 0;
   z-index: 12;
@@ -3976,7 +3976,7 @@ html.ninou-v8203 .action-launcher-head {
 }
 
 /* X desenhado por CSS: não depende de fonte, SVG ou caractere do sistema. */
-html.ninou-v8203 #closeActionLauncherButton {
+html.ninou-v8200 #closeActionLauncherButton {
   position: relative !important;
   top: auto !important;
   display: grid !important;
@@ -3998,8 +3998,8 @@ html.ninou-v8203 #closeActionLauncherButton {
   visibility: visible !important;
 }
 
-html.ninou-v8203 #closeActionLauncherButton::before,
-html.ninou-v8203 #closeActionLauncherButton::after {
+html.ninou-v8200 #closeActionLauncherButton::before,
+html.ninou-v8200 #closeActionLauncherButton::after {
   content: "" !important;
   position: absolute !important;
   left: 50% !important;
@@ -4011,25 +4011,25 @@ html.ninou-v8203 #closeActionLauncherButton::after {
   transform-origin: center !important;
   pointer-events: none !important;
 }
-html.ninou-v8203 #closeActionLauncherButton::before { transform: translate(-50%, -50%) rotate(45deg) !important; }
-html.ninou-v8203 #closeActionLauncherButton::after  { transform: translate(-50%, -50%) rotate(-45deg) !important; }
+html.ninou-v8200 #closeActionLauncherButton::before { transform: translate(-50%, -50%) rotate(45deg) !important; }
+html.ninou-v8200 #closeActionLauncherButton::after  { transform: translate(-50%, -50%) rotate(-45deg) !important; }
 
-html.ninou-v8203 body.day-theme #closeActionLauncherButton {
+html.ninou-v8200 body.day-theme #closeActionLauncherButton {
   background: rgba(255,255,255,.88) !important;
   border-color: rgba(69,52,98,.14) !important;
   box-shadow: 0 10px 22px rgba(71,53,104,.13), inset 0 1px 0 #fff !important;
 }
-html.ninou-v8203 body.day-theme #closeActionLauncherButton::before,
-html.ninou-v8203 body.day-theme #closeActionLauncherButton::after {
+html.ninou-v8200 body.day-theme #closeActionLauncherButton::before,
+html.ninou-v8200 body.day-theme #closeActionLauncherButton::after {
   background: #433958 !important;
 }
 
 /* Botões no mesmo vocabulário visual dos itens do Diário. */
-html.ninou-v8203 .action-launcher-grid {
+html.ninou-v8200 .action-launcher-grid {
   gap: 10px !important;
 }
 
-html.ninou-v8203 .action-launcher-grid > button {
+html.ninou-v8200 .action-launcher-grid > button {
   min-height: 92px !important;
   padding: 12px !important;
   grid-template-columns: 56px minmax(0, 1fr) !important;
@@ -4044,14 +4044,14 @@ html.ninou-v8203 .action-launcher-grid > button {
   box-shadow: 0 8px 20px rgba(5,3,16,.08), inset 0 1px 0 rgba(255,255,255,.055) !important;
 }
 
-html.ninou-v8203 body.day-theme .action-launcher-grid > button {
+html.ninou-v8200 body.day-theme .action-launcher-grid > button {
   background: rgba(255,255,255,.76) !important;
   border-color: rgba(78,59,113,.11) !important;
   box-shadow: 0 8px 22px rgba(78,59,113,.075), inset 0 1px 0 rgba(255,255,255,.92) !important;
 }
 
 /* Avatares circulares como no Diário; elimina quinas brancas das imagens. */
-html.ninou-v8203 .launcher-icon {
+html.ninou-v8200 .launcher-icon {
   grid-row: 1 / span 2 !important;
   width: 56px !important;
   height: 56px !important;
@@ -4065,8 +4065,8 @@ html.ninou-v8203 .launcher-icon {
   box-shadow: 0 8px 18px rgba(25,13,55,.22), inset 0 1px 0 rgba(255,255,255,.22) !important;
 }
 
-html.ninou-v8203 .launcher-icon img,
-html.ninou-v8203 .launcher-icon svg {
+html.ninou-v8200 .launcher-icon img,
+html.ninou-v8200 .launcher-icon svg {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
@@ -4078,18 +4078,18 @@ html.ninou-v8203 .launcher-icon svg {
   filter: none !important;
 }
 
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="amamentacao"] .launcher-icon { background: linear-gradient(145deg,#9c7cf1,#6541ae) !important; }
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="mamadeira"] .launcher-icon { background: linear-gradient(145deg,#8ca9ff,#6962cf) !important; }
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="fralda"] .launcher-icon { background: linear-gradient(145deg,#8bd6bc,#4a9e84) !important; }
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="medicamento"] .launcher-icon { background: linear-gradient(145deg,#7fe2c1,#3b9a83) !important; }
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="acordou"] .launcher-icon { background: linear-gradient(145deg,#ffd47a,#ef9b46) !important; }
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="sono"] .launcher-icon,
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="dormir"] .launcher-icon { background: linear-gradient(145deg,#9687ef,#5142a8) !important; }
-html.ninou-v8203 .action-launcher-grid > button[data-launch-record="despertar-noturno"] .launcher-icon { background: linear-gradient(145deg,#ff9687,#b65374) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="amamentacao"] .launcher-icon { background: linear-gradient(145deg,#9c7cf1,#6541ae) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="mamadeira"] .launcher-icon { background: linear-gradient(145deg,#8ca9ff,#6962cf) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="fralda"] .launcher-icon { background: linear-gradient(145deg,#8bd6bc,#4a9e84) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="medicamento"] .launcher-icon { background: linear-gradient(145deg,#7fe2c1,#3b9a83) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="acordou"] .launcher-icon { background: linear-gradient(145deg,#ffd47a,#ef9b46) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="sono"] .launcher-icon,
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="dormir"] .launcher-icon { background: linear-gradient(145deg,#9687ef,#5142a8) !important; }
+html.ninou-v8200 .action-launcher-grid > button[data-launch-record="despertar-noturno"] .launcher-icon { background: linear-gradient(145deg,#ff9687,#b65374) !important; }
 
-html.ninou-v8203 .launcher-medicine-svg circle:first-child { fill: transparent !important; }
+html.ninou-v8200 .launcher-medicine-svg circle:first-child { fill: transparent !important; }
 
-html.ninou-v8203 .action-launcher-grid strong {
+html.ninou-v8200 .action-launcher-grid strong {
   align-self: end !important;
   min-height: 0 !important;
   margin: 0 !important;
@@ -4098,7 +4098,7 @@ html.ninou-v8203 .action-launcher-grid strong {
   font-weight: 850 !important;
   line-height: 1.18 !important;
 }
-html.ninou-v8203 .action-launcher-grid small {
+html.ninou-v8200 .action-launcher-grid small {
   align-self: start !important;
   min-height: 0 !important;
   margin: 0 !important;
@@ -4107,17 +4107,17 @@ html.ninou-v8203 .action-launcher-grid small {
   line-height: 1.25 !important;
 }
 
-html.ninou-v8203 .action-launcher-group + .action-launcher-group {
+html.ninou-v8200 .action-launcher-group + .action-launcher-group {
   margin-top: 14px !important;
   padding-top: 14px !important;
 }
-html.ninou-v8203 .action-launcher-label {
+html.ninou-v8200 .action-launcher-label {
   display: flex !important;
   align-items: center !important;
   gap: 9px !important;
   margin: 0 2px 10px !important;
 }
-html.ninou-v8203 .action-launcher-label::after {
+html.ninou-v8200 .action-launcher-label::after {
   content: "";
   height: 1px;
   flex: 1;
@@ -4125,13 +4125,13 @@ html.ninou-v8203 .action-launcher-label::after {
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 .action-launcher-grid > button {
+  html.ninou-v8200 .action-launcher-grid > button {
     min-height: 86px !important;
     grid-template-columns: 50px minmax(0,1fr) !important;
     padding: 10px !important;
     column-gap: 9px !important;
   }
-  html.ninou-v8203 .launcher-icon {
+  html.ninou-v8200 .launcher-icon {
     width: 50px !important;
     height: 50px !important;
     min-width: 50px !important;
@@ -4140,14 +4140,14 @@ html.ninou-v8203 .action-launcher-label::after {
 }
 
 /* ============================================================
-   v82.0.3 — unificação dos ícones e botões da Home
+   v82.0.0 — unificação dos ícones e botões da Home
    - ação principal com o mesmo acabamento do menu/diário
    - atalhos “Registre em poucos toques” no mesmo estilo premium
    - marcadores da órbita e ícones auxiliares sempre circulares
    ============================================================ */
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
   position: relative !important;
   overflow: hidden !important;
   border-radius: 26px !important;
@@ -4155,8 +4155,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   box-shadow: 0 20px 36px rgba(15,12,38,.24), inset 0 1px 0 rgba(255,255,255,.10) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action::before,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet]::before {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action::before,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet]::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -4166,7 +4166,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
     linear-gradient(180deg, rgba(255,255,255,.05), transparent 58%);
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
   width: 100% !important;
   min-height: 84px !important;
   padding: 14px 16px !important;
@@ -4182,7 +4182,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   -webkit-text-fill-color: #17362b !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action > span:last-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action > span:last-child {
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
@@ -4194,21 +4194,21 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   text-align: left !important;
 }
 
-html.ninou-v8203 body.day-theme .primary-action {
+html.ninou-v8200 body.day-theme .primary-action {
   background: linear-gradient(160deg, rgba(121,91,206,.98), rgba(156,119,227,.96)) !important;
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   box-shadow: 0 18px 34px rgba(111,82,176,.24), inset 0 1px 0 rgba(255,255,255,.18) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
   grid-template-columns: repeat(2, minmax(0,1fr)) !important;
   grid-auto-rows: minmax(98px, auto) !important;
   gap: 12px !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
   width: 100% !important;
   height: auto !important;
   min-height: 96px !important;
@@ -4229,7 +4229,7 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   -webkit-text-fill-color: #f7f3ff !important;
 }
 
-html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] {
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] {
   background: linear-gradient(155deg, rgba(255,255,255,.98), rgba(250,243,255,.96)) !important;
   border-color: rgba(111,84,166,.14) !important;
   box-shadow: 0 16px 28px rgba(111,84,166,.10), inset 0 1px 0 rgba(255,255,255,.82) !important;
@@ -4237,14 +4237,14 @@ html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] {
   -webkit-text-fill-color: #433466 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon,
-html.ninou-v8203 .event-card .mark,
-html.ninou-v8203 .last-card .mark,
-html.ninou-v8203 .cluster-card .cluster-icon,
-html.ninou-v8203 .orbit-event > i,
-html.ninou-v8203 .live-orbit-marker > i,
-html.ninou-v8203 .orbit-cluster-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon,
+html.ninou-v8200 .event-card .mark,
+html.ninou-v8200 .last-card .mark,
+html.ninou-v8200 .cluster-card .cluster-icon,
+html.ninou-v8200 .orbit-event > i,
+html.ninou-v8200 .live-orbit-marker > i,
+html.ninou-v8200 .orbit-cluster-icon {
   position: relative !important;
   z-index: 1 !important;
   display: grid !important;
@@ -4258,14 +4258,14 @@ html.ninou-v8203 .orbit-cluster-icon {
   box-shadow: 0 12px 24px rgba(19,14,39,.28), inset 0 1px 0 rgba(255,255,255,.14) !important;
 }
 
-html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] > .action-icon,
-html.ninou-v8203 body.day-theme .primary-action .action-icon,
-html.ninou-v8203 body.day-theme .event-card .mark,
-html.ninou-v8203 body.day-theme .last-card .mark,
-html.ninou-v8203 body.day-theme .cluster-card .cluster-icon,
-html.ninou-v8203 body.day-theme .orbit-event > i,
-html.ninou-v8203 body.day-theme .live-orbit-marker > i,
-html.ninou-v8203 body.day-theme .orbit-cluster-icon {
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v8200 body.day-theme .primary-action .action-icon,
+html.ninou-v8200 body.day-theme .event-card .mark,
+html.ninou-v8200 body.day-theme .last-card .mark,
+html.ninou-v8200 body.day-theme .cluster-card .cluster-icon,
+html.ninou-v8200 body.day-theme .orbit-event > i,
+html.ninou-v8200 body.day-theme .live-orbit-marker > i,
+html.ninou-v8200 body.day-theme .orbit-cluster-icon {
   border-color: rgba(255,255,255,.96) !important;
   background:
     radial-gradient(circle at 30% 22%, rgba(255,255,255,.34), rgba(255,255,255,.08) 48%, transparent 70%),
@@ -4273,8 +4273,8 @@ html.ninou-v8203 body.day-theme .orbit-cluster-icon {
   box-shadow: 0 12px 25px rgba(78,60,126,.18), inset 0 1px 0 rgba(255,255,255,.95) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
   width: 56px !important;
   height: 56px !important;
   min-width: 56px !important;
@@ -4284,9 +4284,9 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   padding: 4px !important;
 }
 
-html.ninou-v8203 .event-card .mark,
-html.ninou-v8203 .last-card .mark,
-html.ninou-v8203 .cluster-card .cluster-icon {
+html.ninou-v8200 .event-card .mark,
+html.ninou-v8200 .last-card .mark,
+html.ninou-v8200 .cluster-card .cluster-icon {
   width: 54px !important;
   height: 54px !important;
   min-width: 54px !important;
@@ -4294,8 +4294,8 @@ html.ninou-v8203 .cluster-card .cluster-icon {
   padding: 4px !important;
 }
 
-html.ninou-v8203 .orbit-event,
-html.ninou-v8203 .live-orbit-marker {
+html.ninou-v8200 .orbit-event,
+html.ninou-v8200 .live-orbit-marker {
   width: 42px !important;
   height: 42px !important;
   min-width: 42px !important;
@@ -4309,9 +4309,9 @@ html.ninou-v8203 .live-orbit-marker {
   -webkit-tap-highlight-color: transparent !important;
 }
 
-html.ninou-v8203 .orbit-event > i,
-html.ninou-v8203 .live-orbit-marker > i,
-html.ninou-v8203 .orbit-cluster-icon {
+html.ninou-v8200 .orbit-event > i,
+html.ninou-v8200 .live-orbit-marker > i,
+html.ninou-v8200 .orbit-cluster-icon {
   width: 36px !important;
   height: 36px !important;
   min-width: 36px !important;
@@ -4319,28 +4319,28 @@ html.ninou-v8203 .orbit-cluster-icon {
   padding: 2px !important;
 }
 
-html.ninou-v8203 .orbit-cluster {
+html.ninou-v8200 .orbit-cluster {
   width: 48px !important;
   height: 48px !important;
   min-width: 48px !important;
   min-height: 48px !important;
 }
 
-html.ninou-v8203 .orbit-cluster > .orbit-cluster-icon {
+html.ninou-v8200 .orbit-cluster > .orbit-cluster-icon {
   width: 40px !important;
   height: 40px !important;
   min-width: 40px !important;
   min-height: 40px !important;
 }
 
-html.ninou-v8203 .orbit-event > i > :is(img,svg),
-html.ninou-v8203 .live-orbit-marker > i > :is(img,svg),
-html.ninou-v8203 .orbit-cluster-icon > :is(img,svg),
-html.ninou-v8203 .quick-actions > button[data-open-sheet] > .action-icon :is(img,svg),
-html.ninou-v8203 .primary-action .action-icon :is(img,svg),
-html.ninou-v8203 .event-card .mark :is(img,svg),
-html.ninou-v8203 .last-card .mark :is(img,svg),
-html.ninou-v8203 .cluster-card .cluster-icon :is(img,svg) {
+html.ninou-v8200 .orbit-event > i > :is(img,svg),
+html.ninou-v8200 .live-orbit-marker > i > :is(img,svg),
+html.ninou-v8200 .orbit-cluster-icon > :is(img,svg),
+html.ninou-v8200 .quick-actions > button[data-open-sheet] > .action-icon :is(img,svg),
+html.ninou-v8200 .primary-action .action-icon :is(img,svg),
+html.ninou-v8200 .event-card .mark :is(img,svg),
+html.ninou-v8200 .last-card .mark :is(img,svg),
+html.ninou-v8200 .cluster-card .cluster-icon :is(img,svg) {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
@@ -4351,22 +4351,22 @@ html.ninou-v8203 .cluster-card .cluster-icon :is(img,svg) {
   background: transparent !important;
 }
 
-html.ninou-v8203 .orbit-event:focus,
-html.ninou-v8203 .live-orbit-marker:focus,
-html.ninou-v8203 .orbit-event:focus-visible,
-html.ninou-v8203 .live-orbit-marker:focus-visible {
+html.ninou-v8200 .orbit-event:focus,
+html.ninou-v8200 .live-orbit-marker:focus,
+html.ninou-v8200 .orbit-event:focus-visible,
+html.ninou-v8200 .live-orbit-marker:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
 
-html.ninou-v8203 .orbit-event:focus-visible > i,
-html.ninou-v8203 .live-orbit-marker:focus-visible > i,
-html.ninou-v8203 .orbit-cluster:focus-visible > .orbit-cluster-icon {
+html.ninou-v8200 .orbit-event:focus-visible > i,
+html.ninou-v8200 .live-orbit-marker:focus-visible > i,
+html.ninou-v8200 .orbit-cluster:focus-visible > .orbit-cluster-icon {
   box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 0 0 5px rgba(142,114,231,.24), 0 12px 24px rgba(19,14,39,.28) !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child {
   position: relative !important;
   z-index: 1 !important;
   width: 100% !important;
@@ -4378,8 +4378,8 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   padding: 0 !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > strong,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > strong {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > strong,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > strong {
   display: block !important;
   color: #fbf8ff !important;
   -webkit-text-fill-color: #fbf8ff !important;
@@ -4389,14 +4389,14 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   letter-spacing: -.02em !important;
 }
 
-html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > strong,
-html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > strong {
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > strong,
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > strong {
   color: #47356d !important;
   -webkit-text-fill-color: #47356d !important;
 }
 
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > small,
-html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > small {
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > small,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > small {
   display: block !important;
   color: rgba(232,226,255,.72) !important;
   -webkit-text-fill-color: rgba(232,226,255,.72) !important;
@@ -4405,25 +4405,25 @@ html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 700 !important;
 }
 
-html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > small,
-html.ninou-v8203 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > small {
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > small,
+html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > small {
   color: rgba(71,53,109,.62) !important;
   -webkit-text-fill-color: rgba(71,53,109,.62) !important;
 }
 
 @media (max-width: 390px) {
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
     min-height: 80px !important;
     grid-template-columns: 54px minmax(0,1fr) !important;
     padding: 12px 14px !important;
   }
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
     min-height: 92px !important;
     grid-template-columns: 52px minmax(0,1fr) !important;
     padding: 12px !important;
   }
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
-  html.ninou-v8203 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
     width: 52px !important;
     height: 52px !important;
     min-width: 52px !important;

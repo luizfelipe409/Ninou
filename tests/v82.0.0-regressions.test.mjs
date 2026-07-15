@@ -4,12 +4,12 @@ import assert from "node:assert/strict";
 const root = new URL("../", import.meta.url);
 const [html, boot, core, ux, stability, premiumCss, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
-  readFile(new URL("js/boot-v82.0.3.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-core-v82.0.3.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-ux-v82.0.3.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-stability-v82.0.3.mjs", root), "utf8"),
-  readFile(new URL("styles/premium-v82.0.3.css", root), "utf8"),
-  readFile(new URL("js/runtime/visual-guard-v82.0.3.mjs", root), "utf8"),
+  readFile(new URL("js/boot-v82.0.0.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-core-v82.0.0.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-ux-v82.0.0.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-stability-v82.0.0.mjs", root), "utf8"),
+  readFile(new URL("styles/premium-v82.0.0.css", root), "utf8"),
+  readFile(new URL("js/runtime/visual-guard-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("sw.js", root), "utf8"),
   readFile(new URL("scripts/build-production.mjs", root), "utf8"),
   readFile(new URL("vercel.json", root), "utf8"),
@@ -18,7 +18,7 @@ const [html, boot, core, ux, stability, premiumCss, visualGuard, sw, build, verc
 ]);
 
 const headEnd = html.indexOf("</head>");
-const bootBarrier = html.indexOf('classList.add("ninou-booting", "ninou-v8203")');
+const bootBarrier = html.indexOf('classList.add("ninou-booting", "ninou-v8200")');
 assert.ok(bootBarrier > 0 && bootBarrier < headEnd, "A barreira de boot deve começar dentro do <head>.");
 assert.match(html, /<body data-profile-access-state="booting">/);
 assert.match(html, /id="quickActions" class="quick-actions"/);
@@ -80,13 +80,13 @@ assert.match(nightSky, /<radialGradient id="nebulaA"/);
 assert.match(nightSky, /mask id="moonCut"/);
 
 const legacySize = (await stat(new URL("styles/legacy.css", root))).size;
-const premiumSize = (await stat(new URL("styles/premium-v82.0.3.css", root))).size;
+const premiumSize = (await stat(new URL("styles/premium-v82.0.0.css", root))).size;
 assert.ok(legacySize < 800 * 1024, "O CSS legado deve permanecer abaixo de 800 KB.");
 assert.ok(premiumSize > 20 * 1024 && premiumSize < 170 * 1024, "A autoridade premium deve ser substancial sem virar outro monólito.");
 
-console.log("Regressões v82.0.3 validadas: céu claro solar, noite cósmica, órbita local, menu + e estabilidade preservados.");
+console.log("Regressões v82.0.0 validadas: céu claro solar, noite cósmica, órbita local, menu + e estabilidade preservados.");
 
-// v82.0.3: ajustes solicitados após validação visual.
+// v82.0.0: ajustes solicitados após validação visual.
 assert.doesNotMatch(html, /class="orbit-sun"/);
 assert.match(premiumCss, /#orbitClusterSheet\[hidden\]/);
 assert.match(premiumCss, /body\[data-active-screen="profile"\] \.fab-real-plus/);

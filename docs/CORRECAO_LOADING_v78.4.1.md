@@ -1,4 +1,4 @@
-# Correção do loading — Ninou v82.0.3
+# Correção do loading — Ninou v82.0.0
 
 ## Causa encontrada
 
