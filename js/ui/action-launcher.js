@@ -43,4 +43,10 @@ export function initActionLauncher() {
   });
   window.addEventListener("keydown", (event) => { if (event.key === "Escape" && !launcher.hidden) close(); });
   window.addEventListener("ninou:screen-change", close, { passive: true });
+
+  try {
+    Object.defineProperty(window, "NinouOpenActionLauncher", { value: () => open(), configurable: true });
+  } catch (_) {
+    window.NinouOpenActionLauncher = () => open();
+  }
 }

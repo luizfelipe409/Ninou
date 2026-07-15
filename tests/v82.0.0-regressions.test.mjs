@@ -2,13 +2,14 @@ import { readFile, stat } from "node:fs/promises";
 import assert from "node:assert/strict";
 
 const root = new URL("../", import.meta.url);
-const [html, boot, core, ux, stability, premiumCss, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
+const [html, boot, core, ux, stability, premiumCss, focusedFlowCss, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
   readFile(new URL("js/boot-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-core-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-ux-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-stability-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("styles/premium-v82.0.0.css", root), "utf8"),
+  readFile(new URL("styles/focused-flow-v82.0.0.css", root), "utf8"),
   readFile(new URL("js/runtime/visual-guard-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("sw.js", root), "utf8"),
   readFile(new URL("scripts/build-production.mjs", root), "utf8"),
@@ -25,6 +26,7 @@ assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
 assert.match(html, /styles\/legacy\.css\?v=82\.0\.0/);
 assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.0\.0/);
+assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.0\.0/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
 assert.match(html, /boot-v82\.0\.0\.mjs\?v=82\.0\.0/);
 assert.match(html, /__NINOU_BOOT_WATCHDOG__/);
@@ -74,9 +76,9 @@ assert.match(html, /class="orbit-sky"/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v81-0-1-menu-diario-x/);
+assert.match(sw, /ninou-v82-0-0-record-flow-avatar-chart/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
-assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0"\]/);
+assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
 assert.match(build, /"assets"/);
@@ -103,3 +105,16 @@ assert.match(premiumCss, /#orbitClusterSheet\[hidden\]/);
 assert.match(premiumCss, /body\[data-active-screen="profile"\] \.fab-real-plus/);
 assert.match(premiumCss, /--n79-nav-height: 70px/);
 assert.match(premiumCss, /Marcadores reais com arte legível no céu claro/);
+
+// Fluxo solicitado: escolha no menu, formulário focado e retorno explícito.
+const recordSheetMarkup = html.slice(html.indexOf('id="recordSheet"'), html.indexOf('id="orbitClusterSheet"'));
+assert.doesNotMatch(recordSheetMarkup, /class="record-types"/);
+assert.match(recordSheetMarkup, /id="backToActionLauncher"/);
+assert.match(recordSheetMarkup, /id="closeSheet"/);
+assert.match(recordSheetMarkup, />Registrar</);
+assert.match(core, /function returnToActionLauncher/);
+assert.match(core, /NinouOpenActionLauncher/);
+assert.match(focusedFlowCss, /--n80-sheet-grid-rows: 16px auto minmax\(0, 1fr\) auto/);
+assert.match(focusedFlowCss, /#babyAvatarTestCard \.avatar-option-grid\.icon-grid/);
+assert.match(focusedFlowCss, /\.avatar-picker-section::after/);
+assert.match(focusedFlowCss, /\.actions-mini-chart span:not\(\.is-empty\)::before/);

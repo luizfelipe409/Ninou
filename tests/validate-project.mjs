@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const failures = [];
-const cssModules = ["legacy", "premium-v82.0.0"];
+const cssModules = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const required = [
   "index.html", "styles.css", "sw.js", "manifest.webmanifest", "firestore.rules", "vercel.json",
   ...cssModules.map((name) => `styles/${name}.css`),
@@ -53,7 +53,7 @@ for (const removed of ["tokens", "foundation", "home", "components", "motion", "
 }
 
 const sw = await readFile(join(root, "sw.js"), "utf8");
-if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0"]')) failures.push("Service Worker não declara a autoridade visual revisada");
+if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"]')) failures.push("Service Worker não declara a autoridade visual revisada");
 if (!sw.includes('const APP_VERSION = "82.0.0"')) failures.push("Service Worker não está na v82.0.0");
 for (const asset of ["day-sky.svg", "night-sky.svg"]) if (!sw.includes(asset)) failures.push(`Service Worker não referencia ${asset}`);
 for (const asset of required.filter((file) => file.startsWith("js/"))) {

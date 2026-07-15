@@ -1,0 +1,208 @@
+/* Ninou v82.0.0 — registro focado, avatares preenchidos e paleta de Dados. */
+
+/* O menu escolhe o cuidado; a folha seguinte exibe somente o formulário. */
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #recordSheet {
+  --n80-sheet-grid-rows: 16px auto minmax(0, 1fr) auto;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #recordSheet .record-types {
+  display: none !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #recordSheet .section-title {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  padding-block: 5px 10px !important;
+}
+
+html.ninou-v8200 .record-sheet-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+}
+
+html.ninou-v8200 .sheet-back-action {
+  min-height: 42px !important;
+  padding: 0 12px 0 9px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent) 24%, var(--n79-line)) !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--n79-accent) 9%, var(--n79-surface-3)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v8200 .sheet-back-action[hidden] { display: none !important; }
+
+html.ninou-v8200 .sheet-back-action svg {
+  width: 20px !important;
+  height: 20px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #recordSheet .sheet-back-action span {
+  display: inline !important;
+  margin: 0 !important;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  font-size: .72rem !important;
+  font-weight: 880 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #recordSheet .record-form {
+  padding-top: 8px !important;
+}
+
+/* X no canto direito do menu, com os textos alinhados à esquerda. */
+html.ninou-v8200 .action-launcher-head {
+  position: sticky !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  padding-right: 72px !important;
+}
+
+html.ninou-v8200 #closeActionLauncherButton {
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+}
+
+/* Reserva espaço para que os círculos ilustrados não sejam recortados. */
+html.ninou-v8200 .launcher-icon { overflow: visible !important; }
+
+html.ninou-v8200 .launcher-icon img,
+html.ninou-v8200 .launcher-icon svg {
+  transform: scale(.9) !important;
+  transform-origin: center !important;
+}
+
+/* A grade ocupa todo o espaço livre e continua abaixo com fade e rolagem. */
+html.ninou-v8200 #babyAvatarTestCard .avatar-modal-card {
+  width: min(92vw, 420px) !important;
+  height: min(92dvh, 820px) !important;
+  max-height: min(92dvh, 820px) !important;
+  padding: 20px 18px 16px !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  overflow: hidden !important;
+}
+
+html.ninou-v8200 #babyAvatarTestCard .avatar-picker-section {
+  min-height: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+html.ninou-v8200 #babyAvatarTestCard .avatar-option-grid.icon-grid {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 4px 2px 60px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: 142px !important;
+  align-content: start !important;
+  gap: 12px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scroll-padding-bottom: 60px !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+}
+
+html.ninou-v8200 #babyAvatarTestCard .avatar-option-grid.icon-grid::-webkit-scrollbar {
+  display: none !important;
+}
+
+html.ninou-v8200 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 142px !important;
+  min-height: 142px !important;
+  max-height: 142px !important;
+}
+
+html.ninou-v8200 #babyAvatarTestCard .avatar-picker-section::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 5 !important;
+  height: 58px !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--n79-surface) 92%, transparent) 78%, var(--n79-surface)) !important;
+}
+
+html.ninou-v8200 #babyAvatarTestCard .avatar-editor-actions {
+  position: relative !important;
+  bottom: auto !important;
+  z-index: 8 !important;
+  margin: 0 !important;
+  padding: 4px 0 0 !important;
+  grid-template-columns: 1fr 1fr !important;
+  background: transparent !important;
+}
+
+/* A Home usa a mesma paleta mint-lavanda dos gráficos de Dados. */
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .actions-mini-chart span:not(.is-empty)::before {
+  background: linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,0) 34%), linear-gradient(180deg, #79f3cf 0%, #9275ff 100%) !important;
+  box-shadow: 0 12px 24px rgba(103,241,200,.18), inset 0 1px 0 rgba(255,255,255,.46) !important;
+}
+
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .actions-mini-chart span:not(.is-empty)::before {
+  background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 34%), linear-gradient(180deg, #4fcda6 0%, #8067e8 100%) !important;
+  box-shadow: 0 12px 24px rgba(72,115,150,.14), inset 0 1px 0 rgba(255,255,255,.56) !important;
+}
+
+@media (max-width: 390px) {
+  html.ninou-v8200 .sheet-back-action {
+    width: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #recordSheet .sheet-back-action span {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+  }
+
+  html.ninou-v8200 #babyAvatarTestCard .avatar-modal-card {
+    width: min(96vw, 390px) !important;
+    padding-inline: 14px !important;
+  }
+
+  html.ninou-v8200 #babyAvatarTestCard .avatar-option-grid.icon-grid {
+    gap: 9px !important;
+    grid-auto-rows: 134px !important;
+  }
+
+  html.ninou-v8200 #babyAvatarTestCard .avatar-option-grid.icon-grid button.avatar-choice {
+    height: 134px !important;
+    min-height: 134px !important;
+    max-height: 134px !important;
+  }
+}

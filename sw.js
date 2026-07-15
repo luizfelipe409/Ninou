@@ -1,6 +1,6 @@
-const CACHE_NAME = "ninou-v81-0-1-menu-diario-x";
+const CACHE_NAME = "ninou-v82-0-0-record-flow-avatar-chart";
 const APP_VERSION = "82.0.0";
-const STYLE_MODULES = ["legacy", "premium-v82.0.0"];
+const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),

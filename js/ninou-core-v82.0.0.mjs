@@ -57,6 +57,7 @@ const orbitClusterList = document.querySelector("#orbitClusterList");
 const closeOrbitClusterButton = document.querySelector("#closeOrbitCluster");
 const orbitClusterViewAllButton = document.querySelector("#orbitClusterViewAll");
 const closeSheetButton = document.querySelector("#closeSheet");
+const backToActionLauncherButton = document.querySelector("#backToActionLauncher");
 const openSheetButtons = document.querySelectorAll("[data-open-sheet]");
 const sheetTypeButtons = document.querySelectorAll("[data-sheet-type]");
 const sheetTitle = document.querySelector("#sheetTitle");
@@ -13000,6 +13001,7 @@ function openSheet(type = "sono", eventId = null) {
   if (!requireLogin(editingEvent ? "editar registros" : "criar registros")) return;
 
   closeOrbitCluster();
+  if (backToActionLauncherButton) backToActionLauncherButton.hidden = Boolean(editingEvent);
   currentEditingEventId = editingEvent?.id || null;
   setSheetType(editingEvent?.type || type);
 
@@ -13045,6 +13047,17 @@ function closeSheet() {
       orbitClusterSheet,
     },
     resetSheetState,
+  });
+}
+
+function returnToActionLauncher() {
+  closeSheet();
+  requestAnimationFrame(() => {
+    if (typeof window.NinouOpenActionLauncher === "function") {
+      window.NinouOpenActionLauncher();
+      return;
+    }
+    document.querySelector("#openActionLauncherButton")?.click();
   });
 }
 
@@ -13831,6 +13844,7 @@ window.addEventListener("resize", scheduleOrbitLayoutRender, { passive: true });
 window.addEventListener("orientationchange", scheduleOrbitLayoutRender, { passive: true });
 
 closeSheetButton.addEventListener("click", closeSheet);
+backToActionLauncherButton?.addEventListener("click", returnToActionLauncher);
 closeOrbitClusterButton.addEventListener("click", closeOrbitCluster);
 if (orbitClusterViewAllButton) {
   orbitClusterViewAllButton.addEventListener("click", () => {

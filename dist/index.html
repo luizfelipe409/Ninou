@@ -56,6 +56,7 @@
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
     <link rel="stylesheet" href="./styles/legacy.css?v=82.0.0" />
     <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.0.0" />
+    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.0.0" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -2067,17 +2068,13 @@
           <span>Novo registro</span>
           <strong id="sheetTitle">Soneca</strong>
         </div>
-        <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
-      </div>
-      <div class="record-types" aria-label="Tipos de registro">
-        <button class="active" type="button" data-sheet-type="amamentacao"><span class="type-icon"><img class="icon-art icon-art-amamentacao" src="./icons/actions/amamentacao.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamada</span></button>
-        <button type="button" data-sheet-type="mamadeira"><span class="type-icon"><img class="icon-art icon-art-mamadeira" src="./icons/actions/mamadeira.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Mamadeira</span></button>
-        <button type="button" data-sheet-type="fralda"><span class="type-icon"><img class="icon-art icon-art-fralda" src="./icons/actions/fralda.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Fralda</span></button>
-        <button type="button" data-sheet-type="medicamento"><span class="type-icon"><svg class="icon-art medicine-svg" viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="rgba(124,229,194,.15)"/><path d="M23.2 38.8 38.8 23.2a9 9 0 0 1 12.7 12.7L35.9 51.5a9 9 0 0 1-12.7-12.7Z" fill="#f7f3ff" stroke="#7ce5c2" stroke-width="4"/><path d="m31.1 30.9 9 9" stroke="#7ce5c2" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="18" r="4" fill="#ffd37a"/><circle cx="17" cy="46" r="3" fill="#ff9a76"/></svg></span><span>Remédio</span></button>
-        <button type="button" data-sheet-type="acordou"><span class="type-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
-        <button type="button" data-sheet-type="sono"><span class="type-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Soneca</span></button>
-        <button type="button" data-sheet-type="dormir"><span class="type-icon"><img class="icon-art icon-art-dormir" src="./icons/actions/dormir.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Noite</span></button>
-        <button type="button" data-sheet-type="despertar-noturno"><span class="type-icon"><img class="icon-art icon-art-despertar-noturno" src="./icons/actions/despertar-noturno.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span><span>Acordou</span></button>
+        <nav class="record-sheet-header-actions" aria-label="Navegação do novo registro">
+          <button id="backToActionLauncher" class="sheet-back-action" type="button" aria-label="Voltar ao menu Novo cuidado">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6" /></svg>
+            <span>Cuidados</span>
+          </button>
+          <button id="closeSheet" class="round-action icon-button-close" type="button" aria-label="Fechar novo registro"></button>
+        </nav>
       </div>
       <form class="record-form">
         <label>
