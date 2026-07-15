@@ -17,7 +17,7 @@ import { formatEventMeta as formatRoutineEventMeta, getEventCardMarkup, getEvent
 import { renderHomeSummary as renderHomeSummaryPanel, renderTodayLastEvents as renderTodayLastEventsPanel } from "./ui/home.js";
 import { renderDailyRhythm, renderDayStory, renderIntelligentTimeline, renderLiveAssistant, renderSmartInsight, renderTrendKpis, renderWeeklyOverview } from "./ui/intelligence.js";
 import { formatNumber as formatChartNumber, getReportDays as buildReportDays, getSleepReportDays as buildSleepReportDays, renderBarChart as renderSharedBarChart, renderTodayMiniChart as renderTodayMiniChartPanel } from "./ui/charts.js";
-import { applyRecordSheetType as renderRecordSheetType, closeRecordSheet as closeRecordSheetPanel, getRecordSheetDetailValue as resolveRecordSheetDetailValue, hydrateRecordSheetFromEvent as hydrateRecordSheetFromEventPanel, prepareRecordSheetForOpen, resetRecordSheet, isTypeWithManualEnd } from "./ui/record-sheet.js";
+import { applyRecordSheetType as renderRecordSheetType, closeRecordSheet as closeRecordSheetPanel, getRecordSheetDetailValue as resolveRecordSheetDetailValue, hydrateRecordSheetFromEvent as hydrateRecordSheetFromEventPanel, prepareRecordSheetForOpen, resetRecordSheet, isTypeWithManualEnd, lockRecordSheetViewport, unlockRecordSheetViewport } from "./ui/record-sheet.js";
 import { buildDeleteConfirmationText, buildManualEventPayload, clearRecordFormAfterSave } from "./domain/event-editor.js";
 import { bindShortcutNavigation } from "./ui/navigation.js";
 import { bindBottomNavigation, bindSyncPillNavigation, createHorizontalScrollToggle, updateScreenVisibility } from "./ui/app-navigation.js";
@@ -907,6 +907,8 @@ const pendingDaySyncStorageKey = "ninou.sync.pendingDays";
 let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
 let timelineRenderSignature = "";
+let growthPanelsRenderSignature = "";
+let weightProfileRenderSignature = "";
 let lastRoutineUndoSnapshot = null;
 let liveTickMinute = -1;
 let breastTimerState = createBreastTimerState();
@@ -10547,6 +10549,7 @@ function openOrbitCluster(events, options = {}) {
   if (orbitClusterViewAllButton) orbitClusterViewAllButton.textContent = `Ver todos os registros`;
   orbitClusterSheet.hidden = false;
   sheetBackdrop.hidden = false;
+  lockRecordSheetViewport();
   orbitClusterList.scrollTop = 0;
   requestAnimationFrame(() => {
     orbitClusterSheet.scrollTop = 0;
@@ -10554,12 +10557,13 @@ function openOrbitCluster(events, options = {}) {
   });
 }
 
-function closeOrbitCluster() {
+function closeOrbitCluster(options = {}) {
   orbitClusterSheet.hidden = true;
   orbitClusterList.innerHTML = "";
   if (orbitClusterViewAllButton) orbitClusterViewAllButton.blur();
   if (sheet.hidden) {
     sheetBackdrop.hidden = true;
+    if (!options.preserveViewportLock) unlockRecordSheetViewport();
   }
 }
 
@@ -11065,6 +11069,10 @@ function updateSleepDurationPreview() {
 }
 
 function renderWeightProfile() {
+  const weights = normalizeWeights(babyProfile.weights || loadLocalWeights());
+  const nextSignature = weights.map((item) => `${item.id}:${item.date}:${item.value}`).join("|");
+  if (nextSignature === weightProfileRenderSignature && weightHistoryList?.childElementCount) return;
+  weightProfileRenderSignature = nextSignature;
   renderWeightProfilePanel({
     profile: babyProfile,
     loadWeights: loadLocalWeights,
@@ -11605,6 +11613,13 @@ function renderGrowthHistoryMini(weights = []) {
 
 function renderGrowthPanels() {
   const weights = getSortedWeightsAsc();
+  const nextSignature = weights.map((item) => `${item.id}:${item.date}:${item.value}`).join("|") || "empty";
+  if (
+    nextSignature === growthPanelsRenderSignature
+    && todayWeightSparkline?.childElementCount
+    && trendWeightSparkline?.childElementCount
+  ) return;
+  growthPanelsRenderSignature = nextSignature;
   const latest = weights[weights.length - 1];
   const previous = weights[weights.length - 2];
   const targetWeightEls = [todayGrowthWeight, trendGrowthWeight].filter(Boolean);
@@ -12998,9 +13013,9 @@ function hydrateSheetFromEvent(event) {
 
 function openSheet(type = "sono", eventId = null) {
   const editingEvent = eventId ? getEventById(eventId) : null;
-  if (!requireLogin(editingEvent ? "editar registros" : "criar registros")) return;
+  if (!requireLogin(editingEvent ? "editar registros" : "criar registros")) return false;
 
-  closeOrbitCluster();
+  closeOrbitCluster({ preserveViewportLock: true });
   if (backToActionLauncherButton) backToActionLauncherButton.hidden = Boolean(editingEvent);
   currentEditingEventId = editingEvent?.id || null;
   setSheetType(editingEvent?.type || type);
@@ -13028,6 +13043,7 @@ function openSheet(type = "sono", eventId = null) {
     recordForm?.scrollTo?.({ top: 0, behavior: "instant" });
     scheduleRecordScrollHintUpdate();
   });
+  return true;
 }
 
 try { Object.defineProperty(window, "NinouOpenRecordSheet", { value: (type) => openSheet(type), configurable: true }); } catch (_) { window.NinouOpenRecordSheet = (type) => openSheet(type); }
@@ -13051,14 +13067,10 @@ function closeSheet() {
 }
 
 function returnToActionLauncher() {
-  closeSheet();
-  requestAnimationFrame(() => {
-    if (typeof window.NinouOpenActionLauncher === "function") {
-      window.NinouOpenActionLauncher();
-      return;
-    }
-    document.querySelector("#openActionLauncherButton")?.click();
-  });
+  const opened = typeof window.NinouOpenActionLauncher === "function"
+    ? window.NinouOpenActionLauncher()
+    : document.querySelector("#openActionLauncherButton")?.click();
+  if (opened !== false) closeSheet();
 }
 
 function shouldStartLiveSleepFromManualEvent(type, start, existingEvent) {

@@ -2,7 +2,7 @@ import { readFile, stat } from "node:fs/promises";
 import assert from "node:assert/strict";
 
 const root = new URL("../", import.meta.url);
-const [html, boot, core, ux, stability, premiumCss, focusedFlowCss, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
+const [html, boot, core, ux, stability, premiumCss, focusedFlowCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
   readFile(new URL("js/boot-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-core-v82.0.0.mjs", root), "utf8"),
@@ -10,6 +10,8 @@ const [html, boot, core, ux, stability, premiumCss, focusedFlowCss, visualGuard,
   readFile(new URL("js/ninou-stability-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("styles/premium-v82.0.0.css", root), "utf8"),
   readFile(new URL("styles/focused-flow-v82.0.0.css", root), "utf8"),
+  readFile(new URL("js/ui/action-launcher.js", root), "utf8"),
+  readFile(new URL("js/ui/record-sheet.js", root), "utf8"),
   readFile(new URL("js/runtime/visual-guard-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("sw.js", root), "utf8"),
   readFile(new URL("scripts/build-production.mjs", root), "utf8"),
@@ -76,7 +78,7 @@ assert.match(html, /class="orbit-sky"/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-record-flow-avatar-chart/);
+assert.match(sw, /ninou-v82-0-0-iphone-overlay-orbit-profile/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -118,3 +120,16 @@ assert.match(focusedFlowCss, /--n80-sheet-grid-rows: 16px auto minmax\(0, 1fr\) 
 assert.match(focusedFlowCss, /#babyAvatarTestCard \.avatar-option-grid\.icon-grid/);
 assert.match(focusedFlowCss, /\.avatar-picker-section::after/);
 assert.match(focusedFlowCss, /\.actions-mini-chart span:not\(\.is-empty\)::before/);
+
+// Correções reproduzidas no iPhone 14 Pro Max.
+assert.match(html, /maximum-scale=1, user-scalable=no/);
+assert.match(focusedFlowCss, /body\.action-launcher-open[\s\S]*position: fixed/);
+assert.match(focusedFlowCss, /data-active-screen="profile"[\s\S]*:is\(\.record-sheet, \.orbit-cluster-sheet\)/);
+assert.match(focusedFlowCss, /\.orbit-cluster-count[\s\S]*display: grid !important/);
+assert.match(focusedFlowCss, /:is\(\.orbit-event > i, \.live-orbit-marker > i, \.orbit-cluster-icon\)[\s\S]*background: transparent !important/);
+assert.match(actionLauncher, /NinouOpenRecordSheet[\s\S]*if \(opened !== false\) close\(\)/);
+assert.doesNotMatch(actionLauncher, /close\(\);\s*requestAnimationFrame\(\(\) => \{\s*if \(typeof window\.NinouOpenRecordSheet/);
+assert.match(recordSheet, /export function lockRecordSheetViewport/);
+assert.match(recordSheet, /action-launcher-open/);
+assert.match(core, /lockRecordSheetViewport\(\)/);
+assert.match(core, /growthPanelsRenderSignature/);

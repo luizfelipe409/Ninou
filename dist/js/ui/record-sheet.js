@@ -100,6 +100,39 @@ export function hydrateRecordSheetFromEvent({
   if (hasMatchingOption) detailSelect.value = event.detail;
 }
 
+function getCurrentViewportScrollY() {
+  const launcherScrollY = Number(document.body?.dataset?.actionLauncherScrollY);
+  if (document.body?.classList.contains("action-launcher-open") && Number.isFinite(launcherScrollY)) {
+    return launcherScrollY;
+  }
+  return window.scrollY || document.documentElement.scrollTop || 0;
+}
+
+export function lockRecordSheetViewport() {
+  if (!document.body) return;
+  if (!document.body.classList.contains("record-sheet-open")) {
+    const currentScrollY = getCurrentViewportScrollY();
+    document.body.dataset.recordSheetScrollY = String(currentScrollY);
+    document.body.style.setProperty("--record-sheet-scroll-y", `-${currentScrollY}px`);
+  }
+  document.body.classList.add("record-sheet-open");
+  document.documentElement?.classList.add("record-sheet-open");
+}
+
+export function unlockRecordSheetViewport() {
+  if (!document.body?.classList.contains("record-sheet-open")) return;
+  const lockedScrollY = Number(document.body?.dataset?.recordSheetScrollY || 0);
+  document.body?.classList.remove("record-sheet-open");
+  document.documentElement?.classList.remove("record-sheet-open");
+  if (document.body) {
+    document.body.style.removeProperty("--record-sheet-scroll-y");
+    delete document.body.dataset.recordSheetScrollY;
+  }
+  if (!document.body?.classList.contains("action-launcher-open") && Number.isFinite(lockedScrollY)) {
+    requestAnimationFrame(() => window.scrollTo({ top: lockedScrollY, left: 0, behavior: "instant" }));
+  }
+}
+
 export function prepareRecordSheetForOpen({
   editingEvent,
   elements,
@@ -123,13 +156,7 @@ export function prepareRecordSheetForOpen({
 
   if (elements.sheet) elements.sheet.hidden = false;
   if (elements.backdrop) elements.backdrop.hidden = false;
-  const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-  if (document.body && !document.body.classList.contains("record-sheet-open")) {
-    document.body.dataset.recordSheetScrollY = String(currentScrollY);
-    document.body.style.setProperty("--record-sheet-scroll-y", `-${currentScrollY}px`);
-  }
-  document.body?.classList.add("record-sheet-open");
-  document.documentElement?.classList.add("record-sheet-open");
+  lockRecordSheetViewport();
   requestAnimationFrame(() => elements.sheet?.scrollTo?.({ top: 0, behavior: "instant" }));
 }
 
@@ -139,16 +166,7 @@ export function closeRecordSheet({ elements, resetSheetState }) {
     elements.backdrop.hidden = true;
   }
   if (elements.orbitClusterSheet?.hidden !== false) {
-    const lockedScrollY = Number(document.body?.dataset?.recordSheetScrollY || 0);
-    document.body?.classList.remove("record-sheet-open");
-    document.documentElement?.classList.remove("record-sheet-open");
-    if (document.body) {
-      document.body.style.removeProperty("--record-sheet-scroll-y");
-      delete document.body.dataset.recordSheetScrollY;
-    }
-    if (Number.isFinite(lockedScrollY)) {
-      requestAnimationFrame(() => window.scrollTo({ top: lockedScrollY, left: 0, behavior: "instant" }));
-    }
+    unlockRecordSheetViewport();
   }
   resetSheetState?.();
 }
