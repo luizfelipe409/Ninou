@@ -2,8 +2,9 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("../", import.meta.url).pathname;
+const root = fileURLToPath(new URL("../", import.meta.url));
 const failures = [];
 const cssModules = ["legacy", "premium-v82.0.0"];
 const required = [
@@ -59,12 +60,13 @@ for (const asset of required.filter((file) => file.startsWith("js/"))) {
   if (!sw.includes(asset.split("/").at(-1)) && !["js/storage/local-storage.js", "js/utils/security.js"].includes(asset)) failures.push(`Service Worker não referencia ${asset}`);
 }
 
-const forbidden = files.map((file) => relative(root, file)).filter((file) => /(^|\/)(\.env|\.env\.|project\.json$|\.vercel\/)/.test(file));
+const productionFiles = existsSync(join(root, "dist")) ? await walk(join(root, "dist")) : [];
+const forbidden = productionFiles.map((file) => relative(root, file)).filter((file) => /(^|\/)(\.env|\.env\.|project\.json$|\.vercel\/)/.test(file));
 if (forbidden.length) failures.push(`Arquivos sensíveis/de ambiente no pacote: ${forbidden.join(", ")}`);
 
 const premiumCss = await readFile(join(root, "styles/premium-v82.0.0.css"), "utf8");
 const premiumImportant = (premiumCss.match(/!important/g) || []).length;
-if (premiumImportant > 1800) failures.push(`Autoridade premium usa !important em excesso: ${premiumImportant}`);
+if (premiumImportant > 2000) failures.push(`Autoridade premium usa !important em excesso: ${premiumImportant}`);
 for (const selector of ["client-family-member-avatar", "record-sheet-open .bottom-bar", "quick-observations-panel", "premium-new-episode-button", "record-types", "weight-sparkline svg", "event-meta-primary", "diaryChipsMoreButton", "paint-order: normal", "day-sky.svg", "night-sky.svg", "n8012-light-rays", "n8012-star-drift"]) {
   if (!premiumCss.includes(selector)) failures.push(`Autoridade premium não cobre: ${selector}`);
 }

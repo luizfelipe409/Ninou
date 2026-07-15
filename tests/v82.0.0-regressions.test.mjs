@@ -55,6 +55,12 @@ assert.match(premiumCss, /body\.day-theme .*\.orbit-track/s);
 assert.match(premiumCss, /body:not\(\.day-theme\) .*\.orbit-track/s);
 assert.match(premiumCss, /body\.day-theme .*\.orbit-center-safe/s);
 assert.match(premiumCss, /body:not\(\.day-theme\) .*\.orbit-center-safe/s);
+assert.match(premiumCss, /\.orbit-duration-segment\s*\{[^}]*fill:\s*none[^}]*stroke:\s*url\(#orbitSegmentGradient\)/s);
+assert.match(premiumCss, /\.orbit-gradient-stop-a\s*\{\s*stop-color:/);
+assert.match(premiumCss, /@keyframes n82-marker-arrival/);
+assert.match(premiumCss, /body\[data-active-screen="profile"\] \.app-header/);
+assert.match(premiumCss, /:is\(#closeSheet, #closeOrbitCluster\)\.icon-button-close/);
+assert.match(premiumCss, /@media \(max-width: 430px\)[\s\S]*\.record-types/);
 
 assert.match(core, /return -90 \+ .*ORBIT_DAY_MINUTES.*\* 360/s);
 assert.match(core, /--orbit-celestial-x/);

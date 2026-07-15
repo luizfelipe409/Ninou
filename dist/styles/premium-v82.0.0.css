@@ -1815,6 +1815,382 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   }
 }
 
+/* v82.0.0 — acabamento premium para lançamento. */
+
+html.ninou-v8200 .orbit-duration-arcs {
+  pointer-events: none !important;
+}
+
+html.ninou-v8200 .orbit-gradient-stop-a { stop-color: #9b7bf2; }
+html.ninou-v8200 .orbit-gradient-stop-b { stop-color: #6fd7bd; }
+html.ninou-v8200 .orbit-gradient-active-a { stop-color: #ffbd78; }
+html.ninou-v8200 .orbit-gradient-active-b { stop-color: #9b7bf2; }
+
+html.ninou-v8200 .orbit-duration-segment {
+  fill: none !important;
+  stroke: url(#orbitSegmentGradient) !important;
+  stroke-width: 9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  opacity: .82 !important;
+  filter: drop-shadow(0 0 4px rgba(140, 103, 235, .42)) !important;
+}
+
+html.ninou-v8200 .orbit-duration-segment.active {
+  stroke: url(#orbitActiveGradient) !important;
+  opacity: 1 !important;
+  filter:
+    drop-shadow(0 0 4px rgba(255, 183, 112, .62))
+    drop-shadow(0 0 11px rgba(151, 105, 241, .42)) !important;
+}
+
+html.ninou-v8200 body.day-theme .orbit-duration-segment {
+  stroke-width: 8 !important;
+  opacity: .74 !important;
+  filter: drop-shadow(0 3px 6px rgba(91, 66, 151, .18)) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.orbit-event, .live-orbit-marker),
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).day-theme :is(.orbit-event, .live-orbit-marker),
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]):not(.day-theme) :is(.orbit-event, .live-orbit-marker) {
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.orbit-event, .live-orbit-marker) > i {
+  overflow: hidden !important;
+  border: 1.5px solid rgba(255, 255, 255, .64) !important;
+  border-radius: 50% !important;
+  background: rgba(25, 19, 55, .46) !important;
+  box-shadow: 0 8px 18px rgba(8, 5, 24, .24), inset 0 1px 0 rgba(255, 255, 255, .22) !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: transform 420ms cubic-bezier(.22, 1, .36, 1), box-shadow 420ms ease !important;
+}
+
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) :is(.orbit-event, .live-orbit-marker) > i {
+  border-color: rgba(255, 255, 255, .98) !important;
+  background: rgba(255, 255, 255, .56) !important;
+  box-shadow: 0 8px 18px rgba(71, 52, 120, .17), inset 0 1px 0 #fff !important;
+}
+
+html.ninou-v8200 .ninou-orbit-updated > :is(.orbit-event, .live-orbit-marker):last-child > i {
+  animation: n82-marker-arrival 520ms cubic-bezier(.22, 1, .36, 1) both !important;
+}
+
+@keyframes n82-marker-arrival {
+  0% { opacity: .35; transform: translate3d(0, 7px, 0) scale(.94); }
+  68% { opacity: 1; transform: translate3d(0, -2px, 0) scale(1.015); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
+  grid-template-columns: 52px auto !important;
+  justify-content: center !important;
+  justify-items: center !important;
+  column-gap: 12px !important;
+  text-align: center !important;
+  transform: none !important;
+  transition: box-shadow 260ms ease, filter 260ms ease !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action > span:last-child {
+  width: auto !important;
+  max-width: min(66vw, 260px) !important;
+  text-align: center !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  padding: 2px !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: transform 360ms cubic-bezier(.22, 1, .36, 1), filter 360ms ease !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action:active {
+  transform: none !important;
+  filter: brightness(.985) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action:active .action-icon {
+  transform: translate3d(0, -3px, 0) scale(.985) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .app-header {
+  position: sticky !important;
+  top: max(8px, var(--n79-safe-top)) !important;
+  z-index: 40 !important;
+  min-height: 66px !important;
+  margin: 0 0 14px !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 22px !important;
+  background: var(--n79-glass) !important;
+  background-image: none !important;
+  box-shadow: var(--n79-shadow-soft) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .identity {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background: transparent !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .identity > img {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  object-fit: cover !important;
+  border: 0 !important;
+  border-radius: 15px !important;
+  background: rgba(255, 255, 255, .72) !important;
+  box-shadow: 0 7px 18px rgba(7, 4, 22, .20) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .identity > div { min-width: 0 !important; }
+
+html.ninou-v8200 body[data-active-screen="profile"] .identity span {
+  display: block !important;
+  margin: 0 0 2px !important;
+  color: var(--n79-label) !important;
+  -webkit-text-fill-color: var(--n79-label) !important;
+  font-size: .68rem !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  letter-spacing: .13em !important;
+  text-transform: uppercase !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .identity strong {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  font-size: .98rem !important;
+  line-height: 1.15 !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .sync-pill {
+  flex: 0 0 auto !important;
+  min-height: 34px !important;
+  padding: 0 11px !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent) 30%, transparent) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--n79-accent) 11%, var(--n79-surface)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+  font-size: .72rem !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+  grid-auto-rows: minmax(88px, auto) !important;
+  gap: 10px !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  min-height: 88px !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 12px !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  border-radius: 21px !important;
+  background: linear-gradient(155deg, rgba(57, 45, 94, .96), rgba(36, 28, 68, .96)) !important;
+}
+
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+  border-color: rgba(91, 67, 147, .12) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, .99), rgba(248, 245, 255, .98)) !important;
+  color: #433466 !important;
+  -webkit-text-fill-color: #433466 !important;
+  box-shadow: 0 12px 26px rgba(84, 62, 139, .09), inset 0 1px 0 #fff !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  padding: 1px !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > strong,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > strong {
+  min-width: 0 !important;
+  font-size: clamp(.78rem, 3.45vw, .92rem) !important;
+  line-height: 1.14 !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > small,
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > small {
+  font-size: clamp(.62rem, 2.8vw, .7rem) !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+html.ninou-v8200 body.family-daily-surface :is(#closeSheet, #closeOrbitCluster).icon-button-close {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 12 !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: visible !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 14px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html.ninou-v8200 body.family-daily-surface :is(#closeSheet, #closeOrbitCluster).icon-button-close::before,
+html.ninou-v8200 body.family-daily-surface :is(#closeSheet, #closeOrbitCluster).icon-button-close::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 17px !important;
+  height: 2px !important;
+  display: block !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: currentColor !important;
+  box-shadow: none !important;
+  transform-origin: center !important;
+}
+
+html.ninou-v8200 body.family-daily-surface :is(#closeSheet, #closeOrbitCluster).icon-button-close::before {
+  transform: translate(-50%, -50%) rotate(45deg) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface :is(#closeSheet, #closeOrbitCluster).icon-button-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title {
+  grid-template-columns: minmax(0, 1fr) 42px !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+@media (max-width: 430px) {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet {
+    width: calc(100vw - 12px) !important;
+    height: min(88dvh, 744px) !important;
+    max-height: calc(100dvh - max(14px, var(--n79-safe-top)) - max(8px, var(--n79-safe-bottom))) !important;
+    padding-inline: 12px !important;
+    border-radius: 27px !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-sheet .section-title {
+    min-height: 56px !important;
+    grid-template-columns: minmax(0, 1fr) 42px !important;
+    padding: 2px 0 8px !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types {
+    width: calc(100% + 12px) !important;
+    margin: 0 -6px 10px !important;
+    padding: 2px 6px 8px !important;
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x proximity !important;
+    scroll-padding-inline: 6px !important;
+    overscroll-behavior-inline: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .record-types button[data-sheet-type] {
+    flex: 0 0 76px !important;
+    width: 76px !important;
+    min-width: 76px !important;
+    height: 74px !important;
+    min-height: 74px !important;
+    max-height: 74px !important;
+    scroll-snap-align: start !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
+    grid-auto-rows: minmax(84px, auto) !important;
+    gap: 8px !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
+    min-height: 84px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 10px !important;
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ninou-v8200 .ninou-orbit-updated > :is(.orbit-event, .live-orbit-marker):last-child > i {
+    animation: none !important;
+  }
+
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
+    transition-duration: 1ms !important;
+  }
+}
+
 @media (min-width: 700px) {
   html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).regular-family-mode .phone-shell {
     padding-inline: 20px !important;
@@ -4171,12 +4547,13 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   min-height: 84px !important;
   padding: 14px 16px !important;
   display: grid !important;
-  grid-template-columns: 58px minmax(0,1fr) !important;
+  grid-template-columns: 44px auto !important;
   align-items: center !important;
-  justify-items: start !important;
+  justify-content: center !important;
+  justify-items: center !important;
   gap: 12px !important;
   border-radius: 28px !important;
-  text-align: left !important;
+  text-align: center !important;
   background: linear-gradient(160deg, rgba(131,229,198,.96), rgba(170,236,192,.94)) !important;
   color: #17362b !important;
   -webkit-text-fill-color: #17362b !important;
@@ -4185,13 +4562,13 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action > span:last-child {
   position: relative !important;
   z-index: 1 !important;
-  width: 100% !important;
+  width: auto !important;
   display: block !important;
   font-size: 1.08rem !important;
   font-weight: 950 !important;
   line-height: 1.15 !important;
   letter-spacing: -.02em !important;
-  text-align: left !important;
+  text-align: center !important;
 }
 
 html.ninou-v8200 body.day-theme .primary-action {
@@ -4204,25 +4581,25 @@ html.ninou-v8200 body.day-theme .primary-action {
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) #quickActions.quick-actions,
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .screen[data-screen="today"] > .quick-actions {
   grid-template-columns: repeat(2, minmax(0,1fr)) !important;
-  grid-auto-rows: minmax(98px, auto) !important;
-  gap: 12px !important;
+  grid-auto-rows: minmax(88px, auto) !important;
+  gap: 10px !important;
 }
 
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
   width: 100% !important;
   height: auto !important;
-  min-height: 96px !important;
+  min-height: 88px !important;
   max-height: none !important;
   margin: 0 !important;
-  padding: 14px 14px !important;
+  padding: 12px !important;
   display: grid !important;
-  grid-template-columns: 56px minmax(0,1fr) !important;
+  grid-template-columns: 44px minmax(0,1fr) !important;
   grid-template-rows: none !important;
   align-items: center !important;
   justify-items: start !important;
   align-content: center !important;
-  gap: 12px !important;
-  border-radius: 24px !important;
+  gap: 10px !important;
+  border-radius: 21px !important;
   text-align: left !important;
   background: linear-gradient(155deg, rgba(47,36,83,.98), rgba(29,21,54,.98)) !important;
   color: #f7f3ff !important;
@@ -4275,13 +4652,13 @@ html.ninou-v8200 body.day-theme .orbit-cluster-icon {
 
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px !important;
-  min-height: 56px !important;
-  max-width: 56px !important;
-  max-height: 56px !important;
-  padding: 4px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  padding: 1px !important;
 }
 
 html.ninou-v8200 .event-card .mark,
@@ -4383,14 +4760,14 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   display: block !important;
   color: #fbf8ff !important;
   -webkit-text-fill-color: #fbf8ff !important;
-  font-size: .98rem !important;
+  font-size: .86rem !important;
   line-height: 1.1 !important;
   font-weight: 950 !important;
   letter-spacing: -.02em !important;
 }
 
-html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > strong,
-html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > strong {
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > strong,
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > strong {
   color: #47356d !important;
   -webkit-text-fill-color: #47356d !important;
 }
@@ -4405,8 +4782,8 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   font-weight: 700 !important;
 }
 
-html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > .action-copy > small,
-html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:last-child > small {
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-copy > small,
+html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > span:last-child > small {
   color: rgba(71,53,109,.62) !important;
   -webkit-text-fill-color: rgba(71,53,109,.62) !important;
 }
@@ -4414,19 +4791,19 @@ html.ninou-v8200 body.day-theme .quick-actions > button[data-open-sheet] > span:
 @media (max-width: 390px) {
   html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
     min-height: 80px !important;
-    grid-template-columns: 54px minmax(0,1fr) !important;
+    grid-template-columns: 40px auto !important;
     padding: 12px 14px !important;
   }
   html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] {
-    min-height: 92px !important;
-    grid-template-columns: 52px minmax(0,1fr) !important;
-    padding: 12px !important;
+    min-height: 84px !important;
+    grid-template-columns: 40px minmax(0,1fr) !important;
+    padding: 10px !important;
   }
   html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .quick-actions > button[data-open-sheet] > .action-icon,
   html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action .action-icon {
-    width: 52px !important;
-    height: 52px !important;
-    min-width: 52px !important;
-    min-height: 52px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
   }
 }
