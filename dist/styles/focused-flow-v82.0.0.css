@@ -1251,8 +1251,8 @@ html.ninou-v8200 .orbit-cluster .orbit-cluster-icon {
 }
 
 html.ninou-v8200 .orbit-cluster .orbit-cluster-count {
-  left: 8px !important;
-  top: 8px !important;
+  left: var(--cluster-count-x, 8px) !important;
+  top: var(--cluster-count-y, 8px) !important;
   right: auto !important;
   width: 22px !important;
   height: 22px !important;
@@ -1265,7 +1265,7 @@ html.ninou-v8200 .orbit-cluster .orbit-cluster-count {
   -webkit-text-fill-color: #173c35 !important;
   box-shadow: 0 0 0 2px rgba(121,229,196,.12), 0 5px 12px rgba(23,60,53,.24) !important;
   font-size: .61rem !important;
-  transform: none !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 html.ninou-v8200 body.day-theme .orbit-cluster .orbit-cluster-count {
@@ -1313,4 +1313,21 @@ html.ninou-v8200 .orbit-event.active > .orbit-marker-icon,
 html.ninou-v8200 .orbit-cluster.contains-active .orbit-cluster-icon {
   border-color: rgba(128,242,207,.94) !important;
   box-shadow: 0 0 0 2px rgba(128,242,207,.13), 0 6px 14px rgba(38,126,105,.18), inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* Mais respiro entre o mostrador central e a linha de vida. */
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .state-orbit.live-timeline-orbit {
+  width: min(100%, 390px) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe {
+  width: min(64%, 230px) !important;
+  min-height: 150px !important;
+}
+
+@media (max-width: 390px) {
+  html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-center-safe {
+    width: min(65%, 228px) !important;
+    min-height: 146px !important;
+  }
 }

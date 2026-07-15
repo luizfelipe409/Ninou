@@ -10428,6 +10428,14 @@ function getOrbitClusterMarkup(eventList) {
   return `<span class="orbit-cluster-compact" aria-hidden="true"><i class="orbit-cluster-icon">${primaryConfig.icon}</i><span class="orbit-cluster-count">${eventList.length}</span></span>`;
 }
 
+function setOrbitClusterCountGeometry(button, position) {
+  const radialAngle = Math.atan2(Number(position?.y) || 0, Number(position?.x) || 0);
+  const badgeAngle = radialAngle + .52;
+  const badgeDistance = 22;
+  button.style.setProperty("--cluster-count-x", `${(Math.cos(badgeAngle) * badgeDistance).toFixed(1)}px`);
+  button.style.setProperty("--cluster-count-y", `${(Math.sin(badgeAngle) * badgeDistance).toFixed(1)}px`);
+}
+
 function createOrbitCluster(group) {
   const eventList = group.items.map((item) => item.event).sort((a, b) => a.start - b.start);
   const config = getEventConfig(eventList[eventList.length - 1].type);
@@ -10444,6 +10452,7 @@ function createOrbitCluster(group) {
     : formatTime(markerTimes[0]);
   button.title = `${eventList.length} registros próximos · ${timeRange}`;
   button.setAttribute("aria-label", `${eventList.length} registros próximos, no período ${timeRange}`);
+  setOrbitClusterCountGeometry(button, group.position);
   button.innerHTML = getOrbitClusterMarkup(eventList);
   button.addEventListener("click", () => openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` }));
   return button;
