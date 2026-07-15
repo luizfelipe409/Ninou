@@ -906,6 +906,8 @@ const pendingProfileSyncStorageKey = "ninou.sync.pendingProfile";
 const pendingDaySyncStorageKey = "ninou.sync.pendingDays";
 let pendingProfilePhotoSave = false;
 let orbitRenderSignature = "";
+let orbitDurationRenderSignature = "";
+let orbitCompletedJourneyKeys = new Set();
 let timelineRenderSignature = "";
 let growthPanelsRenderSignature = "";
 let weightProfileRenderSignature = "";
@@ -10168,6 +10170,7 @@ function renderCurrentState() {
 const ORBIT_RADIUS = 126;
 const ORBIT_CENTER = 160;
 const ORBIT_COLLISION_DISTANCE = 54;
+const ORBIT_CLUSTER_WINDOW_MINUTES = 75;
 const ORBIT_DAY_MINUTES = 1440;
 
 function getOrbitMinuteOfDay(timestamp = Date.now()) {
@@ -10284,8 +10287,16 @@ function getOrbitGroupPosition(members) {
 
 function getOrbitGroups(items) {
   const groups = [];
-  [...items].sort((a, b) => Number(a.event?.start || 0) - Number(b.event?.start || 0)).forEach((item) => {
-    const group = groups.find((candidate) => candidate.items.some((member) => getDistance(member.position, item.position) <= ORBIT_COLLISION_DISTANCE));
+  const clusterWindowMs = ORBIT_CLUSTER_WINDOW_MINUTES * 60000;
+  [...items].sort((a, b) => Number(a.timestamp || a.event?.start || 0) - Number(b.timestamp || b.event?.start || 0)).forEach((item) => {
+    const itemTimestamp = Number(item.timestamp || item.event?.start || 0);
+    const group = groups.find((candidate) => {
+      const timestamps = candidate.items.map((member) => Number(member.timestamp || member.event?.start || 0));
+      const groupStart = Math.min(...timestamps, itemTimestamp);
+      const groupEnd = Math.max(...timestamps, itemTimestamp);
+      return groupEnd - groupStart <= clusterWindowMs
+        && candidate.items.some((member) => getDistance(member.position, item.position) <= ORBIT_COLLISION_DISTANCE);
+    });
     if (group) {
       group.items.push(item);
       group.position = getOrbitGroupPosition(group.items);
@@ -10315,21 +10326,59 @@ function describeOrbitArc(startMinute, endMinute, radius = ORBIT_RADIUS) {
 
 function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
   if (!orbitDurationArcs) return;
-  orbitDurationArcs.replaceChildren();
   const dayEnd = orbitStart + day;
-  events.filter(isOrbitDurationEvent).forEach((event) => {
+  const durationEvents = events.filter(isOrbitDurationEvent);
+  const nextSignature = durationEvents.map((event) => [
+    event.id || event.type,
+    event.type,
+    Math.floor((Number(event.start) || 0) / 60000),
+    Math.floor(getOrbitEventEnd(event) / 60000),
+    event.isActive ? "active" : "complete",
+  ].join(":")).join("|");
+  if (nextSignature === orbitDurationRenderSignature) return;
+  orbitDurationRenderSignature = nextSignature;
+  orbitDurationArcs.replaceChildren();
+  const nextCompletedJourneyKeys = new Set();
+
+  durationEvents.forEach((event) => {
     const startTs = Math.max(Number(event.start) || orbitStart, orbitStart);
     const endTs = Math.min(getOrbitEventEnd(event), dayEnd);
     if (endTs <= startTs) return;
     const startMinute = (startTs - orbitStart) / 60000;
     const endMinute = (endTs - orbitStart) / 60000;
     const config = getEventConfig(event.type);
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", describeOrbitArc(startMinute, endMinute));
-    path.setAttribute("class", `orbit-duration-segment ${config.arcType}${event.isActive ? " active" : ""}`);
-    path.setAttribute("pathLength", "100");
-    orbitDurationArcs.append(path);
+    const journeyKey = `${event.id || event.type}:${Math.floor(startTs / 60000)}:${Math.floor(endTs / 60000)}`;
+    const journeyArrivalClass = !event.isActive && !orbitCompletedJourneyKeys.has(journeyKey) ? " is-arriving" : "";
+    if (!event.isActive) nextCompletedJourneyKeys.add(journeyKey);
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    group.setAttribute("class", `orbit-duration-journey ${config.arcType}${event.isActive ? " active" : ` complete${journeyArrivalClass}`}`);
+    const pathData = describeOrbitArc(startMinute, endMinute);
+    ["orbit-duration-halo", "orbit-duration-segment", "orbit-duration-glint"].forEach((className) => {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", pathData);
+      path.setAttribute("class", `${className} ${config.arcType}${event.isActive ? " active" : ""}`);
+      path.setAttribute("pathLength", "100");
+      group.append(path);
+    });
+    const startPoint = orbitPointForMinute(startMinute);
+    const endPoint = orbitPointForMinute(endMinute);
+    [["orbit-duration-start", startPoint], ["orbit-duration-head", endPoint]].forEach(([className, point]) => {
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("class", className);
+      dot.setAttribute("cx", point.svgX.toFixed(2));
+      dot.setAttribute("cy", point.svgY.toFixed(2));
+      dot.setAttribute("r", className.endsWith("head") ? "4.5" : "3");
+      group.append(dot);
+    });
+    orbitDurationArcs.append(group);
   });
+  orbitCompletedJourneyKeys = nextCompletedJourneyKeys;
+}
+
+function openOrbitEventsFromMarker(marker, events, options = {}) {
+  marker.classList.add("is-opening");
+  window.setTimeout(() => marker.classList.remove("is-opening"), 440);
+  openOrbitCluster(events, options);
 }
 
 function createOrbitEvent(event, active = false, position = eventPosition(event.start)) {
@@ -10345,7 +10394,7 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
     : `${config.title} às ${formatTime(markerTime)}`;
   button.title = markerLabel;
   button.setAttribute("aria-label", markerLabel);
-  button.addEventListener("click", () => openOrbitCluster([event], { title: config.title }));
+  button.addEventListener("click", () => openOrbitEventsFromMarker(button, [event], { title: config.title }));
   return button;
 }
 
@@ -10356,11 +10405,20 @@ function createOrbitCluster(group) {
   button.type = "button";
   button.className = `orbit-event live-orbit-marker orbit-cluster ${config.arcType}`;
   applyOrbitMarkerPosition(button, group.position);
-  button.title = `${eventList.length} ações próximas`;
-  button.setAttribute("aria-label", `${eventList.length} ações agrupadas na linha do tempo`);
   button.dataset.clusterCount = String(eventList.length);
-  button.innerHTML = `<i class="orbit-cluster-icon">${config.icon}</i><span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>`;
-  button.addEventListener("click", () => openOrbitCluster(eventList, { title: `${eventList.length} ações agrupadas` }));
+  const previewIcons = eventList.slice(-3, -1).map((event, index) => {
+    const previewConfig = getEventConfig(event.type);
+    return `<span class="orbit-cluster-peek orbit-cluster-peek-${index + 1}" aria-hidden="true">${previewConfig.icon}</span>`;
+  }).join("");
+  const markerTimes = group.items.map((item) => Number(item.timestamp || getOrbitMarkerTimestamp(item.event))).sort((a, b) => a - b);
+  const lastMarkerTime = markerTimes[markerTimes.length - 1];
+  const timeRange = markerTimes.length > 1 && formatTime(markerTimes[0]) !== formatTime(lastMarkerTime)
+    ? `${formatTime(markerTimes[0])}–${formatTime(lastMarkerTime)}`
+    : formatTime(markerTimes[0]);
+  button.title = `${eventList.length} registros próximos · ${timeRange}`;
+  button.setAttribute("aria-label", `${eventList.length} registros próximos, no período ${timeRange}`);
+  button.innerHTML = `<span class="orbit-cluster-constellation" aria-hidden="true">${previewIcons}</span><i class="orbit-cluster-icon">${config.icon}</i><span class="orbit-cluster-count" aria-hidden="true">${eventList.length}</span>`;
+  button.addEventListener("click", () => openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` }));
   return button;
 }
 
@@ -10398,6 +10456,7 @@ function renderOrbit() {
   const displayEvents = dayEvents.slice(-72).map((event) => ({
     event,
     active: false,
+    timestamp: getOrbitMarkerTimestamp(event, orbitStart, orbitEnd),
     position: eventPosition(getOrbitMarkerTimestamp(event, orbitStart, orbitEnd)),
   }));
 
@@ -10416,6 +10475,7 @@ function renderOrbit() {
     displayEvents.push({
       event: activeEvent,
       active: true,
+      timestamp: getOrbitMarkerTimestamp(activeEvent, orbitStart, orbitEnd),
       position: eventPosition(getOrbitMarkerTimestamp(activeEvent, orbitStart, orbitEnd)),
     });
   }
@@ -10527,13 +10587,13 @@ function openOrbitCluster(events, options = {}) {
   const selectedStart = selectedDiaryDay ?? getDayStart();
   const orderedEvents = [...events].sort((a, b) => a.start - b.start);
   orbitClusterTitle.textContent = options?.title || `${orderedEvents.length} registros próximos`;
-  orbitClusterList.innerHTML = orderedEvents.map((rawEvent) => {
+  orbitClusterList.innerHTML = orderedEvents.map((rawEvent, index) => {
     const event = decorateEventForSelectedDay(rawEvent, selectedStart);
     const config = getEventConfig(event.type);
     const notes = event.notes ? `<p>${escapeHtml(event.notes)}</p>` : "";
 
     return `
-      <article class="cluster-card">
+      <article class="cluster-card" style="--cluster-delay:${45 + index * 42}ms">
         <i class="cluster-icon ${config.arcType}">${config.icon}</i>
         <div>
           <strong>${escapeHtml(config.title)}</strong>
@@ -10547,17 +10607,23 @@ function openOrbitCluster(events, options = {}) {
 
   closeSheet();
   if (orbitClusterViewAllButton) orbitClusterViewAllButton.textContent = `Ver todos os registros`;
+  orbitClusterSheet.dataset.clusterSize = String(orderedEvents.length);
+  orbitClusterSheet.classList.remove("is-entering");
   orbitClusterSheet.hidden = false;
   sheetBackdrop.hidden = false;
+  document.body.classList.add("orbit-cluster-open");
   lockRecordSheetViewport();
   orbitClusterList.scrollTop = 0;
   requestAnimationFrame(() => {
+    orbitClusterSheet.classList.add("is-entering");
     orbitClusterSheet.scrollTop = 0;
     orbitClusterList.scrollTop = 0;
   });
 }
 
 function closeOrbitCluster(options = {}) {
+  orbitClusterSheet.classList.remove("is-entering");
+  document.body.classList.remove("orbit-cluster-open");
   orbitClusterSheet.hidden = true;
   orbitClusterList.innerHTML = "";
   if (orbitClusterViewAllButton) orbitClusterViewAllButton.blur();

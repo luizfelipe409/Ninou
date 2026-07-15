@@ -235,7 +235,6 @@ html.ninou-v8200 :is(.action-launcher-card, .record-sheet, .orbit-cluster-sheet)
   touch-action: pan-y !important;
 }
 
-/* O Perfil passa a usar a mesma largura, respiros e cabeçalho das demais telas. */
 html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"].regular-family-mode .phone-shell {
   width: min(100%, var(--n79-page-max)) !important;
   max-width: var(--n79-page-max) !important;
@@ -283,7 +282,6 @@ html.ninou-v8200 #recordSheet[hidden] {
   pointer-events: none !important;
 }
 
-/* O formulário conserva a mesma geometria quando é aberto sobre o Perfil. */
 html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] .sheet-backdrop {
   position: fixed !important;
   inset: 0 0 calc(-48px - env(safe-area-inset-bottom, 0px)) !important;
@@ -461,7 +459,6 @@ html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"] #record
   transform: none !important;
 }
 
-/* Marcadores do arco: somente a arte circular, contador legível e sem salto/zoom. */
 html.ninou-v8200 :is(.orbit-event, .live-orbit-marker, .orbit-cluster) {
   position: absolute !important;
   overflow: visible !important;
@@ -536,14 +533,51 @@ html.ninou-v8200 body.day-theme .orbit-cluster-count {
   -webkit-text-fill-color: #fff !important;
 }
 
+html.ninou-v8200 .orbit-cluster-constellation {
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+}
+
+html.ninou-v8200 .orbit-cluster-peek {
+  position: absolute !important;
+  z-index: 0 !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,.5) !important;
+  border-radius: 50% !important;
+  background: rgba(31,22,67,.9) !important;
+  box-shadow: 0 5px 12px rgba(8,5,24,.34) !important;
+  transition: transform 320ms cubic-bezier(.22,1,.36,1) !important;
+}
+
+html.ninou-v8200 body.day-theme .orbit-cluster-peek {
+  border-color: #fff !important;
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: 0 5px 12px rgba(72,53,126,.2) !important;
+}
+
+html.ninou-v8200 .orbit-cluster-peek-1 { left: -5px !important; top: 2px !important; transform: scale(.78) rotate(-8deg) !important; }
+html.ninou-v8200 .orbit-cluster-peek-2 { right: -5px !important; bottom: 1px !important; transform: scale(.78) rotate(8deg) !important; }
+html.ninou-v8200 .orbit-cluster.is-opening .orbit-cluster-peek-1 { transform: translate(-6px,-4px) scale(.86) rotate(-11deg) !important; }
+html.ninou-v8200 .orbit-cluster.is-opening .orbit-cluster-peek-2 { transform: translate(6px,4px) scale(.86) rotate(11deg) !important; }
+
+html.ninou-v8200 .orbit-cluster-peek :is(img,svg) {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 50% !important;
+}
+
 @media (max-width: 390px) {
   html.ninou-v8200 body.family-daily-surface[data-active-screen="profile"].regular-family-mode .phone-shell {
     padding-inline: 10px !important;
   }
 }
 
-/* Ajustes observados no iPhone: o Perfil recebe a mesma entrada suave das
-   demais telas, e os formulários curtos não mantêm área vazia artificial. */
 @media (prefers-reduced-motion: no-preference) {
   html.ninou-v8200 body.family-daily-surface .screen.active {
     animation: n79-screen-in 260ms ease both !important;
@@ -605,7 +639,6 @@ html.ninou-v8200 body.record-sheet-open .bottom-bar {
   visibility: hidden !important;
 }
 
-/* Perfil usa literalmente a superfície clara e o cabeçalho das outras telas. */
 html.ninou-v8200 body.family-daily-surface.day-theme[data-active-screen="profile"] {
   --n79-glass: rgba(247,246,250,.86);
   background:

@@ -1836,72 +1836,107 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
 
 html.ninou-v8200 .orbit-duration-arcs {
   pointer-events: none !important;
+  overflow: visible !important;
 }
 
-html.ninou-v8200 .orbit-gradient-stop-a { stop-color: #9b7bf2; }
-html.ninou-v8200 .orbit-gradient-stop-b { stop-color: #6fd7bd; }
-html.ninou-v8200 .orbit-gradient-active-a { stop-color: #ffbd78; }
-html.ninou-v8200 .orbit-gradient-active-b { stop-color: #9b7bf2; }
+html.ninou-v8200 body:not(.day-theme) .orbit-gradient-stop-a { stop-color: #8f75ff; }
+html.ninou-v8200 body:not(.day-theme) .orbit-gradient-stop-b { stop-color: #77e1cd; }
+html.ninou-v8200 body:not(.day-theme) .orbit-gradient-active-a { stop-color: #ffc47f; }
+html.ninou-v8200 body:not(.day-theme) .orbit-gradient-active-b { stop-color: #9f82ff; }
+html.ninou-v8200 body.day-theme .orbit-gradient-stop-a { stop-color: #7359cf; }
+html.ninou-v8200 body.day-theme .orbit-gradient-stop-b { stop-color: #58bfa9; }
+html.ninou-v8200 body.day-theme .orbit-gradient-active-a { stop-color: #e79a4b; }
+html.ninou-v8200 body.day-theme .orbit-gradient-active-b { stop-color: #7257cb; }
+
+html.ninou-v8200 .orbit-duration-journey :is(.orbit-duration-halo,.orbit-duration-segment,.orbit-duration-glint) {
+  fill: none !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+html.ninou-v8200 .orbit-duration-halo {
+  stroke: rgba(137,108,238,.18) !important;
+  stroke-width: 18 !important;
+  filter: drop-shadow(0 0 9px rgba(115,83,226,.24)) !important;
+}
 
 html.ninou-v8200 .orbit-duration-segment {
   fill: none !important;
   stroke: url(#orbitSegmentGradient) !important;
-  stroke-width: 9 !important;
+  stroke-width: 10 !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
-  opacity: .82 !important;
-  filter: drop-shadow(0 0 4px rgba(140, 103, 235, .42)) !important;
+  opacity: .94 !important;
+  filter: drop-shadow(0 0 5px rgba(140,103,235,.44)) !important;
 }
 
 html.ninou-v8200 .orbit-duration-segment.active {
   stroke: url(#orbitActiveGradient) !important;
   opacity: 1 !important;
-  filter:
-    drop-shadow(0 0 4px rgba(255, 183, 112, .62))
-    drop-shadow(0 0 11px rgba(151, 105, 241, .42)) !important;
+  filter: drop-shadow(0 0 5px rgba(255,183,112,.66)) drop-shadow(0 0 13px rgba(151,105,241,.48)) !important;
+}
+
+html.ninou-v8200 .orbit-duration-glint {
+  stroke: rgba(255,255,255,.7) !important;
+  stroke-width: 2 !important;
+  stroke-dasharray: 7 93 !important;
+  opacity: 0 !important;
+}
+
+html.ninou-v8200 .orbit-duration-journey.active .orbit-duration-glint {
+  opacity: .82 !important;
+  animation: n82-journey-glint 7s linear infinite !important;
+}
+
+html.ninou-v8200 .orbit-duration-journey.complete.is-arriving .orbit-duration-segment {
+  animation: n82-journey-draw 720ms cubic-bezier(.22,1,.36,1) both !important;
+}
+
+html.ninou-v8200 :is(.orbit-duration-start,.orbit-duration-head) {
+  fill: #f6f1ff !important;
+  stroke: rgba(116,85,210,.8) !important;
+  stroke-width: 2 !important;
+  filter: drop-shadow(0 0 5px rgba(137,104,236,.55)) !important;
+}
+
+html.ninou-v8200 .orbit-duration-journey.active .orbit-duration-head {
+  fill: #fff4dd !important;
+  stroke: #eaa45c !important;
+  transform-box: fill-box !important;
+  transform-origin: center !important;
+  animation: n82-journey-breathe 3s ease-in-out infinite !important;
 }
 
 html.ninou-v8200 body.day-theme .orbit-duration-segment {
-  stroke-width: 8 !important;
-  opacity: .74 !important;
-  filter: drop-shadow(0 3px 6px rgba(91, 66, 151, .18)) !important;
+  stroke-width: 9 !important;
+  opacity: .86 !important;
+  filter: drop-shadow(0 3px 6px rgba(91,66,151,.2)) !important;
 }
 
-html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.orbit-event, .live-orbit-marker),
-html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]).day-theme :is(.orbit-event, .live-orbit-marker),
-html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]):not(.day-theme) :is(.orbit-event, .live-orbit-marker) {
-  overflow: visible !important;
-  border: 0 !important;
-  border-radius: 50% !important;
-  background: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
+html.ninou-v8200 body.day-theme .orbit-duration-halo {
+  stroke: rgba(104,79,178,.13) !important;
+  filter: drop-shadow(0 4px 7px rgba(82,62,144,.14)) !important;
 }
 
-html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) :is(.orbit-event, .live-orbit-marker) > i {
-  overflow: hidden !important;
-  border: 1.5px solid rgba(255, 255, 255, .64) !important;
-  border-radius: 50% !important;
-  background: rgba(25, 19, 55, .46) !important;
-  box-shadow: 0 8px 18px rgba(8, 5, 24, .24), inset 0 1px 0 rgba(255, 255, 255, .22) !important;
-  transform: translate3d(0, 0, 0) !important;
-  transition: transform 420ms cubic-bezier(.22, 1, .36, 1), box-shadow 420ms ease !important;
+html.ninou-v8200 body.day-theme :is(.orbit-duration-start,.orbit-duration-head) {
+  fill: #fff !important;
+  stroke: #7054bd !important;
+  filter: drop-shadow(0 3px 5px rgba(84,62,145,.24)) !important;
 }
 
-html.ninou-v8200 body.day-theme.family-daily-surface:not([data-active-screen="profile"]) :is(.orbit-event, .live-orbit-marker) > i {
-  border-color: rgba(255, 255, 255, .98) !important;
-  background: rgba(255, 255, 255, .56) !important;
-  box-shadow: 0 8px 18px rgba(71, 52, 120, .17), inset 0 1px 0 #fff !important;
+@keyframes n82-journey-draw {
+  from { stroke-dasharray: 0 100; opacity: .28; }
+  to { stroke-dasharray: 100 0; opacity: 1; }
 }
 
-html.ninou-v8200 .ninou-orbit-updated > :is(.orbit-event, .live-orbit-marker):last-child > i {
-  animation: n82-marker-arrival 520ms cubic-bezier(.22, 1, .36, 1) both !important;
+@keyframes n82-journey-glint {
+  from { stroke-dashoffset: 10; }
+  to { stroke-dashoffset: -90; }
 }
 
-@keyframes n82-marker-arrival {
-  0% { opacity: .35; transform: translate3d(0, 7px, 0) scale(.94); }
-  68% { opacity: 1; transform: translate3d(0, -2px, 0) scale(1.015); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+@keyframes n82-journey-breathe {
+  0%,100% { opacity: .78; transform: scale(.9); }
+  50% { opacity: 1; transform: scale(1.18); }
 }
 
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .primary-action {
@@ -3087,46 +3122,6 @@ html.ninou-v8200 body[data-active-screen="profile"] .bottom-nav {
   grid-template-columns: repeat(5,minmax(0,1fr));
 }
 
-/* Tema claro: marcador/ícone da órbita fica visível e não vira apenas um círculo. */
-html.ninou-v8200 body.day-theme .orbit-event,
-html.ninou-v8200 body.day-theme .live-orbit-marker {
-  overflow: visible;
-  background: rgba(255,255,255,.96);
-  border-color: rgba(93,72,148,.18);
-  box-shadow: 0 8px 20px rgba(72,55,119,.18);
-}
-html.ninou-v8200 body.day-theme .orbit-event > i,
-html.ninou-v8200 body.day-theme .live-orbit-marker > i,
-html.ninou-v8200 body.day-theme .orbit-cluster-icon {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  color: #4f3b82;
-  -webkit-text-fill-color: #4f3b82;
-  opacity: 1;
-}
-html.ninou-v8200 body.day-theme .orbit-event :is(img,svg),
-html.ninou-v8200 body.day-theme .live-orbit-marker :is(img,svg),
-html.ninou-v8200 body.day-theme .orbit-cluster-icon :is(img,svg) {
-  width: 88%;
-  height: 88%;
-  max-width: 88%;
-  max-height: 88%;
-  display: block;
-  object-fit: contain;
-  opacity: 1;
-  filter: none;
-  transform: none;
-}
-html.ninou-v8200 body.day-theme .orbit-cluster-count {
-  z-index: 4;
-  color: #4b3979;
-  -webkit-text-fill-color: #4b3979;
-  background: #fff;
-}
-
 /* Resposta tátil/visual consistente sem deslocar componentes. */
 @media (hover:hover) and (pointer:fine) {
   html.ninou-v8200 .action-launcher-grid > button:hover {
@@ -3362,6 +3357,7 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   grid-template-rows: 16px auto minmax(0, auto) auto;
   contain: layout paint;
   padding-bottom: max(14px, var(--n79-safe-bottom));
+  animation: n82-cluster-sheet-in 360ms cubic-bezier(.22,1,.36,1) both;
 }
 html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .orbit-cluster-sheet .section-title {
   min-height: 64px;
@@ -3430,7 +3426,12 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   background: var(--n79-surface-3);
   color: var(--n79-text);
   transform: none;
+  animation: n82-cluster-card-in 380ms cubic-bezier(.22,1,.36,1) both;
+  animation-delay: var(--cluster-delay,45ms);
 }
+
+@keyframes n82-cluster-sheet-in { from { opacity: 0; filter: blur(5px); } to { opacity: 1; filter: none; } }
+@keyframes n82-cluster-card-in { from { opacity: 0; transform: translateY(9px) scale(.985); } to { opacity: 1; transform: none; } }
 html.ninou-v8200 .cluster-card .cluster-icon {
   width: 42px;
   height: 42px;
