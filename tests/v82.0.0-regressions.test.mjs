@@ -85,7 +85,7 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-orbit-count-safe-space/);
+assert.match(sw, /ninou-v82-0-0-premium-guest-entry/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -193,3 +193,18 @@ assert.match(core, /showScreen\(APP_LAUNCH_SCREEN\);\s*renderAll\(\);/);
 assert.match(focusedFlowCss, /@supports \(-webkit-touch-callout: none\)/);
 assert.match(focusedFlowCss, /body\.day-theme \.orbit-sky::before[\s\S]*animation-duration:\s*7\.5s/);
 assert.match(focusedFlowCss, /body:not\(\.day-theme\) \.orbit-sky::after[\s\S]*animation-duration:\s*3\.8s/);
+
+// Entrada deslogada própria: sem herdar o shell, menu inferior ou botão de registro.
+assert.match(html, /id="guestEntryPortal" class="guest-entry-portal"/);
+assert.match(html, /id="guestPortalAuthPanel"/);
+assert.match(html, /id="guestPortalCreateButton"/);
+assert.match(html, /id="guestPortalLoginButton"/);
+assert.match(html, /id="guestPortalInviteButton"/);
+assert.match(focusedFlowCss, /body\[data-profile-access-state="guest"\] > main\.phone-shell[\s\S]*display: none !important/);
+assert.match(focusedFlowCss, /body\[data-profile-access-state="guest"\] > \.guest-entry-portal/);
+assert.match(focusedFlowCss, /body\[data-profile-access-state="guest"\]\.day-theme/);
+assert.match(focusedFlowCss, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.guest-entry-orbit/);
+assert.match(core, /function openGuestPortalAuth/);
+assert.match(core, /function submitGuestPortalAuth/);
+assert.match(core, /pendingInviteCode = code/);
+assert.match(core, /guestEntryPortal\.hidden = !showGuestPortal/);

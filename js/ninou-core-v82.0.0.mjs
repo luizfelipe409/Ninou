@@ -202,6 +202,23 @@ const guestWelcomeCard = document.querySelector("#guestWelcomeCard");
 const guestWelcomeLoginButton = document.querySelector("#guestWelcomeLoginButton");
 const guestWelcomeInviteButton = document.querySelector("#guestWelcomeInviteButton");
 const guestWelcomeCreateFamilyButton = document.querySelector("#guestWelcomeCreateFamilyButton");
+const guestEntryPortal = document.querySelector("#guestEntryPortal");
+const guestPortalCreateButton = document.querySelector("#guestPortalCreateButton");
+const guestPortalLoginButton = document.querySelector("#guestPortalLoginButton");
+const guestPortalInviteButton = document.querySelector("#guestPortalInviteButton");
+const guestPortalAuthPanel = document.querySelector("#guestPortalAuthPanel");
+const guestPortalAuthBackButton = document.querySelector("#guestPortalAuthBackButton");
+const guestPortalAuthKicker = document.querySelector("#guestPortalAuthKicker");
+const guestPortalAuthTitle = document.querySelector("#guestPortalAuthTitle");
+const guestPortalAuthDescription = document.querySelector("#guestPortalAuthDescription");
+const guestPortalEmail = document.querySelector("#guestPortalEmail");
+const guestPortalPassword = document.querySelector("#guestPortalPassword");
+const guestPortalInviteField = document.querySelector("#guestPortalInviteField");
+const guestPortalInviteCode = document.querySelector("#guestPortalInviteCode");
+const guestPortalAuthStatus = document.querySelector("#guestPortalAuthStatus");
+const guestPortalAuthSubmitButton = document.querySelector("#guestPortalAuthSubmitButton");
+const guestPortalAuthSwitchText = document.querySelector("#guestPortalAuthSwitchText");
+const guestPortalAuthSwitchButton = document.querySelector("#guestPortalAuthSwitchButton");
 const postAccessCard = document.querySelector("#postAccessCard");
 const postAccessKicker = document.querySelector("#postAccessKicker");
 const postAccessTitle = document.querySelector("#postAccessTitle");
@@ -1126,6 +1143,12 @@ function updateProfileStateClasses() {
   ["booting", "guest", "account-no-family", "invite-pending", "family-ready", "admin-panel"].forEach((name) => {
     document.body.classList.toggle(`profile-state-${name}`, stateName === name);
   });
+  if (guestEntryPortal) {
+    const showGuestPortal = stateName === "guest";
+    guestEntryPortal.hidden = !showGuestPortal;
+    guestEntryPortal.setAttribute("aria-hidden", showGuestPortal ? "false" : "true");
+    if (!showGuestPortal) closeGuestPortalAuth();
+  }
   return stateName;
 }
 
@@ -2231,6 +2254,135 @@ function normalizeCommercialEntryAction(action = "login") {
   if (value === "invite") return "invite";
   if (value === "create" || value === "family") return "create";
   return "login";
+}
+
+let guestPortalJourney = "create";
+let guestPortalCreatesAccount = true;
+
+function setGuestPortalStatus(message = "", state = "info") {
+  if (!guestPortalAuthStatus) return;
+  guestPortalAuthStatus.textContent = String(message || "");
+  guestPortalAuthStatus.dataset.state = state;
+}
+
+function renderGuestPortalAuth() {
+  if (!guestPortalAuthPanel) return;
+  const invite = guestPortalJourney === "invite";
+  const create = guestPortalCreatesAccount;
+
+  if (guestPortalInviteField) guestPortalInviteField.hidden = !invite;
+  if (guestPortalAuthKicker) guestPortalAuthKicker.textContent = invite ? "Convite familiar" : create ? "Nova família" : "Conta Ninou";
+  if (guestPortalAuthTitle) {
+    guestPortalAuthTitle.textContent = invite
+      ? (create ? "Crie a conta do cuidador" : "Entre para aceitar o convite")
+      : create
+        ? "Crie seu espaço no Ninou"
+        : "Bem-vindo de volta";
+  }
+  if (guestPortalAuthDescription) {
+    guestPortalAuthDescription.textContent = invite
+      ? "Use o mesmo e-mail que recebeu o convite. O Ninou valida o código antes de liberar a rotina da família."
+      : create
+        ? "Use um e-mail da família e uma senha segura. Depois, você configura o bebê e convida os cuidadores."
+        : "Acesse a família já conectada a esta conta e continue a rotina de onde parou.";
+  }
+  if (guestPortalAuthSubmitButton) {
+    guestPortalAuthSubmitButton.textContent = invite
+      ? (create ? "Criar conta e aceitar convite" : "Entrar e aceitar convite")
+      : create
+        ? "Criar conta familiar"
+        : "Entrar no Ninou";
+  }
+  if (guestPortalAuthSwitchText) guestPortalAuthSwitchText.textContent = create ? "Já possui uma conta?" : "Ainda não possui uma conta?";
+  if (guestPortalAuthSwitchButton) guestPortalAuthSwitchButton.textContent = create ? "Entrar" : "Criar conta";
+  if (guestPortalPassword) guestPortalPassword.autocomplete = create ? "new-password" : "current-password";
+}
+
+function openGuestPortalAuth(journey = "login") {
+  if (!guestPortalAuthPanel || !guestEntryPortal) return;
+  guestPortalJourney = normalizeCommercialEntryAction(journey);
+  guestPortalCreatesAccount = guestPortalJourney === "create";
+  setCommercialEntryIntent(guestPortalJourney);
+  guestPortalAuthPanel.hidden = false;
+  guestEntryPortal.dataset.authOpen = "true";
+  document.body.classList.add("guest-entry-auth-open");
+
+  if (guestPortalEmail && !guestPortalEmail.value) {
+    guestPortalEmail.value = String(loginEmail?.value || localStorage.getItem(storageKeys.email) || "").trim();
+  }
+  if (guestPortalInviteCode && guestPortalJourney === "invite" && !guestPortalInviteCode.value) {
+    guestPortalInviteCode.value = normalizeInviteCode(pendingInviteCode || "");
+  }
+  renderGuestPortalAuth();
+  setGuestPortalStatus(
+    guestPortalJourney === "invite"
+      ? "O código e o e-mail precisam pertencer ao mesmo convite."
+      : guestPortalCreatesAccount
+        ? "Seus dados serão vinculados somente à sua família."
+        : "Entre com o e-mail já conectado à família.",
+  );
+  window.setTimeout(() => (guestPortalEmail?.value ? guestPortalPassword : guestPortalEmail)?.focus(), 80);
+}
+
+function closeGuestPortalAuth() {
+  if (guestPortalAuthPanel) guestPortalAuthPanel.hidden = true;
+  if (guestEntryPortal) delete guestEntryPortal.dataset.authOpen;
+  document.body.classList.remove("guest-entry-auth-open");
+  if (guestPortalPassword) guestPortalPassword.value = "";
+}
+
+function persistGuestPortalInvite() {
+  if (guestPortalJourney !== "invite") return true;
+  const code = normalizeInviteCode(guestPortalInviteCode?.value || "");
+  if (!code) {
+    setGuestPortalStatus("Digite o código do convite enviado pelo responsável da família.", "error");
+    guestPortalInviteCode?.focus();
+    return false;
+  }
+  pendingInviteCode = code;
+  if (guestPortalInviteCode) guestPortalInviteCode.value = code;
+  if (inviteCodeInput) inviteCodeInput.value = code;
+  try { localStorage.setItem(storageKeys.pendingInvite, code); } catch {}
+  return true;
+}
+
+async function submitGuestPortalAuth() {
+  if (!guestPortalEmail || !guestPortalPassword) return;
+  const email = guestPortalEmail.value.trim();
+  const password = guestPortalPassword.value.trim();
+  if (!email) {
+    setGuestPortalStatus("Digite o e-mail usado pela sua família.", "error");
+    guestPortalEmail.focus();
+    return;
+  }
+  if (!password) {
+    setGuestPortalStatus("Digite sua senha para continuar.", "error");
+    guestPortalPassword.focus();
+    return;
+  }
+  if (guestPortalCreatesAccount && password.length < 6) {
+    setGuestPortalStatus("A senha precisa ter pelo menos 6 caracteres.", "error");
+    guestPortalPassword.focus();
+    return;
+  }
+  if (!persistGuestPortalInvite()) return;
+
+  loginEmail.value = email;
+  loginPassword.value = password;
+  setCommercialEntryIntent(guestPortalJourney);
+  setGuestPortalStatus(guestPortalCreatesAccount ? "Criando o espaço da família…" : "Entrando com segurança…");
+
+  if (guestPortalCreatesAccount) {
+    await createAccount();
+  } else {
+    await signInAccount();
+  }
+
+  if (document.body.dataset.profileAccessState === "guest") {
+    const feedback = String(loginHelper?.textContent || "Não foi possível concluir. Confira os dados e tente novamente.");
+    const isError = /não|erro|incorret|invál|digite|senha|conta já|falh/i.test(feedback);
+    setGuestPortalStatus(feedback, isError ? "error" : "info");
+  }
 }
 
 function closeGuestLoginModal() {
@@ -14147,6 +14299,40 @@ if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => wit
 if (exportStartDateInput) exportStartDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
+if (guestPortalCreateButton) guestPortalCreateButton.addEventListener("click", () => openGuestPortalAuth("create"));
+if (guestPortalLoginButton) guestPortalLoginButton.addEventListener("click", () => openGuestPortalAuth("login"));
+if (guestPortalInviteButton) guestPortalInviteButton.addEventListener("click", () => openGuestPortalAuth("invite"));
+if (guestPortalAuthBackButton) guestPortalAuthBackButton.addEventListener("click", closeGuestPortalAuth);
+if (guestPortalAuthSwitchButton) {
+  guestPortalAuthSwitchButton.addEventListener("click", () => {
+    guestPortalCreatesAccount = !guestPortalCreatesAccount;
+    renderGuestPortalAuth();
+    setGuestPortalStatus(
+      guestPortalCreatesAccount
+        ? "Crie a conta com o e-mail que representa você na família."
+        : "Entre com o e-mail já conectado ao Ninou.",
+    );
+    guestPortalPassword?.focus();
+  });
+}
+if (guestPortalAuthSubmitButton) {
+  guestPortalAuthSubmitButton.addEventListener("click", () => withButtonBusy(
+    guestPortalAuthSubmitButton,
+    "Aguarde…",
+    submitGuestPortalAuth,
+    { afterFinish: renderGuestPortalAuth },
+  ));
+}
+[guestPortalEmail, guestPortalPassword, guestPortalInviteCode].filter(Boolean).forEach((input) => {
+  input.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || guestPortalAuthSubmitButton?.disabled) return;
+    event.preventDefault();
+    guestPortalAuthSubmitButton?.click();
+  });
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && guestPortalAuthPanel && !guestPortalAuthPanel.hidden) closeGuestPortalAuth();
+});
 if (guestWelcomeLoginButton) guestWelcomeLoginButton.addEventListener("click", () => focusProfileAccess("login"));
 if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
 if (guestWelcomeCreateFamilyButton) {

@@ -180,6 +180,97 @@
         }, { passive: true });
       })();
     </script>
+    <section id="guestEntryPortal" class="guest-entry-portal" aria-label="Bem-vindo ao Ninou" aria-hidden="true" hidden>
+      <div class="guest-entry-ambient" aria-hidden="true">
+        <span class="guest-entry-star star-one"></span>
+        <span class="guest-entry-star star-two"></span>
+        <span class="guest-entry-star star-three"></span>
+        <span class="guest-entry-glow glow-one"></span>
+        <span class="guest-entry-glow glow-two"></span>
+      </div>
+
+      <div class="guest-entry-shell">
+        <header class="guest-entry-header">
+          <a class="guest-entry-brand" href="#guestEntryContent" aria-label="Ninou, início">
+            <span class="guest-entry-brand-mark"><img src="./icons/icon-192.png" alt="" /></span>
+            <span><strong>Ninou</strong><small>Diário compartilhado do bebê</small></span>
+          </a>
+          <div class="guest-entry-theme" role="group" aria-label="Tema da tela">
+            <button type="button" data-theme-choice="light" aria-label="Usar tema claro"><span aria-hidden="true">☀</span></button>
+            <button type="button" data-theme-choice="dark" aria-label="Usar tema escuro"><span aria-hidden="true">☾</span></button>
+          </div>
+        </header>
+
+        <main id="guestEntryContent" class="guest-entry-content">
+          <section class="guest-entry-copy" aria-labelledby="guestEntryTitle">
+            <span class="guest-entry-eyebrow"><i aria-hidden="true"></i> Rotina em família, no tempo certo</span>
+            <h1 id="guestEntryTitle">Mais presença.<br /><em>Menos preocupação.</em></h1>
+            <p>O Ninou transforma sono, mamadas e cuidados em uma rotina clara, compartilhada e acolhedora para toda a família.</p>
+
+            <div class="guest-entry-actions">
+              <button id="guestPortalCreateButton" class="guest-entry-primary" type="button">
+                <span>Começar minha família</span><i aria-hidden="true">→</i>
+              </button>
+              <button id="guestPortalLoginButton" class="guest-entry-secondary" type="button">Já tenho uma conta</button>
+            </div>
+            <button id="guestPortalInviteButton" class="guest-entry-invite" type="button"><span aria-hidden="true">✦</span> Recebi um convite familiar</button>
+
+            <div class="guest-entry-trust" aria-label="Benefícios do Ninou">
+              <span><i aria-hidden="true">✓</i> Cada família no seu espaço</span>
+              <span><i aria-hidden="true">✓</i> Cuidador identificado</span>
+              <span><i aria-hidden="true">✓</i> Sincronização segura</span>
+            </div>
+          </section>
+
+          <section class="guest-entry-visual" aria-label="Prévia da rotina no Ninou">
+            <div class="guest-entry-orbit" aria-hidden="true">
+              <span class="guest-orbit-ring ring-outer"></span>
+              <span class="guest-orbit-ring ring-progress"></span>
+              <span class="guest-orbit-event event-sleep"><img src="./icons/actions/soneca.png" alt="" /><small>09:24</small></span>
+              <span class="guest-orbit-event event-feed"><img src="./icons/actions/amamentacao.png" alt="" /><small>11:08</small></span>
+              <span class="guest-orbit-event event-wake"><img src="./icons/actions/acordou.png" alt="" /><small>12:42</small></span>
+              <span class="guest-orbit-now"></span>
+              <div class="guest-orbit-center">
+                <span>ACORDADO HÁ</span>
+                <strong>01:18</strong>
+                <small>desde 12:42</small>
+              </div>
+            </div>
+            <div class="guest-entry-moment-card">
+              <span class="guest-moment-icon"><img src="./icons/actions/amamentacao.png" alt="" /></span>
+              <div><small>ÚLTIMO CUIDADO</small><strong>Amamentação</strong><span>há 16 minutos</span></div>
+              <i aria-hidden="true">✓</i>
+            </div>
+            <div class="guest-entry-family-card">
+              <span class="guest-family-avatars" aria-hidden="true"><i>F</i><i>M</i><i>+2</i></span>
+              <div><strong>A família acompanha junta</strong><small>Atualizado agora</small></div>
+              <b aria-hidden="true"></b>
+            </div>
+          </section>
+        </main>
+
+        <section id="guestPortalAuthPanel" class="guest-portal-auth-panel" role="dialog" aria-modal="true" aria-labelledby="guestPortalAuthTitle" hidden>
+          <button id="guestPortalAuthBackButton" class="guest-portal-auth-back" type="button" aria-label="Voltar para a apresentação">←</button>
+          <div class="guest-portal-auth-copy">
+            <span id="guestPortalAuthKicker">Conta familiar</span>
+            <strong id="guestPortalAuthTitle">Crie seu espaço no Ninou</strong>
+            <p id="guestPortalAuthDescription">Use um e-mail da família e uma senha segura. Depois, você configura o bebê e convida os cuidadores.</p>
+          </div>
+          <div class="guest-portal-auth-fields">
+            <label><span>E-mail</span><input id="guestPortalEmail" type="email" inputmode="email" autocomplete="email" placeholder="voce@familia.com" /></label>
+            <label><span>Senha</span><input id="guestPortalPassword" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" /></label>
+            <label id="guestPortalInviteField" class="guest-portal-invite-field" hidden><span>Código do convite</span><input id="guestPortalInviteCode" type="text" inputmode="text" autocomplete="one-time-code" maxlength="24" placeholder="Ex.: NINOU-ABC123" /></label>
+          </div>
+          <p id="guestPortalAuthStatus" class="guest-portal-auth-status" role="status" aria-live="polite">Seus dados serão vinculados somente à sua família.</p>
+          <button id="guestPortalAuthSubmitButton" class="guest-entry-primary guest-portal-auth-submit" type="button">Criar conta familiar</button>
+          <p class="guest-portal-auth-switch"><span id="guestPortalAuthSwitchText">Já possui uma conta?</span> <button id="guestPortalAuthSwitchButton" type="button">Entrar</button></p>
+          <small class="guest-portal-legal">Ao continuar, você confirma o uso responsável do Ninou. O app organiza a rotina e não substitui orientação pediátrica.</small>
+        </section>
+
+        <footer class="guest-entry-footer"><span>Feito para a rotina real da família.</span><small>Ninou · Beta familiar</small></footer>
+      </div>
+    </section>
+
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
       <header class="app-header">
         <div class="identity">

@@ -1,4 +1,4 @@
-const CACHE_NAME = "ninou-v82-0-0-orbit-count-safe-space";
+const CACHE_NAME = "ninou-v82-0-0-premium-guest-entry";
 const APP_VERSION = "82.0.0";
 const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const APP_SHELL = [
