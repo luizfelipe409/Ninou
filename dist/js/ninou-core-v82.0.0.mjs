@@ -27,6 +27,33 @@ import { applyProfilePhotoToImages, clearWeightForm, getBabyAgeTextFromProfile, 
 import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
+const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
+const ADMIN_STYLESHEET_HREF = "./styles/admin-v82.0.0.css?v=82.0.0";
+
+function ensureAdminStylesheet() {
+  if (document.getElementById(ADMIN_STYLESHEET_ID)) return;
+
+  const stylesheet = document.createElement("link");
+  stylesheet.id = ADMIN_STYLESHEET_ID;
+  stylesheet.rel = "stylesheet";
+  stylesheet.href = ADMIN_STYLESHEET_HREF;
+  document.body.dataset.adminStylesState = "loading";
+  stylesheet.addEventListener("load", () => {
+    document.body.dataset.adminStylesState = "ready";
+  }, { once: true });
+  stylesheet.addEventListener("error", () => {
+    document.body.dataset.adminStylesState = "error";
+    console.warn("Ninou: não foi possível carregar o acabamento administrativo.");
+  }, { once: true });
+
+  const legacyStylesheet = document.getElementById("ninouLegacyStylesheet");
+  if (legacyStylesheet?.parentNode) {
+    legacyStylesheet.parentNode.insertBefore(stylesheet, legacyStylesheet.nextSibling);
+  } else {
+    document.head.append(stylesheet);
+  }
+}
+
 const navButtons = document.querySelectorAll(".bottom-nav button");
 const screens = document.querySelectorAll(".screen");
 const wakeAction = document.querySelector("#wakeAction");
@@ -9224,6 +9251,7 @@ function updateBodyModeClasses() {
   const appAdmin = Boolean(isGlobalAppAdmin());
   const previewOpen = Boolean(window.__ninouAdminFamilyDataOpen);
   const familySurface = Boolean(isLoggedIn() && hasFamilyAccess() && (!appAdmin || previewOpen));
+  if (appAdmin) ensureAdminStylesheet();
   document.body.classList.toggle("global-admin-mode", appAdmin && !previewOpen);
   document.body.classList.toggle("admin-panel-only", appAdmin && !previewOpen);
   document.body.classList.toggle("admin-family-preview", appAdmin && previewOpen);

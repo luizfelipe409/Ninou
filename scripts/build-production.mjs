@@ -10,6 +10,7 @@ const publicFiles = [
   "manifest.webmanifest",
 
   "styles/legacy.css",
+  "styles/admin-v82.0.0.css",
   "styles/premium-v82.0.0.css",
   "styles/focused-flow-v82.0.0.css",
 

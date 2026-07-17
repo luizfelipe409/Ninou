@@ -54,14 +54,15 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link rel="stylesheet" href="./styles/legacy.css?v=82.0.0" />
+    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.0.0" />
     <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.0.0" />
     <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.0.0" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
       html.ninou-booting body > :not(#ninouBootScreen):not(script):not(style),
-      body[data-profile-access-state="booting"] > main.phone-shell { visibility: hidden !important; opacity: 0 !important; }
+      body[data-profile-access-state="booting"] > main.phone-shell,
+      body[data-admin-styles-state="loading"] > main.phone-shell { visibility: hidden !important; opacity: 0 !important; }
       body[data-profile-access-state="booting"] #ninouBootScreen { display:grid !important; visibility:visible !important; opacity:1 !important; }
       html.ninou-booting #ninouBootScreen, html.ninou-loading-overlay #ninouBootScreen { display: grid !important; visibility: visible !important; opacity: 1; }
       #ninouBootScreen { position: fixed; inset: 0; z-index: 2147483646; display: grid; place-items: center; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); background: radial-gradient(circle at 18% 12%, rgba(255,214,142,.45), transparent 34%), radial-gradient(circle at 84% 84%, rgba(108,218,194,.22), transparent 38%), linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); color:#29233d; font-family:Inter,ui-rounded,-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",sans-serif; transition: opacity .34s ease, visibility .34s ease; }
