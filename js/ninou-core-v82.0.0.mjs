@@ -12,7 +12,7 @@ import { getFirebaseServices as loadFirebaseServices, getFirebaseErrorMessage as
 import { getDefaultBabyProfile as createDefaultBabyProfile, getCloudProfileVersion as readCloudProfileVersion, hasProfileContent as profileHasContent, loadBabyProfile as loadStoredBabyProfile, normalizeBabyProfile as normalizeStoredBabyProfile, saveBabyProfile as persistBabyProfile } from "./domain/baby-profile.js";
 import { loadLocalWeights as loadStoredWeights, normalizeWeights as normalizeStoredWeights, persistLocalWeights as persistStoredWeights, removeWeightById, upsertWeight } from "./domain/weights.js";
 import { buildExportEvents } from "./services/export-service.js";
-import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventOrderTime, getEventsForDay, getLatestEvent, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, updateEventKeepingDuration } from "./domain/records.js";
+import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventOrderTime, getEventsForDay, getLatestEvent, getLatestRoutineLiveState, isRoutineLiveStateNewer, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, stampRoutineLiveState, updateEventKeepingDuration } from "./domain/records.js";
 import { formatEventMeta as formatRoutineEventMeta, getEventCardMarkup, getEventRenderSignature as buildEventRenderSignature, getMiniEventMarkup, getTimelineRenderSignature as buildTimelineSignature } from "./ui/event-formatters.js";
 import { renderHomeSummary as renderHomeSummaryPanel, renderTodayLastEvents as renderTodayLastEventsPanel } from "./ui/home.js";
 import { renderDailyRhythm, renderDayStory, renderIntelligentTimeline, renderLiveAssistant, renderSmartInsight, renderTrendKpis, renderWeeklyOverview } from "./ui/intelligence.js";
@@ -8865,9 +8865,13 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
 
 function saveDayState() {
   loadedStateDayId = getSelectedDayId();
+  const previousLocalState = loadLocalDayState(loadedStateDayId);
   const deletedIds = getDeletedEventIdsFromState(state);
   state.events = dedupeEventsByDisplayKey((state.events || []).filter((event) => !deletedIds.has(event?.id)));
   state = sanitizeDayStateForDay(state, loadedStateDayId, { preserveLive: true });
+  state = stampRoutineLiveState(state, previousLocalState, {
+    mutationId: `${getOrCreateCaregiverDeviceId()}-${Date.now()}`,
+  });
   saveLocalDayState(loadedStateDayId);
   syncSelectedDayIntoFamilyCache();
   scheduleDayCloudSave(loadedStateDayId);
@@ -9520,6 +9524,8 @@ function applyCloudProfile(data = {}) {
 }
 
 function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
+  let shouldRepairCloudLiveState = false;
+  let repairDayId = "";
   applyingCloudState = true;
   try {
     const daySource = data.state && typeof data.state === "object" ? data.state : data;
@@ -9529,6 +9535,8 @@ function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
     const localState = dayStateHasVisibleContent(currentSelectedState) || getDeletedEventIdsFromState(currentSelectedState).size
       ? currentSelectedState
       : cachedState;
+    shouldRepairCloudLiveState = isRoutineLiveStateNewer(localState, daySource);
+    repairDayId = safeDayId;
     let mergedState = mergeRoutineDayStatesForCloud(localState, daySource, safeDayId);
     mergedState = rebuildRoutineModeAfterMutation(mergedState, safeDayId, { preserveSleeping: true });
 
@@ -9554,6 +9562,11 @@ function applyCloudDay(data = {}, dayId = getSelectedDayId()) {
     }
   } finally {
     applyingCloudState = false;
+  }
+
+  if (shouldRepairCloudLiveState && repairDayId === getCurrentDayId() && cloudUser && hasFamilyAccess()) {
+    markDaySyncQueued(repairDayId);
+    window.setTimeout(() => void saveDayToCloud(repairDayId, { reason: "live-state-repair" }), 0);
   }
 }
 
@@ -9640,6 +9653,7 @@ function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}, dayId
   const cloudSource = cloudData.state && typeof cloudData.state === "object" ? cloudData.state : cloudData;
   const cloudState = sanitizeDayStateForDay(cloudSource || {}, safeDayId);
   const currentState = sanitizeDayStateForDay(localState || {}, safeDayId, { preserveLive: true });
+  const latestLiveState = getLatestRoutineLiveState(currentState, cloudState);
   const deletedEventIds = new Set([
     ...getDeletedEventIdsFromState(cloudState),
     ...getDeletedEventIdsFromState(currentState),
@@ -9678,6 +9692,7 @@ function mergeRoutineDayStatesForCloud(localState = state, cloudData = {}, dayId
     dayNotes: chosenNotes,
     dayNotesDayId: chosenNotes ? safeDayId : "",
     dayNotesUpdatedAt: chosenNotesUpdatedAt,
+    ...latestLiveState,
   }, safeDayId, { preserveLive: true });
 }
 
@@ -9701,36 +9716,36 @@ async function saveDayToCloud(dayId = getSelectedDayId(), options = {}) {
 
   try {
     let dayPayload = sourceState;
-    let shouldSetCreatedAt = false;
-
-    try {
-      const currentSnapshot = await firebaseServices.getDoc(dayRef);
-      if (currentSnapshot.exists()) {
-        const currentData = currentSnapshot.data() || {};
-        shouldSetCreatedAt = !currentData.createdAt;
-        dayPayload = mergeRoutineDayStatesForCloud(dayPayload, currentData, safeDayId);
-      } else {
-        shouldSetCreatedAt = true;
-      }
-    } catch (mergeError) {
-      console.warn("Não foi possível mesclar rotina antes de salvar. Salvando estado local atual:", mergeError);
-    }
-
-    dayPayload = rebuildRoutineModeAfterMutation(dayPayload, safeDayId, { preserveSleeping: true });
-    const cloudTimestamps = {
-      updatedAt: firebaseServices.serverTimestamp(),
-    };
-    if (shouldSetCreatedAt) cloudTimestamps.createdAt = firebaseServices.serverTimestamp();
-
     setSyncStatus("syncing", cloudUser.email || "", `Enviando rotina de ${safeDayId}...`);
-    await firebaseServices.setDoc(
-      dayRef,
-      stampFamilyData({
-        ...dayPayload,
-        ...cloudTimestamps,
-      }),
-      { merge: true },
-    );
+
+    const buildAtomicDayPayload = (snapshot = null) => {
+      const exists = Boolean(snapshot?.exists?.());
+      const currentData = exists ? (snapshot.data() || {}) : {};
+      const merged = exists
+        ? mergeRoutineDayStatesForCloud(sourceState, currentData, safeDayId)
+        : sourceState;
+      const rebuilt = rebuildRoutineModeAfterMutation(merged, safeDayId, { preserveSleeping: true });
+      const cloudTimestamps = { updatedAt: firebaseServices.serverTimestamp() };
+      if (!exists || !currentData.createdAt) cloudTimestamps.createdAt = firebaseServices.serverTimestamp();
+      return {
+        dayState: rebuilt,
+        cloudPayload: stampFamilyData({ ...rebuilt, ...cloudTimestamps }),
+      };
+    };
+
+    if (typeof firebaseServices.runTransaction === "function") {
+      await firebaseServices.runTransaction(firebaseServices.db, async (transaction) => {
+        const currentSnapshot = await transaction.get(dayRef);
+        const atomicPayload = buildAtomicDayPayload(currentSnapshot);
+        dayPayload = atomicPayload.dayState;
+        transaction.set(dayRef, atomicPayload.cloudPayload, { merge: true });
+      });
+    } else {
+      const currentSnapshot = await firebaseServices.getDoc(dayRef);
+      const atomicPayload = buildAtomicDayPayload(currentSnapshot);
+      dayPayload = atomicPayload.dayState;
+      await firebaseServices.setDoc(dayRef, atomicPayload.cloudPayload, { merge: true });
+    }
 
     familyDayStatesCache = sanitizeDayStateMapByDay({ ...familyDayStatesCache, [safeDayId]: normalizeDayState(dayPayload) });
     if (dayStateHasVisibleContent(dayPayload) && !familyDayIdsCache.includes(safeDayId)) {

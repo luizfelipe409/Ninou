@@ -157,6 +157,7 @@ export async function getFirebaseServices() {
           orderBy: firestoreModule.orderBy,
           limit: firestoreModule.limit,
           onSnapshot: firestoreModule.onSnapshot,
+          runTransaction: firestoreModule.runTransaction,
           serverTimestamp: firestoreModule.serverTimestamp,
         };
 

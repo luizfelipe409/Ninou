@@ -3,6 +3,7 @@ import { createEventBus } from "../js/core/event-bus.js";
 import { createAppState } from "../js/core/app-state.js";
 import { createLogger } from "../js/core/logger.js";
 import { createJsonRepository } from "../js/repositories/json-repository.js";
+import { getLatestRoutineLiveState, isRoutineLiveStateNewer, normalizeDayState, stampRoutineLiveState } from "../js/domain/records.js";
 
 const bus = createEventBus();
 let received = 0;
@@ -32,6 +33,39 @@ repository.write([{ id: 1 }]);
 assert.deepEqual(repository.read(), [{ id: 1 }]);
 repository.update((items) => [...items, { id: 2 }]);
 assert.equal(repository.read().length, 2);
+
+const deviceAwake = stampRoutineLiveState({
+  mode: "awake",
+  activeStartedAt: 1_000,
+}, {}, { now: 1_100, mutationId: "device-a-awake" });
+const familySleeping = stampRoutineLiveState({
+  ...deviceAwake,
+  mode: "sleeping",
+  activeStartedAt: 2_000,
+  activeType: "sono",
+  activeDetail: "Timer",
+}, deviceAwake, { now: 2_100, mutationId: "device-b-sleeping" });
+assert.equal(getLatestRoutineLiveState(deviceAwake, familySleeping).mode, "sleeping");
+assert.equal(getLatestRoutineLiveState(familySleeping, deviceAwake).mode, "sleeping");
+assert.equal(isRoutineLiveStateNewer(familySleeping, deviceAwake), true);
+assert.equal(isRoutineLiveStateNewer(deviceAwake, familySleeping), false);
+
+const unchangedStaleDevice = stampRoutineLiveState({ ...deviceAwake, dayNotes: "Troca de fralda" }, deviceAwake, {
+  now: 3_000,
+  mutationId: "device-a-unrelated-change",
+});
+assert.equal(unchangedStaleDevice.routineStateUpdatedAt, deviceAwake.routineStateUpdatedAt);
+assert.equal(getLatestRoutineLiveState(unchangedStaleDevice, familySleeping).mode, "sleeping");
+
+const familyAwakeAgain = stampRoutineLiveState({
+  ...familySleeping,
+  mode: "awake",
+  activeStartedAt: 4_000,
+  activeType: "sono",
+  activeDetail: "",
+}, familySleeping, { now: 4_100, mutationId: "device-b-awake" });
+assert.equal(getLatestRoutineLiveState(familySleeping, familyAwakeAgain).mode, "awake");
+assert.equal(normalizeDayState(familyAwakeAgain).routineStateMutationId, "device-b-awake");
 
 const sink = { info() {}, warn() {}, error() {}, debug() {} };
 const logger = createLogger({ sink });

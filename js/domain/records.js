@@ -197,9 +197,87 @@ export function normalizeDayState(dayState = {}) {
     dayId: typeof dayState.dayId === "string" ? dayState.dayId : "",
     date: typeof dayState.date === "string" ? dayState.date : "",
     clientUpdatedAt: Number.isFinite(Number(dayState.clientUpdatedAt)) ? Number(dayState.clientUpdatedAt) : 0,
+    routineStateUpdatedAt: Number.isFinite(Number(dayState.routineStateUpdatedAt)) ? Number(dayState.routineStateUpdatedAt) : 0,
+    routineStateMutationId: typeof dayState.routineStateMutationId === "string" ? dayState.routineStateMutationId : "",
     dayNotes: typeof dayState.dayNotes === "string" ? dayState.dayNotes : "",
     dayNotesDayId: typeof dayState.dayNotesDayId === "string" ? dayState.dayNotesDayId : "",
     dayNotesUpdatedAt: Number.isFinite(Number(dayState.dayNotesUpdatedAt)) ? Number(dayState.dayNotesUpdatedAt) : 0,
+  };
+}
+
+export function getRoutineLiveSignature(dayState = {}) {
+  const normalized = normalizeDayState(dayState);
+  return [
+    normalized.mode,
+    normalized.activeStartedAt || 0,
+    normalized.activeType,
+    normalized.activeDetail,
+    normalized.activeNotes,
+  ].join("|");
+}
+
+export function stampRoutineLiveState(dayState = {}, previousState = {}, options = {}) {
+  const next = normalizeDayState(dayState);
+  const previous = normalizeDayState(previousState);
+  const changed = getRoutineLiveSignature(next) !== getRoutineLiveSignature(previous);
+
+  if (!changed) {
+    const nextVersion = Number(next.routineStateUpdatedAt) || 0;
+    const previousVersion = Number(previous.routineStateUpdatedAt) || 0;
+    return normalizeDayState(previousVersion > nextVersion
+      ? {
+          ...next,
+          routineStateUpdatedAt: previousVersion,
+          routineStateMutationId: previous.routineStateMutationId,
+        }
+      : next);
+  }
+
+  const now = Number(options.now) || Date.now();
+  const previousVersion = Math.max(
+    Number(previous.routineStateUpdatedAt) || 0,
+    Number(previous.activeStartedAt) || 0,
+  );
+  const activeStartedAt = Number(next.activeStartedAt) || 0;
+  return normalizeDayState({
+    ...next,
+    routineStateUpdatedAt: Math.max(now, previousVersion + 1, activeStartedAt),
+    routineStateMutationId: String(options.mutationId || `routine-${now}`),
+  });
+}
+
+function compareRoutineLiveState(leftState = {}, rightState = {}) {
+  const left = normalizeDayState(leftState);
+  const right = normalizeDayState(rightState);
+  const leftVersion = Math.max(Number(left.routineStateUpdatedAt) || 0, Number(left.activeStartedAt) || 0);
+  const rightVersion = Math.max(Number(right.routineStateUpdatedAt) || 0, Number(right.activeStartedAt) || 0);
+  if (leftVersion !== rightVersion) return leftVersion - rightVersion;
+
+  const leftStart = Number(left.activeStartedAt) || 0;
+  const rightStart = Number(right.activeStartedAt) || 0;
+  if (leftStart !== rightStart) return leftStart - rightStart;
+
+  return String(left.routineStateMutationId || "").localeCompare(String(right.routineStateMutationId || ""));
+}
+
+export function isRoutineLiveStateNewer(candidateState = {}, referenceState = {}) {
+  return compareRoutineLiveState(candidateState, referenceState) > 0;
+}
+
+export function getLatestRoutineLiveState(localState = {}, cloudState = {}) {
+  const local = normalizeDayState(localState);
+  const cloud = normalizeDayState(cloudState);
+  const latest = isRoutineLiveStateNewer(local, cloud) ? local : cloud;
+  return {
+    mode: latest.mode,
+    activeStartedAt: latest.activeStartedAt,
+    activeType: latest.activeType,
+    activeDetail: latest.activeDetail,
+    activeNotes: latest.activeNotes,
+    lastWakeWindowStartedAt: latest.lastWakeWindowStartedAt,
+    lastWakeWindowMs: latest.lastWakeWindowMs,
+    routineStateUpdatedAt: latest.routineStateUpdatedAt,
+    routineStateMutationId: latest.routineStateMutationId,
   };
 }
 

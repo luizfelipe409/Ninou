@@ -85,7 +85,7 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-premium-guest-entry/);
+assert.match(sw, /ninou-v82-0-0-live-state-sync/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -128,6 +128,10 @@ assert.match(core, /window\.setTimeout\(\(\) => URL\.revokeObjectURL\(url\), 150
 assert.match(core, /getConsentStorageKey/);
 assert.match(core, /const legacyAccount = legacy\.uid \|\| legacy\.email \|\| "device"/);
 assert.doesNotMatch(core, /Em beta, a exclusão/);
+assert.match(core, /getLatestRoutineLiveState\(currentState, cloudState\)/);
+assert.match(core, /stampRoutineLiveState\(state, previousLocalState/);
+assert.match(core, /firebaseServices\.runTransaction\(firebaseServices\.db/);
+assert.match(core, /saveDayToCloud\(repairDayId, \{ reason: "live-state-repair" \}\)/);
 assert.match(html, /class="export-custom-range-field" hidden/);
 assert.match(html, /Como podemos ajudar\?/);
 assert.doesNotMatch(html, /Relatar problema com diagnóstico/);
