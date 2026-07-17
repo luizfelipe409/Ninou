@@ -137,6 +137,7 @@ const familyAccountLabel = document.querySelector("#familyAccountLabel");
 const familyAccessTypeLabel = document.querySelector("#familyAccessTypeLabel");
 const familyInviteDescription = document.querySelector("#familyInviteDescription");
 const familyInviteForm = document.querySelector("#familyInviteForm");
+const familyInviteArea = familyInviteForm?.closest(".profile-invite-area");
 const familyInviteEmailInput = document.querySelector("#familyInviteEmailInput");
 const familyInviteRoleSelect = document.querySelector("#familyInviteRoleSelect");
 const familyInviteFormHint = document.querySelector("#familyInviteFormHint");
@@ -426,6 +427,7 @@ const weightHistoryList = document.querySelector("#weightHistoryList");
 const NINOU_RUNTIME_VERSION = "82.0.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
+let exportRoutineInProgress = false;
 let currentDayNotesModel = { dayId: "", entries: [], freeform: "", updatedAt: 0 };
 let editingDayNoteEntryId = "";
 let selectedDayNoteIcon = "✦";
@@ -1130,6 +1132,33 @@ function getProfileAccessState() {
 function canManageFamilyAccess() {
   if (!hasFamilyAccess()) return false;
   return isFamilyManagerRole(familyAccess?.role || FAMILY_ROLE_VIEWER, cloudUser?.email || familyAccess?.email || "");
+}
+
+function openFamilyInviteComposer() {
+  if (!canUsePrivateFeatures() || !hasFamilyAccess()) {
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Entre em uma família para convidar outro cuidador.";
+    return;
+  }
+  if (!canManageFamilyAccess()) {
+    if (familyAccessSummaryInviteStatus) familyAccessSummaryInviteStatus.textContent = "Seu acesso não permite criar convites. Peça a um responsável da família.";
+    return;
+  }
+
+  if (familyInviteForm) {
+    familyInviteForm.hidden = false;
+    familyInviteForm.setAttribute("aria-hidden", "false");
+  }
+  if (familyInviteArea) {
+    familyInviteArea.hidden = false;
+    familyInviteArea.classList.add("is-open");
+  }
+  if (familyAccessSummaryInviteStatus) {
+    familyAccessSummaryInviteStatus.textContent = "Informe o e-mail e a permissão da pessoa que você quer convidar.";
+  }
+  window.setTimeout(() => {
+    familyInviteForm?.scrollIntoView({ behavior: "smooth", block: "center" });
+    familyInviteEmailInput?.focus({ preventScroll: true });
+  }, 50);
 }
 
 function canEditFamilyProfile() {
@@ -2024,9 +2053,7 @@ function updateProfileReadyExperience() {
   if (postAccessCard && authorized) postAccessCard.hidden = true;
   if (dataRealityCard && authorized) dataRealityCard.hidden = true;
   if (familyWelcomeCard && ready) familyWelcomeCard.hidden = true;
-  if (familyAccessCard) {
-    familyAccessCard.hidden = Boolean(ready && !familyAdmin && !appAdmin);
-  }
+  if (familyAccessCard) familyAccessCard.hidden = ready;
 
   normalizeLoggedProfileCards();
   renderLoggedOutProfileShell();
@@ -13709,6 +13736,21 @@ function syncExportRangeModeFromDates() {
   if (exportStartDateInput.value && exportEndDateInput.value && exportStartDateInput.value !== exportEndDateInput.value) {
     exportRangeSelect.value = "custom";
   }
+  syncExportRangeVisibility();
+}
+
+function syncExportRangeVisibility({ resetPresetDates = false } = {}) {
+  if (!exportRangeSelect) return;
+  const custom = exportRangeSelect.value === "custom";
+  document.querySelectorAll(".export-custom-range-field").forEach((field) => {
+    field.hidden = !custom;
+    field.setAttribute("aria-hidden", custom ? "false" : "true");
+  });
+  exportRangeSelect.closest(".export-period-grid")?.classList.toggle("is-custom", custom);
+  if (!custom && resetPresetDates) {
+    if (exportStartDateInput) exportStartDateInput.value = "";
+    if (exportEndDateInput) exportEndDateInput.value = "";
+  }
 }
 
 function getExportWindow() {
@@ -13782,10 +13824,11 @@ function downloadFile(filename, content, type) {
   const link = document.createElement("a");
   link.href = url;
   link.download = filename;
+  link.hidden = true;
   document.body.append(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 function escapeCsv(value) {
@@ -14097,8 +14140,9 @@ function exportRoutine(format) {
 
   if (format === "pdf") {
     const html = buildPrintableReportHtml(payload);
-    const win = window.open("", "_blank", "noopener,noreferrer");
+    const win = window.open("", "_blank");
     if (win) {
+      win.opener = null;
       win.document.write(html);
       win.document.close();
     } else {
@@ -14118,7 +14162,8 @@ function exportRoutine(format) {
     }
     const text = encodeURIComponent(buildWhatsappShareText(payload));
     const url = number ? `https://wa.me/${number}?text=${text}` : `https://wa.me/?text=${text}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) window.location.assign(url);
     return;
   }
 
@@ -14283,7 +14328,7 @@ if (familyCreateInviteButton) familyCreateInviteButton.addEventListener("click",
 if (familyCopyInviteButton) familyCopyInviteButton.addEventListener("click", copyFamilyInviteCode);
 if (familyShareInviteWhatsAppButton) familyShareInviteWhatsAppButton.addEventListener("click", shareFamilyInviteOnWhatsApp);
 if (familyJoinInviteButton) familyJoinInviteButton.addEventListener("click", openJoinFamilyModal);
-if (familyAccessSummaryInviteButton) familyAccessSummaryInviteButton.addEventListener("click", () => withButtonBusy(familyAccessSummaryInviteButton, "Criando...", createFamilyCaregiverInvite));
+if (familyAccessSummaryInviteButton) familyAccessSummaryInviteButton.addEventListener("click", openFamilyInviteComposer);
 if (familyAccessSummaryProfileButton) familyAccessSummaryProfileButton.addEventListener("click", openCaregiverEditor);
 if (familyLeaveButton) familyLeaveButton.addEventListener("click", () => withButtonBusy(familyLeaveButton, "Saindo...", leaveCurrentFamily));
 if (confirmJoinInviteButton) confirmJoinInviteButton.addEventListener("click", () => withButtonBusy(confirmJoinInviteButton, "Aceitando...", confirmJoinFamilyInvite));
@@ -14298,6 +14343,8 @@ if (exportPdfButton) exportPdfButton.addEventListener("click", () => withButtonB
 if (shareWhatsappButton) shareWhatsappButton.addEventListener("click", () => withButtonBusy(shareWhatsappButton, "Preparando...", () => exportRoutine("whatsapp")));
 if (exportStartDateInput) exportStartDateInput.addEventListener("change", syncExportRangeModeFromDates);
 if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExportRangeModeFromDates);
+if (exportRangeSelect) exportRangeSelect.addEventListener("change", () => syncExportRangeVisibility({ resetPresetDates: true }));
+syncExportRangeVisibility();
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
 if (guestPortalCreateButton) guestPortalCreateButton.addEventListener("click", () => openGuestPortalAuth("create"));
 if (guestPortalLoginButton) guestPortalLoginButton.addEventListener("click", () => openGuestPortalAuth("login"));
@@ -15151,17 +15198,17 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
         <article><strong>Quais dados o Ninou organiza</strong><p>Rotina do bebê, horários, mamadas, fraldas, sono, peso, observações, nomes de cuidadores, vínculo familiar, convites e dados básicos da conta usada para login.</p></article>
         <article><strong>Como os dados são separados</strong><p>Cada família usa um <b>familyId</b>. Um cuidador só deve acessar a família em que foi autorizado por convite ou vínculo familiar.</p></article>
         <article><strong>Finalidade</strong><p>O uso é familiar: acompanhar a rotina, gerar relatórios, compartilhar resumo por WhatsApp/PDF e facilitar a comunicação entre cuidadores.</p></article>
-        <article><strong>Controle da família</strong><p>A família pode exportar os dados no Perfil e solicitar exclusão. Em beta, a exclusão deve ser confirmada pelo administrador antes de remoções definitivas.</p></article>
+        <article><strong>Controle da família</strong><p>A família pode exportar os dados no Perfil e solicitar exclusão. A exclusão deve ser confirmada pelo responsável antes de qualquer remoção definitiva.</p></article>
       `,
     },
     terms: {
       kicker: "Termos de uso",
-      title: "Termos de uso do beta Ninou",
+      title: "Termos de uso do Ninou",
       html: `
         <article><strong>Uso familiar</strong><p>O Ninou é um diário de rotina familiar para bebês. O responsável deve cadastrar apenas dados necessários e convidar somente cuidadores autorizados.</p></article>
         <article><strong>Conta e convite</strong><p>Cada pessoa deve usar seu próprio e-mail quando possível. Convites são pessoais e devem ser aceitos pelo e-mail informado.</p></article>
-        <article><strong>Beta controlado</strong><p>Esta versão é candidata a beta. Pode haver ajustes, correções e revisão jurídica antes de lançamento público ou cobrança recorrente.</p></article>
-        <article><strong>Responsabilidade</strong><p>O usuário deve revisar registros, exportar backup antes de testes críticos e procurar suporte ao notar divergência de dados.</p></article>
+        <article><strong>Disponibilidade</strong><p>O serviço pode receber melhorias e manutenções. O Ninou preserva os registros locais e sincroniza os dados familiares quando há conexão.</p></article>
+        <article><strong>Responsabilidade</strong><p>O usuário deve revisar os registros e procurar suporte ao notar qualquer divergência de dados.</p></article>
       `,
     },
     medical: {
@@ -15189,9 +15236,23 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
     };
   }
 
+  function getConsentStorageKey(context = {}) {
+    const account = context.uid || cloudUser?.uid || context.email || cloudUser?.email || familyAccess?.email || "device";
+    return `${CONSENT_KEY}.${sanitizeLocalStorageSegment(account)}`;
+  }
+
   function readConsent() {
-    try { return JSON.parse(localStorage.getItem(CONSENT_KEY) || "null"); }
-    catch { return null; }
+    try {
+      const scoped = localStorage.getItem(getConsentStorageKey());
+      if (scoped) return JSON.parse(scoped);
+      const legacy = JSON.parse(localStorage.getItem(CONSENT_KEY) || "null");
+      if (!legacy) return null;
+      const currentAccount = cloudUser?.uid || cloudUser?.email || familyAccess?.email || "device";
+      const legacyAccount = legacy.uid || legacy.email || "device";
+      return String(currentAccount).toLowerCase() === String(legacyAccount).toLowerCase() ? legacy : null;
+    } catch {
+      return null;
+    }
   }
 
   function setLegalStatus(message) {
@@ -15226,7 +15287,11 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
     }
     if (consentStatus) consentStatus.textContent = accepted ? "Confirmado" : "Não confirmado";
     if (consentDate) consentDate.textContent = accepted ? formatConsentDate(consent.acceptedAtClient) : "Aguardando aceite";
-    if (consentButton) consentButton.textContent = accepted ? "Aceite registrado" : "Aceitar termos";
+    if (consentButton) {
+      consentButton.textContent = accepted ? "Aceite registrado" : "Aceitar termos";
+      consentButton.dataset.state = accepted ? "accepted" : "pending";
+      consentButton.setAttribute("aria-pressed", accepted ? "true" : "false");
+    }
     if (exportButton) exportButton.hidden = !canUseFamilyDataExport();
     if (requestButton) requestButton.hidden = !canRequestFamilyDataDeletion();
     if (!canUseFamilyDataExport() && status) {
@@ -15274,22 +15339,31 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
       termsVersion: LEGAL_VERSION,
       medicalDisclaimerAccepted: true,
     });
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(payload));
+    const serialized = JSON.stringify(payload);
+    localStorage.setItem(getConsentStorageKey(payload), serialized);
+    localStorage.setItem(CONSENT_KEY, serialized);
     renderLegalCenter();
     closeLegalModal();
-    setLegalStatus("Aceite registrado neste aparelho. Quando logado em uma família, o Ninou também tenta salvar esse aceite na nuvem.");
+    setLegalStatus("Aceite registrado e salvo neste aparelho.");
 
+    const cloudWrites = [];
     if (cloudUser?.uid) {
-      await writeLegalDoc((services) => services.doc(services.db, "users", cloudUser.uid, "account", "legal"), payload);
+      cloudWrites.push(writeLegalDoc((services) => services.doc(services.db, "users", cloudUser.uid, "account", "legal"), payload));
     }
     if (cloudUser?.uid && payload.familyId) {
-      await writeLegalDoc((services) => services.doc(services.db, "families", payload.familyId, "legal", `consent_${cloudUser.uid}`), {
+      cloudWrites.push(writeLegalDoc((services) => services.doc(services.db, "families", payload.familyId, "legal", `consent_${cloudUser.uid}`), {
         ...payload,
         familyId: payload.familyId,
         actorUid: cloudUser.uid,
         actorEmail: payload.email,
         status: "accepted",
-      });
+      }));
+    }
+    if (cloudWrites.length) {
+      const results = await Promise.all(cloudWrites);
+      setLegalStatus(results.every(Boolean)
+        ? "Aceite salvo neste aparelho e sincronizado com a sua conta."
+        : "Aceite salvo neste aparelho. A sincronização será tentada novamente quando a conexão estiver disponível.");
     }
   }
 
@@ -15484,7 +15558,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
     if (adminStatus) adminStatus.textContent = reports.length || errors.length
       ? "Baixe o diagnóstico antes de investigar permissões, convites ou cache em outro aparelho."
       : "Os relatórios também tentam salvar em families/{familyId}/legal quando o usuário está logado e autorizado.";
-    if (backupButton) backupButton.hidden = !canUseSupportBackup();
+    if (backupButton) backupButton.hidden = true;
     const isGlobal = typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin();
     document.querySelectorAll("[data-global-admin-only]").forEach((node) => { node.hidden = !isGlobal; });
     renderAdminSupportList(reports, errors);
@@ -15749,7 +15823,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
     const status = document.querySelector("#supportBetaStatus");
     if (status && !managerAllowed) {
-      status.textContent = "Você pode relatar problema e copiar diagnóstico. Backup, exportação e exclusão ficam restritos ao responsável/admin.";
+      status.textContent = "Você pode relatar um problema. As informações técnicas necessárias são incluídas automaticamente.";
     }
     const legalStatus = document.querySelector("#legalReadinessStatus");
     if (legalStatus && !managerAllowed) {

@@ -1832,6 +1832,275 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   }
 }
 
+/* ============================================================
+   v82.0.0 — fechamento visual para uso final
+   ============================================================ */
+
+/* Home: cinco indicadores em uma composição equilibrada e legível. */
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .summary-grid > article {
+  min-width: 0 !important;
+  min-height: 86px !important;
+  padding: 14px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(155deg, var(--n79-surface-3), var(--n79-surface-2)) !important;
+}
+
+html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .summary-grid > article:last-child:nth-child(odd) {
+  grid-column: 1 / -1 !important;
+}
+
+/* Diário: modal de episódio com hierarquia, seleção e ações de produto final. */
+html.ninou-v8200 .day-note-episode-modal-card {
+  width: min(100%, 520px) !important;
+  padding: 20px !important;
+  display: grid !important;
+  gap: 18px !important;
+  overflow-x: hidden !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 0 0, color-mix(in srgb, var(--n79-accent-2) 14%, transparent), transparent 38%),
+    linear-gradient(165deg, var(--n79-surface-2), var(--n79-surface)) !important;
+}
+
+html.ninou-v8200 .day-note-modal-header {
+  display: grid !important;
+  grid-template-columns: 54px minmax(0, 1fr) 44px !important;
+  align-items: center !important;
+  gap: 13px !important;
+}
+
+html.ninou-v8200 .day-note-modal-header > div:nth-child(2) { min-width: 0 !important; }
+
+html.ninou-v8200 .day-note-modal-icon-preview {
+  width: 54px !important;
+  height: 54px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid color-mix(in srgb, var(--n79-accent) 24%, var(--n79-line)) !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--n79-accent) 10%, var(--n79-surface-3)) !important;
+  font-size: 1.45rem !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+html.ninou-v8200 .day-note-modal-header span {
+  display: block !important;
+  margin: 0 0 4px !important;
+  color: var(--n79-accent) !important;
+  font-size: .68rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+
+html.ninou-v8200 .day-note-modal-header strong {
+  display: block !important;
+  color: var(--n79-text) !important;
+  font-size: 1.12rem !important;
+  line-height: 1.15 !important;
+}
+
+html.ninou-v8200 .day-note-modal-header p {
+  margin: 6px 0 0 !important;
+  color: var(--n79-muted) !important;
+  font-size: .76rem !important;
+  line-height: 1.35 !important;
+}
+
+html.ninou-v8200 .day-note-modal-header .guest-modal-close {
+  position: static !important;
+  inset: auto !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 15px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+  font-size: 1.25rem !important;
+}
+
+html.ninou-v8200 .day-note-icon-picker {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+html.ninou-v8200 .day-note-icon-picker > button {
+  width: 100% !important;
+  min-width: 0 !important;
+  aspect-ratio: 1 !important;
+  min-height: 46px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 15px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+  font-size: 1.2rem !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+
+html.ninou-v8200 .day-note-icon-picker > button:is(.selected,[aria-pressed="true"]) {
+  border-color: var(--n79-accent) !important;
+  background: color-mix(in srgb, var(--n79-accent) 15%, var(--n79-surface-3)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--n79-accent) 14%, transparent) !important;
+}
+
+html.ninou-v8200 .day-note-modal-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+html.ninou-v8200 .day-note-modal-field {
+  min-width: 0 !important;
+  display: grid !important;
+  gap: 7px !important;
+  color: var(--n79-text-2) !important;
+  font-size: .76rem !important;
+  font-weight: 800 !important;
+}
+
+html.ninou-v8200 .day-note-modal-field :is(input, textarea) {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 13px 14px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 16px !important;
+  background: var(--n79-field) !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+}
+
+html.ninou-v8200 .day-note-modal-field input { min-height: 50px !important; }
+html.ninou-v8200 .day-note-modal-field textarea { min-height: 112px !important; resize: vertical !important; }
+html.ninou-v8200 .day-note-modal-field small { color: var(--n79-muted) !important; font-weight: 700 !important; }
+
+html.ninou-v8200 .day-note-modal-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 9px !important;
+  padding-top: 2px !important;
+}
+
+html.ninou-v8200 .day-note-modal-actions > button {
+  min-height: 48px !important;
+  padding: 0 17px !important;
+  border-radius: 16px !important;
+  font-weight: 850 !important;
+}
+
+html.ninou-v8200 .day-note-save-button {
+  border: 0 !important;
+  background: linear-gradient(135deg, var(--n79-accent), color-mix(in srgb, var(--n79-accent) 62%, #fff)) !important;
+  color: #10251f !important;
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--n79-accent) 22%, transparent) !important;
+}
+
+/* Perfil: remove metadados técnicos vazados e estabiliza contraste escuro. */
+html.ninou-v8200 .client-family-hidden-meta { display: none !important; }
+
+html.ninou-v8200 body[data-active-screen="profile"] .profile-sharing-card .profile-invite-area.is-open {
+  display: grid !important;
+  gap: 14px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--n79-line) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] :is(.legal-status-grid, .support-beta-grid) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] :is(.legal-status-grid, .support-beta-grid) > article {
+  min-width: 0 !important;
+  padding: 14px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 18px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] :is(.legal-status-grid, .support-beta-grid) > article :is(span, small) {
+  display: block !important;
+  color: var(--n79-muted) !important;
+  -webkit-text-fill-color: var(--n79-muted) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] :is(.legal-status-grid, .support-beta-grid) > article strong {
+  display: block !important;
+  margin: 7px 0 4px !important;
+  color: var(--n79-text) !important;
+  -webkit-text-fill-color: var(--n79-text) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .legal-consent-badge {
+  align-self: start !important;
+  padding: 8px 12px !important;
+  border: 1px solid var(--n79-line) !important;
+  border-radius: 999px !important;
+  background: var(--n79-surface-3) !important;
+  color: var(--n79-text-2) !important;
+  -webkit-text-fill-color: var(--n79-text-2) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .legal-consent-badge[data-state="accepted"],
+html.ninou-v8200 body[data-active-screen="profile"] #legalConsentButton[data-state="accepted"] {
+  border-color: color-mix(in srgb, var(--n79-accent) 42%, transparent) !important;
+  background: color-mix(in srgb, var(--n79-accent) 16%, var(--n79-surface-3)) !important;
+  color: var(--n79-accent) !important;
+  -webkit-text-fill-color: var(--n79-accent) !important;
+}
+
+html.ninou-v8200 body[data-active-screen="profile"] .support-actions-row #supportReportButton {
+  width: 100% !important;
+}
+
+html.ninou-v8200 #supportCopyDiagnosticsButton[hidden],
+html.ninou-v8200 #supportDownloadBackupButton[hidden],
+html.ninou-v8200 .support-beta-grid[hidden] { display: none !important; }
+
+/* Relatório: datas manuais existem somente no período personalizado. */
+html.ninou-v8200 .export-period-grid:not(.is-custom) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+html.ninou-v8200 .export-period-grid.is-custom {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+html.ninou-v8200 .export-period-grid.is-custom > .export-period-field {
+  grid-column: 1 / -1 !important;
+}
+
+html.ninou-v8200 .export-custom-range-field[hidden] { display: none !important; }
+
+@media (max-width: 420px) {
+  html.ninou-v8200 .day-note-episode-modal-card { padding: 16px !important; gap: 15px !important; }
+  html.ninou-v8200 .day-note-modal-header { grid-template-columns: 48px minmax(0, 1fr) 42px !important; gap: 10px !important; }
+  html.ninou-v8200 .day-note-modal-icon-preview { width: 48px !important; height: 48px !important; border-radius: 15px !important; }
+  html.ninou-v8200 .day-note-icon-picker { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  html.ninou-v8200 .day-note-modal-grid { grid-template-columns: 1fr !important; }
+  html.ninou-v8200 .day-note-modal-actions { display: grid !important; grid-template-columns: 1fr 1.35fr !important; }
+  html.ninou-v8200 .day-note-modal-actions > button { width: 100% !important; padding-inline: 10px !important; }
+  html.ninou-v8200 .day-note-delete-button:not([hidden]) { grid-column: 1 / -1 !important; }
+}
+
 /* v82.0.0 — acabamento premium para lançamento. */
 
 html.ninou-v8200 .orbit-duration-arcs {

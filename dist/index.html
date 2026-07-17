@@ -1383,25 +1383,25 @@
             <small id="legalReadinessStatus" class="family-health-status">Confirme os termos para manter o uso familiar claro e seguro.</small>
           </article>
 
-          <article id="supportBetaCard" class="profile-family-card support-beta-card" aria-label="Suporte e diagnóstico do beta">
+          <article id="supportBetaCard" class="profile-family-card support-beta-card" aria-label="Ajuda e suporte">
             <div class="profile-card-head">
               <div>
-                <span>Suporte</span>
-                <strong>Relatar problema com diagnóstico</strong>
+                <span>Ajuda e suporte</span>
+                <strong>Como podemos ajudar?</strong>
               </div>
               <span id="supportBetaBadge" class="legal-consent-badge" data-state="pending">Pronto</span>
             </div>
-            <p>Para testar com outras famílias, o Ninou agora junta contexto do aparelho, versão, família ativa e últimos erros locais em um relatório simples de suporte.</p>
-            <div class="support-beta-grid" aria-label="Status do suporte beta">
+            <p>Conte o que aconteceu. O Ninou inclui automaticamente as informações técnicas necessárias, sem expor a rotina da família na tela.</p>
+            <div class="support-beta-grid" aria-label="Informações técnicas do suporte" hidden>
               <article><span>Versão</span><strong id="supportVersionLabel">v82.0.0</strong><small>Suporte + monitoramento</small></article>
               <article><span>Último relatório</span><strong id="supportLastReportLabel">Nenhum</strong><small id="supportLastReportDetail">Aguardando teste real</small></article>
             </div>
             <div class="profile-actions-row support-actions-row">
-              <button id="supportReportButton" class="profile-primary-button" type="button">Relatar problema</button>
-              <button id="supportCopyDiagnosticsButton" class="profile-secondary-button" type="button">Copiar diagnóstico</button>
-              <button id="supportDownloadBackupButton" class="profile-secondary-button" type="button" data-sensitive-action="manager">Backup JSON</button>
+              <button id="supportReportButton" class="profile-primary-button" type="button">Relatar um problema</button>
+              <button id="supportCopyDiagnosticsButton" class="profile-secondary-button" type="button" hidden>Copiar diagnóstico</button>
+              <button id="supportDownloadBackupButton" class="profile-secondary-button" type="button" hidden>Backup JSON</button>
             </div>
-            <small id="supportBetaStatus" class="family-health-status">Use este card para relatar erro, copiar diagnóstico ou enviar backup quando permitido.</small>
+            <small id="supportBetaStatus" class="family-health-status">Seu relato fica associado à conta e à família conectada para facilitar o atendimento.</small>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Acesso familiar</span>
@@ -1954,11 +1954,11 @@
                   <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </span>
               </label>
-              <label>
+              <label class="export-custom-range-field" hidden>
                 Início
                 <input id="exportStartDateInput" type="date" />
               </label>
-              <label>
+              <label class="export-custom-range-field" hidden>
                 Fim
                 <input id="exportEndDateInput" type="date" />
               </label>

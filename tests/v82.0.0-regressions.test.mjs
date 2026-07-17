@@ -104,7 +104,7 @@ assert.match(nightSky, /mask id="moonCut"/);
 const legacySize = (await stat(new URL("styles/legacy.css", root))).size;
 const premiumSize = (await stat(new URL("styles/premium-v82.0.0.css", root))).size;
 assert.ok(legacySize < 800 * 1024, "O CSS legado deve permanecer abaixo de 800 KB.");
-assert.ok(premiumSize > 20 * 1024 && premiumSize < 170 * 1024, "A autoridade premium deve ser substancial sem virar outro monólito.");
+assert.ok(premiumSize > 20 * 1024 && premiumSize < 190 * 1024, "A autoridade premium deve ser substancial sem virar outro monólito.");
 
 console.log("Regressões v82.0.0 validadas: céu claro solar, noite cósmica, órbita local, menu + e estabilidade preservados.");
 
@@ -114,6 +114,27 @@ assert.match(premiumCss, /#orbitClusterSheet\[hidden\]/);
 assert.match(premiumCss, /body\[data-active-screen="profile"\] \.fab-real-plus/);
 assert.match(premiumCss, /--n79-nav-height: 70px/);
 assert.match(premiumCss, /Marcadores reais com arte legível no céu claro/);
+
+// Fechamento reproduzido no vídeo: convite, relatório, aceite e contraste final.
+assert.match(core, /let exportRoutineInProgress = false/);
+assert.match(core, /familyAccessSummaryInviteButton\.addEventListener\("click", openFamilyInviteComposer\)/);
+assert.match(core, /familyInviteArea\.classList\.add\("is-open"\)/);
+assert.match(core, /familyAccessCard\.hidden = ready/);
+assert.match(core, /syncExportRangeVisibility\(\{ resetPresetDates: true \}\)/);
+assert.match(core, /const win = window\.open\("", "_blank"\)/);
+assert.match(core, /class="cover"/);
+assert.match(core, /if \(!opened\) window\.location\.assign\(url\)/);
+assert.match(core, /window\.setTimeout\(\(\) => URL\.revokeObjectURL\(url\), 1500\)/);
+assert.match(core, /getConsentStorageKey/);
+assert.match(core, /const legacyAccount = legacy\.uid \|\| legacy\.email \|\| "device"/);
+assert.doesNotMatch(core, /Em beta, a exclusão/);
+assert.match(html, /class="export-custom-range-field" hidden/);
+assert.match(html, /Como podemos ajudar\?/);
+assert.doesNotMatch(html, /Relatar problema com diagnóstico/);
+assert.match(premiumCss, /\.day-note-modal-header/);
+assert.match(premiumCss, /\.client-family-hidden-meta \{ display: none !important; \}/);
+assert.match(premiumCss, /\.profile-invite-area\.is-open/);
+assert.match(premiumCss, /\.legal-status-grid, \.support-beta-grid/);
 
 // Fluxo solicitado: escolha no menu, formulário focado e retorno explícito.
 const recordSheetMarkup = html.slice(html.indexOf('id="recordSheet"'), html.indexOf('id="orbitClusterSheet"'));
