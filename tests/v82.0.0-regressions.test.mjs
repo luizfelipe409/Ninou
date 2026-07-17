@@ -90,7 +90,11 @@ assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
-assert.match(build, /"assets"/);
+assert.match(build, /"assets\/clock-themes\/day-sky\.svg"/);
+assert.match(build, /const publicFiles = \[/);
+assert.match(build, /"js\/ninou-core-v82\.0\.0\.mjs"/);
+assert.match(build, /"styles\/premium-v82\.0\.0\.css"/);
+assert.doesNotMatch(build, /^\s*"(?:styles|js|icons|audio|assets|app\.js|styles\.css|firestore\.rules|vercel\.json)",?$/m);
 assert.match(vercel, /"buildCommand": "npm run build"/);
 assert.match(vercel, /"outputDirectory": "dist"/);
 

@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const failures = [];
 const cssModules = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const required = [
-  "index.html", "styles.css", "sw.js", "manifest.webmanifest", "firestore.rules", "vercel.json",
+  "index.html", "sw.js", "manifest.webmanifest", "firestore.rules", "vercel.json",
   ...cssModules.map((name) => `styles/${name}.css`),
   "js/boot-v82.0.0.mjs", "js/ninou-core-v82.0.0.mjs", "js/ninou-ux-v82.0.0.mjs",
   "js/ninou-consistency-v82.0.0.mjs", "js/ninou-stability-v82.0.0.mjs",
@@ -63,6 +63,12 @@ for (const asset of required.filter((file) => file.startsWith("js/"))) {
 const productionFiles = existsSync(join(root, "dist")) ? await walk(join(root, "dist")) : [];
 const forbidden = productionFiles.map((file) => relative(root, file)).filter((file) => /(^|\/)(\.env|\.env\.|project\.json$|\.vercel\/)/.test(file));
 if (forbidden.length) failures.push(`Arquivos sensíveis/de ambiente no pacote: ${forbidden.join(", ")}`);
+const publicRootFiles = new Set(productionFiles.map((file) => relative(join(root, "dist"), file)));
+const forbiddenPublicFiles = ["app.js", "styles.css", "firestore.rules", "vercel.json"]
+  .filter((file) => publicRootFiles.has(file));
+const obsoletePublicFiles = [...publicRootFiles].filter((file) => /v81\.0\.1|premium-v81\.0\.1|(^|\/)\.DS_Store$/.test(file));
+if (forbiddenPublicFiles.length) failures.push(`Arquivos internos publicados em dist: ${forbiddenPublicFiles.join(", ")}`);
+if (obsoletePublicFiles.length) failures.push(`Arquivos obsoletos publicados em dist: ${obsoletePublicFiles.join(", ")}`);
 
 const premiumCss = await readFile(join(root, "styles/premium-v82.0.0.css"), "utf8");
 const premiumImportant = (premiumCss.match(/!important/g) || []).length;
