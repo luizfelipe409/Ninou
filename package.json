@@ -8,6 +8,8 @@
     "test:architecture": "node tests/architecture.test.mjs",
     "test": "npm run test:architecture && npm run test:regressions && npm run check",
     "build": "node scripts/build-production.mjs",
-    "test:regressions": "node tests/v82.0.0-regressions.test.mjs"
+    "test:regressions": "node tests/v82.0.0-regressions.test.mjs",
+    "mobile:start": "npm --prefix mobile run start",
+    "mobile:check": "npm --prefix mobile run check"
   }
 }

@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Ninou",
+    "slug": "ninou",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/ninou-icon.png",
+    "scheme": "ninou",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/images/ninou-icon.png",
+      "bundleIdentifier": "com.ninou.app",
+      "buildNumber": "1",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.ninou.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#1D1435",
+        "foregroundImage": "./assets/images/ninou-icon.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/ninou-favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#120B24",
+          "image": "./assets/images/ninou-splash.png",
+          "imageWidth": 160
+        }
+      ],
+      "expo-audio",
+      "expo-asset",
+      "expo-sharing"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

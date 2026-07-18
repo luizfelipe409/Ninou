@@ -2,10 +2,11 @@ import { readFile, stat } from "node:fs/promises";
 import assert from "node:assert/strict";
 
 const root = new URL("../", import.meta.url);
-const [html, boot, core, ux, stability, adminCss, premiumCss, focusedFlowCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
+const [html, boot, core, adminRuntime, ux, stability, adminCss, premiumCss, focusedFlowCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
   readFile(new URL("js/boot-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-core-v82.0.0.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-admin-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-ux-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-stability-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("styles/admin-v82.0.0.css", root), "utf8"),
@@ -29,6 +30,7 @@ assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
 assert.match(html, /styles\/legacy\.css\?v=82\.0\.0/);
 assert.doesNotMatch(html, /styles\/admin-v82\.0\.0\.css/);
+assert.doesNotMatch(html, /js\/ninou-admin-v82\.0\.0\.mjs/);
 assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.0\.0/);
 assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.0\.0/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
@@ -42,7 +44,12 @@ assert.match(boot, /visual-guard-v82\.0\.0/);
 assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.0\.0"/);
 assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.0\.0-premium-consolidated"/);
 assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-v82\.0\.0\.css\?v=82\.0\.0"/);
-assert.match(core, /if \(appAdmin\) ensureAdminStylesheet\(\)/);
+assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-v82\.0\.0\.mjs\?v=82\.0\.0"/);
+assert.match(core, /void ensureAdminRuntime\(\)/);
+assert.doesNotMatch(core, /createInviteButton\.addEventListener/);
+assert.doesNotMatch(core, /adminInvitePanel\.addEventListener/);
+assert.match(adminRuntime, /export function initializeNinouAdminRuntime/);
+assert.match(adminRuntime, /panel\.addEventListener\("click"/);
 assert.match(core, /insertBefore\(stylesheet, legacyStylesheet\.nextSibling\)/);
 assert.match(ux, /const UX_VERSION = "82\.0\.0"/);
 assert.match(stability, /const STABILITY_VERSION = "82\.0\.0"/);
@@ -90,7 +97,8 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-admin-css-split/);
+assert.match(sw, /ninou-v82-0-0-admin-runtime-split/);
+assert.doesNotMatch(sw, /ninou-admin-v82\.0\.0/);
 assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
@@ -98,6 +106,7 @@ assert.match(sw, /night-sky\.svg/);
 assert.match(build, /"assets\/clock-themes\/day-sky\.svg"/);
 assert.match(build, /const publicFiles = \[/);
 assert.match(build, /"js\/ninou-core-v82\.0\.0\.mjs"/);
+assert.match(build, /"js\/ninou-admin-v82\.0\.0\.mjs"/);
 assert.match(build, /"styles\/premium-v82\.0\.0\.css"/);
 assert.match(build, /"styles\/admin-v82\.0\.0\.css"/);
 assert.doesNotMatch(build, /^\s*"(?:styles|js|icons|audio|assets|app\.js|styles\.css|firestore\.rules|vercel\.json)",?$/m);

@@ -1,0 +1,335 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import {
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
+  getAuth,
+  initializeAuth,
+  onAuthStateChanged,
+  setPersistence,
+  signInWithEmailAndPassword,
+  signOut,
+  type Auth,
+  type Persistence,
+  type User,
+} from 'firebase/auth';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  runTransaction,
+  serverTimestamp,
+  setDoc,
+  type Firestore,
+  type Unsubscribe,
+} from 'firebase/firestore';
+import { Platform } from 'react-native';
+
+import { mergeDayStates, normalizeDayState, type DayState } from '@/domain/routine';
+
+const firebaseConfig = {
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || 'AIzaSyAlGGx3z6kDWk4vsgBjSH2BDkDQwPoZlAM',
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || 'ninou-3c936.firebaseapp.com',
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || 'ninou-3c936',
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || 'ninou-3c936.firebasestorage.app',
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '18333404018',
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || '1:18333404018:web:6faefb89f2e79e737c6beb',
+};
+
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+function initializeNinouAuth(): Auth {
+  if (Platform.OS === 'web') {
+    const webAuth = getAuth(app);
+    void setPersistence(webAuth, browserLocalPersistence);
+    return webAuth;
+  }
+
+  try {
+    const reactNativePersistence = {
+      type: 'LOCAL',
+      _isAvailable: async () => true,
+      _set: async (key: string, value: unknown) => AsyncStorage.setItem(key, JSON.stringify(value)),
+      _get: async (key: string) => {
+        const value = await AsyncStorage.getItem(key);
+        return value ? JSON.parse(value) : null;
+      },
+      _remove: async (key: string) => AsyncStorage.removeItem(key),
+      _addListener: () => undefined,
+      _removeListener: () => undefined,
+    } as unknown as Persistence;
+    return initializeAuth(app, { persistence: reactNativePersistence });
+  } catch (error) {
+    if ((error as { code?: string })?.code !== 'auth/already-initialized') throw error;
+    return getAuth(app);
+  }
+}
+
+export const auth = initializeNinouAuth();
+export const db: Firestore = getFirestore(app);
+
+export type FamilyAccess = {
+  familyId: string;
+  role: string;
+  email: string;
+  ownerUid: string;
+};
+
+export type FamilyMember = { uid: string; email: string; role: string; name: string; status: string };
+
+export function observeAuth(callback: (user: User | null) => void) {
+  return onAuthStateChanged(auth, callback);
+}
+
+export async function loginWithEmail(email: string, password: string) {
+  return signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+}
+
+export async function registerWithEmail(email: string, password: string) {
+  return createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+}
+
+export async function logout() {
+  await signOut(auth);
+}
+
+function isActiveAccess(data: Record<string, unknown>) {
+  return !['inactive', 'revoked', 'removed'].includes(String(data.status || 'active'));
+}
+
+function toFamilyAccess(data: Record<string, unknown>, fallbackId: string, user: User): FamilyAccess | null {
+  const familyId = String(data.familyId || fallbackId || '').trim();
+  if (!familyId || !isActiveAccess(data)) return null;
+  return {
+    familyId,
+    role: String(data.role || 'admin'),
+    email: String(data.email || user.email || ''),
+    ownerUid: String(data.ownerUid || data.owner || ''),
+  };
+}
+
+export async function resolveFamilyAccess(user: User): Promise<FamilyAccess | null> {
+  const familySnapshots = await getDocs(collection(db, 'users', user.uid, 'families'));
+  const accesses = familySnapshots.docs
+    .map((snapshot) => toFamilyAccess(snapshot.data(), snapshot.id, user))
+    .filter((access): access is FamilyAccess => Boolean(access));
+  if (accesses.length) return accesses[0];
+
+  const legacySnapshot = await getDoc(doc(db, 'users', user.uid, 'access', 'ninou'));
+  return legacySnapshot.exists() ? toFamilyAccess(legacySnapshot.data(), '', user) : null;
+}
+
+export async function createPersonalFamily(user: User, input: { familyName: string; babyName: string; birthDate: string; article: 'do' | 'da'; responsibleName: string; responsibleRelation: string }) {
+  const email = (user.email || '').trim().toLowerCase();
+  const familyId = `family-${user.uid}`;
+  const access: FamilyAccess = { familyId, role: 'owner', email, ownerUid: user.uid };
+  const accessPayload = { ...access, status: 'active', roleVersion: 2, updatedAt: serverTimestamp() };
+  await setDoc(doc(db, 'users', user.uid, 'families', familyId), { ...accessPayload, joinedAt: serverTimestamp() }, { merge: true });
+  await setDoc(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
+  await setDoc(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload, name: input.responsibleName, relation: input.responsibleRelation, joinedAt: serverTimestamp() }, { merge: true });
+  await setDoc(doc(db, 'families', familyId), {
+    familyId, title: input.familyName, name: input.familyName, babyName: input.babyName, babyArticle: input.article,
+    ownerUid: user.uid, ownerEmail: email, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation,
+    familyType: 'client', status: 'active', appVersion: '82.0.0-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+  }, { merge: true });
+  await setDoc(doc(db, 'families', familyId, 'profile', 'main'), {
+    familyId, familyName: input.familyName, name: input.babyName, birthDate: input.birthDate, article: input.article,
+    ownerUid: user.uid, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation, updatedAt: serverTimestamp(),
+  }, { merge: true });
+  return access;
+}
+
+function normalizeInviteCode(code: string) {
+  return code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+}
+
+function makeInviteCode() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 8 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
+}
+
+export async function createCaregiverInvite(user: User, access: FamilyAccess, emailValue: string, role = 'caregiver') {
+  const email = emailValue.trim().toLowerCase();
+  if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
+  if (!['owner', 'admin', 'global_admin'].includes(access.role)) throw new Error('Seu acesso não permite criar convites.');
+  const code = makeInviteCode();
+  const expiresAtClient = Date.now() + 7 * 86400000;
+  const payload = { code, familyId: access.familyId, email, role, status: 'pending', maxUses: 1, useCount: 0, expiresAtClient, createdByUid: user.uid, createdByEmail: user.email || '', source: 'mobile_profile', createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  await setDoc(doc(db, 'families', access.familyId, 'invites', code), payload, { merge: true });
+  await setDoc(doc(db, 'families', access.familyId, 'invitations', code), payload, { merge: true });
+  await setDoc(doc(db, 'invites', code), payload, { merge: true });
+  return { code, email, role, expiresAtClient };
+}
+
+export async function acceptCaregiverInvite(user: User, codeValue: string) {
+  const code = normalizeInviteCode(codeValue);
+  if (!code) throw new Error('Digite o código do convite.');
+  const inviteRef = doc(db, 'invites', code);
+  const snapshot = await getDoc(inviteRef);
+  if (!snapshot.exists()) throw new Error('Convite não encontrado ou expirado.');
+  const invite = snapshot.data();
+  const familyId = String(invite.familyId || '');
+  const email = (user.email || '').trim().toLowerCase();
+  const invitedEmail = String(invite.email || '').trim().toLowerCase();
+  if (!familyId) throw new Error('Família do convite não encontrada.');
+  if (invitedEmail && invitedEmail !== email) throw new Error(`Este convite foi criado para ${invitedEmail}.`);
+  if (String(invite.status || 'pending') !== 'pending' || Number(invite.useCount || 0) >= Number(invite.maxUses || 1)) throw new Error('Este convite já foi utilizado ou cancelado.');
+  if (Number(invite.expiresAtClient || 0) && Number(invite.expiresAtClient) < Date.now()) throw new Error('Este convite expirou. Peça um novo código.');
+  const role = String(invite.role || 'caregiver');
+  const access: FamilyAccess = { familyId, role, email, ownerUid: String(invite.ownerUid || invite.createdByUid || '') };
+  const accessPayload = { ...access, inviteCode: code, status: 'active', roleVersion: 2, joinedAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  await setDoc(doc(db, 'users', user.uid, 'families', familyId), accessPayload, { merge: true });
+  await setDoc(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
+  await setDoc(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload }, { merge: true });
+  const acceptedPayload = { status: 'accepted', useCount: Number(invite.useCount || 0) + 1, acceptedByUid: user.uid, acceptedByEmail: email, acceptedAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  await setDoc(inviteRef, acceptedPayload, { merge: true });
+  await setDoc(doc(db, 'families', familyId, 'invites', code), acceptedPayload, { merge: true });
+  await setDoc(doc(db, 'families', familyId, 'invitations', code), acceptedPayload, { merge: true });
+  return access;
+}
+
+export function observeFamilyMembers(familyId: string, onValue: (members: FamilyMember[]) => void, onError: (error: Error) => void): Unsubscribe {
+  return onSnapshot(collection(db, 'families', familyId, 'members'), (snapshot) => onValue(snapshot.docs.map((member) => {
+    const data = member.data();
+    return { uid: member.id, email: String(data.email || ''), role: String(data.role || 'caregiver'), name: String(data.name || data.displayName || ''), status: String(data.status || 'active') };
+  })), onError);
+}
+
+export async function loadRoutineDays(familyId: string) {
+  const snapshot = await getDocs(collection(db, 'families', familyId, 'days'));
+  return Object.fromEntries(snapshot.docs.map((day) => {
+    const data = day.data();
+    return [day.id, normalizeDayState((data.state && typeof data.state === 'object' ? data.state : data) as Partial<DayState>)];
+  }));
+}
+
+export async function saveLegalConsent(user: User, familyId: string | undefined, payload: { termsVersion: string; privacyVersion: string; medicalDisclaimerVersion: string }) {
+  const data = { ...payload, accepted: true, acceptedAt: serverTimestamp(), acceptedAtClient: Date.now(), email: user.email || '', uid: user.uid };
+  await setDoc(doc(db, 'users', user.uid, 'account', 'legal'), data, { merge: true });
+  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `consent_${user.uid}`), data, { merge: true });
+  return data;
+}
+
+export async function submitSupportRequest(user: User, familyId: string | undefined, input: { category: string; message: string; diagnostics?: string }) {
+  const stamp = Date.now();
+  const payload = { ...input, uid: user.uid, email: user.email || '', familyId: familyId || '', status: 'open', createdAtClient: stamp, createdAt: serverTimestamp() };
+  await setDoc(doc(db, 'users', user.uid, 'account', 'supportLastRequest'), payload, { merge: true });
+  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `support_${user.uid}_${stamp}`), payload, { merge: true });
+}
+
+export async function requestAccountDeletion(user: User, familyId?: string) {
+  const payload = { uid: user.uid, email: user.email || '', familyId: familyId || '', status: 'requested', requestedAtClient: Date.now(), requestedAt: serverTimestamp() };
+  await setDoc(doc(db, 'users', user.uid, 'account', 'dataDeletionRequest'), payload, { merge: true });
+  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `data_request_${user.uid}`), payload, { merge: true });
+}
+
+export function getLocalDateId(now = Date.now()) {
+  const date = new Date(now);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+export function observeRoutineDay(
+  familyId: string,
+  dayId: string,
+  onValue: (state: DayState) => void,
+  onError: (error: Error) => void,
+): Unsubscribe {
+  return onSnapshot(
+    doc(db, 'families', familyId, 'days', dayId),
+    (snapshot) => {
+      if (!snapshot.exists()) return;
+      const data = snapshot.data();
+      onValue(normalizeDayState((data.state && typeof data.state === 'object' ? data.state : data) as Partial<DayState>));
+    },
+    onError,
+  );
+}
+
+export async function saveRoutineDay(input: {
+  familyId: string;
+  dayId: string;
+  state: DayState;
+  user: User;
+}) {
+  const dayRef = doc(db, 'families', input.familyId, 'days', input.dayId);
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(dayRef);
+    const cloudData = snapshot.exists() ? snapshot.data() : {};
+    const cloudState = normalizeDayState((cloudData.state && typeof cloudData.state === 'object' ? cloudData.state : cloudData) as Partial<DayState>);
+    const mergedBase = mergeDayStates(input.state, cloudState);
+    const merged = normalizeDayState({
+      ...mergedBase,
+      mode: input.state.mode,
+      activeStartedAt: input.state.activeStartedAt,
+      activeType: input.state.activeType,
+      activeDetail: input.state.activeDetail,
+      activeNotes: input.state.activeNotes,
+      lastWakeWindowStartedAt: input.state.lastWakeWindowStartedAt,
+      lastWakeWindowMs: input.state.lastWakeWindowMs,
+      routineStateUpdatedAt: Math.max(Date.now(), input.state.routineStateUpdatedAt, cloudState.routineStateUpdatedAt + 1),
+      routineStateMutationId: input.state.routineStateMutationId,
+    });
+    transaction.set(dayRef, {
+      ...merged,
+      dayId: input.dayId,
+      date: input.dayId,
+      familyId: input.familyId,
+      familyScopeVersion: 2,
+      clientUpdatedAt: Date.now(),
+      updatedAt: serverTimestamp(),
+      updatedByUid: input.user.uid,
+      updatedByEmail: input.user.email || '',
+      ...(snapshot.exists() ? {} : { createdAt: serverTimestamp() }),
+    }, { merge: true });
+  });
+}
+
+export type CloudBabyProfile = {
+  name?: string;
+  birthDate?: string;
+  wakeWindow?: number | string;
+  wakeWindowMinutes?: number;
+  avatarId?: string;
+  avatar?: { hair?: string; icon?: string };
+  article?: 'do' | 'da';
+  weights?: unknown[];
+};
+
+export function observeBabyProfile(
+  familyId: string,
+  onValue: (profile: CloudBabyProfile) => void,
+  onError: (error: Error) => void,
+) {
+  return onSnapshot(doc(db, 'families', familyId, 'profile', 'main'), (snapshot) => {
+    if (snapshot.exists()) onValue(snapshot.data());
+  }, onError);
+}
+
+export async function saveBabyProfile(familyId: string, profile: { name: string; birthDate: string; wakeWindowMinutes: number; avatarId: string; article: 'do' | 'da'; weights: { id: string; date: string; value: number }[] }) {
+  await setDoc(doc(db, 'families', familyId, 'profile', 'main'), {
+    ...profile,
+    familyId,
+    wakeWindow: profile.wakeWindowMinutes,
+    avatarId: profile.avatarId,
+    avatar: { hair: profile.avatarId, icon: profile.avatarId },
+    avatarConfigured: true,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export function getFirebaseErrorMessage(error: unknown) {
+  const code = (error as { code?: string })?.code || '';
+  const messages: Record<string, string> = {
+    'auth/email-already-in-use': 'Este e-mail já possui uma conta. Use Entrar.',
+    'auth/invalid-email': 'Digite um e-mail válido.',
+    'auth/invalid-credential': 'E-mail ou senha incorretos.',
+    'auth/wrong-password': 'E-mail ou senha incorretos.',
+    'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+    'auth/network-request-failed': 'Sem conexão com o Firebase. Confira a internet e tente novamente.',
+    'permission-denied': 'Sua conta não tem permissão para esta família.',
+  };
+  return messages[code] || (error instanceof Error ? error.message : 'Não foi possível concluir esta ação agora.');
+}

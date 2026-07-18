@@ -1,0 +1,78 @@
+import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider, Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+
+import { NinouThemeProvider, useNinouTheme } from '@/theme/tokens';
+import { RoutineProvider } from '@/state/routine-context';
+import { ProfileProvider } from '@/state/profile-context';
+import { AuthProvider, useNinouAuth } from '@/state/auth-context';
+import { GuestEntryPortal, NinouLoadingScreen } from '@/components/guest-entry-portal';
+import { FamilySetupPortal } from '@/components/family-setup-portal';
+import { PreferencesProvider } from '@/state/preferences-context';
+
+void SplashScreen.preventAutoHideAsync();
+
+export default function RootLayout() {
+  return <NinouThemeProvider><RootNavigation /></NinouThemeProvider>;
+}
+
+function RootNavigation() {
+  const { colors, isDark } = useNinouTheme();
+
+  useEffect(() => {
+    void SplashScreen.hideAsync();
+  }, []);
+
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      background: colors.background,
+      card: colors.surface,
+      border: colors.border,
+      primary: colors.primary,
+      text: colors.text,
+    },
+  };
+
+  return (
+    <NavigationThemeProvider value={navigationTheme}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <AuthProvider>
+        <AppGate />
+      </AuthProvider>
+    </NavigationThemeProvider>
+  );
+}
+
+function AppGate() {
+  const { user, status } = useNinouAuth();
+  const { colors } = useNinouTheme();
+  if (status === 'loading' || status === 'resolving-family') return <NinouLoadingScreen />;
+  if (!user) return <GuestEntryPortal />;
+  if (status === 'no-family' || status === 'error') return <FamilySetupPortal />;
+  return (
+    <ProfileProvider>
+      <PreferencesProvider>
+        <RoutineProvider>
+          <Stack screenOptions={{ contentStyle: { backgroundColor: colors.background } }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="registrar"
+            options={{
+              presentation: 'formSheet',
+              headerShown: false,
+              sheetGrabberVisible: true,
+              sheetAllowedDetents: [0.78, 1],
+              sheetInitialDetentIndex: 0,
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen name="relatorios" options={{ presentation: 'modal', title: 'Relatórios', headerShadowVisible: false, headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text }} />
+          </Stack>
+        </RoutineProvider>
+      </PreferencesProvider>
+    </ProfileProvider>
+  );
+}

@@ -16,6 +16,7 @@ const publicFiles = [
 
   "js/boot-v82.0.0.mjs",
   "js/ninou-core-v82.0.0.mjs",
+  "js/ninou-admin-v82.0.0.mjs",
   "js/ninou-ux-v82.0.0.mjs",
   "js/ninou-consistency-v82.0.0.mjs",
   "js/ninou-stability-v82.0.0.mjs",

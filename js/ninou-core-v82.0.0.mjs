@@ -29,6 +29,8 @@ import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
 const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
 const ADMIN_STYLESHEET_HREF = "./styles/admin-v82.0.0.css?v=82.0.0";
+const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.0.0";
+let adminRuntimePromise = null;
 
 function ensureAdminStylesheet() {
   if (document.getElementById(ADMIN_STYLESHEET_ID)) return;
@@ -52,6 +54,49 @@ function ensureAdminStylesheet() {
   } else {
     document.head.append(stylesheet);
   }
+}
+
+function ensureAdminRuntime() {
+  if (!isGlobalAppAdmin()) return Promise.resolve(null);
+  if (adminRuntimePromise) return adminRuntimePromise;
+
+  document.body.dataset.adminRuntimeState = "loading";
+  adminRuntimePromise = import(ADMIN_RUNTIME_HREF)
+    .then(({ initializeNinouAdminRuntime }) => initializeNinouAdminRuntime({
+      isGlobalAppAdmin,
+      withButtonBusy,
+      getErrorMessage: getFirebaseErrorMessage,
+      createFamilyInvite,
+      refreshAdminStats,
+      createAdminClientFamily,
+      prepareFranciscoFamilyForMigration,
+      openAdminFamilyPreview,
+      returnToAdminPanel,
+      restoreFamilyDataFromBestSource,
+      scanLegacySourceByManualUid,
+      scanLegacySourceByManualEmail,
+      selectAdminFamily: async (familyId) => {
+        window.__ninouAdminFamilyDataOpen = false;
+        ensureGlobalAdminAccess(cloudUser, familyId);
+        if (loginHelper) loginHelper.textContent = "Família selecionada no painel. A rotina ainda não foi aberta.";
+        return refreshAdminStats();
+      },
+      scrollAdminSection,
+      fillAdminInviteEmail,
+      fillAdminMigrationEmail,
+      authorizeKnownUserAsCaregiver,
+      cancelFamilyInvite,
+      updateFamilyMemberRole,
+      removeFamilyMember,
+      appAdminFamilyId: APP_ADMIN_FAMILY_ID,
+      familyRoleViewer: FAMILY_ROLE_VIEWER,
+    }))
+    .catch((error) => {
+      document.body.dataset.adminRuntimeState = "error";
+      console.error("Ninou: não foi possível carregar o runtime administrativo.", error);
+      return null;
+    });
+  return adminRuntimePromise;
 }
 
 const navButtons = document.querySelectorAll(".bottom-nav button");
@@ -290,8 +335,6 @@ const adminAcceptedInvitesCount = document.querySelector("#adminAcceptedInvitesC
 const adminLastMigrationStatus = document.querySelector("#adminLastMigrationStatus");
 const adminStatsHint = document.querySelector("#adminStatsHint");
 const refreshAdminStatsButton = document.querySelector("#refreshAdminStatsButton");
-const adminModeToggleButton = document.querySelector("#adminModeToggleButton");
-const adminModeHint = document.querySelector("#adminModeHint");
 const adminClientsList = document.querySelector("#adminClientsList");
 const adminSelectedFamilyHint = document.querySelector("#adminSelectedFamilyHint");
 const adminCommercialDashboard = document.querySelector("#adminCommercialDashboard");
@@ -9251,7 +9294,10 @@ function updateBodyModeClasses() {
   const appAdmin = Boolean(isGlobalAppAdmin());
   const previewOpen = Boolean(window.__ninouAdminFamilyDataOpen);
   const familySurface = Boolean(isLoggedIn() && hasFamilyAccess() && (!appAdmin || previewOpen));
-  if (appAdmin) ensureAdminStylesheet();
+  if (appAdmin) {
+    ensureAdminStylesheet();
+    void ensureAdminRuntime();
+  }
   document.body.classList.toggle("global-admin-mode", appAdmin && !previewOpen);
   document.body.classList.toggle("admin-panel-only", appAdmin && !previewOpen);
   document.body.classList.toggle("admin-family-preview", appAdmin && previewOpen);
@@ -14666,204 +14712,6 @@ if (acceptInviteButton) {
     }), { restoreDisabled: false, afterFinish: renderAuthControls });
   });
 }
-if (createInviteButton) {
-  createInviteButton.addEventListener("click", () => {
-    withButtonBusy(createInviteButton, "Gerando...", () => createFamilyInvite().catch((error) => {
-      console.error("Erro ao gerar convite:", error);
-      if (inviteResult) {
-        inviteResult.hidden = false;
-        inviteResult.textContent = getFirebaseErrorMessage(error);
-      }
-    }));
-  });
-}
-if (refreshAdminStatsButton) {
-  refreshAdminStatsButton.addEventListener("click", () => refreshAdminStats());
-}
-if (adminCreateClientFamilyButton) {
-  adminCreateClientFamilyButton.addEventListener("click", () => {
-    withButtonBusy(adminCreateClientFamilyButton, "Criando...", () => createAdminClientFamily().catch((error) => {
-      console.error("Erro ao criar família/cliente:", error);
-      if (adminCreateFamilyResult) {
-        adminCreateFamilyResult.hidden = false;
-        adminCreateFamilyResult.textContent = getFirebaseErrorMessage(error);
-      }
-    }));
-  });
-}
-if (prepareFranciscoFamilyButton) {
-  prepareFranciscoFamilyButton.addEventListener("click", () => {
-    prepareFranciscoFamilyForMigration().catch((error) => {
-      console.error("Erro ao preparar família Francisco:", error);
-      if (franciscoMigrationResult) {
-        franciscoMigrationResult.hidden = false;
-        franciscoMigrationResult.textContent = getFirebaseErrorMessage(error);
-      }
-    });
-  });
-}
-if (adminOpenFamilyButton) {
-  adminOpenFamilyButton.addEventListener("click", () => {
-    openAdminFamilyPreview().catch((error) => {
-      console.error("Erro ao abrir família como admin:", error);
-      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
-    });
-  });
-}
-if (adminReturnToPanelButton) {
-  adminReturnToPanelButton.addEventListener("click", () => {
-    returnToAdminPanel().catch((error) => {
-      console.error("Erro ao voltar ao painel admin:", error);
-      if (loginHelper) loginHelper.textContent = getFirebaseErrorMessage(error);
-    });
-  });
-}
-if (restoreFamilyDataButton) {
-  restoreFamilyDataButton.addEventListener("click", () => {
-    restoreFamilyDataFromBestSource().catch((error) => {
-      console.error("Erro ao importar dados familiares:", error);
-      if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
-    });
-  });
-}
-if (scanLegacyUidButton) {
-  scanLegacyUidButton.addEventListener("click", () => {
-    scanLegacySourceByManualUid().catch((error) => {
-      console.error("Erro ao buscar UID legado:", error);
-      if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
-    });
-  });
-}
-if (scanLegacyEmailButton) {
-  scanLegacyEmailButton.addEventListener("click", () => {
-    scanLegacySourceByManualEmail().catch((error) => {
-      console.error("Erro ao buscar e-mail legado:", error);
-      if (adminMigrationStatus) adminMigrationStatus.textContent = getFirebaseErrorMessage(error);
-    });
-  });
-}
-if (adminInvitePanel) {
-  adminInvitePanel.addEventListener("click", async (event) => {
-    const copyButton = event.target.closest("[data-copy-invite]");
-    if (copyButton) {
-      const text = copyButton.dataset.copyInvite || "";
-      try {
-        await navigator.clipboard.writeText(text);
-        copyButton.textContent = text.startsWith("http") ? "Link copiado" : "Código copiado";
-      } catch {
-        copyButton.textContent = "Copie manualmente";
-      }
-      return;
-    }
-
-    const selectFamilyButton = event.target.closest("[data-select-admin-family]");
-    if (selectFamilyButton) {
-      const familyId = selectFamilyButton.dataset.selectAdminFamily || APP_ADMIN_FAMILY_ID;
-      window.__ninouAdminFamilyDataOpen = false;
-      ensureGlobalAdminAccess(cloudUser, familyId);
-      if (loginHelper) loginHelper.textContent = "Família selecionada no painel. A rotina ainda não foi aberta.";
-      await refreshAdminStats();
-      return;
-    }
-
-    const openFamilyButton = event.target.closest("[data-open-admin-family]");
-    if (openFamilyButton) {
-      const familyId = openFamilyButton.dataset.openAdminFamily || APP_ADMIN_FAMILY_ID;
-      openFamilyButton.disabled = true;
-      openFamilyButton.textContent = "Abrindo...";
-      await openAdminFamilyPreview(familyId);
-      return;
-    }
-
-    const scrollButton = event.target.closest("[data-admin-scroll]");
-    if (scrollButton) {
-      const target = scrollButton.dataset.adminScroll || "";
-      const map = { "create-family": "adminCreateFamilySection", clients: "adminFamilyMonitorSection", commercial: "adminCommercialDashboard", beta: "adminCommercialReadinessSection", members: "adminMembersSection", invite: "adminInviteSection", migration: "adminMigrationSection" };
-      scrollAdminSection(map[target] || target);
-      return;
-    }
-
-    if (event.target.closest("#familyHealthRefreshButton")) {
-      return;
-    }
-
-    if (event.target.closest("#familyHealthRepairButton")) {
-      const button = event.target.closest("#familyHealthRepairButton");
-      button.disabled = true;
-      button.textContent = "Corrigindo...";
-      await repairFamilyIntegrity();
-      button.textContent = "Corrigir vínculos";
-      button.disabled = !cloudUser || !hasFamilyAccess();
-      return;
-    }
-
-    if (event.target.closest("#familyBackupJsonButton")) {
-      exportFullFamilyBackup();
-      return;
-    }
-
-    const newFamilyResponsibleButton = event.target.closest("[data-fill-new-family-responsible]");
-    if (newFamilyResponsibleButton) {
-      if (adminNewResponsibleEmailInput) adminNewResponsibleEmailInput.value = newFamilyResponsibleButton.dataset.fillNewFamilyResponsible || "";
-      scrollAdminSection("adminCreateFamilySection");
-      adminNewFamilyNameInput?.focus();
-      return;
-    }
-
-    const inviteEmailButton = event.target.closest("[data-fill-invite-email]");
-    if (inviteEmailButton) {
-      fillAdminInviteEmail(inviteEmailButton.dataset.fillInviteEmail || "");
-      return;
-    }
-
-    const migrationEmailButton = event.target.closest("[data-fill-migration-email]");
-    if (migrationEmailButton) {
-      fillAdminMigrationEmail(migrationEmailButton.dataset.fillMigrationEmail || "");
-      return;
-    }
-
-    const linkKnownUserButton = event.target.closest("[data-link-known-user]");
-    if (linkKnownUserButton) {
-      linkKnownUserButton.disabled = true;
-      linkKnownUserButton.textContent = "Autorizando...";
-      await authorizeKnownUserAsCaregiver(
-        linkKnownUserButton.dataset.linkKnownUser || "",
-        linkKnownUserButton.dataset.linkKnownEmail || "",
-      );
-      return;
-    }
-
-    const cancelButton = event.target.closest("[data-cancel-invite]");
-    if (cancelButton) {
-      const code = cancelButton.dataset.cancelInvite || "";
-      cancelButton.disabled = true;
-      cancelButton.textContent = "Cancelando...";
-      await cancelFamilyInvite(code);
-      return;
-    }
-
-    const roleButton = event.target.closest("[data-update-member-role]");
-    if (roleButton) {
-      const uid = roleButton.dataset.updateMemberRole || "";
-      const select = adminInvitePanel.querySelector(`[data-member-role-select="${CSS.escape(uid)}"]`);
-      roleButton.disabled = true;
-      roleButton.textContent = "Salvando...";
-      await updateFamilyMemberRole(uid, select?.value || FAMILY_ROLE_VIEWER);
-      return;
-    }
-
-    const removeButton = event.target.closest("[data-remove-member]");
-    if (removeButton) {
-      const uid = removeButton.dataset.removeMember || "";
-      const email = removeButton.dataset.removeMemberEmail || "";
-      removeButton.disabled = true;
-      removeButton.textContent = "Removendo...";
-      await removeFamilyMember(uid, email);
-      return;
-    }
-  });
-}
-
 function withNinouTimeout(promise, timeoutMs = 12000) {
   return Promise.race([
     promise,
@@ -14987,30 +14835,6 @@ if (inviteResult) {
 }
 
 
-function setAdminInterfaceMode(isAdvanced, { persist = true } = {}) {
-  const advanced = Boolean(isAdvanced);
-  document.body.classList.toggle("ninou-advanced-mode", advanced);
-  document.body.classList.toggle("ninou-simple-mode", !advanced);
-  if (adminModeToggleButton) {
-    adminModeToggleButton.setAttribute("aria-pressed", advanced ? "true" : "false");
-    adminModeToggleButton.textContent = advanced ? "Usar modo simples" : "Mostrar modo avançado";
-  }
-  if (adminModeHint) {
-    adminModeHint.textContent = advanced
-      ? "Modo avançado ativo: diagnóstico técnico, histórico completo, backup JSON e manutenção ficam visíveis."
-      : "Modo simples ativo: o Ninou mostra só o essencial e mantém diagnóstico técnico recolhido.";
-  }
-  if (persist) localStorage.setItem("ninou_admin_interface_mode", advanced ? "advanced" : "simple");
-}
-
-function initAdminInterfaceMode() {
-  const savedMode = localStorage.getItem("ninou_admin_interface_mode");
-  setAdminInterfaceMode(savedMode === "advanced", { persist: false });
-  adminModeToggleButton?.addEventListener("click", () => {
-    setAdminInterfaceMode(!document.body.classList.contains("ninou-advanced-mode"));
-  });
-}
-
 function initSleepSounds() {
   initSleepSoundsPanel();
 }
@@ -15031,7 +14855,7 @@ syncBabyProfileForm();
 updateWakeWindow(wakeWindowMinutes, { skipLogin: true, skipPersist: true });
 preloadActionIcons();
 renderAuthControls();
-initAdminInterfaceMode();
+document.body.classList.add("ninou-simple-mode");
 showScreen(APP_LAUNCH_SCREEN);
 renderAll();
 updateDiaryChipsMoreButton();

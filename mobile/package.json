@@ -1,0 +1,53 @@
+{
+  "name": "ninou-mobile",
+  "main": "expo-router/entry",
+  "version": "1.0.0",
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~57.0.7",
+    "expo-asset": "~57.0.6",
+    "expo-audio": "~57.0.2",
+    "expo-constants": "~57.0.6",
+    "expo-dev-client": "~57.0.7",
+    "expo-file-system": "~57.0.1",
+    "expo-font": "~57.0.1",
+    "expo-haptics": "~57.0.1",
+    "expo-linear-gradient": "~57.0.1",
+    "expo-linking": "~57.0.3",
+    "expo-print": "~57.0.1",
+    "expo-router": "~57.0.7",
+    "expo-sharing": "~57.0.6",
+    "expo-splash-screen": "~57.0.4",
+    "expo-status-bar": "~57.0.1",
+    "firebase": "^12.16.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "~0.21.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.0",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "start:dev-client": "expo start --dev-client",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm run test:sync",
+    "test:sync": "node --experimental-strip-types tests/routine-sync.test.mjs",
+    "audit:production": "npm audit --omit=dev --audit-level=high",
+    "build:preview": "npx eas-cli build --profile preview --platform all",
+    "build:production": "npx eas-cli build --profile production --platform all"
+  },
+  "private": true
+}
