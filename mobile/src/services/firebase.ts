@@ -4,13 +4,13 @@ import {
   browserLocalPersistence,
   createUserWithEmailAndPassword,
   getAuth,
+  getReactNativePersistence,
   initializeAuth,
   onAuthStateChanged,
   setPersistence,
   signInWithEmailAndPassword,
   signOut,
   type Auth,
-  type Persistence,
   type User,
 } from 'firebase/auth';
 import {
@@ -28,6 +28,7 @@ import {
 } from 'firebase/firestore';
 import { Platform } from 'react-native';
 
+import { canManageFamily, normalizeInviteRole } from '@/domain/family-access';
 import { mergeDayStates, normalizeDayState, type DayState } from '@/domain/routine';
 
 const firebaseConfig = {
@@ -49,19 +50,9 @@ function initializeNinouAuth(): Auth {
   }
 
   try {
-    const reactNativePersistence = {
-      type: 'LOCAL',
-      _isAvailable: async () => true,
-      _set: async (key: string, value: unknown) => AsyncStorage.setItem(key, JSON.stringify(value)),
-      _get: async (key: string) => {
-        const value = await AsyncStorage.getItem(key);
-        return value ? JSON.parse(value) : null;
-      },
-      _remove: async (key: string) => AsyncStorage.removeItem(key),
-      _addListener: () => undefined,
-      _removeListener: () => undefined,
-    } as unknown as Persistence;
-    return initializeAuth(app, { persistence: reactNativePersistence });
+    return initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
   } catch (error) {
     if ((error as { code?: string })?.code !== 'auth/already-initialized') throw error;
     return getAuth(app);
@@ -154,14 +145,15 @@ function makeInviteCode() {
 export async function createCaregiverInvite(user: User, access: FamilyAccess, emailValue: string, role = 'caregiver') {
   const email = emailValue.trim().toLowerCase();
   if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
-  if (!['owner', 'admin', 'global_admin'].includes(access.role)) throw new Error('Seu acesso não permite criar convites.');
+  if (!canManageFamily(access.role)) throw new Error('Seu acesso não permite criar convites.');
+  const inviteRole = normalizeInviteRole(role);
   const code = makeInviteCode();
   const expiresAtClient = Date.now() + 7 * 86400000;
-  const payload = { code, familyId: access.familyId, email, role, status: 'pending', maxUses: 1, useCount: 0, expiresAtClient, createdByUid: user.uid, createdByEmail: user.email || '', source: 'mobile_profile', createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const payload = { code, familyId: access.familyId, email, role: inviteRole, status: 'pending', maxUses: 1, useCount: 0, expiresAtClient, createdByUid: user.uid, createdByEmail: user.email || '', source: 'mobile_profile', createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   await setDoc(doc(db, 'families', access.familyId, 'invites', code), payload, { merge: true });
   await setDoc(doc(db, 'families', access.familyId, 'invitations', code), payload, { merge: true });
   await setDoc(doc(db, 'invites', code), payload, { merge: true });
-  return { code, email, role, expiresAtClient };
+  return { code, email, role: inviteRole, expiresAtClient };
 }
 
 export async function acceptCaregiverInvite(user: User, codeValue: string) {
@@ -206,24 +198,98 @@ export async function loadRoutineDays(familyId: string) {
   }));
 }
 
-export async function saveLegalConsent(user: User, familyId: string | undefined, payload: { termsVersion: string; privacyVersion: string; medicalDisclaimerVersion: string }) {
-  const data = { ...payload, accepted: true, acceptedAt: serverTimestamp(), acceptedAtClient: Date.now(), email: user.email || '', uid: user.uid };
+export async function loadLegalConsent(user: User) {
+  const snapshot = await getDoc(doc(db, 'users', user.uid, 'account', 'legal'));
+  return snapshot.exists() ? snapshot.data() : null;
+}
+
+export async function loadAccountCaregiverProfile(user: User, familyId?: string) {
+  const accountSnapshot = await getDoc(doc(db, 'users', user.uid, 'account', 'profile'));
+  const account = accountSnapshot.exists() ? accountSnapshot.data() : {};
+  let member: Record<string, unknown> = {};
+  if (familyId) {
+    try {
+      const memberSnapshot = await getDoc(doc(db, 'families', familyId, 'members', user.uid));
+      if (memberSnapshot.exists()) member = memberSnapshot.data();
+    } catch {
+      // O perfil individual continua disponível mesmo durante uma falha no vínculo familiar.
+    }
+  }
+  return {
+    caregiverName: String(account.caregiverName || account.name || account.displayName || member.name || member.displayName || '').trim(),
+    caregiverRelation: String(account.caregiverRelation || account.relation || account.relationship || member.relation || member.relationship || '').trim(),
+  };
+}
+
+export async function saveAccountCaregiverProfile(user: User, familyId: string | undefined, input: { caregiverName: string; caregiverRelation: string }) {
+  const caregiverName = input.caregiverName.trim().slice(0, 80);
+  const caregiverRelation = input.caregiverRelation.trim().slice(0, 80);
+  await setDoc(doc(db, 'users', user.uid, 'account', 'profile'), {
+    caregiverName,
+    caregiverRelation,
+    name: caregiverName,
+    relation: caregiverRelation,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+  if (familyId) {
+    try {
+      await setDoc(doc(db, 'families', familyId, 'members', user.uid), {
+        name: caregiverName,
+        displayName: caregiverName,
+        relation: caregiverRelation,
+        relationship: caregiverRelation,
+        lastSeenAt: serverTimestamp(),
+      }, { merge: true });
+    } catch {
+      // A conta continua salva; o membro será atualizado quando o vínculo permitir.
+    }
+  }
+}
+
+export async function saveLegalConsent(user: User, familyId: string | undefined, payload: { termsVersion: string; privacyVersion: string; medicalDisclaimerVersion: string; acceptedAtClient?: number }) {
+  const data = {
+    ...payload,
+    type: 'terms_acceptance',
+    legalVersion: payload.termsVersion,
+    privacyPolicyVersion: payload.privacyVersion,
+    medicalDisclaimerAccepted: true,
+    accepted: true,
+    acceptedAt: serverTimestamp(),
+    acceptedAtClient: payload.acceptedAtClient || Date.now(),
+    email: user.email || '',
+    uid: user.uid,
+  };
   await setDoc(doc(db, 'users', user.uid, 'account', 'legal'), data, { merge: true });
-  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `consent_${user.uid}`), data, { merge: true });
-  return data;
+  let familySynced = false;
+  if (familyId) {
+    try {
+      await setDoc(doc(db, 'families', familyId, 'legal', `consent_${user.uid}`), {
+        ...data,
+        familyId,
+        actorUid: user.uid,
+        actorEmail: user.email || '',
+        status: 'accepted',
+      }, { merge: true });
+      familySynced = true;
+    } catch {
+      familySynced = false;
+    }
+  }
+  return { ...data, familySynced };
 }
 
 export async function submitSupportRequest(user: User, familyId: string | undefined, input: { category: string; message: string; diagnostics?: string }) {
   const stamp = Date.now();
   const payload = { ...input, uid: user.uid, email: user.email || '', familyId: familyId || '', status: 'open', createdAtClient: stamp, createdAt: serverTimestamp() };
   await setDoc(doc(db, 'users', user.uid, 'account', 'supportLastRequest'), payload, { merge: true });
-  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `support_${user.uid}_${stamp}`), payload, { merge: true });
+  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `support_${user.uid}_${stamp}`), { ...payload, type: 'support_request', actorUid: user.uid, actorEmail: user.email || '' }, { merge: true });
 }
 
 export async function requestAccountDeletion(user: User, familyId?: string) {
-  const payload = { uid: user.uid, email: user.email || '', familyId: familyId || '', status: 'requested', requestedAtClient: Date.now(), requestedAt: serverTimestamp() };
+  const stamp = Date.now();
+  const payload = { uid: user.uid, email: user.email || '', familyId: familyId || '', status: 'requested', requestedAtClient: stamp, requestedAt: serverTimestamp() };
   await setDoc(doc(db, 'users', user.uid, 'account', 'dataDeletionRequest'), payload, { merge: true });
-  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `data_request_${user.uid}`), payload, { merge: true });
+  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `data_request_${user.uid}_${stamp}`), { ...payload, type: 'data_deletion_request', actorUid: user.uid, actorEmail: user.email || '' }, { merge: true });
 }
 
 export function getLocalDateId(now = Date.now()) {

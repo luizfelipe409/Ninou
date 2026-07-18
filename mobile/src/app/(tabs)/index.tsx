@@ -1,8 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionArt } from '@/components/action-art';
@@ -11,21 +10,17 @@ import { RoutineOrbit } from '@/components/routine-orbit';
 import { NinouAppHeader } from '@/components/ninou-app-header';
 import { NinouBackground } from '@/components/ninou-background';
 import { formatDuration, formatTime, getPrimaryAction, getTodaySummary, recordConfig, type RecordType } from '@/domain/routine';
+import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
-import { useFamilyPreferences } from '@/state/preferences-context';
 
 const quickTypes: RecordType[] = ['amamentacao', 'fralda', 'mamadeira', 'medicamento'];
 
 export default function TodayScreen() {
   const { colors, isDark } = useNinouTheme();
-  const { state, now, beginRoutine, runPrimaryAction, undoLastAction } = useRoutine();
+  const { state, now, canUndo, beginRoutine, runPrimaryAction, undoLastAction } = useRoutine();
   const { profile } = useBabyProfile();
-  const { preferences, updatePreferences } = useFamilyPreferences();
-  const [caregiverOpen, setCaregiverOpen] = useState(false);
-  const [caregiverName, setCaregiverName] = useState(preferences.caregiverName);
-  const [caregiverRelation, setCaregiverRelation] = useState(preferences.caregiverRelation);
   const primaryAction = getPrimaryAction(state, now);
   const summary = getTodaySummary(state, now);
   const latest = [...state.events].sort((a, b) => b.start - a.start)[0];
@@ -33,6 +28,12 @@ export default function TodayScreen() {
   const openRecord = (type?: RecordType) => {
     void Haptics.selectionAsync();
     router.push(type ? { pathname: '/registrar', params: { type } } : '/registrar');
+  };
+
+  const editLatest = () => {
+    if (!latest) return;
+    void Haptics.selectionAsync();
+    router.push({ pathname: '/diario', params: { dayId: getLocalDateId(latest.start), editEventId: latest.id, editRequest: String(Date.now()) } });
   };
 
   const getLast = (types: RecordType[]) => [...state.events].reverse().find((event) => types.includes(event.type));
@@ -52,12 +53,6 @@ export default function TodayScreen() {
           <Text style={[styles.toplineText, { color: colors.textMuted }]} numberOfLines={1}>{getBabyAgeText(profile.birthDate)}</Text>
           <Pressable onPress={() => router.push('/perfil')} style={[styles.profileButton, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.profileButtonText, { color: colors.text }]}>Perfil</Text></Pressable>
         </View>
-
-        <NinouCard style={styles.caregiverCard}>
-          <View style={[styles.caregiverAvatar, { backgroundColor: colors.primarySoft }]}><Text style={[styles.caregiverInitial, { color: colors.primary }]}>{(preferences.caregiverName || 'F').charAt(0).toUpperCase()}</Text></View>
-          <View style={styles.caregiverCopy}><Text style={[styles.caregiverKicker, { color: colors.textMuted }]}>CUIDANDO AGORA</Text><Text style={[styles.caregiverName, { color: colors.text }]}>{preferences.caregiverName || 'Identifique este aparelho'}</Text><Text style={[styles.caregiverRelation, { color: colors.textMuted }]}>{preferences.caregiverName ? preferences.caregiverRelation : 'Os registros mostrarão quem cuidou do bebê.'}</Text></View>
-          <Pressable onPress={() => { setCaregiverName(preferences.caregiverName); setCaregiverRelation(preferences.caregiverRelation); setCaregiverOpen(true); }} style={[styles.changeCaregiver, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.changeText, { color: colors.primary }]}>Trocar</Text></Pressable>
-        </NinouCard>
 
         <RoutineOrbit state={state} now={now} />
 
@@ -87,7 +82,7 @@ export default function TodayScreen() {
           </Pressable>
         ) : null}
 
-        {latest ? <View style={[styles.lastAction, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.lastActionCopy}><Text style={[styles.lastKicker, { color: colors.textMuted }]}>ÚLTIMA AÇÃO</Text><Text style={[styles.lastTitle, { color: colors.text }]}>{recordConfig[latest.type].title} · {formatTime(latest.start)}</Text></View><Pressable onPress={() => router.push('/diario')} style={styles.lastButton}><Text style={[styles.lastButtonText, { color: colors.primary }]}>Corrigir</Text></Pressable><Pressable onPress={undoLastAction} style={styles.lastButton}><Text style={[styles.lastButtonText, { color: colors.danger }]}>Desfazer</Text></Pressable></View> : null}
+        {latest ? <View style={[styles.lastAction, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.lastActionCopy}><Text style={[styles.lastKicker, { color: colors.textMuted }]}>ÚLTIMA AÇÃO</Text><Text style={[styles.lastTitle, { color: colors.text }]}>{recordConfig[latest.type].title} · {formatTime(latest.start)}</Text></View><Pressable onPress={editLatest} style={styles.lastButton}><Text style={[styles.lastButtonText, { color: colors.primary }]}>Editar</Text></Pressable><Pressable disabled={!canUndo} onPress={() => { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); undoLastAction(); }} style={[styles.lastButton, !canUndo && styles.lastButtonDisabled]}><Text style={[styles.lastButtonText, { color: colors.danger }]}>Desfazer</Text></Pressable></View> : null}
 
         <NinouCard>
           <View style={styles.cardHead}>
@@ -131,8 +126,8 @@ export default function TodayScreen() {
         <View style={styles.quickGrid}>
           {quickTypes.map((type) => (
             <Pressable key={type} onPress={() => openRecord(type)} style={({ pressed }) => [styles.quickCard, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.pressed]}>
-              <ActionArt type={type} size={68} />
-              <View style={styles.quickCopy}><Text style={[styles.quickTitle, { color: colors.text }]}>{recordConfig[type].title}</Text><Text style={[styles.quickHint, { color: colors.textMuted }]}>{recordConfig[type].hint}</Text></View>
+              <ActionArt type={type} size={54} />
+              <View style={styles.quickCopy}><Text adjustsFontSizeToFit minimumFontScale={0.82} numberOfLines={1} style={[styles.quickTitle, { color: colors.text }]}>{recordConfig[type].title}</Text><Text numberOfLines={2} style={[styles.quickHint, { color: colors.textMuted }]}>{recordConfig[type].hint}</Text></View>
             </Pressable>
           ))}
         </View>
@@ -154,7 +149,6 @@ export default function TodayScreen() {
         </View>
       </ScrollView>
 
-      <Modal visible={caregiverOpen} transparent animationType="slide" onRequestClose={() => setCaregiverOpen(false)}><View style={styles.modalBackdrop}><View style={[styles.caregiverModal, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.modalHandle, { backgroundColor: colors.border }]} /><Text style={[styles.modalKicker, { color: colors.primary }]}>CUIDADOR DESTE APARELHO</Text><Text style={[styles.modalTitle, { color: colors.text }]}>Quem está cuidando agora?</Text><Text style={[styles.modalText, { color: colors.textMuted }]}>Essa identificação fica neste aparelho e acompanha os próximos registros.</Text><Text style={[styles.modalLabel, { color: colors.text }]}>Nome</Text><TextInput value={caregiverName} onChangeText={setCaregiverName} placeholder="Ex.: Felipe" placeholderTextColor={colors.textMuted} style={[styles.modalInput, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.modalLabel, { color: colors.text }]}>Relação com o bebê</Text><TextInput value={caregiverRelation} onChangeText={setCaregiverRelation} placeholder="Pai, mãe, avó, babá…" placeholderTextColor={colors.textMuted} style={[styles.modalInput, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><View style={styles.modalActions}><Pressable onPress={() => setCaregiverOpen(false)} style={[styles.modalCancel, { borderColor: colors.border }]}><Text style={[styles.modalCancelText, { color: colors.text }]}>Cancelar</Text></Pressable><Pressable disabled={!caregiverName.trim()} onPress={() => { updatePreferences({ caregiverName: caregiverName.trim(), caregiverRelation: caregiverRelation.trim() || 'Responsável' }); setCaregiverOpen(false); }} style={[styles.modalSave, { backgroundColor: colors.primary }, !caregiverName.trim() && styles.disabled]}><Text style={styles.modalSaveText}>Salvar identificação</Text></Pressable></View></View></View></Modal>
     </SafeAreaView>
   );
 
@@ -174,7 +168,6 @@ const styles = StyleSheet.create({
   toplineText: { flex: 1, fontSize: 12, fontWeight: '800', letterSpacing: 0.45, textTransform: 'uppercase' },
   profileButton: { minHeight: 42, borderRadius: 15, paddingHorizontal: spacing.lg, alignItems: 'center', justifyContent: 'center' },
   profileButtonText: { fontSize: 13, fontWeight: '900' },
-  caregiverCard: { minHeight: 78, padding: 11, flexDirection: 'row', alignItems: 'center', gap: 10 }, caregiverAvatar: { width: 48, height: 48, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, caregiverInitial: { fontSize: 20, fontWeight: '900' }, caregiverCopy: { flex: 1 }, caregiverKicker: { fontSize: 8.5, fontWeight: '900', letterSpacing: 1 }, caregiverName: { marginTop: 2, fontSize: 14, fontWeight: '900' }, caregiverRelation: { marginTop: 2, fontSize: 9.5, lineHeight: 13 }, changeCaregiver: { minHeight: 38, borderRadius: 13, paddingHorizontal: 11, alignItems: 'center', justifyContent: 'center' }, changeText: { fontSize: 11, fontWeight: '900' },
   link: { fontSize: 13, fontWeight: '800' },
   startChoice: { gap: spacing.md },
   startButton: { minHeight: 78, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', padding: spacing.md, gap: spacing.md },
@@ -182,7 +175,7 @@ const styles = StyleSheet.create({
   primaryAction: { minHeight: 76, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: spacing.xl, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.md, overflow: 'hidden' },
   primaryTitle: { fontSize: 16, fontWeight: '900' },
   pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
-  lastAction: { minHeight: 66, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 8 }, lastActionCopy: { flex: 1 }, lastKicker: { fontSize: 8, fontWeight: '900', letterSpacing: 1 }, lastTitle: { marginTop: 3, fontSize: 12, fontWeight: '900' }, lastButton: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 5 }, lastButtonText: { fontSize: 10.5, fontWeight: '900' },
+  lastAction: { minHeight: 66, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 8 }, lastActionCopy: { flex: 1 }, lastKicker: { fontSize: 8, fontWeight: '900', letterSpacing: 1 }, lastTitle: { marginTop: 3, fontSize: 12, fontWeight: '900' }, lastButton: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 5 }, lastButtonDisabled: { opacity: 0.35 }, lastButtonText: { fontSize: 10.5, fontWeight: '900' },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md },
   cardKicker: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.6 },
   cardTitle: { fontSize: 18, fontWeight: '900', marginTop: 2 },
@@ -196,16 +189,15 @@ const styles = StyleSheet.create({
   insightTitle: { fontSize: 17, fontWeight: '900', marginTop: spacing.xs },
   insightText: { fontSize: 13, lineHeight: 19, marginTop: spacing.xs },
   sectionTitle: { fontSize: 19, fontWeight: '900' },
-  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  quickCard: { width: '47%', flexGrow: 1, minHeight: 126, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  quickCard: { width: '47%', flexGrow: 1, minHeight: 100, borderRadius: 22, borderWidth: StyleSheet.hairlineWidth, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 7 },
   quickCopy: { flex: 1, gap: 3 },
-  quickTitle: { fontSize: 14, fontWeight: '900' },
-  quickHint: { fontSize: 11, lineHeight: 15 },
+  quickTitle: { width: '100%', fontSize: 12.5, lineHeight: 15, fontWeight: '900' },
+  quickHint: { fontSize: 10, lineHeight: 13 },
   miniRing: { width: 54, height: 54, borderRadius: 27, borderWidth: 5, alignItems: 'center', justifyContent: 'center' },
   miniRingText: { fontSize: 14, fontWeight: '900' },
   summaryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   summaryItem: { width: '31%', flexGrow: 1, minHeight: 78, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md, gap: spacing.xs },
   summaryLabel: { fontSize: 11, fontWeight: '700' },
   summaryValue: { fontSize: 17, fontWeight: '900' },
-  modalBackdrop: { flex: 1, backgroundColor: 'rgba(6,3,13,0.58)', justifyContent: 'flex-end' }, caregiverModal: { width: '100%', maxWidth: 540, alignSelf: 'center', borderTopLeftRadius: 30, borderTopRightRadius: 30, borderWidth: StyleSheet.hairlineWidth, padding: 20, paddingBottom: 30 }, modalHandle: { width: 44, height: 5, borderRadius: 3, alignSelf: 'center', marginBottom: 18 }, modalKicker: { fontSize: 9.5, fontWeight: '900', letterSpacing: 1.2 }, modalTitle: { marginTop: 6, fontSize: 25, fontWeight: '900' }, modalText: { marginTop: 7, fontSize: 12, lineHeight: 18 }, modalLabel: { marginTop: 15, marginBottom: 7, fontSize: 11.5, fontWeight: '900' }, modalInput: { minHeight: 50, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, fontSize: 14 }, modalActions: { flexDirection: 'row', gap: 9, marginTop: 20 }, modalCancel: { flex: 1, minHeight: 52, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' }, modalCancelText: { fontSize: 12.5, fontWeight: '900' }, modalSave: { flex: 1.5, minHeight: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, modalSaveText: { color: '#FFF', fontSize: 12.5, fontWeight: '900' }, disabled: { opacity: 0.45 },
 });

@@ -1,4 +1,11 @@
 export type RoutineMode = 'idle' | 'awake' | 'sleeping';
+export type RoutineActor = {
+  uid: string;
+  email: string;
+  name: string;
+  relationship: string;
+  label: string;
+};
 export type RecordType =
   | 'acordou'
   | 'sono'
@@ -18,6 +25,20 @@ export type RoutineEvent = {
   notes: string;
   amountMl?: number;
   createdAtClient: number;
+  createdByUid?: string;
+  createdByEmail?: string;
+  createdByName?: string;
+  createdByRelationship?: string;
+  createdByLabel?: string;
+  updatedByUid?: string;
+  updatedByEmail?: string;
+  updatedByName?: string;
+  updatedByRelationship?: string;
+  updatedByLabel?: string;
+  caregiverName?: string;
+  caregiverRole?: string;
+  caregiverRelationship?: string;
+  caregiverLabel?: string;
 };
 
 export type DayNoteEpisode = {
@@ -34,6 +55,7 @@ export type DayState = {
   activeType: RecordType;
   activeDetail: string;
   activeNotes: string;
+  activeActor: RoutineActor | null;
   lastWakeWindowStartedAt: number | null;
   lastWakeWindowMs: number | null;
   routineStateUpdatedAt: number;
@@ -64,6 +86,7 @@ export function createEmptyDayState(): DayState {
     activeType: 'sono',
     activeDetail: '',
     activeNotes: '',
+    activeActor: null,
     lastWakeWindowStartedAt: null,
     lastWakeWindowMs: null,
     routineStateUpdatedAt: 0,
@@ -77,7 +100,53 @@ export function createEmptyDayState(): DayState {
   };
 }
 
-export function makeEvent(type: RecordType, start: number, end = start, detail = '', notes = '', amountMl?: number): RoutineEvent {
+function cleanText(value: unknown, maxLength = 120) {
+  return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
+}
+
+function normalizeRoutineActor(value: unknown): RoutineActor | null {
+  if (!value || typeof value !== 'object') return null;
+  const actor = value as Partial<RoutineActor>;
+  const name = cleanText(actor.name, 80);
+  const relationship = cleanText(actor.relationship, 80);
+  const email = cleanText(actor.email, 160);
+  const label = cleanText(actor.label, 160) || [name, relationship].filter(Boolean).join(' · ') || email;
+  if (!label) return null;
+  return { uid: cleanText(actor.uid, 128), email, name, relationship, label };
+}
+
+function createdByFields(actor?: RoutineActor | null) {
+  const normalized = normalizeRoutineActor(actor);
+  return normalized ? {
+    createdByUid: normalized.uid,
+    createdByEmail: normalized.email,
+    createdByName: normalized.name,
+    createdByRelationship: normalized.relationship,
+    createdByLabel: normalized.label,
+  } : {};
+}
+
+function updatedByFields(actor?: RoutineActor | null) {
+  const normalized = normalizeRoutineActor(actor);
+  return normalized ? {
+    updatedByUid: normalized.uid,
+    updatedByEmail: normalized.email,
+    updatedByName: normalized.name,
+    updatedByRelationship: normalized.relationship,
+    updatedByLabel: normalized.label,
+  } : {};
+}
+
+export function formatRoutineActorLabel(event: RoutineEvent) {
+  return cleanText(event.createdByLabel, 160)
+    || [cleanText(event.createdByName, 80), cleanText(event.createdByRelationship, 80)].filter(Boolean).join(' · ')
+    || cleanText(event.caregiverLabel, 160)
+    || [cleanText(event.caregiverName, 80), cleanText(event.caregiverRelationship || event.caregiverRole, 80)].filter(Boolean).join(' · ')
+    || cleanText(event.createdByEmail, 160)
+    || 'Responsável';
+}
+
+export function makeEvent(type: RecordType, start: number, end = start, detail = '', notes = '', amountMl?: number, actor?: RoutineActor | null): RoutineEvent {
   return {
     id: `${type}-${Math.round(start)}-${Math.random().toString(36).slice(2, 8)}`,
     type,
@@ -86,6 +155,7 @@ export function makeEvent(type: RecordType, start: number, end = start, detail =
     detail,
     notes,
     ...(Number.isFinite(amountMl) ? { amountMl } : {}),
+    ...createdByFields(actor),
     createdAtClient: Date.now(),
   };
 }
@@ -101,6 +171,7 @@ export function normalizeDayState(value: Partial<DayState> | null | undefined): 
     mode,
     activeStartedAt: mode !== 'idle' && Number.isFinite(start) ? start : null,
     activeType: value.activeType && recordConfig[value.activeType] ? value.activeType : 'sono',
+    activeActor: normalizeRoutineActor(value.activeActor),
     events: Array.isArray(value.events)
       ? value.events.map(normalizeRoutineEvent).filter((event): event is RoutineEvent => Boolean(event))
       : [],
@@ -153,6 +224,14 @@ function normalizeRoutineEvent(event: Partial<RoutineEvent> | null | undefined):
     detail,
     notes: typeof event.notes === 'string' ? event.notes : '',
     ...(Number.isFinite(amountMl) ? { amountMl } : {}),
+    ...Object.fromEntries([
+      'createdByUid', 'createdByEmail', 'createdByName', 'createdByRelationship', 'createdByLabel',
+      'updatedByUid', 'updatedByEmail', 'updatedByName', 'updatedByRelationship', 'updatedByLabel',
+      'caregiverName', 'caregiverRole', 'caregiverRelationship', 'caregiverLabel',
+    ].flatMap((key) => {
+      const value = cleanText(event[key as keyof RoutineEvent], key.toLowerCase().includes('email') ? 160 : 120);
+      return value ? [[key, value]] : [];
+    })),
     createdAtClient: Number.isFinite(Number(event.createdAtClient)) ? Number(event.createdAtClient) : start as number,
   };
 }
@@ -188,6 +267,7 @@ export function mergeDayStates(localValue: Partial<DayState>, cloudValue: Partia
     activeType: latestLive.activeType,
     activeDetail: latestLive.activeDetail,
     activeNotes: latestLive.activeNotes,
+    activeActor: latestLive.activeActor,
     lastWakeWindowStartedAt: latestLive.lastWakeWindowStartedAt,
     lastWakeWindowMs: latestLive.lastWakeWindowMs,
     routineStateUpdatedAt: latestLive.routineStateUpdatedAt,
@@ -209,7 +289,7 @@ function stamp(state: DayState, now: number, action: string): DayState {
   };
 }
 
-export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>, now = Date.now()): DayState {
+export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>, now = Date.now(), actor?: RoutineActor | null): DayState {
   return stamp({
     ...state,
     mode,
@@ -217,13 +297,14 @@ export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>
     activeType: mode === 'sleeping' ? 'sono' : 'acordou',
     activeDetail: mode === 'sleeping' ? 'Timer' : '',
     activeNotes: '',
+    activeActor: normalizeRoutineActor(actor),
     events: mode === 'awake'
-      ? [...state.events, makeEvent('acordou', now, now, 'Rotina iniciada agora')]
+      ? [...state.events, makeEvent('acordou', now, now, 'Rotina iniciada agora', '', undefined, actor)]
       : state.events,
   }, now, `start-${mode}`);
 }
 
-export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.now()): DayState {
+export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.now(), actor?: RoutineActor | null): DayState {
   const awakeStart = state.mode === 'awake' ? state.activeStartedAt : null;
   return stamp({
     ...state,
@@ -232,12 +313,13 @@ export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.
     activeType: type,
     activeDetail: type === 'dormir' ? 'Sono noturno' : 'Timer',
     activeNotes: '',
+    activeActor: normalizeRoutineActor(actor),
     lastWakeWindowStartedAt: awakeStart,
     lastWakeWindowMs: awakeStart ? Math.max(0, now - awakeStart) : null,
   }, now, `start-${type}`);
 }
 
-export function finishSleep(state: DayState, now = Date.now()): DayState {
+export function finishSleep(state: DayState, now = Date.now(), actor?: RoutineActor | null): DayState {
   if (state.mode !== 'sleeping' || !state.activeStartedAt) return state;
   const isNight = state.activeType === 'dormir' || isNightPeriod(now);
   const wakeType: RecordType = isNight ? 'despertar-noturno' : 'acordou';
@@ -248,25 +330,26 @@ export function finishSleep(state: DayState, now = Date.now()): DayState {
     activeType: wakeType,
     activeDetail: '',
     activeNotes: '',
+    activeActor: normalizeRoutineActor(actor),
     events: [
       ...state.events,
-      makeEvent(state.activeType === 'dormir' ? 'dormir' : 'sono', state.activeStartedAt, now, state.activeDetail || 'Timer', state.activeNotes),
-      makeEvent(wakeType, now, now, isNight ? 'Despertar noturno' : 'Após soneca'),
+      makeEvent(state.activeType === 'dormir' ? 'dormir' : 'sono', state.activeStartedAt, now, state.activeDetail || 'Timer', state.activeNotes, undefined, state.activeActor || actor),
+      makeEvent(wakeType, now, now, isNight ? 'Despertar noturno' : 'Após soneca', '', undefined, actor),
     ],
   }, now, `finish-${state.activeType}`);
 }
 
-export function addRoutineRecord(state: DayState, input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }, now = Date.now()): DayState {
+export function addRoutineRecord(state: DayState, input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }, now = Date.now(), actor?: RoutineActor | null): DayState {
   const { type, detail = '', notes = '', amountMl } = input;
   const customStart = Number(input.start);
   const customEnd = Number(input.end);
   if (Number.isFinite(customStart)) {
     const end = Number.isFinite(customEnd) ? Math.max(customStart, customEnd) : customStart;
-    return stamp({ ...state, events: [...state.events, makeEvent(type, customStart, end, detail, notes, amountMl)] }, now, `record-${type}`);
+    return stamp({ ...state, events: [...state.events, makeEvent(type, customStart, end, detail, notes, amountMl, actor)] }, now, `record-${type}`);
   }
-  if (type === 'sono' || type === 'dormir') return startSleep(state, type, now);
+  if (type === 'sono' || type === 'dormir') return startSleep(state, type, now, actor);
   if (type === 'acordou' || type === 'despertar-noturno') {
-    if (state.mode === 'sleeping') return finishSleep(state, now);
+    if (state.mode === 'sleeping') return finishSleep(state, now, actor);
     const base = state;
     return stamp({
       ...base,
@@ -275,19 +358,20 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
       activeType: type,
       activeDetail: '',
       activeNotes: '',
-      events: [...base.events, makeEvent(type, now, now, detail, notes)],
+      activeActor: normalizeRoutineActor(actor),
+      events: [...base.events, makeEvent(type, now, now, detail, notes, undefined, actor)],
     }, now, `record-${type}`);
   }
   const durableDetail = type === 'mamadeira' && Number.isFinite(amountMl)
     ? [detail, `${amountMl} ml`].filter(Boolean).join(' • ')
     : detail;
-  return stamp({ ...state, events: [...state.events, makeEvent(type, now, now, durableDetail, notes, amountMl)] }, now, `record-${type}`);
+  return stamp({ ...state, events: [...state.events, makeEvent(type, now, now, durableDetail, notes, amountMl, actor)] }, now, `record-${type}`);
 }
 
-export function updateRoutineEvent(state: DayState, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>, now = Date.now()) {
+export function updateRoutineEvent(state: DayState, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>, now = Date.now(), actor?: RoutineActor | null) {
   return stamp({
     ...state,
-    events: state.events.map((event) => event.id === eventId ? normalizeRoutineEvent({ ...event, ...patch }) || event : event),
+    events: state.events.map((event) => event.id === eventId ? normalizeRoutineEvent({ ...event, ...patch, ...updatedByFields(actor) }) || event : event),
   }, now, 'edit-event');
 }
 
@@ -319,6 +403,21 @@ export function clearRoutineDay(state: DayState, now = Date.now()) {
     deletedNoteEpisodeIds: [...new Set([...state.deletedNoteEpisodeIds, ...state.noteEpisodes.map((episode) => episode.id)])],
     dayNotesUpdatedAt: now,
   }, now, 'clear-day');
+}
+
+export function restoreRoutineSnapshot(currentValue: DayState, previousValue: DayState, now = Date.now()) {
+  const current = normalizeDayState(currentValue);
+  const previous = normalizeDayState(previousValue);
+  const previousEventIds = new Set(previous.events.map((event) => event.id));
+  const previousEpisodeIds = new Set(previous.noteEpisodes.map((episode) => episode.id));
+  const eventsRemovedByUndo = current.events.filter((event) => !previousEventIds.has(event.id)).map((event) => event.id);
+  const episodesRemovedByUndo = current.noteEpisodes.filter((episode) => !previousEpisodeIds.has(episode.id)).map((episode) => episode.id);
+  return stamp({
+    ...previous,
+    routineStateUpdatedAt: current.routineStateUpdatedAt,
+    deletedEventIds: [...new Set([...current.deletedEventIds, ...previous.deletedEventIds, ...eventsRemovedByUndo])].filter((id) => !previousEventIds.has(id)),
+    deletedNoteEpisodeIds: [...new Set([...current.deletedNoteEpisodeIds, ...previous.deletedNoteEpisodeIds, ...episodesRemovedByUndo])].filter((id) => !previousEpisodeIds.has(id)),
+  }, now, 'undo');
 }
 
 export function isNightPeriod(now = Date.now()) {
@@ -369,4 +468,9 @@ export function formatDuration(ms: number, includeSeconds = false) {
 
 export function formatTime(timestamp: number) {
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(timestamp);
+}
+
+export function getRoutineEventOrbitTimestamp(event: RoutineEvent) {
+  const isSleepDuration = event.type === 'sono' || event.type === 'dormir';
+  return isSleepDuration && event.end > event.start ? event.end : event.start;
 }

@@ -7,6 +7,7 @@ import { Alert, Modal, Pressable, ScrollView, Share, StyleSheet, Text, TextInput
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
 import { AvatarArt } from '@/components/avatar-art';
 import { avatarIds, avatarLabels, type AvatarId } from '@/domain/avatar';
+import { canEditFamilyProfile, canExportFamilyReports, canManageFamily as roleCanManageFamily } from '@/domain/family-access';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
 import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
@@ -28,7 +29,7 @@ export default function ProfileScreen() {
   const [weightValue, setWeightValue] = useState('');
   const [weightDate, setWeightDate] = useState(new Date().toISOString().slice(0, 10));
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('caregiver');
+  const [inviteRole, setInviteRole] = useState('cuidador');
   const [inviteCode, setInviteCode] = useState('');
   const [inviteFeedback, setInviteFeedback] = useState('');
   const [members, setMembers] = useState<FamilyMember[]>([]);
@@ -37,8 +38,12 @@ export default function ProfileScreen() {
   const [supportMessage, setSupportMessage] = useState('');
   const [legalDocument, setLegalDocument] = useState<'terms' | 'privacy' | 'medical' | null>(null);
   const [working, setWorking] = useState('');
-  const canEditProfile = !access || ['owner', 'admin', 'global_admin'].includes(access.role);
-  const canManageFamily = Boolean(access && ['owner', 'admin', 'global_admin'].includes(access.role));
+  const [caregiverDraft, setCaregiverDraft] = useState<{ name: string; relation: string } | null>(null);
+  const canEditProfile = !access || canEditFamilyProfile(access.role);
+  const canManageFamily = Boolean(access && roleCanManageFamily(access.role));
+  const canExportReports = Boolean(access && canExportFamilyReports(access.role));
+  const caregiverNameDraft = caregiverDraft?.name ?? preferences.caregiverName;
+  const caregiverRelationDraft = caregiverDraft?.relation ?? preferences.caregiverRelation;
 
   useEffect(() => {
     if (!access) return;
@@ -71,6 +76,18 @@ export default function ProfileScreen() {
     setWeightValue('');
   };
 
+  const saveCaregiverIdentity = () => {
+    const caregiverName = caregiverNameDraft.trim();
+    if (!caregiverName) {
+      Alert.alert('Informe seu nome', 'O nome identifica quem realizou cada cuidado no Diário.');
+      return;
+    }
+    const caregiverRelation = caregiverRelationDraft.trim() || 'Responsável';
+    updatePreferences({ caregiverName, caregiverRelation });
+    setCaregiverDraft(null);
+    Alert.alert('Identidade salva', 'Os próximos registros desta conta mostrarão seu nome no Diário.');
+  };
+
   const createInvite = async () => {
     if (!user || !access) return;
     setWorking('invite'); setInviteFeedback('Gerando convite de uso único…');
@@ -82,9 +99,11 @@ export default function ProfileScreen() {
 
   const acceptLegal = async () => {
     if (!user) return;
+    const acceptedAt = Date.now();
+    updatePreferences({ legalAcceptedAt: acceptedAt });
     setWorking('legal');
-    try { await saveLegalConsent(user, access?.familyId, { termsVersion: '82.0.0', privacyVersion: '82.0.0', medicalDisclaimerVersion: '82.0.0' }); updatePreferences({ legalAcceptedAt: Date.now() }); Alert.alert('Preferências salvas', 'O aceite foi registrado nesta conta e família.'); }
-    catch (legalError) { Alert.alert('Não foi possível salvar', getFirebaseErrorMessage(legalError)); } finally { setWorking(''); }
+    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: '82.0.0', privacyVersion: '82.0.0', medicalDisclaimerVersion: '82.0.0', acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
+    catch (legalError) { Alert.alert('Aceite salvo neste aparelho', `${getFirebaseErrorMessage(legalError)} A sincronização será tentada novamente.`); } finally { setWorking(''); }
   };
 
   const sendSupport = async () => {
@@ -107,7 +126,7 @@ export default function ProfileScreen() {
         <Text style={[styles.heroAge, { color: colors.text }]}>{getBabyAgeText(profile.birthDate)}</Text>
       </LinearGradient>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Perfil do diário</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Diário de cuidados</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Ajustes usados no diário de {profile.name || 'seu bebê'}.</Text>
@@ -157,23 +176,30 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Peso e crescimento</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Atualizar peso</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Guarde o histórico informado pela família. O Ninou não interpreta curvas nem oferece diagnóstico.</Text>
         <View style={styles.weightForm}><View style={styles.weightField}><Text style={[styles.label, { color: colors.text }]}>Data</Text><TextInput value={weightDate} onChangeText={setWeightDate} placeholder="AAAA-MM-DD" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /></View><View style={styles.weightField}><Text style={[styles.label, { color: colors.text }]}>Peso em kg</Text><TextInput value={weightValue} onChangeText={setWeightValue} placeholder="Ex.: 5,250" keyboardType="decimal-pad" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /></View></View>
-        <Pressable disabled={!canEditProfile || !weightValue.trim()} onPress={addWeight} style={[styles.primaryButton, { backgroundColor: colors.primary }, (!canEditProfile || !weightValue.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>Atualizar peso</Text></Pressable>
+        <Pressable disabled={!canEditProfile || !weightValue.trim()} onPress={addWeight} style={[styles.primaryButton, styles.cardAction, { backgroundColor: colors.primary }, (!canEditProfile || !weightValue.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>Atualizar peso</Text></Pressable>
         {profile.weights.slice(0, 4).map((weight) => <View key={weight.id} style={[styles.weightHistory, { borderTopColor: colors.border }]}><Text style={[styles.weightHistoryDate, { color: colors.textMuted }]}>{new Date(`${weight.date}T12:00:00`).toLocaleDateString('pt-BR')}</Text><Text style={[styles.weightHistoryValue, { color: colors.text }]}>{weight.value.toLocaleString('pt-BR', { minimumFractionDigits: 3 })} kg</Text></View>)}
       </NinouCard>
 
-      <NinouCard>
-        <Text style={[styles.sectionKicker, { color: colors.primary }]}>Cuidador deste aparelho</Text>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>Quem está cuidando agora?</Text>
-        <Text style={[styles.cardText, { color: colors.textMuted }]}>Essa identificação acompanha os novos registros feitos neste aparelho.</Text>
-        <View style={styles.form}><Text style={[styles.label, { color: colors.text }]}>Nome</Text><TextInput value={preferences.caregiverName} onChangeText={(caregiverName) => updatePreferences({ caregiverName })} placeholder="Ex.: Felipe" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Relação com o bebê</Text><TextInput value={preferences.caregiverRelation} onChangeText={(caregiverRelation) => updatePreferences({ caregiverRelation })} placeholder="Pai, mãe, avó, babá…" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /></View>
+      <NinouCard style={styles.profileCard}>
+        <Text style={[styles.sectionKicker, { color: colors.primary }]}>Identidade da conta</Text>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Quem registra os cuidados?</Text>
+        <Text style={[styles.cardText, { color: colors.textMuted }]}>Cada conta mantém seu próprio nome. Ele acompanha os novos registros e aparece no Diário em todos os aparelhos.</Text>
+        {user?.email ? <View style={[styles.accountBadge, { backgroundColor: colors.primarySoft }]}><Ionicons name="person-circle-outline" size={18} color={colors.primary} /><Text numberOfLines={1} style={[styles.accountBadgeText, { color: colors.primary }]}>{user.email}</Text></View> : null}
+        <View style={styles.form}>
+          <Text style={[styles.label, { color: colors.text }]}>Nome</Text>
+          <TextInput value={caregiverNameDraft} onChangeText={(name) => setCaregiverDraft({ name, relation: caregiverRelationDraft })} placeholder="Ex.: Felipe" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} />
+          <Text style={[styles.label, { color: colors.text }]}>Relação com o bebê</Text>
+          <TextInput value={caregiverRelationDraft} onChangeText={(relation) => setCaregiverDraft({ name: caregiverNameDraft, relation })} placeholder="Pai, mãe, avó, babá…" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} />
+        </View>
+        <Pressable onPress={saveCaregiverIdentity} style={[styles.primaryButton, styles.cardAction, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Salvar identidade da conta</Text></Pressable>
       </NinouCard>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Janela acordado</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Referência gentil</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Escolha o tempo usado nos indicadores da rotina. Não é uma recomendação médica.</Text>
@@ -186,7 +212,7 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Preferências</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Tema do app</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>A escolha fica salva neste aparelho e também muda a órbita entre o céu claro e o cenário cósmico.</Text>
@@ -194,7 +220,7 @@ export default function ProfileScreen() {
           {([
             ['light', 'sunny-outline', 'Claro'],
             ['dark', 'moon-outline', 'Escuro'],
-            ['system', 'phone-portrait-outline', 'Sistema'],
+            ['system', 'phone-portrait-outline', 'Automático'],
           ] as [ThemeMode, keyof typeof Ionicons.glyphMap, string][]).map(([value, icon, label]) => {
             const selected = mode === value;
             return (
@@ -207,15 +233,15 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <View style={styles.accessRow}><View style={[styles.accessIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={24} color={colors.primary} /></View><View style={styles.accessCopy}><Text style={[styles.sectionKicker, { color: colors.primary }]}>Família conectada</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Acesso e convites</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>{canManageFamily ? 'Convide cuidadores por e-mail. O código tem uso único e expira em 7 dias.' : 'Você pode acompanhar a família, mas apenas responsáveis podem gerar convites.'}</Text></View></View>
-        {canManageFamily ? <View style={styles.inviteForm}><Text style={[styles.label, { color: colors.text }]}>E-mail do familiar</Text><TextInput value={inviteEmail} onChangeText={setInviteEmail} autoCapitalize="none" keyboardType="email-address" placeholder="familiar@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Papel</Text><View style={styles.articleRow}>{[['caregiver', 'Cuidador'], ['admin', 'Responsável']] .map(([value, label]) => <Pressable key={value} onPress={() => setInviteRole(value)} style={[styles.articleChoice, { borderColor: inviteRole === value ? colors.primary : colors.border, backgroundColor: inviteRole === value ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.articleChoiceText, { color: inviteRole === value ? '#FFF' : colors.text }]}>{label}</Text></Pressable>)}</View><Pressable disabled={working === 'invite' || !inviteEmail.trim()} onPress={() => void createInvite()} style={[styles.primaryButton, { backgroundColor: colors.primary }, (working === 'invite' || !inviteEmail.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>{working === 'invite' ? 'Gerando…' : 'Gerar convite'}</Text></Pressable></View> : null}
+        {canManageFamily ? <View style={styles.inviteForm}><Text style={[styles.label, { color: colors.text }]}>E-mail do familiar</Text><TextInput value={inviteEmail} onChangeText={setInviteEmail} autoCapitalize="none" keyboardType="email-address" placeholder="familiar@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Papel</Text><View style={styles.articleRow}>{[['cuidador', 'Cuidador'], ['admin_familiar', 'Responsável']] .map(([value, label]) => <Pressable key={value} onPress={() => setInviteRole(value)} style={[styles.articleChoice, { borderColor: inviteRole === value ? colors.primary : colors.border, backgroundColor: inviteRole === value ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.articleChoiceText, { color: inviteRole === value ? '#FFF' : colors.text }]}>{label}</Text></Pressable>)}</View><Pressable disabled={working === 'invite' || !inviteEmail.trim()} onPress={() => void createInvite()} style={[styles.primaryButton, { backgroundColor: colors.primary }, (working === 'invite' || !inviteEmail.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>{working === 'invite' ? 'Gerando…' : 'Gerar convite'}</Text></Pressable></View> : null}
         {inviteFeedback ? <Text style={[styles.inviteFeedback, { color: colors.warning }]}>{inviteFeedback}</Text> : null}
         {inviteCode ? <View style={[styles.inviteResult, { backgroundColor: colors.primarySoft, borderColor: colors.primary }]}><Text style={[styles.inviteResultLabel, { color: colors.primary }]}>CÓDIGO DO CONVITE</Text><Text style={[styles.inviteCode, { color: colors.text }]}>{inviteCode}</Text><Pressable onPress={() => void shareInvite()} style={[styles.shareInvite, { backgroundColor: colors.primary }]}><Ionicons name="share-social-outline" size={18} color="#FFF" /><Text style={styles.shareInviteText}>Compartilhar convite</Text></Pressable></View> : null}
         <View style={styles.memberList}><Text style={[styles.label, { color: colors.text }]}>Pessoas com acesso</Text>{members.length ? members.map((member) => <View key={member.uid} style={[styles.member, { backgroundColor: colors.surfaceElevated }]}><View style={[styles.memberAvatar, { backgroundColor: colors.primarySoft }]}><Text style={[styles.memberInitial, { color: colors.primary }]}>{(member.name || member.email || 'F').charAt(0).toUpperCase()}</Text></View><View style={styles.memberCopy}><Text style={[styles.memberName, { color: colors.text }]}>{member.name || member.email}</Text><Text style={[styles.memberMeta, { color: colors.textMuted }]}>{member.role} · {member.status}</Text></View></View>) : <Text style={[styles.cardText, { color: colors.textMuted }]}>A lista aparecerá quando a família estiver sincronizada.</Text>}</View>
       </NinouCard>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <View style={styles.accessRow}>
           <View style={[styles.accessIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={24} color={colors.primary} /></View>
           <View style={styles.accessCopy}>
@@ -270,21 +296,23 @@ export default function ProfileScreen() {
         {error ? <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text> : null}
       </NinouCard>
 
-      <Pressable onPress={() => router.push('/relatorios' as never)} style={[styles.reportCard, { backgroundColor: colors.primary, borderColor: colors.primary }]}><View style={styles.reportIcon}><Ionicons name="document-text-outline" size={27} color="#FFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>PDF profissional e exportações</Text><Text style={styles.reportText}>WhatsApp, CSV, JSON e períodos personalizados.</Text></View><Ionicons name="chevron-forward" size={22} color="#FFF" /></Pressable>
+      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={[styles.reportCard, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.disabled]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={27} color="#FFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF profissional e exportações' : 'Exportação restrita'}</Text><Text style={styles.reportText}>{canExportReports ? 'WhatsApp, CSV, JSON e períodos personalizados.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFF" /></Pressable>
 
-      <NinouCard>
+      <NinouCard style={styles.profileCard}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Privacidade e segurança</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Seus dados, suas escolhas</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Consulte os documentos e registre o aceite. A preferência fica salva na conta e na família.</Text>
         <View style={styles.legalActions}><Pressable onPress={() => setLegalDocument('privacy')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="shield-checkmark-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Política</Text></Pressable><Pressable onPress={() => setLegalDocument('terms')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="document-text-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Termos</Text></Pressable><Pressable onPress={() => setLegalDocument('medical')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="medical-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Aviso médico</Text></Pressable></View>
-        <Pressable disabled={working === 'legal'} onPress={() => void acceptLegal()} style={[styles.primaryButton, { backgroundColor: preferences.legalAcceptedAt ? colors.accent : colors.primary }]}><Text style={styles.primaryButtonText}>{working === 'legal' ? 'Salvando…' : preferences.legalAcceptedAt ? `Termos aceitos em ${new Date(preferences.legalAcceptedAt).toLocaleDateString('pt-BR')}` : 'Aceitar termos'}</Text></Pressable>
-        <Pressable onPress={() => Alert.alert('Solicitar exclusão?', 'A solicitação será registrada para análise. Nenhum dado será apagado imediatamente.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Solicitar', style: 'destructive', onPress: async () => { if (user) { await requestAccountDeletion(user, access?.familyId); Alert.alert('Solicitação registrada'); } } }])} style={[styles.secondaryButton, { borderColor: colors.danger }]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>Solicitar exclusão dos meus dados</Text></Pressable>
+        <View style={styles.legalButtonStack}>
+          <Pressable disabled={working === 'legal'} onPress={() => void acceptLegal()} style={[styles.primaryButton, { backgroundColor: preferences.legalAcceptedAt ? colors.accent : colors.primary }]}><Text style={styles.primaryButtonText}>{working === 'legal' ? 'Salvando…' : preferences.legalAcceptedAt ? `Termos aceitos em ${new Date(preferences.legalAcceptedAt).toLocaleDateString('pt-BR')}` : 'Aceitar termos'}</Text></Pressable>
+          <Pressable onPress={() => Alert.alert('Solicitar exclusão?', 'A solicitação será registrada para análise. Nenhum dado será apagado imediatamente.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Solicitar', style: 'destructive', onPress: async () => { if (user) { await requestAccountDeletion(user, access?.familyId); Alert.alert('Solicitação registrada'); } } }])} style={[styles.secondaryButton, { borderColor: colors.danger }]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>Solicitar exclusão dos meus dados</Text></Pressable>
+        </View>
       </NinouCard>
 
-      <NinouCard>
-        <Text style={[styles.sectionKicker, { color: colors.primary }]}>Ajuda e suporte</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Encontrou algum problema?</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Envie uma descrição. O diagnóstico técnico inclui apenas versão, família, papel e estado de sincronização — nunca senha ou conteúdo privado.</Text><Pressable onPress={() => setSupportOpen(true)} style={[styles.primaryButton, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Relatar um problema</Text></Pressable>
+      <NinouCard style={styles.profileCard}>
+        <Text style={[styles.sectionKicker, { color: colors.primary }]}>Ajuda e suporte</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Encontrou algum problema?</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Envie uma descrição. O diagnóstico técnico inclui apenas versão, família, papel e estado de sincronização — nunca senha ou conteúdo privado.</Text><Pressable onPress={() => setSupportOpen(true)} style={[styles.primaryButton, styles.cardAction, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Relatar um problema</Text></Pressable>
       </NinouCard>
 
-      <NinouCard>
-        <Text style={[styles.sectionKicker, { color: colors.danger }]}>Dados do dia</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Recomeçar os registros de hoje</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Remove o estado, os eventos e as notas de hoje para toda a família. Relatórios de dias anteriores permanecem intactos.</Text><Pressable onPress={() => Alert.alert('Zerar o dia?', 'Esta ação será sincronizada e não poderá ser desfeita.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Zerar hoje', style: 'destructive', onPress: () => resetDay(getLocalDateId()) }])} style={[styles.secondaryButton, { borderColor: colors.danger }]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>Zerar dia</Text></Pressable>
+      <NinouCard style={styles.profileCard}>
+        <Text style={[styles.sectionKicker, { color: colors.danger }]}>Dados do dia</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Recomeçar os registros de hoje</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Remove o estado, os eventos e as notas de hoje para toda a família. Relatórios de dias anteriores permanecem intactos.</Text><Pressable onPress={() => Alert.alert('Zerar o dia?', 'Esta ação será sincronizada e não poderá ser desfeita.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Zerar hoje', style: 'destructive', onPress: () => resetDay(getLocalDateId()) }])} style={[styles.secondaryButton, styles.cardAction, { borderColor: colors.danger }]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>Zerar dia</Text></Pressable>
       </NinouCard>
 
       <Modal visible={avatarModalOpen} transparent animationType="fade" onRequestClose={() => setAvatarModalOpen(false)}>
@@ -344,16 +372,19 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   profileHero: { minHeight: 308, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, gap: spacing.lg, overflow: 'hidden' },
+  profileCard: { padding: 20 },
   avatarHaloOuter: { width: 122, height: 122, borderRadius: 61, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.06)' },
   avatarHaloInner: { width: 106, height: 106, borderRadius: 53, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   heroName: { marginTop: spacing.sm, fontSize: 42, lineHeight: 46, fontWeight: '900', letterSpacing: -1.8, textAlign: 'center' },
   heroAge: { fontSize: 18, lineHeight: 23, fontWeight: '900', textAlign: 'center' },
-  sectionKicker: { fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: spacing.sm },
-  cardTitle: { fontSize: 17, fontWeight: '900' },
-  cardText: { fontSize: 13, lineHeight: 19, marginTop: spacing.xs },
-  form: { gap: spacing.sm },
+  sectionKicker: { fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 },
+  cardTitle: { fontSize: 17, lineHeight: 22, fontWeight: '900' },
+  cardText: { fontSize: 13, lineHeight: 20, marginTop: 7 },
+  form: { marginTop: spacing.md, gap: spacing.sm },
   label: { fontSize: 12, fontWeight: '800', marginTop: spacing.sm },
   input: { minHeight: 50, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: spacing.md, fontSize: 15 },
+  accountBadge: { minHeight: 40, marginTop: spacing.md, borderRadius: 14, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 7 },
+  accountBadgeText: { flex: 1, fontSize: 11.5, fontWeight: '800' },
   articleRow: { flexDirection: 'row', gap: spacing.sm },
   articleChoice: { minHeight: 42, flex: 1, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' },
   articleChoiceText: { fontSize: 13, fontWeight: '900' },
@@ -374,6 +405,7 @@ const styles = StyleSheet.create({
   inviteForm: { marginTop: spacing.lg, gap: spacing.sm }, inviteFeedback: { marginTop: spacing.md, fontSize: 11.5, lineHeight: 17, fontWeight: '700' }, inviteResult: { marginTop: spacing.md, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, padding: 15, alignItems: 'center' }, inviteResultLabel: { fontSize: 9, fontWeight: '900', letterSpacing: 1.1 }, inviteCode: { marginVertical: 8, fontSize: 28, fontWeight: '900', letterSpacing: 4 }, shareInvite: { minHeight: 44, width: '100%', borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, shareInviteText: { color: '#FFF', fontSize: 12, fontWeight: '900' }, memberList: { marginTop: spacing.lg, gap: spacing.sm }, member: { minHeight: 58, borderRadius: 17, padding: 9, flexDirection: 'row', alignItems: 'center', gap: 10 }, memberAvatar: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, memberInitial: { fontSize: 16, fontWeight: '900' }, memberCopy: { flex: 1 }, memberName: { fontSize: 12.5, fontWeight: '900' }, memberMeta: { marginTop: 2, fontSize: 9.5, fontWeight: '700' },
   authForm: { marginTop: spacing.lg, gap: spacing.md },
   primaryButton: { minHeight: 50, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg },
+  cardAction: { marginTop: spacing.lg },
   primaryButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
   secondaryButton: { minHeight: 44, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md },
   secondaryButtonText: { fontSize: 13, fontWeight: '800' },
@@ -385,7 +417,8 @@ const styles = StyleSheet.create({
   buttonRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   errorText: { marginTop: spacing.md, fontSize: 12, lineHeight: 17, fontWeight: '700' },
   reportCard: { minHeight: 104, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 15, flexDirection: 'row', alignItems: 'center', gap: 12 }, reportIcon: { width: 54, height: 54, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }, reportCopy: { flex: 1 }, reportKicker: { color: 'rgba(255,255,255,0.72)', fontSize: 8.5, fontWeight: '900', letterSpacing: 1 }, reportTitle: { color: '#FFF', marginTop: 3, fontSize: 15, fontWeight: '900' }, reportText: { color: 'rgba(255,255,255,0.76)', marginTop: 3, fontSize: 10.5, lineHeight: 15 },
-  legalActions: { marginVertical: spacing.lg, flexDirection: 'row', gap: 7 }, legalButton: { flex: 1, minHeight: 68, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', gap: 5 }, legalText: { fontSize: 10.5, fontWeight: '900' },
+  legalActions: { marginTop: spacing.lg, marginBottom: spacing.md, flexDirection: 'row', gap: 9 }, legalButton: { flex: 1, minHeight: 72, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', gap: 6 }, legalText: { fontSize: 10.5, fontWeight: '900' },
+  legalButtonStack: { gap: 12 },
   disabled: { opacity: 0.48 },
   avatarModalBackdrop: { flex: 1, backgroundColor: 'rgba(7,4,18,0.82)', padding: 14, alignItems: 'center', justifyContent: 'center' },
   avatarModalCard: { width: '100%', maxWidth: 390, height: '92%', maxHeight: 760, borderRadius: 30, borderWidth: StyleSheet.hairlineWidth, padding: 18, overflow: 'hidden' },

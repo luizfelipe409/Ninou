@@ -2,12 +2,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Line, Path, Rect, Stop, Text as SvgText } from 'react-native-svg';
 
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
+import { canExportFamilyReports } from '@/domain/family-access';
 import { createEmptyDayState, formatDuration, getTodaySummary, type DayState } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
+import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
-import { useBabyProfile } from '@/state/profile-context';
+import { useBabyProfile, type WeightEntry } from '@/state/profile-context';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
 type DayMetric = {
@@ -24,6 +27,35 @@ type DayMetric = {
 };
 
 const dayLabels = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+
+function formatKg(value: number) {
+  return `${value.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg`;
+}
+
+function formatWeightDelta(value: number) {
+  const absolute = Math.abs(value);
+  const sign = value >= 0 ? '+' : '−';
+  if (absolute < 1) return `${sign}${Math.round(absolute * 1000)} g no período`;
+  return `${sign}${absolute.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 3 })} kg no período`;
+}
+
+function buildSmoothPath(points: { x: number; y: number }[]) {
+  if (!points.length) return '';
+  if (points.length < 3) return points.map((point, index) => `${index ? 'L' : 'M'}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(' ');
+  const path = [`M${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const current = points[index];
+    const next = points[index + 1];
+    const previous = points[index - 1] || current;
+    const afterNext = points[index + 2] || next;
+    const cp1x = current.x + (next.x - previous.x) / 6;
+    const cp1y = current.y + (next.y - previous.y) / 6;
+    const cp2x = next.x - (afterNext.x - current.x) / 6;
+    const cp2y = next.y - (afterNext.y - current.y) / 6;
+    path.push(`C${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${next.x.toFixed(1)} ${next.y.toFixed(1)}`);
+  }
+  return path.join(' ');
+}
 
 function metricForDay(id: string, state: DayState, now: number, isToday: boolean): DayMetric {
   const safeState = isToday ? state : { ...state, mode: 'idle' as const, activeStartedAt: null };
@@ -47,7 +79,9 @@ export default function DataScreen() {
   const { colors } = useNinouTheme();
   const { width } = useWindowDimensions();
   const { state, history, now } = useRoutine();
+  const { access } = useNinouAuth();
   const { profile } = useBabyProfile();
+  const canExportReports = Boolean(access && canExportFamilyReports(access.role));
   const todayId = getLocalDateId(now);
   const dayIds = Array.from({ length: 7 }, (_, index) => getLocalDateId(now - (6 - index) * 86400000));
   const days = dayIds.map((id) => metricForDay(id, id === todayId ? state : history[id] || createEmptyDayState(), now, id === todayId));
@@ -60,7 +94,7 @@ export default function DataScreen() {
   const today = days[days.length - 1];
   const compactCharts = width < 430;
   const weights = [...profile.weights].sort((left, right) => right.date.localeCompare(left.date));
-  const latestWeight = weights[0];
+  const weightsAscending = [...weights].reverse();
 
   return (
     <NinouScreen title="Dados" hidePageHeader>
@@ -76,7 +110,7 @@ export default function DataScreen() {
         </View>
       </LinearGradient>
 
-      <Pressable onPress={() => router.push('/relatorios' as never)} style={({ pressed }) => [styles.reportButton, { backgroundColor: colors.primary, borderColor: colors.primary }, pressed && styles.pressed]}><View style={styles.reportIcon}><Ionicons name="document-text-outline" size={24} color="#FFFFFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>PDF, WhatsApp, CSV e JSON</Text><Text style={styles.reportHint}>Escolha o período e compartilhe dados reais da família.</Text></View><Ionicons name="chevron-forward" size={22} color="#FFFFFF" /></Pressable>
+      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={({ pressed }) => [styles.reportButton, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.reportDisabled, pressed && canExportReports && styles.pressed]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={24} color="#FFFFFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF, WhatsApp, CSV e JSON' : 'Exportação restrita'}</Text><Text style={styles.reportHint}>{canExportReports ? 'Escolha o período e compartilhe dados reais da família.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFFFFF" /></Pressable>
 
       <View style={styles.overviewRow}>
         <NinouCard style={styles.overviewCard}>
@@ -104,18 +138,17 @@ export default function DataScreen() {
             <Text style={[styles.kicker, { color: colors.textMuted }]}>Peso e crescimento</Text>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Peso do bebê</Text>
           </View>
-          <View style={[styles.statusPill, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.statusText, { color: colors.textMuted }]}>Acompanhe no perfil</Text></View>
+          <View style={[styles.statusPill, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.statusText, { color: colors.textMuted }]}>{weights.length ? `${weights.length} registro${weights.length === 1 ? '' : 's'}` : 'Aguardando registro'}</Text></View>
         </View>
-        <View style={[styles.weightEmpty, { borderColor: colors.border, backgroundColor: colors.surfaceElevated }]}>
-          <Text style={[styles.weightValue, { color: colors.text }]}>{latestWeight ? `${latestWeight.value.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg` : 'Sem peso cadastrado'}</Text>
-          <Text style={[styles.overviewHint, { color: colors.textMuted }]}>{latestWeight ? `Última pesagem em ${new Date(`${latestWeight.date}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}.` : 'Registre o peso no Perfil para acompanhar evolução e histórico.'}</Text>
+        <WeightChart weights={weightsAscending} />
+        {weights.length ? <View style={styles.weightHistory}>
           {weights.slice(0, 4).map((weight) => (
             <View key={weight.id} style={[styles.weightRow, { borderTopColor: colors.border }]}>
               <Text style={[styles.weightRowDate, { color: colors.textMuted }]}>{new Date(`${weight.date}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</Text>
-              <Text style={[styles.weightRowValue, { color: colors.text }]}>{weight.value.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</Text>
+              <Text style={[styles.weightRowValue, { color: colors.text }]}>{formatKg(weight.value)}</Text>
             </View>
           ))}
-        </View>
+        </View> : null}
       </NinouCard>
 
       <View style={styles.sectionHeading}>
@@ -156,6 +189,97 @@ function Kpi({ label, value, hint }: { label: string; value: string; hint: strin
       <Text style={[styles.kpiValue, { color: colors.text }]}>{value}</Text>
       <Text style={[styles.kpiHint, { color: colors.textMuted }]}>{hint}</Text>
     </NinouCard>
+  );
+}
+
+function WeightChart({ weights }: { weights: WeightEntry[] }) {
+  const { colors, isDark } = useNinouTheme();
+  const normalized = weights.filter((item) => Number.isFinite(item.value)).slice(-10);
+  const curveColor = isDark ? '#A892FF' : '#5C43C9';
+  const gridColor = isDark ? '#C9C0FF' : '#5C43C9';
+
+  if (!normalized.length) {
+    return (
+      <View style={[styles.weightChart, styles.weightChartEmpty, { borderColor: colors.border, backgroundColor: colors.surfaceElevated }]}>
+        <View style={[styles.weightIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="analytics-outline" size={25} color={colors.primary} /></View>
+        <Text style={[styles.weightValue, { color: colors.text }]}>Sem peso cadastrado</Text>
+        <Text style={[styles.weightEmptyHint, { color: colors.textMuted }]}>Registre o primeiro peso no Perfil para montar uma curva simples e legível.</Text>
+      </View>
+    );
+  }
+
+  const latest = normalized[normalized.length - 1];
+  if (normalized.length === 1) {
+    return (
+      <View style={[styles.weightChart, styles.weightChartEmpty, { borderColor: colors.border, backgroundColor: colors.surfaceElevated }]}>
+        <Text style={[styles.weightEyebrow, { color: colors.textMuted }]}>Peso atual</Text>
+        <Text style={[styles.weightSingleValue, { color: colors.text }]}>{formatKg(latest.value)}</Text>
+        <Text style={[styles.weightSingleDate, { color: colors.textMuted }]}>{new Date(`${latest.date}T12:00:00`).toLocaleDateString('pt-BR')}</Text>
+        <Text style={[styles.weightEmptyHint, { color: colors.textMuted }]}>Com mais um peso, o Ninou desenha a evolução.</Text>
+      </View>
+    );
+  }
+
+  const values = normalized.map((item) => item.value);
+  const realMin = Math.min(...values);
+  const realMax = Math.max(...values);
+  const naturalSpread = Math.max(0.18, realMax - realMin);
+  const paddedMin = Math.max(0, realMin - Math.max(0.08, naturalSpread * 0.22));
+  const paddedMax = realMax + Math.max(0.08, naturalSpread * 0.22);
+  const spread = Math.max(0.18, paddedMax - paddedMin);
+  const chartWidth = 360;
+  const chartHeight = 190;
+  const chartLeft = 58;
+  const chartRight = chartWidth - 24;
+  const chartTop = 34;
+  const chartBottom = chartHeight - 48;
+  const points = normalized.map((item, index) => ({
+    item,
+    x: chartLeft + (index / (normalized.length - 1)) * (chartRight - chartLeft),
+    y: chartBottom - ((item.value - paddedMin) / spread) * (chartBottom - chartTop),
+  }));
+  const path = buildSmoothPath(points);
+  const areaPath = `${path} L${points[points.length - 1].x.toFixed(1)} ${chartBottom} L${points[0].x.toFixed(1)} ${chartBottom} Z`;
+  const axisValues = [realMax, (realMax + realMin) / 2, realMin];
+  const latestPoint = points[points.length - 1];
+  const latestLabelX = Math.max(chartLeft + 38, Math.min(chartRight - 46, latestPoint.x));
+  const latestLabelY = Math.max(chartTop + 18, latestPoint.y - 14);
+  const firstDate = normalized[0].date.split('-').reverse().slice(0, 2).join('/');
+  const lastDate = latest.date.split('-').reverse().slice(0, 2).join('/');
+
+  return (
+    <View style={[styles.weightChart, { borderColor: colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.035)' : 'rgba(255,255,255,0.58)' }]}>
+      <View style={styles.weightChartTopline}>
+        <View style={[styles.weightChartPill, { backgroundColor: isDark ? colors.surfaceElevated : 'rgba(255,255,255,0.78)', borderColor: colors.border }]}><Text style={[styles.weightChartPillText, { color: colors.textMuted }]}>{normalized.length} registros</Text></View>
+        <View style={[styles.weightChartPill, { backgroundColor: isDark ? 'rgba(168,146,255,0.16)' : 'rgba(102,81,201,0.10)', borderColor: isDark ? 'rgba(168,146,255,0.22)' : 'rgba(102,81,201,0.15)' }]}><Text style={[styles.weightChartPillText, { color: colors.text }]}>{formatWeightDelta(latest.value - normalized[0].value)}</Text></View>
+      </View>
+      <Svg accessible accessibilityLabel="Evolução do peso do bebê" width="100%" height={190} viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+        <Defs>
+          <SvgLinearGradient id="weightPremiumFillMobile" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={curveColor} stopOpacity={0.2} />
+            <Stop offset="1" stopColor={curveColor} stopOpacity={0.025} />
+          </SvgLinearGradient>
+        </Defs>
+        {axisValues.map((value, index) => {
+          const y = chartBottom - ((value - paddedMin) / spread) * (chartBottom - chartTop);
+          return <Line key={`${value}-${index}`} x1={chartLeft} y1={y} x2={chartRight} y2={y} stroke={gridColor} strokeOpacity={0.2} strokeWidth={1} strokeDasharray="4 6" />;
+        })}
+        {axisValues.map((value, index) => {
+          const y = chartBottom - ((value - paddedMin) / spread) * (chartBottom - chartTop);
+          return <SvgText key={`label-${value}-${index}`} x={chartLeft - 8} y={y + 4} textAnchor="end" fill={gridColor} opacity={0.68} fontSize={8.2} fontWeight="900">{formatKg(value)}</SvgText>;
+        })}
+        <Path d={areaPath} fill="url(#weightPremiumFillMobile)" />
+        <Path d={path} fill="none" stroke={curveColor} strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round" />
+        {points.map((point, index) => {
+          const isLatest = index === points.length - 1;
+          return <Circle key={point.item.id} cx={point.x} cy={point.y} r={isLatest ? 6.2 : 4.2} fill={isLatest ? curveColor : '#FFFFFF'} stroke={isLatest ? '#FFFFFF' : curveColor} strokeWidth={3} />;
+        })}
+        <Rect x={latestLabelX - 42} y={latestLabelY - 18} width={84} height={26} rx={13} fill={isDark ? '#281B49' : '#FFFFFF'} stroke={curveColor} strokeOpacity={0.25} />
+        <SvgText x={latestLabelX} y={latestLabelY - 1} textAnchor="middle" fill={isDark ? '#F8F4FF' : '#3A2C67'} fontSize={9.5} fontWeight="900">{formatKg(latest.value)}</SvgText>
+        <SvgText x={chartLeft} y={chartHeight - 18} fill={gridColor} opacity={0.68} fontSize={9} fontWeight="900">{firstDate}</SvgText>
+        <SvgText x={chartRight} y={chartHeight - 18} textAnchor="end" fill={gridColor} opacity={0.68} fontSize={9} fontWeight="900">{lastDate}</SvgText>
+      </Svg>
+    </View>
   );
 }
 
@@ -203,7 +327,7 @@ const styles = StyleSheet.create({
   heroTitle: { fontSize: 39, lineHeight: 40, fontWeight: '900', letterSpacing: -2 },
   heroText: { fontSize: 14, lineHeight: 20 },
   heroBadge: { width: 86, minHeight: 86, borderRadius: 25, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', gap: 2 },
-  reportButton: { minHeight: 92, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }, reportIcon: { width: 50, height: 50, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }, reportCopy: { flex: 1 }, reportKicker: { color: 'rgba(255,255,255,0.72)', fontSize: 8.5, fontWeight: '900', letterSpacing: 1 }, reportTitle: { color: '#FFF', marginTop: 3, fontSize: 15, fontWeight: '900' }, reportHint: { color: 'rgba(255,255,255,0.76)', marginTop: 3, fontSize: 10.5, lineHeight: 15 }, pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
+  reportButton: { minHeight: 92, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }, reportDisabled: { opacity: 0.56 }, reportIcon: { width: 50, height: 50, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }, reportCopy: { flex: 1 }, reportKicker: { color: 'rgba(255,255,255,0.72)', fontSize: 8.5, fontWeight: '900', letterSpacing: 1 }, reportTitle: { color: '#FFF', marginTop: 3, fontSize: 15, fontWeight: '900' }, reportHint: { color: 'rgba(255,255,255,0.76)', marginTop: 3, fontSize: 10.5, lineHeight: 15 }, pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
   badgeKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' },
   badgeValue: { fontSize: 18, fontWeight: '900' },
   overviewRow: { flexDirection: 'row', gap: 12 },
@@ -218,8 +342,18 @@ const styles = StyleSheet.create({
   sectionTitle: { marginTop: 5, fontSize: 20, fontWeight: '900' },
   statusPill: { borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 8 },
   statusText: { fontSize: 10, fontWeight: '900' },
-  weightEmpty: { marginTop: spacing.lg, minHeight: 118, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, padding: spacing.lg, justifyContent: 'center', gap: spacing.sm },
+  weightChart: { marginTop: spacing.lg, minHeight: 248, borderRadius: 24, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, paddingTop: 16, paddingBottom: 12, overflow: 'hidden' },
+  weightChartEmpty: { alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 24 },
+  weightIcon: { width: 48, height: 48, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   weightValue: { fontSize: 21, fontWeight: '900' },
+  weightEmptyHint: { maxWidth: 290, fontSize: 12.5, lineHeight: 18, textAlign: 'center' },
+  weightEyebrow: { fontSize: 11, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' },
+  weightSingleValue: { fontSize: 30, lineHeight: 36, fontWeight: '900', letterSpacing: -1 },
+  weightSingleDate: { fontSize: 12, fontWeight: '800' },
+  weightChartTopline: { minHeight: 30, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 2 },
+  weightChartPill: { minHeight: 30, maxWidth: '62%', borderRadius: radius.pill, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 11, alignItems: 'center', justifyContent: 'center' },
+  weightChartPillText: { fontSize: 10.5, fontWeight: '900' },
+  weightHistory: { marginTop: spacing.md },
   weightRow: { minHeight: 34, borderTopWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
   weightRowDate: { fontSize: 12, fontWeight: '700' },
   weightRowValue: { fontSize: 13, fontWeight: '900' },

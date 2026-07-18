@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Animated,
   Image,
+  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -79,12 +80,12 @@ function DemoOrbit() {
         </View>
         <View style={[styles.livePill, { backgroundColor: isDark ? 'rgba(97,225,191,0.12)' : '#E5F8F1' }]}><View style={styles.liveDot} /><Text style={styles.liveText}>AO VIVO</Text></View>
       </View>
-      <LinearGradient colors={isDark ? ['#201545', '#151C3B'] : ['#E8E0FF', '#EAF7F3']} style={styles.demoOrbit}>
+      <ImageBackground source={isDark ? require('../../assets/clock-themes/night-sky.png') : require('../../assets/clock-themes/day-sky.png')} resizeMode="cover" imageStyle={styles.demoOrbitImage} style={styles.demoOrbit}>
         <Text style={[styles.demoStar, { color: isDark ? '#FFF8E6' : '#B599E7' }]}>✦</Text>
-        <Ionicons name={isDark ? 'moon' : 'sunny'} size={32} color={isDark ? '#E8DFC5' : '#F2B75F'} style={styles.demoMoon} />
         <Svg width={258} height={258} style={StyleSheet.absoluteFill}>
-          <Circle cx={129} cy={129} r={94} fill="none" stroke={isDark ? 'rgba(190,174,255,0.22)' : 'rgba(100,75,160,0.15)'} strokeWidth={18} />
-          <Circle cx={129} cy={129} r={94} fill="none" stroke={isDark ? '#9179EC' : '#7558E8'} strokeWidth={7} strokeLinecap="round" strokeDasharray="255 336" transform="rotate(-90 129 129)" opacity={0.85} />
+          <Circle cx={129} cy={129} r={94} fill="none" stroke={isDark ? 'rgba(91,51,194,0.2)' : 'rgba(255,255,255,0.34)'} strokeWidth={16} />
+          <Circle cx={129} cy={129} r={94} fill="none" stroke={isDark ? 'rgba(155,117,255,0.68)' : 'rgba(255,255,255,0.9)'} strokeWidth={isDark ? 4.2 : 5.5} />
+          <Circle cx={129} cy={129} r={94} fill="none" stroke={isDark ? '#A684FF' : '#7558E8'} strokeWidth={7} strokeLinecap="round" strokeDasharray="255 336" transform="rotate(-90 129 129)" opacity={0.72} />
         </Svg>
         <Animated.View style={[styles.demoPulse, { opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.2, 0.55] }), transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1.08] }) }] }]} />
         <View style={[styles.demoCore, { backgroundColor: isDark ? 'rgba(25,17,45,0.96)' : 'rgba(255,255,255,0.94)' }]}>
@@ -95,7 +96,7 @@ function DemoOrbit() {
         <View style={[styles.demoMarker, { left: 40, top: 43 }]}><ActionArt type="mamadeira" size={31} /></View>
         <View style={[styles.demoMarker, { right: 28, bottom: 67 }]}><ActionArt type="fralda" size={31} /></View>
         <Animated.View style={[styles.rotatingArm, { transform: orbitTransform }]}><View style={styles.orbitNow} /></Animated.View>
-      </LinearGradient>
+      </ImageBackground>
       <View style={styles.demoStats}>
         <View><Text style={[styles.statLabel, { color: isDark ? '#AFA5C1' : '#7A6D87' }]}>SONO HOJE</Text><Text style={[styles.statValue, { color: isDark ? '#F8F4FF' : '#342646' }]}>07h 42min</Text></View>
         <View><Text style={[styles.statLabel, { color: isDark ? '#AFA5C1' : '#7A6D87' }]}>ÚLTIMO CUIDADO</Text><Text style={[styles.statValue, { color: isDark ? '#F8F4FF' : '#342646' }]}>Mamadeira · 21:10</Text></View>
@@ -106,16 +107,36 @@ function DemoOrbit() {
 
 export function NinouLoadingScreen() {
   const { isDark } = useNinouTheme();
+  const [launchPulse] = useState(() => new Animated.Value(0));
+  const [launchSpin] = useState(() => new Animated.Value(0));
+
+  useEffect(() => {
+    const pulseLoop = Animated.loop(Animated.sequence([
+      Animated.timing(launchPulse, { toValue: 1, duration: 1450, useNativeDriver: true }),
+      Animated.timing(launchPulse, { toValue: 0, duration: 1450, useNativeDriver: true }),
+    ]));
+    const spinLoop = Animated.loop(Animated.timing(launchSpin, { toValue: 1, duration: 9000, useNativeDriver: true }));
+    pulseLoop.start();
+    spinLoop.start();
+    return () => { pulseLoop.stop(); spinLoop.stop(); };
+  }, [launchPulse, launchSpin]);
+
   return (
     <SafeAreaView style={styles.loading}>
       <NinouBackground intense />
       <View style={styles.loadingContent}>
-        <Image source={require('../../assets/images/ninou-icon.png')} style={styles.loadingIcon} />
+        <View style={styles.launchStage}>
+          <Animated.View style={[styles.launchGlow, { backgroundColor: isDark ? 'rgba(132,103,241,0.22)' : 'rgba(117,88,232,0.16)', opacity: launchPulse.interpolate({ inputRange: [0, 1], outputRange: [0.42, 0.9] }), transform: [{ scale: launchPulse.interpolate({ inputRange: [0, 1], outputRange: [0.88, 1.14] }) }] }]} />
+          <Animated.View style={[styles.launchRing, { borderColor: isDark ? 'rgba(203,188,255,0.26)' : 'rgba(117,88,232,0.2)', transform: [{ rotate: launchSpin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }]}><View style={[styles.launchDot, { backgroundColor: isDark ? '#61E1BF' : '#35B997' }]} /></Animated.View>
+          <Animated.View style={{ transform: [{ scale: launchPulse.interpolate({ inputRange: [0, 1], outputRange: [0.97, 1.04] }) }] }}><Image source={require('../../assets/images/ninou-icon.png')} style={styles.loadingIcon} /></Animated.View>
+          <Animated.Text style={[styles.launchStar, styles.launchStarA, { opacity: launchPulse.interpolate({ inputRange: [0, 1], outputRange: [0.25, 1] }) }]}>✦</Animated.Text>
+          <Animated.Text style={[styles.launchStar, styles.launchStarB, { opacity: launchPulse.interpolate({ inputRange: [0, 1], outputRange: [0.8, 0.22] }) }]}>✧</Animated.Text>
+        </View>
         <Text style={[styles.loadingBrand, { color: isDark ? '#FFFFFF' : '#332446' }]}>NINOU</Text>
-        <Text style={[styles.loadingTitle, { color: isDark ? '#FFFFFF' : '#332446' }]}>Preparando o diário do bebê</Text>
-        <Text style={[styles.loadingText, { color: isDark ? '#C7BCD9' : '#756985' }]}>Validando conta e família...</Text>
-        <View style={[styles.loadingTrack, { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(74,49,103,0.12)' }]}><View style={styles.loadingBar} /></View>
-        <ActivityIndicator color={isDark ? '#B9A9FF' : '#7558E8'} />
+        <Text style={[styles.loadingTitle, { color: isDark ? '#FFFFFF' : '#332446' }]}>Seu cuidado, no tempo certo.</Text>
+        <Text style={[styles.loadingText, { color: isDark ? '#C7BCD9' : '#756985' }]}>Preparando o diário da família…</Text>
+        <View style={[styles.loadingTrack, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(74,49,103,0.1)' }]}><Animated.View style={[styles.loadingBar, { transform: [{ translateX: launchPulse.interpolate({ inputRange: [0, 1], outputRange: [-90, 90] }) }] }]}><LinearGradient colors={['rgba(141,116,239,0)', '#8D74EF', '#61E1BF', 'rgba(97,225,191,0)']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} /></Animated.View></View>
+        <View style={styles.loadingStatus}><View style={[styles.loadingStatusDot, { backgroundColor: isDark ? '#61E1BF' : '#35B997' }]} /><Text style={[styles.loadingStatusText, { color: isDark ? '#BDB2D2' : '#746985' }]}>Conta e família protegidas</Text></View>
       </View>
     </SafeAreaView>
   );
@@ -238,11 +259,10 @@ const styles = StyleSheet.create({
   livePill: { borderRadius: 99, paddingHorizontal: 8, paddingVertical: 6, flexDirection: 'row', alignItems: 'center', gap: 5 },
   liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#48C9A5' },
   liveText: { color: '#48C9A5', fontSize: 8, fontWeight: '900' },
-  demoOrbit: { width: 258, height: 258, alignSelf: 'center', borderRadius: 129, overflow: 'hidden' },
+  demoOrbit: { width: 258, height: 258, alignSelf: 'center', borderRadius: 129, overflow: 'hidden' }, demoOrbitImage: { borderRadius: 129 },
   demoStar: { position: 'absolute', left: 42, top: 47, fontSize: 18 },
-  demoMoon: { position: 'absolute', right: 38, top: 28, transform: [{ rotate: '-18deg' }] },
   demoPulse: { position: 'absolute', width: 140, height: 140, borderRadius: 70, left: 59, top: 59, backgroundColor: 'rgba(117,88,232,0.22)' },
-  demoCore: { position: 'absolute', width: 154, height: 98, borderRadius: 38, left: 52, top: 80, alignItems: 'center', justifyContent: 'center', padding: 9 },
+  demoCore: { position: 'absolute', width: 176, height: 104, borderRadius: 52, left: 41, top: 77, alignItems: 'center', justifyContent: 'center', padding: 9 },
   demoCoreLabel: { fontSize: 8, fontWeight: '900', letterSpacing: 1 },
   demoClock: { fontSize: 25, lineHeight: 29, fontWeight: '900', letterSpacing: -1.2, fontVariant: ['tabular-nums'] },
   demoHint: { maxWidth: 125, fontSize: 7.5, lineHeight: 10, fontWeight: '700', textAlign: 'center' },
@@ -274,11 +294,13 @@ const styles = StyleSheet.create({
   legal: { color: '#94899A', maxWidth: 340, marginTop: 18, fontSize: 10.5, lineHeight: 16, textAlign: 'center' },
   loading: { flex: 1 },
   loadingContent: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
-  loadingIcon: { width: 86, height: 86, borderRadius: 26 },
-  loadingBrand: { marginTop: 18, fontSize: 12, fontWeight: '900', letterSpacing: 4 },
+  launchStage: { width: 170, height: 170, alignItems: 'center', justifyContent: 'center' }, launchGlow: { position: 'absolute', width: 140, height: 140, borderRadius: 70 }, launchRing: { position: 'absolute', width: 156, height: 156, borderRadius: 78, borderWidth: 1 }, launchDot: { position: 'absolute', width: 10, height: 10, borderRadius: 5, top: -5, left: 72, shadowColor: '#61E1BF', shadowOpacity: 0.8, shadowRadius: 8 }, launchStar: { position: 'absolute', color: '#FFF4D4' }, launchStarA: { left: 7, top: 47, fontSize: 19 }, launchStarB: { right: 10, bottom: 43, fontSize: 15 },
+  loadingIcon: { width: 92, height: 92, borderRadius: 29, shadowColor: '#06030D', shadowOpacity: 0.28, shadowRadius: 20, shadowOffset: { width: 0, height: 12 } },
+  loadingBrand: { marginTop: 12, fontSize: 12, fontWeight: '900', letterSpacing: 4.5 },
   loadingTitle: { marginTop: 24, fontSize: 22, lineHeight: 28, fontWeight: '900', textAlign: 'center' },
   loadingText: { marginTop: 8, fontSize: 13, fontWeight: '600' },
-  loadingTrack: { width: 230, height: 7, marginTop: 26, marginBottom: 20, borderRadius: 4, overflow: 'hidden' },
-  loadingBar: { width: '68%', height: '100%', backgroundColor: '#8D74EF', borderRadius: 4 },
+  loadingTrack: { width: 230, height: 6, marginTop: 28, borderRadius: 4, overflow: 'hidden' },
+  loadingBar: { width: 150, height: '100%', borderRadius: 4, alignSelf: 'center', overflow: 'hidden' },
+  loadingStatus: { marginTop: 17, flexDirection: 'row', alignItems: 'center', gap: 7 }, loadingStatusDot: { width: 6, height: 6, borderRadius: 3 }, loadingStatusText: { fontSize: 10.5, fontWeight: '700' },
   pressed: { opacity: 0.76, transform: [{ scale: 0.985 }] },
 });

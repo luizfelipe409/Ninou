@@ -7,8 +7,10 @@ import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, Vie
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { NinouBackground } from '@/components/ninou-background';
+import { canExportFamilyReports, familyRoleLabel } from '@/domain/family-access';
 import { formatDuration, formatTime, getTodaySummary, recordConfig, type DayState } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
+import { useNinouAuth } from '@/state/auth-context';
 import { useBabyProfile } from '@/state/profile-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
 import { useRoutine } from '@/state/routine-context';
@@ -20,6 +22,7 @@ function escapeHtml(value: string) { return value.replace(/[&<>"']/g, (character
 
 export default function ReportsScreen() {
   const { colors, isDark } = useNinouTheme();
+  const { access } = useNinouAuth();
   const { state, history } = useRoutine();
   const { profile } = useBabyProfile();
   const { preferences, updatePreferences } = useFamilyPreferences();
@@ -28,6 +31,7 @@ export default function ReportsScreen() {
   const [endDate, setEndDate] = useState(getLocalDateId());
   const [message, setMessage] = useState('Olá! Segue o resumo da rotina do bebê preparado no Ninou.');
   const [busy, setBusy] = useState('');
+  const canExport = Boolean(access && canExportFamilyReports(access.role));
   const report = buildReport();
 
   function buildReport() {
@@ -51,6 +55,7 @@ export default function ReportsScreen() {
   }
 
   async function generatePdf() {
+    if (!canExport) return;
     setBusy('pdf');
     try {
       const rows = report.events.map((event) => `<tr><td>${new Date(event.start).toLocaleDateString('pt-BR')}</td><td>${formatTime(event.start)}</td><td>${escapeHtml(recordConfig[event.type].title)}</td><td>${escapeHtml(event.detail || '—')}</td><td>${event.end > event.start ? formatDuration(event.end - event.start) : '—'}</td></tr>`).join('');
@@ -61,6 +66,7 @@ export default function ReportsScreen() {
   }
 
   async function exportData(format: 'csv' | 'json') {
+    if (!canExport) return;
     setBusy(format);
     try {
       const content = format === 'json' ? JSON.stringify({ generatedAt: new Date().toISOString(), baby: profile, report }, null, 2) : ['data,hora,tipo,detalhe,observacoes,duracao_minutos', ...report.events.map((event) => [new Date(event.start).toLocaleDateString('pt-BR'), formatTime(event.start), recordConfig[event.type].title, event.detail, event.notes, Math.round((event.end - event.start) / 60000)].map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','))].join('\n');
@@ -71,9 +77,24 @@ export default function ReportsScreen() {
   }
 
   async function shareWhatsapp() {
+    if (!canExport) return;
     setBusy('whatsapp');
     try { await Linking.openURL(`https://wa.me/${preferences.reportWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`${message}\n\n${summaryText}`)}`); } catch { Alert.alert('WhatsApp indisponível', 'Não foi possível abrir o WhatsApp neste aparelho.'); } finally { setBusy(''); }
   }
+
+  if (!canExport) return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['bottom']}>
+      <NinouBackground />
+      <View style={styles.restrictedWrap}>
+        <View style={[styles.restrictedCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={[styles.restrictedIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="lock-closed-outline" size={30} color={colors.primary} /></View>
+          <Text style={[styles.kicker, { color: colors.primary }]}>ACESSO RESTRITO</Text>
+          <Text style={[styles.restrictedTitle, { color: colors.text }]}>Exportações não disponíveis</Text>
+          <Text style={[styles.restrictedText, { color: colors.textMuted }]}>PDF, WhatsApp, CSV e JSON ficam disponíveis somente para responsáveis, administradores e cuidadores. Seu acesso atual é {familyRoleLabel(access?.role).toLowerCase()}.</Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['bottom']}><NinouBackground /><ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -92,4 +113,4 @@ export default function ReportsScreen() {
   function Action({ icon, label, kind, busy: working, onPress }: { icon: keyof typeof Ionicons.glyphMap; label: string; kind?: 'primary'; busy: boolean; onPress: () => void }) { return <Pressable disabled={Boolean(busy)} onPress={onPress} style={[styles.action, { backgroundColor: kind === 'primary' ? colors.primary : colors.surface, borderColor: kind === 'primary' ? colors.primary : colors.border }, Boolean(busy) && styles.disabled]}><Ionicons name={icon} size={22} color={kind === 'primary' ? '#FFF' : colors.primary} /><Text style={[styles.actionText, { color: kind === 'primary' ? '#FFF' : colors.text }]}>{working ? 'Preparando…' : label}</Text></Pressable>; }
 }
 
-const styles = StyleSheet.create({ safe: { flex: 1 }, content: { width: '100%', maxWidth: 620, alignSelf: 'center', padding: 16, paddingBottom: 45, gap: 14 }, heading: { paddingVertical: 10 }, kicker: { fontSize: 10.5, fontWeight: '900', letterSpacing: 1.3 }, title: { marginTop: 8, fontSize: 31, lineHeight: 35, fontWeight: '900', letterSpacing: -1 }, subtitle: { marginTop: 8, fontSize: 14, lineHeight: 21 }, periodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 }, period: { minHeight: 39, borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' }, periodText: { fontSize: 11, fontWeight: '900' }, customRow: { flexDirection: 'row', gap: 10 }, preview: { borderRadius: 28, borderWidth: StyleSheet.hairlineWidth, padding: 18 }, previewHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, previewKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1 }, previewTitle: { marginTop: 4, fontSize: 23, fontWeight: '900' }, daysBadge: { width: 64, height: 64, borderRadius: 21, alignItems: 'center', justifyContent: 'center' }, daysValue: { fontSize: 22, fontWeight: '900' }, daysLabel: { fontSize: 9, fontWeight: '900' }, kpiGrid: { marginTop: 18, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, kpi: { width: '47%', flexGrow: 1, minHeight: 72, borderRadius: 17, padding: 11 }, kpiLabel: { fontSize: 9.5, fontWeight: '800' }, kpiValue: { marginTop: 5, fontSize: 18, fontWeight: '900' }, previewHint: { marginTop: 12, fontSize: 11 }, shareCard: { borderRadius: 25, borderWidth: StyleSheet.hairlineWidth, padding: 16, gap: 12 }, sectionTitle: { fontSize: 17, fontWeight: '900' }, field: { flex: 1, gap: 6 }, fieldLabel: { fontSize: 10.5, fontWeight: '900' }, input: { minHeight: 48, borderRadius: 15, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, fontSize: 12.5 }, multiline: { minHeight: 82, paddingTop: 12, textAlignVertical: 'top' }, whatsapp: { minHeight: 52, borderRadius: 17, backgroundColor: '#25A96B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, actions: { gap: 9 }, action: { minHeight: 55, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 }, actionText: { color: '#FFF', fontSize: 13, fontWeight: '900' }, disclaimer: { paddingHorizontal: 10, fontSize: 10.5, lineHeight: 16, textAlign: 'center' }, disabled: { opacity: 0.5 } });
+const styles = StyleSheet.create({ safe: { flex: 1 }, content: { width: '100%', maxWidth: 620, alignSelf: 'center', padding: 16, paddingBottom: 45, gap: 14 }, restrictedWrap: { flex: 1, padding: 18, alignItems: 'center', justifyContent: 'center' }, restrictedCard: { width: '100%', maxWidth: 440, minHeight: 330, borderRadius: 30, borderWidth: StyleSheet.hairlineWidth, padding: 28, alignItems: 'center', justifyContent: 'center' }, restrictedIcon: { width: 68, height: 68, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 20 }, restrictedTitle: { marginTop: 9, fontSize: 27, lineHeight: 31, fontWeight: '900', textAlign: 'center' }, restrictedText: { marginTop: 12, maxWidth: 340, fontSize: 13.5, lineHeight: 21, textAlign: 'center' }, heading: { paddingVertical: 10 }, kicker: { fontSize: 10.5, fontWeight: '900', letterSpacing: 1.3 }, title: { marginTop: 8, fontSize: 31, lineHeight: 35, fontWeight: '900', letterSpacing: -1 }, subtitle: { marginTop: 8, fontSize: 14, lineHeight: 21 }, periodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 }, period: { minHeight: 39, borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' }, periodText: { fontSize: 11, fontWeight: '900' }, customRow: { flexDirection: 'row', gap: 10 }, preview: { borderRadius: 28, borderWidth: StyleSheet.hairlineWidth, padding: 18 }, previewHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, previewKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1 }, previewTitle: { marginTop: 4, fontSize: 23, fontWeight: '900' }, daysBadge: { width: 64, height: 64, borderRadius: 21, alignItems: 'center', justifyContent: 'center' }, daysValue: { fontSize: 22, fontWeight: '900' }, daysLabel: { fontSize: 9, fontWeight: '900' }, kpiGrid: { marginTop: 18, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, kpi: { width: '47%', flexGrow: 1, minHeight: 72, borderRadius: 17, padding: 11 }, kpiLabel: { fontSize: 9.5, fontWeight: '800' }, kpiValue: { marginTop: 5, fontSize: 18, fontWeight: '900' }, previewHint: { marginTop: 12, fontSize: 11 }, shareCard: { borderRadius: 25, borderWidth: StyleSheet.hairlineWidth, padding: 16, gap: 12 }, sectionTitle: { fontSize: 17, fontWeight: '900' }, field: { flex: 1, gap: 6 }, fieldLabel: { fontSize: 10.5, fontWeight: '900' }, input: { minHeight: 48, borderRadius: 15, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, fontSize: 12.5 }, multiline: { minHeight: 82, paddingTop: 12, textAlignVertical: 'top' }, whatsapp: { minHeight: 52, borderRadius: 17, backgroundColor: '#25A96B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, actions: { gap: 9 }, action: { minHeight: 55, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 }, actionText: { color: '#FFF', fontSize: 13, fontWeight: '900' }, disclaimer: { paddingHorizontal: 10, fontSize: 10.5, lineHeight: 16, textAlign: 'center' }, disabled: { opacity: 0.5 } });

@@ -1,13 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { ActionArt } from '@/components/action-art';
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
-import { createEmptyDayState, formatDuration, formatTime, recordConfig, type RoutineEvent } from '@/domain/routine';
+import { createEmptyDayState, formatDuration, formatRoutineActorLabel, formatTime, recordConfig, type RoutineEvent } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useNinouAuth } from '@/state/auth-context';
+import { useFamilyPreferences } from '@/state/preferences-context';
 import { useRoutine } from '@/state/routine-context';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
@@ -45,9 +46,15 @@ function timeOnDay(dayId: string, value: string) {
   return date.getTime();
 }
 
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 export default function DiaryScreen() {
+  const routeParams = useLocalSearchParams<{ dayId?: string | string[]; editEventId?: string | string[]; editRequest?: string | string[] }>();
   const { colors } = useNinouTheme();
   const { user } = useNinouAuth();
+  const { preferences } = useFamilyPreferences();
   const { state, history, updateEvent, deleteEvent, updateDayNotes, addNoteEpisode, deleteNoteEpisode } = useRoutine();
   const [selectedDayId, setSelectedDayId] = useState(getLocalDateId());
   const [filter, setFilter] = useState<Filter>('all');
@@ -59,6 +66,7 @@ export default function DiaryScreen() {
   const [freeform, setFreeform] = useState('');
   const [newEpisodeOpen, setNewEpisodeOpen] = useState(false);
   const [newEpisode, setNewEpisode] = useState('');
+  const handledEditRequestRef = useRef('');
   const dayState = selectedDayId === getLocalDateId() ? state : history[selectedDayId] || createEmptyDayState();
   const events = useMemo(() => [...dayState.events].filter((event) => matches(event, filter)).sort((a, b) => b.start - a.start), [dayState.events, filter]);
 
@@ -68,6 +76,26 @@ export default function DiaryScreen() {
     const timer = setTimeout(() => updateDayNotes(selectedDayId, freeform), 700);
     return () => clearTimeout(timer);
   }, [dayState.dayNotes, freeform, selectedDayId, updateDayNotes]);
+
+  useEffect(() => {
+    const editEventId = firstParam(routeParams.editEventId);
+    if (!editEventId) return;
+    const requestedDayId = firstParam(routeParams.dayId) || getLocalDateId();
+    if (requestedDayId !== selectedDayId) {
+      setSelectedDayId(requestedDayId);
+      return;
+    }
+    const requestKey = `${requestedDayId}:${editEventId}:${firstParam(routeParams.editRequest) || ''}`;
+    if (handledEditRequestRef.current === requestKey) return;
+    const event = dayState.events.find((candidate) => candidate.id === editEventId);
+    if (!event) return;
+    handledEditRequestRef.current = requestKey;
+    setEditing(event);
+    setEditStart(formatTime(event.start));
+    setEditEnd(event.end > event.start ? formatTime(event.end) : '');
+    setEditDetail(event.detail);
+    setEditNotes(event.notes);
+  }, [dayState.events, routeParams.dayId, routeParams.editEventId, routeParams.editRequest, selectedDayId]);
 
   const openEdit = (event: RoutineEvent) => {
     setEditing(event); setEditStart(formatTime(event.start)); setEditEnd(event.end > event.start ? formatTime(event.end) : ''); setEditDetail(event.detail); setEditNotes(event.notes);
@@ -80,7 +108,8 @@ export default function DiaryScreen() {
     setEditing(null);
   };
   const confirmDelete = (event: RoutineEvent) => Alert.alert('Excluir registro?', `${recordConfig[event.type].title}, às ${formatTime(event.start)}.`, [{ text: 'Cancelar', style: 'cancel' }, { text: 'Excluir', style: 'destructive', onPress: () => deleteEvent(selectedDayId, event.id) }]);
-  const saveEpisode = (icon: string, text: string) => addNoteEpisode(selectedDayId, { icon, text, time: Date.now(), caregiver: user?.email || 'Família' });
+  const caregiverLabel = [preferences.caregiverName.trim(), preferences.caregiverRelation.trim()].filter(Boolean).join(' · ') || user?.email || 'Responsável';
+  const saveEpisode = (icon: string, text: string) => addNoteEpisode(selectedDayId, { icon, text, time: Date.now(), caregiver: caregiverLabel });
 
   return (
     <NinouScreen eyebrow={displayDate(selectedDayId)} title="Diário" subtitle="Registros, acontecimentos e notas compartilhadas pela família.">
@@ -97,7 +126,7 @@ export default function DiaryScreen() {
           <View style={styles.rail}><View style={[styles.dot, { backgroundColor: colors.primary }]} />{index < events.length - 1 ? <View style={[styles.line, { backgroundColor: colors.border }]} /> : null}</View>
           <Pressable onPress={() => openEdit(event)} style={styles.eventPressable}>
             <NinouCard style={styles.eventCard}>
-              <View style={styles.eventHead}><ActionArt type={event.type} size={50} /><View style={styles.eventCopy}><Text style={[styles.eventTitle, { color: colors.text }]}>{recordConfig[event.type].title}</Text><Text style={[styles.eventTime, { color: colors.primary }]}>{formatTime(event.start)}{event.end > event.start ? ` · ${formatDuration(event.end - event.start)}` : ''}</Text></View><Pressable onPress={() => confirmDelete(event)} hitSlop={10}><Ionicons name="trash-outline" size={18} color={colors.textMuted} /></Pressable></View>
+              <View style={styles.eventHead}><ActionArt type={event.type} size={50} /><View style={styles.eventCopy}><Text style={[styles.eventTitle, { color: colors.text }]}>{recordConfig[event.type].title}</Text><Text style={[styles.eventTime, { color: colors.primary }]}>{formatTime(event.start)}{event.end > event.start ? ` · ${formatDuration(event.end - event.start)}` : ''}</Text><View style={styles.eventActor}><Ionicons name="person-circle-outline" size={14} color={colors.textMuted} /><Text numberOfLines={1} style={[styles.eventActorText, { color: colors.textMuted }]}>Registrado por {formatRoutineActorLabel(event)}</Text></View></View><Pressable onPress={() => confirmDelete(event)} hitSlop={10}><Ionicons name="trash-outline" size={18} color={colors.textMuted} /></Pressable></View>
               {event.detail ? <Text style={[styles.eventDetail, { color: colors.text }]}>{event.detail}{event.amountMl ? ` • ${event.amountMl} ml` : ''}</Text> : null}
               {event.notes ? <Text style={[styles.eventNotes, { color: colors.textMuted }]}>{event.notes}</Text> : null}
               <Text style={[styles.editHint, { color: colors.textMuted }]}>Toque para corrigir horário ou detalhes</Text>
@@ -129,7 +158,7 @@ export default function DiaryScreen() {
 const styles = StyleSheet.create({
   dateCard: { minHeight: 86, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 }, dateArrow: { width: 44, height: 44, borderRadius: 16, alignItems: 'center', justifyContent: 'center' }, dateCopy: { flex: 1, alignItems: 'center' }, dateTitle: { fontSize: 17, fontWeight: '900', textTransform: 'capitalize' }, dateInput: { marginTop: 2, fontSize: 11, fontWeight: '700', textAlign: 'center', minWidth: 100 },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }, chip: { minHeight: 38, paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' }, chipText: { fontSize: 12, fontWeight: '800' },
-  timeline: { gap: 0 }, timelineRow: { flexDirection: 'row', alignItems: 'stretch' }, rail: { width: 26, alignItems: 'center' }, dot: { width: 10, height: 10, borderRadius: 5, marginTop: 27, zIndex: 2 }, line: { width: 2, flex: 1 }, eventPressable: { flex: 1 }, eventCard: { marginBottom: spacing.md, padding: spacing.md }, eventHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.md }, eventCopy: { flex: 1 }, eventTitle: { fontSize: 15, fontWeight: '900' }, eventTime: { fontSize: 12, fontWeight: '800', marginTop: 2 }, eventDetail: { fontSize: 13, fontWeight: '700', marginTop: spacing.md }, eventNotes: { fontSize: 12, lineHeight: 18, marginTop: spacing.xs }, editHint: { marginTop: 10, fontSize: 9.5, fontWeight: '700' },
+  timeline: { gap: 0 }, timelineRow: { flexDirection: 'row', alignItems: 'stretch' }, rail: { width: 26, alignItems: 'center' }, dot: { width: 10, height: 10, borderRadius: 5, marginTop: 27, zIndex: 2 }, line: { width: 2, flex: 1 }, eventPressable: { flex: 1 }, eventCard: { marginBottom: spacing.md, padding: spacing.md }, eventHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.md }, eventCopy: { flex: 1 }, eventTitle: { fontSize: 15, fontWeight: '900' }, eventTime: { fontSize: 12, fontWeight: '800', marginTop: 2 }, eventActor: { marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 4 }, eventActorText: { flex: 1, fontSize: 10, lineHeight: 14, fontWeight: '700' }, eventDetail: { fontSize: 13, fontWeight: '700', marginTop: spacing.md }, eventNotes: { fontSize: 12, lineHeight: 18, marginTop: spacing.xs }, editHint: { marginTop: 10, fontSize: 9.5, fontWeight: '700' },
   emptyState: { minHeight: 230, alignItems: 'center', justifyContent: 'center', gap: spacing.md, paddingHorizontal: spacing.lg }, emptyTitle: { fontSize: 18, fontWeight: '900' }, emptyText: { fontSize: 13, lineHeight: 19, textAlign: 'center' }, emptyButton: { minHeight: 44, borderRadius: radius.md, paddingHorizontal: spacing.xl, alignItems: 'center', justifyContent: 'center' }, emptyButtonText: { color: '#FFF', fontWeight: '900' },
   notesHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }, notesKicker: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }, notesTitle: { fontSize: 18, fontWeight: '900', marginTop: 3 }, autosave: { borderRadius: 99, paddingHorizontal: 8, paddingVertical: 6, flexDirection: 'row', alignItems: 'center', gap: 4 }, autosaveText: { fontSize: 8.5, fontWeight: '900' },
   quickGrid: { marginTop: 16, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, quickNote: { width: '31%', flexGrow: 1, minHeight: 64, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, padding: 8, alignItems: 'center', justifyContent: 'center', gap: 4 }, quickIcon: { fontSize: 19 }, quickText: { fontSize: 9.5, fontWeight: '800', textAlign: 'center' }, newEpisode: { minHeight: 48, marginTop: 12, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, newEpisodeText: { fontSize: 13, fontWeight: '900' },

@@ -11,6 +11,7 @@ import {
   isNightPeriod,
   mergeDayStates,
   normalizeDayState,
+  restoreRoutineSnapshot,
   startRoutine,
   startSleep,
   deleteDayNoteEpisode,
@@ -21,9 +22,11 @@ import {
   type DayNoteEpisode,
   type RoutineEvent,
   type RecordType,
+  type RoutineActor,
 } from '@/domain/routine';
 import { getFirebaseErrorMessage, getLocalDateId, loadRoutineDays, observeRoutineDay, saveRoutineDay } from '@/services/firebase';
 import { useNinouAuth } from '@/state/auth-context';
+import { useFamilyPreferences } from '@/state/preferences-context';
 
 const STORAGE_KEY_PREFIX = 'ninou.mobile.day-state.v2';
 
@@ -36,6 +39,7 @@ type RoutineContextValue = {
   hydrated: boolean;
   syncStatus: RoutineSyncStatus;
   syncMessage: string;
+  canUndo: boolean;
   beginRoutine: (mode: 'awake' | 'sleeping') => void;
   runPrimaryAction: () => void;
   addRecord: (input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => void;
@@ -52,6 +56,7 @@ const RoutineContext = createContext<RoutineContextValue | null>(null);
 
 export function RoutineProvider({ children }: PropsWithChildren) {
   const { user, access, status: authStatus } = useNinouAuth();
+  const { preferences } = useFamilyPreferences();
   const [state, setState] = useState(createEmptyDayState);
   const [history, setHistory] = useState<Record<string, DayState>>({});
   const stateRef = useRef(state);
@@ -59,21 +64,39 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const [now, setNow] = useState(0);
   const [syncStatus, setSyncStatus] = useState<RoutineSyncStatus>('local');
   const [syncMessage, setSyncMessage] = useState('Salvo neste aparelho');
+  const [canUndo, setCanUndo] = useState(false);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const undoStateRef = useRef<DayState | null>(null);
   const dayId = getLocalDateId();
   const storageScope = access?.familyId || (user ? `account-${user.uid}` : 'guest');
   const storageKey = `${STORAGE_KEY_PREFIX}.${storageScope}.${dayId}`;
+  const undoStorageKey = `${storageKey}.undo`;
+  const routineActor = useMemo<RoutineActor>(() => {
+    const email = user?.email || access?.email || '';
+    const name = preferences.caregiverName.trim() || email.split('@')[0] || 'Responsável';
+    const relationship = preferences.caregiverRelation.trim();
+    return {
+      uid: user?.uid || '',
+      email,
+      name,
+      relationship,
+      label: [name, relationship].filter(Boolean).join(' · '),
+    };
+  }, [access?.email, preferences.caregiverName, preferences.caregiverRelation, user?.email, user?.uid]);
 
   useEffect(() => {
     if (authStatus === 'loading' || authStatus === 'resolving-family') return;
     let mounted = true;
     const unsubscribes: (() => void)[] = [];
-    AsyncStorage.getItem(storageKey)
-      .then((raw) => {
+    AsyncStorage.multiGet([storageKey, undoStorageKey])
+      .then((entries) => {
         if (!mounted) return;
+        const raw = entries[0]?.[1];
+        const undoRaw = entries[1]?.[1];
         setSyncStatus(access ? 'connecting' : 'local');
         setSyncMessage(access ? 'Conectando à família…' : 'Salvo neste aparelho');
+        undoStateRef.current = undoRaw ? normalizeDayState(JSON.parse(undoRaw)) : null;
+        setCanUndo(Boolean(undoStateRef.current));
         const localState = raw ? normalizeDayState(JSON.parse(raw)) : createEmptyDayState();
         stateRef.current = localState;
         setState(localState);
@@ -117,7 +140,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       })
       .finally(() => { if (mounted) setHydrated(true); });
     return () => { mounted = false; unsubscribes.forEach((unsubscribe) => unsubscribe()); };
-  }, [access, authStatus, dayId, storageKey]);
+  }, [access, authStatus, dayId, storageKey, undoStorageKey]);
 
   useEffect(() => {
     const initialTimer = setTimeout(() => setNow(Date.now()), 0);
@@ -132,6 +155,8 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const commit = useCallback((buildNext: (current: DayState, at: number) => DayState) => {
     const at = Date.now();
     undoStateRef.current = stateRef.current;
+    setCanUndo(true);
+    void AsyncStorage.setItem(undoStorageKey, JSON.stringify(stateRef.current));
     const next = buildNext(stateRef.current, at);
     setNow(at);
     stateRef.current = next;
@@ -162,7 +187,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       setSyncStatus('local');
       setSyncMessage('Salvo neste aparelho');
     }
-  }, [access, dayId, storageKey, user]);
+  }, [access, dayId, storageKey, undoStorageKey, user]);
 
   const saveDay = useCallback((targetDayId: string, next: DayState) => {
     setHistory((current) => ({ ...current, [targetDayId]: next }));
@@ -184,24 +209,24 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   }, [dayId, history, saveDay]);
 
   const beginRoutine = useCallback((mode: 'awake' | 'sleeping') => {
-    commit((current, at) => startRoutine(current, mode, at));
-  }, [commit]);
+    commit((current, at) => startRoutine(current, mode, at, routineActor));
+  }, [commit, routineActor]);
 
   const runPrimaryAction = useCallback(() => {
     commit((current, at) => {
-      if (current.mode === 'sleeping') return finishSleep(current, at);
-      if (current.mode === 'awake') return startSleep(current, isNightPeriod(at) ? 'dormir' : 'sono', at);
+      if (current.mode === 'sleeping') return finishSleep(current, at, routineActor);
+      if (current.mode === 'awake') return startSleep(current, isNightPeriod(at) ? 'dormir' : 'sono', at, routineActor);
       return current;
     });
-  }, [commit]);
+  }, [commit, routineActor]);
 
   const addRecord = useCallback((input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => {
     const targetDayId = Number.isFinite(Number(input.start)) ? getLocalDateId(Number(input.start)) : dayId;
-    if (targetDayId === dayId) commit((current, at) => addRoutineRecord(current, input, at));
-    else commitDay(targetDayId, (current, at) => addRoutineRecord(current, input, at));
-  }, [commit, commitDay, dayId]);
+    if (targetDayId === dayId) commit((current, at) => addRoutineRecord(current, input, at, routineActor));
+    else commitDay(targetDayId, (current, at) => addRoutineRecord(current, input, at, routineActor));
+  }, [commit, commitDay, dayId, routineActor]);
 
-  const updateEvent = useCallback((targetDayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>) => commitDay(targetDayId, (current, at) => updateRoutineEvent(current, eventId, patch, at)), [commitDay]);
+  const updateEvent = useCallback((targetDayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>) => commitDay(targetDayId, (current, at) => updateRoutineEvent(current, eventId, patch, at, routineActor)), [commitDay, routineActor]);
   const deleteEvent = useCallback((targetDayId: string, eventId: string) => commitDay(targetDayId, (current, at) => deleteRoutineEvent(current, eventId, at)), [commitDay]);
   const updateDayNotes = useCallback((targetDayId: string, notes: string) => commitDay(targetDayId, (current, at) => saveDayNotes(current, notes, at)), [commitDay]);
   const addNoteEpisodeToDay = useCallback((targetDayId: string, input: Omit<DayNoteEpisode, 'id'>) => commitDay(targetDayId, (current, at) => addDayNoteEpisode(current, input, at)), [commitDay]);
@@ -209,12 +234,14 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const undoLastAction = useCallback(() => {
     if (!undoStateRef.current) return;
     const previous = undoStateRef.current;
-    undoStateRef.current = stateRef.current;
-    saveDay(dayId, previous);
-  }, [dayId, saveDay]);
+    undoStateRef.current = null;
+    setCanUndo(false);
+    void AsyncStorage.removeItem(undoStorageKey);
+    saveDay(dayId, restoreRoutineSnapshot(stateRef.current, previous, Date.now()));
+  }, [dayId, saveDay, undoStorageKey]);
   const resetDay = useCallback((targetDayId: string) => commitDay(targetDayId, (current, at) => clearRoutineDay(current, at)), [commitDay]);
 
-  const value = useMemo(() => ({ state, history, now, hydrated, syncStatus, syncMessage, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisode: addNoteEpisodeToDay, deleteNoteEpisode: deleteNoteEpisodeFromDay, undoLastAction, resetDay }), [state, history, now, hydrated, syncStatus, syncMessage, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisodeToDay, deleteNoteEpisodeFromDay, undoLastAction, resetDay]);
+  const value = useMemo(() => ({ state, history, now, hydrated, syncStatus, syncMessage, canUndo, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisode: addNoteEpisodeToDay, deleteNoteEpisode: deleteNoteEpisodeFromDay, undoLastAction, resetDay }), [state, history, now, hydrated, syncStatus, syncMessage, canUndo, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisodeToDay, deleteNoteEpisodeFromDay, undoLastAction, resetDay]);
   return <RoutineContext.Provider value={value}>{children}</RoutineContext.Provider>;
 }
 

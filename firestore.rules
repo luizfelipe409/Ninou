@@ -44,6 +44,10 @@ service cloud.firestore {
       return memberPath(familyId, request.auth.uid);
     }
 
+    function currentUserFamilyPath(familyId) {
+      return userFamilyPath(request.auth.uid, familyId);
+    }
+
     function userFamilyPath(userId, familyId) {
       return /databases/$(database)/documents/users/$(userId)/families/$(familyId);
     }
@@ -54,14 +58,20 @@ service cloud.firestore {
 
     function isFamilyMember(familyId) {
       return isSignedIn()
-        && exists(currentMemberPath(familyId))
-        && isActiveData(get(currentMemberPath(familyId)).data);
+        && (
+          (exists(currentMemberPath(familyId))
+            && isActiveData(get(currentMemberPath(familyId)).data))
+          || (exists(currentUserFamilyPath(familyId))
+            && isActiveData(get(currentUserFamilyPath(familyId)).data))
+        );
     }
 
     function memberRole(familyId) {
-      return isFamilyMember(familyId)
+      return exists(currentMemberPath(familyId))
         ? get(currentMemberPath(familyId)).data.role
-        : "";
+        : (exists(currentUserFamilyPath(familyId))
+          ? get(currentUserFamilyPath(familyId)).data.role
+          : "");
     }
 
     function canReadFamily(familyId) {
@@ -75,6 +85,7 @@ service cloud.firestore {
         "responsavel",
         "pai",
         "mae",
+        "global_admin",
         "admin"
       ];
     }
@@ -87,6 +98,7 @@ service cloud.firestore {
         "pai",
         "mae",
         "cuidador",
+        "caregiver",
         "admin"
       ];
     }
@@ -159,7 +171,7 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.status == "active"
         && inviteCanBeUsedByCurrentUser(familyId, inviteCodeFromRequest())
-        && request.resource.data.role in ["admin_familiar", "cuidador", "visualizacao", "responsavel"];
+        && request.resource.data.role in ["admin_familiar", "cuidador", "caregiver", "visualizacao", "visualizador", "viewer", "responsavel"];
     }
 
     function memberOwnerProtected() {
@@ -251,7 +263,7 @@ service cloud.firestore {
         && request.resource.data.status in ["pending", "active"]
         && request.resource.data.useCount == 0
         && request.resource.data.maxUses <= 1
-        && request.resource.data.role in ["admin_familiar", "cuidador", "visualizacao", "responsavel"];
+        && request.resource.data.role in ["admin_familiar", "cuidador", "caregiver", "visualizacao", "visualizador", "viewer", "responsavel"];
     }
 
     function inviteUpdateByFamilyAdmin() {
@@ -324,6 +336,19 @@ service cloud.firestore {
           "removedBy",
           "leftAt",
           "updatedAt"
+        ]);
+    }
+
+    function userFamilyUpdateBySelfSafe(userId) {
+      return isSelf(userId)
+        && request.resource.data.familyId == resource.data.familyId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "email",
+          "updatedAt",
+          "linkedAt",
+          "lastSeenAt",
+          "deviceId",
+          "acceptedAt"
         ]);
     }
 
@@ -420,6 +445,17 @@ service cloud.firestore {
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
               "status",
               "updatedAt",
+              "acceptedAt",
+              "acceptedAtClient",
+              "accepted",
+              "legalVersion",
+              "termsVersion",
+              "privacyVersion",
+              "privacyPolicyVersion",
+              "medicalDisclaimerVersion",
+              "medicalDisclaimerAccepted",
+              "email",
+              "actorEmail",
               "resolvedAt",
               "cancelledAt",
               "note",
@@ -444,7 +480,7 @@ service cloud.firestore {
         allow read: if isSelf(userId) || isGlobalAdmin() || isFamilyAdmin(familyId);
         allow create: if isGlobalAdmin() || userFamilyCreateBySelf(userId, familyId) || (isFamilyAdmin(familyId) && exists(memberPath(familyId, userId)));
         allow update: if isGlobalAdmin()
-          || (isSelf(userId) && request.resource.data.familyId == resource.data.familyId)
+          || userFamilyUpdateBySelfSafe(userId)
           || userFamilyUpdateByFamilyAdmin(userId, familyId);
         allow delete: if isGlobalAdmin();
       }
