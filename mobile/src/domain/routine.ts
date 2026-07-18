@@ -456,6 +456,43 @@ export function getTodaySummary(state: DayState, now: number) {
   };
 }
 
+export function getTodayAwakeMs(state: DayState, now = Date.now()) {
+  const dayStartDate = new Date(now);
+  dayStartDate.setHours(0, 0, 0, 0);
+  const dayStart = dayStartDate.getTime();
+  const dayEnd = Math.max(dayStart, now);
+  const sleepStarts = state.events
+    .filter((event) => event.type === 'sono' || event.type === 'dormir')
+    .map((event) => event.start);
+  if (state.mode === 'sleeping' && state.activeStartedAt) sleepStarts.push(state.activeStartedAt);
+  sleepStarts.sort((left, right) => left - right);
+
+  const intervals: [number, number][] = state.events
+    .filter((event) => event.type === 'acordou' || event.type === 'despertar-noturno')
+    .map((event) => {
+      const sleepStart = sleepStarts.find((timestamp) => timestamp >= event.start);
+      const end = sleepStart ?? (state.mode === 'awake' ? dayEnd : event.start);
+      return [event.start, Math.max(event.start, end)] as [number, number];
+    });
+
+  if (state.lastWakeWindowStartedAt && state.lastWakeWindowMs) {
+    intervals.push([state.lastWakeWindowStartedAt, state.lastWakeWindowStartedAt + state.lastWakeWindowMs]);
+  }
+  if (state.mode === 'awake' && state.activeStartedAt) intervals.push([state.activeStartedAt, dayEnd]);
+
+  const clipped = intervals
+    .map(([start, end]) => [Math.max(dayStart, start), Math.min(dayEnd, end)] as [number, number])
+    .filter(([start, end]) => end > start)
+    .sort((left, right) => left[0] - right[0]);
+  const merged = clipped.reduce<[number, number][]>((result, interval) => {
+    const previous = result[result.length - 1];
+    if (!previous || interval[0] > previous[1]) result.push([...interval]);
+    else previous[1] = Math.max(previous[1], interval[1]);
+    return result;
+  }, []);
+  return merged.reduce((total, [start, end]) => total + end - start, 0);
+}
+
 export function formatDuration(ms: number, includeSeconds = false) {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const hours = Math.floor(totalSeconds / 3600);

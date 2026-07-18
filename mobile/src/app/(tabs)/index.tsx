@@ -9,7 +9,7 @@ import { NinouCard } from '@/components/ninou-screen';
 import { RoutineOrbit } from '@/components/routine-orbit';
 import { NinouAppHeader } from '@/components/ninou-app-header';
 import { NinouBackground } from '@/components/ninou-background';
-import { formatDuration, formatTime, getPrimaryAction, getTodaySummary, recordConfig, type RecordType } from '@/domain/routine';
+import { formatDuration, formatTime, getPrimaryAction, getTodayAwakeMs, getTodaySummary, recordConfig, type RecordType } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
@@ -40,8 +40,10 @@ export default function TodayScreen() {
   const lastBottle = getLast(['mamadeira']);
   const lastDiaper = getLast(['fralda']);
   const awakeMs = state.mode === 'awake' && state.activeStartedAt ? Math.max(0, now - state.activeStartedAt) : 0;
+  const awakeTodayMs = getTodayAwakeMs(state, now);
   const wakeWindowMs = profile.wakeWindowMinutes * 60000;
   const wakeOverdueMs = Math.max(0, awakeMs - wakeWindowMs);
+  const wakeWindowApproaching = state.mode === 'awake' && awakeMs >= wakeWindowMs * 0.9;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
@@ -92,6 +94,7 @@ export default function TodayScreen() {
           <View style={styles.overviewGrid}>
             <OverviewItem label="Estado atual" value={state.mode === 'sleeping' ? `Dormindo há ${formatDuration(now - (state.activeStartedAt || now))}` : state.mode === 'awake' ? `Acordado há ${formatDuration(awakeMs)}` : 'Ainda não iniciado'} />
             <OverviewItem label="Sono total" value={formatDuration(summary.sleepMs)} />
+            <OverviewItem label="Acordado hoje" value={formatDuration(awakeTodayMs)} />
             <OverviewItem label="Mamadeiras" value={String(state.events.filter((event) => event.type === 'mamadeira').length)} />
             <OverviewItem label="Fraldas" value={String(summary.diapers)} />
             <OverviewItem label="Última mamadeira" value={lastBottle ? `${lastBottle.amountMl || 0} ml • ${formatTime(lastBottle.start)}` : 'Sem registro'} />
@@ -111,15 +114,15 @@ export default function TodayScreen() {
         {state.mode === 'awake' ? (
           <NinouCard style={{ backgroundColor: colors.surfaceElevated }}>
             <Text style={[styles.insightKicker, { color: colors.accent }]}>🌿 Lembrete gentil</Text>
-            <Text style={[styles.insightTitle, { color: colors.text }]}>{profile.name || 'O bebê'} está acordado há {formatDuration(awakeMs)}</Text>
-            <Text style={[styles.insightText, { color: colors.textMuted }]}>Talvez seja um bom momento para observar sinais de sono. Este é só um lembrete gentil, sem diagnóstico.</Text>
+            <Text style={[styles.insightTitle, { color: colors.text }]}>{wakeWindowApproaching ? `${profile.name || 'O bebê'} está acordado há ${formatDuration(awakeMs)}` : 'Dentro da referência gentil'}</Text>
+            <Text style={[styles.insightText, { color: colors.textMuted }]}>{wakeWindowApproaching ? `A referência escolhida pela família é de ${profile.wakeWindowMinutes} minutos. Observe os sinais com calma, sem diagnóstico.` : `Referência atual: ${profile.wakeWindowMinutes} minutos. O aviso muda conforme o tempo acordado avança.`}</Text>
           </NinouCard>
         ) : null}
 
         <NinouCard>
           <Text style={[styles.cardKicker, { color: colors.textMuted }]}>Janela acordado</Text>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>{wakeOverdueMs > 0 ? 'Pode ser hora de preparar a soneca' : 'Dentro da janela de referência'}</Text>
-          <Text style={[styles.cardBody, { color: colors.textMuted }]}>{wakeOverdueMs > 0 ? `Já passou da janela de referência em ${formatDuration(wakeOverdueMs)}. Sem pressa: observe os sinais do bebê.` : `Referência atual: ${profile.wakeWindowMinutes} minutos. Ajuste no Perfil conforme a rotina da família.`}</Text>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>{state.mode === 'sleeping' ? 'Pausada durante o sono' : state.mode === 'idle' ? 'Aguardando o início da rotina' : wakeOverdueMs > 0 ? 'Pode ser hora de preparar a soneca' : 'Dentro da janela de referência'}</Text>
+          <Text style={[styles.cardBody, { color: colors.textMuted }]}>{state.mode === 'sleeping' ? `A referência de ${profile.wakeWindowMinutes} minutos começa novamente quando o bebê acordar.` : state.mode === 'idle' ? `Referência atual: ${profile.wakeWindowMinutes} minutos. O acompanhamento começa ao registrar que o bebê acordou.` : wakeOverdueMs > 0 ? `Já passou da janela de referência em ${formatDuration(wakeOverdueMs)}. Sem pressa: observe os sinais do bebê.` : `Referência atual: ${profile.wakeWindowMinutes} minutos. Ajuste no Perfil conforme a rotina da família.`}</Text>
         </NinouCard>
 
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Registre em poucos toques</Text>
@@ -135,14 +138,14 @@ export default function TodayScreen() {
         <NinouCard>
           <View style={styles.cardHead}>
             <View><Text style={[styles.cardKicker, { color: colors.textMuted }]}>Próxima soneca</Text><Text style={[styles.cardTitle, { color: colors.text }]}>{state.mode === 'awake' ? 'Janela em andamento' : 'Aguardando'}</Text></View>
-            <View style={[styles.miniRing, { borderColor: colors.primary }]}><Text style={[styles.miniRingText, { color: colors.primary }]}>70</Text></View>
+            <View style={[styles.miniRing, { borderColor: colors.primary }]}><Text style={[styles.miniRingText, { color: colors.primary }]}>{profile.wakeWindowMinutes}</Text></View>
           </View>
           <Text style={[styles.cardBody, { color: colors.textMuted }]}>O acompanhamento usa os registros da rotina e não substitui orientação pediátrica.</Text>
         </NinouCard>
 
         <View style={styles.summaryGrid}>
           <SummaryItem label="Sono" value={formatDuration(summary.sleepMs)} />
-          <SummaryItem label="Acordado" value={state.mode === 'awake' && state.activeStartedAt ? formatDuration(now - state.activeStartedAt) : '—'} />
+          <SummaryItem label="Acordado" value={formatDuration(awakeTodayMs)} />
           <SummaryItem label="Mamadas" value={String(summary.feeding)} />
           <SummaryItem label="Fraldas" value={String(summary.diapers)} />
           <SummaryItem label="Medicamentos" value={String(summary.medicine)} />

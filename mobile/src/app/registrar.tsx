@@ -76,7 +76,7 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['bottom']}>
       <NinouBackground />
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView key={selectedType || 'care-menu'} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {!selectedType ? (
           <>
             <View style={styles.intro}>
@@ -89,7 +89,7 @@ export default function RegisterScreen() {
           </>
         ) : (
           <>
-            <Pressable onPress={() => setSelectedType(null)} style={styles.backButton}>
+            <Pressable onPress={() => { setActiveBreastSide(null); setSelectedType(null); }} style={styles.backButton}>
               <Ionicons name="chevron-back" size={20} color={colors.primary} />
               <Text style={[styles.backText, { color: colors.primary }]}>Cuidados</Text>
             </Pressable>
@@ -165,9 +165,9 @@ export default function RegisterScreen() {
         <Text style={[styles.groupTitle, { color: colors.textMuted }]}>{title}</Text>
         <View style={styles.grid}>
           {types.map((type) => (
-            <Pressable key={type} onPress={() => selectType(type)} style={({ pressed }) => [styles.action, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.pressed]}>
-              <ActionArt type={type} size={72} />
-              <Text style={[styles.actionTitle, { color: colors.text }]}>{recordConfig[type].title}</Text>
+            <Pressable key={type} onPress={() => selectType(type)} style={({ pressed }) => [styles.action, { backgroundColor: colors.surface, borderColor: pressed ? colors.primary : colors.border, shadowColor: colors.primary }, pressed && styles.actionPressed]}>
+              <ActionArt type={type} size={50} />
+              <Text adjustsFontSizeToFit minimumFontScale={0.8} numberOfLines={1} style={[styles.actionTitle, { color: colors.text }]}>{recordConfig[type].title}</Text>
               <Text style={[styles.actionHint, { color: colors.textMuted }]}>{recordConfig[type].hint}</Text>
             </Pressable>
           ))}
@@ -201,8 +201,9 @@ const styles = StyleSheet.create({
   group: { gap: spacing.md },
   groupTitle: { fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  action: { width: '47%', flexGrow: 1, minHeight: 164, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md, justifyContent: 'flex-end' },
-  actionTitle: { fontSize: 15, fontWeight: '900', marginTop: spacing.sm },
+  action: { width: '47%', flexGrow: 1, minHeight: 116, borderRadius: 21, borderWidth: StyleSheet.hairlineWidth, padding: 11, justifyContent: 'center' },
+  actionPressed: { borderWidth: 1, shadowOpacity: 0.32, shadowRadius: 14, shadowOffset: { width: 0, height: 0 } },
+  actionTitle: { width: '100%', fontSize: 13, lineHeight: 16, fontWeight: '900', marginTop: 6 },
   actionHint: { fontSize: 11, marginTop: 2 },
   pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
   backButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 2 },

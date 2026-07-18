@@ -8,6 +8,7 @@ const {
   finishSleep,
   formatRoutineActorLabel,
   getRoutineEventOrbitTimestamp,
+  getTodayAwakeMs,
   mergeDayStates,
   restoreRoutineSnapshot,
   saveDayNotes,
@@ -39,6 +40,12 @@ assert.equal(formatRoutineActorLabel(sleepEvent), 'Felipe · Pai');
 assert.equal(formatRoutineActorLabel(wakeEvent), 'Mary · Mãe');
 assert.equal(getRoutineEventOrbitTimestamp(sleepEvent), sleepEvent.end);
 assert.equal(getRoutineEventOrbitTimestamp(wakeEvent), wakeEvent.start);
+
+const dayStart = new Date(2026, 6, 18, 0, 0, 0, 0).getTime();
+const firstWake = startRoutine(createEmptyDayState(), 'awake', dayStart + 60 * 60 * 1000, felipe);
+const firstSleep = startSleep(firstWake, 'sono', dayStart + 2 * 60 * 60 * 1000, felipe);
+const secondWake = finishSleep(firstSleep, dayStart + 3 * 60 * 60 * 1000, mary);
+assert.equal(getTodayAwakeMs(secondWake, dayStart + 3.5 * 60 * 60 * 1000), 90 * 60 * 1000);
 
 const withDiaper = addRoutineRecord(awake, { type: 'fralda', detail: 'Xixi' }, 1_700_000_002_000);
 const withBottle = addRoutineRecord(awake, { type: 'mamadeira', detail: 'Fórmula', amountMl: 90 }, 1_700_000_003_000);

@@ -76,7 +76,7 @@ function metricForDay(id: string, state: DayState, now: number, isToday: boolean
 }
 
 export default function DataScreen() {
-  const { colors } = useNinouTheme();
+  const { colors, isDark } = useNinouTheme();
   const { width } = useWindowDimensions();
   const { state, history, now } = useRoutine();
   const { access } = useNinouAuth();
@@ -98,7 +98,7 @@ export default function DataScreen() {
 
   return (
     <NinouScreen title="Dados" hidePageHeader>
-      <LinearGradient colors={['#2B2048', '#201632']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.hero, { borderColor: colors.border }]}>
+      <LinearGradient colors={isDark ? ['#2B2048', '#201632'] : ['#FFFDFC', '#F7EFFB', '#EEF5FF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.hero, { borderColor: colors.border }]}>
         <View style={styles.heroCopy}>
           <Text style={[styles.kicker, { color: colors.textMuted }]}>Últimos 7 dias</Text>
           <Text style={[styles.heroTitle, { color: colors.text }]}>Dados inteligentes</Text>

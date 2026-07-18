@@ -14,6 +14,11 @@ const starPoints = [
   [38, 83, 2], [18, 70, 1], [8, 49, 1.5], [27, 55, 1], [51, 32, 1.5],
 ] as const;
 
+const lightStarPoints = [
+  [5, 16, 1.4], [10, 27, 1], [6, 41, 1.7], [12, 57, 1.1], [7, 72, 1.5], [11, 86, 1],
+  [94, 14, 1.2], [89, 26, 1.6], [95, 43, 1], [88, 59, 1.5], [94, 74, 1.2], [89, 87, 1.6],
+] as const;
+
 function pointForTime(timestamp: number, size: number, orbitRadius: number, markerSize = 34) {
   const date = new Date(timestamp);
   const minutes = date.getHours() * 60 + date.getMinutes();
@@ -78,6 +83,7 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
   const size = Math.min(390, width - 28);
   const center = size / 2;
   const orbitRadius = (size - 26) * (126 / 320);
+  const eventOrbitRadius = orbitRadius - 22;
   const circumference = 2 * Math.PI * orbitRadius;
   const coreWidth = Math.min(230, size * 0.62);
   const coreHeight = Math.min(150, size * 0.4);
@@ -87,7 +93,9 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
     : state.mode === 'sleeping'
       ? state.activeType === 'dormir' ? 'Sono noturno há' : 'Dormindo há'
       : state.activeType === 'despertar-noturno' ? 'Despertar noturno há' : 'Acordado há';
-  const completedSleep = state.events.filter((event) => (event.type === 'sono' || event.type === 'dormir') && event.end > event.start).slice(-5);
+  const completedSleep = state.events.filter((event) => (event.type === 'sono' || event.type === 'dormir')
+    && event.end > event.start
+    && !(state.mode === 'sleeping' && state.activeStartedAt && Math.abs(event.start - state.activeStartedAt) < 60000)).slice(-5);
   const dayStartDate = new Date(now);
   dayStartDate.setHours(0, 0, 0, 0);
   const dayStart = dayStartDate.getTime();
@@ -100,7 +108,11 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
   const primaryJourneyId = activeArc?.id || completedSleep.reduce<RoutineEvent | null>((longest, event) => !longest || event.end - event.start > longest.end - longest.start ? event : longest, null)?.id;
   const nowPoint = pointForTime(now, size, orbitRadius, 10);
   const daySunPoint = { left: size * 0.067, top: size * 0.108 };
-  const eventGroups = groupNearbyEvents(state.events.filter((event) => event.type !== 'acordou').slice(-12));
+  const eventGroups = groupNearbyEvents(state.events.filter((event) => event.type !== 'acordou'
+    && !(state.mode === 'sleeping'
+      && state.activeStartedAt
+      && (event.type === 'sono' || event.type === 'dormir')
+      && Math.abs(event.start - state.activeStartedAt) < 60000)).slice(-12));
   const activeIsAlreadyRecorded = Boolean(state.activeStartedAt && state.events.some((event) => event.type === state.activeType && Math.abs(event.start - state.activeStartedAt!) < 2 * 60 * 1000));
 
   useEffect(() => {
@@ -135,7 +147,7 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
         <Circle cx={endPoint.x} cy={endPoint.y} r={active ? 10 : 8} fill={active ? 'rgba(255,188,105,0.18)' : 'rgba(119,226,204,0.14)'} stroke={active ? 'rgba(255,202,139,0.58)' : 'rgba(145,242,222,0.42)'} strokeWidth={1} />
         <Circle cx={startPoint.x} cy={startPoint.y} r={4} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.2} />
         <Circle cx={endPoint.x} cy={endPoint.y} r={5.5} fill={active ? '#FFF4DD' : isDark ? '#F6F1FF' : '#FFFFFF'} stroke={active ? '#EAA45C' : '#7054BD'} strokeWidth={2.4} />
-        {primary ? (
+        {primary && !active ? (
           <G>
             <Rect x={labelPoint.x - 22} y={labelPoint.y - 10} width={44} height={20} rx={10} fill={isDark ? 'rgba(23,16,46,0.96)' : 'rgba(255,255,255,0.96)'} stroke={isDark ? 'rgba(188,158,255,0.72)' : 'rgba(103,78,178,0.30)'} strokeWidth={1} />
             <SvgText x={labelPoint.x} y={labelPoint.y + 3.2} fill={isDark ? '#FFF8EC' : '#332650'} fontSize={9} fontWeight="900" textAnchor="middle">{formatTime(start)}</SvgText>
@@ -176,14 +188,13 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
             ]}
           />
         </>
-      ) : (
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }), transform: [{ translateX: twinkle.interpolate({ inputRange: [0, 1], outputRange: [-3, 4] }) }, { translateY: twinkle.interpolate({ inputRange: [0, 1], outputRange: [-2, 3] }) }] }]}>
-          {starPoints.map(([left, top, dotSize], index) => <View key={`${left}-${top}`} style={[styles.starDot, { left: `${left}%`, top: `${top}%`, width: dotSize * 2, height: dotSize * 2, borderRadius: dotSize, opacity: 0.68 + (index % 3) * 0.14 }]} />)}
-        </Animated.View>
-      )}
-      <Animated.Text style={[styles.sparkle, styles.sparkleA, { color: isDark ? '#FFF8E6' : '#B98626', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.68, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.72, 1.26] }) }] }]}>✦</Animated.Text>
-      <Animated.Text style={[styles.sparkle, styles.sparkleB, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1, 0.62] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1.2, 0.76] }) }] }]}>✧</Animated.Text>
-      <Animated.Text style={[styles.sparkle, styles.sparkleC, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.18] }) }] }]}>✦</Animated.Text>
+      ) : null}
+      <Animated.View pointerEvents="none" style={[styles.starLayer, StyleSheet.absoluteFill, { opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: isDark ? [0.7, 1] : [0.62, 0.94] }) }]}>
+        {(isDark ? starPoints : lightStarPoints).map(([left, top, dotSize], index) => <View key={`${left}-${top}`} style={[styles.starDot, { left: `${left}%`, top: `${top}%`, width: dotSize * 2, height: dotSize * 2, borderRadius: dotSize, backgroundColor: isDark ? '#FFF7CE' : '#FFFFFF', shadowColor: isDark ? '#D8B5FF' : '#8B68D5', opacity: 0.68 + (index % 3) * 0.14 }]} />)}
+      </Animated.View>
+      <Animated.Text style={[styles.sparkle, isDark ? styles.sparkleA : styles.sparkleLightA, { color: isDark ? '#FFF8E6' : '#B98626', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.68, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.72, 1.26] }) }] }]}>✦</Animated.Text>
+      <Animated.Text style={[styles.sparkle, isDark ? styles.sparkleB : styles.sparkleLightB, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1, 0.62] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1.2, 0.76] }) }] }]}>✧</Animated.Text>
+      <Animated.Text style={[styles.sparkle, isDark ? styles.sparkleC : styles.sparkleLightC, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.18] }) }] }]}>✦</Animated.Text>
 
       <Svg width={size} height={size} style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
         <Defs>
@@ -213,7 +224,7 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
       {eventGroups.map((group) => {
         const event = group[group.length - 1];
         const markerTimestamp = getRoutineEventOrbitTimestamp(event);
-        const point = pointForTime(group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length, size, orbitRadius, group.length > 1 ? 44 : 34);
+        const point = pointForTime(group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length, size, eventOrbitRadius, group.length > 1 ? 44 : 34);
         if (group.length > 1) return (
           <Pressable accessibilityRole="button" accessibilityLabel={`${group.length} registros próximos`} onPress={() => setSelectedCluster(group)} key={`cluster-${group[0].id}`} style={({ pressed }) => [styles.marker, styles.clusterMarker, point, { backgroundColor: isDark ? 'rgba(18,12,43,0.92)' : 'rgba(255,255,255,0.92)', borderColor: isDark ? 'rgba(181,131,255,0.72)' : 'rgba(117,88,232,0.48)' }, pressed && styles.markerPressed]}>
             <ActionArt type={event.type} size={37} />
@@ -230,9 +241,9 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
 
       {state.mode !== 'idle' && state.activeType !== 'acordou' && state.activeStartedAt && !activeIsAlreadyRecorded ? (() => {
         const activeMarkerTimestamp = state.mode === 'sleeping' ? now : state.activeStartedAt;
-        const activePoint = pointForTime(activeMarkerTimestamp, size, orbitRadius, 40);
+        const activePoint = pointForTime(activeMarkerTimestamp, size, eventOrbitRadius, 40);
         const activeEvent: RoutineEvent = { id: 'active', type: state.activeType, start: state.activeStartedAt, end: now, detail: state.activeDetail, notes: state.activeNotes, createdAtClient: state.activeStartedAt };
-        return <Pressable accessibilityRole="button" accessibilityLabel="Abrir cuidado em andamento" onPress={() => setSelectedEvent(activeEvent)} style={({ pressed }) => [styles.marker, styles.activeMarker, activePoint, { backgroundColor: colors.surface, borderColor: colors.accent }, pressed && styles.markerPressed]}><ActionArt type={state.activeType} size={35} /><View style={[styles.activeBadge, { backgroundColor: colors.accent }]} /><Text style={[styles.markerTime, { color: colors.text }]}>{formatTime(state.activeStartedAt)}</Text></Pressable>;
+        return <Pressable accessibilityRole="button" accessibilityLabel="Abrir cuidado em andamento" onPress={() => setSelectedEvent(activeEvent)} style={({ pressed }) => [styles.marker, styles.activeMarker, activePoint, { backgroundColor: colors.surface, borderColor: colors.accent }, pressed && styles.markerPressed]}><ActionArt type={state.activeType} size={35} /><View style={[styles.activeBadge, { backgroundColor: colors.accent }]} /></Pressable>;
       })() : null}
 
       <Animated.View pointerEvents="none" style={[styles.coreHalo, { width: coreWidth + 24, height: coreHeight + 24, borderRadius: 999, left: center - (coreWidth + 24) / 2, top: center - (coreHeight + 24) / 2, backgroundColor: isDark ? 'rgba(113,66,210,0.1)' : 'rgba(255,255,255,0.24)', opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.36, 0.72] }), transform: [{ scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.98, 1.035] }) }] }]} />
@@ -285,13 +296,17 @@ const styles = StyleSheet.create({
   sky: { borderRadius: 34, borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden' },
   skyImage: { borderRadius: 34 },
   sunGlow: { position: 'absolute', backgroundColor: 'rgba(255,205,101,0.20)', shadowColor: '#FFC94E', shadowOpacity: 0.72, shadowRadius: 34, shadowOffset: { width: 0, height: 0 } },
-  starDot: { position: 'absolute', backgroundColor: '#FFF7CE', shadowColor: '#D8B5FF', shadowOpacity: 0.9, shadowRadius: 5, shadowOffset: { width: 0, height: 0 } },
-  sparkle: { position: 'absolute', color: '#FFF8E6' },
+  starLayer: { zIndex: 1 },
+  starDot: { position: 'absolute', shadowOpacity: 0.9, shadowRadius: 5, shadowOffset: { width: 0, height: 0 } },
+  sparkle: { position: 'absolute', zIndex: 2, color: '#FFF8E6' },
   sparkleA: { left: '21%', top: '22%', fontSize: 18 },
   sparkleB: { right: '18%', top: '28%', fontSize: 14 },
   sparkleC: { left: '16%', bottom: '22%', fontSize: 12 },
-  nowDotHalo: { position: 'absolute', width: 18, height: 18, borderRadius: 9 },
-  nowDot: { position: 'absolute', width: 10, height: 10, borderRadius: 5, borderWidth: 2 },
+  sparkleLightA: { left: '5%', top: '26%', fontSize: 16 },
+  sparkleLightB: { right: '4%', top: '43%', fontSize: 13 },
+  sparkleLightC: { left: '6%', bottom: '24%', fontSize: 11 },
+  nowDotHalo: { position: 'absolute', zIndex: 4, width: 18, height: 18, borderRadius: 9 },
+  nowDot: { position: 'absolute', zIndex: 4, width: 10, height: 10, borderRadius: 5, borderWidth: 2 },
   anchor: { position: 'absolute', zIndex: 6, width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   anchorTheme: { borderWidth: StyleSheet.hairlineWidth, shadowColor: '#2D174F', shadowOpacity: 0.22, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
   anchorText: { fontSize: 10.5, fontWeight: '900' },

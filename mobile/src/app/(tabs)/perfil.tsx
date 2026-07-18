@@ -16,7 +16,7 @@ import { useFamilyPreferences } from '@/state/preferences-context';
 import { createCaregiverInvite, getFirebaseErrorMessage, getLocalDateId, observeFamilyMembers, requestAccountDeletion, saveLegalConsent, submitSupportRequest, type FamilyMember } from '@/services/firebase';
 
 export default function ProfileScreen() {
-  const { colors, mode, setMode } = useNinouTheme();
+  const { colors, isDark, mode, setMode } = useNinouTheme();
   const { profile, updateProfile } = useBabyProfile();
   const { user, access, status, error, login, signOut, refreshAccess } = useNinouAuth();
   const { syncMessage, resetDay } = useRoutine();
@@ -116,8 +116,8 @@ export default function ProfileScreen() {
 
   return (
     <NinouScreen title="Perfil" hidePageHeader>
-      <LinearGradient colors={['#2A1D4B', '#171029', '#100C20']} style={[styles.profileHero, { borderColor: colors.border }]}>
-        <View style={[styles.avatarHaloOuter, { borderColor: `${colors.accent}66` }]}>
+      <LinearGradient colors={isDark ? ['#2A1D4B', '#171029', '#100C20'] : ['#FFFDFC', '#F8F0FB', '#EEF5FF']} style={[styles.profileHero, { borderColor: colors.border }]}>
+        <View style={[styles.avatarHaloOuter, { borderColor: `${colors.accent}66`, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.78)' }]}>
           <View style={[styles.avatarHaloInner, { borderColor: `${colors.primary}AA` }]}>
             <AvatarArt avatarId={profile.avatarId} size={88} />
           </View>
@@ -373,7 +373,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   profileHero: { minHeight: 308, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, gap: spacing.lg, overflow: 'hidden' },
   profileCard: { padding: 20 },
-  avatarHaloOuter: { width: 122, height: 122, borderRadius: 61, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.06)' },
+  avatarHaloOuter: { width: 122, height: 122, borderRadius: 61, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   avatarHaloInner: { width: 106, height: 106, borderRadius: 53, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   heroName: { marginTop: spacing.sm, fontSize: 42, lineHeight: 46, fontWeight: '900', letterSpacing: -1.8, textAlign: 'center' },
   heroAge: { fontSize: 18, lineHeight: 23, fontWeight: '900', textAlign: 'center' },

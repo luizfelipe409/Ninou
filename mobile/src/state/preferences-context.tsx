@@ -56,7 +56,7 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
       void saveAccountCaregiverProfile(user, access?.familyId, {
         caregiverName: next.caregiverName,
         caregiverRelation: next.caregiverRelation,
-      });
+      }).catch(() => undefined);
     }
     return next;
   }), [access?.familyId, key, user]);
