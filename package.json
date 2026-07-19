@@ -1,7 +1,7 @@
 {
   "name": "ninou-app",
   "private": true,
-  "version": "82.1.4",
+  "version": "82.1.5",
   "type": "module",
   "scripts": {
     "check": "node tests/validate-project.mjs",

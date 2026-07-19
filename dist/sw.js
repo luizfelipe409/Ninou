@@ -1,14 +1,14 @@
-const CACHE_NAME = "ninou-v82-1-4-web-admin-gate";
-const APP_VERSION = "82.1.4";
+const CACHE_NAME = "ninou-v82-1-5-admin-web-portal";
+const APP_VERSION = "82.1.5";
 const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
-  `/styles/admin-mobile-parity-v82.1.1.css?v=${APP_VERSION}`,
-  `/js/boot-v82.0.0.mjs?v=${APP_VERSION}`,
-  `/js/ninou-admin-v82.0.0.mjs?v=${APP_VERSION}`,
-  `/js/services/admin-service.js?v=${APP_VERSION}`,
-  `/js/ninou-core-v82.0.0.mjs?v=${APP_VERSION}`,
+  `/styles/admin-web-v82.1.5.css?v=${APP_VERSION}`,
+  `/js/boot-v82.1.5.mjs?v=${APP_VERSION}`,
+  `/js/ninou-admin-web-v82.1.5.mjs?v=${APP_VERSION}`,
+  `/js/services/admin-service-v82.1.5.js`,
+  `/js/ninou-core-v82.1.5.mjs?v=${APP_VERSION}`,
   `/js/ninou-ux-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/ninou-consistency-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/ninou-stability-v82.0.0.mjs?v=${APP_VERSION}`,

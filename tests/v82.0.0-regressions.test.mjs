@@ -5,14 +5,14 @@ import { getEventDaySegment } from "../js/domain/records.js";
 const root = new URL("../", import.meta.url);
 const [html, boot, core, adminRuntime, adminService, firebaseService, ux, stability, adminCss, premiumCss, focusedFlowCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
-  readFile(new URL("js/boot-v82.0.0.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-core-v82.0.0.mjs", root), "utf8"),
-  readFile(new URL("js/ninou-admin-v82.0.0.mjs", root), "utf8"),
-  readFile(new URL("js/services/admin-service.js", root), "utf8"),
+  readFile(new URL("js/boot-v82.1.5.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-core-v82.1.5.mjs", root), "utf8"),
+  readFile(new URL("js/ninou-admin-web-v82.1.5.mjs", root), "utf8"),
+  readFile(new URL("js/services/admin-service-v82.1.5.js", root), "utf8"),
   readFile(new URL("js/services/firebase-service.js", root), "utf8"),
   readFile(new URL("js/ninou-ux-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-stability-v82.0.0.mjs", root), "utf8"),
-  readFile(new URL("styles/admin-mobile-parity-v82.1.1.css", root), "utf8"),
+  readFile(new URL("styles/admin-web-v82.1.5.css", root), "utf8"),
   readFile(new URL("styles/premium-v82.0.0.css", root), "utf8"),
   readFile(new URL("styles/focused-flow-v82.0.0.css", root), "utf8"),
   readFile(new URL("js/ui/action-launcher.js", root), "utf8"),
@@ -29,30 +29,34 @@ const headEnd = html.indexOf("</head>");
 const bootBarrier = html.indexOf('classList.add("ninou-booting", "ninou-v8200")');
 assert.ok(bootBarrier > 0 && bootBarrier < headEnd, "A barreira de boot deve começar dentro do <head>.");
 assert.match(html, /<body data-profile-access-state="booting">/);
+assert.match(html, /id="adminWebPortal" class="premium-admin-root admin-web-portal"/);
+assert.ok(html.indexOf('id="adminWebPortal"') < html.indexOf('<main class="phone-shell'), "O portal admin deve existir fora e antes do shell familiar.");
+assert.match(adminRuntime, /const panelRoot = \$\('#adminWebPortal'\)/);
+assert.match(adminCss, /body\.global-admin-mode > main\.phone-shell[\s\S]*display: none !important/);
 assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
-assert.match(html, /styles\/legacy\.css\?v=82\.1\.4/);
+assert.match(html, /styles\/legacy\.css\?v=82\.1\.5/);
 assert.doesNotMatch(html, /styles\/admin-v82\.0\.0\.css/);
-assert.doesNotMatch(html, /js\/ninou-admin-v82\.0\.0\.mjs/);
-assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.1\.4/);
-assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.1\.4/);
+assert.doesNotMatch(html, /<script[^>]+ninou-admin-web-v82\.1\.5\.mjs/);
+assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.1\.5/);
+assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.1\.5/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
-assert.match(html, /boot-v82\.0\.0\.mjs\?v=82\.1\.4/);
+assert.match(html, /boot-v82\.1\.5\.mjs\?v=82\.1\.5/);
 assert.match(html, /__NINOU_BOOT_WATCHDOG__/);
 assert.match(html, /history\.replaceState/);
 
-assert.match(boot, /const NINOU_VERSION = "82\.1\.4"/);
+assert.match(boot, /const NINOU_VERSION = "82\.1\.5"/);
 assert.match(boot, /const MIN_SPLASH_MS = 1500;/);
 assert.match(boot, /visual-guard-v82\.0\.0/);
-assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.1\.4"/);
-assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.1\.4-admin-responsive-clean"/);
-assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-mobile-parity-v82\.1\.1\.css\?v=82\.1\.4"/);
-assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-v82\.0\.0\.mjs\?v=82\.1\.4"/);
+assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.1\.5"/);
+assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.1\.5-admin-web-portal"/);
+assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-web-v82\.1\.5\.css\?v=82\.1\.5"/);
+assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-web-v82\.1\.5\.mjs\?v=82\.1\.5"/);
 assert.match(core, /void ensureAdminRuntime\(\)/);
 assert.doesNotMatch(core, /createInviteButton\.addEventListener/);
 assert.doesNotMatch(core, /adminInvitePanel\.addEventListener/);
 assert.match(adminRuntime, /export function initializeNinouAdminRuntime/);
-assert.match(adminRuntime, /admin-service\.js\?v=82\.1\.4/);
+assert.match(adminRuntime, /admin-service-v82\.1\.5\.js/);
 assert.match(core, /async function activateGlobalAdminWebPortal/);
 assert.match(core, /showAdminRuntimeFallback/);
 assert.match(adminRuntime, /panelRoot\.addEventListener\(['"]click['"]/);
@@ -134,18 +138,18 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-1-4-web-admin-gate/);
-assert.match(sw, /ninou-admin-v82\.0\.0\.mjs\?v=\$\{APP_VERSION\}/);
-assert.match(sw, /const APP_VERSION = "82\.1\.4"/);
+assert.match(sw, /ninou-v82-1-5-admin-web-portal/);
+assert.match(sw, /ninou-admin-web-v82\.1\.5\.mjs\?v=\$\{APP_VERSION\}/);
+assert.match(sw, /const APP_VERSION = "82\.1\.5"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
 assert.match(build, /"assets\/clock-themes\/day-sky\.svg"/);
 assert.match(build, /const publicFiles = \[/);
-assert.match(build, /"js\/ninou-core-v82\.0\.0\.mjs"/);
-assert.match(build, /"js\/ninou-admin-v82\.0\.0\.mjs"/);
+assert.match(build, /"js\/ninou-core-v82\.1\.5\.mjs"/);
+assert.match(build, /"js\/ninou-admin-web-v82\.1\.5\.mjs"/);
 assert.match(build, /"styles\/premium-v82\.0\.0\.css"/);
-assert.match(build, /"styles\/admin-mobile-parity-v82\.1\.1\.css"/);
+assert.match(build, /"styles\/admin-web-v82\.1\.5\.css"/);
 assert.doesNotMatch(build, /"styles\/admin-v82\.0\.0\.css"/);
 assert.doesNotMatch(build, /^\s*"(?:styles|js|icons|audio|assets|app\.js|styles\.css|firestore\.rules|vercel\.json)",?$/m);
 assert.match(vercel, /"buildCommand": "npm run build"/);
@@ -160,7 +164,7 @@ assert.match(nightSky, /<radialGradient id="nebulaA"/);
 assert.match(nightSky, /mask id="moonCut"/);
 
 const legacySize = (await stat(new URL("styles/legacy.css", root))).size;
-const adminSize = (await stat(new URL("styles/admin-mobile-parity-v82.1.1.css", root))).size;
+const adminSize = (await stat(new URL("styles/admin-web-v82.1.5.css", root))).size;
 const premiumSize = (await stat(new URL("styles/premium-v82.0.0.css", root))).size;
 assert.ok(legacySize < 620 * 1024, "O CSS comum deve permanecer abaixo de 620 KB.");
 assert.ok(adminSize > 25 * 1024 && adminSize < 60 * 1024, "O CSS administrativo deve permanecer isolado e focado.");
@@ -192,7 +196,7 @@ assert.match(premiumCss, /body\[data-active-screen="profile"\] \.fab-real-plus/)
 assert.match(premiumCss, /--n79-nav-height: 70px/);
 assert.match(premiumCss, /Marcadores reais com arte legível no céu claro/);
 
-const { normalizeAdminRole } = await import(new URL("js/services/admin-service.js", root));
+const { normalizeAdminRole } = await import(new URL("js/services/admin-service-v82.1.5.js", root));
 assert.equal(normalizeAdminRole("responsavel"), "owner");
 assert.equal(normalizeAdminRole("caregiver"), "cuidador");
 assert.equal(normalizeAdminRole("admin"), "admin_familiar");

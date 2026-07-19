@@ -5,15 +5,16 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const releaseVersion = "82.1.4";
+const releaseVersion = "82.1.5";
 const failures = [];
 const cssModules = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
-const conditionalCssModules = ["admin-mobile-parity-v82.1.1"];
-const conditionalJsModules = ["js/ninou-admin-v82.0.0.mjs"];
+const conditionalCssModules = [];
+const adminCssModule = "admin-web-v82.1.5";
+const conditionalJsModules = ["js/ninou-admin-web-v82.1.5.mjs"];
 const required = [
   "index.html", "sw.js", "manifest.webmanifest", "firestore.rules", "vercel.json",
-  ...[...cssModules, ...conditionalCssModules].map((name) => `styles/${name}.css`),
-  "js/boot-v82.0.0.mjs", "js/ninou-core-v82.0.0.mjs", ...conditionalJsModules, "js/ninou-ux-v82.0.0.mjs",
+  ...[...cssModules, ...conditionalCssModules, adminCssModule].map((name) => `styles/${name}.css`),
+  "js/boot-v82.1.5.mjs", "js/ninou-core-v82.1.5.mjs", ...conditionalJsModules, "js/services/admin-service-v82.1.5.js", "js/ninou-ux-v82.0.0.mjs",
   "js/ninou-consistency-v82.0.0.mjs", "js/ninou-stability-v82.0.0.mjs",
   "js/runtime/architecture-v82.0.0.mjs", "js/runtime/diagnostics-v82.0.0.mjs", "js/runtime/visual-guard-v82.0.0.mjs",
   "js/core/event-bus.js", "js/core/app-state.js", "js/core/logger.js",
@@ -49,9 +50,11 @@ const html = await readFile(join(root, "index.html"), "utf8");
 const ids = [...html.matchAll(/\sid=["']([^"']+)["']/g)].map((match) => match[1]);
 const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
 if (duplicates.length) failures.push(`IDs duplicados no HTML: ${duplicates.join(", ")}`);
-if (!html.includes(`boot-v82.0.0.mjs?v=${releaseVersion}`)) failures.push(`Boot v${releaseVersion} não está ligado ao index.html`);
+if (!html.includes(`boot-v82.1.5.mjs?v=${releaseVersion}`)) failures.push(`Boot v${releaseVersion} não está ligado ao index.html`);
 for (const module of cssModules) if (!html.includes(`styles/${module}.css?v=${releaseVersion}`)) failures.push(`CSS ${module} não está ligado ao HTML`);
-for (const module of conditionalCssModules) if (html.includes(`styles/${module}.css`)) failures.push(`CSS condicional ${module} não deve ser carregado pelo HTML comum`);
+if (!html.includes(`styles/${adminCssModule}.css?v=${releaseVersion}`)) failures.push("CSS do portal administrativo não está ligado ao HTML");
+if (!html.includes('id="adminWebPortal"')) failures.push("Host dedicado #adminWebPortal ausente do HTML");
+if (html.indexOf('id="adminWebPortal"') > html.indexOf('<main class="phone-shell')) failures.push("Portal admin ainda está aninhado no shell familiar");
 for (const module of conditionalJsModules) if (html.includes(module)) failures.push(`JavaScript condicional ${module} não deve ser carregado pelo HTML comum`);
 for (const removed of ["tokens", "foundation", "home", "components", "motion", "responsive", "v78.4-critical"]) {
   if (html.includes(`styles/${removed}.css`)) failures.push(`CSS antigo ainda ligado ao HTML: ${removed}`);
@@ -59,9 +62,9 @@ for (const removed of ["tokens", "foundation", "home", "components", "motion", "
 
 const sw = await readFile(join(root, "sw.js"), "utf8");
 if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"]')) failures.push("Service Worker não declara a autoridade visual revisada");
-if (!sw.includes("styles/admin-mobile-parity-v82.1.1.css?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o CSS administrativo versionado");
-if (!sw.includes("ninou-admin-v82.0.0.mjs?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o runtime administrativo versionado");
-if (!sw.includes("services/admin-service.js?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o serviço administrativo versionado");
+if (!sw.includes("styles/admin-web-v82.1.5.css?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o CSS administrativo versionado");
+if (!sw.includes("ninou-admin-web-v82.1.5.mjs?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o runtime administrativo versionado");
+if (!sw.includes("services/admin-service-v82.1.5.js")) failures.push("Service Worker não pré-carrega o serviço administrativo versionado");
 if (!sw.includes(`const APP_VERSION = "${releaseVersion}"`)) failures.push(`Service Worker não está na v${releaseVersion}`);
 for (const asset of ["day-sky.svg", "night-sky.svg"]) if (!sw.includes(asset)) failures.push(`Service Worker não referencia ${asset}`);
 for (const asset of required.filter((file) => file.startsWith("js/"))) {
@@ -72,8 +75,8 @@ const productionFiles = existsSync(join(root, "dist")) ? await walk(join(root, "
 const forbidden = productionFiles.map((file) => relative(root, file)).filter((file) => /(^|\/)(\.env|\.env\.|project\.json$|\.vercel\/)/.test(file));
 if (forbidden.length) failures.push(`Arquivos sensíveis/de ambiente no pacote: ${forbidden.join(", ")}`);
 const publicRootFiles = new Set(productionFiles.map((file) => relative(join(root, "dist"), file)));
-if (productionFiles.length && !publicRootFiles.has("styles/admin-mobile-parity-v82.1.1.css")) failures.push("CSS administrativo ausente do pacote de produção");
-if (productionFiles.length && !publicRootFiles.has("js/ninou-admin-v82.0.0.mjs")) failures.push("Runtime administrativo ausente do pacote de produção");
+if (productionFiles.length && !publicRootFiles.has("styles/admin-web-v82.1.5.css")) failures.push("CSS administrativo ausente do pacote de produção");
+if (productionFiles.length && !publicRootFiles.has("js/ninou-admin-web-v82.1.5.mjs")) failures.push("Runtime administrativo ausente do pacote de produção");
 const forbiddenPublicFiles = ["app.js", "styles.css", "firestore.rules", "vercel.json"]
   .filter((file) => publicRootFiles.has(file));
 const obsoletePublicFiles = [...publicRootFiles].filter((file) => /v81\.0\.1|premium-v81\.0\.1|(^|\/)\.DS_Store$/.test(file));
@@ -88,22 +91,23 @@ const legacyImportant = (legacyCss.match(/!important/g) || []).length;
 if (legacyImportant > 4735) failures.push(`Camada comum usa !important em excesso: ${legacyImportant}`);
 const legacyWithoutSharedAccessCard = legacyCss.replace(/\.admin-access-card\b/g, "");
 if (/(?:[.#][A-Za-z0-9_-]*admin[A-Za-z0-9_-]*|\[data-(?:global-admin-only|advanced-only)\])/.test(legacyWithoutSharedAccessCard)) failures.push("Seletores exclusivos do painel administrativo retornaram à camada comum");
-const adminCss = await readFile(join(root, "styles/admin-mobile-parity-v82.1.1.css"), "utf8");
+const adminCss = await readFile(join(root, `styles/${adminCssModule}.css`), "utf8");
 const adminImportant = (adminCss.match(/!important/g) || []).length;
 if (adminImportant > 850) failures.push(`Camada administrativa usa !important em excesso: ${adminImportant}`);
 for (const selector of ["body.global-admin-mode", ".premium-admin-root", ".premium-admin-family-screen", ".premium-admin-confirm-dialog"]) {
   if (!adminCss.includes(selector)) failures.push(`Camada administrativa não cobre: ${selector}`);
 }
-const core = await readFile(join(root, "js/ninou-core-v82.0.0.mjs"), "utf8");
-if (!core.includes(`const ADMIN_STYLESHEET_HREF = "./styles/admin-mobile-parity-v82.1.1.css?v=${releaseVersion}"`)) failures.push("Núcleo não declara o CSS administrativo condicional");
-if (!core.includes(`const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=${releaseVersion}"`)) failures.push("Núcleo não declara o runtime administrativo condicional");
+const core = await readFile(join(root, "js/ninou-core-v82.1.5.mjs"), "utf8");
+if (!core.includes(`const ADMIN_STYLESHEET_HREF = "./styles/admin-web-v82.1.5.css?v=${releaseVersion}"`)) failures.push("Núcleo não declara o CSS administrativo condicional");
+if (!core.includes(`const ADMIN_RUNTIME_HREF = "./ninou-admin-web-v82.1.5.mjs?v=${releaseVersion}"`)) failures.push("Núcleo não declara o runtime administrativo condicional");
 if (!core.includes("void ensureAdminRuntime()")) failures.push("Núcleo não restringe o runtime administrativo ao admin global");
 if (!core.includes("async function activateGlobalAdminWebPortal")) failures.push("Web app não possui gate dedicado para o admin global");
 if (!core.includes("showAdminRuntimeFallback")) failures.push("Web app não possui recuperação visível para falha do runtime admin");
 if (/createInviteButton\.addEventListener|adminInvitePanel\.addEventListener/.test(core)) failures.push("Listeners administrativos retornaram ao núcleo comum");
 const adminRuntime = await readFile(join(root, conditionalJsModules[0]), "utf8");
 if (!adminRuntime.includes("export function initializeNinouAdminRuntime")) failures.push("Runtime administrativo não expõe inicialização explícita");
-if (!adminRuntime.includes(`./services/admin-service.js?v=${releaseVersion}`)) failures.push("Runtime administrativo não fixa a versão do serviço administrativo");
+if (!adminRuntime.includes("const panelRoot = $('#adminWebPortal')")) failures.push("Runtime administrativo ainda não monta no portal dedicado");
+if (!adminRuntime.includes(`./services/admin-service-v82.1.5.js`)) failures.push("Runtime administrativo não fixa a versão do serviço administrativo");
 const vercel = await readFile(join(root, "vercel.json"), "utf8");
 if (vercel.includes("max-age=31536000, immutable")) failures.push("Vercel ainda mantém módulos internos imutáveis entre versões");
 for (const removedSelector of ["chips-more-button", "quick-observation-custom", "family-access-summary-grid", "icon-art-dormir", "icon-art-despertar-noturno"]) {
@@ -125,9 +129,9 @@ const sizes = {};
 for (const name of cssModules) sizes[name] = (await stat(join(root, `styles/${name}.css`))).size;
 const totalCss = Object.values(sizes).reduce((a,b) => a+b,0);
 if (totalCss >= 810 * 1024) failures.push(`CSS comum ainda está grande demais: ${(totalCss/1024).toFixed(1)} KB`);
-const adminCssSize = (await stat(join(root, "styles/admin-mobile-parity-v82.1.1.css"))).size;
+const adminCssSize = (await stat(join(root, `styles/${adminCssModule}.css`))).size;
 if (adminCssSize >= 60 * 1024) failures.push(`CSS administrativo ainda está grande demais: ${(adminCssSize/1024).toFixed(1)} KB`);
-const coreJsSize = (await stat(join(root, "js/ninou-core-v82.0.0.mjs"))).size;
+const coreJsSize = (await stat(join(root, "js/ninou-core-v82.1.5.mjs"))).size;
 const adminRuntimeSize = (await stat(join(root, conditionalJsModules[0]))).size;
 if (coreJsSize >= 680 * 1024) failures.push(`Núcleo JavaScript comum ainda está grande demais: ${(coreJsSize/1024).toFixed(1)} KB`);
 if (adminRuntimeSize >= 48 * 1024) failures.push(`Runtime administrativo está grande demais: ${(adminRuntimeSize/1024).toFixed(1)} KB`);
