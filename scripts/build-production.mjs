@@ -10,7 +10,7 @@ const publicFiles = [
   "manifest.webmanifest",
 
   "styles/legacy.css",
-  "styles/admin-v82.0.0.css",
+  "styles/admin-mobile-parity-v82.1.1.css",
   "styles/premium-v82.0.0.css",
   "styles/focused-flow-v82.0.0.css",
 
@@ -105,4 +105,4 @@ for (const file of publicFiles) {
   publicBytes += (await stat(source)).size;
 }
 
-console.log(`Build de produção v82.1.0 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);
+console.log(`Build de produção v82.1.3 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);

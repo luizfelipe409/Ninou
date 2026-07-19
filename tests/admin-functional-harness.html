@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" href="../styles/admin-mobile-parity-v82.1.1.css">
+  <title>Teste funcional do admin</title>
+</head>
+<body class="global-admin-mode">
+  <section id="adminInvitePanel" hidden></section>
+  <script type="module">
+    import { initializeNinouAdminRuntime } from '../js/ninou-admin-v82.0.0.mjs?functional-harness=1';
+
+    const now = Date.now();
+    const workspace = {
+      families: [{
+        id: 'family-functional-test', name: 'Família Teste', babyName: 'Nina', status: 'active',
+        ownerUid: '', ownerEmail: 'marry@example.com', plan: 'courtesy', subscriptionStatus: 'active',
+        trialEndsAt: 0, premiumUntil: now + 30 * 86400000,
+        members: [
+          { uid: 'u1', email: 'marry@example.com', name: 'Marry', role: 'owner', status: 'active' },
+          { uid: 'u2', email: 'care@example.com', name: 'Daniel', role: 'cuidador', status: 'active' },
+        ],
+        invites: [{ code: 'OK123', familyId: 'family-functional-test', email: 'old@example.com', role: 'cuidador', status: 'accepted', expiresAt: now - 1000, createdAt: now - 5000 }],
+        days: [{ dayId: '2026-07-19', eventCount: 2, updatedAt: now, events: [
+          { id: 'e1', type: 'soneca', start: now - 7200000, end: now - 3600000 },
+          { id: 'e2', type: 'mamadeira', start: now - 1800000, end: now - 1800000, amount: 120 },
+        ] }],
+        audits: [], supportCount: 0, lastActivityAt: now,
+        integrityIssues: ['O responsável existe, mas o vínculo principal ainda precisa ser consolidado.'],
+      }],
+      users: [], tickets: [], audits: [],
+      metrics: { activeFamilies: 1, suspendedFamilies: 0, activeUsers: 2, pendingInvites: 0, openTickets: 0, orphanUsers: 0, trialsEndingSoon: 0, syncWarnings: 0 },
+    };
+
+    const fakeMutation = async () => undefined;
+    initializeNinouAdminRuntime({
+      isGlobalAppAdmin: () => true,
+      getCurrentUser: () => ({ uid: 'admin', email: 'luizfelipe.dasilva@gmail.com' }),
+      loadAdminWorkspace: async () => workspace,
+      getErrorMessage: (error) => error?.message || String(error),
+      signOutAccount: fakeMutation,
+      updateAdminFamily: fakeMutation,
+      updateAdminMember: fakeMutation,
+      transferAdminOwnership: fakeMutation,
+      logIntegrityCheck: async () => ({ checkedAt: Date.now(), issues: workspace.families[0].integrityIssues }),
+    });
+  </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-const CONSISTENCY_VERSION = "82.1.0";
+const CONSISTENCY_VERSION = "82.1.3";
 
 const primaryClasses = [
   "primary-action", "profile-primary-button", "commercial-primary-action",

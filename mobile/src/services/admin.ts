@@ -139,6 +139,14 @@ function isActiveStatus(value: unknown) {
   return !['inactive', 'revoked', 'removed', 'blocked', 'suspended', 'archived'].includes(lower(value) || 'active');
 }
 
+export function normalizeAdminRole(value: unknown) {
+  const role = lower(value);
+  if (['owner', 'responsavel', 'responsável', 'pai', 'mae', 'mãe'].includes(role)) return 'owner';
+  if (['admin_familiar', 'admin', 'manager', 'gestor'].includes(role)) return 'admin_familiar';
+  if (['visualizacao', 'visualização', 'viewer', 'read_only'].includes(role)) return 'visualizacao';
+  return ['cuidador', 'caregiver'].includes(role) ? 'cuidador' : (role || 'cuidador');
+}
+
 function assertGlobalAdmin(user: User) {
   if (!isGlobalAppAdminEmail(user.email)) throw new Error('Esta conta não possui permissão administrativa global.');
 }
@@ -151,14 +159,21 @@ function inviteExpired(data: Record<string, unknown>) {
 function buildIntegrityIssues(input: { data: Record<string, unknown>; profile: Record<string, unknown>; members: AdminMember[]; invites: AdminInvite[]; routineDays: AdminRoutineDay[] }) {
   const issues: string[] = [];
   const activeMembers = input.members.filter((member) => isActiveStatus(member.status));
-  const ownerMembers = activeMembers.filter((member) => member.role === 'owner');
+  const ownerMembers = activeMembers.filter((member) => normalizeAdminRole(member.role) === 'owner');
   const emails = activeMembers.map((member) => lower(member.email)).filter(Boolean);
   if (!clean(input.data.ownerUid) && !ownerMembers.length) issues.push('Família sem responsável principal definido.');
+  if (!clean(input.data.ownerUid) && ownerMembers.length) issues.push('O responsável existe, mas o vínculo principal ainda precisa ser consolidado.');
+  if (ownerMembers.length > 1) issues.push('Mais de um membro está marcado como responsável principal.');
   if (!clean(input.profile.name || input.data.babyName)) issues.push('Perfil do bebê incompleto.');
   if (!activeMembers.length) issues.push('Família sem membros ativos.');
   if (new Set(emails).size !== emails.length) issues.push('Existem e-mails duplicados entre os membros.');
   if (input.invites.filter((invite) => invite.status === 'pending' && invite.expiresAt <= Date.now()).length) issues.push('Existem convites expirados ainda marcados como pendentes.');
   if (!input.routineDays.length) issues.push('Nenhuma rotina sincronizada foi encontrada.');
+  if (input.routineDays.some((day) => day.events.some((event) => !event.type || !event.start))) issues.push('Existem registros de rotina incompletos.');
+  const plan = lower(input.data.subscriptionPlan || input.data.plan || 'trial');
+  const planEndsAt = plan === 'trial' ? toMillis(input.data.trialEndsAt || input.data.trialEndsAtClient) : toMillis(input.data.premiumUntil || input.data.premiumUntilClient);
+  if (plan !== 'suspended' && !planEndsAt) issues.push('O acesso não possui uma data de validade definida.');
+  if (plan !== 'suspended' && planEndsAt && planEndsAt <= Date.now()) issues.push('A validade do acesso terminou.');
   return issues;
 }
 
@@ -206,7 +221,7 @@ export async function loadAdminWorkspace(user: User): Promise<AdminWorkspace> {
         email: lower(member.email),
         name: clean(member.name || member.displayName),
         relation: clean(member.relation || member.relationship),
-        role: clean(member.role || 'caregiver'),
+        role: normalizeAdminRole(member.role),
         status: clean(member.status || 'active'),
         lastSeenAt: toMillis(member.lastSeenAt || member.updatedAt),
         deviceId: clean(member.deviceId),
@@ -478,8 +493,9 @@ export async function adminUpdateMember(user: User, family: Pick<AdminFamily, 'i
 
 export async function adminTransferOwnership(user: User, family: AdminFamily, member: AdminMember) {
   assertGlobalAdmin(user);
+  if (!clean(member.uid)) throw new Error('Este membro não possui uma identidade válida para receber a responsabilidade.');
   const batch = writeBatch(db);
-  family.members.filter((item) => item.role === 'owner' && item.uid !== member.uid).forEach((oldOwner) => {
+  family.members.filter((item) => normalizeAdminRole(item.role) === 'owner' && item.uid !== member.uid).forEach((oldOwner) => {
     batch.set(doc(db, 'families', family.id, 'members', oldOwner.uid), { role: 'admin_familiar', updatedAt: serverTimestamp() }, { merge: true });
     batch.set(doc(db, 'users', oldOwner.uid, 'families', family.id), { role: 'admin_familiar', updatedAt: serverTimestamp() }, { merge: true });
   });
@@ -509,7 +525,10 @@ export async function adminUpdateTicket(user: User, ticket: AdminSupportTicket, 
 }
 
 export async function adminLogIntegrityCheck(user: User, family: AdminFamily) {
-  await logAdminAction(user, { action: 'integrity_check', summary: family.integrityIssues.length ? `Diagnóstico encontrou ${family.integrityIssues.length} alerta(s).` : 'Diagnóstico concluído sem alertas.', familyId: family.id, targetId: family.id, metadata: { issues: family.integrityIssues } });
+  const issues = [...new Set(family.integrityIssues.map(clean).filter(Boolean))];
+  const checkedAt = Date.now();
+  await logAdminAction(user, { action: 'integrity_check', summary: issues.length ? `Diagnóstico encontrou ${issues.length} alerta(s).` : 'Diagnóstico concluído sem alertas.', familyId: family.id, targetId: family.id, metadata: { issues, checkedAt } });
+  return { checkedAt, issues, checks: 7, passed: Math.max(0, 7 - issues.length) };
 }
 
 export async function adminLogJustification(user: User, title: string, reason: string, familyId = '') {

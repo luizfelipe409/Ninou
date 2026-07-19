@@ -2,10 +2,11 @@ import { getFirebaseServices } from './firebase-service.js';
 
 export const GLOBAL_ADMIN_EMAIL = 'luizfelipe.dasilva@gmail.com';
 export const INTERNAL_ADMIN_FAMILY_ID = 'ninou-family-luizfelipe';
-export const ADMIN_WEB_VERSION = '82.1.0-web-admin';
+export const ADMIN_WEB_VERSION = '82.1.3-web-admin';
 
 const clean = (value) => String(value || '').trim();
 const lower = (value) => clean(value).toLowerCase();
+const uniqueStrings = (items = []) => [...new Set(items.map((item) => clean(item)).filter(Boolean))];
 const toMillis = (value) => {
   if (value && typeof value.toMillis === 'function') return value.toMillis();
   if (value && typeof value === 'object' && Number.isFinite(Number(value.seconds))) return Number(value.seconds) * 1000;
@@ -54,16 +55,32 @@ function normalizeEvent(event = {}) {
   return { ...event, id: clean(event.id) || `event-${start}`, type: clean(event.type), start, end: Number(event.end || start) };
 }
 
+export function normalizeAdminRole(value = '') {
+  const role = lower(value);
+  if (['owner', 'responsavel', 'responsável', 'pai', 'mae', 'mãe'].includes(role)) return 'owner';
+  if (['admin_familiar', 'admin', 'manager', 'gestor'].includes(role)) return 'admin_familiar';
+  if (['visualizacao', 'visualização', 'viewer', 'read_only'].includes(role)) return 'visualizacao';
+  return ['cuidador', 'caregiver'].includes(role) ? 'cuidador' : (role || 'cuidador');
+}
+
 function buildIssues({ data, profile, members, invites, days }) {
   const issues = [];
   const activeMembers = members.filter((member) => isActive(member.status));
   const emails = activeMembers.map((member) => lower(member.email)).filter(Boolean);
-  if (!clean(data.ownerUid) && !activeMembers.some((member) => member.role === 'owner')) issues.push('Família sem responsável principal definido.');
+  const owners = activeMembers.filter((member) => normalizeAdminRole(member.role) === 'owner');
+  if (!clean(data.ownerUid) && !owners.length) issues.push('Família sem responsável principal definido.');
+  if (!clean(data.ownerUid) && owners.length) issues.push('O responsável existe, mas o vínculo principal ainda precisa ser consolidado.');
+  if (owners.length > 1) issues.push('Mais de um membro está marcado como responsável principal.');
   if (!clean(profile.name || data.babyName)) issues.push('Perfil do bebê incompleto.');
   if (!activeMembers.length) issues.push('Família sem membros ativos.');
   if (new Set(emails).size !== emails.length) issues.push('Existem e-mails duplicados entre os membros.');
   if (invites.some((invite) => invite.status === 'expired')) issues.push('Existem convites expirados ainda não resolvidos.');
   if (!days.length) issues.push('Nenhuma rotina sincronizada foi encontrada.');
+  if (days.some((day) => day.events.some((event) => !event.type || !event.start))) issues.push('Existem registros de rotina incompletos.');
+  const plan = lower(data.subscriptionPlan || data.plan || 'trial');
+  const planEndsAt = plan === 'trial' ? toMillis(data.trialEndsAt || data.trialEndsAtClient) : toMillis(data.premiumUntil || data.premiumUntilClient);
+  if (plan !== 'suspended' && !planEndsAt) issues.push('O acesso não possui uma data de validade definida.');
+  if (plan !== 'suspended' && planEndsAt && planEndsAt <= Date.now()) issues.push('A validade do acesso terminou.');
   return issues;
 }
 
@@ -106,7 +123,7 @@ export async function loadAdminWorkspace(user) {
     const members = membersSnapshot.docs.flatMap((item) => {
       const member = item.data() || {};
       if (lower(member.email) === GLOBAL_ADMIN_EMAIL || lower(member.role) === 'global_admin') return [];
-      return [{ uid: item.id, email: lower(member.email), name: clean(member.name || member.displayName), relation: clean(member.relation || member.relationship), role: clean(member.role || 'cuidador'), status: lower(member.status || 'active'), lastSeenAt: toMillis(member.lastSeenAt || member.updatedAt) }];
+      return [{ uid: item.id, email: lower(member.email), name: clean(member.name || member.displayName), relation: clean(member.relation || member.relationship), role: normalizeAdminRole(member.role), sourceRole: clean(member.role || 'cuidador'), status: lower(member.status || 'active'), lastSeenAt: toMillis(member.lastSeenAt || member.updatedAt) }];
     });
     const inviteMap = new Map();
     globalInvites.filter((item) => clean(item.data.familyId) === familyId).forEach((item) => inviteMap.set(item.id, item.data));
@@ -189,7 +206,8 @@ export async function updateAdminMember(user, family, member, patch, reason = ''
 
 export async function transferAdminOwnership(user, family, member, reason = '') {
   assertAdmin(user); const services = await getFirebaseServices(); const writes = [];
-  family.members.filter((item) => item.role === 'owner' && item.uid !== member.uid).forEach((oldOwner) => { writes.push(services.setDoc(services.doc(services.db, 'families', family.id, 'members', oldOwner.uid), { role: 'admin_familiar', updatedAt: services.serverTimestamp() }, { merge: true })); writes.push(services.setDoc(services.doc(services.db, 'users', oldOwner.uid, 'families', family.id), { role: 'admin_familiar', updatedAt: services.serverTimestamp() }, { merge: true })); });
+  if (!clean(member.uid)) throw new Error('Este membro não possui uma identidade válida para receber a responsabilidade.');
+  family.members.filter((item) => normalizeAdminRole(item.role) === 'owner' && item.uid !== member.uid).forEach((oldOwner) => { writes.push(services.setDoc(services.doc(services.db, 'families', family.id, 'members', oldOwner.uid), { role: 'admin_familiar', ownerUid: member.uid, updatedAt: services.serverTimestamp() }, { merge: true })); writes.push(services.setDoc(services.doc(services.db, 'users', oldOwner.uid, 'families', family.id), { familyId: family.id, role: 'admin_familiar', ownerUid: member.uid, updatedAt: services.serverTimestamp() }, { merge: true })); });
   writes.push(services.setDoc(services.doc(services.db, 'families', family.id, 'members', member.uid), { role: 'owner', status: 'active', updatedAt: services.serverTimestamp() }, { merge: true }));
   writes.push(services.setDoc(services.doc(services.db, 'users', member.uid, 'families', family.id), { familyId: family.id, role: 'owner', status: 'active', ownerUid: member.uid, updatedAt: services.serverTimestamp() }, { merge: true }));
   writes.push(services.setDoc(services.doc(services.db, 'users', member.uid, 'access', 'ninou'), { familyId: family.id, role: 'owner', status: 'active', ownerUid: member.uid, email: member.email, updatedAt: services.serverTimestamp() }, { merge: true }));
@@ -213,5 +231,8 @@ export async function updateAdminTicket(user, ticket, status, note = '') {
 }
 
 export async function logIntegrityCheck(user, family) {
-  await logAction(user, { action: 'integrity_check', summary: family.integrityIssues.length ? `Diagnóstico encontrou ${family.integrityIssues.length} alerta(s).` : 'Diagnóstico concluído sem alertas.', familyId: family.id, targetId: family.id, metadata: { issues: family.integrityIssues } });
+  const issues = uniqueStrings(family.integrityIssues);
+  const checkedAt = Date.now();
+  await logAction(user, { action: 'integrity_check', summary: issues.length ? `Diagnóstico encontrou ${issues.length} alerta(s).` : 'Diagnóstico concluído sem alertas.', familyId: family.id, targetId: family.id, metadata: { issues, checkedAt } });
+  return { checkedAt, issues, checks: 7, passed: Math.max(0, 7 - issues.length) };
 }

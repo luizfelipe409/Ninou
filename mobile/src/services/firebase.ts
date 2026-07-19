@@ -70,6 +70,13 @@ export type FamilyAccess = {
 };
 
 export type FamilyMember = { uid: string; email: string; role: string; name: string; status: string };
+export type FamilySubscription = { plan: string; status: string; validUntil: number };
+
+function timestampMillis(value: unknown) {
+  if (value && typeof (value as { toMillis?: unknown }).toMillis === 'function') return (value as { toMillis: () => number }).toMillis();
+  if (value && typeof value === 'object' && Number.isFinite(Number((value as { seconds?: number }).seconds))) return Number((value as { seconds: number }).seconds) * 1000;
+  return Number.isFinite(Number(value)) ? Number(value) : 0;
+}
 
 export function observeAuth(callback: (user: User | null) => void) {
   return onAuthStateChanged(auth, callback);
@@ -188,6 +195,19 @@ export function observeFamilyMembers(familyId: string, onValue: (members: Family
     const data = member.data();
     return { uid: member.id, email: String(data.email || ''), role: String(data.role || 'caregiver'), name: String(data.name || data.displayName || ''), status: String(data.status || 'active') };
   })), onError);
+}
+
+export function observeFamilySubscription(familyId: string, onValue: (subscription: FamilySubscription | null) => void, onError: (error: Error) => void): Unsubscribe {
+  return onSnapshot(doc(db, 'families', familyId), (snapshot) => {
+    if (!snapshot.exists()) { onValue(null); return; }
+    const data = snapshot.data();
+    const plan = String(data.subscriptionPlan || data.plan || 'trial').toLowerCase();
+    onValue({
+      plan,
+      status: String(data.subscriptionStatus || (plan === 'suspended' ? 'suspended' : 'active')).toLowerCase(),
+      validUntil: timestampMillis(plan === 'trial' ? (data.trialEndsAtClient || data.trialEndsAt) : (data.premiumUntilClient || data.premiumUntil)),
+    });
+  }, onError);
 }
 
 export async function loadRoutineDays(familyId: string) {

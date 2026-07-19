@@ -9611,6 +9611,21 @@ body.profile-guest-focused .screen[data-screen="profile"] .login-actions {
   display: none !important;
 }
 
+.family-subscription-summary {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0;
+  padding: 14px 15px;
+  border: 1px solid rgba(126, 95, 201, .18);
+  border-radius: 18px;
+  background: rgba(126, 95, 201, .09);
+}
+.family-subscription-summary[hidden] { display: none !important; }
+.family-subscription-summary > span { color: var(--accent, #8065d5); font-size: .7rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.family-subscription-summary > strong { font-size: .98rem; font-weight: 900; }
+.family-subscription-summary > small { opacity: .72; font-size: .78rem; font-weight: 700; }
+.family-subscription-summary[data-plan="suspended"] { border-color: rgba(211, 77, 103, .25); background: rgba(211, 77, 103, .1); }
+
 .profile-state-icon {
   width: 42px;
   height: 42px;

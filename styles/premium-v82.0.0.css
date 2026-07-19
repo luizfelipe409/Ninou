@@ -1701,6 +1701,15 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   }
 }
 
+/* O centro premium substitui integralmente o painel administrativo legado.
+   Manter a origem antiga invisível evita flash de checklists e cards técnicos
+   enquanto o runtime administrativo e sua folha condicional são carregados. */
+html.ninou-v8200 body.global-admin-mode #adminInvitePanel,
+html.ninou-v8200 body.global-admin-mode #adminDiagnosticsCard {
+  display: none !important;
+}
+
+
 /* v82.1.0 — confirmação de cuidado e bloqueio espelhados da experiência mobile. */
 .record-success-modal,
 .blocked-account-portal {

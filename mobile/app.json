@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ninou",
     "slug": "ninou",
-    "version": "82.1.0",
+    "version": "82.1.3",
     "orientation": "portrait",
     "icon": "./assets/images/ninou-icon.png",
     "scheme": "ninou",
@@ -10,12 +10,12 @@
     "ios": {
       "icon": "./assets/images/ninou-icon.png",
       "bundleIdentifier": "com.ninou.app",
-      "buildNumber": "82",
+      "buildNumber": "83",
       "supportsTablet": false
     },
     "android": {
       "package": "com.ninou.app",
-      "versionCode": 82,
+      "versionCode": 83,
       "adaptiveIcon": {
         "backgroundColor": "#1D1435",
         "foregroundImage": "./assets/images/ninou-icon.png"

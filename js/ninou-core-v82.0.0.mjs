@@ -28,8 +28,8 @@ import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
 const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
-const ADMIN_STYLESHEET_HREF = "./styles/admin-v82.0.0.css?v=82.1.0";
-const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.1.0";
+const ADMIN_STYLESHEET_HREF = "./styles/admin-mobile-parity-v82.1.1.css?v=82.1.3";
+const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.1.3";
 let adminRuntimePromise = null;
 
 function ensureAdminStylesheet() {
@@ -48,12 +48,7 @@ function ensureAdminStylesheet() {
     console.warn("Ninou: não foi possível carregar o acabamento administrativo.");
   }, { once: true });
 
-  const legacyStylesheet = document.getElementById("ninouLegacyStylesheet");
-  if (legacyStylesheet?.parentNode) {
-    legacyStylesheet.parentNode.insertBefore(stylesheet, legacyStylesheet.nextSibling);
-  } else {
-    document.head.append(stylesheet);
-  }
+  document.head.append(stylesheet);
 }
 
 function ensureAdminRuntime() {
@@ -236,6 +231,10 @@ const familyAccessSummaryDevice = document.querySelector("#familyAccessSummaryDe
 const familyAccessSummaryRole = document.querySelector("#familyAccessSummaryRole");
 const familyAccessSummaryRoleBadge = document.querySelector("#familyAccessSummaryRoleBadge");
 const familyAccessSummaryMembers = document.querySelector("#familyAccessSummaryMembers");
+const familySubscriptionSummary = document.querySelector("#familySubscriptionSummary");
+const familySubscriptionPlan = document.querySelector("#familySubscriptionPlan");
+const familySubscriptionValidity = document.querySelector("#familySubscriptionValidity");
+const familySubscriptionRemaining = document.querySelector("#familySubscriptionRemaining");
 const clientFamilyMembersList = document.querySelector("#clientFamilyMembersList");
 const familyAccessSummaryInviteButton = document.querySelector("#familyAccessSummaryInviteButton");
 const familyAccessSummaryProfileButton = document.querySelector("#familyAccessSummaryProfileButton");
@@ -496,7 +495,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "82.1.0";
+const NINOU_RUNTIME_VERSION = "82.1.3";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let exportRoutineInProgress = false;
@@ -521,7 +520,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "82.1.0-mobile-reference";
+const NINOU_FAMILY_SCOPE_VERSION = "82.1.3-admin-responsive-clean";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -976,6 +975,7 @@ let recentInvites = [];
 let adminStatsRequestId = 0;
 let latestAdminStats = null;
 let clientFamilyMembersCache = [];
+let clientFamilySubscriptionCache = null;
 let clientFamilyMembersFamilyId = "";
 let clientFamilyMembersFetchedAt = 0;
 let clientFamilyMembersLoading = false;
@@ -1351,8 +1351,10 @@ async function refreshClientFamilyMembers(options = {}) {
   const familyId = normalizeFamilyId(familyAccess?.familyId || "");
   if (!familyId || !hasFamilyAccess()) {
     clientFamilyMembersCache = [];
+    clientFamilySubscriptionCache = null;
     clientFamilyMembersFamilyId = "";
     renderClientFamilyMembers([]);
+    renderClientFamilySubscription();
     return;
   }
 
@@ -1361,6 +1363,7 @@ async function refreshClientFamilyMembers(options = {}) {
     && Date.now() - clientFamilyMembersFetchedAt < 60000;
   if (!options.force && (freshEnough || clientFamilyMembersLoading)) {
     renderClientFamilyMembers(clientFamilyMembersCache);
+    renderClientFamilySubscription();
     return;
   }
 
@@ -1369,7 +1372,10 @@ async function refreshClientFamilyMembers(options = {}) {
   renderClientFamilyMembers(clientFamilyMembersCache);
   try {
     const services = await getFirebaseServices();
-    const snapshot = await services.getDocs(services.collection(services.db, "families", familyId, "members"));
+    const [snapshot, familySnapshot] = await Promise.all([
+      services.getDocs(services.collection(services.db, "families", familyId, "members")),
+      services.getDoc(services.doc(services.db, "families", familyId)),
+    ]);
     const members = [];
     snapshot.forEach((memberDoc) => {
       const data = memberDoc.data() || {};
@@ -1380,6 +1386,7 @@ async function refreshClientFamilyMembers(options = {}) {
       members.push({ uid: memberDoc.id, ...data, email });
     });
     clientFamilyMembersCache = mergeClientFamilyMembers(members);
+    clientFamilySubscriptionCache = familySnapshot.exists() ? familySnapshot.data() || {} : null;
     clientFamilyMembersFetchedAt = Date.now();
   } catch (error) {
     console.warn("Não foi possível carregar os membros da família para o perfil:", error);
@@ -1387,7 +1394,23 @@ async function refreshClientFamilyMembers(options = {}) {
   } finally {
     clientFamilyMembersLoading = false;
     renderClientFamilyMembers(clientFamilyMembersCache);
+    renderClientFamilySubscription();
   }
+}
+
+function renderClientFamilySubscription() {
+  if (!familySubscriptionSummary) return;
+  const data = clientFamilySubscriptionCache;
+  familySubscriptionSummary.hidden = !data;
+  if (!data) return;
+  const plan = String(data.subscriptionPlan || data.plan || "trial").toLowerCase();
+  const labels = { trial: "Período de teste", premium: "Plano Premium", courtesy: "Acesso cortesia", suspended: "Acesso suspenso" };
+  const until = toMilliseconds(plan === "trial" ? (data.trialEndsAtClient || data.trialEndsAt) : (data.premiumUntilClient || data.premiumUntil));
+  const remaining = until ? Math.max(0, Math.ceil((until - Date.now()) / 86400000)) : 0;
+  setText(familySubscriptionPlan, labels[plan] || "Acesso da família");
+  setText(familySubscriptionValidity, plan === "suspended" ? "Temporariamente suspenso" : until ? `${until <= Date.now() ? "Validade encerrada" : "Válido até"} ${new Date(until).toLocaleDateString("pt-BR")}` : "Validade ainda não definida");
+  setText(familySubscriptionRemaining, plan === "suspended" ? "Fale com o suporte para reativar o acesso." : until ? (remaining ? `${remaining} dia(s) restante(s)` : "O período terminou.") : "O administrador ainda não definiu um período.");
+  familySubscriptionSummary.dataset.plan = plan;
 }
 
 function renderFamilyAccessSummary() {
@@ -1446,6 +1469,7 @@ function renderFamilyAccessSummary() {
   }
 
   renderClientFamilyMembers(clientFamilyMembersCache);
+  renderClientFamilySubscription();
   refreshClientFamilyMembers().catch(() => {});
 }
 
@@ -15011,7 +15035,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=82.1.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=82.1.3", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -15039,7 +15063,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "82.1.0";
+  const VERSION = "82.1.3";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -15096,7 +15120,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "82.1.0";
+  const VERSION = "82.1.3";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -15160,7 +15184,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "82.1.0";
+  const LEGAL_VERSION = "82.1.3";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -15419,7 +15443,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "82.1.0";
+  const SUPPORT_VERSION = "82.1.3";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -15748,7 +15772,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "82.1.0";
+  const REVIEW_VERSION = "82.1.3";
 
   function currentEffectiveRole() {
     try {

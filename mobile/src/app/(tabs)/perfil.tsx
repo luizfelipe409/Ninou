@@ -13,7 +13,7 @@ import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
 import { radius, spacing, useNinouTheme, type ThemeMode } from '@/theme/tokens';
 import { useFamilyPreferences } from '@/state/preferences-context';
-import { createCaregiverInvite, getFirebaseErrorMessage, getLocalDateId, observeFamilyMembers, requestAccountDeletion, saveLegalConsent, submitSupportRequest, type FamilyMember } from '@/services/firebase';
+import { createCaregiverInvite, getFirebaseErrorMessage, getLocalDateId, observeFamilyMembers, observeFamilySubscription, requestAccountDeletion, saveLegalConsent, submitSupportRequest, type FamilyMember, type FamilySubscription } from '@/services/firebase';
 
 export default function ProfileScreen() {
   const { colors, isDark, mode, setMode } = useNinouTheme();
@@ -33,6 +33,8 @@ export default function ProfileScreen() {
   const [inviteCode, setInviteCode] = useState('');
   const [inviteFeedback, setInviteFeedback] = useState('');
   const [members, setMembers] = useState<FamilyMember[]>([]);
+  const [subscription, setSubscription] = useState<FamilySubscription | null>(null);
+  const [subscriptionClock] = useState(() => Date.now());
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportCategory, setSupportCategory] = useState('Problema no aplicativo');
   const [supportMessage, setSupportMessage] = useState('');
@@ -48,8 +50,14 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (!access) return;
-    return observeFamilyMembers(access.familyId, setMembers, () => undefined);
+    const stopMembers = observeFamilyMembers(access.familyId, setMembers, () => undefined);
+    const stopSubscription = observeFamilySubscription(access.familyId, setSubscription, () => undefined);
+    return () => { stopMembers(); stopSubscription(); };
   }, [access]);
+
+  const activeSubscription = access ? subscription : null;
+  const subscriptionLabel = activeSubscription ? ({ trial: 'Período de teste', premium: 'Plano Premium', courtesy: 'Acesso cortesia', suspended: 'Acesso suspenso' }[activeSubscription.plan] || 'Acesso da família') : '';
+  const remainingDays = activeSubscription?.validUntil ? Math.max(0, Math.ceil((activeSubscription.validUntil - subscriptionClock) / 86400000)) : 0;
 
   const handleLogin = async () => {
     if (!email.trim() || !password) return;
@@ -236,6 +244,7 @@ export default function ProfileScreen() {
 
       <NinouCard style={styles.profileCard}>
         <View style={styles.accessRow}><View style={[styles.accessIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={24} color={colors.primary} /></View><View style={styles.accessCopy}><Text style={[styles.sectionKicker, { color: colors.primary }]}>Família conectada</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Acesso e convites</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>{canManageFamily ? 'Convide cuidadores por e-mail. O código tem uso único e expira em 7 dias.' : 'Você pode acompanhar a família, mas apenas responsáveis podem gerar convites.'}</Text></View></View>
+        {activeSubscription ? <View style={[styles.subscriptionCard, { backgroundColor: colors.primarySoft, borderColor: colors.border }]}><Text style={[styles.subscriptionKicker, { color: colors.primary }]}>{subscriptionLabel}</Text><Text style={[styles.subscriptionTitle, { color: colors.text }]}>{activeSubscription.plan === 'suspended' ? 'Temporariamente suspenso' : activeSubscription.validUntil ? `${activeSubscription.validUntil <= subscriptionClock ? 'Validade encerrada' : 'Válido até'} ${new Date(activeSubscription.validUntil).toLocaleDateString('pt-BR')}` : 'Validade ainda não definida'}</Text><Text style={[styles.subscriptionMeta, { color: colors.textMuted }]}>{activeSubscription.plan === 'suspended' ? 'Fale com o suporte para reativar o acesso.' : activeSubscription.validUntil ? (remainingDays ? `${remainingDays} dia(s) restante(s)` : 'O período terminou.') : 'O administrador ainda não definiu um período.'}</Text></View> : null}
         {canManageFamily ? <View style={styles.inviteForm}><Text style={[styles.label, { color: colors.text }]}>E-mail do familiar</Text><TextInput value={inviteEmail} onChangeText={setInviteEmail} autoCapitalize="none" keyboardType="email-address" placeholder="familiar@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Papel</Text><View style={styles.articleRow}>{[['cuidador', 'Cuidador'], ['admin_familiar', 'Responsável']] .map(([value, label]) => <Pressable key={value} onPress={() => setInviteRole(value)} style={[styles.articleChoice, { borderColor: inviteRole === value ? colors.primary : colors.border, backgroundColor: inviteRole === value ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.articleChoiceText, { color: inviteRole === value ? '#FFF' : colors.text }]}>{label}</Text></Pressable>)}</View><Pressable disabled={working === 'invite' || !inviteEmail.trim()} onPress={() => void createInvite()} style={[styles.primaryButton, { backgroundColor: colors.primary }, (working === 'invite' || !inviteEmail.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>{working === 'invite' ? 'Gerando…' : 'Gerar convite'}</Text></Pressable></View> : null}
         {inviteFeedback ? <Text style={[styles.inviteFeedback, { color: colors.warning }]}>{inviteFeedback}</Text> : null}
         {inviteCode ? <View style={[styles.inviteResult, { backgroundColor: colors.primarySoft, borderColor: colors.primary }]}><Text style={[styles.inviteResultLabel, { color: colors.primary }]}>CÓDIGO DO CONVITE</Text><Text style={[styles.inviteCode, { color: colors.text }]}>{inviteCode}</Text><Pressable onPress={() => void shareInvite()} style={[styles.shareInvite, { backgroundColor: colors.primary }]}><Ionicons name="share-social-outline" size={18} color="#FFF" /><Text style={styles.shareInviteText}>Compartilhar convite</Text></Pressable></View> : null}
@@ -417,6 +426,7 @@ const styles = StyleSheet.create({
   accessRow: { flexDirection: 'row', gap: spacing.md },
   accessIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   accessCopy: { flex: 1 },
+  subscriptionCard: { marginTop: spacing.lg, padding: 14, borderWidth: StyleSheet.hairlineWidth, borderRadius: 18, gap: 4 }, subscriptionKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }, subscriptionTitle: { fontSize: 14, lineHeight: 19, fontWeight: '900' }, subscriptionMeta: { fontSize: 10.5, lineHeight: 15, fontWeight: '700' },
   inviteForm: { marginTop: spacing.lg, gap: spacing.sm }, inviteFeedback: { marginTop: spacing.md, fontSize: 11.5, lineHeight: 17, fontWeight: '700' }, inviteResult: { marginTop: spacing.md, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, padding: 15, alignItems: 'center' }, inviteResultLabel: { fontSize: 9, fontWeight: '900', letterSpacing: 1.1 }, inviteCode: { marginVertical: 8, fontSize: 28, fontWeight: '900', letterSpacing: 4 }, shareInvite: { minHeight: 44, width: '100%', borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, shareInviteText: { color: '#FFF', fontSize: 12, fontWeight: '900' }, memberList: { marginTop: spacing.lg, gap: spacing.sm }, member: { minHeight: 58, borderRadius: 17, padding: 9, flexDirection: 'row', alignItems: 'center', gap: 10 }, memberAvatar: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, memberInitial: { fontSize: 16, fontWeight: '900' }, memberCopy: { flex: 1 }, memberName: { fontSize: 12.5, fontWeight: '900' }, memberMeta: { marginTop: 2, fontSize: 9.5, fontWeight: '700' },
   authForm: { marginTop: spacing.lg, gap: spacing.md },
   primaryButton: { minHeight: 50, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg },

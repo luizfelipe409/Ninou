@@ -1,10 +1,16 @@
-# Ninou v82.1.0 — Mobile como referência do produto
+# Ninou v82.1.3 — Admin responsivo e sem resíduos legados
 
 Projeto completo para publicação na Vercel. A experiência mobile é a fonte principal de produto e o web app acompanha os mesmos fluxos, regras e acabamento.
 
 ## O que mudou
 
-- Web app espelhado com a versão mobile, mantendo a adaptação responsiva para telas maiores.
+- Centro administrativo web mantém a linguagem do mobile e ganha composição própria para notebook e desktop, como a página inicial.
+- Abas administrativas não quebram: deslizam horizontalmente no mobile e formam cinco colunas estáveis em telas largas.
+- Métricas usam duas colunas no mobile e quatro colunas equilibradas no desktop.
+- Painéis antigos, checklists numerados e cards técnicos não aparecem nem durante o carregamento do admin.
+- Alertas de integridade duplicados são consolidados e a ação passa a se chamar “Verificar integridade”.
+- Detalhes de família abrem em uma tela integral com transição vertical; confirmações aparecem sobre essa tela sem perder o contexto.
+- Criação de família e ticket usam o mesmo diálogo central com transição suave do mobile.
 - Centro de Operação premium para o admin global, sem família pessoal ou card técnico.
 - Gestão de famílias clientes, usuários, convites, planos, suporte, auditoria e integridade.
 - Login inválido permanece na mesma tela e informa “E-mail ou senha incorretos”.
