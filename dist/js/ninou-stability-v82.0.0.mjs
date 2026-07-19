@@ -1,5 +1,5 @@
 import { readJson, writeJson } from "./storage/local-storage.js";
-const STABILITY_VERSION = "82.1.3";
+const STABILITY_VERSION = "82.1.4";
 const ERROR_KEY = "ninou:runtime-errors";
 const MAX_ERRORS = 15;
 

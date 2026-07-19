@@ -1,4 +1,4 @@
-# Ninou v82.1.3 — Admin responsivo e sem resíduos legados
+# Ninou v82.1.4 — Admin responsivo e sem resíduos legados
 
 Projeto completo para publicação na Vercel. A experiência mobile é a fonte principal de produto e o web app acompanha os mesmos fluxos, regras e acabamento.
 

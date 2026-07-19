@@ -10,7 +10,7 @@ import {
   updateAdminMember,
   updateAdminTicket,
   updateAdminUser,
-} from './services/admin-service.js';
+} from './services/admin-service.js?v=82.1.4';
 
 let initialized = false;
 let workspace = null;
@@ -366,10 +366,26 @@ function bindEvents(panelRoot) {
 }
 
 export function initializeNinouAdminRuntime(api = {}) {
-  if (initialized || !api.isGlobalAppAdmin?.()) return { initialized };
-  initialized = true; apiRef = api;
-  const panelRoot = $('#adminInvitePanel'); if (!panelRoot) return { initialized:false };
-  panelRoot.className = 'premium-admin-root'; panelRoot.innerHTML = shellMarkup(api.getCurrentUser?.()); panelRoot.hidden = false;
-  bindEvents(panelRoot); resetSession(); void refresh(); document.body.dataset.adminRuntimeState = 'ready';
-  return { initialized:true };
+  if (!api.isGlobalAppAdmin?.()) return { initialized: false };
+  const panelRoot = $('#adminInvitePanel');
+  if (!panelRoot) {
+    initialized = false;
+    return { initialized: false };
+  }
+  if (initialized && panelRoot.dataset.adminRuntimeMounted === 'true') {
+    panelRoot.hidden = false;
+    document.body.dataset.adminRuntimeState = 'ready';
+    return { initialized: true };
+  }
+  apiRef = api;
+  panelRoot.className = 'premium-admin-root';
+  panelRoot.innerHTML = shellMarkup(api.getCurrentUser?.());
+  panelRoot.hidden = false;
+  panelRoot.dataset.adminRuntimeMounted = 'true';
+  initialized = true;
+  bindEvents(panelRoot);
+  resetSession();
+  void refresh();
+  document.body.dataset.adminRuntimeState = 'ready';
+  return { initialized: true };
 }

@@ -28,17 +28,22 @@ import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
 const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
-const ADMIN_STYLESHEET_HREF = "./styles/admin-mobile-parity-v82.1.1.css?v=82.1.3";
-const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.1.3";
+const ADMIN_STYLESHEET_HREF = "./styles/admin-mobile-parity-v82.1.1.css?v=82.1.4";
+const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.1.4";
 let adminRuntimePromise = null;
+let adminRuntimeAttempt = 0;
 
-function ensureAdminStylesheet() {
-  if (document.getElementById(ADMIN_STYLESHEET_ID)) return;
+function ensureAdminStylesheet(options = {}) {
+  const expectedHref = new URL(ADMIN_STYLESHEET_HREF, document.baseURI).href;
+  const current = document.getElementById(ADMIN_STYLESHEET_ID);
+  const shouldReplace = Boolean(current && (options.force || current.href !== expectedHref || document.body.dataset.adminStylesState === "error"));
+  if (current && !shouldReplace) return current;
+  if (shouldReplace) current.remove();
 
   const stylesheet = document.createElement("link");
   stylesheet.id = ADMIN_STYLESHEET_ID;
   stylesheet.rel = "stylesheet";
-  stylesheet.href = ADMIN_STYLESHEET_HREF;
+  stylesheet.href = expectedHref;
   document.body.dataset.adminStylesState = "loading";
   stylesheet.addEventListener("load", () => {
     document.body.dataset.adminStylesState = "ready";
@@ -49,14 +54,41 @@ function ensureAdminStylesheet() {
   }, { once: true });
 
   document.head.append(stylesheet);
+  return stylesheet;
 }
 
-function ensureAdminRuntime() {
+function showAdminRuntimeFallback(error = null) {
+  const panelRoot = document.querySelector("#adminInvitePanel");
+  if (!panelRoot || !isGlobalAppAdmin()) return;
+  document.body.classList.add("global-admin-mode", "admin-panel-only");
+  panelRoot.hidden = false;
+  panelRoot.className = "premium-admin-root admin-runtime-fallback";
+  panelRoot.innerHTML = `
+    <section style="min-height:100vh;display:grid;place-items:center;padding:24px;background:#0f0a20;color:#f8f4ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+      <article style="width:min(100%,560px);padding:24px;border:1px solid #3b2b5d;border-radius:24px;background:#19112f;box-shadow:0 20px 60px rgba(0,0,0,.28)">
+        <small style="display:block;margin-bottom:8px;color:#a892ff;font-weight:800;letter-spacing:.08em">NINOU ADMIN</small>
+        <h1 style="margin:0 0 10px;font-size:26px;line-height:1.15">O painel não terminou de carregar</h1>
+        <p style="margin:0 0 18px;color:#b7adca;line-height:1.55">A sessão administrativa está ativa, mas um arquivo do painel ficou desatualizado no cache. Tente carregar novamente.</p>
+        <button type="button" data-admin-runtime-retry style="min-height:46px;padding:0 18px;border:0;border-radius:14px;background:#a892ff;color:#171027;font-weight:900;cursor:pointer">Recarregar painel</button>
+        <p style="margin:14px 0 0;color:#8f84a7;font-size:12px;line-height:1.45">${escapeHtml(error?.message || "Falha ao inicializar o módulo administrativo.")}</p>
+      </article>
+    </section>`;
+  panelRoot.querySelector("[data-admin-runtime-retry]")?.addEventListener("click", () => {
+    adminRuntimePromise = null;
+    ensureAdminStylesheet({ force: true });
+    void ensureAdminRuntime({ force: true });
+  }, { once: true });
+}
+
+function ensureAdminRuntime(options = {}) {
   if (!isGlobalAppAdmin()) return Promise.resolve(null);
-  if (adminRuntimePromise) return adminRuntimePromise;
+  if (adminRuntimePromise && !options.force) return adminRuntimePromise;
+  if (options.force) adminRuntimePromise = null;
 
   document.body.dataset.adminRuntimeState = "loading";
-  adminRuntimePromise = import(ADMIN_RUNTIME_HREF)
+  adminRuntimeAttempt += 1;
+  const runtimeHref = options.force ? `${ADMIN_RUNTIME_HREF}&retry=${Date.now()}-${adminRuntimeAttempt}` : ADMIN_RUNTIME_HREF;
+  adminRuntimePromise = import(runtimeHref)
     .then(({ initializeNinouAdminRuntime }) => initializeNinouAdminRuntime({
       isGlobalAppAdmin,
       getCurrentUser: () => cloudUser,
@@ -88,12 +120,34 @@ function ensureAdminRuntime() {
       appAdminFamilyId: APP_ADMIN_FAMILY_ID,
       familyRoleViewer: FAMILY_ROLE_VIEWER,
     }))
+    .then((result) => {
+      if (!result?.initialized) throw new Error("O contêiner administrativo não foi inicializado.");
+      document.body.dataset.adminRuntimeState = "ready";
+      return result;
+    })
     .catch((error) => {
+      adminRuntimePromise = null;
       document.body.dataset.adminRuntimeState = "error";
       console.error("Ninou: não foi possível carregar o runtime administrativo.", error);
-      return null;
+      showAdminRuntimeFallback(error);
+      return { initialized: false, error };
     });
   return adminRuntimePromise;
+}
+
+async function activateGlobalAdminWebPortal(user = cloudUser) {
+  if (!isGlobalAppAdmin(user)) return false;
+  ensureAdminStylesheet();
+  showScreen("profile");
+  const result = await ensureAdminRuntime();
+  const ready = Boolean(result?.initialized);
+  if (ready) {
+    const panelRoot = document.querySelector("#adminInvitePanel");
+    if (panelRoot) panelRoot.hidden = false;
+    document.body.classList.add("global-admin-mode", "admin-panel-only");
+    document.body.dataset.profileAccessState = "admin-panel";
+  }
+  return ready;
 }
 
 const navButtons = document.querySelectorAll(".bottom-nav button");
@@ -495,7 +549,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "82.1.3";
+const NINOU_RUNTIME_VERSION = "82.1.4";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let exportRoutineInProgress = false;
@@ -520,7 +574,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "82.1.3-admin-responsive-clean";
+const NINOU_FAMILY_SCOPE_VERSION = "82.1.4-admin-responsive-clean";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -9998,13 +10052,18 @@ async function initFirebaseAuthState() {
         saveSelectedAdminFamilyId("");
         renderAuthControls();
         loginHelper.textContent = "Admin conectado. Preparando painel...";
+        const adminPortalReady = await activateGlobalAdminWebPortal(user);
+        if (!isCurrentAuthRun()) return;
         await loadAdminAccountProfileFromCloud(user);
         if (!isCurrentAuthRun()) return;
         setAuthAccessLoading(false);
         setSyncStatus("online", user.email || "");
-        loginHelper.textContent = "Admin conectado. Painel administrativo ativo.";
+        loginHelper.textContent = adminPortalReady
+          ? "Admin conectado. Painel administrativo ativo."
+          : "Admin conectado. Use Recarregar painel para concluir a abertura.";
         renderAuthControls();
         showScreen("profile");
+        if (!adminPortalReady) showAdminRuntimeFallback(new Error("O módulo administrativo não respondeu durante a abertura da sessão."));
         return;
       }
 
@@ -15035,7 +15094,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=82.1.3", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=82.1.4", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -15063,7 +15122,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "82.1.3";
+  const VERSION = "82.1.4";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -15120,7 +15179,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "82.1.3";
+  const VERSION = "82.1.4";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -15184,7 +15243,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "82.1.3";
+  const LEGAL_VERSION = "82.1.4";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -15443,7 +15502,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "82.1.3";
+  const SUPPORT_VERSION = "82.1.4";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -15772,7 +15831,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "82.1.3";
+  const REVIEW_VERSION = "82.1.4";
 
   function currentEffectiveRole() {
     try {

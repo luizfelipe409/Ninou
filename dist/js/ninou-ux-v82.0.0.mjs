@@ -1,4 +1,4 @@
-const UX_VERSION = "82.1.3";
+const UX_VERSION = "82.1.4";
 const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
 function vibrate(pattern = 8) {

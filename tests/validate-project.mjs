@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const releaseVersion = "82.1.3";
+const releaseVersion = "82.1.4";
 const failures = [];
 const cssModules = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const conditionalCssModules = ["admin-mobile-parity-v82.1.1"];
@@ -59,8 +59,9 @@ for (const removed of ["tokens", "foundation", "home", "components", "motion", "
 
 const sw = await readFile(join(root, "sw.js"), "utf8");
 if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"]')) failures.push("Service Worker não declara a autoridade visual revisada");
-if (sw.includes("styles/admin-mobile-parity-v82.1.1.css")) failures.push("Service Worker não deve pré-carregar o CSS administrativo");
-if (sw.includes("ninou-admin-v82.0.0")) failures.push("Service Worker não deve pré-carregar o runtime administrativo");
+if (!sw.includes("styles/admin-mobile-parity-v82.1.1.css?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o CSS administrativo versionado");
+if (!sw.includes("ninou-admin-v82.0.0.mjs?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o runtime administrativo versionado");
+if (!sw.includes("services/admin-service.js?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o serviço administrativo versionado");
 if (!sw.includes(`const APP_VERSION = "${releaseVersion}"`)) failures.push(`Service Worker não está na v${releaseVersion}`);
 for (const asset of ["day-sky.svg", "night-sky.svg"]) if (!sw.includes(asset)) failures.push(`Service Worker não referencia ${asset}`);
 for (const asset of required.filter((file) => file.startsWith("js/"))) {
@@ -97,9 +98,14 @@ const core = await readFile(join(root, "js/ninou-core-v82.0.0.mjs"), "utf8");
 if (!core.includes(`const ADMIN_STYLESHEET_HREF = "./styles/admin-mobile-parity-v82.1.1.css?v=${releaseVersion}"`)) failures.push("Núcleo não declara o CSS administrativo condicional");
 if (!core.includes(`const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=${releaseVersion}"`)) failures.push("Núcleo não declara o runtime administrativo condicional");
 if (!core.includes("void ensureAdminRuntime()")) failures.push("Núcleo não restringe o runtime administrativo ao admin global");
+if (!core.includes("async function activateGlobalAdminWebPortal")) failures.push("Web app não possui gate dedicado para o admin global");
+if (!core.includes("showAdminRuntimeFallback")) failures.push("Web app não possui recuperação visível para falha do runtime admin");
 if (/createInviteButton\.addEventListener|adminInvitePanel\.addEventListener/.test(core)) failures.push("Listeners administrativos retornaram ao núcleo comum");
 const adminRuntime = await readFile(join(root, conditionalJsModules[0]), "utf8");
 if (!adminRuntime.includes("export function initializeNinouAdminRuntime")) failures.push("Runtime administrativo não expõe inicialização explícita");
+if (!adminRuntime.includes(`./services/admin-service.js?v=${releaseVersion}`)) failures.push("Runtime administrativo não fixa a versão do serviço administrativo");
+const vercel = await readFile(join(root, "vercel.json"), "utf8");
+if (vercel.includes("max-age=31536000, immutable")) failures.push("Vercel ainda mantém módulos internos imutáveis entre versões");
 for (const removedSelector of ["chips-more-button", "quick-observation-custom", "family-access-summary-grid", "icon-art-dormir", "icon-art-despertar-noturno"]) {
   if (legacyCss.includes(removedSelector)) failures.push(`Seletor órfão retornou ao legado: ${removedSelector}`);
 }

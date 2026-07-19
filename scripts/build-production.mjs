@@ -105,4 +105,4 @@ for (const file of publicFiles) {
   publicBytes += (await stat(source)).size;
 }
 
-console.log(`Build de produção v82.1.3 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);
+console.log(`Build de produção v82.1.4 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);

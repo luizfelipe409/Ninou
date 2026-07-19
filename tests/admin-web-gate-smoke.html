@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ninou Admin Web Gate Smoke</title>
+  <link rel="stylesheet" href="../styles/admin-mobile-parity-v82.1.1.css?v=82.1.4">
+  <script type="importmap">
+    {
+      "imports": {
+        "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js": "./mocks/firebase-app.js",
+        "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js": "./mocks/firebase-auth.js",
+        "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js": "./mocks/firebase-firestore.js",
+        "https://www.gstatic.com/firebasejs/10.12.4/firebase-app-check.js": "./mocks/firebase-app-check.js"
+      }
+    }
+  </script>
+</head>
+<body class="global-admin-mode admin-panel-only" data-profile-access-state="admin-panel">
+  <main class="phone-shell">
+    <section class="screen active" data-screen="profile">
+      <div class="settings-list">
+        <article id="familyAccessCard"><section id="adminInvitePanel" hidden></section></article>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { initializeNinouAdminRuntime } from '../js/ninou-admin-v82.0.0.mjs?smoke=82.1.4';
+    initializeNinouAdminRuntime({
+      isGlobalAppAdmin: () => true,
+      getCurrentUser: () => ({ uid: 'admin-smoke', email: 'luizfelipe.dasilva@gmail.com' }),
+      signOutAccount: async () => undefined,
+      getErrorMessage: (error) => error?.message || String(error),
+    });
+  </script>
+</body>
+</html>
