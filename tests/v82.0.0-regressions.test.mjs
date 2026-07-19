@@ -1,12 +1,15 @@
 import { readFile, stat } from "node:fs/promises";
 import assert from "node:assert/strict";
+import { getEventDaySegment } from "../js/domain/records.js";
 
 const root = new URL("../", import.meta.url);
-const [html, boot, core, adminRuntime, ux, stability, adminCss, premiumCss, focusedFlowCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
+const [html, boot, core, adminRuntime, adminService, firebaseService, ux, stability, adminCss, premiumCss, focusedFlowCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
   readFile(new URL("js/boot-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-core-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-admin-v82.0.0.mjs", root), "utf8"),
+  readFile(new URL("js/services/admin-service.js", root), "utf8"),
+  readFile(new URL("js/services/firebase-service.js", root), "utf8"),
   readFile(new URL("js/ninou-ux-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ninou-stability-v82.0.0.mjs", root), "utf8"),
   readFile(new URL("styles/admin-v82.0.0.css", root), "utf8"),
@@ -28,31 +31,40 @@ assert.ok(bootBarrier > 0 && bootBarrier < headEnd, "A barreira de boot deve com
 assert.match(html, /<body data-profile-access-state="booting">/);
 assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
-assert.match(html, /styles\/legacy\.css\?v=82\.0\.0/);
+assert.match(html, /styles\/legacy\.css\?v=82\.1\.0/);
 assert.doesNotMatch(html, /styles\/admin-v82\.0\.0\.css/);
 assert.doesNotMatch(html, /js\/ninou-admin-v82\.0\.0\.mjs/);
-assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.0\.0/);
-assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.0\.0/);
+assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.1\.0/);
+assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.1\.0/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
-assert.match(html, /boot-v82\.0\.0\.mjs\?v=82\.0\.0/);
+assert.match(html, /boot-v82\.0\.0\.mjs\?v=82\.1\.0/);
 assert.match(html, /__NINOU_BOOT_WATCHDOG__/);
 assert.match(html, /history\.replaceState/);
 
-assert.match(boot, /const NINOU_VERSION = "82\.0\.0"/);
+assert.match(boot, /const NINOU_VERSION = "82\.1\.0"/);
 assert.match(boot, /const MIN_SPLASH_MS = 1500;/);
 assert.match(boot, /visual-guard-v82\.0\.0/);
-assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.0\.0"/);
-assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.0\.0-premium-consolidated"/);
-assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-v82\.0\.0\.css\?v=82\.0\.0"/);
-assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-v82\.0\.0\.mjs\?v=82\.0\.0"/);
+assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.1\.0"/);
+assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.1\.0-mobile-reference"/);
+assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-v82\.0\.0\.css\?v=82\.1\.0"/);
+assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-v82\.0\.0\.mjs\?v=82\.1\.0"/);
 assert.match(core, /void ensureAdminRuntime\(\)/);
 assert.doesNotMatch(core, /createInviteButton\.addEventListener/);
 assert.doesNotMatch(core, /adminInvitePanel\.addEventListener/);
 assert.match(adminRuntime, /export function initializeNinouAdminRuntime/);
-assert.match(adminRuntime, /panel\.addEventListener\("click"/);
+assert.match(adminRuntime, /panel\.addEventListener\(['"]click['"]/);
+assert.match(adminRuntime, /Centro de operação/);
+assert.match(adminRuntime, /panel\.className = 'premium-admin-root'/);
+assert.match(adminService, /isInternalAdminFamily/);
+assert.match(adminService, /ninou-family-luizfelipe/);
+assert.match(adminService, /familyDocuments = familiesSnapshot\.docs\.filter/);
+assert.match(core, /saveFamilyAccess\(null, \{ render: false \}\);[\s\S]*saveSelectedAdminFamilyId\(""\)/);
+assert.doesNotMatch(core, /if \(isGlobalAppAdmin\(user\)\)[\s\S]{0,800}await activatePersonalFamily\(\)/);
+assert.match(core, /showBlockedAccountPortal/);
+assert.match(firebaseService, /"auth\/wrong-password": "E-mail ou senha incorretos\."/);
 assert.match(core, /insertBefore\(stylesheet, legacyStylesheet\.nextSibling\)/);
-assert.match(ux, /const UX_VERSION = "82\.0\.0"/);
-assert.match(stability, /const STABILITY_VERSION = "82\.0\.0"/);
+assert.match(ux, /const UX_VERSION = "82\.1\.0"/);
+assert.match(stability, /const STABILITY_VERSION = "82\.1\.0"/);
 
 assert.match(premiumCss, /autoridade visual revisada/);
 assert.match(premiumCss, /body\.family-daily-surface:not\(\[data-active-screen="profile"\]\)/);
@@ -89,6 +101,25 @@ assert.match(core, /position: eventPosition\(getOrbitMarkerTimestamp\(event, orb
 assert.match(core, /terminou às/);
 assert.match(core, /--orbit-celestial-x/);
 assert.match(core, /--orbit-celestial-y/);
+
+// A órbita de hoje herda apenas o trecho de um sono que realmente atravessou a meia-noite.
+const currentDayStart = new Date(2026, 6, 19, 0, 0, 0, 0).getTime();
+const currentDayEnd = currentDayStart + 24 * 60 * 60 * 1000;
+const overnightSegment = getEventDaySegment({
+  start: new Date(2026, 6, 18, 20, 21).getTime(),
+  end: new Date(2026, 6, 19, 2, 50).getTime(),
+}, currentDayStart, currentDayEnd);
+assert.deepEqual(overnightSegment, {
+  start: currentDayStart,
+  end: new Date(2026, 6, 19, 2, 50).getTime(),
+  crossesStart: true,
+  crossesEnd: false,
+});
+assert.equal(getEventDaySegment({
+  start: new Date(2026, 6, 18, 8, 15).getTime(),
+  end: new Date(2026, 6, 18, 9, 5).getTime(),
+}, currentDayStart, currentDayEnd), null);
+assert.match(core, /getEventDaySegment\(\{ \.\.\.event, end: getOrbitEventEnd\(event\) \}, orbitStart, dayEnd\)/);
 assert.match(html, /class="orbit-sky"/);
 assert.match(html, /class="breast-side-play"/);
 assert.match(html, /data-breast-side="left" aria-pressed="false"/);
@@ -97,9 +128,9 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-0-0-admin-runtime-split/);
+assert.match(sw, /ninou-v82-1-0-mobile-reference/);
 assert.doesNotMatch(sw, /ninou-admin-v82\.0\.0/);
-assert.match(sw, /const APP_VERSION = "82\.0\.0"/);
+assert.match(sw, /const APP_VERSION = "82\.1\.0"/);
 assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
@@ -159,6 +190,9 @@ assert.match(html, /class="export-custom-range-field" hidden/);
 assert.match(html, /Como podemos ajudar\?/);
 assert.doesNotMatch(html, /Relatar problema com diagnóstico/);
 assert.match(premiumCss, /\.day-note-modal-header/);
+assert.match(premiumCss, /\.record-success-modal/);
+assert.match(core, /function openRecordSuccessModal/);
+assert.match(core, /Registrar outro cuidado/);
 assert.match(premiumCss, /\.client-family-hidden-meta \{ display: none !important; \}/);
 assert.match(premiumCss, /\.profile-invite-area\.is-open/);
 assert.match(premiumCss, /\.legal-status-grid, \.support-beta-grid/);

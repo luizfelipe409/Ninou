@@ -1,4 +1,12 @@
-# Ninou v82.1.0 — Administração Premium Mobile
+# Ninou v82.1.0 — Mobile como referência, também no Web App
+
+## Paridade do web app
+
+- Os fluxos e regras desta versão mobile foram espelhados no web app.
+- O layout diário mantém a linguagem visual mobile e ganha espaço apenas onde a tela maior melhora a leitura.
+- O Centro de Operação web substitui integralmente o painel administrativo legado.
+- Cache do PWA, módulos de runtime, diagnóstico, legal e suporte foram promovidos para a versão 82.1.0.
+- O build de produção inclui o novo serviço administrativo web.
 
 ## Painel administrativo
 

@@ -1,6 +1,7 @@
-NINOU v82.0.0 — POLIMENTO VISUAL
+NINOU v82.1.0 — MOBILE COMO REFERÊNCIA
 
 1. Extraia o ZIP.
 2. Use esta pasta completa como projeto na Vercel.
-3. Após o deploy, abra com ?ninouVersion=82.0.0.
+3. Após o deploy, abra com ?ninouVersion=82.1.0.
 4. No iPhone instalado como PWA, feche e reabra o app após a atualização.
+5. O admin global entra no Centro de Operação sem família pessoal.

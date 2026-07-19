@@ -1,5 +1,5 @@
-const CACHE_NAME = "ninou-v82-0-0-admin-runtime-split";
-const APP_VERSION = "82.0.0";
+const CACHE_NAME = "ninou-v82-1-0-mobile-reference";
+const APP_VERSION = "82.1.0";
 const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
 const APP_SHELL = [
   "/", "/index.html",

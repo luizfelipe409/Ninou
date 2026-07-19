@@ -44,6 +44,7 @@ const publicFiles = [
   "js/services/account-service.js",
   "js/services/export-service.js",
   "js/services/firebase-service.js",
+  "js/services/admin-service.js",
   "js/services/timer-service.js",
   "js/storage/local-storage.js",
   "js/ui/account.js",
@@ -104,4 +105,4 @@ for (const file of publicFiles) {
   publicBytes += (await stat(source)).size;
 }
 
-console.log(`Build de produção v82.0.0 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);
+console.log(`Build de produção v82.1.0 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);

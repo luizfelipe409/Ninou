@@ -179,8 +179,8 @@ export function getFirebaseErrorMessage(error) {
   const messages = {
     "auth/email-already-in-use": "Este e-mail já tem uma conta. Toque em Entrar.",
     "auth/invalid-email": "Digite um e-mail válido.",
-    "auth/user-not-found": "Conta não encontrada. Crie uma conta nova.",
-    "auth/wrong-password": "Senha incorreta.",
+    "auth/user-not-found": "E-mail ou senha incorretos.",
+    "auth/wrong-password": "E-mail ou senha incorretos.",
     "auth/invalid-credential": "E-mail ou senha incorretos.",
     "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
     "auth/operation-not-allowed": "Ative Email/Password no Firebase Authentication.",

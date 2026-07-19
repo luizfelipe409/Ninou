@@ -12,7 +12,7 @@ import { getFirebaseServices as loadFirebaseServices, getFirebaseErrorMessage as
 import { getDefaultBabyProfile as createDefaultBabyProfile, getCloudProfileVersion as readCloudProfileVersion, hasProfileContent as profileHasContent, loadBabyProfile as loadStoredBabyProfile, normalizeBabyProfile as normalizeStoredBabyProfile, saveBabyProfile as persistBabyProfile } from "./domain/baby-profile.js";
 import { loadLocalWeights as loadStoredWeights, normalizeWeights as normalizeStoredWeights, persistLocalWeights as persistStoredWeights, removeWeightById, upsertWeight } from "./domain/weights.js";
 import { buildExportEvents } from "./services/export-service.js";
-import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventOrderTime, getEventsForDay, getLatestEvent, getLatestRoutineLiveState, isRoutineLiveStateNewer, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, stampRoutineLiveState, updateEventKeepingDuration } from "./domain/records.js";
+import { createEmptyDayState as createEmptyRoutineDayState, findEventById, getEventDaySegment, getEventOrderTime, getEventsForDay, getLatestEvent, getLatestRoutineLiveState, isRoutineLiveStateNewer, makeEvent as createRoutineEvent, matchesDiaryFilter as recordMatchesDiaryFilter, normalizeDayState as normalizeRoutineDayState, normalizeEvent as normalizeRoutineEvent, removeEventById, sortEventsByStartAsc, sortEventsByStartDesc, stampRoutineLiveState, updateEventKeepingDuration } from "./domain/records.js";
 import { formatEventMeta as formatRoutineEventMeta, getEventCardMarkup, getEventRenderSignature as buildEventRenderSignature, getMiniEventMarkup, getTimelineRenderSignature as buildTimelineSignature } from "./ui/event-formatters.js";
 import { renderHomeSummary as renderHomeSummaryPanel, renderTodayLastEvents as renderTodayLastEventsPanel } from "./ui/home.js";
 import { renderDailyRhythm, renderDayStory, renderIntelligentTimeline, renderLiveAssistant, renderSmartInsight, renderTrendKpis, renderWeeklyOverview } from "./ui/intelligence.js";
@@ -28,8 +28,8 @@ import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
 const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
-const ADMIN_STYLESHEET_HREF = "./styles/admin-v82.0.0.css?v=82.0.0";
-const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.0.0";
+const ADMIN_STYLESHEET_HREF = "./styles/admin-v82.0.0.css?v=82.1.0";
+const ADMIN_RUNTIME_HREF = "./ninou-admin-v82.0.0.mjs?v=82.1.0";
 let adminRuntimePromise = null;
 
 function ensureAdminStylesheet() {
@@ -64,6 +64,8 @@ function ensureAdminRuntime() {
   adminRuntimePromise = import(ADMIN_RUNTIME_HREF)
     .then(({ initializeNinouAdminRuntime }) => initializeNinouAdminRuntime({
       isGlobalAppAdmin,
+      getCurrentUser: () => cloudUser,
+      signOutAccount,
       withButtonBusy,
       getErrorMessage: getFirebaseErrorMessage,
       createFamilyInvite,
@@ -494,7 +496,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "82.0.0";
+const NINOU_RUNTIME_VERSION = "82.1.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let exportRoutineInProgress = false;
@@ -519,7 +521,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "82.0.0-premium-consolidated";
+const NINOU_FAMILY_SCOPE_VERSION = "82.1.0-mobile-reference";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -733,18 +735,18 @@ function getFamilyCollectionPath(familyId = getActiveFamilyId()) {
 
 function loadSelectedAdminFamilyId() {
   try {
-    return normalizeFamilyId(localStorage.getItem("ninou.admin.selectedFamilyId") || APP_ADMIN_FAMILY_ID);
+    return normalizeFamilyId(localStorage.getItem("ninou.admin.selectedFamilyId") || "");
   } catch {
-    return APP_ADMIN_FAMILY_ID;
+    return "";
   }
 }
 
 function getActiveAdminFamilyId() {
-  return normalizeFamilyId(selectedAdminFamilyId || APP_ADMIN_FAMILY_ID);
+  return normalizeFamilyId(selectedAdminFamilyId || "");
 }
 
-function saveSelectedAdminFamilyId(familyId = APP_ADMIN_FAMILY_ID) {
-  selectedAdminFamilyId = normalizeFamilyId(familyId || APP_ADMIN_FAMILY_ID);
+function saveSelectedAdminFamilyId(familyId = "") {
+  selectedAdminFamilyId = normalizeFamilyId(familyId || "");
   try { localStorage.setItem("ninou.admin.selectedFamilyId", selectedAdminFamilyId); } catch {}
   try { exposeFamilyScopeForDebug(); } catch {}
   return selectedAdminFamilyId;
@@ -5592,10 +5594,7 @@ function getEventWindowEnd(event = {}) {
 }
 
 function eventOverlapsWindow(event = {}, windowStart = getDayStart(), windowEnd = windowStart + day) {
-  const start = getEventWindowStart(event);
-  const end = getEventWindowEnd(event);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
-  return start < windowEnd && end >= windowStart;
+  return Boolean(getEventDaySegment(event, windowStart, windowEnd));
 }
 
 function getEventDisplayDedupeKey(event = {}) {
@@ -9942,6 +9941,7 @@ async function initFirebaseAuthState() {
     window.dispatchEvent(new CustomEvent("ninou:auth-state-resolved", { detail: { signedIn: Boolean(user), email: user?.email || "" } }));
 
     if (!user) {
+      hideBlockedAccountPortal();
       accessFlowNotice = "";
       unsubscribeCloudListeners();
       clearLocalAccountData();
@@ -9966,14 +9966,14 @@ async function initFirebaseAuthState() {
 
     try {
       if (isGlobalAppAdmin(user)) {
+        hideBlockedAccountPortal();
         prepareAdminPanelContext(user);
         resetMigrationSearchState();
         clearPendingInviteCode();
-        ensureGlobalAdminAccess(user);
+        saveFamilyAccess(null, { render: false });
+        saveSelectedAdminFamilyId("");
         renderAuthControls();
         loginHelper.textContent = "Admin conectado. Preparando painel...";
-        await activatePersonalFamily();
-        if (!isCurrentAuthRun()) return;
         await loadAdminAccountProfileFromCloud(user);
         if (!isCurrentAuthRun()) return;
         setAuthAccessLoading(false);
@@ -9983,6 +9983,19 @@ async function initFirebaseAuthState() {
         showScreen("profile");
         return;
       }
+
+      const accountSnapshot = await services.getDoc(services.doc(services.db, "users", user.uid));
+      if (!isCurrentAuthRun()) return;
+      const accountStatus = String(accountSnapshot.exists() ? accountSnapshot.data()?.status || "active" : "active").trim().toLowerCase();
+      if (["blocked", "suspended", "disabled"].includes(accountStatus)) {
+        saveFamilyAccess(null, { render: false });
+        setAuthAccessLoading(false);
+        setSyncStatus("offline", user.email || "");
+        showBlockedAccountPortal(user);
+        renderAuthControls();
+        return;
+      }
+      hideBlockedAccountPortal();
 
       let restoredAccess = null;
       try {
@@ -10109,6 +10122,7 @@ async function signOutAccount() {
     loginHelper.textContent = "Saindo...";
     createAccountButton.disabled = true;
     await services.signOut(services.auth);
+    hideBlockedAccountPortal();
     cloudUser = null;
     unsubscribeCloudListeners();
     clearLocalAccountData();
@@ -10125,6 +10139,45 @@ async function signOutAccount() {
   } finally {
     createAccountButton.disabled = false;
   }
+}
+
+function ensureBlockedAccountPortal() {
+  let portal = document.querySelector("#blockedAccountPortal");
+  if (portal) return portal;
+  portal = document.createElement("section");
+  portal.id = "blockedAccountPortal";
+  portal.className = "blocked-account-portal";
+  portal.hidden = true;
+  portal.setAttribute("role", "dialog");
+  portal.setAttribute("aria-modal", "true");
+  portal.setAttribute("aria-labelledby", "blockedAccountTitle");
+  portal.innerHTML = `
+    <div class="blocked-account-card">
+      <span class="blocked-account-icon" aria-hidden="true">⌁</span>
+      <p class="blocked-account-kicker">SEGURANÇA DA CONTA</p>
+      <h2 id="blockedAccountTitle">Acesso suspenso</h2>
+      <p id="blockedAccountMessage">Esta conta foi temporariamente bloqueada pela administração. Seus dados permanecem preservados.</p>
+      <small>Entre em contato com o suporte Ninou para revisar o acesso.</small>
+      <button type="button" id="blockedAccountSignOut">Voltar para o login</button>
+    </div>`;
+  portal.querySelector("#blockedAccountSignOut")?.addEventListener("click", () => void signOutAccount());
+  document.body.append(portal);
+  return portal;
+}
+
+function showBlockedAccountPortal(user = cloudUser) {
+  const portal = ensureBlockedAccountPortal();
+  const message = portal.querySelector("#blockedAccountMessage");
+  if (message) message.textContent = `A conta ${user?.email || ""} foi temporariamente bloqueada pela administração. Seus dados permanecem preservados.`;
+  portal.hidden = false;
+  document.body.classList.add("blocked-account-mode");
+  portal.querySelector("#blockedAccountSignOut")?.focus();
+}
+
+function hideBlockedAccountPortal() {
+  document.body.classList.remove("blocked-account-mode");
+  const portal = document.querySelector("#blockedAccountPortal");
+  if (portal) portal.hidden = true;
 }
 
 function matchesDiaryFilter(event) {
@@ -10624,8 +10677,10 @@ function renderOrbitDurationArcs(events = [], orbitStart = getDayStart()) {
   const nextCompletedJourneyKeys = new Set();
 
   durationEvents.forEach((event) => {
-    const startTs = Math.max(Number(event.start) || orbitStart, orbitStart);
-    const endTs = Math.min(getOrbitEventEnd(event), dayEnd);
+    const segment = getEventDaySegment({ ...event, end: getOrbitEventEnd(event) }, orbitStart, dayEnd);
+    if (!segment) return;
+    const startTs = segment.start;
+    const endTs = segment.end;
     if (endTs <= startTs) return;
     const startMinute = (startTs - orbitStart) / 60000;
     const endMinute = (endTs - orbitStart) / 60000;
@@ -13624,6 +13679,66 @@ function reconcileAfterManualSleepEvent(savedEvent = null) {
   return true;
 }
 
+function ensureRecordSuccessModal() {
+  let modal = document.querySelector("#recordSuccessModal");
+  if (modal) return modal;
+  modal = document.createElement("section");
+  modal.id = "recordSuccessModal";
+  modal.className = "record-success-modal";
+  modal.hidden = true;
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "recordSuccessTitle");
+  modal.innerHTML = `
+    <button type="button" class="record-success-backdrop" data-record-success-close aria-label="Fechar confirmação"></button>
+    <article class="record-success-card">
+      <div class="record-success-art" id="recordSuccessArt" aria-hidden="true"></div>
+      <span class="record-success-check" aria-hidden="true">✓</span>
+      <p class="record-success-kicker">REGISTRO SALVO</p>
+      <h2 id="recordSuccessTitle">Cuidado registrado</h2>
+      <p id="recordSuccessSummary"></p>
+      <div class="record-success-identity"><small>REGISTRADO POR</small><strong id="recordSuccessActor"></strong></div>
+      <div class="record-success-actions">
+        <button type="button" class="record-success-primary" data-record-success-close>Concluir</button>
+        <button type="button" class="record-success-secondary" data-record-success-another>Registrar outro cuidado</button>
+      </div>
+    </article>`;
+  modal.addEventListener("click", (event) => {
+    if (event.target.closest("[data-record-success-close]")) {
+      modal.hidden = true;
+      document.body.classList.remove("record-success-open");
+      return;
+    }
+    if (event.target.closest("[data-record-success-another]")) {
+      modal.hidden = true;
+      document.body.classList.remove("record-success-open");
+      window.setTimeout(() => {
+        if (typeof window.NinouOpenActionLauncher === "function") window.NinouOpenActionLauncher();
+        else document.querySelector("#openActionLauncherButton")?.click();
+      }, 80);
+    }
+  });
+  document.body.append(modal);
+  return modal;
+}
+
+function openRecordSuccessModal({ type, start, actor, editing = false, timerStarted = false } = {}) {
+  const modal = ensureRecordSuccessModal();
+  const config = getEventConfig(type);
+  const art = modal.querySelector("#recordSuccessArt");
+  if (art) art.innerHTML = config.icon || iconMarkup(type);
+  const title = modal.querySelector("#recordSuccessTitle");
+  if (title) title.textContent = editing ? "Registro atualizado" : timerStarted ? "Timer iniciado" : "Cuidado registrado";
+  const summary = modal.querySelector("#recordSuccessSummary");
+  if (summary) summary.textContent = `${config.title || "Cuidado"} às ${formatTime(start)}.`;
+  const actorLabel = formatCaregiverNameRole(actor?.displayName || actor?.label, actor?.relationshipLabel) || actor?.label || "Responsável";
+  const actorElement = modal.querySelector("#recordSuccessActor");
+  if (actorElement) actorElement.textContent = actorLabel;
+  modal.hidden = false;
+  document.body.classList.add("record-success-open");
+  modal.querySelector(".record-success-primary")?.focus();
+}
+
 function saveManualEvent() {
   if (!requireLogin("salvar registros")) return;
   const payload = buildManualEventPayload({
@@ -13641,6 +13756,7 @@ function saveManualEvent() {
   }
 
   const existingEvent = payload.editingEventId ? getEventById(payload.editingEventId) : null;
+  const actorAtSave = getCurrentActorProfile();
   const validationWarning = getManualEventValidationWarning(payload, existingEvent);
   if (validationWarning && !window.confirm(validationWarning)) return;
   markRoutineMutationSnapshot(existingEvent ? "editou registro" : "adicionou registro");
@@ -13764,6 +13880,14 @@ function saveManualEvent() {
     window.clearTimeout(dayCloudSaveTimer);
     void saveDayToCloud(getSelectedDayId());
   }
+
+  openRecordSuccessModal({
+    type: payload.type,
+    start: payload.start,
+    actor: actorAtSave,
+    editing: Boolean(existingEvent),
+    timerStarted: !existingEvent && isManualSleepType(payload.type) && !payload.hasManualEnd,
+  });
 }
 
 function editEvent(eventId) {
@@ -14887,7 +15011,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=82.0.0", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=82.1.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -14915,7 +15039,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "82.0.0";
+  const VERSION = "82.1.0";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -14972,7 +15096,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "82.0.0";
+  const VERSION = "82.1.0";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -15036,7 +15160,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "82.0.0";
+  const LEGAL_VERSION = "82.1.0";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -15295,7 +15419,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "82.0.0";
+  const SUPPORT_VERSION = "82.1.0";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -15624,7 +15748,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "82.0.0";
+  const REVIEW_VERSION = "82.1.0";
 
   function currentEffectiveRole() {
     try {

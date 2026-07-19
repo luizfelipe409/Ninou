@@ -55,6 +55,20 @@ export function getEventOrderTime(event = {}) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
+export function getEventDaySegment(event = {}, dayStart = 0, dayEnd = dayStart + day) {
+  const rawStart = toMilliseconds(event.start ?? event.eventTime);
+  if (!Number.isFinite(rawStart) || !Number.isFinite(dayStart) || !Number.isFinite(dayEnd) || dayEnd <= dayStart) return null;
+  const parsedEnd = toMilliseconds(event.end);
+  const rawEnd = Number.isFinite(parsedEnd) && parsedEnd > rawStart ? parsedEnd : rawStart;
+  if (rawStart >= dayEnd || rawEnd < dayStart) return null;
+  return {
+    start: Math.max(rawStart, dayStart),
+    end: Math.min(rawEnd, dayEnd),
+    crossesStart: rawStart < dayStart,
+    crossesEnd: rawEnd > dayEnd,
+  };
+}
+
 export function createEmptyDayState() {
   return {
     mode: "idle",

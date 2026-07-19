@@ -1701,6 +1701,161 @@ html.ninou-v8200 body.family-daily-surface:not([data-active-screen="profile"]) .
   }
 }
 
+/* v82.1.0 — confirmação de cuidado e bloqueio espelhados da experiência mobile. */
+.record-success-modal,
+.blocked-account-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  display: grid;
+  place-items: center;
+  padding: max(22px, env(safe-area-inset-top)) 18px max(22px, env(safe-area-inset-bottom));
+}
+
+.record-success-modal[hidden],
+.blocked-account-portal[hidden] { display: none !important; }
+
+.record-success-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: rgba(9, 7, 27, .72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.record-success-card,
+.blocked-account-card {
+  position: relative;
+  width: min(100%, 430px);
+  overflow: hidden;
+  border: 1px solid rgba(167, 137, 255, .26);
+  border-radius: 32px;
+  padding: 34px 28px 28px;
+  color: #f9f7ff;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(139, 111, 255, .30), transparent 44%),
+    linear-gradient(155deg, rgba(34, 27, 70, .98), rgba(17, 14, 43, .99));
+  box-shadow: 0 30px 90px rgba(4, 3, 18, .56), inset 0 1px rgba(255, 255, 255, .08);
+  animation: record-success-enter .34s cubic-bezier(.2,.85,.25,1.08) both;
+}
+
+@keyframes record-success-enter {
+  from { opacity: 0; transform: translateY(20px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.record-success-art,
+.blocked-account-icon {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 14px;
+  border: 1px solid rgba(167, 137, 255, .24);
+  border-radius: 28px;
+  background: rgba(128, 96, 255, .13);
+  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 18px 40px rgba(9, 6, 30, .34);
+}
+
+.record-success-art .icon-art { width: 62px; height: 62px; object-fit: contain; }
+.record-success-check {
+  position: absolute;
+  top: 86px;
+  left: calc(50% + 23px);
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 4px solid #231b48;
+  border-radius: 50%;
+  color: #112c26;
+  background: #70e4c1;
+  font-size: .82rem;
+  font-weight: 1000;
+}
+
+.record-success-kicker,
+.blocked-account-kicker {
+  margin: 4px 0 8px;
+  color: #9f86ff;
+  font-size: .68rem;
+  font-weight: 950;
+  letter-spacing: .18em;
+}
+
+.record-success-card h2,
+.blocked-account-card h2 { margin: 0; font-size: clamp(1.65rem, 5vw, 2rem); letter-spacing: -.04em; }
+.record-success-card > p:not(.record-success-kicker),
+.blocked-account-card > p:not(.blocked-account-kicker) { margin: 10px auto 22px; color: rgba(235, 229, 255, .72); line-height: 1.55; }
+
+.record-success-identity {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 22px;
+  padding: 15px 18px;
+  border: 1px solid rgba(167, 137, 255, .15);
+  border-radius: 18px;
+  text-align: left;
+  background: rgba(255,255,255,.045);
+}
+
+.record-success-identity small { color: rgba(218, 208, 255, .54); font-size: .62rem; font-weight: 900; letter-spacing: .14em; }
+.record-success-identity strong { color: #f8f5ff; font-size: .94rem; }
+.record-success-actions { display: grid; gap: 10px; }
+.record-success-actions button,
+.blocked-account-card button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 17px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.record-success-primary,
+.blocked-account-card button { color: #fff; background: linear-gradient(135deg, #8062f6, #9d74ff); box-shadow: 0 13px 28px rgba(91, 62, 202, .32); }
+.record-success-secondary { color: #ded5ff; background: rgba(255,255,255,.075); }
+
+.blocked-account-portal {
+  z-index: 10060;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(111, 229, 199, .12), transparent 32%),
+    radial-gradient(circle at 88% 76%, rgba(128, 98, 246, .21), transparent 42%),
+    #0d0a21;
+}
+.blocked-account-icon { color: #ff8b9f; font-size: 2.4rem; background: rgba(255, 104, 134, .09); border-color: rgba(255, 104, 134, .18); }
+.blocked-account-card > small { display: block; margin: -7px 0 24px; color: rgba(235,229,255,.55); line-height: 1.45; }
+.blocked-account-card button { width: 100%; }
+
+body.record-success-open,
+body.blocked-account-mode { overflow: hidden !important; }
+
+body.day-theme .record-success-card,
+body.day-theme .blocked-account-card {
+  color: #322550;
+  border-color: rgba(96, 69, 156, .14);
+  background: linear-gradient(155deg, rgba(255,255,255,.99), rgba(245,240,255,.99));
+  box-shadow: 0 28px 80px rgba(69, 47, 118, .22);
+}
+body.day-theme .record-success-card > p:not(.record-success-kicker),
+body.day-theme .blocked-account-card > p:not(.blocked-account-kicker),
+body.day-theme .blocked-account-card > small { color: rgba(59, 41, 98, .66); }
+body.day-theme .record-success-identity { background: rgba(99, 68, 171, .055); border-color: rgba(99, 68, 171, .11); }
+body.day-theme .record-success-identity small { color: rgba(64, 44, 105, .56); }
+body.day-theme .record-success-identity strong { color: #37265a; }
+body.day-theme .record-success-secondary {
+  color: #604995 !important;
+  -webkit-text-fill-color: #604995 !important;
+  background: rgba(96, 73, 149, .09) !important;
+}
+
+@media (max-width: 520px) {
+  .record-success-card,
+  .blocked-account-card { border-radius: 28px; padding: 30px 20px 22px; }
+}
+
 @media (max-width: 390px) {
   html.ninou-v8200 .action-launcher-card { padding-inline: 11px; }
   html.ninou-v8200 .action-launcher-grid { gap: 8px; }
