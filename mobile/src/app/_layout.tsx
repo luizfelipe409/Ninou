@@ -9,6 +9,8 @@ import { ProfileProvider } from '@/state/profile-context';
 import { AuthProvider, useNinouAuth } from '@/state/auth-context';
 import { GuestEntryPortal, NinouLoadingScreen } from '@/components/guest-entry-portal';
 import { FamilySetupPortal } from '@/components/family-setup-portal';
+import { GlobalAdminPortal } from '@/components/global-admin-portal';
+import { BlockedAccountPortal } from '@/components/blocked-account-portal';
 import { PreferencesProvider } from '@/state/preferences-context';
 
 void SplashScreen.preventAutoHideAsync();
@@ -51,6 +53,8 @@ function AppGate() {
   const { colors } = useNinouTheme();
   if (status === 'loading' || status === 'resolving-family') return <NinouLoadingScreen />;
   if (!user) return <GuestEntryPortal />;
+  if (status === 'admin') return <GlobalAdminPortal />;
+  if (status === 'blocked') return <BlockedAccountPortal />;
   if (status === 'no-family' || status === 'error') return <FamilySetupPortal />;
   return (
     <ProfileProvider>
@@ -64,8 +68,9 @@ function AppGate() {
               presentation: 'formSheet',
               headerShown: false,
               sheetGrabberVisible: true,
-              sheetAllowedDetents: [0.78, 1],
+              sheetAllowedDetents: [0.78],
               sheetInitialDetentIndex: 0,
+              sheetExpandsWhenScrolledToEdge: false,
               contentStyle: { backgroundColor: colors.background },
             }}
           />

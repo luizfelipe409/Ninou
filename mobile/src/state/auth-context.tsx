@@ -1,9 +1,11 @@
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { User } from 'firebase/auth';
 
+import { isGlobalAppAdminEmail } from '@/domain/family-access';
 import {
   getFirebaseErrorMessage,
   loginWithEmail,
+  loadUserAccountStatus,
   logout,
   observeAuth,
   registerWithEmail,
@@ -11,13 +13,14 @@ import {
   type FamilyAccess,
 } from '@/services/firebase';
 
-type AuthStatus = 'loading' | 'signed-out' | 'resolving-family' | 'ready' | 'no-family' | 'error';
+type AuthStatus = 'loading' | 'signed-out' | 'resolving-family' | 'ready' | 'admin' | 'blocked' | 'no-family' | 'error';
 
 type AuthContextValue = {
   user: User | null;
   access: FamilyAccess | null;
   status: AuthStatus;
   error: string;
+  submitting: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
@@ -31,11 +34,24 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [access, setAccess] = useState<FamilyAccess | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const loadAccess = useCallback(async (nextUser: User) => {
+    if (isGlobalAppAdminEmail(nextUser.email)) {
+      setAccess(null);
+      setError('');
+      setStatus('admin');
+      return;
+    }
     setStatus('resolving-family');
     setError('');
     try {
+      const accountStatus = await loadUserAccountStatus(nextUser);
+      if (['blocked', 'suspended', 'disabled'].includes(accountStatus)) {
+        setAccess(null);
+        setStatus('blocked');
+        return;
+      }
       const nextAccess = await resolveFamilyAccess(nextUser);
       setAccess(nextAccess);
       setStatus(nextAccess ? 'ready' : 'no-family');
@@ -59,7 +75,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const login = useCallback(async (email: string, password: string) => {
     setError('');
-    setStatus('loading');
+    setSubmitting(true);
     try {
       await loginWithEmail(email, password);
       return true;
@@ -67,12 +83,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setStatus('signed-out');
       setError(getFirebaseErrorMessage(loginError));
       return false;
+    } finally {
+      setSubmitting(false);
     }
   }, []);
 
   const register = useCallback(async (email: string, password: string) => {
     setError('');
-    setStatus('loading');
+    setSubmitting(true);
     try {
       await registerWithEmail(email, password);
       return true;
@@ -80,6 +98,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setStatus('signed-out');
       setError(getFirebaseErrorMessage(registerError));
       return false;
+    } finally {
+      setSubmitting(false);
     }
   }, []);
 
@@ -92,7 +112,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (user) await loadAccess(user);
   }, [loadAccess, user]);
 
-  const value = useMemo(() => ({ user, access, status, error, login, register, signOut, refreshAccess }), [user, access, status, error, login, register, signOut, refreshAccess]);
+  const value = useMemo(() => ({ user, access, status, error, submitting, login, register, signOut, refreshAccess }), [user, access, status, error, submitting, login, register, signOut, refreshAccess]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

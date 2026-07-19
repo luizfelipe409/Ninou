@@ -1,5 +1,11 @@
 export type FamilyRole = 'owner' | 'admin' | 'caregiver' | 'viewer';
 
+export const GLOBAL_APP_ADMIN_EMAIL = 'luizfelipe.dasilva@gmail.com';
+
+export function isGlobalAppAdminEmail(email?: string | null) {
+  return String(email || '').trim().toLowerCase() === GLOBAL_APP_ADMIN_EMAIL;
+}
+
 const roleAliases: Record<string, FamilyRole> = {
   owner: 'owner',
   proprietario: 'owner',

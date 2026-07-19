@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionArt } from '@/components/action-art';
@@ -10,19 +11,68 @@ import { NinouBackground } from '@/components/ninou-background';
 import { formatTime, recordConfig, type RecordType } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
+import { useFamilyPreferences } from '@/state/preferences-context';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
-const quickTypes: RecordType[] = ['amamentacao', 'mamadeira', 'fralda', 'medicamento'];
-const sleepTypes: RecordType[] = ['acordou', 'sono', 'dormir', 'despertar-noturno'];
+const careTypes: RecordType[] = ['amamentacao', 'mamadeira', 'fralda', 'sono', 'dormir', 'acordou', 'despertar-noturno', 'medicamento'];
+
+function timestampFor(dayId: string, time: string) {
+  const [hours, minutes] = time.split(':').map(Number);
+  const date = new Date(`${dayId}T00:00:00`);
+  date.setHours(Number.isFinite(hours) ? hours : 0, Number.isFinite(minutes) ? minutes : 0, 0, 0);
+  return date.getTime();
+}
+
+function formatTimer(seconds: number) {
+  return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+}
 
 function validType(value: unknown): value is RecordType {
   return typeof value === 'string' && value in recordConfig;
 }
 
+function CareMenu({ onClose, onSelect }: { onClose: () => void; onSelect: (type: RecordType) => void }) {
+  const { colors, isDark } = useNinouTheme();
+  return (
+    <View style={styles.menuScreen}>
+      <View style={styles.intro}>
+        <View style={styles.introTop}>
+          <Text style={[styles.eyebrow, { color: colors.primary }]}>Novo registro</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={onClose} style={[styles.closeButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="close" size={24} color={colors.text} /></Pressable>
+        </View>
+        <Text style={[styles.title, { color: colors.text }]}>O que aconteceu agora?</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>Escolha um cuidado para registrar em poucos toques.</Text>
+      </View>
+      <View style={styles.grid}>
+        {careTypes.map((type) => (
+          <Pressable
+            key={type}
+            accessibilityRole="button"
+            accessibilityLabel={`${recordConfig[type].title}. ${recordConfig[type].hint}`}
+            onPress={() => onSelect(type)}
+            style={({ pressed }) => [styles.action, { backgroundColor: colors.surface, borderColor: pressed ? colors.primary : colors.border, shadowColor: isDark ? '#000000' : colors.primary }, pressed && styles.actionPressed]}>
+            <LinearGradient pointerEvents="none" colors={isDark ? ['rgba(180,151,255,0.10)', 'rgba(87,225,194,0.02)'] : ['rgba(255,255,255,0.88)', 'rgba(126,91,224,0.035)']} style={styles.actionSheen} />
+            <View style={styles.actionTop}>
+              <ActionArt type={type} size={48} />
+              <View style={[styles.actionChevron, { backgroundColor: colors.primarySoft }]}><Ionicons name="chevron-forward" size={17} color={colors.primary} /></View>
+            </View>
+            <View style={styles.actionCopy}>
+              <Text numberOfLines={1} style={[styles.actionTitle, { color: colors.text }]}>{recordConfig[type].title}</Text>
+              <Text numberOfLines={1} style={[styles.actionHint, { color: colors.textMuted }]}>{recordConfig[type].hint}</Text>
+            </View>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export default function RegisterScreen() {
-  const { colors } = useNinouTheme();
+  const { colors, isDark } = useNinouTheme();
   const { addRecord } = useRoutine();
+  const { preferences } = useFamilyPreferences();
   const params = useLocalSearchParams<{ type?: string; dayId?: string }>();
+  const scrollRef = useRef<ScrollView>(null);
   const [selectedType, setSelectedType] = useState<RecordType | null>(validType(params.type) ? params.type : null);
   const [detail, setDetail] = useState('');
   const [notes, setNotes] = useState('');
@@ -36,6 +86,7 @@ export default function RegisterScreen() {
   const [activeBreastSide, setActiveBreastSide] = useState<'left' | 'right' | null>(null);
   const [medicineName, setMedicineName] = useState('');
   const [medicineDose, setMedicineDose] = useState('');
+  const [savedRecord, setSavedRecord] = useState<{ type: RecordType; timestamp: number; caregiver: string } | null>(null);
 
   useEffect(() => {
     if (validType(params.type)) setSelectedType(params.type);
@@ -47,15 +98,27 @@ export default function RegisterScreen() {
     return () => clearInterval(timer);
   }, [activeBreastSide]);
 
-  const selectType = (type: RecordType) => {
+  const selectType = useCallback((type: RecordType) => {
     void Haptics.selectionAsync();
     setSelectedType(type);
     setDetail('');
     setNotes('');
-  };
+  }, []);
+
+  const showCareMenu = useCallback(() => {
+    setActiveBreastSide(null);
+    setSelectedType(null);
+    router.setParams({ type: '' });
+  }, []);
+
+  useEffect(() => {
+    if (selectedType) return;
+    const frame = requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: 0, animated: false }));
+    return () => cancelAnimationFrame(frame);
+  }, [selectedType]);
 
   const save = () => {
-    if (!selectedType) return;
+    if (!selectedType || savedRecord) return;
     const breastTotal = leftBreastSeconds + rightBreastSeconds;
     let start = manualTime ? timestampFor(recordDayId, startTime) : undefined;
     let end = manualTime && endTime ? Math.max(start || 0, timestampFor(recordDayId, endTime)) : undefined;
@@ -69,27 +132,32 @@ export default function RegisterScreen() {
       ...(selectedType === 'mamadeira' ? { amountMl } : {}),
       ...(Number.isFinite(start) ? { start, end } : {}),
     });
+    const caregiver = [preferences.caregiverName.trim(), preferences.caregiverRelation.trim()].filter(Boolean).join(' · ') || 'Responsável';
+    setActiveBreastSide(null);
+    setSavedRecord({ type: selectedType, timestamp: Number.isFinite(start) ? Number(start) : Date.now(), caregiver });
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.back();
+  };
+
+  const registerAnother = () => {
+    setSavedRecord(null);
+    setDetail('');
+    setNotes('');
+    setMedicineName('');
+    setMedicineDose('');
+    setLeftBreastSeconds(0);
+    setRightBreastSeconds(0);
+    showCareMenu();
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['bottom']}>
       <NinouBackground />
-      <ScrollView key={selectedType || 'care-menu'} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {!selectedType ? (
-          <>
-            <View style={styles.intro}>
-              <View style={styles.introTop}><Text style={[styles.eyebrow, { color: colors.primary }]}>Novo cuidado</Text><Pressable accessibilityLabel="Fechar menu" onPress={() => router.back()} style={[styles.closeButton, { backgroundColor: colors.surfaceElevated }]}><Ionicons name="close" size={21} color={colors.text} /></Pressable></View>
-              <Text style={[styles.title, { color: colors.text }]}>O que você quer registrar?</Text>
-              <Text style={[styles.subtitle, { color: colors.textMuted }]}>Escolha uma ação. O formulário abrirá já preparado.</Text>
-            </View>
-            <ActionGroup title="Cuidados rápidos" types={quickTypes} />
-            <ActionGroup title="Sono e vigília" types={sleepTypes} />
-          </>
+          <CareMenu onClose={() => router.back()} onSelect={selectType} />
         ) : (
           <>
-            <Pressable onPress={() => { setActiveBreastSide(null); setSelectedType(null); }} style={styles.backButton}>
+            <Pressable onPress={showCareMenu} style={styles.backButton}>
               <Ionicons name="chevron-back" size={20} color={colors.primary} />
               <Text style={[styles.backText, { color: colors.primary }]}>Cuidados</Text>
             </Pressable>
@@ -156,34 +224,27 @@ export default function RegisterScreen() {
           </>
         )}
       </ScrollView>
+      <Modal visible={Boolean(savedRecord)} transparent animationType="fade" onRequestClose={() => router.back()}>
+        <View style={styles.successBackdrop}>
+          <View style={[styles.successCard, { backgroundColor: colors.surface, borderColor: colors.border, shadowColor: isDark ? '#000000' : colors.primary }]}>
+            <LinearGradient pointerEvents="none" colors={isDark ? ['rgba(122,94,232,0.22)', 'rgba(93,226,193,0.05)', 'rgba(19,13,38,0)'] : ['rgba(137,103,239,0.16)', 'rgba(91,213,183,0.07)', 'rgba(255,255,255,0)']} style={StyleSheet.absoluteFill} />
+            <View style={styles.successArtWrap}>
+              <View style={[styles.successHalo, { backgroundColor: `${colors.accent}1F`, borderColor: `${colors.accent}55` }]} />
+              <View style={[styles.successArt, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>{savedRecord ? <ActionArt type={savedRecord.type} size={74} /> : null}</View>
+              <View style={[styles.successCheck, { backgroundColor: colors.accent, borderColor: colors.surface }]}><Ionicons name="checkmark" size={20} color="#12362E" /></View>
+            </View>
+            <Text style={[styles.successKicker, { color: colors.primary }]}>REGISTRO CONCLUÍDO</Text>
+            <Text style={[styles.successTitle, { color: colors.text }]}>{savedRecord && (savedRecord.type === 'sono' || savedRecord.type === 'dormir') ? 'Timer iniciado' : 'Cuidado registrado'}</Text>
+            <Text style={[styles.successText, { color: colors.textMuted }]}>{savedRecord ? `${recordConfig[savedRecord.type].title} às ${formatTime(savedRecord.timestamp)}. O diário identificará quem realizou este cuidado.` : ''}</Text>
+            <View style={[styles.successIdentity, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><View style={[styles.successIdentityIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="person-outline" size={18} color={colors.primary} /></View><View style={styles.successIdentityCopy}><Text style={[styles.successIdentityLabel, { color: colors.textMuted }]}>REGISTRADO POR</Text><Text numberOfLines={1} style={[styles.successIdentityName, { color: colors.text }]}>{savedRecord?.caregiver}</Text></View><Ionicons name="cloud-done-outline" size={21} color={colors.accent} /></View>
+            <Pressable onPress={() => router.back()} style={({ pressed }) => [styles.successPrimary, { backgroundColor: colors.primary }, pressed && styles.pressed]}><Text style={styles.successPrimaryText}>Concluir</Text><Ionicons name="arrow-forward" size={18} color="#FFFFFF" /></Pressable>
+            <Pressable onPress={registerAnother} style={({ pressed }) => [styles.successSecondary, { borderColor: colors.border }, pressed && styles.pressed]}><Ionicons name="add-circle-outline" size={18} color={colors.primary} /><Text style={[styles.successSecondaryText, { color: colors.primary }]}>Registrar outro cuidado</Text></Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 
-  function ActionGroup({ title, types }: { title: string; types: RecordType[] }) {
-    return (
-      <View style={styles.group}>
-        <Text style={[styles.groupTitle, { color: colors.textMuted }]}>{title}</Text>
-        <View style={styles.grid}>
-          {types.map((type) => (
-            <Pressable key={type} onPress={() => selectType(type)} style={({ pressed }) => [styles.action, { backgroundColor: colors.surface, borderColor: pressed ? colors.primary : colors.border, shadowColor: colors.primary }, pressed && styles.actionPressed]}>
-              <ActionArt type={type} size={50} />
-              <Text adjustsFontSizeToFit minimumFontScale={0.8} numberOfLines={1} style={[styles.actionTitle, { color: colors.text }]}>{recordConfig[type].title}</Text>
-              <Text style={[styles.actionHint, { color: colors.textMuted }]}>{recordConfig[type].hint}</Text>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-    );
-  }
-
-  function timestampFor(dayId: string, time: string) {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date(`${dayId}T00:00:00`);
-    date.setHours(Number.isFinite(hours) ? hours : 0, Number.isFinite(minutes) ? minutes : 0, 0, 0);
-    return date.getTime();
-  }
-
-  function formatTimer(seconds: number) { return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`; }
   function BreastSide({ side, label, seconds }: { side: 'left' | 'right'; label: string; seconds: number }) {
     const active = activeBreastSide === side;
     return <Pressable accessibilityRole="button" accessibilityState={{ selected: active }} onPress={() => setActiveBreastSide((current) => current === side ? null : side)} style={[styles.breastSide, { backgroundColor: active ? colors.primarySoft : colors.surface, borderColor: active ? colors.primary : colors.border }]}><View style={[styles.breastPlay, { backgroundColor: active ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.breastLetter, { color: active ? '#FFF' : colors.primary }]}>{side === 'left' ? 'E' : 'D'}</Text><Ionicons name={active ? 'pause' : 'play'} size={12} color={active ? '#FFF' : colors.primary} /></View><Text style={[styles.breastTime, { color: colors.text }]}>{formatTimer(seconds)}</Text><Text style={[styles.breastLabel, { color: colors.textMuted }]}>{label}</Text></Pressable>;
@@ -193,18 +254,21 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { width: '100%', maxWidth: 720, alignSelf: 'center', padding: spacing.lg, paddingBottom: spacing.xxl, gap: spacing.xl },
+  menuScreen: { gap: 18 },
   intro: { gap: spacing.xs },
-  introTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, closeButton: { width: 42, height: 42, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
-  eyebrow: { fontSize: 11, fontWeight: '900', letterSpacing: 1.1, textTransform: 'uppercase' },
-  title: { fontSize: 27, lineHeight: 32, fontWeight: '900', letterSpacing: -0.6 },
-  subtitle: { fontSize: 14, lineHeight: 20 },
-  group: { gap: spacing.md },
-  groupTitle: { fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.8 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  action: { width: '47%', flexGrow: 1, minHeight: 116, borderRadius: 21, borderWidth: StyleSheet.hairlineWidth, padding: 11, justifyContent: 'center' },
-  actionPressed: { borderWidth: 1, shadowOpacity: 0.32, shadowRadius: 14, shadowOffset: { width: 0, height: 0 } },
-  actionTitle: { width: '100%', fontSize: 13, lineHeight: 16, fontWeight: '900', marginTop: 6 },
-  actionHint: { fontSize: 11, marginTop: 2 },
+  introTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, closeButton: { width: 48, height: 48, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' },
+  eyebrow: { fontSize: 11.5, lineHeight: 15, fontWeight: '900', letterSpacing: 1.2, textTransform: 'uppercase' },
+  title: { fontSize: 29, lineHeight: 34, fontWeight: '900', letterSpacing: -0.7 },
+  subtitle: { fontSize: 15, lineHeight: 21 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  action: { width: '48%', flexGrow: 1, minHeight: 108, borderRadius: 23, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, paddingVertical: 11, justifyContent: 'space-between', gap: 7, overflow: 'hidden', shadowOpacity: 0.14, shadowRadius: 12, shadowOffset: { width: 0, height: 7 }, elevation: 3 },
+  actionSheen: { position: 'absolute', inset: 0, borderRadius: 23 },
+  actionPressed: { borderWidth: 1, opacity: 0.88, transform: [{ scale: 0.985 }], shadowOpacity: 0.26, shadowRadius: 16 },
+  actionTop: { width: '100%', flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  actionCopy: { width: '100%', minWidth: 0 },
+  actionTitle: { width: '100%', fontSize: 14, lineHeight: 17, fontWeight: '900', letterSpacing: -0.15 },
+  actionHint: { marginTop: 2, fontSize: 11, lineHeight: 14, fontWeight: '600' },
+  actionChevron: { width: 27, height: 27, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
   backButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 2 },
   backText: { fontSize: 14, fontWeight: '800' },
@@ -229,4 +293,10 @@ const styles = StyleSheet.create({
   textArea: { minHeight: 112, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md, fontSize: 14, textAlignVertical: 'top' },
   saveButton: { minHeight: 54, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   saveText: { color: '#FFFFFF', fontSize: 16, fontWeight: '900' },
+  successBackdrop: { flex: 1, backgroundColor: 'rgba(6,3,13,0.72)', padding: 18, alignItems: 'center', justifyContent: 'center' },
+  successCard: { width: '100%', maxWidth: 390, borderRadius: 31, borderWidth: StyleSheet.hairlineWidth, padding: 22, alignItems: 'center', overflow: 'hidden', shadowOpacity: 0.34, shadowRadius: 28, shadowOffset: { width: 0, height: 14 }, elevation: 10 },
+  successArtWrap: { width: 122, height: 122, alignItems: 'center', justifyContent: 'center' }, successHalo: { position: 'absolute', width: 122, height: 122, borderRadius: 61, borderWidth: 1 }, successArt: { width: 94, height: 94, borderRadius: 32, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' }, successCheck: { position: 'absolute', right: 5, bottom: 7, width: 35, height: 35, borderRadius: 18, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
+  successKicker: { marginTop: 15, fontSize: 9.5, fontWeight: '900', letterSpacing: 1.35 }, successTitle: { marginTop: 7, fontSize: 28, lineHeight: 33, fontWeight: '900', letterSpacing: -0.7, textAlign: 'center' }, successText: { marginTop: 8, maxWidth: 320, fontSize: 12.5, lineHeight: 18, fontWeight: '600', textAlign: 'center' },
+  successIdentity: { width: '100%', minHeight: 64, marginTop: 19, borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 10 }, successIdentityIcon: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, successIdentityCopy: { flex: 1 }, successIdentityLabel: { fontSize: 8, fontWeight: '900', letterSpacing: 0.9 }, successIdentityName: { marginTop: 3, fontSize: 12.5, fontWeight: '900' },
+  successPrimary: { width: '100%', minHeight: 54, marginTop: 16, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, successPrimaryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' }, successSecondary: { width: '100%', minHeight: 49, marginTop: 8, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, successSecondaryText: { fontSize: 12.5, fontWeight: '900' },
 });

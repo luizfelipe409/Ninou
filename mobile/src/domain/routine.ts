@@ -511,3 +511,35 @@ export function getRoutineEventOrbitTimestamp(event: RoutineEvent) {
   const isSleepDuration = event.type === 'sono' || event.type === 'dormir';
   return isSleepDuration && event.end > event.start ? event.end : event.start;
 }
+
+export function getRoutineLocalDayBounds(dayTimestamp = Date.now()) {
+  const dayStartDate = new Date(dayTimestamp);
+  dayStartDate.setHours(0, 0, 0, 0);
+  const dayStart = dayStartDate.getTime();
+  const nextDayDate = new Date(dayStartDate);
+  nextDayDate.setDate(nextDayDate.getDate() + 1);
+  const dayEnd = nextDayDate.getTime();
+  return { dayStart, dayEnd };
+}
+
+export function getRoutineSleepSegmentForLocalDay(event: RoutineEvent, dayTimestamp = Date.now()) {
+  if ((event.type !== 'sono' && event.type !== 'dormir') || event.end <= event.start) return null;
+  const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
+  if (event.start >= dayEnd || event.end <= dayStart) return null;
+  return { start: Math.max(event.start, dayStart), end: Math.min(event.end, dayEnd) };
+}
+
+export function getRoutineEventsForLocalDay(events: RoutineEvent[], dayTimestamp = Date.now()) {
+  const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
+
+  return events.filter((event) => {
+    if (getRoutineSleepSegmentForLocalDay(event, dayTimestamp)) return true;
+    const timestamp = getRoutineEventOrbitTimestamp(event);
+    return timestamp >= dayStart && timestamp < dayEnd;
+  });
+}
+
+export function getRoutineMarkerEventsForLocalDay(events: RoutineEvent[], dayTimestamp = Date.now()) {
+  const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
+  return getRoutineEventsForLocalDay(events, dayTimestamp).filter((event) => event.start >= dayStart && event.start < dayEnd);
+}

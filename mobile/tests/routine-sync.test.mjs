@@ -8,6 +8,9 @@ const {
   finishSleep,
   formatRoutineActorLabel,
   getRoutineEventOrbitTimestamp,
+  getRoutineEventsForLocalDay,
+  getRoutineMarkerEventsForLocalDay,
+  getRoutineSleepSegmentForLocalDay,
   getTodayAwakeMs,
   mergeDayStates,
   restoreRoutineSnapshot,
@@ -19,6 +22,7 @@ const {
 const {
   canEditFamilyProfile,
   canExportFamilyReports,
+  isGlobalAppAdminEmail,
   normalizeFamilyRole,
 } = await import('../src/domain/family-access.ts');
 
@@ -40,6 +44,28 @@ assert.equal(formatRoutineActorLabel(sleepEvent), 'Felipe · Pai');
 assert.equal(formatRoutineActorLabel(wakeEvent), 'Mary · Mãe');
 assert.equal(getRoutineEventOrbitTimestamp(sleepEvent), sleepEvent.end);
 assert.equal(getRoutineEventOrbitTimestamp(wakeEvent), wakeEvent.start);
+
+const orbitToday = new Date(2026, 6, 19, 12, 0, 0, 0).getTime();
+const yesterdayMorningNap = {
+  ...sleepEvent,
+  id: 'yesterday-nap',
+  type: 'sono',
+  start: new Date(2026, 6, 18, 9, 0, 0, 0).getTime(),
+  end: new Date(2026, 6, 18, 10, 0, 0, 0).getTime(),
+};
+const overnightSleep = {
+  ...sleepEvent,
+  id: 'overnight-sleep',
+  type: 'dormir',
+  start: new Date(2026, 6, 18, 20, 21, 0, 0).getTime(),
+  end: new Date(2026, 6, 19, 2, 50, 0, 0).getTime(),
+};
+assert.deepEqual(getRoutineEventsForLocalDay([yesterdayMorningNap, overnightSleep], orbitToday).map((event) => event.id), ['overnight-sleep']);
+assert.deepEqual(getRoutineSleepSegmentForLocalDay(overnightSleep, orbitToday), {
+  start: new Date(2026, 6, 19, 0, 0, 0, 0).getTime(),
+  end: new Date(2026, 6, 19, 2, 50, 0, 0).getTime(),
+});
+assert.deepEqual(getRoutineMarkerEventsForLocalDay([yesterdayMorningNap, overnightSleep], orbitToday), []);
 
 const dayStart = new Date(2026, 6, 18, 0, 0, 0, 0).getTime();
 const firstWake = startRoutine(createEmptyDayState(), 'awake', dayStart + 60 * 60 * 1000, felipe);
@@ -83,5 +109,7 @@ assert.equal(canEditFamilyProfile('responsavel'), true);
 assert.equal(canExportFamilyReports('admin_familiar'), true);
 assert.equal(canExportFamilyReports('cuidador'), true);
 assert.equal(canExportFamilyReports('visualizacao'), false);
+assert.equal(isGlobalAppAdminEmail(' LuizFelipe.DaSilva@gmail.com '), true);
+assert.equal(isGlobalAppAdminEmail('responsavel@example.com'), false);
 
 console.log('Sincronização da rotina e permissões familiares validadas.');

@@ -28,7 +28,7 @@ import {
 } from 'firebase/firestore';
 import { Platform } from 'react-native';
 
-import { canManageFamily, normalizeInviteRole } from '@/domain/family-access';
+import { canManageFamily, isGlobalAppAdminEmail, normalizeInviteRole } from '@/domain/family-access';
 import { mergeDayStates, normalizeDayState, type DayState } from '@/domain/routine';
 
 const firebaseConfig = {
@@ -196,6 +196,77 @@ export async function loadRoutineDays(familyId: string) {
     const data = day.data();
     return [day.id, normalizeDayState((data.state && typeof data.state === 'object' ? data.state : data) as Partial<DayState>)];
   }));
+}
+
+export type AdminFamilySummary = {
+  id: string;
+  name: string;
+  babyName: string;
+  status: string;
+  membersCount: number;
+  pendingInvitesCount: number;
+  updatedAt: number;
+};
+
+export type AdminDashboard = {
+  families: AdminFamilySummary[];
+  activeFamiliesCount: number;
+  membersCount: number;
+  pendingInvitesCount: number;
+};
+
+function firestoreValueToMillis(value: unknown) {
+  if (value && typeof (value as { toMillis?: unknown }).toMillis === 'function') return (value as { toMillis: () => number }).toMillis();
+  if (value && typeof value === 'object' && Number.isFinite(Number((value as { seconds?: number }).seconds))) return Number((value as { seconds: number }).seconds) * 1000;
+  return Number.isFinite(Number(value)) ? Number(value) : 0;
+}
+
+export async function loadGlobalAdminDashboard(user: User): Promise<AdminDashboard> {
+  if (!isGlobalAppAdminEmail(user.email)) throw new Error('Esta conta não possui acesso ao painel administrativo.');
+  const familiesSnapshot = await getDocs(collection(db, 'families'));
+  const memberIds = new Set<string>();
+  const families = await Promise.all(familiesSnapshot.docs.map(async (familyDocument) => {
+    const data = familyDocument.data();
+    const [profileSnapshot, membersSnapshot, invitesSnapshot] = await Promise.all([
+      getDoc(doc(db, 'families', familyDocument.id, 'profile', 'main')),
+      getDocs(collection(db, 'families', familyDocument.id, 'members')),
+      getDocs(collection(db, 'families', familyDocument.id, 'invites')),
+    ]);
+    const profile = profileSnapshot.exists() ? profileSnapshot.data() : {};
+    const activeMembers = membersSnapshot.docs.filter((memberDocument) => {
+      const member = memberDocument.data();
+      const active = !['inactive', 'revoked', 'removed'].includes(String(member.status || 'active'));
+      const appAdmin = isGlobalAppAdminEmail(String(member.email || '')) || String(member.role || '') === 'global_admin';
+      if (active && !appAdmin) memberIds.add(memberDocument.id);
+      return active && !appAdmin;
+    });
+    const pendingInvitesCount = invitesSnapshot.docs.filter((inviteDocument) => {
+      const invite = inviteDocument.data();
+      return ['pending', 'active'].includes(String(invite.status || 'pending')) && (!Number(invite.expiresAtClient) || Number(invite.expiresAtClient) > Date.now());
+    }).length;
+    return {
+      id: familyDocument.id,
+      name: String(data.title || data.name || profile.familyName || `Família ${familyDocument.id.slice(-6)}`),
+      babyName: String(data.babyName || profile.name || ''),
+      status: String(data.status || 'active'),
+      membersCount: activeMembers.length,
+      pendingInvitesCount,
+      updatedAt: Math.max(firestoreValueToMillis(data.updatedAt), firestoreValueToMillis(profile.updatedAt), Number(data.clientUpdatedAt || 0)),
+    } satisfies AdminFamilySummary;
+  }));
+  families.sort((left, right) => right.updatedAt - left.updatedAt || left.name.localeCompare(right.name, 'pt-BR'));
+  return {
+    families,
+    activeFamiliesCount: families.filter((family) => !['inactive', 'archived', 'removed'].includes(family.status)).length,
+    membersCount: memberIds.size,
+    pendingInvitesCount: families.reduce((total, family) => total + family.pendingInvitesCount, 0),
+  };
+}
+
+export async function loadUserAccountStatus(user: User) {
+  const accountSnapshot = await getDoc(doc(db, 'users', user.uid));
+  if (!accountSnapshot.exists()) return 'active';
+  return String(accountSnapshot.data().status || 'active').trim().toLowerCase();
 }
 
 export async function loadLegalConsent(user: User) {

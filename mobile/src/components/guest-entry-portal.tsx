@@ -143,11 +143,11 @@ export function NinouLoadingScreen() {
 }
 
 function LoginPanel({ onBack, mode, onMode }: { onBack: () => void; mode: Exclude<EntryView, 'landing'>; onMode: (mode: Exclude<EntryView, 'landing'>) => void }) {
-  const { login, register, error, status } = useNinouAuth();
+  const { login, register, error, submitting, status } = useNinouAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
-  const busy = status === 'loading' || status === 'resolving-family';
+  const busy = submitting || status === 'loading' || status === 'resolving-family';
   const submit = async () => {
     if (!email.trim() || !password) return;
     if (mode === 'invite') await AsyncStorage.setItem('ninou.mobile.pending-invite.v1', inviteCode.trim().toUpperCase());
@@ -182,7 +182,7 @@ function LoginPanel({ onBack, mode, onMode }: { onBack: () => void; mode: Exclud
             <TextInput accessibilityLabel="Senha" autoCapitalize="none" autoComplete="password" secureTextEntry value={password} onChangeText={setPassword} placeholder="Sua senha" placeholderTextColor="#A89CAE" style={styles.input} />
             {mode === 'invite' ? <><Text style={styles.label}>Código do convite</Text><TextInput accessibilityLabel="Código do convite" autoCapitalize="characters" value={inviteCode} onChangeText={setInviteCode} placeholder="Ex.: ABCD2345" placeholderTextColor="#A89CAE" style={styles.input} /></> : null}
             <Text style={styles.formHint}>{mode === 'register' ? 'Use uma senha com pelo menos 6 caracteres.' : 'Use a mesma conta do Ninou webapp.'}</Text>
-            {error ? <Text style={styles.loginError}>{error}</Text> : null}
+            {error ? <View accessibilityLiveRegion="polite" style={styles.loginErrorCard}><View style={styles.loginErrorIcon}><Ionicons name="alert-circle" size={19} color="#BE4F61" /></View><View style={styles.loginErrorCopy}><Text style={styles.loginErrorTitle}>Não foi possível entrar</Text><Text style={styles.loginError}>{error}</Text></View></View> : null}
             <Pressable disabled={busy || !email.trim() || password.length < 6 || (mode === 'invite' && !inviteCode.trim())} onPress={() => void submit()} style={({ pressed }) => [styles.loginButton, (busy || !email.trim() || password.length < 6 || (mode === 'invite' && !inviteCode.trim())) && styles.disabled, pressed && styles.pressed]}>
               {busy ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.loginButtonText}>{copy.button}</Text>}
             </Pressable>
@@ -284,7 +284,11 @@ const styles = StyleSheet.create({
   label: { color: '#42344F', fontSize: 13, fontWeight: '800', marginBottom: 8, marginTop: 14 },
   input: { height: 56, borderRadius: 17, borderWidth: 1, borderColor: '#DED5E6', backgroundColor: '#FFFFFF', paddingHorizontal: 16, color: '#302142', fontSize: 15, fontWeight: '600' },
   formHint: { color: '#86798E', marginTop: 10, fontSize: 11.5, lineHeight: 17 },
-  loginError: { color: '#BE4F61', marginTop: 12, fontSize: 12, lineHeight: 17, fontWeight: '700' },
+  loginErrorCard: { marginTop: 14, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(190,79,97,0.28)', backgroundColor: 'rgba(190,79,97,0.07)', padding: 11, flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
+  loginErrorIcon: { width: 32, height: 32, borderRadius: 11, backgroundColor: 'rgba(190,79,97,0.1)', alignItems: 'center', justifyContent: 'center' },
+  loginErrorCopy: { flex: 1 },
+  loginErrorTitle: { color: '#8E3343', fontSize: 12, lineHeight: 16, fontWeight: '900' },
+  loginError: { color: '#A74758', marginTop: 1, fontSize: 11.5, lineHeight: 16, fontWeight: '700' },
   loginButton: { minHeight: 58, marginTop: 24, borderRadius: 18, backgroundColor: '#7558E8', alignItems: 'center', justifyContent: 'center' },
   loginButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900' },
   disabled: { opacity: 0.5 },

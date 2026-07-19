@@ -1,7 +1,7 @@
 {
   "name": "ninou-mobile",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "82.1.0",
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -46,7 +46,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run test:sync",
-    "test:sync": "node --experimental-strip-types tests/routine-sync.test.mjs",
+    "test:sync": "node --experimental-strip-types tests/routine-sync.test.mjs && node --experimental-strip-types tests/admin-policy.test.mjs",
     "audit:production": "npm audit --omit=dev --audit-level=high",
     "build:preview": "npx eas-cli build --profile preview --platform all",
     "build:production": "npx eas-cli build --profile production --platform all"

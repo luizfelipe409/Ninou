@@ -5,13 +5,12 @@ import { Animated, ImageBackground, Modal, Pressable, ScrollView, StyleSheet, Te
 import Svg, { Circle, Defs, G, LinearGradient as SvgLinearGradient, Polygon, Rect, Stop, Text as SvgText } from 'react-native-svg';
 
 import { ActionArt } from '@/components/action-art';
-import { formatDuration, formatTime, getElapsedMs, getRoutineEventOrbitTimestamp, recordConfig, type DayState, type RoutineEvent } from '@/domain/routine';
+import { formatDuration, formatTime, getElapsedMs, getRoutineEventOrbitTimestamp, getRoutineEventsForLocalDay, getRoutineLocalDayBounds, getRoutineMarkerEventsForLocalDay, getRoutineSleepSegmentForLocalDay, recordConfig, type DayState, type RoutineEvent } from '@/domain/routine';
 import { useNinouTheme } from '@/theme/tokens';
 
-const starPoints = [
-  [12, 17, 2], [21, 28, 1], [31, 12, 1.5], [42, 22, 1], [55, 10, 2],
-  [70, 18, 1], [83, 31, 1.5], [91, 54, 2], [76, 72, 1], [62, 88, 1.5],
-  [38, 83, 2], [18, 70, 1], [8, 49, 1.5], [27, 55, 1], [51, 32, 1.5],
+const darkStarPoints = [
+  [4, 10, 1], [9, 18, 1.7], [13, 31, 1], [5, 44, 1.5], [11, 58, 1.1], [6, 72, 1.8], [13, 84, 1], [5, 92, 1.4],
+  [95, 9, 1.4], [89, 19, 1], [96, 32, 1.7], [88, 46, 1.1], [95, 60, 1.5], [89, 73, 1], [96, 86, 1.8], [90, 94, 1],
 ] as const;
 
 const lightStarPoints = [
@@ -25,6 +24,13 @@ function pointForTime(timestamp: number, size: number, orbitRadius: number, mark
   const angle = -Math.PI / 2 + (minutes / 1440) * Math.PI * 2;
   const center = size / 2;
   return { left: center + Math.cos(angle) * orbitRadius - markerSize / 2, top: center + Math.sin(angle) * orbitRadius - markerSize / 2 };
+}
+
+function distanceFromClockAnchor(timestamp: number, anchorMinutes: number) {
+  const date = new Date(timestamp);
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  const distance = Math.abs(minutes - anchorMinutes);
+  return Math.min(distance, 1440 - distance);
 }
 
 function dayFraction(timestamp: number) {
@@ -83,7 +89,6 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
   const size = Math.min(390, width - 28);
   const center = size / 2;
   const orbitRadius = (size - 26) * (126 / 320);
-  const eventOrbitRadius = orbitRadius - 22;
   const circumference = 2 * Math.PI * orbitRadius;
   const coreWidth = Math.min(230, size * 0.62);
   const coreHeight = Math.min(150, size * 0.4);
@@ -93,27 +98,31 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
     : state.mode === 'sleeping'
       ? state.activeType === 'dormir' ? 'Sono noturno há' : 'Dormindo há'
       : state.activeType === 'despertar-noturno' ? 'Despertar noturno há' : 'Acordado há';
-  const completedSleep = state.events.filter((event) => (event.type === 'sono' || event.type === 'dormir')
-    && event.end > event.start
-    && !(state.mode === 'sleeping' && state.activeStartedAt && Math.abs(event.start - state.activeStartedAt) < 60000)).slice(-5);
-  const dayStartDate = new Date(now);
-  dayStartDate.setHours(0, 0, 0, 0);
-  const dayStart = dayStartDate.getTime();
-  const dayEnd = dayStart + 86400000;
+  const { dayStart, dayEnd } = getRoutineLocalDayBounds(now);
+  const todayEvents = getRoutineEventsForLocalDay(state.events, now);
+  const todayMarkerEvents = getRoutineMarkerEventsForLocalDay(state.events, now);
+  const completedSleep = todayEvents.flatMap((event) => {
+    const segment = getRoutineSleepSegmentForLocalDay(event, now);
+    return segment && !(state.mode === 'sleeping' && state.activeStartedAt && Math.abs(event.start - state.activeStartedAt) < 60000)
+      ? [{ event, ...segment }]
+      : [];
+  }).slice(-5);
   const activeArc = state.mode === 'sleeping'
     && (state.activeType === 'sono' || state.activeType === 'dormir')
     && state.activeStartedAt
     ? { id: 'active', start: Math.max(state.activeStartedAt, dayStart), end: Math.min(now, dayEnd) }
     : null;
-  const primaryJourneyId = activeArc?.id || completedSleep.reduce<RoutineEvent | null>((longest, event) => !longest || event.end - event.start > longest.end - longest.start ? event : longest, null)?.id;
+  const primaryJourneyId = activeArc?.id || completedSleep.reduce<(typeof completedSleep)[number] | null>((longest, segment) => !longest || segment.end - segment.start > longest.end - longest.start ? segment : longest, null)?.event.id;
   const nowPoint = pointForTime(now, size, orbitRadius, 10);
   const daySunPoint = { left: size * 0.067, top: size * 0.108 };
-  const eventGroups = groupNearbyEvents(state.events.filter((event) => event.type !== 'acordou'
+  const eventGroups = groupNearbyEvents(todayMarkerEvents.filter((event) => event.type !== 'acordou'
     && !(state.mode === 'sleeping'
       && state.activeStartedAt
       && (event.type === 'sono' || event.type === 'dormir')
       && Math.abs(event.start - state.activeStartedAt) < 60000)).slice(-12));
-  const activeIsAlreadyRecorded = Boolean(state.activeStartedAt && state.events.some((event) => event.type === state.activeType && Math.abs(event.start - state.activeStartedAt!) < 2 * 60 * 1000));
+  const orbitMarkerTimestamps = eventGroups.map((group) => group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length);
+  if (state.mode !== 'idle' && state.activeType !== 'acordou' && state.activeStartedAt) orbitMarkerTimestamps.push(state.mode === 'sleeping' ? now : state.activeStartedAt);
+  const anchorIsOccupied = (anchorMinutes: number) => orbitMarkerTimestamps.some((timestamp) => distanceFromClockAnchor(timestamp, anchorMinutes) <= 60);
 
   useEffect(() => {
     const breatheLoop = Animated.loop(Animated.sequence([
@@ -137,16 +146,14 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
     const endPoint = svgPointForTime(end, size, orbitRadius);
     const labelPoint = svgPointForTime(start, size, orbitRadius - 18);
     const segmentWidth = primary ? (isDark ? 11 : 10) : 6;
-    const glintLength = Math.min(arcLength, 24);
     return (
       <G key={key} opacity={primary ? 1 : 0.48}>
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={isDark ? 'rgba(137,108,238,0.30)' : 'rgba(104,79,178,0.20)'} strokeWidth={primary ? 18 : 12} strokeLinecap="round" strokeDasharray={`${arcLength} ${circumference - arcLength}`} strokeDashoffset={dashOffset} transform={`rotate(-90 ${center} ${center})`} />
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={stroke} strokeWidth={segmentWidth} strokeLinecap="round" strokeDasharray={`${arcLength} ${circumference - arcLength}`} strokeDashoffset={dashOffset} transform={`rotate(-90 ${center} ${center})`} />
-        {active ? <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke="rgba(255,255,255,0.78)" strokeWidth={2} strokeLinecap="round" strokeDasharray={`${glintLength} ${circumference - glintLength}`} strokeDashoffset={-(dayFraction(end) * circumference - glintLength)} transform={`rotate(-90 ${center} ${center})`} /> : null}
         <Circle cx={startPoint.x} cy={startPoint.y} r={7.5} fill="rgba(132,99,231,0.13)" stroke="rgba(181,157,255,0.32)" strokeWidth={1} />
-        <Circle cx={endPoint.x} cy={endPoint.y} r={active ? 10 : 8} fill={active ? 'rgba(255,188,105,0.18)' : 'rgba(119,226,204,0.14)'} stroke={active ? 'rgba(255,202,139,0.58)' : 'rgba(145,242,222,0.42)'} strokeWidth={1} />
+        {!active ? <Circle cx={endPoint.x} cy={endPoint.y} r={8} fill="rgba(119,226,204,0.14)" stroke="rgba(145,242,222,0.42)" strokeWidth={1} /> : null}
         <Circle cx={startPoint.x} cy={startPoint.y} r={4} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.2} />
-        <Circle cx={endPoint.x} cy={endPoint.y} r={5.5} fill={active ? '#FFF4DD' : isDark ? '#F6F1FF' : '#FFFFFF'} stroke={active ? '#EAA45C' : '#7054BD'} strokeWidth={2.4} />
+        {!active ? <Circle cx={endPoint.x} cy={endPoint.y} r={5.5} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.4} /> : null}
         {primary && !active ? (
           <G>
             <Rect x={labelPoint.x - 22} y={labelPoint.y - 10} width={44} height={20} rx={10} fill={isDark ? 'rgba(23,16,46,0.96)' : 'rgba(255,255,255,0.96)'} stroke={isDark ? 'rgba(188,158,255,0.72)' : 'rgba(103,78,178,0.30)'} strokeWidth={1} />
@@ -190,11 +197,11 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
         </>
       ) : null}
       <Animated.View pointerEvents="none" style={[styles.starLayer, StyleSheet.absoluteFill, { opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: isDark ? [0.7, 1] : [0.62, 0.94] }) }]}>
-        {(isDark ? starPoints : lightStarPoints).map(([left, top, dotSize], index) => <View key={`${left}-${top}`} style={[styles.starDot, { left: `${left}%`, top: `${top}%`, width: dotSize * 2, height: dotSize * 2, borderRadius: dotSize, backgroundColor: isDark ? '#FFF7CE' : '#FFFFFF', shadowColor: isDark ? '#D8B5FF' : '#8B68D5', opacity: 0.68 + (index % 3) * 0.14 }]} />)}
+        {(isDark ? darkStarPoints : lightStarPoints).map(([left, top, dotSize], index) => <View key={`${left}-${top}`} style={[styles.starDot, { left: `${left}%`, top: `${top}%`, width: dotSize * 2, height: dotSize * 2, borderRadius: dotSize, backgroundColor: isDark ? '#FFF7CE' : '#FFFFFF', shadowColor: isDark ? '#D8B5FF' : '#8B68D5', opacity: 0.68 + (index % 3) * 0.14 }]} />)}
       </Animated.View>
-      <Animated.Text style={[styles.sparkle, isDark ? styles.sparkleA : styles.sparkleLightA, { color: isDark ? '#FFF8E6' : '#B98626', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.68, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.72, 1.26] }) }] }]}>✦</Animated.Text>
-      <Animated.Text style={[styles.sparkle, isDark ? styles.sparkleB : styles.sparkleLightB, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1, 0.62] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1.2, 0.76] }) }] }]}>✧</Animated.Text>
-      <Animated.Text style={[styles.sparkle, isDark ? styles.sparkleC : styles.sparkleLightC, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.18] }) }] }]}>✦</Animated.Text>
+      <Animated.Text style={[styles.sparkle, styles.sparkleSideA, { color: isDark ? '#FFF8E6' : '#B98626', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.68, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.72, 1.26] }) }] }]}>✦</Animated.Text>
+      <Animated.Text style={[styles.sparkle, styles.sparkleSideB, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1, 0.62] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [1.2, 0.76] }) }] }]}>✧</Animated.Text>
+      <Animated.Text style={[styles.sparkle, styles.sparkleSideC, { color: isDark ? '#FFF8E6' : '#8060B6', opacity: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }), transform: [{ scale: twinkle.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.18] }) }] }]}>✦</Animated.Text>
 
       <Svg width={size} height={size} style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
         <Defs>
@@ -209,22 +216,22 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
         </Defs>
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={isDark ? 'rgba(92,51,194,0.20)' : 'rgba(92,76,152,0.13)'} strokeWidth={isDark ? 10 : 11} />
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={isDark ? 'rgba(155,117,255,0.64)' : 'rgba(255,255,255,0.86)'} strokeWidth={isDark ? 4.5 : 5.8} />
-        {completedSleep.map((event) => renderArc(Math.max(event.start, dayStart), Math.min(event.end, dayEnd), 'url(#completedJourney)', event.id, false, event.id === primaryJourneyId))}
+        {completedSleep.map((segment) => renderArc(segment.start, segment.end, 'url(#completedJourney)', segment.event.id, false, segment.event.id === primaryJourneyId))}
         {activeArc ? renderArc(activeArc.start, activeArc.end, 'url(#activeJourney)', activeArc.id, true, true) : null}
       </Svg>
 
-      <Animated.View style={[styles.nowDotHalo, { left: nowPoint.left - 5, top: nowPoint.top - 5, backgroundColor: isDark ? 'rgba(255,121,68,0.28)' : 'rgba(255,159,46,0.28)', opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }), transform: [{ scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.5] }) }] }]} />
-      <View style={[styles.nowDot, { left: nowPoint.left, top: nowPoint.top, backgroundColor: isDark ? '#FFAD4D' : '#FF9F2E', borderColor: isDark ? '#FFF4D3' : '#FFF9E9' }]} />
+      {!activeArc ? <><Animated.View style={[styles.nowDotHalo, { left: nowPoint.left - 5, top: nowPoint.top - 5, backgroundColor: isDark ? 'rgba(255,121,68,0.28)' : 'rgba(255,159,46,0.28)', opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }), transform: [{ scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1.5] }) }] }]} /><View style={[styles.nowDot, { left: nowPoint.left, top: nowPoint.top, backgroundColor: isDark ? '#FFAD4D' : '#FF9F2E', borderColor: isDark ? '#FFF4D3' : '#FFF9E9' }]} /></> : null}
 
-      <View style={[styles.anchor, styles.anchorTheme, { top: 8, left: center - 15, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>00</Text></View>
-      <View style={[styles.anchor, styles.anchorTheme, { top: center - 15, right: 8, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>06</Text></View>
-      <View style={[styles.anchor, styles.anchorTheme, { bottom: 8, left: center - 15, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>12</Text></View>
-      <View style={[styles.anchor, styles.anchorTheme, { top: center - 15, left: 8, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>18</Text></View>
+      {!anchorIsOccupied(0) ? <View style={[styles.anchor, styles.anchorTheme, { top: 8, left: center - 15, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>00</Text></View> : null}
+      {!anchorIsOccupied(360) ? <View style={[styles.anchor, styles.anchorTheme, { top: center - 15, right: 8, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>06</Text></View> : null}
+      {!anchorIsOccupied(720) ? <View style={[styles.anchor, styles.anchorTheme, { bottom: 8, left: center - 15, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>12</Text></View> : null}
+      {!anchorIsOccupied(1080) ? <View style={[styles.anchor, styles.anchorTheme, { top: center - 15, left: 8, backgroundColor: isDark ? 'rgba(27,23,58,0.9)' : 'rgba(255,255,255,0.82)', borderColor: isDark ? 'rgba(157,116,238,0.38)' : 'rgba(255,255,255,0.96)' }]}><Text style={[styles.anchorText, { color: isDark ? '#F6EFFF' : '#44366F' }]}>18</Text></View> : null}
 
       {eventGroups.map((group) => {
         const event = group[group.length - 1];
         const markerTimestamp = getRoutineEventOrbitTimestamp(event);
-        const point = pointForTime(group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length, size, eventOrbitRadius, group.length > 1 ? 44 : 34);
+        const groupTimestamp = group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length;
+        const point = pointForTime(groupTimestamp, size, orbitRadius, group.length > 1 ? 44 : 34);
         if (group.length > 1) return (
           <Pressable accessibilityRole="button" accessibilityLabel={`${group.length} registros próximos`} onPress={() => setSelectedCluster(group)} key={`cluster-${group[0].id}`} style={({ pressed }) => [styles.marker, styles.clusterMarker, point, { backgroundColor: isDark ? 'rgba(18,12,43,0.92)' : 'rgba(255,255,255,0.92)', borderColor: isDark ? 'rgba(181,131,255,0.72)' : 'rgba(117,88,232,0.48)' }, pressed && styles.markerPressed]}>
             <ActionArt type={event.type} size={37} />
@@ -239,11 +246,40 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
         );
       })}
 
-      {state.mode !== 'idle' && state.activeType !== 'acordou' && state.activeStartedAt && !activeIsAlreadyRecorded ? (() => {
+      {state.mode !== 'idle' && state.activeType !== 'acordou' && state.activeStartedAt ? (() => {
         const activeMarkerTimestamp = state.mode === 'sleeping' ? now : state.activeStartedAt;
-        const activePoint = pointForTime(activeMarkerTimestamp, size, eventOrbitRadius, 40);
+        const activePoint = pointForTime(activeMarkerTimestamp, size, orbitRadius, 50);
         const activeEvent: RoutineEvent = { id: 'active', type: state.activeType, start: state.activeStartedAt, end: now, detail: state.activeDetail, notes: state.activeNotes, createdAtClient: state.activeStartedAt };
-        return <Pressable accessibilityRole="button" accessibilityLabel="Abrir cuidado em andamento" onPress={() => setSelectedEvent(activeEvent)} style={({ pressed }) => [styles.marker, styles.activeMarker, activePoint, { backgroundColor: colors.surface, borderColor: colors.accent }, pressed && styles.markerPressed]}><ActionArt type={state.activeType} size={35} /><View style={[styles.activeBadge, { backgroundColor: colors.accent }]} /></Pressable>;
+        return (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Abrir ${recordConfig[state.activeType].title} em andamento`}
+            onPress={() => setSelectedEvent(activeEvent)}
+            style={({ pressed }) => [styles.activeMarker, activePoint, pressed && styles.activeMarkerPressed]}>
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.activeMarkerAura,
+                {
+                  borderColor: isDark ? 'rgba(255,207,142,0.72)' : 'rgba(109,81,196,0.48)',
+                  opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.34, 0.82] }),
+                },
+              ]}
+            />
+            <LinearGradient
+              pointerEvents="none"
+              colors={isDark ? ['#FFD08E', '#A987FF', '#72E2CC'] : ['#F7C57B', '#795AE2', '#50CDB5']}
+              locations={[0, 0.52, 1]}
+              start={{ x: 0.08, y: 0.08 }}
+              end={{ x: 0.92, y: 0.92 }}
+              style={styles.activeMarkerRing}>
+              <View style={[styles.activeMarkerInner, { backgroundColor: isDark ? '#17102E' : '#FFFDFC' }]}>
+                <ActionArt type={state.activeType} size={40} />
+              </View>
+            </LinearGradient>
+            <Animated.View pointerEvents="none" style={[styles.activeMarkerGlint, { opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.45, 1] }) }]} />
+          </Pressable>
+        );
       })() : null}
 
       <Animated.View pointerEvents="none" style={[styles.coreHalo, { width: coreWidth + 24, height: coreHeight + 24, borderRadius: 999, left: center - (coreWidth + 24) / 2, top: center - (coreHeight + 24) / 2, backgroundColor: isDark ? 'rgba(113,66,210,0.1)' : 'rgba(255,255,255,0.24)', opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.36, 0.72] }), transform: [{ scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.98, 1.035] }) }] }]} />
@@ -299,12 +335,9 @@ const styles = StyleSheet.create({
   starLayer: { zIndex: 1 },
   starDot: { position: 'absolute', shadowOpacity: 0.9, shadowRadius: 5, shadowOffset: { width: 0, height: 0 } },
   sparkle: { position: 'absolute', zIndex: 2, color: '#FFF8E6' },
-  sparkleA: { left: '21%', top: '22%', fontSize: 18 },
-  sparkleB: { right: '18%', top: '28%', fontSize: 14 },
-  sparkleC: { left: '16%', bottom: '22%', fontSize: 12 },
-  sparkleLightA: { left: '5%', top: '26%', fontSize: 16 },
-  sparkleLightB: { right: '4%', top: '43%', fontSize: 13 },
-  sparkleLightC: { left: '6%', bottom: '24%', fontSize: 11 },
+  sparkleSideA: { left: '4%', top: '26%', fontSize: 16 },
+  sparkleSideB: { right: '3%', top: '43%', fontSize: 13 },
+  sparkleSideC: { left: '5%', bottom: '22%', fontSize: 11 },
   nowDotHalo: { position: 'absolute', zIndex: 4, width: 18, height: 18, borderRadius: 9 },
   nowDot: { position: 'absolute', zIndex: 4, width: 10, height: 10, borderRadius: 5, borderWidth: 2 },
   anchor: { position: 'absolute', zIndex: 6, width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
@@ -314,8 +347,12 @@ const styles = StyleSheet.create({
   clusterMarker: { width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, shadowColor: '#8E5EFF', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, clusterBadge: { position: 'absolute', right: -5, top: -5, minWidth: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }, clusterCount: { color: '#10251F', fontSize: 10, fontWeight: '900' },
   markerPressed: { opacity: 0.7, transform: [{ scale: 0.88 }] },
   markerTime: { position: 'absolute', top: 35, minWidth: 42, textAlign: 'center', fontSize: 8, fontWeight: '900', textShadowColor: 'rgba(255,255,255,0.3)', textShadowRadius: 3 },
-  activeMarker: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, zIndex: 7 },
-  activeBadge: { position: 'absolute', right: -1, top: -1, width: 9, height: 9, borderRadius: 5, borderWidth: 2, borderColor: '#FFFFFF' },
+  activeMarker: { position: 'absolute', width: 50, height: 50, zIndex: 8, alignItems: 'center', justifyContent: 'center', shadowColor: '#4B2D91', shadowOpacity: 0.44, shadowRadius: 13, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
+  activeMarkerAura: { position: 'absolute', width: 56, height: 56, borderRadius: 28, borderWidth: 2, backgroundColor: 'rgba(255,255,255,0.06)' },
+  activeMarkerRing: { width: 50, height: 50, borderRadius: 25, padding: 3, alignItems: 'center', justifyContent: 'center' },
+  activeMarkerInner: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  activeMarkerGlint: { position: 'absolute', right: 4, top: 3, width: 7, height: 7, borderRadius: 4, backgroundColor: '#FFFFFF', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.72)', shadowColor: '#FFFFFF', shadowOpacity: 1, shadowRadius: 5, shadowOffset: { width: 0, height: 0 } },
+  activeMarkerPressed: { opacity: 0.78, transform: [{ scale: 0.96 }] },
   coreHalo: { position: 'absolute', zIndex: 2 },
   center: { position: 'absolute', paddingHorizontal: 12, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, gap: 7, zIndex: 3, shadowColor: '#050315', shadowOpacity: 0.2, shadowRadius: 22, shadowOffset: { width: 0, height: 12 }, elevation: 6 },
   stateLabel: { width: '100%', fontSize: 11.8, lineHeight: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.05, textAlign: 'center' },
