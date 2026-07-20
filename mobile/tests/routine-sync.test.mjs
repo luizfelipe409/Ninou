@@ -11,8 +11,11 @@ const {
   getRoutineEventsForLocalDay,
   getRoutineMarkerEventsForLocalDay,
   getRoutineSleepSegmentForLocalDay,
+  getRoutineSleepSegmentsForOrbit,
   getTodayAwakeMs,
+  getTodaySummary,
   mergeDayStates,
+  resolveRoutineIntervalEnd,
   restoreRoutineSnapshot,
   saveDayNotes,
   startRoutine,
@@ -66,6 +69,53 @@ assert.deepEqual(getRoutineSleepSegmentForLocalDay(overnightSleep, orbitToday), 
   end: new Date(2026, 6, 19, 2, 50, 0, 0).getTime(),
 });
 assert.deepEqual(getRoutineMarkerEventsForLocalDay([yesterdayMorningNap, overnightSleep], orbitToday), []);
+
+
+const exactOvernightStart = new Date(2026, 6, 18, 20, 30, 0, 0).getTime();
+const rawSameDateEnd = new Date(2026, 6, 18, 2, 30, 0, 0).getTime();
+const exactOvernightEnd = new Date(2026, 6, 19, 2, 30, 0, 0).getTime();
+assert.equal(resolveRoutineIntervalEnd('sono', exactOvernightStart, rawSameDateEnd), exactOvernightEnd);
+
+const completedOvernightState = addRoutineRecord(createEmptyDayState(), {
+  type: 'sono',
+  start: exactOvernightStart,
+  end: rawSameDateEnd,
+  detail: 'No berço',
+}, new Date(2026, 6, 19, 15, 0, 0, 0).getTime(), felipe);
+const completedOvernightEvent = completedOvernightState.events.find((event) => event.type === 'sono');
+assert.ok(completedOvernightEvent);
+assert.equal(completedOvernightEvent.end, exactOvernightEnd);
+assert.equal(completedOvernightEvent.end - completedOvernightEvent.start, 6 * 60 * 60 * 1000);
+assert.equal(completedOvernightState.mode, 'idle');
+
+const openManualSleep = addRoutineRecord(createEmptyDayState(), {
+  type: 'sono',
+  start: exactOvernightStart,
+  detail: 'No berço',
+}, new Date(2026, 6, 18, 20, 31, 0, 0).getTime(), felipe);
+assert.equal(openManualSleep.mode, 'sleeping');
+assert.equal(openManualSleep.activeStartedAt, exactOvernightStart);
+assert.equal(openManualSleep.events.length, 0);
+
+const orbitAtAfternoon = getRoutineSleepSegmentsForOrbit([completedOvernightEvent], new Date(2026, 6, 19, 15, 0, 0, 0).getTime());
+assert.equal(orbitAtAfternoon.length, 1);
+assert.equal(orbitAtAfternoon[0].carriedFromPreviousDay, true);
+assert.equal(orbitAtAfternoon[0].start, exactOvernightStart);
+assert.equal(orbitAtAfternoon[0].end, exactOvernightEnd);
+assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], new Date(2026, 6, 19, 23, 59, 0, 0).getTime()).length, 1);
+assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], new Date(2026, 6, 20, 0, 1, 0, 0).getTime()).length, 0);
+
+const nonOverlappingBlocker = [{
+  start: new Date(2026, 6, 19, 10, 0, 0, 0).getTime(),
+  end: new Date(2026, 6, 19, 11, 0, 0, 0).getTime(),
+}];
+const overlappingBlocker = [{
+  start: new Date(2026, 6, 19, 20, 40, 0, 0).getTime(),
+  end: new Date(2026, 6, 19, 21, 10, 0, 0).getTime(),
+}];
+assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], orbitToday, nonOverlappingBlocker).length, 1);
+assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], orbitToday, overlappingBlocker).length, 0);
+assert.equal(getTodaySummary({ ...createEmptyDayState(), events: [completedOvernightEvent] }, new Date(2026, 6, 19, 15, 0, 0, 0).getTime()).sleepMs, 2.5 * 60 * 60 * 1000);
 
 const dayStart = new Date(2026, 6, 18, 0, 0, 0, 0).getTime();
 const firstWake = startRoutine(createEmptyDayState(), 'awake', dayStart + 60 * 60 * 1000, felipe);

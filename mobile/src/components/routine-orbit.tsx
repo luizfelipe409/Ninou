@@ -5,7 +5,7 @@ import { Animated, ImageBackground, Modal, Pressable, ScrollView, StyleSheet, Te
 import Svg, { Circle, Defs, G, LinearGradient as SvgLinearGradient, Polygon, Rect, Stop, Text as SvgText } from 'react-native-svg';
 
 import { ActionArt } from '@/components/action-art';
-import { formatDuration, formatTime, getElapsedMs, getRoutineEventOrbitTimestamp, getRoutineEventsForLocalDay, getRoutineLocalDayBounds, getRoutineMarkerEventsForLocalDay, getRoutineSleepSegmentForLocalDay, recordConfig, type DayState, type RoutineEvent } from '@/domain/routine';
+import { formatDuration, formatTime, getElapsedMs, getRoutineEventOrbitTimestamp, getRoutineEventsForLocalDay, getRoutineLocalDayBounds, getRoutineMarkerEventsForLocalDay, getRoutineSleepSegmentsForOrbit, recordConfig, type DayState, type RoutineEvent } from '@/domain/routine';
 import { useNinouTheme } from '@/theme/tokens';
 
 const darkStarPoints = [
@@ -101,17 +101,31 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
   const { dayStart, dayEnd } = getRoutineLocalDayBounds(now);
   const todayEvents = getRoutineEventsForLocalDay(state.events, now);
   const todayMarkerEvents = getRoutineMarkerEventsForLocalDay(state.events, now);
-  const completedSleep = todayEvents.flatMap((event) => {
-    const segment = getRoutineSleepSegmentForLocalDay(event, now);
-    return segment && !(state.mode === 'sleeping' && state.activeStartedAt && Math.abs(event.start - state.activeStartedAt) < 60000)
-      ? [{ event, ...segment }]
-      : [];
-  }).slice(-5);
+  const previousDayStartDate = new Date(dayStart);
+  previousDayStartDate.setDate(previousDayStartDate.getDate() - 1);
+  const previousDayStart = previousDayStartDate.getTime();
   const activeArc = state.mode === 'sleeping'
     && (state.activeType === 'sono' || state.activeType === 'dormir')
     && state.activeStartedAt
-    ? { id: 'active', start: Math.max(state.activeStartedAt, dayStart), end: Math.min(now, dayEnd) }
+    && state.activeStartedAt < dayEnd
+    && now > dayStart
+    ? {
+        id: 'active',
+        start: state.activeStartedAt < dayStart && state.activeStartedAt >= previousDayStart
+          ? state.activeStartedAt
+          : Math.max(state.activeStartedAt, dayStart),
+        end: Math.min(now, dayEnd),
+      }
     : null;
+  const sleepSegments = getRoutineSleepSegmentsForOrbit(
+    todayEvents.filter((event) => !(state.mode === 'sleeping' && state.activeStartedAt && Math.abs(event.start - state.activeStartedAt) < 60000)),
+    now,
+    activeArc ? [activeArc] : [],
+  );
+  const completedSleep = [
+    ...sleepSegments.filter((segment) => segment.carriedFromPreviousDay),
+    ...sleepSegments.filter((segment) => !segment.carriedFromPreviousDay).slice(-5),
+  ];
   const primaryJourneyId = activeArc?.id || completedSleep.reduce<(typeof completedSleep)[number] | null>((longest, segment) => !longest || segment.end - segment.start > longest.end - longest.start ? segment : longest, null)?.event.id;
   const nowPoint = pointForTime(now, size, orbitRadius, 10);
   const daySunPoint = { left: size * 0.067, top: size * 0.108 };

@@ -29,8 +29,39 @@ import { useNinouAuth } from '@/state/auth-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
 
 const STORAGE_KEY_PREFIX = 'ninou.mobile.day-state.v2';
+const LIVE_STATE_KEY_PREFIX = 'ninou.mobile.live-state.v1';
 
 export type RoutineSyncStatus = 'local' | 'connecting' | 'saving' | 'synced' | 'pending' | 'error';
+
+function getRecentLocalDayIds(reference = Date.now(), count = 7) {
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(reference);
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() - index);
+    return getLocalDateId(date.getTime());
+  });
+}
+
+function liveStateVersion(state: DayState) {
+  return Math.max(state.routineStateUpdatedAt || 0, state.activeStartedAt || 0);
+}
+
+function applyLiveRoutineSnapshot(current: DayState, snapshot: DayState) {
+  if (liveStateVersion(snapshot) <= liveStateVersion(current)) return current;
+  return normalizeDayState({
+    ...current,
+    mode: snapshot.mode,
+    activeStartedAt: snapshot.activeStartedAt,
+    activeType: snapshot.activeType,
+    activeDetail: snapshot.activeDetail,
+    activeNotes: snapshot.activeNotes,
+    activeActor: snapshot.activeActor,
+    lastWakeWindowStartedAt: snapshot.lastWakeWindowStartedAt,
+    lastWakeWindowMs: snapshot.lastWakeWindowMs,
+    routineStateUpdatedAt: snapshot.routineStateUpdatedAt,
+    routineStateMutationId: snapshot.routineStateMutationId,
+  });
+}
 
 type RoutineContextValue = {
   state: DayState;
@@ -67,10 +98,12 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const [canUndo, setCanUndo] = useState(false);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const undoStateRef = useRef<DayState | null>(null);
+  const hydratedStorageKeyRef = useRef('');
   const dayId = getLocalDateId();
   const storageScope = access?.familyId || (user ? `account-${user.uid}` : 'guest');
   const storageKey = `${STORAGE_KEY_PREFIX}.${storageScope}.${dayId}`;
   const undoStorageKey = `${storageKey}.undo`;
+  const liveStorageKey = `${LIVE_STATE_KEY_PREFIX}.${storageScope}`;
   const routineActor = useMemo<RoutineActor>(() => {
     const email = user?.email || access?.email || '';
     const name = preferences.caregiverName.trim() || email.split('@')[0] || 'Responsável';
@@ -88,28 +121,58 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     if (authStatus === 'loading' || authStatus === 'resolving-family') return;
     let mounted = true;
     const unsubscribes: (() => void)[] = [];
-    AsyncStorage.multiGet([storageKey, undoStorageKey])
+    const recentDayIds = getRecentLocalDayIds(Date.now(), 7);
+    const recentStorageKeys = recentDayIds.map((recentDayId) => `${STORAGE_KEY_PREFIX}.${storageScope}.${recentDayId}`);
+    hydratedStorageKeyRef.current = '';
+
+    AsyncStorage.multiGet([...recentStorageKeys, undoStorageKey, liveStorageKey])
       .then((entries) => {
         if (!mounted) return;
-        const raw = entries[0]?.[1];
-        const undoRaw = entries[1]?.[1];
+        const localHistory: Record<string, DayState> = {};
+        recentDayIds.forEach((recentDayId, index) => {
+          const raw = entries[index]?.[1];
+          if (raw) localHistory[recentDayId] = normalizeDayState(JSON.parse(raw));
+        });
+        const undoRaw = entries[recentStorageKeys.length]?.[1];
+        const liveRaw = entries[recentStorageKeys.length + 1]?.[1];
         setSyncStatus(access ? 'connecting' : 'local');
         setSyncMessage(access ? 'Conectando à família…' : 'Salvo neste aparelho');
         undoStateRef.current = undoRaw ? normalizeDayState(JSON.parse(undoRaw)) : null;
         setCanUndo(Boolean(undoStateRef.current));
-        const localState = raw ? normalizeDayState(JSON.parse(raw)) : createEmptyDayState();
+
+        let localState = localHistory[dayId] || createEmptyDayState();
+        if (liveRaw) localState = applyLiveRoutineSnapshot(localState, normalizeDayState(JSON.parse(liveRaw)));
+        localHistory[dayId] = localState;
         stateRef.current = localState;
         setState(localState);
-        setHistory({ [dayId]: localState });
+        setHistory(localHistory);
+
         if (access) {
           void loadRoutineDays(access.familyId).then((cloudHistory) => {
             if (!mounted) return;
-            setHistory((current) => ({ ...cloudHistory, ...current }));
+            setHistory((current) => {
+              const merged = { ...current };
+              Object.entries(cloudHistory).forEach(([cloudDayId, cloudState]) => {
+                merged[cloudDayId] = mergeDayStates(merged[cloudDayId] || createEmptyDayState(), cloudState);
+              });
+              return merged;
+            });
+            let currentWithCloud = cloudHistory[dayId]
+              ? mergeDayStates(stateRef.current, cloudHistory[dayId])
+              : stateRef.current;
+            Object.entries(cloudHistory).forEach(([cloudDayId, cloudState]) => {
+              if (cloudDayId === dayId || (cloudState.mode !== 'idle' && cloudState.activeStartedAt)) {
+                currentWithCloud = applyLiveRoutineSnapshot(currentWithCloud, cloudState);
+              }
+            });
+            stateRef.current = currentWithCloud;
+            setState(currentWithCloud);
+            setHistory((current) => ({ ...current, [dayId]: currentWithCloud }));
           }).catch(() => undefined);
-          const recentDayIds = Array.from({ length: 7 }, (_, index) => getLocalDateId(Date.now() - index * 86400000));
+
           recentDayIds.forEach((recentDayId) => {
             const unsubscribe = observeRoutineDay(access.familyId, recentDayId, (cloudState) => {
-            if (!mounted) return;
+              if (!mounted) return;
               if (recentDayId === dayId) {
                 const merged = mergeDayStates(stateRef.current, cloudState);
                 stateRef.current = merged;
@@ -118,7 +181,18 @@ export function RoutineProvider({ children }: PropsWithChildren) {
                 setSyncStatus('synced');
                 setSyncMessage('Sincronizado com a família');
               } else {
-                setHistory((current) => ({ ...current, [recentDayId]: cloudState }));
+                setHistory((current) => ({
+                  ...current,
+                  [recentDayId]: mergeDayStates(current[recentDayId] || createEmptyDayState(), cloudState),
+                }));
+                const withLiveSnapshot = cloudState.mode !== 'idle' && cloudState.activeStartedAt
+                  ? applyLiveRoutineSnapshot(stateRef.current, cloudState)
+                  : stateRef.current;
+                if (withLiveSnapshot !== stateRef.current) {
+                  stateRef.current = withLiveSnapshot;
+                  setState(withLiveSnapshot);
+                  setHistory((current) => ({ ...current, [dayId]: withLiveSnapshot }));
+                }
               }
             }, (cloudError) => {
               if (!mounted || recentDayId !== dayId) return;
@@ -138,9 +212,14 @@ export function RoutineProvider({ children }: PropsWithChildren) {
           setSyncMessage(getFirebaseErrorMessage(loadError));
         }
       })
-      .finally(() => { if (mounted) setHydrated(true); });
+      .finally(() => {
+        if (mounted) {
+          hydratedStorageKeyRef.current = storageKey;
+          setHydrated(true);
+        }
+      });
     return () => { mounted = false; unsubscribes.forEach((unsubscribe) => unsubscribe()); };
-  }, [access, authStatus, dayId, storageKey, undoStorageKey]);
+  }, [access, authStatus, dayId, liveStorageKey, storageKey, storageScope, undoStorageKey]);
 
   useEffect(() => {
     const initialTimer = setTimeout(() => setNow(Date.now()), 0);
@@ -149,8 +228,10 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    if (hydrated) void AsyncStorage.setItem(storageKey, JSON.stringify(state));
-  }, [hydrated, state, storageKey]);
+    if (hydrated && hydratedStorageKeyRef.current === storageKey) {
+      void AsyncStorage.multiSet([[storageKey, JSON.stringify(state)], [liveStorageKey, JSON.stringify(state)]]);
+    }
+  }, [hydrated, liveStorageKey, state, storageKey]);
 
   const commit = useCallback((buildNext: (current: DayState, at: number) => DayState) => {
     const at = Date.now();
@@ -162,7 +243,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     stateRef.current = next;
     setState(next);
     setHistory((current) => ({ ...current, [dayId]: next }));
-    void AsyncStorage.setItem(storageKey, JSON.stringify(next));
+    void AsyncStorage.multiSet([[storageKey, JSON.stringify(next)], [liveStorageKey, JSON.stringify(next)]]);
     if (user && access) {
       setSyncStatus('saving');
       setSyncMessage('Enviando atualização…');
@@ -187,13 +268,17 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       setSyncStatus('local');
       setSyncMessage('Salvo neste aparelho');
     }
-  }, [access, dayId, storageKey, undoStorageKey, user]);
+  }, [access, dayId, liveStorageKey, storageKey, undoStorageKey, user]);
 
   const saveDay = useCallback((targetDayId: string, next: DayState) => {
     setHistory((current) => ({ ...current, [targetDayId]: next }));
     const targetStorageKey = `${STORAGE_KEY_PREFIX}.${storageScope}.${targetDayId}`;
     void AsyncStorage.setItem(targetStorageKey, JSON.stringify(next));
-    if (targetDayId === dayId) { stateRef.current = next; setState(next); }
+    if (targetDayId === dayId) {
+      stateRef.current = next;
+      setState(next);
+      void AsyncStorage.setItem(liveStorageKey, JSON.stringify(next));
+    }
     if (user && access) {
       setSyncStatus('saving');
       setSyncMessage('Enviando atualização…');
@@ -201,7 +286,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       saveQueueRef.current = saveTask;
       void saveTask.then(() => { setSyncStatus('synced'); setSyncMessage('Sincronizado com a família'); }).catch((error) => { setSyncStatus('pending'); setSyncMessage(getFirebaseErrorMessage(error)); });
     }
-  }, [access, dayId, storageScope, user]);
+  }, [access, dayId, liveStorageKey, storageScope, user]);
 
   const commitDay = useCallback((targetDayId: string, buildNext: (current: DayState, at: number) => DayState) => {
     const current = targetDayId === dayId ? stateRef.current : history[targetDayId] || createEmptyDayState();
@@ -221,7 +306,10 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   }, [commit, routineActor]);
 
   const addRecord = useCallback((input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => {
-    const targetDayId = Number.isFinite(Number(input.start)) ? getLocalDateId(Number(input.start)) : dayId;
+    const isOpenSleep = (input.type === 'sono' || input.type === 'dormir')
+      && Number.isFinite(Number(input.start))
+      && !Number.isFinite(Number(input.end));
+    const targetDayId = isOpenSleep ? dayId : Number.isFinite(Number(input.start)) ? getLocalDateId(Number(input.start)) : dayId;
     if (targetDayId === dayId) commit((current, at) => addRoutineRecord(current, input, at, routineActor));
     else commitDay(targetDayId, (current, at) => addRoutineRecord(current, input, at, routineActor));
   }, [commit, commitDay, dayId, routineActor]);

@@ -1,8 +1,10 @@
-NINOU v82.1.4 — ADMIN RESPONSIVO E SEM RESÍDUOS LEGADOS
+NINOU v82.1.8 — MOBILE CORRIGIDO + WEB COMERCIAL
 
-1. Extraia o ZIP.
-2. Use esta pasta completa como projeto na Vercel.
-3. Após o deploy, abra com ?ninouVersion=82.1.4.
-4. No iPhone instalado como PWA, feche e reabra o app após a atualização.
-5. O admin global entra no Centro de Operação sem família pessoal.
-6. O painel mantém a linguagem e as transições do mobile, com grade própria para notebook e desktop.
+1. Execute: npm test
+2. Execute: npm run build
+3. Publique a pasta dist pela Vercel.
+4. Crie uma família piloto no painel administrativo.
+5. Valide a ativação com e-mail e código reais antes de liberar novos clientes.
+
+A versão não possui checkout automático. Planos, validade e renovação são controlados pelo painel administrativo.
+A pasta mobile está na versão 82.1.8. A aplicação web comercial permanece funcionalmente igual à v82.1.7.

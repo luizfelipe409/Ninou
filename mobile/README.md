@@ -18,7 +18,8 @@ Aplicativo nativo Android e iOS do Ninou, criado com Expo SDK 57, React Native, 
 - listener Firestore do dia e gravação transacional da rotina compartilhada;
 - tema claro/escuro, identificadores iniciais Android/iOS e perfis EAS;
 - Development Build configurado;
-- criação/aceite de convites, administração familiar, relatórios/exportações e partes avançadas do Perfil ainda não migrados para o mobile.
+- criação e aceite de convites, administração familiar, relatórios/exportações, suporte, consentimentos e solicitação de exclusão de conta integrados ao mobile;
+- preparação App Store v82.1.6 com ícone 1024 × 1024, Privacy Manifest, versões alinhadas e reprodução de áudio sem permissão de microfone.
 
 O app web continua independente na raiz do repositório. O mobile reutiliza a linguagem visual e as regras de domínio, sem incorporar a versão web por WebView.
 
@@ -45,6 +46,6 @@ npx eas-cli build --profile development --platform android
 npx eas-cli build --profile development --platform ios
 ```
 
-Antes do primeiro envio às lojas, confirme a disponibilidade de `com.ninou.app` e gere os ícones definitivos em 1024 × 1024.
+Antes do primeiro envio às lojas, confirme a disponibilidade de `com.ninou.app`, publique a política de privacidade em URL pública e valide o IPA no TestFlight. O ícone-fonte já está em 1024 × 1024.
 
 O roteiro completo está em [`docs/mobile-migration.md`](../docs/mobile-migration.md).

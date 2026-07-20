@@ -1,6 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { useMemo } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,7 +10,7 @@ import { NinouCard } from '@/components/ninou-screen';
 import { RoutineOrbit } from '@/components/routine-orbit';
 import { NinouAppHeader } from '@/components/ninou-app-header';
 import { NinouBackground } from '@/components/ninou-background';
-import { formatDuration, formatTime, getPrimaryAction, getTodayAwakeMs, getTodaySummary, recordConfig, type RecordType } from '@/domain/routine';
+import { formatDuration, formatTime, getPrimaryAction, getTodayAwakeMs, getTodaySummary, recordConfig, type RecordType, type RoutineEvent } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
@@ -19,10 +20,20 @@ const quickTypes: RecordType[] = ['amamentacao', 'fralda', 'mamadeira', 'medicam
 
 export default function TodayScreen() {
   const { colors, isDark } = useNinouTheme();
-  const { state, now, canUndo, beginRoutine, runPrimaryAction, undoLastAction } = useRoutine();
+  const { state, history, now, canUndo, beginRoutine, runPrimaryAction, undoLastAction } = useRoutine();
   const { profile } = useBabyProfile();
+  const orbitState = useMemo(() => {
+    const referenceTime = now || Date.now();
+    const previousDate = new Date(referenceTime);
+    previousDate.setDate(previousDate.getDate() - 1);
+    const previousState = history[getLocalDateId(previousDate.getTime())];
+    const events = new Map<string, RoutineEvent>();
+    previousState?.events.forEach((event) => events.set(event.id, event));
+    state.events.forEach((event) => events.set(event.id, event));
+    return { ...state, events: [...events.values()].sort((left, right) => left.start - right.start) };
+  }, [history, now, state]);
   const primaryAction = getPrimaryAction(state, now);
-  const summary = getTodaySummary(state, now);
+  const summary = getTodaySummary(orbitState, now);
   const latest = [...state.events].sort((a, b) => b.start - a.start)[0];
 
   const openRecord = (type?: RecordType) => {
@@ -40,7 +51,7 @@ export default function TodayScreen() {
   const lastBottle = getLast(['mamadeira']);
   const lastDiaper = getLast(['fralda']);
   const awakeMs = state.mode === 'awake' && state.activeStartedAt ? Math.max(0, now - state.activeStartedAt) : 0;
-  const awakeTodayMs = getTodayAwakeMs(state, now);
+  const awakeTodayMs = getTodayAwakeMs(orbitState, now);
   const wakeWindowMs = profile.wakeWindowMinutes * 60000;
   const wakeOverdueMs = Math.max(0, awakeMs - wakeWindowMs);
   const wakeWindowApproaching = state.mode === 'awake' && awakeMs >= wakeWindowMs * 0.9;
@@ -56,7 +67,7 @@ export default function TodayScreen() {
           <Pressable onPress={() => router.push('/perfil')} style={[styles.profileButton, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.profileButtonText, { color: colors.text }]}>Perfil</Text></Pressable>
         </View>
 
-        <RoutineOrbit state={state} now={now} />
+        <RoutineOrbit state={orbitState} now={now} />
 
         {state.mode === 'idle' ? (
           <View style={styles.startChoice}>

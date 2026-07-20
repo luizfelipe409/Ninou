@@ -1,7 +1,7 @@
 {
   "name": "Ninou",
   "short_name": "Ninou",
-  "description": "Diário familiar do bebê com rotina, sono, alimentação e sincronização segura.",
+  "description": "Diário compartilhado do bebê para famílias com acesso Ninou, com sono, alimentação, fraldas e sincronização segura.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -22,5 +22,9 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "82.0.0"
+  "version": "82.1.7",
+  "categories": [
+    "lifestyle",
+    "family"
+  ]
 }

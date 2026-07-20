@@ -1,5 +1,5 @@
-const NINOU_VERSION = "82.1.5";
-const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v82.1.5";
+const NINOU_VERSION = "82.1.7";
+const LEGACY_REPAIR_KEY = "ninou:pwa-legacy-cleanup:v82.1.7";
 const BOOT_STARTED_AT = performance.now();
 const MIN_SPLASH_MS = 1500;
 const MAX_BOOT_WAIT_MS = 8500;
@@ -305,7 +305,7 @@ async function bootNinou() {
     }
 
     setBootStatus("Carregando o diário do bebê…");
-    await withTimeout(import(`./ninou-core-v82.1.5.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Núcleo do aplicativo");
+    await withTimeout(import(`./ninou-core-v82.1.7.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Núcleo do aplicativo");
 
     const layerResults = await Promise.allSettled([
       withTimeout(import(`./ninou-ux-v82.0.0.mjs?v=${NINOU_VERSION}`), MODULE_TIMEOUT_MS, "Experiência de uso"),

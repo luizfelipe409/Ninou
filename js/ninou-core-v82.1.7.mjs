@@ -9,6 +9,7 @@ import { getEventConfig, iconMarkup, isSleepEvent, preloadActionIcons, typeConfi
 import { escapeHtml, pluralize } from "./utils/text.js";
 import { formatDiaryDate, formatDuration, formatShortDuration, formatTime, getDayLabel, getDayStart, parseLocalDate, toDateInputValue, toDateTimeInputValue } from "./utils/time.js";
 import { getFirebaseServices as loadFirebaseServices, getFirebaseErrorMessage as resolveFirebaseErrorMessage } from "./services/firebase-service.js";
+import { normalizeCommercialSubscription as resolveCommercialSubscription } from "./services/commercial-access-service.js";
 import { getDefaultBabyProfile as createDefaultBabyProfile, getCloudProfileVersion as readCloudProfileVersion, hasProfileContent as profileHasContent, loadBabyProfile as loadStoredBabyProfile, normalizeBabyProfile as normalizeStoredBabyProfile, saveBabyProfile as persistBabyProfile } from "./domain/baby-profile.js";
 import { loadLocalWeights as loadStoredWeights, normalizeWeights as normalizeStoredWeights, persistLocalWeights as persistStoredWeights, removeWeightById, upsertWeight } from "./domain/weights.js";
 import { buildExportEvents } from "./services/export-service.js";
@@ -28,8 +29,8 @@ import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
 const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
-const ADMIN_STYLESHEET_HREF = "./styles/admin-web-v82.1.5.css?v=82.1.5";
-const ADMIN_RUNTIME_HREF = "./ninou-admin-web-v82.1.5.mjs?v=82.1.5";
+const ADMIN_STYLESHEET_HREF = "./styles/admin-web-v82.1.7.css?v=82.1.7";
+const ADMIN_RUNTIME_HREF = "./ninou-admin-web-v82.1.7.mjs?v=82.1.7";
 let adminRuntimePromise = null;
 let adminRuntimeAttempt = 0;
 
@@ -358,6 +359,19 @@ const guestPortalAuthStatus = document.querySelector("#guestPortalAuthStatus");
 const guestPortalAuthSubmitButton = document.querySelector("#guestPortalAuthSubmitButton");
 const guestPortalAuthSwitchText = document.querySelector("#guestPortalAuthSwitchText");
 const guestPortalAuthSwitchButton = document.querySelector("#guestPortalAuthSwitchButton");
+const guestPortalForgotPasswordButton = document.querySelector("#guestPortalForgotPasswordButton");
+const guestPortalInstallButton = document.querySelector("#guestPortalInstallButton");
+const guestPortalPrivacyLink = document.querySelector("#guestPortalPrivacyLink");
+const guestPortalTermsLink = document.querySelector("#guestPortalTermsLink");
+const subscriptionAccessPortal = document.querySelector("#subscriptionAccessPortal");
+const subscriptionAccessKicker = document.querySelector("#subscriptionAccessKicker");
+const subscriptionAccessTitle = document.querySelector("#subscriptionAccessTitle");
+const subscriptionAccessMessage = document.querySelector("#subscriptionAccessMessage");
+const subscriptionAccessPlan = document.querySelector("#subscriptionAccessPlan");
+const subscriptionAccessValidity = document.querySelector("#subscriptionAccessValidity");
+const subscriptionRetryButton = document.querySelector("#subscriptionRetryButton");
+const subscriptionContactButton = document.querySelector("#subscriptionContactButton");
+const subscriptionSignOutButton = document.querySelector("#subscriptionSignOutButton");
 const postAccessCard = document.querySelector("#postAccessCard");
 const postAccessKicker = document.querySelector("#postAccessKicker");
 const postAccessTitle = document.querySelector("#postAccessTitle");
@@ -560,7 +574,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "82.1.5";
+const NINOU_RUNTIME_VERSION = "82.1.7";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let exportRoutineInProgress = false;
@@ -585,11 +599,16 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "82.1.5-admin-web-portal";
+const NINOU_FAMILY_SCOPE_VERSION = "82.1.7-admin-web-portal";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
 const ADMIN_WHATSAPP_URL = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(ADMIN_WHATSAPP_MESSAGE)}`;
+const COMMERCIAL_ACCESS_MODE = "invite_only";
+const COMMERCIAL_ACCESS_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+let deferredInstallPrompt = null;
+let lastCommercialAccessCheckAt = 0;
+let currentCommercialAccessState = null;
 
 function isGlobalAdminEmail(email = "") {
   return normalizeEmail(email) === GLOBAL_APP_ADMIN_EMAIL;
@@ -1333,7 +1352,7 @@ function renderProfileStateNotice() {
 
   setText(profileStateKicker, "Conta conectada");
   setText(profileStateTitle, "Esta conta ainda não tem família.");
-  setText(profileStateText, "Crie uma família nova somente se você for o primeiro responsável. Se recebeu um convite, use o código para entrar na família já existente.");
+  setText(profileStateText, "Informe o código de ativação recebido após a aquisição. Se você é cuidador, use o convite enviado pelo responsável da família.");
 }
 
 
@@ -2054,7 +2073,7 @@ function getGuestPremiumCardMarkup(screenKey) {
 
     <div class="guest-premium-proof" aria-label="Confirmações da prévia">
       <span>Prévia do app</span>
-      <span>Criar família</span>
+      <span>Ativação controlada</span>
       <span>Convite seguro</span>
       <span>Claro ou escuro</span>
     </div>
@@ -2062,8 +2081,8 @@ function getGuestPremiumCardMarkup(screenKey) {
     <p class="guest-store-cta">${escapeHtml(item.cta)}</p>
 
     <div class="guest-premium-actions commercial-entry-actions-inline">
-      <button type="button" data-guest-action="create">Criar minha família</button>
-      <button type="button" data-guest-action="invite">Entrar com convite</button>
+      <button type="button" data-guest-action="create">Ativar meu acesso</button>
+      <button type="button" data-guest-action="invite">Informar código</button>
       <button type="button" data-guest-action="login">Já tenho conta</button>
     </div>
   `;
@@ -2412,11 +2431,11 @@ function updateAccountJourneyGuide() {
       ? "Acesso familiar liberado. Agora este aparelho pode registrar e acompanhar a rotina conforme sua permissão."
       : connected
         ? (pendingCode
-          ? "Convite detectado. Cole ou confirme o código para conectar esta conta à família certa."
-          : "Conta criada. Agora você pode criar sua família ou usar o código de convite recebido.")
+          ? "Código detectado. Confirme a ativação para conectar esta conta à família certa."
+          : "Conta conectada. Informe o código de ativação recebido após a aquisição do Ninou.")
         : (pendingCode
-          ? "Convite salvo neste aparelho. Crie sua conta ou entre usando o mesmo e-mail convidado pelo admin."
-          : "Crie sua família se você for o primeiro responsável ou entre com um convite recebido.");
+          ? "Código salvo neste aparelho. Crie sua conta ou entre usando o mesmo e-mail autorizado."
+          : "Ative o acesso adquirido com seu código ou entre em uma conta já conectada.");
   }
 
   card.querySelectorAll("[data-journey-action]").forEach((button) => {
@@ -2427,7 +2446,7 @@ function updateAccountJourneyGuide() {
     }
     if (action === "create") {
       button.hidden = connected;
-      button.textContent = "Criar minha família";
+      button.textContent = "Ativar meu acesso";
     }
     if (action === "login") {
       button.hidden = false;
@@ -2439,8 +2458,7 @@ function updateAccountJourneyGuide() {
 
 function normalizeCommercialEntryAction(action = "login") {
   const value = String(action || "login").trim();
-  if (value === "invite") return "invite";
-  if (value === "create" || value === "family") return "create";
+  if (["invite", "activation", "activate", "create", "family"].includes(value)) return "invite";
   return "login";
 }
 
@@ -2459,37 +2477,32 @@ function renderGuestPortalAuth() {
   const create = guestPortalCreatesAccount;
 
   if (guestPortalInviteField) guestPortalInviteField.hidden = !invite;
-  if (guestPortalAuthKicker) guestPortalAuthKicker.textContent = invite ? "Convite familiar" : create ? "Nova família" : "Conta Ninou";
+  if (guestPortalAuthKicker) guestPortalAuthKicker.textContent = invite ? "Ativação do acesso" : "Conta Ninou";
   if (guestPortalAuthTitle) {
     guestPortalAuthTitle.textContent = invite
-      ? (create ? "Crie a conta do cuidador" : "Entre para aceitar o convite")
-      : create
-        ? "Crie seu espaço no Ninou"
-        : "Bem-vindo de volta";
+      ? (create ? "Ative seu acesso ao Ninou" : "Entre para concluir a ativação")
+      : "Bem-vindo de volta";
   }
   if (guestPortalAuthDescription) {
     guestPortalAuthDescription.textContent = invite
-      ? "Use o mesmo e-mail que recebeu o convite. O Ninou valida o código antes de liberar a rotina da família."
-      : create
-        ? "Use um e-mail da família e uma senha segura. Depois, você configura o bebê e convida os cuidadores."
-        : "Acesse a família já conectada a esta conta e continue a rotina de onde parou.";
+      ? "Informe o código recebido após a aquisição e use exatamente o e-mail autorizado. O código conecta sua conta à família correta."
+      : "Acesse a família já conectada a esta conta e continue a rotina de onde parou.";
   }
   if (guestPortalAuthSubmitButton) {
     guestPortalAuthSubmitButton.textContent = invite
-      ? (create ? "Criar conta e aceitar convite" : "Entrar e aceitar convite")
-      : create
-        ? "Criar conta familiar"
-        : "Entrar no Ninou";
+      ? (create ? "Criar conta e ativar acesso" : "Entrar e ativar acesso")
+      : "Entrar no Ninou";
   }
   if (guestPortalAuthSwitchText) guestPortalAuthSwitchText.textContent = create ? "Já possui uma conta?" : "Ainda não possui uma conta?";
   if (guestPortalAuthSwitchButton) guestPortalAuthSwitchButton.textContent = create ? "Entrar" : "Criar conta";
   if (guestPortalPassword) guestPortalPassword.autocomplete = create ? "new-password" : "current-password";
+  if (guestPortalForgotPasswordButton) guestPortalForgotPasswordButton.hidden = create;
 }
 
 function openGuestPortalAuth(journey = "login") {
   if (!guestPortalAuthPanel || !guestEntryPortal) return;
   guestPortalJourney = normalizeCommercialEntryAction(journey);
-  guestPortalCreatesAccount = guestPortalJourney === "create";
+  guestPortalCreatesAccount = guestPortalJourney === "invite";
   setCommercialEntryIntent(guestPortalJourney);
   guestPortalAuthPanel.hidden = false;
   guestEntryPortal.dataset.authOpen = "true";
@@ -2506,8 +2519,8 @@ function openGuestPortalAuth(journey = "login") {
     guestPortalJourney === "invite"
       ? "O código e o e-mail precisam pertencer ao mesmo convite."
       : guestPortalCreatesAccount
-        ? "Seus dados serão vinculados somente à sua família."
-        : "Entre com o e-mail já conectado à família.",
+        ? "O acesso só será liberado se código e e-mail corresponderem à aquisição."
+        : "Entre com o e-mail já conectado à sua família.",
   );
   window.setTimeout(() => (guestPortalEmail?.value ? guestPortalPassword : guestPortalEmail)?.focus(), 80);
 }
@@ -2573,6 +2586,48 @@ async function submitGuestPortalAuth() {
   }
 }
 
+async function requestPasswordReset() {
+  const email = String(guestPortalEmail?.value || loginEmail?.value || "").trim();
+  if (!email || !email.includes("@")) {
+    setGuestPortalStatus("Digite o e-mail da sua conta para receber o link de recuperação.", "error");
+    guestPortalEmail?.focus();
+    return;
+  }
+  try {
+    setGuestPortalStatus("Enviando link de recuperação…");
+    const services = await getFirebaseServices();
+    await services.sendPasswordResetEmail(services.auth, email);
+    setGuestPortalStatus("Link enviado. Confira também a caixa de spam.", "success");
+  } catch (error) {
+    console.warn("Não foi possível enviar recuperação de senha:", error);
+    setGuestPortalStatus(getFirebaseErrorMessage(error), "error");
+  }
+}
+
+function openCommercialContact(message = ADMIN_WHATSAPP_MESSAGE) {
+  const url = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+async function promptInstallNinou() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(() => null);
+    deferredInstallPrompt = null;
+    if (guestPortalInstallButton) guestPortalInstallButton.hidden = true;
+    return;
+  }
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent || "");
+  const isStandalone = window.matchMedia?.("(display-mode: standalone)")?.matches || navigator.standalone === true;
+  if (isStandalone) {
+    setGuestPortalStatus("O Ninou já está instalado neste aparelho.", "success");
+    return;
+  }
+  setGuestPortalStatus(isIos
+    ? "No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início."
+    : "Abra o menu do navegador e escolha Instalar aplicativo ou Adicionar à tela inicial.");
+}
+
 function closeGuestLoginModal() {
   if (guestOnboardingModal) guestOnboardingModal.hidden = true;
 }
@@ -2589,18 +2644,16 @@ function focusProfileAccess(mode = "login") {
   closeGuestLoginModal();
   showScreen("profile");
 
-  const wantsInvite = mode === "invite";
-  const wantsCreate = mode === "create";
-  setCommercialEntryIntent(wantsCreate ? "create" : wantsInvite ? "invite" : "login");
-  if (loginCard) loginCard.dataset.commercialIntent = wantsCreate ? "create" : wantsInvite ? "invite" : "login";
-  if (createAccountButton) createAccountButton.textContent = wantsCreate ? "Criar conta familiar" : "Criar conta";
-  if (loginButton) loginButton.textContent = wantsInvite ? "Entrar para usar convite" : "Entrar";
+  const normalizedMode = normalizeCommercialEntryAction(mode);
+  const wantsInvite = normalizedMode === "invite";
+  setCommercialEntryIntent(normalizedMode);
+  if (loginCard) loginCard.dataset.commercialIntent = normalizedMode;
+  if (createAccountButton) createAccountButton.textContent = wantsInvite ? "Criar conta e ativar" : "Criar conta";
+  if (loginButton) loginButton.textContent = wantsInvite ? "Entrar para ativar" : "Entrar";
   if (loginHelper) {
     loginHelper.textContent = wantsInvite
-      ? "Entre ou crie sua conta com o mesmo e-mail do convite. Depois cole o código da família existente."
-      : wantsCreate
-        ? "Crie sua conta familiar com e-mail e senha. Depois preencha os dados do bebê para criar a família agora."
-        : "Entre com sua conta Ninou para acessar uma família já conectada.";
+      ? "Entre ou crie sua conta com o e-mail autorizado. Depois informe o código recebido após a aquisição."
+      : "Entre com sua conta Ninou para acessar uma família já conectada.";
   }
 
   window.setTimeout(() => {
@@ -2608,17 +2661,10 @@ function focusProfileAccess(mode = "login") {
     const journeyCard = document.querySelector("#accountJourneyCard");
     const target = wantsInvite && isLoggedIn()
       ? inviteAcceptBox
-      : wantsCreate && isLoggedIn()
-        ? (createFamilyWizard || familyAccessCard || journeyCard || loginCardElement)
-        : (isLoggedIn() ? (journeyCard || loginCardElement) : loginCardElement);
+      : (isLoggedIn() ? (journeyCard || loginCardElement) : loginCardElement);
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (wantsInvite && isLoggedIn()) {
-      inviteCodeInput?.focus();
-    } else if (wantsCreate && isLoggedIn()) {
-      openCreateFamilyWizard({ focus: true });
-    } else {
-      loginEmail?.focus();
-    }
+    if (wantsInvite && isLoggedIn()) inviteCodeInput?.focus();
+    else loginEmail?.focus();
   }, 220);
 }
 
@@ -2668,6 +2714,12 @@ function syncCreateFamilyWizardDefaults({ force = false } = {}) {
 
 function openCreateFamilyWizard(options = {}) {
   if (!createFamilyWizard) return false;
+  if (COMMERCIAL_ACCESS_MODE === "invite_only" && !isGlobalAppAdmin()) {
+    createFamilyWizard.hidden = true;
+    if (loginHelper) loginHelper.textContent = "A criação de famílias é feita pelo atendimento após a aquisição. Informe o código de ativação recebido.";
+    focusProfileAccess("invite");
+    return false;
+  }
   setCommercialEntryIntent("create");
   if (!isLoggedIn()) {
     focusProfileAccess("create");
@@ -2727,6 +2779,12 @@ function validateCommercialFamilyForm() {
 }
 
 async function createCommercialFamilyFromWizard() {
+  if (COMMERCIAL_ACCESS_MODE === "invite_only" && !isGlobalAppAdmin()) {
+    if (createFamilyWizard) createFamilyWizard.hidden = true;
+    if (createFamilyWizardStatus) createFamilyWizardStatus.textContent = "A criação de famílias é realizada pelo atendimento após a aquisição.";
+    focusProfileAccess("invite");
+    return null;
+  }
   if (!cloudUser) {
     focusProfileAccess("create");
     return null;
@@ -5156,7 +5214,7 @@ function requireLogin(actionText = "usar o Ninou") {
   }
   showScreen("profile");
   if (loginHelper) {
-    loginHelper.textContent = `Sua conta precisa estar vinculada a uma família para ${actionText}. Crie sua família ou use um convite recebido.`;
+    loginHelper.textContent = `Sua conta precisa estar vinculada a uma família para ${actionText}. Informe o código de ativação ou use um convite recebido.`;
   }
   return false;
 }
@@ -7952,8 +8010,8 @@ function renderFamilyAccessPanel() {
       : connected
         ? (pendingCode
           ? "Convite detectado. Confirme o código para entrar na família existente, sem criar uma nova família."
-          : "Esta conta está conectada, mas ainda não encontramos acesso familiar. Crie sua família agora se você for o primeiro responsável ou use um convite recebido.")
-        : "Visitantes podem conhecer o app. Para registrar dados reais, entre com usuário e senha. Se recebeu convite, use o mesmo e-mail convidado.";
+          : "Esta conta ainda não possui uma família liberada. Use o código de ativação recebido após a aquisição do Ninou.")
+        : "Para registrar dados reais, entre com sua conta ou ative o acesso usando o código enviado para o seu e-mail.";
   }
 
   if (familyAccessBadge) {
@@ -7962,20 +8020,13 @@ function renderFamilyAccessPanel() {
   }
 
   if (createFamilyButton) {
-    // v75.75.67: criar família agora abre o fluxo real de cadastro da família.
-    createFamilyButton.hidden = !connected || authorized || Boolean(pendingCode);
+    createFamilyButton.hidden = !appAdmin || !connected || authorized;
     createFamilyButton.disabled = personalFamilyActivationInFlight;
-    createFamilyButton.textContent = personalFamilyActivationInFlight
-      ? (appAdmin ? "Ativando..." : "Criando...")
-      : (appAdmin ? "Ativar família principal" : "Criar minha família");
+    createFamilyButton.textContent = personalFamilyActivationInFlight ? "Ativando..." : "Ativar família técnica";
   }
 
   if (createFamilyWizard) {
-    const shouldShowCreateWizard = connected
-      && !authorized
-      && !appAdmin
-      && !pendingCode
-      && getCommercialEntryIntent() === "create";
+    const shouldShowCreateWizard = false;
     createFamilyWizard.hidden = !shouldShowCreateWizard;
     if (shouldShowCreateWizard) syncCreateFamilyWizardDefaults();
   }
@@ -9001,6 +9052,11 @@ async function acceptFamilyInvite(codeValue = inviteCodeInput?.value || pendingI
     const cloudContentAfterInvite = await familyCloudHasContent();
     if (!cloudContentAfterInvite.profile && hasProfileContent()) await saveProfileToCloud();
     if (!cloudContentAfterInvite.day && hasRoutineDayContent()) await saveDayToCloud();
+    const commercialAccessAllowed = await verifyCurrentFamilySubscription({ force: true });
+    if (!commercialAccessAllowed) {
+      if (!options.silent && loginHelper) loginHelper.textContent = "Convite aceito, mas a validade do acesso precisa ser regularizada pelo atendimento.";
+      return false;
+    }
     await connectCurrentAccount();
     await flushPendingCloudSync("invite-accepted");
     setSyncStatus(hasPendingCloudSyncItems() ? "pending" : "online", cloudUser.email || "", getPendingSyncSummary());
@@ -10122,10 +10178,18 @@ async function initFirebaseAuthState() {
 
       if (!hasFamilyAccess()) {
         setAuthAccessLoading(false);
-        loginHelper.textContent = "Conta autenticada, mas sem família vinculada. Crie sua família se você for o primeiro responsável ou aceite um convite familiar.";
+        loginHelper.textContent = "Conta autenticada, mas sem acesso ativo. Informe o código recebido após a aquisição para conectar sua família.";
         setSyncStatus("offline", user.email || "");
         renderAuthControls();
         showScreen("profile");
+        return;
+      }
+
+      const commercialAccessAllowed = await verifyCurrentFamilySubscription({ force: true });
+      if (!isCurrentAuthRun()) return;
+      if (!commercialAccessAllowed) {
+        setAuthAccessLoading(false);
+        renderAuthControls();
         return;
       }
 
@@ -10162,6 +10226,68 @@ function getFirebaseErrorMessage(error) {
   return resolveFirebaseErrorMessage(error);
 }
 
+function normalizeCommercialSubscription(data = {}) {
+  return resolveCommercialSubscription(data);
+}
+
+function hideSubscriptionAccessPortal() {
+  if (subscriptionAccessPortal) {
+    subscriptionAccessPortal.hidden = true;
+    subscriptionAccessPortal.setAttribute("aria-hidden", "true");
+  }
+  document.body.classList.remove("subscription-access-blocked");
+}
+
+function showSubscriptionAccessPortal(state = {}) {
+  if (!subscriptionAccessPortal || isGlobalAppAdmin()) return;
+  const expired = state.reason === "expired";
+  if (subscriptionAccessKicker) subscriptionAccessKicker.textContent = expired ? "VALIDADE ENCERRADA" : "ACESSO PAUSADO";
+  if (subscriptionAccessTitle) subscriptionAccessTitle.textContent = expired ? "Seu período de acesso terminou" : "O acesso desta família está temporariamente suspenso";
+  if (subscriptionAccessMessage) subscriptionAccessMessage.textContent = expired
+    ? "Seus registros continuam preservados. Fale com o atendimento para renovar e retomar a rotina no mesmo ponto."
+    : "Os dados da família permanecem preservados enquanto o atendimento revisa a situação do acesso.";
+  if (subscriptionAccessPlan) subscriptionAccessPlan.textContent = state.planLabel || "Acesso familiar";
+  if (subscriptionAccessValidity) subscriptionAccessValidity.textContent = state.until
+    ? `Validade: ${new Date(state.until).toLocaleDateString("pt-BR")}`
+    : "Validade sob revisão";
+  subscriptionAccessPortal.hidden = false;
+  subscriptionAccessPortal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("subscription-access-blocked");
+}
+
+async function verifyCurrentFamilySubscription({ force = false } = {}) {
+  if (!cloudUser || !familyAccess?.familyId || isGlobalAppAdmin()) {
+    hideSubscriptionAccessPortal();
+    currentCommercialAccessState = null;
+    return true;
+  }
+  const now = Date.now();
+  if (!force && currentCommercialAccessState && now - lastCommercialAccessCheckAt < COMMERCIAL_ACCESS_CHECK_INTERVAL_MS) {
+    if (!currentCommercialAccessState.allowed) showSubscriptionAccessPortal(currentCommercialAccessState);
+    return currentCommercialAccessState.allowed;
+  }
+  try {
+    const services = await getFirebaseServices();
+    const snapshot = await services.getDoc(services.doc(services.db, "families", familyAccess.familyId));
+    const data = snapshot.exists() ? snapshot.data() || {} : {};
+    clientFamilySubscriptionCache = data;
+    currentCommercialAccessState = normalizeCommercialSubscription(data);
+    lastCommercialAccessCheckAt = now;
+    renderClientFamilySubscription();
+    if (!currentCommercialAccessState.allowed) {
+      showSubscriptionAccessPortal(currentCommercialAccessState);
+      setSyncStatus("offline", cloudUser.email || "", "Acesso comercial pausado; os dados permanecem preservados.");
+      return false;
+    }
+    hideSubscriptionAccessPortal();
+    return true;
+  } catch (error) {
+    console.warn("Não foi possível confirmar a validade comercial:", error);
+    // Falha de rede não bloqueia uma família já autorizada no aparelho.
+    hideSubscriptionAccessPortal();
+    return true;
+  }
+}
 
 async function signInAccount() {
   const credentials = getLoginCredentials("entrar");
@@ -10191,6 +10317,12 @@ async function signInAccount() {
 async function createAccount() {
   if (isLoggedIn()) {
     await signOutAccount();
+    return;
+  }
+
+  if (COMMERCIAL_ACCESS_MODE === "invite_only" && !isGlobalAppAdmin() && !pendingInviteCode) {
+    loginHelper.textContent = "Informe o código de ativação enviado após a aquisição do Ninou.";
+    focusProfileAccess("invite");
     return;
   }
 
@@ -10229,6 +10361,8 @@ async function signOutAccount() {
     createAccountButton.disabled = true;
     await services.signOut(services.auth);
     hideBlockedAccountPortal();
+    hideSubscriptionAccessPortal();
+    currentCommercialAccessState = null;
     cloudUser = null;
     unsubscribeCloudListeners();
     clearLocalAccountData();
@@ -14665,9 +14799,13 @@ if (exportEndDateInput) exportEndDateInput.addEventListener("change", syncExport
 if (exportRangeSelect) exportRangeSelect.addEventListener("change", () => syncExportRangeVisibility({ resetPresetDates: true }));
 syncExportRangeVisibility();
 if (familyWelcomeStartButton) familyWelcomeStartButton.addEventListener("click", () => showScreen("today"));
-if (guestPortalCreateButton) guestPortalCreateButton.addEventListener("click", () => openGuestPortalAuth("create"));
+if (guestPortalCreateButton) guestPortalCreateButton.addEventListener("click", () => openGuestPortalAuth("activation"));
 if (guestPortalLoginButton) guestPortalLoginButton.addEventListener("click", () => openGuestPortalAuth("login"));
-if (guestPortalInviteButton) guestPortalInviteButton.addEventListener("click", () => openGuestPortalAuth("invite"));
+if (guestPortalInviteButton) guestPortalInviteButton.addEventListener("click", () => openCommercialContact());
+if (guestPortalForgotPasswordButton) guestPortalForgotPasswordButton.addEventListener("click", () => void requestPasswordReset());
+if (guestPortalInstallButton) guestPortalInstallButton.addEventListener("click", () => void promptInstallNinou());
+if (guestPortalPrivacyLink) guestPortalPrivacyLink.addEventListener("click", () => window.open("/privacidade.html", "_blank", "noopener,noreferrer"));
+if (guestPortalTermsLink) guestPortalTermsLink.addEventListener("click", () => window.open("/termos.html", "_blank", "noopener,noreferrer"));
 if (guestPortalAuthBackButton) guestPortalAuthBackButton.addEventListener("click", closeGuestPortalAuth);
 if (guestPortalAuthSwitchButton) {
   guestPortalAuthSwitchButton.addEventListener("click", () => {
@@ -14699,18 +14837,34 @@ if (guestPortalAuthSubmitButton) {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && guestPortalAuthPanel && !guestPortalAuthPanel.hidden) closeGuestPortalAuth();
 });
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  if (guestPortalInstallButton) guestPortalInstallButton.hidden = false;
+});
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  if (guestPortalInstallButton) guestPortalInstallButton.hidden = true;
+});
+subscriptionRetryButton?.addEventListener("click", () => withButtonBusy(subscriptionRetryButton, "Verificando…", async () => {
+  const allowed = await verifyCurrentFamilySubscription({ force: true });
+  if (allowed) {
+    hideSubscriptionAccessPortal();
+    await connectCurrentAccount();
+    showScreen(APP_LAUNCH_SCREEN);
+    renderAll();
+  }
+}));
+subscriptionContactButton?.addEventListener("click", () => openCommercialContact(`Olá! Preciso revisar o acesso da família ${familyAccess?.familyId || ""} no Ninou. Conta: ${cloudUser?.email || ""}`));
+subscriptionSignOutButton?.addEventListener("click", () => void signOutAccount());
+window.addEventListener("online", () => { if (cloudUser && familyAccess?.familyId) void verifyCurrentFamilySubscription({ force: true }); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && cloudUser && familyAccess?.familyId) void verifyCurrentFamilySubscription();
+});
 if (guestWelcomeLoginButton) guestWelcomeLoginButton.addEventListener("click", () => focusProfileAccess("login"));
 if (guestWelcomeInviteButton) guestWelcomeInviteButton.addEventListener("click", () => focusProfileAccess("invite"));
 if (guestWelcomeCreateFamilyButton) {
-  guestWelcomeCreateFamilyButton.addEventListener("click", () => {
-    focusProfileAccess("create");
-    if (isLoggedIn()) {
-      openCreateFamilyWizard({ focus: true });
-    } else {
-      if (loginHelper) loginHelper.textContent = "Crie sua conta familiar com e-mail e senha. Depois preencha os dados do bebê para criar a família.";
-      loginEmail?.focus();
-    }
-  });
+  guestWelcomeCreateFamilyButton.addEventListener("click", () => focusProfileAccess("invite"));
 }
 if (guestModalCloseButton) guestModalCloseButton.addEventListener("click", closeGuestLoginModal);
 if (guestModalCreateFamilyButton) guestModalCreateFamilyButton.addEventListener("click", () => focusProfileAccess("create"));
@@ -15117,7 +15271,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=82.1.5", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=82.1.7", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -15145,7 +15299,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "82.1.5";
+  const VERSION = "82.1.7";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -15202,7 +15356,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "82.1.5";
+  const VERSION = "82.1.7";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -15266,7 +15420,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "82.1.5";
+  const LEGAL_VERSION = "82.1.7";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -15472,7 +15626,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
   async function requestDataDeletion() {
     if (!canRequestFamilyDataDeletion()) {
-      setLegalStatus("Solicitação de exclusão fica disponível apenas para responsável principal/admin global.");
+      setLegalStatus("Solicitação de exclusão fica disponível apenas para responsável/admin familiar.");
       return;
     }
     const confirmed = window.confirm("Deseja registrar uma solicitação de exclusão dos dados desta família/conta? Antes de excluir definitivamente, exporte um backup JSON.");
@@ -15481,11 +15635,11 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
       type: "data_deletion_request",
       status: "requested",
       requestedAtClient: new Date().toISOString(),
-      note: "Solicitação feita pelo Centro de confiança do Ninou. Exige conferência antes de exclusão definitiva.",
+      note: "Solicitação feita pelo Centro de confiança do Ninou. Os dados ficam bloqueados para revisão e remoção definitiva pelo atendimento.",
     });
     localStorage.setItem(REQUEST_KEY, JSON.stringify(payload));
     downloadLegalRequest(payload);
-    setLegalStatus("Solicitação de exclusão registrada e baixada em JSON. Em beta, confirme com o administrador antes de remover dados definitivos.");
+    setLegalStatus("Solicitação registrada. O atendimento revisará a conta e confirmará a conclusão da exclusão.");
 
     if (cloudUser?.uid) {
       await writeLegalDoc((services) => services.doc(services.db, "users", cloudUser.uid, "account", "dataDeletionRequest"), payload);
@@ -15525,7 +15679,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "82.1.5";
+  const SUPPORT_VERSION = "82.1.7";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -15854,7 +16008,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "82.1.5";
+  const REVIEW_VERSION = "82.1.7";
 
   function currentEffectiveRole() {
     try {
@@ -15879,7 +16033,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
   function canRequestDeletion() {
     try {
       if (typeof isGlobalAppAdmin === "function" && isGlobalAppAdmin()) return true;
-      if (typeof isFamilyOwnerRole === "function") return Boolean(familyAccess?.familyId && isFamilyOwnerRole(familyAccess?.role));
+      if (typeof isFamilyManagerRole === "function") return Boolean(familyAccess?.familyId && isFamilyManagerRole(familyAccess?.role, cloudUser?.email || familyAccess?.email || ""));
       return false;
     } catch {
       return false;
@@ -15912,7 +16066,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
       setHidden(node, !managerAllowed, "Disponível apenas para responsável/admin familiar.");
     });
     document.querySelectorAll('[data-sensitive-action="owner"]').forEach((node) => {
-      setHidden(node, !ownerAllowed, "Disponível apenas para responsável principal/admin global.");
+      setHidden(node, !ownerAllowed, "Disponível apenas para responsável/admin familiar.");
     });
     document.querySelectorAll('[data-global-admin-only]').forEach((node) => {
       setHidden(node, !globalAllowed, "Disponível apenas para admin global.");

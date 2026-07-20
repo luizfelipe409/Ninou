@@ -131,7 +131,7 @@ export async function createPersonalFamily(user: User, input: { familyName: stri
   await setDoc(doc(db, 'families', familyId), {
     familyId, title: input.familyName, name: input.familyName, babyName: input.babyName, babyArticle: input.article,
     ownerUid: user.uid, ownerEmail: email, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation,
-    familyType: 'client', status: 'active', appVersion: '82.0.0-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    familyType: 'client', status: 'active', appVersion: '82.1.8-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   }, { merge: true });
   await setDoc(doc(db, 'families', familyId, 'profile', 'main'), {
     familyId, familyName: input.familyName, name: input.babyName, birthDate: input.birthDate, article: input.article,
@@ -378,9 +378,36 @@ export async function submitSupportRequest(user: User, familyId: string | undefi
 
 export async function requestAccountDeletion(user: User, familyId?: string) {
   const stamp = Date.now();
-  const payload = { uid: user.uid, email: user.email || '', familyId: familyId || '', status: 'requested', requestedAtClient: stamp, requestedAt: serverTimestamp() };
+  const payload = {
+    uid: user.uid,
+    email: user.email || '',
+    familyId: familyId || '',
+    type: 'data_deletion_request',
+    category: 'Exclusão da conta',
+    message: 'Excluir a conta Ninou e os dados pessoais associados. Dados compartilhados da família devem ser avaliados antes da remoção definitiva.',
+    scope: 'account_and_personal_data',
+    status: 'open',
+    requestState: 'requested',
+    requestedAtClient: stamp,
+    requestedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
   await setDoc(doc(db, 'users', user.uid, 'account', 'dataDeletionRequest'), payload, { merge: true });
-  if (familyId) await setDoc(doc(db, 'families', familyId, 'legal', `data_request_${user.uid}_${stamp}`), { ...payload, type: 'data_deletion_request', actorUid: user.uid, actorEmail: user.email || '' }, { merge: true });
+  if (familyId) {
+    await setDoc(doc(db, 'families', familyId, 'legal', `data_request_${user.uid}_${stamp}`), {
+      ...payload,
+      actorUid: user.uid,
+      actorEmail: user.email || '',
+    }, { merge: true });
+  }
+  await setDoc(doc(db, 'users', user.uid), {
+    status: 'deletion_requested',
+    deletionRequestStatus: 'open',
+    deletionRequestedAtClient: stamp,
+    deletionRequestedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+  return payload;
 }
 
 export function getLocalDateId(now = Date.now()) {

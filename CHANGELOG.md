@@ -1,3 +1,29 @@
+# Ninou v82.1.8 — Soneca atravessando a meia-noite
+
+- Sono manual com fim no dia seguinte salvo como intervalo concluído.
+- Confirmação não exibe mais “Timer iniciado” quando há término.
+- Diário mostra início, fim e duração completos.
+- Sono herdado de ontem permanece na órbita do dia atual e cede espaço somente em caso de colisão com uma barra mais recente.
+- Estado em andamento e histórico do dia anterior preservados na virada do dia.
+- Web comercial v82.1.7 preservada.
+
+Detalhes em `CHANGELOG_v82.1.8.md`.
+
+---
+
+# Ninou v82.1.7 — Web pronta para famílias adquirentes
+
+- Ativação por código após aquisição.
+- Planos e validade controlados pelo painel administrativo.
+- Bloqueio de acesso vencido/suspenso com preservação dos dados.
+- Recuperação de senha, instalação PWA e páginas públicas legais.
+- Cadastro autônomo de famílias removido da experiência do cliente.
+- Mobile v82.1.6 preservado.
+
+Detalhes em `CHANGELOG_v82.1.7.md`.
+
+---
+
 # Ninou v82.0.0 — Polimento visual e experiência de registro
 
 Baseada na v80.1.4, preservando o relógio Céu Vivo e as correções de estabilidade.

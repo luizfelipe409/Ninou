@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "82.1.5";
+        const VERSION = "82.1.7";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
         root.classList.add("ninou-booting", "ninou-v8200");
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=82.1.5" />
+    <link rel="manifest" href="./manifest.webmanifest?v=82.1.7" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,10 +54,11 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.5" />
-    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.5" />
-    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.5" />
-    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.5.css?v=82.1.5" />
+    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.7" />
+    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.7" />
+    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.7" />
+    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=82.1.7" />
+    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=82.1.7" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -133,7 +134,7 @@
               if ("caches" in window) await Promise.allSettled((await caches.keys()).map((name) => caches.delete(name)));
             } catch (_) {}
             const url = new URL(location.href);
-            url.searchParams.set("ninouRecovery", `82.1.5-${Date.now()}`);
+            url.searchParams.set("ninouRecovery", `82.1.7-${Date.now()}`);
             location.replace(url.toString());
           });
           panel.querySelector("[data-ninou-open-anyway]")?.addEventListener("click", () => {
@@ -184,6 +185,25 @@
     </script>
     <section id="adminWebPortal" class="premium-admin-root admin-web-portal" aria-label="Painel administrativo do Ninou" aria-hidden="true" hidden></section>
 
+    <section id="subscriptionAccessPortal" class="subscription-access-portal" role="dialog" aria-modal="true" aria-labelledby="subscriptionAccessTitle" aria-hidden="true" hidden>
+      <article class="subscription-access-card">
+        <span class="subscription-access-mark" aria-hidden="true"><img src="./icons/icon-192.png" alt="" /></span>
+        <p id="subscriptionAccessKicker" class="subscription-access-kicker">ACESSO DA FAMÍLIA</p>
+        <h2 id="subscriptionAccessTitle">Verificando seu acesso</h2>
+        <p id="subscriptionAccessMessage">Seus registros permanecem preservados enquanto confirmamos a situação da assinatura.</p>
+        <div class="subscription-access-summary">
+          <div><span>Plano</span><strong id="subscriptionAccessPlan">Acesso familiar</strong></div>
+          <div><span>Situação</span><strong id="subscriptionAccessValidity">Em verificação</strong></div>
+        </div>
+        <div class="subscription-access-actions">
+          <button id="subscriptionRetryButton" type="button">Verificar novamente</button>
+          <button id="subscriptionContactButton" type="button">Falar com atendimento</button>
+          <button id="subscriptionSignOutButton" type="button">Sair da conta</button>
+        </div>
+        <small>Nenhum dado da rotina é apagado quando o acesso fica pausado.</small>
+      </article>
+    </section>
+
     <section id="guestEntryPortal" class="guest-entry-portal" aria-label="Bem-vindo ao Ninou" aria-hidden="true" hidden>
       <div class="guest-entry-ambient" aria-hidden="true">
         <span class="guest-entry-star star-one"></span>
@@ -199,25 +219,28 @@
             <span class="guest-entry-brand-mark"><img src="./icons/icon-192.png" alt="" /></span>
             <span><strong>Ninou</strong><small>Diário compartilhado do bebê</small></span>
           </a>
-          <div class="guest-entry-theme" role="group" aria-label="Tema da tela">
-            <button type="button" data-theme-choice="light" aria-label="Usar tema claro"><span aria-hidden="true">☀</span></button>
-            <button type="button" data-theme-choice="dark" aria-label="Usar tema escuro"><span aria-hidden="true">☾</span></button>
+          <div class="guest-entry-header-actions">
+            <button id="guestPortalInstallButton" class="guest-entry-install" type="button">Instalar</button>
+            <div class="guest-entry-theme" role="group" aria-label="Tema da tela">
+              <button type="button" data-theme-choice="light" aria-label="Usar tema claro"><span aria-hidden="true">☀</span></button>
+              <button type="button" data-theme-choice="dark" aria-label="Usar tema escuro"><span aria-hidden="true">☾</span></button>
+            </div>
           </div>
         </header>
 
         <main id="guestEntryContent" class="guest-entry-content">
           <section class="guest-entry-copy" aria-labelledby="guestEntryTitle">
-            <span class="guest-entry-eyebrow"><i aria-hidden="true"></i> Rotina em família, no tempo certo</span>
+            <span class="guest-entry-eyebrow"><i aria-hidden="true"></i> Acesso exclusivo para famílias</span>
             <h1 id="guestEntryTitle">Mais presença.<br /><em>Menos preocupação.</em></h1>
-            <p>O Ninou transforma sono, mamadas e cuidados em uma rotina clara, compartilhada e acolhedora para toda a família.</p>
+            <p>O Ninou organiza sono, mamadas e cuidados em uma rotina compartilhada. Ative o acesso recebido ou entre para continuar de onde sua família parou.</p>
 
             <div class="guest-entry-actions">
               <button id="guestPortalCreateButton" class="guest-entry-primary" type="button">
-                <span>Começar minha família</span><i aria-hidden="true">→</i>
+                <span>Ativar meu acesso</span><i aria-hidden="true">→</i>
               </button>
-              <button id="guestPortalLoginButton" class="guest-entry-secondary" type="button">Já tenho uma conta</button>
+              <button id="guestPortalLoginButton" class="guest-entry-secondary" type="button">Entrar na minha conta</button>
             </div>
-            <button id="guestPortalInviteButton" class="guest-entry-invite" type="button"><span aria-hidden="true">✦</span> Recebi um convite familiar</button>
+            <button id="guestPortalInviteButton" class="guest-entry-invite" type="button"><span aria-hidden="true">✦</span> Ainda não adquiri o Ninou · Falar com atendimento</button>
 
             <div class="guest-entry-trust" aria-label="Benefícios do Ninou">
               <span><i aria-hidden="true">✓</i> Cada família no seu espaço</span>
@@ -256,22 +279,23 @@
         <section id="guestPortalAuthPanel" class="guest-portal-auth-panel" role="dialog" aria-modal="true" aria-labelledby="guestPortalAuthTitle" hidden>
           <button id="guestPortalAuthBackButton" class="guest-portal-auth-back" type="button" aria-label="Voltar para a apresentação">←</button>
           <div class="guest-portal-auth-copy">
-            <span id="guestPortalAuthKicker">Conta familiar</span>
-            <strong id="guestPortalAuthTitle">Crie seu espaço no Ninou</strong>
-            <p id="guestPortalAuthDescription">Use um e-mail da família e uma senha segura. Depois, você configura o bebê e convida os cuidadores.</p>
+            <span id="guestPortalAuthKicker">Ativação do acesso</span>
+            <strong id="guestPortalAuthTitle">Ative seu acesso ao Ninou</strong>
+            <p id="guestPortalAuthDescription">Use o e-mail autorizado e o código recebido após a aquisição.</p>
           </div>
           <div class="guest-portal-auth-fields">
             <label><span>E-mail</span><input id="guestPortalEmail" type="email" inputmode="email" autocomplete="email" placeholder="voce@familia.com" /></label>
             <label><span>Senha</span><input id="guestPortalPassword" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" /></label>
             <label id="guestPortalInviteField" class="guest-portal-invite-field" hidden><span>Código do convite</span><input id="guestPortalInviteCode" type="text" inputmode="text" autocomplete="one-time-code" maxlength="24" placeholder="Ex.: NINOU-ABC123" /></label>
           </div>
-          <p id="guestPortalAuthStatus" class="guest-portal-auth-status" role="status" aria-live="polite">Seus dados serão vinculados somente à sua família.</p>
-          <button id="guestPortalAuthSubmitButton" class="guest-entry-primary guest-portal-auth-submit" type="button">Criar conta familiar</button>
+          <p id="guestPortalAuthStatus" class="guest-portal-auth-status" role="status" aria-live="polite">Código e e-mail precisam pertencer ao mesmo acesso.</p>
+          <button id="guestPortalAuthSubmitButton" class="guest-entry-primary guest-portal-auth-submit" type="button">Criar conta e ativar acesso</button>
+          <button id="guestPortalForgotPasswordButton" class="guest-portal-forgot-password" type="button" hidden>Esqueci minha senha</button>
           <p class="guest-portal-auth-switch"><span id="guestPortalAuthSwitchText">Já possui uma conta?</span> <button id="guestPortalAuthSwitchButton" type="button">Entrar</button></p>
-          <small class="guest-portal-legal">Ao continuar, você confirma o uso responsável do Ninou. O app organiza a rotina e não substitui orientação pediátrica.</small>
+          <small class="guest-portal-legal">Ao continuar, você concorda com a <button id="guestPortalPrivacyLink" type="button">Política de Privacidade</button> e os <button id="guestPortalTermsLink" type="button">Termos de Uso</button>. O Ninou organiza a rotina e não substitui orientação pediátrica.</small>
         </section>
 
-        <footer class="guest-entry-footer"><span>Feito para a rotina real da família.</span><small>Ninou · Beta familiar</small></footer>
+        <footer class="guest-entry-footer"><span>Feito para a rotina real da família.</span><small><a href="/privacidade.html" target="_blank" rel="noopener">Privacidade</a> · <a href="/termos.html" target="_blank" rel="noopener">Termos</a> · Ninou</small></footer>
       </div>
     </section>
 
@@ -1136,7 +1160,7 @@
           <div>
             <span id="profileStateKicker">Acesso familiar</span>
             <strong id="profileStateTitle">Conecte sua família para continuar.</strong>
-            <p id="profileStateText">Crie uma família nova somente se você for o primeiro responsável. Se recebeu convite, aceite o código para entrar na família existente.</p>
+            <p id="profileStateText">Ative o acesso com o código recebido após a aquisição. Cuidadores adicionais entram com os convites enviados pelo responsável.</p>
           </div>
         </section>
 
@@ -1148,7 +1172,7 @@
             </div>
           </div>
           <div class="family-roles-grid">
-            <article data-role="owner"><strong>Responsável principal</strong><span>Cria a família e preserva o controle principal.</span></article>
+            <article data-role="owner"><strong>Responsável principal</strong><span>Recebe o acesso adquirido e preserva o controle principal.</span></article>
             <article data-role="admin_familiar"><strong>Admin familiar</strong><span>Gerencia perfil, convites, membros e rotina.</span></article>
             <article data-role="cuidador"><strong>Cuidador</strong><span>Registra sono, mamadas, fraldas e observações.</span></article>
             <article data-role="visualizacao"><strong>Visualização</strong><span>Acompanha dados sem alterar registros.</span></article>
@@ -1164,16 +1188,16 @@
           </div>
 
           <div class="guest-welcome-actions guest-entry-actions commercial-entry-actions">
-            <button id="guestWelcomeCreateFamilyButton" class="commercial-primary-action" type="button">Criar minha família</button>
-            <button id="guestWelcomeInviteButton" type="button">Entrar com convite</button>
-            <button id="guestWelcomeLoginButton" class="commercial-secondary-action" type="button">Já tenho conta</button>
+            <button id="guestWelcomeCreateFamilyButton" class="commercial-primary-action" type="button">Ativar acesso adquirido</button>
+            <button id="guestWelcomeInviteButton" type="button">Informar código de ativação</button>
+            <button id="guestWelcomeLoginButton" class="commercial-secondary-action" type="button">Entrar na minha conta</button>
           </div>
 
           <div class="commercial-entry-proof" aria-label="Diferenciais do Ninou">
             <span>Multi-família</span>
             <span>Cuidador por aparelho</span>
             <span>Dados separados</span>
-            <span>Beta familiar</span>
+            <span>Acesso familiar</span>
           </div>
         </section>
 
@@ -1182,8 +1206,8 @@
           <strong>Cada família entra no seu próprio espaço.</strong>
           <p>Cada família acessa um espaço próprio, com convites e registros separados por bebê.</p>
           <div class="premium-trust-grid" aria-label="Pontos de confiança">
-            <article><b>01</b><strong>Criar família</strong><small>Entrada preparada para o responsável iniciar o espaço familiar.</small></article>
-            <article><b>02</b><strong>Entrar com convite</strong><small>Cuidadores entram apenas na família correta.</small></article>
+            <article><b>01</b><strong>Ativar acesso</strong><small>O responsável usa o código enviado após a aquisição.</small></article>
+            <article><b>02</b><strong>Convidar cuidadores</strong><small>Cada cuidador entra somente no espaço da família correta.</small></article>
             <article><b>03</b><strong>Já tenho conta</strong><small>Famílias existentes acessam a rotina sem refazer cadastro.</small></article>
           </div>
         </section>
@@ -1192,14 +1216,14 @@
           <div class="journey-head">
             <span>Primeiros passos</span>
             <strong>Escolha como sua família vai começar.</strong>
-            <p id="accountJourneyHint">Crie uma família nova, entre com convite de uma família existente ou acesse sua conta Ninou.</p>
+            <p id="accountJourneyHint">Ative o acesso adquirido, entre com um convite de cuidador ou acesse uma conta já conectada.</p>
           </div>
           <ol class="journey-steps" aria-label="Fluxo de acesso do usuário">
             <li data-journey-step="invite">
               <i>1</i>
               <div>
                 <strong>Escolher caminho</strong>
-                <span>Criar família, entrar com convite ou acessar conta existente.</span>
+                <span>Ativar acesso, entrar com convite ou acessar uma conta existente.</span>
               </div>
             </li>
             <li data-journey-step="account">
@@ -1213,7 +1237,7 @@
               <i>3</i>
               <div>
                 <strong>Conectar família</strong>
-                <span>O app prepara a separação dos dados pelo ID da família.</span>
+                <span>O app conecta sua conta ao espaço familiar autorizado.</span>
               </div>
             </li>
             <li data-journey-step="record">
@@ -1225,17 +1249,17 @@
             </li>
           </ol>
           <div class="journey-actions">
-            <button type="button" data-journey-action="create">Criar minha família</button>
-            <button type="button" data-journey-action="invite">Entrar com convite</button>
+            <button type="button" data-journey-action="create">Ativar meu acesso</button>
+            <button type="button" data-journey-action="invite">Informar código</button>
             <button type="button" data-journey-action="login">Já tenho conta</button>
           </div>
         </section>
 
         <section id="postAccessCard" class="post-access-card" hidden aria-live="polite">
           <div class="post-access-hero">
-            <span id="postAccessKicker">Conta criada</span>
-            <strong id="postAccessTitle">Agora vamos conectar você à família.</strong>
-            <p id="postAccessText">O Ninou verifica se existe convite pendente e orienta o próximo passo para liberar os dados reais.</p>
+            <span id="postAccessKicker">Conta preparada</span>
+            <strong id="postAccessTitle">Agora vamos concluir a ativação.</strong>
+            <p id="postAccessText">O Ninou valida o código e conecta sua conta ao espaço familiar adquirido.</p>
           </div>
           <div class="post-access-grid" aria-label="Status da conexão">
             <article data-post-status="account">
@@ -1268,7 +1292,7 @@
         </section>
 
 
-        <section id="commercialBetaCard" class="commercial-beta-card" aria-label="Preparação comercial do Ninou" data-global-admin-only="true" hidden>
+        <section id="commercialBetaCard" class="commercial-beta-card" aria-label="Preparação de acesso comercial do Ninou" data-global-admin-only="true" hidden>
           <div class="commercial-beta-head">
             <span>Validação comercial</span>
             <strong>Checklist interno para liberação controlada.</strong>
@@ -1280,7 +1304,7 @@
             <article><b>✓</b><strong>Papéis claros</strong><small>Responsável, admin, cuidador e visualização.</small></article>
             <article><b>!</b><strong>Uso responsável</strong><small>Não substitui pediatra nem orientação médica.</small></article>
           </div>
-          <p class="commercial-beta-note">Antes de abrir para o público geral, siga a sequência: publicar regras, testar Francisco, testar uma família piloto, validar permissões, revisar suporte e só então ampliar o beta.</p>
+          <p class="commercial-beta-note">Antes de liberar novos acessos, publique as regras, valide uma família piloto, confira permissões e revise o atendimento.</p>
         </section>
         <section id="commercialFinalSequenceCard" class="parent-identity-sleep-recalc-card" aria-label="Sequência de revisão comercial final" data-global-admin-only="true" hidden>
           <div class="parent-identity-sleep-recalc-head">
@@ -1335,7 +1359,7 @@
           <article class="login-card">
             <span>Conta</span>
             <strong>Conta Ninou</strong>
-            <p id="loginHelper">Crie uma conta para iniciar sua família, entre com convite ou acesse uma conta existente.</p>
+            <p id="loginHelper">Ative o acesso adquirido com seu código ou entre em uma conta já conectada.</p>
             <div class="account-sync-summary" aria-label="Status da conta e sincronização">
               <div class="account-sync-status">
                 <strong id="syncStatusTitle">Sincronização off-line</strong>
@@ -1352,7 +1376,7 @@
             </div>
             <div class="login-actions">
               <button id="loginButton" type="button">Entrar</button>
-              <button id="createAccountButton" class="secondary-login" type="button">Criar conta familiar</button>
+              <button id="createAccountButton" class="secondary-login" type="button">Criar conta com código</button>
             </div>
           </article>
 
@@ -1376,7 +1400,7 @@
             </div>
             <p>Consulte política, termos, aviso de uso responsável e opções de dados conforme sua permissão na família.</p>
             <div class="legal-status-grid" aria-label="Status legal do Ninou">
-              <article><span>Versão legal</span><strong id="legalVersionLabel">v82.1.5</strong><small>Privacidade + termos</small></article>
+              <article><span>Versão legal</span><strong id="legalVersionLabel">v82.1.7</strong><small>Privacidade + termos</small></article>
               <article><span>Consentimento</span><strong id="legalConsentStatus">Não confirmado</strong><small id="legalConsentDate">Aguardando aceite</small></article>
             </div>
             <div class="profile-actions-row legal-actions-row">
@@ -1387,7 +1411,7 @@
             </div>
             <div class="profile-actions-row legal-actions-row secondary-legal-actions">
               <button id="legalExportDataButton" class="profile-secondary-button" type="button" data-sensitive-action="manager">Exportar meus dados</button>
-              <button id="legalDataRequestButton" class="profile-secondary-button danger-soft-button" type="button" data-sensitive-action="owner">Solicitar exclusão</button>
+              <button id="legalDataRequestButton" class="profile-secondary-button danger-soft-button" type="button" data-sensitive-action="owner">Solicitar exclusão de dados</button>
             </div>
             <small id="legalReadinessStatus" class="family-health-status">Confirme os termos para manter o uso familiar claro e seguro.</small>
           </article>
@@ -1402,23 +1426,23 @@
             </div>
             <p>Conte o que aconteceu. O Ninou inclui automaticamente as informações técnicas necessárias, sem expor a rotina da família na tela.</p>
             <div class="support-beta-grid" aria-label="Informações técnicas do suporte" hidden>
-              <article><span>Versão</span><strong id="supportVersionLabel">v82.1.5</strong><small>Suporte + monitoramento</small></article>
-              <article><span>Último relatório</span><strong id="supportLastReportLabel">Nenhum</strong><small id="supportLastReportDetail">Aguardando teste real</small></article>
+              <article><span>Versão</span><strong id="supportVersionLabel">v82.1.7</strong><small>Atendimento Ninou</small></article>
+              <article><span>Último relatório</span><strong id="supportLastReportLabel">Nenhum</strong><small id="supportLastReportDetail">Nenhum relato enviado</small></article>
             </div>
             <div class="profile-actions-row support-actions-row">
               <button id="supportReportButton" class="profile-primary-button" type="button">Relatar um problema</button>
               <button id="supportCopyDiagnosticsButton" class="profile-secondary-button" type="button" hidden>Copiar diagnóstico</button>
               <button id="supportDownloadBackupButton" class="profile-secondary-button" type="button" hidden>Backup JSON</button>
             </div>
-            <small id="supportBetaStatus" class="family-health-status">Seu relato fica associado à conta e à família conectada para facilitar o atendimento.</small>
+            <small id="supportBetaStatus" class="family-health-status">Seu relato fica associado à conta e à família conectada para facilitar o atendimento, sem incluir a rotina completa.</small>
           </article>
           <article class="admin-access-card" id="familyAccessCard">
             <span>Acesso familiar</span>
             <strong id="familyAccessTitle">Acesso da família</strong>
-            <p id="familyAccessText">Nesta etapa o Ninou permite criar uma nova família, entrar com convite ou acessar uma conta familiar existente.</p>
+            <p id="familyAccessText">Use o código recebido após a aquisição para conectar esta conta à família liberada pelo atendimento.</p>
             <div class="access-status-row">
               <span id="familyAccessBadge" class="access-badge">Sem login</span>
-              <button id="createFamilyButton" class="secondary-login" type="button" hidden>Criar minha família</button>
+              <button id="createFamilyButton" class="secondary-login" type="button" hidden>Ativar família técnica</button>
             </div>
 
             <section id="createFamilyWizard" class="create-family-wizard commercial-create-family-panel" hidden aria-label="Criar nova família no Ninou">
@@ -1605,7 +1629,7 @@
                 </div>
                 <div class="commercial-readiness-score" aria-label="Status geral do beta">
                   <span>Candidato a beta</span>
-                  <strong>Beta em sequência controlada</strong>
+                  <strong>Ativação em sequência controlada</strong>
                   <p>Fluxo comercial consolidado com criação de família, convites, papéis, isolamento, suporte, privacidade e restrição visual de ações sensíveis.</p>
                 </div>
                 <ul class="commercial-readiness-list">
@@ -1630,7 +1654,7 @@
                   <em>Roteiro recomendado para liberar o beta sem pular validações.</em>
                 </div>
                 <ol class="admin-commercial-sequence-list">
-                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v82.1.5, publicar firestore.rules e limpar cache do PWA.</span></li>
+                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v82.1.7, publicar firestore.rules e limpar cache do PWA.</span></li>
                   <li><strong>2. Testar família Francisco</strong><span>Pai: luizfelipe.4092@hotmail.com. Mãe: marry@gmail.com. Ambos na mesma família.</span></li>
                   <li><strong>3. Criar família piloto</strong><span>Criar família nova com outro e-mail, gerar convite e aceitar em outro aparelho.</span></li>
                   <li><strong>4. Validar papéis</strong><span>Responsável/admin veem backup/exportação/exclusão; cuidador e visualização não veem ações sensíveis.</span></li>
@@ -1648,7 +1672,7 @@
                   <article><span>Política</span><strong>Visível no app</strong><small>Resumo claro sobre dados coletados, família e exportação.</small></article>
                   <article><span>Termos</span><strong>Uso familiar</strong><small>O app é diário de rotina, não ferramenta médica.</small></article>
                   <article><span>Exclusão</span><strong>Solicitação registrada</strong><small>Famílias podem pedir remoção de dados pelo Perfil.</small></article>
-                  <article><span>Consentimento</span><strong>Versão 82.1.5</strong><small>Aceite local e, quando possível, salvo na nuvem.</small></article>
+                  <article><span>Consentimento</span><strong>Versão 82.1.7</strong><small>Aceite local e, quando possível, salvo na nuvem.</small></article>
                 </div>
                 <ul class="commercial-readiness-list admin-legal-list">
                   <li data-state="ready"><strong>Política de privacidade</strong><span>Texto resumido disponível no Perfil e no modal legal.</span></li>
@@ -1658,7 +1682,7 @@
                 </ul>
               </section>
 
-              <section id="adminSupportBetaSection" class="admin-clean-section admin-support-beta-section" aria-label="Suporte e monitoramento do beta" data-global-admin-only="true">
+              <section id="adminSupportBetaSection" class="admin-clean-section admin-support-beta-section" aria-label="Suporte e monitoramento dos clientes" data-global-admin-only="true">
                 <div class="admin-invite-header">
                   <strong>Suporte e monitoramento</strong>
                   <em>Use no beta para acompanhar relatos, erros locais e diagnósticos enviados pelas famílias.</em>
@@ -1666,7 +1690,7 @@
                 <div class="admin-legal-grid admin-support-grid" aria-label="Indicadores de suporte do beta">
                   <article><span>Relatórios locais</span><strong id="adminSupportReportsCount">0</strong><small>neste aparelho/admin</small></article>
                   <article><span>Erros capturados</span><strong id="adminSupportErrorsCount">0</strong><small>últimos registros locais</small></article>
-                  <article><span>Versão</span><strong>82.1.5</strong><small>suporte + permissões</small></article>
+                  <article><span>Versão</span><strong>82.1.7</strong><small>suporte + permissões</small></article>
                   <article><span>Status</span><strong id="adminSupportStatusLabel">Aguardando beta</strong><small>testes com famílias reais</small></article>
                 </div>
                 <ul id="adminSupportReportsList" class="admin-access-list admin-support-reports-list">
@@ -1897,7 +1921,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v82.1.5</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v82.1.7</strong>
             <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -2030,16 +2054,16 @@
       <div class="guest-login-dialog commercial-entry-dialog" role="dialog" aria-modal="true" aria-labelledby="guestLoginTitle">
         <button id="guestModalCloseButton" class="guest-modal-close" type="button" aria-label="Fechar">×</button>
         <span>Bem-vindo ao Ninou</span>
-        <strong id="guestLoginTitle">Como sua família quer começar?</strong>
-        <p>Acompanhe sono, mamadas, fraldas, peso e rotina do bebê em família. Escolha o caminho correto para não misturar dados entre famílias.</p>
+        <strong id="guestLoginTitle">Como você quer acessar o Ninou?</strong>
+        <p>Ative o acesso adquirido, use um convite de cuidador ou entre em uma conta já conectada.</p>
         <div class="commercial-modal-options">
           <button id="guestModalCreateFamilyButton" class="commercial-modal-option primary" type="button">
-            <b>Criar minha família</b>
-            <small>Para responsáveis começando uma nova rotina no Ninou.</small>
+            <b>Ativar acesso adquirido</b>
+            <small>Para o responsável que recebeu o código de ativação do Ninou.</small>
           </button>
           <button id="guestModalInviteButton" class="commercial-modal-option" type="button">
-            <b>Entrar com convite</b>
-            <small>Para cuidadores convidados por uma família existente.</small>
+            <b>Usar convite de cuidador</b>
+            <small>Para quem foi convidado pelo responsável de uma família existente.</small>
           </button>
           <button id="guestModalLoginButton" class="commercial-modal-option" type="button">
             <b>Já tenho conta</b>
@@ -2051,7 +2075,7 @@
           <span>Convite seguro</span>
           <span>Cuidador por aparelho</span>
         </div>
-        <p class="commercial-modal-legal-note">Beta familiar: confirme o e-mail correto antes de criar ou aceitar convite. O Ninou organiza rotina, mas não substitui orientação pediátrica.</p>
+        <p class="commercial-modal-legal-note">Confirme o e-mail autorizado antes de ativar ou aceitar o convite. O Ninou organiza a rotina, mas não substitui orientação pediátrica.</p>
       </div>
     </section>
 
@@ -2342,7 +2366,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v82.1.5.mjs?v=82.1.5").catch((error) => {
+      import("./js/boot-v82.1.7.mjs?v=82.1.7").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2356,7 +2380,7 @@
     </script>
 
     <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.5";
+      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.7";
       initActionLauncher();
     </script>
   </body>

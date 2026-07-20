@@ -344,7 +344,22 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
   const customStart = Number(input.start);
   const customEnd = Number(input.end);
   if (Number.isFinite(customStart)) {
-    const end = Number.isFinite(customEnd) ? Math.max(customStart, customEnd) : customStart;
+    const resolvedEnd = resolveRoutineIntervalEnd(type, customStart, Number.isFinite(customEnd) ? customEnd : null);
+    if ((type === 'sono' || type === 'dormir') && resolvedEnd === null) {
+      const awakeStart = state.mode === 'awake' ? state.activeStartedAt : null;
+      return stamp({
+        ...state,
+        mode: 'sleeping',
+        activeStartedAt: customStart,
+        activeType: type,
+        activeDetail: type === 'dormir' ? 'Sono noturno' : 'Timer',
+        activeNotes: notes,
+        activeActor: normalizeRoutineActor(actor),
+        lastWakeWindowStartedAt: awakeStart,
+        lastWakeWindowMs: awakeStart ? Math.max(0, customStart - awakeStart) : null,
+      }, now, `start-${type}-manual`);
+    }
+    const end = resolvedEnd ?? customStart;
     return stamp({ ...state, events: [...state.events, makeEvent(type, customStart, end, detail, notes, amountMl, actor)] }, now, `record-${type}`);
   }
   if (type === 'sono' || type === 'dormir') return startSleep(state, type, now, actor);
@@ -444,10 +459,12 @@ export function getElapsedMs(state: DayState, now = Date.now()) {
 }
 
 export function getTodaySummary(state: DayState, now: number) {
-  const events = state.events;
+  const { dayStart, dayEnd } = getRoutineLocalDayBounds(now);
+  const summaryEnd = Math.min(dayEnd, now);
+  const events = getRoutineEventsForLocalDay(state.events, now);
   const sleepMs = events.filter((event) => event.type === 'sono' || event.type === 'dormir')
-    .reduce((total, event) => total + Math.max(0, event.end - event.start), 0)
-    + (state.mode === 'sleeping' && state.activeStartedAt ? Math.max(0, now - state.activeStartedAt) : 0);
+    .reduce((total, event) => total + Math.max(0, Math.min(event.end, summaryEnd) - Math.max(event.start, dayStart)), 0)
+    + (state.mode === 'sleeping' && state.activeStartedAt ? Math.max(0, summaryEnd - Math.max(state.activeStartedAt, dayStart)) : 0);
   return {
     sleepMs,
     feeding: events.filter((event) => event.type === 'amamentacao' || event.type === 'mamadeira').length,
@@ -507,6 +524,20 @@ export function formatTime(timestamp: number) {
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(timestamp);
 }
 
+function addLocalCalendarDays(timestamp: number, amount: number) {
+  const date = new Date(timestamp);
+  date.setDate(date.getDate() + amount);
+  return date.getTime();
+}
+
+export function resolveRoutineIntervalEnd(type: RecordType, start: number, end: number | null | undefined) {
+  if (!Number.isFinite(start) || end === null || end === undefined || !Number.isFinite(Number(end))) return null;
+  const rawEnd = Number(end);
+  const canCrossMidnight = type === 'sono' || type === 'dormir' || type === 'amamentacao';
+  if (canCrossMidnight && rawEnd < start) return addLocalCalendarDays(rawEnd, 1);
+  return Math.max(start, rawEnd);
+}
+
 export function getRoutineEventOrbitTimestamp(event: RoutineEvent) {
   const isSleepDuration = event.type === 'sono' || event.type === 'dormir';
   return isSleepDuration && event.end > event.start ? event.end : event.start;
@@ -527,6 +558,73 @@ export function getRoutineSleepSegmentForLocalDay(event: RoutineEvent, dayTimest
   const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
   if (event.start >= dayEnd || event.end <= dayStart) return null;
   return { start: Math.max(event.start, dayStart), end: Math.min(event.end, dayEnd) };
+}
+
+export type RoutineOrbitSleepSegment = {
+  event: RoutineEvent;
+  start: number;
+  end: number;
+  carriedFromPreviousDay: boolean;
+};
+
+function clockMilliseconds(timestamp: number) {
+  const date = new Date(timestamp);
+  return ((date.getHours() * 60 + date.getMinutes()) * 60 + date.getSeconds()) * 1000 + date.getMilliseconds();
+}
+
+export function routineOrbitSegmentsOverlap(
+  left: Pick<RoutineOrbitSleepSegment, 'start' | 'end'>,
+  right: Pick<RoutineOrbitSleepSegment, 'start' | 'end'>,
+  bufferMs = 12 * 60 * 1000,
+) {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const leftDuration = Math.min(dayMs, Math.max(0, left.end - left.start));
+  const rightDuration = Math.min(dayMs, Math.max(0, right.end - right.start));
+  if (!leftDuration || !rightDuration) return false;
+  if (leftDuration >= dayMs || rightDuration >= dayMs) return true;
+
+  const leftStart = clockMilliseconds(left.start);
+  const leftEnd = leftStart + leftDuration;
+  const rightStart = clockMilliseconds(right.start);
+  const rightEnd = rightStart + rightDuration;
+  return [-dayMs, 0, dayMs].some((shift) => {
+    const shiftedStart = rightStart + shift;
+    const shiftedEnd = rightEnd + shift;
+    return leftEnd + bufferMs >= shiftedStart && shiftedEnd + bufferMs >= leftStart;
+  });
+}
+
+export function getRoutineSleepSegmentsForOrbit(
+  events: RoutineEvent[],
+  dayTimestamp = Date.now(),
+  blockers: { start: number; end: number }[] = [],
+) {
+  const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
+  const previousDayStart = addLocalCalendarDays(dayStart, -1);
+  const candidates = events.flatMap<RoutineOrbitSleepSegment>((event) => {
+    if ((event.type !== 'sono' && event.type !== 'dormir') || event.end <= event.start) return [];
+    if (event.start >= dayEnd || event.end <= dayStart) return [];
+    const isCarryover = event.start < dayStart && event.end > dayStart && event.start >= previousDayStart && event.end - event.start < 24 * 60 * 60 * 1000;
+    return [{
+      event,
+      start: isCarryover ? event.start : Math.max(event.start, dayStart),
+      end: Math.min(event.end, dayEnd),
+      carriedFromPreviousDay: isCarryover,
+    }];
+  });
+
+  const currentSegments = candidates.filter((segment) => !segment.carriedFromPreviousDay);
+  const collisionSegments = [...currentSegments, ...blockers];
+  const visibleCarryovers: RoutineOrbitSleepSegment[] = [];
+  candidates
+    .filter((segment) => segment.carriedFromPreviousDay)
+    .sort((left, right) => right.end - left.end)
+    .forEach((segment) => {
+      const collides = [...collisionSegments, ...visibleCarryovers].some((other) => routineOrbitSegmentsOverlap(segment, other));
+      if (!collides) visibleCarryovers.push(segment);
+    });
+
+  return [...visibleCarryovers, ...currentSegments].sort((left, right) => left.start - right.start);
 }
 
 export function getRoutineEventsForLocalDay(events: RoutineEvent[], dayTimestamp = Date.now()) {

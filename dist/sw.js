@@ -1,14 +1,14 @@
-const CACHE_NAME = "ninou-v82-1-5-admin-web-portal";
-const APP_VERSION = "82.1.5";
-const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0"];
+const CACHE_NAME = "ninou-v82-1-7-customer-ready";
+const APP_VERSION = "82.1.7";
+const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
-  `/styles/admin-web-v82.1.5.css?v=${APP_VERSION}`,
-  `/js/boot-v82.1.5.mjs?v=${APP_VERSION}`,
-  `/js/ninou-admin-web-v82.1.5.mjs?v=${APP_VERSION}`,
-  `/js/services/admin-service-v82.1.5.js`,
-  `/js/ninou-core-v82.1.5.mjs?v=${APP_VERSION}`,
+  `/styles/admin-web-v82.1.7.css?v=${APP_VERSION}`,
+  `/js/boot-v82.1.7.mjs?v=${APP_VERSION}`,
+  `/js/ninou-admin-web-v82.1.7.mjs?v=${APP_VERSION}`,
+  `/js/services/admin-service-v82.1.7.js`,
+  `/js/ninou-core-v82.1.7.mjs?v=${APP_VERSION}`,
   `/js/ninou-ux-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/ninou-consistency-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/ninou-stability-v82.0.0.mjs?v=${APP_VERSION}`,
@@ -21,13 +21,14 @@ const APP_SHELL = [
   "/js/domain/record-types.js", "/js/domain/records.js", "/js/domain/sleep.js",
   "/js/domain/feeding.js", "/js/domain/diaper.js", "/js/domain/medication.js",
   "/js/domain/event-editor.js", "/js/domain/baby-profile.js", "/js/domain/weights.js",
-  "/js/domain/sounds.js", "/js/services/firebase-service.js", "/js/services/account-service.js",
+  "/js/domain/sounds.js", "/js/services/firebase-service.js", "/js/services/commercial-access-service.js", "/js/services/account-service.js",
   "/js/services/export-service.js", "/js/services/timer-service.js", "/js/storage/local-storage.js",
   "/js/ui/event-formatters.js", "/js/ui/home.js", "/js/ui/intelligence.js", "/js/ui/charts.js",
   "/js/ui/record-sheet.js", "/js/ui/action-launcher.js", "/js/ui/navigation.js", "/js/ui/app-navigation.js",
   "/js/ui/empty-states.js", "/js/ui/render-utils.js", "/js/ui/profile.js", "/js/ui/account.js",
   "/js/ui/theme.js", "/js/ui/sounds.js", "/js/utils/text.js", "/js/utils/time.js", "/js/utils/security.js",
   `/manifest.webmanifest?v=${APP_VERSION}`,
+  "/privacidade.html", "/termos.html", "/suporte.html",
   "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png",
   "/icons/actions/acordou.png", "/icons/actions/amamentacao.png", "/icons/actions/despertar-noturno.png",
   "/icons/actions/dormir.png", "/icons/actions/fralda.png", "/icons/actions/mamadeira.png", "/icons/actions/soneca.png",
@@ -82,12 +83,15 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith((async () => {
+      const standalonePages = new Set(["/privacidade.html", "/termos.html", "/suporte.html"]);
+      const isStandalonePage = standalonePages.has(url.pathname);
+      const cacheKey = isStandalonePage ? request : "/index.html";
       try {
         const response = await fetchWithTimeout(new Request(request, { cache: "no-store" }));
-        if (canStore(response)) (await caches.open(CACHE_NAME)).put("/index.html", response.clone());
+        if (canStore(response)) (await caches.open(CACHE_NAME)).put(cacheKey, response.clone());
         return response;
       } catch (_) {
-        return (await caches.match("/index.html")) || Response.error();
+        return (await caches.match(cacheKey)) || (isStandalonePage ? Response.error() : (await caches.match("/index.html"))) || Response.error();
       }
     })());
     return;

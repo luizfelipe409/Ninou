@@ -10,7 +10,7 @@ import {
   updateAdminMember,
   updateAdminTicket,
   updateAdminUser,
-} from './services/admin-service-v82.1.5.js';
+} from './services/admin-service-v82.1.7.js';
 
 let initialized = false;
 let workspace = null;
@@ -241,7 +241,7 @@ function dialogHead(titleText, subtitle = '') {
 }
 
 function openCreateFamily() {
-  openMainModal(`${dialogHead('Nova família cliente','Crie o espaço e convide o responsável.')}<form id="premiumCreateFamilyForm" class="premium-admin-form"><label>Nome da família<input name="familyName" required placeholder="Ex.: Família Oliveira"></label><label>Nome do bebê<input name="babyName" required></label><label>Nascimento (AAAA-MM-DD)<input name="birthDate" inputmode="numeric"></label><label>E-mail do responsável<input name="responsibleEmail" type="email"></label><small class="premium-admin-field-label">Plano inicial</small><div class="premium-admin-filters modal-chips">${['trial','premium','courtesy'].map((value) => `<button type="button" data-create-plan="${value}" aria-pressed="${value === 'trial'}">${planLabels[value]}</button>`).join('')}</div><input type="hidden" name="plan" value="trial"><label data-create-trial-days>Dias de teste<input name="days" type="number" value="14" min="1"></label><button class="premium-admin-primary" type="submit">${icon('plus',18)}<span>Criar família</span></button></form>`);
+  openMainModal(`${dialogHead('Nova família cliente','Crie o espaço e convide o responsável.')}<form id="premiumCreateFamilyForm" class="premium-admin-form"><label>Nome da família<input name="familyName" required placeholder="Ex.: Família Oliveira"></label><label>Nome do bebê<input name="babyName" required></label><label>Nascimento (AAAA-MM-DD)<input name="birthDate" inputmode="numeric"></label><label>E-mail do responsável<input name="responsibleEmail" type="email" required autocomplete="email" placeholder="cliente@email.com"></label><small class="premium-admin-field-label">Plano inicial</small><div class="premium-admin-filters modal-chips">${['trial','premium','courtesy'].map((value) => `<button type="button" data-create-plan="${value}" aria-pressed="${value === 'trial'}">${planLabels[value]}</button>`).join('')}</div><input type="hidden" name="plan" value="trial"><label data-create-access-days>Validade inicial (dias)<input name="days" type="number" value="14" min="1" max="730"></label><button class="premium-admin-primary" type="submit">${icon('plus',18)}<span>Criar família</span></button></form>`);
 }
 
 function openTicket(key) {
@@ -327,7 +327,7 @@ function bindEvents(panelRoot) {
   });
   panelRoot.addEventListener('submit', (event) => {
     event.preventDefault(); const form = event.target;
-    if (form.id === 'premiumCreateFamilyForm') { const values = Object.fromEntries(new FormData(form)); void mutate(async () => { const result = await createAdminFamily(apiRef.getCurrentUser(),values); selectedFamilyId = result.familyId; return result; },'Família criada e convite preparado.',{ closeMain: true, showFamily: true }); }
+    if (form.id === 'premiumCreateFamilyForm') { const values = Object.fromEntries(new FormData(form)); void mutate(async () => { const result = await createAdminFamily(apiRef.getCurrentUser(),values); selectedFamilyId = result.familyId; if (result.invite?.code) { const message = `Seu acesso ao Ninou está pronto. Abra ${location.origin}, toque em “Ativar meu acesso” e informe o código ${result.invite.code} usando o e-mail ${result.invite.email}.`; await navigator.clipboard?.writeText?.(message); } return result; },'Família criada. A mensagem de ativação foi copiada.',{ closeMain: true, showFamily: true }); }
     if (form.id === 'premiumInviteForm') { const family = selectedFamily(); const values = Object.fromEntries(new FormData(form)); if (family) void mutate(async () => { const invite = await createAdminInvite(apiRef.getCurrentUser(),family,values.email,values.role); await navigator.clipboard?.writeText?.(`Convite Ninou para ${family.name}: ${invite.code}`); },'Convite criado com validade de 7 dias.'); }
     if (form.id === 'premiumTicketForm') { const ticket = workspace.tickets.find((item) => `${item.familyId}::${item.id}` === form.dataset.ticketKey); const values = Object.fromEntries(new FormData(form)); if (ticket) void mutate(() => updateAdminTicket(apiRef.getCurrentUser(),ticket,values.status,values.note),'Atendimento atualizado.',{ closeMain: true }); }
   });
@@ -346,7 +346,7 @@ function bindEvents(panelRoot) {
     if (action === 'create-family') { openCreateFamily(); return; }
     if (action === 'dismiss-notice') { showNotice(''); return; }
     if (action === 'clear-search') { searchTerm = ''; render(); return; }
-    if (button.dataset.createPlan) { setPressedChoice(button,'[data-create-plan]','input[name="plan"]',button.dataset.createPlan); const days = button.closest('form')?.querySelector('[data-create-trial-days]'); if (days) days.hidden = button.dataset.createPlan !== 'trial'; return; }
+    if (button.dataset.createPlan) { setPressedChoice(button,'[data-create-plan]','input[name="plan"]',button.dataset.createPlan); const input = button.closest('form')?.querySelector('input[name="days"]'); if (input) input.value = button.dataset.createPlan === 'trial' ? '14' : '30'; return; }
     if (button.dataset.ticketStatus) { setPressedChoice(button,'[data-ticket-status]','input[name="status"]',button.dataset.ticketStatus); return; }
     if (button.dataset.inviteRole) { setPressedChoice(button,'[data-invite-role]','input[name="role"]',button.dataset.inviteRole); return; }
     if (button.dataset.familyPlanChoice) { button.closest('.premium-admin-panel')?.querySelectorAll('[data-family-plan-choice]').forEach((item) => item.setAttribute('aria-pressed',String(item === button))); return; }
@@ -356,7 +356,7 @@ function bindEvents(panelRoot) {
     if (button.dataset.familyStatus) { const next = button.dataset.familyStatus; if (next === family.status) return; openConfirmation({ titleText:`${statusLabels[next]} família`,message:`Alterar ${family.name} para o estado “${statusLabels[next]}”?`,familyId:family.id,destructive:next !== 'active',action:(reason) => adminOperation('updateAdminFamily',updateAdminFamily,apiRef.getCurrentUser(),family,{status:next},'family_status_updated',reason) }); return; }
     if (button.hasAttribute('data-family-integrity')) { void mutate(async () => { const report = await adminOperation('logIntegrityCheck',logIntegrityCheck,apiRef.getCurrentUser(),family); return report; }, integrityIssuesMessage(family)); return; }
     if (button.hasAttribute('data-family-export')) { const blob = new Blob([JSON.stringify({exportedAt:new Date().toISOString(),family},null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href=url; link.download=`ninou-${family.id}.json`; link.click(); URL.revokeObjectURL(url); return; }
-    if (button.dataset.inviteCopy) { void navigator.clipboard?.writeText?.(`Convite Ninou para ${family.name}: ${button.dataset.inviteCopy}`); familyFeedback = { familyId: family.id, message: 'Código de convite copiado.', tone: 'success' }; renderFamilyScreen(false); return; }
+    if (button.dataset.inviteCopy) { void navigator.clipboard?.writeText?.(`Seu acesso ao Ninou está pronto. Abra ${location.origin}, toque em “Ativar meu acesso” e informe o código ${button.dataset.inviteCopy}.`); familyFeedback = { familyId: family.id, message: 'Código de convite copiado.', tone: 'success' }; renderFamilyScreen(false); return; }
     if (button.dataset.inviteUpdate) { const invite = family.invites.find((item) => item.code === button.dataset.inviteUpdate); if (!invite) return; const renew = invite.status === 'expired'; openConfirmation({ titleText:renew ? 'Renovar convite' : 'Cancelar convite',message:`Alterar o convite enviado para ${invite.email}?`,familyId:family.id,destructive:!renew,action:(reason) => updateAdminInvite(apiRef.getCurrentUser(),invite,renew ? 'renew' : 'cancel',reason) }); return; }
     if (button.dataset.memberRole) { const member = family.members.find((item) => item.uid === button.dataset.memberRole); const role = button.dataset.role; if (member && role && member.role !== role) openConfirmation({ titleText:'Alterar permissão',message:`Alterar ${member.email} para ${roleLabels[role]}?`,familyId:family.id,action:(reason) => adminOperation('updateAdminMember',updateAdminMember,apiRef.getCurrentUser(),family,member,{role},reason) }); return; }
     if (button.dataset.memberOwner) { const member = family.members.find((item) => item.uid === button.dataset.memberOwner); if (member) openConfirmation({ titleText:normalizeAdminRole(member.role) === 'owner' ? 'Consolidar responsável' : 'Transferir responsabilidade',message:`${member.email} passará a ser o responsável principal da família.`,familyId:family.id,action:(reason) => adminOperation('transferAdminOwnership',transferAdminOwnership,apiRef.getCurrentUser(),family,member,reason) }); return; }

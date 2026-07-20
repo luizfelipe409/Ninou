@@ -1,43 +1,58 @@
-# Ninou v82.1.3 — Admin responsivo e sem resíduos legados
+# Ninou v82.1.8 — Mobile corrigido, web comercial preservada
 
-Projeto completo para publicação na Vercel. A experiência mobile é a fonte principal de produto e o web app acompanha os mesmos fluxos, regras e acabamento.
+Projeto completo do Ninou com:
 
-## O que mudou
+- aplicação web/PWA para famílias;
+- painel administrativo web;
+- aplicação mobile v82.1.8, com correção de sono atravessando a meia-noite e órbita de 24 horas;
+- Firebase/Firestore como camada de autenticação e sincronização.
 
-- Centro administrativo web mantém a linguagem do mobile e ganha composição própria para notebook e desktop, como a página inicial.
-- Abas administrativas não quebram: deslizam horizontalmente no mobile e formam cinco colunas estáveis em telas largas.
-- Métricas usam duas colunas no mobile e quatro colunas equilibradas no desktop.
-- Painéis antigos, checklists numerados e cards técnicos não aparecem nem durante o carregamento do admin.
-- Alertas de integridade duplicados são consolidados e a ação passa a se chamar “Verificar integridade”.
-- Detalhes de família abrem em uma tela integral com transição vertical; confirmações aparecem sobre essa tela sem perder o contexto.
-- Criação de família e ticket usam o mesmo diálogo central com transição suave do mobile.
-- Centro de Operação premium para o admin global, sem família pessoal ou card técnico.
-- Gestão de famílias clientes, usuários, convites, planos, suporte, auditoria e integridade.
-- Login inválido permanece na mesma tela e informa “E-mail ou senha incorretos”.
-- Confirmação moderna depois de registrar ou atualizar um cuidado.
-- Sonecas antigas não aparecem na órbita atual; sono atravessando a meia-noite é recortado a partir de 00:00.
-- Contas bloqueadas exibem o mesmo portal de acesso suspenso do mobile.
-- Tema claro do relógio com céu azul suave, nuvens, brilho solar e raios animados.
-- Tema escuro com céu cósmico, nebulosas, lua crescente e estrelas com movimento discreto.
-- As artes são arquivos SVG leves do próprio projeto; não dependem de serviços externos.
-- Sol e marcador continuam usando a hora local do aparelho.
-- A órbita mantém o mapeamento 00 no topo, 06 à direita, 12 embaixo e 18 à esquerda.
-- Menu +, amamentação, Perfil, painel de eventos e correções da v80.1.1 foram preservados.
+## Fluxo para uma nova família adquirente
 
-## Instalação
+1. No painel administrativo, abra **Nova família cliente**.
+2. Informe família, bebê e e-mail do responsável.
+3. Escolha o plano e a validade.
+4. Crie a família e envie ao cliente a mensagem de ativação copiada pelo painel.
+5. O cliente abre o Ninou, toca em **Ativar meu acesso** e usa o e-mail autorizado e o código recebido.
 
-Preserve apenas a pasta `.git` do projeto atual, remova os demais arquivos e copie o conteúdo desta pasta para a raiz do repositório.
+O cliente não consegue criar uma família comercial sem convite. Cuidadores adicionais entram por convites da família.
 
-## Validação
+## Controle de acesso
+
+- **Teste:** validade configurável, inicialmente 14 dias.
+- **Premium:** validade configurável, inicialmente 30 dias.
+- **Cortesia:** validade configurável.
+- **Suspenso:** bloqueia a entrada preservando os dados.
+- **Legado:** famílias antigas sem metadados comerciais continuam funcionando.
+
+Não há checkout ou cobrança automática nesta versão. Pagamento, renovação e liberação são administrados pelo painel.
+
+## Publicação na Vercel
 
 ```bash
 npm test
 npm run build
 ```
 
-A Vercel deve usar `npm run build` e publicar a pasta `dist`.
+Configuração esperada:
 
+- Build Command: `npm run build`
+- Output Directory: `dist`
 
-## Correções preservadas da v82.0.0
+Publique também as regras atualizadas do Firestore quando houver alteração nelas.
 
-Esta versão remove o sol HTML duplicado, corrige o X residual do painel de eventos, restaura o botão + no Perfil, compacta a barra inferior e reforça a visibilidade dos ícones no tema claro.
+## Verificação após publicar
+
+Use uma família piloto para validar:
+
+1. criação no painel;
+2. recebimento/cópia do código;
+3. criação de conta com o e-mail autorizado;
+4. ativação da família;
+5. login em outro aparelho;
+6. recuperação de senha;
+7. expiração e renovação do plano;
+8. páginas de privacidade, termos e suporte;
+9. instalação como PWA.
+
+Consulte `VALIDACAO_WEB_CLIENTES_v82.1.7.md` para a camada web e `mobile/VALIDACAO_SONECA_ORBITA_v82.1.8.md` para a correção mobile.

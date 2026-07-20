@@ -1,5 +1,5 @@
 export const INTERNAL_ADMIN_FAMILY_ID = 'ninou-family-luizfelipe';
-export const ADMIN_APP_VERSION = '82.1.3-mobile-admin';
+export const ADMIN_APP_VERSION = '82.1.8-mobile-admin';
 
 function text(value: unknown) {
   return String(value || '').trim().toLowerCase();

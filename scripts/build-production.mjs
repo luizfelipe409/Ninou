@@ -8,19 +8,23 @@ const publicFiles = [
   "index.html",
   "sw.js",
   "manifest.webmanifest",
+  "privacidade.html",
+  "termos.html",
+  "suporte.html",
 
   "styles/legacy.css",
   "styles/admin-mobile-parity-v82.1.1.css",
-  "styles/admin-web-v82.1.5.css",
+  "styles/admin-web-v82.1.7.css",
+  "styles/customer-ready-v82.1.7.css",
   "styles/premium-v82.0.0.css",
   "styles/focused-flow-v82.0.0.css",
 
   "js/boot-v82.0.0.mjs",
-  "js/boot-v82.1.5.mjs",
+  "js/boot-v82.1.7.mjs",
   "js/ninou-core-v82.0.0.mjs",
-  "js/ninou-core-v82.1.5.mjs",
+  "js/ninou-core-v82.1.7.mjs",
   "js/ninou-admin-v82.0.0.mjs",
-  "js/ninou-admin-web-v82.1.5.mjs",
+  "js/ninou-admin-web-v82.1.7.mjs",
   "js/ninou-ux-v82.0.0.mjs",
   "js/ninou-consistency-v82.0.0.mjs",
   "js/ninou-stability-v82.0.0.mjs",
@@ -48,8 +52,9 @@ const publicFiles = [
   "js/services/account-service.js",
   "js/services/export-service.js",
   "js/services/firebase-service.js",
+  "js/services/commercial-access-service.js",
   "js/services/admin-service.js",
-  "js/services/admin-service-v82.1.5.js",
+  "js/services/admin-service-v82.1.7.js",
   "js/services/timer-service.js",
   "js/storage/local-storage.js",
   "js/ui/account.js",
@@ -110,4 +115,4 @@ for (const file of publicFiles) {
   publicBytes += (await stat(source)).size;
 }
 
-console.log(`Build de produção v82.1.5 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);
+console.log(`Build de produção v82.1.7 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);

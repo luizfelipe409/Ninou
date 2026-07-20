@@ -19,6 +19,7 @@ type AuthContextValue = {
   user: User | null;
   access: FamilyAccess | null;
   status: AuthStatus;
+  accountStatus: string;
   error: string;
   submitting: boolean;
   login: (email: string, password: string) => Promise<boolean>;
@@ -33,12 +34,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [access, setAccess] = useState<FamilyAccess | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
+  const [accountStatus, setAccountStatus] = useState('active');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const loadAccess = useCallback(async (nextUser: User) => {
     if (isGlobalAppAdminEmail(nextUser.email)) {
       setAccess(null);
+      setAccountStatus('active');
       setError('');
       setStatus('admin');
       return;
@@ -46,8 +49,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus('resolving-family');
     setError('');
     try {
-      const accountStatus = await loadUserAccountStatus(nextUser);
-      if (['blocked', 'suspended', 'disabled'].includes(accountStatus)) {
+      const nextAccountStatus = await loadUserAccountStatus(nextUser);
+      setAccountStatus(nextAccountStatus);
+      if (['blocked', 'suspended', 'disabled', 'deletion_requested', 'deletion-pending', 'pending_deletion'].includes(nextAccountStatus)) {
         setAccess(null);
         setStatus('blocked');
         return;
@@ -57,6 +61,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setStatus(nextAccess ? 'ready' : 'no-family');
     } catch (loadError) {
       setAccess(null);
+      setAccountStatus('unknown');
       setError(getFirebaseErrorMessage(loadError));
       setStatus('error');
     }
@@ -65,6 +70,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => observeAuth((nextUser) => {
     setUser(nextUser);
     setAccess(null);
+    setAccountStatus('active');
     setError('');
     if (!nextUser) {
       setStatus('signed-out');
@@ -112,7 +118,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (user) await loadAccess(user);
   }, [loadAccess, user]);
 
-  const value = useMemo(() => ({ user, access, status, error, submitting, login, register, signOut, refreshAccess }), [user, access, status, error, submitting, login, register, signOut, refreshAccess]);
+  const value = useMemo(() => ({ user, access, status, accountStatus, error, submitting, login, register, signOut, refreshAccess }), [user, access, status, accountStatus, error, submitting, login, register, signOut, refreshAccess]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
