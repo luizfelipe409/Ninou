@@ -111,7 +111,7 @@ export default function ProfileScreen() {
     const acceptedAt = Date.now();
     updatePreferences({ legalAcceptedAt: acceptedAt });
     setWorking('legal');
-    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: '82.1.8', privacyVersion: '82.1.8', medicalDisclaimerVersion: '82.1.8', acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
+    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: '82.1.9', privacyVersion: '82.1.9', medicalDisclaimerVersion: '82.1.9', acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
     catch (legalError) { Alert.alert('Aceite salvo neste aparelho', `${getFirebaseErrorMessage(legalError)} A sincronização será tentada novamente.`); } finally { setWorking(''); }
   };
 
@@ -135,7 +135,7 @@ export default function ProfileScreen() {
   const sendSupport = async () => {
     if (!user || !supportMessage.trim()) return;
     setWorking('support');
-    const diagnostics = `Ninou Expo 82.1.8 | family=${access?.familyId || 'none'} | role=${access?.role || 'none'} | sync=${syncMessage}`;
+    const diagnostics = `Ninou Expo 82.1.9 | family=${access?.familyId || 'none'} | role=${access?.role || 'none'} | sync=${syncMessage}`;
     try { await submitSupportRequest(user, access?.familyId, { category: supportCategory, message: supportMessage.trim(), diagnostics }); setSupportMessage(''); setSupportOpen(false); Alert.alert('Relato enviado', 'Recebemos o problema junto com as informações técnicas necessárias.'); }
     catch (supportError) { Alert.alert('Não foi possível enviar', getFirebaseErrorMessage(supportError)); } finally { setWorking(''); }
   };

@@ -565,6 +565,10 @@ export type RoutineOrbitSleepSegment = {
   start: number;
   end: number;
   carriedFromPreviousDay: boolean;
+  orbitKey: string;
+  showStartCap: boolean;
+  showEndCap: boolean;
+  showStartLabel: boolean;
 };
 
 function clockMilliseconds(timestamp: number) {
@@ -599,32 +603,116 @@ export function getRoutineSleepSegmentsForOrbit(
   dayTimestamp = Date.now(),
   blockers: { start: number; end: number }[] = [],
 ) {
+  const dayMs = 24 * 60 * 60 * 1000;
   const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
   const previousDayStart = addLocalCalendarDays(dayStart, -1);
-  const candidates = events.flatMap<RoutineOrbitSleepSegment>((event) => {
+
+  const timestampAtClock = (localDayStart: number, clockMs: number) => {
+    const date = new Date(localDayStart);
+    const hours = Math.floor(clockMs / (60 * 60 * 1000));
+    const minutes = Math.floor((clockMs % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((clockMs % (60 * 1000)) / 1000);
+    const milliseconds = clockMs % 1000;
+    date.setHours(hours, minutes, seconds, milliseconds);
+    return date.getTime();
+  };
+
+  const toClockRanges = (segment: { start: number; end: number }) => {
+    const duration = Math.min(dayMs, Math.max(0, segment.end - segment.start));
+    if (!duration) return [] as { start: number; end: number }[];
+    if (duration >= dayMs) return [{ start: 0, end: dayMs }];
+    const startClock = clockMilliseconds(segment.start);
+    const linearEnd = startClock + duration;
+    return linearEnd <= dayMs
+      ? [{ start: startClock, end: linearEnd }]
+      : [{ start: startClock, end: dayMs }, { start: 0, end: linearEnd - dayMs }];
+  };
+
+  const firstCollisionAt = (
+    rangeStart: number,
+    rangeEnd: number,
+    collisionRanges: { start: number; end: number }[],
+  ) => collisionRanges.reduce((cutoff, range) => {
+    if (range.end <= rangeStart || range.start >= rangeEnd) return cutoff;
+    return Math.min(cutoff, Math.max(rangeStart, range.start));
+  }, rangeEnd);
+
+  const baseSegments = events.flatMap<RoutineOrbitSleepSegment>((event) => {
     if ((event.type !== 'sono' && event.type !== 'dormir') || event.end <= event.start) return [];
     if (event.start >= dayEnd || event.end <= dayStart) return [];
-    const isCarryover = event.start < dayStart && event.end > dayStart && event.start >= previousDayStart && event.end - event.start < 24 * 60 * 60 * 1000;
+    const carriedFromPreviousDay = event.start < dayStart
+      && event.end > dayStart
+      && event.start >= previousDayStart
+      && event.end - event.start < dayMs;
+    if (carriedFromPreviousDay) return [];
+    const start = Math.max(event.start, dayStart);
+    const end = Math.min(event.end, dayEnd);
     return [{
       event,
-      start: isCarryover ? event.start : Math.max(event.start, dayStart),
-      end: Math.min(event.end, dayEnd),
-      carriedFromPreviousDay: isCarryover,
+      start,
+      end,
+      carriedFromPreviousDay: false,
+      orbitKey: `${event.id}:current:${start}:${end}`,
+      showStartCap: true,
+      showEndCap: true,
+      showStartLabel: true,
     }];
   });
 
-  const currentSegments = candidates.filter((segment) => !segment.carriedFromPreviousDay);
-  const collisionSegments = [...currentSegments, ...blockers];
-  const visibleCarryovers: RoutineOrbitSleepSegment[] = [];
-  candidates
-    .filter((segment) => segment.carriedFromPreviousDay)
-    .sort((left, right) => right.end - left.end)
-    .forEach((segment) => {
-      const collides = [...collisionSegments, ...visibleCarryovers].some((other) => routineOrbitSegmentsOverlap(segment, other));
-      if (!collides) visibleCarryovers.push(segment);
-    });
+  const collisionRanges = [
+    ...baseSegments.map(({ start, end }) => ({ start, end })),
+    ...blockers,
+  ].flatMap(toClockRanges);
+  const nowClock = clockMilliseconds(dayTimestamp);
 
-  return [...visibleCarryovers, ...currentSegments].sort((left, right) => left.start - right.start);
+  const carryoverSegments = events.flatMap<RoutineOrbitSleepSegment>((event) => {
+    if ((event.type !== 'sono' && event.type !== 'dormir') || event.end <= event.start) return [];
+    const isCarryover = event.start < dayStart
+      && event.end > dayStart
+      && event.start >= previousDayStart
+      && event.end - event.start < dayMs;
+    if (!isCarryover) return [];
+
+    const startClock = clockMilliseconds(event.start);
+    const endClock = Math.min(dayMs, clockMilliseconds(event.end));
+    let eveningCutoff = firstCollisionAt(startClock, dayMs, collisionRanges);
+
+    // Quando o dia atual alcança novamente o horário em que o sono começou ontem,
+    // a cauda futura da volta anterior é ocultada progressivamente. O trecho já
+    // percorrido continua visível, assim como a parte real entre 00:00 e o término.
+    if (nowClock >= startClock) eveningCutoff = Math.min(eveningCutoff, nowClock);
+
+    const segments: RoutineOrbitSleepSegment[] = [];
+    if (eveningCutoff > startClock) {
+      segments.push({
+        event,
+        start: event.start,
+        end: timestampAtClock(previousDayStart, eveningCutoff),
+        carriedFromPreviousDay: true,
+        orbitKey: `${event.id}:carry:evening:${eveningCutoff}`,
+        showStartCap: true,
+        showEndCap: false,
+        showStartLabel: true,
+      });
+    }
+
+    const morningCutoff = firstCollisionAt(0, endClock, collisionRanges);
+    if (morningCutoff > 0) {
+      segments.push({
+        event,
+        start: dayStart,
+        end: timestampAtClock(dayStart, morningCutoff),
+        carriedFromPreviousDay: true,
+        orbitKey: `${event.id}:carry:morning:${morningCutoff}`,
+        showStartCap: false,
+        showEndCap: morningCutoff >= endClock,
+        showStartLabel: false,
+      });
+    }
+    return segments;
+  });
+
+  return [...carryoverSegments, ...baseSegments].sort((left, right) => left.start - right.start || left.end - right.end);
 }
 
 export function getRoutineEventsForLocalDay(events: RoutineEvent[], dayTimestamp = Date.now()) {

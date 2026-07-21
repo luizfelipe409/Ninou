@@ -1,3 +1,37 @@
+# Ninou v82.1.11 — paridade dos menus web com o mobile
+
+- Barra inferior da web alinhada ao componente mobile.
+- Menu do avatar da web alinhado ao mobile.
+- Mobile v82.1.9 preservado integralmente.
+
+Detalhes em `CHANGELOG_v82.1.11.md`.
+
+---
+
+# Ninou v82.1.10 — estabilidade de toque na web app
+
+- Botão principal sem escala ou deslocamento do ícone/texto.
+- Barra inferior com ícones e legendas geometricamente estáveis.
+- Tela de sons sem animação vertical ou cards que diminuem ao clicar.
+- Indicador de seleção dos sons com largura fixa.
+- Mobile v82.1.9 preservado integralmente.
+
+Detalhes em `CHANGELOG_v82.1.10.md`.
+
+---
+
+# Ninou v82.1.9 — Recorte progressivo da órbita noturna
+
+- Sono herdado continua visível no horário real em que ocorreu.
+- Ao alcançar novamente o trecho noturno, somente a parte futura que se sobreporia é ocultada.
+- Às 23:15, um sono de 21:34 a 02:00 permanece como 21:34–23:15 e 00:00–02:00.
+- Colisões não removem mais o registro inteiro.
+- Web comercial v82.1.7 preservada.
+
+Detalhes em `CHANGELOG_v82.1.9.md`.
+
+---
+
 # Ninou v82.1.8 — Soneca atravessando a meia-noite
 
 - Sono manual com fim no dia seguinte salvo como intervalo concluído.

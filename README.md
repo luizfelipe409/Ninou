@@ -1,10 +1,10 @@
-# Ninou v82.1.8 — Mobile corrigido, web comercial preservada
+# Ninou v82.1.11 — menus web alinhados ao mobile
 
 Projeto completo do Ninou com:
 
-- aplicação web/PWA para famílias;
+- aplicação web/PWA para famílias, com interações sem quique de ícones, textos ou cards;
 - painel administrativo web;
-- aplicação mobile v82.1.8, com correção de sono atravessando a meia-noite e órbita de 24 horas;
+- aplicação mobile v82.1.9, com sono atravessando a meia-noite e recorte progressivo da órbita;
 - Firebase/Firestore como camada de autenticação e sincronização.
 
 ## Fluxo para uma nova família adquirente
@@ -55,4 +55,4 @@ Use uma família piloto para validar:
 8. páginas de privacidade, termos e suporte;
 9. instalação como PWA.
 
-Consulte `VALIDACAO_WEB_CLIENTES_v82.1.7.md` para a camada web e `mobile/VALIDACAO_SONECA_ORBITA_v82.1.8.md` para a correção mobile.
+Consulte `VALIDACAO_WEB_CLIENTES_v82.1.7.md`, `VALIDACAO_ESTABILIDADE_WEB_v82.1.10.md` e `mobile/VALIDACAO_ORBITA_PROGRESSIVA_v82.1.9.md`.

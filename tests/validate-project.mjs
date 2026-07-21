@@ -5,9 +5,9 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const releaseVersion = "82.1.7";
+const releaseVersion = "82.1.11";
 const failures = [];
-const cssModules = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7"];
+const cssModules = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7", "web-interaction-stability-v82.1.10", "web-mobile-menu-parity-v82.1.11"];
 const conditionalCssModules = [];
 const adminCssModule = "admin-web-v82.1.7";
 const conditionalJsModules = ["js/ninou-admin-web-v82.1.7.mjs"];
@@ -15,7 +15,7 @@ const required = [
   "index.html", "sw.js", "manifest.webmanifest", "firestore.rules", "vercel.json", "privacidade.html", "termos.html", "suporte.html",
   ...[...cssModules, ...conditionalCssModules, adminCssModule].map((name) => `styles/${name}.css`),
   "js/boot-v82.1.7.mjs", "js/ninou-core-v82.1.7.mjs", ...conditionalJsModules, "js/services/admin-service-v82.1.7.js", "js/ninou-ux-v82.0.0.mjs",
-  "js/ninou-consistency-v82.0.0.mjs", "js/ninou-stability-v82.0.0.mjs",
+  "js/ninou-consistency-v82.0.0.mjs", "js/ninou-stability-v82.0.0.mjs", "js/web-mobile-menu-parity-v82.1.11.mjs",
   "js/runtime/architecture-v82.0.0.mjs", "js/runtime/diagnostics-v82.0.0.mjs", "js/runtime/visual-guard-v82.0.0.mjs",
   "js/core/event-bus.js", "js/core/app-state.js", "js/core/logger.js",
   "js/repositories/json-repository.js", "js/repositories/routine-repository.js", "js/repositories/profile-repository.js",
@@ -62,13 +62,17 @@ for (const removed of ["tokens", "foundation", "home", "components", "motion", "
   if (html.includes(`styles/${removed}.css`)) failures.push(`CSS antigo ainda ligado ao HTML: ${removed}`);
 }
 
+if (!html.includes('id="avatarMenuTrigger"')) failures.push("Acionador do menu do avatar ausente");
+if (!html.includes('id="avatarQuickMenu"')) failures.push("Menu do avatar alinhado ao mobile ausente");
+if (!html.includes('data-avatar-action="new-record"')) failures.push("Atalho de novo registro ausente do menu do avatar");
+if (!html.includes('data-avatar-theme="system"')) failures.push("Tema automático ausente do menu do avatar");
 if (!html.includes('id="subscriptionAccessPortal"')) failures.push("Portal de validade comercial ausente");
 if (!html.includes('Ativar meu acesso')) failures.push("Entrada comercial não prioriza ativação adquirida");
 if (!html.includes('id="guestPortalForgotPasswordButton"')) failures.push("Recuperação de senha ausente da entrada pública");
 if (!html.includes('/privacidade.html') || !html.includes('/termos.html')) failures.push("Links legais públicos ausentes");
 if (existsSync(join(root, ".env.local"))) failures.push(".env.local sensível permaneceu no pacote do projeto");
 const sw = await readFile(join(root, "sw.js"), "utf8");
-if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7"]')) failures.push("Service Worker não declara a autoridade visual revisada");
+if (!sw.includes('const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7", "web-interaction-stability-v82.1.10", "web-mobile-menu-parity-v82.1.11"]')) failures.push("Service Worker não declara a autoridade visual revisada");
 if (!sw.includes("styles/admin-web-v82.1.7.css?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o CSS administrativo versionado");
 if (!sw.includes("ninou-admin-web-v82.1.7.mjs?v=${APP_VERSION}")) failures.push("Service Worker não pré-carrega o runtime administrativo versionado");
 if (!sw.includes("services/admin-service-v82.1.7.js")) failures.push("Service Worker não pré-carrega o serviço administrativo versionado");
@@ -125,11 +129,18 @@ for (const removedSelector of ["chips-more-button", "quick-observation-custom", 
 for (const removedAnimation of ["appear", "recordHintFloat"]) {
   if (new RegExp(`@keyframes\\s+${removedAnimation}\\b`).test(legacyCss)) failures.push(`Animação órfã retornou ao legado: ${removedAnimation}`);
 }
-const totalImportant = (await Promise.all(cssModules.map(async (name) => {
+const importantByModule = Object.fromEntries(await Promise.all(cssModules.map(async (name) => {
   const css = await readFile(join(root, `styles/${name}.css`), "utf8");
-  return (css.match(/!important/g) || []).length;
-}))).reduce((total, count) => total + count, 0);
-if (totalImportant > 7550) failures.push(`Cascata comum usa !important em excesso: ${totalImportant}`);
+  return [name, (css.match(/!important/g) || []).length];
+})));
+const interactionImportant = importantByModule["web-interaction-stability-v82.1.10"] || 0;
+const menuParityImportant = importantByModule["web-mobile-menu-parity-v82.1.11"] || 0;
+const baseImportant = Object.entries(importantByModule)
+  .filter(([name]) => !["web-interaction-stability-v82.1.10", "web-mobile-menu-parity-v82.1.11"].includes(name))
+  .reduce((total, [, count]) => total + count, 0);
+const totalImportant = baseImportant + interactionImportant;
+if (baseImportant > 7550) failures.push(`Cascata comum base usa !important em excesso: ${baseImportant}`);
+if (interactionImportant > 140) failures.push(`Camada de estabilidade tátil usa !important em excesso: ${interactionImportant}`);
 for (const selector of ["client-family-member-avatar", "record-sheet-open .bottom-bar", "quick-observations-panel", "premium-new-episode-button", "record-types", "weight-sparkline svg", "event-meta-primary", "diaryChipsMoreButton", "paint-order: normal", "day-sky.svg", "night-sky.svg", "n8012-light-rays", "n8012-star-drift"]) {
   if (!premiumCss.includes(selector)) failures.push(`Autoridade premium não cobre: ${selector}`);
 }

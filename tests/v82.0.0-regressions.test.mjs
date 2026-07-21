@@ -4,7 +4,7 @@ import { getEventDaySegment } from "../js/domain/records.js";
 import { normalizeCommercialSubscription } from "../js/services/commercial-access-service.js";
 
 const root = new URL("../", import.meta.url);
-const [html, boot, core, adminRuntime, adminService, firebaseService, ux, stability, adminCss, premiumCss, focusedFlowCss, customerReadyCss, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
+const [html, boot, core, adminRuntime, adminService, firebaseService, ux, stability, adminCss, premiumCss, focusedFlowCss, customerReadyCss, webInteractionCss, menuParityCss, menuParityJs, actionLauncher, recordSheet, visualGuard, sw, build, vercel, daySky, nightSky] = await Promise.all([
   readFile(new URL("index.html", root), "utf8"),
   readFile(new URL("js/boot-v82.1.7.mjs", root), "utf8"),
   readFile(new URL("js/ninou-core-v82.1.7.mjs", root), "utf8"),
@@ -17,6 +17,9 @@ const [html, boot, core, adminRuntime, adminService, firebaseService, ux, stabil
   readFile(new URL("styles/premium-v82.0.0.css", root), "utf8"),
   readFile(new URL("styles/focused-flow-v82.0.0.css", root), "utf8"),
   readFile(new URL("styles/customer-ready-v82.1.7.css", root), "utf8"),
+  readFile(new URL("styles/web-interaction-stability-v82.1.10.css", root), "utf8"),
+  readFile(new URL("styles/web-mobile-menu-parity-v82.1.11.css", root), "utf8"),
+  readFile(new URL("js/web-mobile-menu-parity-v82.1.11.mjs", root), "utf8"),
   readFile(new URL("js/ui/action-launcher.js", root), "utf8"),
   readFile(new URL("js/ui/record-sheet.js", root), "utf8"),
   readFile(new URL("js/runtime/visual-guard-v82.0.0.mjs", root), "utf8"),
@@ -37,23 +40,23 @@ assert.match(adminRuntime, /const panelRoot = \$\('#adminWebPortal'\)/);
 assert.match(adminCss, /body\.global-admin-mode > main\.phone-shell[\s\S]*display: none !important/);
 assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
-assert.match(html, /styles\/legacy\.css\?v=82\.1\.7/);
+assert.match(html, /styles\/legacy\.css\?v=82\.1\.11/);
 assert.doesNotMatch(html, /styles\/admin-v82\.0\.0\.css/);
 assert.doesNotMatch(html, /<script[^>]+ninou-admin-web-v82\.1\.7\.mjs/);
-assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.1\.7/);
-assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.1\.7/);
+assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=82\.1\.11/);
+assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=82\.1\.11/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
-assert.match(html, /boot-v82\.1\.7\.mjs\?v=82\.1\.7/);
+assert.match(html, /boot-v82\.1\.7\.mjs\?v=82\.1\.11/);
 assert.match(html, /__NINOU_BOOT_WATCHDOG__/);
 assert.match(html, /history\.replaceState/);
 
-assert.match(boot, /const NINOU_VERSION = "82\.1\.7"/);
+assert.match(boot, /const NINOU_VERSION = "82\.1\.11"/);
 assert.match(boot, /const MIN_SPLASH_MS = 1500;/);
 assert.match(boot, /visual-guard-v82\.0\.0/);
-assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.1\.7"/);
-assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.1\.7-admin-web-portal"/);
-assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-web-v82\.1\.7\.css\?v=82\.1\.7"/);
-assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-web-v82\.1\.7\.mjs\?v=82\.1\.7"/);
+assert.match(core, /const NINOU_RUNTIME_VERSION = "82\.1\.11"/);
+assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "82\.1\.11-web-mobile-menu-parity"/);
+assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-web-v82\.1\.7\.css\?v=82\.1\.11"/);
+assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-web-v82\.1\.7\.mjs\?v=82\.1\.11"/);
 assert.match(core, /void ensureAdminRuntime\(\)/);
 assert.doesNotMatch(core, /createInviteButton\.addEventListener/);
 assert.doesNotMatch(core, /adminInvitePanel\.addEventListener/);
@@ -106,6 +109,21 @@ assert.match(premiumCss, /\.action-launcher-grid > button:is\(:active,:hover\)/)
 assert.match(focusedFlowCss, /\.breast-side-play::before/);
 assert.match(focusedFlowCss, /\.select-control-wrap > select[\s\S]*width: 100%/);
 assert.match(focusedFlowCss, /\.select-control-wrap > \.select-control-icon[\s\S]*translate3d\(0, -50%, 0\)/);
+assert.match(html, /styles\/web-interaction-stability-v82\.1\.10\.css\?v=82\.1\.11/);
+assert.match(webInteractionCss, /\.primary-action:active \.action-icon[\s\S]*transform: none !important/);
+assert.match(webInteractionCss, /\.bottom-nav button:active[\s\S]*transform: none !important/);
+assert.match(webInteractionCss, /\.sound-option > i::after[\s\S]*content: "▶"/);
+assert.match(webInteractionCss, /\.screen\[data-screen="sounds"\] \.sound-option:active[\s\S]*transform: none !important/);
+assert.match(html, /id="avatarMenuTrigger"/);
+assert.match(html, /id="avatarQuickMenu"/);
+assert.match(html, /data-avatar-target="profile"/);
+assert.match(html, /data-avatar-action="new-record"/);
+assert.match(menuParityCss, /Barra inferior espelhada no componente PremiumTabBar do mobile/);
+assert.match(menuParityCss, /\.avatar-quick-menu-sheet/);
+assert.match(menuParityCss, /\.bottom-nav > button\.active::after/);
+assert.match(menuParityJs, /const navIconByTarget = \{ today: 'home', diary: 'reader', trends: 'stats', sounds: 'music', profile: 'person' \}/);
+assert.match(menuParityJs, /function openAvatarMenu\(\)/);
+assert.match(menuParityJs, /function openReports\(\)/);
 
 assert.match(core, /return -90 \+ .*ORBIT_DAY_MINUTES.*\* 360/s);
 assert.match(core, /function getOrbitMarkerTimestamp[\s\S]*isSleepEvent\(event\)[\s\S]*getOrbitEventEnd\(event\)/);
@@ -140,10 +158,10 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v82-1-7-customer-ready/);
+assert.match(sw, /ninou-v82-1-11-web-mobile-menu-parity/);
 assert.match(sw, /ninou-admin-web-v82\.1\.7\.mjs\?v=\$\{APP_VERSION\}/);
-assert.match(sw, /const APP_VERSION = "82\.1\.7"/);
-assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0", "customer-ready-v82\.1\.7"\]/);
+assert.match(sw, /const APP_VERSION = "82\.1\.11"/);
+assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0", "customer-ready-v82\.1\.7", "web-interaction-stability-v82\.1\.10", "web-mobile-menu-parity-v82\.1\.11"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
 assert.match(build, /"assets\/clock-themes\/day-sky\.svg"/);
@@ -152,6 +170,9 @@ assert.match(build, /"js\/ninou-core-v82\.1\.7\.mjs"/);
 assert.match(build, /"js\/ninou-admin-web-v82\.1\.7\.mjs"/);
 assert.match(build, /"styles\/premium-v82\.0\.0\.css"/);
 assert.match(build, /"styles\/admin-web-v82\.1\.7\.css"/);
+assert.match(build, /"styles\/web-interaction-stability-v82\.1\.10\.css"/);
+assert.match(build, /"styles\/web-mobile-menu-parity-v82\.1\.11\.css"/);
+assert.match(build, /"js\/web-mobile-menu-parity-v82\.1\.11\.mjs"/);
 assert.doesNotMatch(build, /"styles\/admin-v82\.0\.0\.css"/);
 assert.doesNotMatch(build, /^\s*"(?:styles|js|icons|audio|assets|app\.js|styles\.css|firestore\.rules|vercel\.json)",?$/m);
 assert.match(vercel, /"buildCommand": "npm run build"/);

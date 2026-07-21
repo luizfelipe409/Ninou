@@ -131,7 +131,7 @@ export async function createPersonalFamily(user: User, input: { familyName: stri
   await setDoc(doc(db, 'families', familyId), {
     familyId, title: input.familyName, name: input.familyName, babyName: input.babyName, babyArticle: input.article,
     ownerUid: user.uid, ownerEmail: email, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation,
-    familyType: 'client', status: 'active', appVersion: '82.1.8-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    familyType: 'client', status: 'active', appVersion: '82.1.9-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   }, { merge: true });
   await setDoc(doc(db, 'families', familyId, 'profile', 'main'), {
     familyId, familyName: input.familyName, name: input.babyName, birthDate: input.birthDate, article: input.article,

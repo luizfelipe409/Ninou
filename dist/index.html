@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "82.1.7";
+        const VERSION = "82.1.11";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
         root.classList.add("ninou-booting", "ninou-v8200");
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=82.1.7" />
+    <link rel="manifest" href="./manifest.webmanifest?v=82.1.11" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,11 +54,13 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.7" />
-    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.7" />
-    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.7" />
-    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=82.1.7" />
-    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=82.1.7" />
+    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.11" />
+    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.11" />
+    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.11" />
+    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=82.1.11" />
+    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=82.1.11" />
+    <link rel="stylesheet" href="./styles/web-interaction-stability-v82.1.10.css?v=82.1.11" />
+    <link rel="stylesheet" href="./styles/web-mobile-menu-parity-v82.1.11.css?v=82.1.11" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -301,13 +303,13 @@
 
     <main class="phone-shell premium-final-shell" aria-label="Ninou">
       <header class="app-header">
-        <div class="identity">
+        <button id="avatarMenuTrigger" class="identity avatar-menu-trigger" type="button" aria-label="Abrir menu do avatar" aria-haspopup="dialog" aria-controls="avatarQuickMenu" aria-expanded="false">
           <img src="./icons/icon-192.png" alt="" />
           <div>
             <span>Ninou</span>
             <strong id="diaryTitle">Diário do bebê</strong>
           </div>
-        </div>
+        </button>
         <button class="sync-pill offline" type="button" aria-label="Status da sincronização">Off-line</button>
       </header>
 
@@ -2040,15 +2042,65 @@
 
       <div id="bottomBar" class="bottom-bar">
         <nav class="bottom-nav" aria-label="Menu principal">
-          <button class="active" type="button" data-target="today"><span class="nav-symbol" aria-hidden="true">⌂</span><span>Hoje</span></button>
-          <button type="button" data-target="diary"><span class="nav-symbol" aria-hidden="true">☰</span><span>Diário</span></button>
-          <button type="button" data-target="trends"><span class="nav-symbol" aria-hidden="true">▥</span><span>Dados</span></button>
-          <button type="button" data-target="sounds"><span class="nav-symbol" aria-hidden="true">♪</span><span>Sons</span></button>
-          <button type="button" data-target="profile"><span class="nav-symbol" aria-hidden="true">○</span><span>Perfil</span></button>
+          <button class="active" type="button" data-target="today"><span class="nav-symbol" aria-hidden="true"></span><span class="nav-label">Hoje</span></button>
+          <button type="button" data-target="diary"><span class="nav-symbol" aria-hidden="true"></span><span class="nav-label">Diário</span></button>
+          <button type="button" data-target="trends"><span class="nav-symbol" aria-hidden="true"></span><span class="nav-label">Dados</span></button>
+          <button type="button" data-target="sounds"><span class="nav-symbol" aria-hidden="true"></span><span class="nav-label">Sons</span></button>
+          <button type="button" data-target="profile"><span class="nav-symbol" aria-hidden="true"></span><span class="nav-label">Perfil</span></button>
         </nav>
         <button id="openActionLauncherButton" class="fab fab-real-plus" type="button" aria-label="Abrir menu de novos registros" aria-haspopup="dialog" aria-controls="actionLauncher"><span aria-hidden="true">+</span></button>
       </div>
     </main>
+
+    <section id="avatarQuickMenu" class="avatar-quick-menu" aria-label="Menu do diário Ninou" hidden>
+      <button class="avatar-quick-menu-backdrop" type="button" data-close-avatar-quick-menu aria-label="Fechar menu"></button>
+      <div class="avatar-quick-menu-sheet" role="dialog" aria-modal="true" aria-labelledby="avatarQuickMenuName">
+        <div class="avatar-quick-menu-content">
+          <div class="avatar-menu-handle" aria-hidden="true"></div>
+          <div class="avatar-menu-identity">
+            <div class="avatar-menu-photo"><img id="avatarQuickMenuPhoto" src="./icons/icon-192.png" alt="" /></div>
+            <div class="avatar-menu-copy">
+              <span class="avatar-menu-brand">DIÁRIO NINOU</span>
+              <strong id="avatarQuickMenuName" class="avatar-menu-name">Seu bebê</strong>
+              <small id="avatarQuickMenuMeta" class="avatar-menu-meta">Dados salvos neste aparelho</small>
+            </div>
+            <button id="avatarQuickMenuClose" class="avatar-menu-close" type="button" aria-label="Fechar menu">×</button>
+          </div>
+
+          <div class="avatar-menu-family-status">
+            <i id="avatarQuickMenuStatusDot" class="avatar-menu-status-dot" aria-hidden="true"></i>
+            <div class="avatar-menu-status-copy">
+              <strong id="avatarQuickMenuSyncTitle">Neste aparelho</strong>
+              <small>As alterações desta família são atualizadas em tempo real.</small>
+            </div>
+            <span id="avatarQuickMenuCloud" class="avatar-menu-cloud-icon" aria-hidden="true"></span>
+          </div>
+
+          <span class="avatar-menu-section-label">ACESSOS RÁPIDOS</span>
+          <div class="avatar-menu-grid">
+            <button class="avatar-menu-item" type="button" data-avatar-target="profile"><span class="avatar-menu-item-icon" data-avatar-icon="profile" aria-hidden="true"></span><strong>Perfil</strong><small>Bebê e família</small></button>
+            <button class="avatar-menu-item" type="button" data-avatar-target="diary"><span class="avatar-menu-item-icon" data-avatar-icon="diary" aria-hidden="true"></span><strong>Diário</strong><small>Histórico completo</small></button>
+            <button class="avatar-menu-item" type="button" data-avatar-target="trends"><span class="avatar-menu-item-icon" data-avatar-icon="trends" aria-hidden="true"></span><strong>Dados</strong><small>Tendências</small></button>
+            <button class="avatar-menu-item" type="button" data-avatar-target="sounds"><span class="avatar-menu-item-icon" data-avatar-icon="sounds" aria-hidden="true"></span><strong>Sons</strong><small>Relaxamento</small></button>
+            <button class="avatar-menu-item" type="button" data-avatar-action="reports"><span class="avatar-menu-item-icon" data-avatar-icon="reports" aria-hidden="true"></span><strong>Relatórios</strong><small>PDF e exportações</small></button>
+            <button class="avatar-menu-item" type="button" data-avatar-action="new-record"><span class="avatar-menu-item-icon" data-avatar-icon="newRecord" aria-hidden="true"></span><strong>Novo registro</strong><small>Registrar cuidado</small></button>
+          </div>
+
+          <span class="avatar-menu-section-label">APARÊNCIA</span>
+          <div class="avatar-theme-segment" role="group" aria-label="Tema do aplicativo">
+            <button class="avatar-theme-choice" type="button" data-avatar-theme="light" aria-pressed="false"><span class="avatar-theme-icon" aria-hidden="true"></span><span>Claro</span></button>
+            <button class="avatar-theme-choice" type="button" data-avatar-theme="dark" aria-pressed="false"><span class="avatar-theme-icon" aria-hidden="true"></span><span>Escuro</span></button>
+            <button class="avatar-theme-choice" type="button" data-avatar-theme="system" aria-pressed="false"><span class="avatar-theme-icon" aria-hidden="true"></span><span>Automático</span></button>
+          </div>
+
+          <button id="avatarQuickMenuSignOut" class="avatar-menu-signout" type="button">
+            <span class="avatar-menu-signout-icon" aria-hidden="true"></span>
+            <span class="avatar-menu-signout-copy"><strong>Sair desta conta</strong><small>O diário continuará salvo e sincronizado.</small></span>
+            <span class="avatar-menu-chevron" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </section>
 
     <section id="guestOnboardingModal" class="guest-login-modal commercial-entry-modal" aria-label="Começar no Ninou" hidden>
       <div class="guest-login-dialog commercial-entry-dialog" role="dialog" aria-modal="true" aria-labelledby="guestLoginTitle">
@@ -2366,7 +2418,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v82.1.7.mjs?v=82.1.7").catch((error) => {
+      import("./js/boot-v82.1.7.mjs?v=82.1.11").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2380,8 +2432,9 @@
     </script>
 
     <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.7";
+      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.11";
       initActionLauncher();
     </script>
+    <script type="module" src="./js/web-mobile-menu-parity-v82.1.11.mjs?v=82.1.11"></script>
   </body>
 </html>

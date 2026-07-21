@@ -152,8 +152,8 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
     return () => { breatheLoop.stop(); twinkleLoop.stop(); };
   }, [breathe, twinkle]);
 
-  const renderArc = (start: number, end: number, stroke: string, key: string, active = false, primary = false) => {
-    const durationFraction = Math.max(0.004, Math.min(0.995, (end - start) / 86400000));
+  const renderArc = (start: number, end: number, stroke: string, key: string, active = false, primary = false, showStartCap = true, showEndCap = !active, showStartLabel = true) => {
+    const durationFraction = Math.max(1 / 1440, Math.min(0.995, (end - start) / 86400000));
     const arcLength = circumference * durationFraction;
     const dashOffset = -dayFraction(start) * circumference;
     const startPoint = svgPointForTime(start, size, orbitRadius);
@@ -164,11 +164,11 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
       <G key={key} opacity={primary ? 1 : 0.48}>
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={isDark ? 'rgba(137,108,238,0.30)' : 'rgba(104,79,178,0.20)'} strokeWidth={primary ? 18 : 12} strokeLinecap="round" strokeDasharray={`${arcLength} ${circumference - arcLength}`} strokeDashoffset={dashOffset} transform={`rotate(-90 ${center} ${center})`} />
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={stroke} strokeWidth={segmentWidth} strokeLinecap="round" strokeDasharray={`${arcLength} ${circumference - arcLength}`} strokeDashoffset={dashOffset} transform={`rotate(-90 ${center} ${center})`} />
-        <Circle cx={startPoint.x} cy={startPoint.y} r={7.5} fill="rgba(132,99,231,0.13)" stroke="rgba(181,157,255,0.32)" strokeWidth={1} />
-        {!active ? <Circle cx={endPoint.x} cy={endPoint.y} r={8} fill="rgba(119,226,204,0.14)" stroke="rgba(145,242,222,0.42)" strokeWidth={1} /> : null}
-        <Circle cx={startPoint.x} cy={startPoint.y} r={4} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.2} />
-        {!active ? <Circle cx={endPoint.x} cy={endPoint.y} r={5.5} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.4} /> : null}
-        {primary && !active ? (
+        {showStartCap ? <Circle cx={startPoint.x} cy={startPoint.y} r={7.5} fill="rgba(132,99,231,0.13)" stroke="rgba(181,157,255,0.32)" strokeWidth={1} /> : null}
+        {showEndCap ? <Circle cx={endPoint.x} cy={endPoint.y} r={8} fill="rgba(119,226,204,0.14)" stroke="rgba(145,242,222,0.42)" strokeWidth={1} /> : null}
+        {showStartCap ? <Circle cx={startPoint.x} cy={startPoint.y} r={4} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.2} /> : null}
+        {showEndCap ? <Circle cx={endPoint.x} cy={endPoint.y} r={5.5} fill={isDark ? '#F6F1FF' : '#FFFFFF'} stroke="#7054BD" strokeWidth={2.4} /> : null}
+        {primary && !active && showStartLabel ? (
           <G>
             <Rect x={labelPoint.x - 22} y={labelPoint.y - 10} width={44} height={20} rx={10} fill={isDark ? 'rgba(23,16,46,0.96)' : 'rgba(255,255,255,0.96)'} stroke={isDark ? 'rgba(188,158,255,0.72)' : 'rgba(103,78,178,0.30)'} strokeWidth={1} />
             <SvgText x={labelPoint.x} y={labelPoint.y + 3.2} fill={isDark ? '#FFF8EC' : '#332650'} fontSize={9} fontWeight="900" textAnchor="middle">{formatTime(start)}</SvgText>
@@ -230,7 +230,7 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
         </Defs>
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={isDark ? 'rgba(92,51,194,0.20)' : 'rgba(92,76,152,0.13)'} strokeWidth={isDark ? 10 : 11} />
         <Circle cx={center} cy={center} r={orbitRadius} fill="none" stroke={isDark ? 'rgba(155,117,255,0.64)' : 'rgba(255,255,255,0.86)'} strokeWidth={isDark ? 4.5 : 5.8} />
-        {completedSleep.map((segment) => renderArc(segment.start, segment.end, 'url(#completedJourney)', segment.event.id, false, segment.event.id === primaryJourneyId))}
+        {completedSleep.map((segment) => renderArc(segment.start, segment.end, 'url(#completedJourney)', segment.orbitKey, false, segment.event.id === primaryJourneyId, segment.showStartCap, segment.showEndCap, segment.showStartLabel))}
         {activeArc ? renderArc(activeArc.start, activeArc.end, 'url(#activeJourney)', activeArc.id, true, true) : null}
       </Svg>
 

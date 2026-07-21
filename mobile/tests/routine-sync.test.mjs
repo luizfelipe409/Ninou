@@ -97,24 +97,68 @@ assert.equal(openManualSleep.mode, 'sleeping');
 assert.equal(openManualSleep.activeStartedAt, exactOvernightStart);
 assert.equal(openManualSleep.events.length, 0);
 
-const orbitAtAfternoon = getRoutineSleepSegmentsForOrbit([completedOvernightEvent], new Date(2026, 6, 19, 15, 0, 0, 0).getTime());
-assert.equal(orbitAtAfternoon.length, 1);
-assert.equal(orbitAtAfternoon[0].carriedFromPreviousDay, true);
-assert.equal(orbitAtAfternoon[0].start, exactOvernightStart);
-assert.equal(orbitAtAfternoon[0].end, exactOvernightEnd);
-assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], new Date(2026, 6, 19, 23, 59, 0, 0).getTime()).length, 1);
-assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], new Date(2026, 6, 20, 0, 1, 0, 0).getTime()).length, 0);
+const progressiveStart = new Date(2026, 6, 19, 21, 34, 0, 0).getTime();
+const progressiveEnd = new Date(2026, 6, 20, 2, 0, 0, 0).getTime();
+const progressiveOvernightEvent = {
+  ...completedOvernightEvent,
+  id: 'progressive-overnight-sleep',
+  start: progressiveStart,
+  end: progressiveEnd,
+};
+const progressiveDayStart = new Date(2026, 6, 20, 0, 0, 0, 0).getTime();
+const progressivePreviousMidnight = progressiveDayStart;
+
+const orbitAtMorning = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 6, 43, 0, 0).getTime());
+assert.equal(orbitAtMorning.length, 2);
+assert.deepEqual(orbitAtMorning.map((segment) => [segment.start, segment.end]), [
+  [progressiveStart, progressivePreviousMidnight],
+  [progressiveDayStart, progressiveEnd],
+]);
+assert.deepEqual(orbitAtMorning.map((segment) => [segment.showStartCap, segment.showEndCap, segment.showStartLabel]), [
+  [true, false, true],
+  [false, true, false],
+]);
+
+const orbitBeforeRepeatedStart = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 21, 20, 0, 0).getTime());
+assert.equal(orbitBeforeRepeatedStart[0].end, progressiveDayStart);
+
+const orbitAt2315 = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 23, 15, 0, 0).getTime());
+assert.equal(orbitAt2315.length, 2);
+assert.equal(orbitAt2315[0].start, progressiveStart);
+assert.equal(orbitAt2315[0].end, new Date(2026, 6, 19, 23, 15, 0, 0).getTime());
+assert.equal(orbitAt2315[1].start, progressiveDayStart);
+assert.equal(orbitAt2315[1].end, progressiveEnd);
+assert.equal(orbitAt2315[0].showEndCap, false);
+assert.equal(orbitAt2315[1].showStartCap, false);
+
+const orbitAt2359 = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 23, 59, 0, 0).getTime());
+assert.equal(orbitAt2359[0].end, new Date(2026, 6, 19, 23, 59, 0, 0).getTime());
+assert.equal(getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 21, 0, 1, 0, 0).getTime()).length, 0);
 
 const nonOverlappingBlocker = [{
-  start: new Date(2026, 6, 19, 10, 0, 0, 0).getTime(),
-  end: new Date(2026, 6, 19, 11, 0, 0, 0).getTime(),
+  start: new Date(2026, 6, 20, 10, 0, 0, 0).getTime(),
+  end: new Date(2026, 6, 20, 11, 0, 0, 0).getTime(),
 }];
-const overlappingBlocker = [{
-  start: new Date(2026, 6, 19, 20, 40, 0, 0).getTime(),
-  end: new Date(2026, 6, 19, 21, 10, 0, 0).getTime(),
+const overlappingEveningBlocker = [{
+  start: new Date(2026, 6, 20, 23, 15, 0, 0).getTime(),
+  end: new Date(2026, 6, 20, 23, 45, 0, 0).getTime(),
 }];
-assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], orbitToday, nonOverlappingBlocker).length, 1);
-assert.equal(getRoutineSleepSegmentsForOrbit([completedOvernightEvent], orbitToday, overlappingBlocker).length, 0);
+const overlappingMorningBlocker = [{
+  start: new Date(2026, 6, 20, 1, 0, 0, 0).getTime(),
+  end: new Date(2026, 6, 20, 1, 30, 0, 0).getTime(),
+}];
+const orbitWithNonOverlap = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 6, 43, 0, 0).getTime(), nonOverlappingBlocker);
+assert.equal(orbitWithNonOverlap.length, 2);
+assert.equal(orbitWithNonOverlap[0].end, progressiveDayStart);
+assert.equal(orbitWithNonOverlap[1].end, progressiveEnd);
+const orbitWithEveningCollision = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 20, 0, 0, 0).getTime(), overlappingEveningBlocker);
+assert.equal(orbitWithEveningCollision.length, 2);
+assert.equal(orbitWithEveningCollision[0].end, new Date(2026, 6, 19, 23, 15, 0, 0).getTime());
+const orbitWithMorningCollision = getRoutineSleepSegmentsForOrbit([progressiveOvernightEvent], new Date(2026, 6, 20, 6, 43, 0, 0).getTime(), overlappingMorningBlocker);
+assert.equal(orbitWithMorningCollision.length, 2);
+assert.equal(orbitWithMorningCollision[1].end, new Date(2026, 6, 20, 1, 0, 0, 0).getTime());
+assert.equal(orbitWithMorningCollision[1].showEndCap, false);
+
 assert.equal(getTodaySummary({ ...createEmptyDayState(), events: [completedOvernightEvent] }, new Date(2026, 6, 19, 15, 0, 0, 0).getTime()).sleepMs, 2.5 * 60 * 60 * 1000);
 
 const dayStart = new Date(2026, 6, 18, 0, 0, 0, 0).getTime();

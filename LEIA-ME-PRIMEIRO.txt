@@ -1,10 +1,10 @@
-NINOU v82.1.8 — MOBILE CORRIGIDO + WEB COMERCIAL
+NINOU v82.1.10 — ESTABILIDADE DE TOQUE NA WEB
 
 1. Execute: npm test
 2. Execute: npm run build
 3. Publique a pasta dist pela Vercel.
-4. Crie uma família piloto no painel administrativo.
-5. Valide a ativação com e-mail e código reais antes de liberar novos clientes.
+4. Após publicar, feche e reabra o PWA ou limpe o cache antigo uma vez.
+5. Valide o botão principal, a barra inferior e a tela de sons.
 
-A versão não possui checkout automático. Planos, validade e renovação são controlados pelo painel administrativo.
-A pasta mobile está na versão 82.1.8. A aplicação web comercial permanece funcionalmente igual à v82.1.7.
+A correção desta versão é exclusiva da web app.
+A pasta mobile permanece exatamente na versão 82.1.9 e não foi modificada.

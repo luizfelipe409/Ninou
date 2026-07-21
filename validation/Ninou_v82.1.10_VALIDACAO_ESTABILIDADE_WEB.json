@@ -1,0 +1,701 @@
+{
+  "version": "82.1.10",
+  "reports": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "primary": {
+        "before": {
+          "primary_button": {
+            "x": 14,
+            "y": 16,
+            "width": 362,
+            "height": 92
+          },
+          "primary_icon": {
+            "x": 29,
+            "y": 40,
+            "width": 44,
+            "height": 44
+          },
+          "primary_label": {
+            "x": 81,
+            "y": 52.797,
+            "width": 280,
+            "height": 18.391
+          }
+        },
+        "pressed": {
+          "primary_button": {
+            "x": 14,
+            "y": 16,
+            "width": 362,
+            "height": 92
+          },
+          "primary_icon": {
+            "x": 29,
+            "y": 40,
+            "width": 44,
+            "height": 44
+          },
+          "primary_label": {
+            "x": 81,
+            "y": 52.797,
+            "width": 280,
+            "height": 18.391
+          }
+        },
+        "after_state_change": {
+          "primary_button": {
+            "x": 14,
+            "y": 16,
+            "width": 362,
+            "height": 92
+          },
+          "primary_icon": {
+            "x": 29,
+            "y": 40,
+            "width": 44,
+            "height": 44
+          },
+          "primary_label": {
+            "x": 81,
+            "y": 52.797,
+            "width": 280,
+            "height": 18.391
+          }
+        },
+        "press_max_delta": 0,
+        "state_change_max_delta": 0
+      },
+      "navigation": {
+        "before": {
+          "nav_today": {
+            "x": 16,
+            "y": 773,
+            "width": 57.391,
+            "height": 56
+          },
+          "nav_today_icon": {
+            "x": 34.688,
+            "y": 784,
+            "width": 20,
+            "height": 20
+          },
+          "nav_today_label": {
+            "x": 18,
+            "y": 807,
+            "width": 53.391,
+            "height": 11
+          },
+          "nav_sounds": {
+            "x": 194.188,
+            "y": 773,
+            "width": 57.406,
+            "height": 56
+          },
+          "nav_sounds_icon": {
+            "x": 212.891,
+            "y": 784,
+            "width": 20,
+            "height": 20
+          },
+          "nav_sounds_label": {
+            "x": 196.188,
+            "y": 807,
+            "width": 53.406,
+            "height": 11
+          }
+        },
+        "pressed": {
+          "nav_today": {
+            "x": 16,
+            "y": 773,
+            "width": 57.391,
+            "height": 56
+          },
+          "nav_today_icon": {
+            "x": 34.688,
+            "y": 784,
+            "width": 20,
+            "height": 20
+          },
+          "nav_today_label": {
+            "x": 18,
+            "y": 807,
+            "width": 53.391,
+            "height": 11
+          },
+          "nav_sounds": {
+            "x": 194.188,
+            "y": 773,
+            "width": 57.406,
+            "height": 56
+          },
+          "nav_sounds_icon": {
+            "x": 212.891,
+            "y": 784,
+            "width": 20,
+            "height": 20
+          },
+          "nav_sounds_label": {
+            "x": 196.188,
+            "y": 807,
+            "width": 53.406,
+            "height": 11
+          }
+        },
+        "after_active_change": {
+          "nav_today": {
+            "x": 16,
+            "y": 773,
+            "width": 57.391,
+            "height": 56
+          },
+          "nav_today_icon": {
+            "x": 34.688,
+            "y": 784,
+            "width": 20,
+            "height": 20
+          },
+          "nav_today_label": {
+            "x": 18,
+            "y": 807,
+            "width": 53.391,
+            "height": 11
+          },
+          "nav_sounds": {
+            "x": 194.188,
+            "y": 773,
+            "width": 57.406,
+            "height": 56
+          },
+          "nav_sounds_icon": {
+            "x": 212.891,
+            "y": 784,
+            "width": 20,
+            "height": 20
+          },
+          "nav_sounds_label": {
+            "x": 196.188,
+            "y": 807,
+            "width": 53.406,
+            "height": 11
+          }
+        },
+        "press_max_delta": 0,
+        "active_change_max_delta": 0
+      },
+      "sounds": {
+        "computed_screen": {
+          "animationName": "none",
+          "transform": "none"
+        },
+        "entry_80ms_max_delta": 0,
+        "entry_320ms_max_delta": 0,
+        "press_max_delta": 0,
+        "selection_max_delta": 0,
+        "before": {
+          "sound_hero": {
+            "x": 14,
+            "y": 16,
+            "width": 362,
+            "height": 150.188
+          },
+          "sound_player": {
+            "x": 14,
+            "y": 180.188,
+            "width": 362,
+            "height": 304.188
+          },
+          "sound_note": {
+            "x": 14,
+            "y": 790.375,
+            "width": 362,
+            "height": 113.188
+          },
+          "sound_womb": {
+            "x": 14,
+            "y": 498.375,
+            "width": 362,
+            "height": 86
+          },
+          "sound_relax": {
+            "x": 14,
+            "y": 594.375,
+            "width": 362,
+            "height": 86
+          },
+          "sound_relax_text": {
+            "x": 89,
+            "y": 612.234,
+            "width": 236,
+            "height": 50.281
+          },
+          "sound_relax_marker": {
+            "x": 337,
+            "y": 624.375,
+            "width": 26,
+            "height": 26
+          },
+          "sound_current": {
+            "x": 31,
+            "y": 237.188,
+            "width": 328,
+            "height": 67.188
+          }
+        },
+        "pressed": {
+          "sound_hero": {
+            "x": 14,
+            "y": 16,
+            "width": 362,
+            "height": 150.188
+          },
+          "sound_player": {
+            "x": 14,
+            "y": 180.188,
+            "width": 362,
+            "height": 304.188
+          },
+          "sound_note": {
+            "x": 14,
+            "y": 790.375,
+            "width": 362,
+            "height": 113.188
+          },
+          "sound_womb": {
+            "x": 14,
+            "y": 498.375,
+            "width": 362,
+            "height": 86
+          },
+          "sound_relax": {
+            "x": 14,
+            "y": 594.375,
+            "width": 362,
+            "height": 86
+          },
+          "sound_relax_text": {
+            "x": 89,
+            "y": 612.234,
+            "width": 236,
+            "height": 50.281
+          },
+          "sound_relax_marker": {
+            "x": 337,
+            "y": 624.375,
+            "width": 26,
+            "height": 26
+          },
+          "sound_current": {
+            "x": 31,
+            "y": 237.188,
+            "width": 328,
+            "height": 67.188
+          }
+        },
+        "after_selection": {
+          "sound_hero": {
+            "x": 14,
+            "y": 16,
+            "width": 362,
+            "height": 150.188
+          },
+          "sound_player": {
+            "x": 14,
+            "y": 180.188,
+            "width": 362,
+            "height": 304.188
+          },
+          "sound_note": {
+            "x": 14,
+            "y": 790.375,
+            "width": 362,
+            "height": 113.188
+          },
+          "sound_womb": {
+            "x": 14,
+            "y": 498.375,
+            "width": 362,
+            "height": 86
+          },
+          "sound_relax": {
+            "x": 14,
+            "y": 594.375,
+            "width": 362,
+            "height": 86
+          },
+          "sound_relax_text": {
+            "x": 89,
+            "y": 612.234,
+            "width": 236,
+            "height": 50.281
+          },
+          "sound_relax_marker": {
+            "x": 337,
+            "y": 624.375,
+            "width": 26,
+            "height": 26
+          },
+          "sound_current": {
+            "x": 31,
+            "y": 237.188,
+            "width": 328,
+            "height": 67.188
+          }
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "primary": {
+        "before": {
+          "primary_button": {
+            "x": 14,
+            "y": 16,
+            "width": 402,
+            "height": 92
+          },
+          "primary_icon": {
+            "x": 31,
+            "y": 40,
+            "width": 44,
+            "height": 44
+          },
+          "primary_label": {
+            "x": 87,
+            "y": 52.797,
+            "width": 312,
+            "height": 18.391
+          }
+        },
+        "pressed": {
+          "primary_button": {
+            "x": 14,
+            "y": 16,
+            "width": 402,
+            "height": 92
+          },
+          "primary_icon": {
+            "x": 31,
+            "y": 40,
+            "width": 44,
+            "height": 44
+          },
+          "primary_label": {
+            "x": 87,
+            "y": 52.797,
+            "width": 312,
+            "height": 18.391
+          }
+        },
+        "after_state_change": {
+          "primary_button": {
+            "x": 14,
+            "y": 16,
+            "width": 402,
+            "height": 92
+          },
+          "primary_icon": {
+            "x": 31,
+            "y": 40,
+            "width": 44,
+            "height": 44
+          },
+          "primary_label": {
+            "x": 87,
+            "y": 52.797,
+            "width": 312,
+            "height": 18.391
+          }
+        },
+        "press_max_delta": 0,
+        "state_change_max_delta": 0
+      },
+      "navigation": {
+        "before": {
+          "nav_today": {
+            "x": 19,
+            "y": 861,
+            "width": 63.594,
+            "height": 56
+          },
+          "nav_today_icon": {
+            "x": 40.797,
+            "y": 872,
+            "width": 20,
+            "height": 20
+          },
+          "nav_today_label": {
+            "x": 21,
+            "y": 895,
+            "width": 59.594,
+            "height": 11
+          },
+          "nav_sounds": {
+            "x": 215.797,
+            "y": 861,
+            "width": 63.594,
+            "height": 56
+          },
+          "nav_sounds_icon": {
+            "x": 237.594,
+            "y": 872,
+            "width": 20,
+            "height": 20
+          },
+          "nav_sounds_label": {
+            "x": 217.797,
+            "y": 895,
+            "width": 59.594,
+            "height": 11
+          }
+        },
+        "pressed": {
+          "nav_today": {
+            "x": 19,
+            "y": 861,
+            "width": 63.594,
+            "height": 56
+          },
+          "nav_today_icon": {
+            "x": 40.797,
+            "y": 872,
+            "width": 20,
+            "height": 20
+          },
+          "nav_today_label": {
+            "x": 21,
+            "y": 895,
+            "width": 59.594,
+            "height": 11
+          },
+          "nav_sounds": {
+            "x": 215.797,
+            "y": 861,
+            "width": 63.594,
+            "height": 56
+          },
+          "nav_sounds_icon": {
+            "x": 237.594,
+            "y": 872,
+            "width": 20,
+            "height": 20
+          },
+          "nav_sounds_label": {
+            "x": 217.797,
+            "y": 895,
+            "width": 59.594,
+            "height": 11
+          }
+        },
+        "after_active_change": {
+          "nav_today": {
+            "x": 19,
+            "y": 861,
+            "width": 63.594,
+            "height": 56
+          },
+          "nav_today_icon": {
+            "x": 40.797,
+            "y": 872,
+            "width": 20,
+            "height": 20
+          },
+          "nav_today_label": {
+            "x": 21,
+            "y": 895,
+            "width": 59.594,
+            "height": 11
+          },
+          "nav_sounds": {
+            "x": 215.797,
+            "y": 861,
+            "width": 63.594,
+            "height": 56
+          },
+          "nav_sounds_icon": {
+            "x": 237.594,
+            "y": 872,
+            "width": 20,
+            "height": 20
+          },
+          "nav_sounds_label": {
+            "x": 217.797,
+            "y": 895,
+            "width": 59.594,
+            "height": 11
+          }
+        },
+        "press_max_delta": 0,
+        "active_change_max_delta": 0
+      },
+      "sounds": {
+        "computed_screen": {
+          "animationName": "none",
+          "transform": "none"
+        },
+        "entry_80ms_max_delta": 0,
+        "entry_320ms_max_delta": 0,
+        "press_max_delta": 0,
+        "selection_max_delta": 0,
+        "before": {
+          "sound_hero": {
+            "x": 14,
+            "y": 16,
+            "width": 402,
+            "height": 125.188
+          },
+          "sound_player": {
+            "x": 14,
+            "y": 155.188,
+            "width": 402,
+            "height": 248.188
+          },
+          "sound_note": {
+            "x": 14,
+            "y": 709.375,
+            "width": 402,
+            "height": 113.188
+          },
+          "sound_womb": {
+            "x": 14,
+            "y": 417.375,
+            "width": 402,
+            "height": 86
+          },
+          "sound_relax": {
+            "x": 14,
+            "y": 513.375,
+            "width": 402,
+            "height": 86
+          },
+          "sound_relax_text": {
+            "x": 89,
+            "y": 528.812,
+            "width": 276,
+            "height": 55.125
+          },
+          "sound_relax_marker": {
+            "x": 377,
+            "y": 543.375,
+            "width": 26,
+            "height": 26
+          },
+          "sound_current": {
+            "x": 31,
+            "y": 212.188,
+            "width": 368,
+            "height": 67.188
+          }
+        },
+        "pressed": {
+          "sound_hero": {
+            "x": 14,
+            "y": 16,
+            "width": 402,
+            "height": 125.188
+          },
+          "sound_player": {
+            "x": 14,
+            "y": 155.188,
+            "width": 402,
+            "height": 248.188
+          },
+          "sound_note": {
+            "x": 14,
+            "y": 709.375,
+            "width": 402,
+            "height": 113.188
+          },
+          "sound_womb": {
+            "x": 14,
+            "y": 417.375,
+            "width": 402,
+            "height": 86
+          },
+          "sound_relax": {
+            "x": 14,
+            "y": 513.375,
+            "width": 402,
+            "height": 86
+          },
+          "sound_relax_text": {
+            "x": 89,
+            "y": 528.812,
+            "width": 276,
+            "height": 55.125
+          },
+          "sound_relax_marker": {
+            "x": 377,
+            "y": 543.375,
+            "width": 26,
+            "height": 26
+          },
+          "sound_current": {
+            "x": 31,
+            "y": 212.188,
+            "width": 368,
+            "height": 67.188
+          }
+        },
+        "after_selection": {
+          "sound_hero": {
+            "x": 14,
+            "y": 16,
+            "width": 402,
+            "height": 125.188
+          },
+          "sound_player": {
+            "x": 14,
+            "y": 155.188,
+            "width": 402,
+            "height": 248.188
+          },
+          "sound_note": {
+            "x": 14,
+            "y": 709.375,
+            "width": 402,
+            "height": 113.188
+          },
+          "sound_womb": {
+            "x": 14,
+            "y": 417.375,
+            "width": 402,
+            "height": 86
+          },
+          "sound_relax": {
+            "x": 14,
+            "y": 513.375,
+            "width": 402,
+            "height": 86
+          },
+          "sound_relax_text": {
+            "x": 89,
+            "y": 528.812,
+            "width": 276,
+            "height": 55.125
+          },
+          "sound_relax_marker": {
+            "x": 377,
+            "y": 543.375,
+            "width": 26,
+            "height": 26
+          },
+          "sound_current": {
+            "x": 31,
+            "y": 212.188,
+            "width": 368,
+            "height": 67.188
+          }
+        }
+      }
+    }
+  ]
+}
