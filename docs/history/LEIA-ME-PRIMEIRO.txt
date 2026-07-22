@@ -1,0 +1,10 @@
+NINOU v82.1.10 — ESTABILIDADE DE TOQUE NA WEB
+
+1. Execute: npm test
+2. Execute: npm run build
+3. Publique a pasta dist pela Vercel.
+4. Após publicar, feche e reabra o PWA ou limpe o cache antigo uma vez.
+5. Valide o botão principal, a barra inferior e a tela de sons.
+
+A correção desta versão é exclusiva da web app.
+A pasta mobile permanece exatamente na versão 82.1.9 e não foi modificada.

@@ -29,6 +29,7 @@ import {
 } from 'firebase/firestore';
 import { Platform } from 'react-native';
 
+import { NINOU_CLIENT_VERSION } from '@/config/release';
 import { canManageFamily, isGlobalAppAdminEmail, normalizeInviteRole } from '@/domain/family-access';
 import { mergeDayStates, normalizeDayState, type DayState } from '@/domain/routine';
 
@@ -133,7 +134,7 @@ export async function createPersonalFamily(user: User, input: { familyName: stri
   batch.set(doc(db, 'families', familyId), {
     familyId, title: input.familyName, name: input.familyName, babyName: input.babyName, babyArticle: input.article,
     ownerUid: user.uid, ownerEmail: email, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation,
-    familyType: 'client', status: 'active', appVersion: '82.1.12-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    familyType: 'client', status: 'active', appVersion: NINOU_CLIENT_VERSION, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   }, { merge: true });
   await batch.commit();
   await setDoc(doc(db, 'families', familyId, 'profile', 'main'), {

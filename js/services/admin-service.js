@@ -2,7 +2,7 @@ import { getFirebaseServices } from './firebase-service.js';
 
 export const GLOBAL_ADMIN_EMAIL = 'luizfelipe.dasilva@gmail.com';
 export const INTERNAL_ADMIN_FAMILY_ID = 'ninou-family-luizfelipe';
-export const ADMIN_WEB_VERSION = '82.1.4-web-admin-gate';
+export const ADMIN_WEB_VERSION = '82.1.7-web-dedicated-portal';
 
 const clean = (value) => String(value || '').trim();
 const lower = (value) => clean(value).toLowerCase();
@@ -167,8 +167,8 @@ export async function createAdminFamily(user, input = {}) {
   assertAdmin(user); const services = await getFirebaseServices();
   const name = clean(input.familyName); const babyName = clean(input.babyName); const email = lower(input.responsibleEmail);
   if (!name || !babyName) throw new Error('Informe o nome da família e do bebê.');
-  if (email && !email.includes('@')) throw new Error('Confira o e-mail do responsável.');
-  const familyId = makeFamilyId(name); const now = Date.now(); const plan = ['trial', 'premium', 'courtesy'].includes(input.plan) ? input.plan : 'trial'; const days = Math.max(1, Number(input.days) || 14);
+  if (!email || !email.includes('@')) throw new Error('Informe o e-mail do responsável que adquiriu o acesso.');
+  const familyId = makeFamilyId(name); const now = Date.now(); const plan = ['trial', 'premium', 'courtesy'].includes(input.plan) ? input.plan : 'trial'; const defaultDays = plan === 'trial' ? 14 : 30; const days = Math.max(1, Number(input.days) || defaultDays);
   await services.setDoc(services.doc(services.db, 'families', familyId), { familyId, title: name, name, babyName, familyType: 'client', status: 'active', ownerUid: '', ownerEmail: email, subscriptionPlan: plan, subscriptionStatus: plan === 'trial' ? 'trialing' : 'active', trialEndsAtClient: plan === 'trial' ? now + days * 86400000 : 0, premiumUntilClient: plan !== 'trial' ? now + days * 86400000 : 0, appVersion: ADMIN_WEB_VERSION, createdByAdminUid: user.uid, createdByAdminEmail: lower(user.email), createdAt: services.serverTimestamp(), updatedAt: services.serverTimestamp() }, { merge: true });
   await services.setDoc(services.doc(services.db, 'families', familyId, 'profile', 'main'), { familyId, familyName: name, name: babyName, birthDate: clean(input.birthDate), article: 'do', updatedAt: services.serverTimestamp() }, { merge: true });
   let invite = null; if (email) invite = await createAdminInvite(user, { id: familyId, name }, email, 'admin_familiar');

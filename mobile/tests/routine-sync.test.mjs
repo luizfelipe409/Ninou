@@ -7,6 +7,8 @@ const {
   deleteRoutineEvent,
   finishSleep,
   formatRoutineActorLabel,
+  getRoutineMarkerCollisionWindowMinutes,
+  getRoutineMarkerGroupTimestamp,
   getRoutineEventOrbitTimestamp,
   getRoutineEventsForLocalDay,
   getRoutineMarkerEventsForLocalDay,
@@ -14,6 +16,9 @@ const {
   getRoutineSleepSegmentsForOrbit,
   getTodayAwakeMs,
   getTodaySummary,
+  groupRoutineMarkerEvents,
+  initializeRoutineDay,
+  MIN_ROUTINE_STATE_DURATION_MS,
   mergeDayStates,
   resolveRoutineIntervalEnd,
   restoreRoutineSnapshot,
@@ -37,7 +42,10 @@ const initial = createEmptyDayState();
 const felipe = { uid: 'felipe', email: 'felipe@example.com', name: 'Felipe', relationship: 'Pai', label: 'Felipe · Pai' };
 const mary = { uid: 'mary', email: 'mary@example.com', name: 'Mary', relationship: 'Mãe', label: 'Mary · Mãe' };
 const awake = startRoutine(initial, 'awake', 1_700_000_000_000, felipe);
-const sleeping = startSleep(awake, 'dormir', 1_700_000_005_000, felipe);
+const blockedRapidSleep = startSleep(awake, 'dormir', 1_700_000_030_000, felipe);
+assert.equal(blockedRapidSleep.mode, 'awake');
+assert.equal(blockedRapidSleep.events.length, awake.events.length);
+const sleeping = startSleep(awake, 'dormir', 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS, felipe);
 
 
 const customWakeTime = new Date(2026, 6, 21, 6, 35, 0, 0).getTime();
@@ -48,18 +56,102 @@ assert.equal(customWake.activeStartedAt, customWakeTime);
 assert.equal(customWake.events.find((event) => event.type === 'acordou')?.start, customWakeTime);
 assert.equal(customWake.events.find((event) => event.type === 'acordou')?.detail, 'Horário inicial informado');
 
+const initializedSleeping = initializeRoutineDay(createEmptyDayState(), {
+  wakeAt: customWakeTime,
+  currentMode: 'sleeping',
+  currentStateStartedAt: new Date(2026, 6, 21, 7, 20, 0, 0).getTime(),
+}, customWakeNow, felipe);
+assert.equal(initializedSleeping.mode, 'sleeping');
+assert.equal(initializedSleeping.events.filter((event) => event.type === 'acordou').length, 1);
+assert.equal(initializedSleeping.events[0].start, customWakeTime);
+assert.equal(initializedSleeping.activeStartedAt, new Date(2026, 6, 21, 7, 20, 0, 0).getTime());
+assert.equal(initializedSleeping.lastWakeWindowMs, 45 * 60 * 1000);
+
+const initializedAwakeStart = new Date(2026, 6, 21, 7, 42, 0, 0).getTime();
+const initializedAwake = initializeRoutineDay(createEmptyDayState(), {
+  wakeAt: customWakeTime,
+  currentMode: 'awake',
+  currentStateStartedAt: initializedAwakeStart,
+}, customWakeNow, felipe);
+assert.equal(initializedAwake.mode, 'awake');
+assert.equal(initializedAwake.events.filter((event) => event.type === 'acordou').length, 1);
+assert.equal(initializedAwake.events[0].start, customWakeTime);
+assert.equal(initializedAwake.activeStartedAt, initializedAwakeStart);
+
+const duplicateSleepStart = startSleep(sleeping, 'dormir', 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS * 2, felipe);
+assert.equal(duplicateSleepStart, sleeping, 'Não deve reiniciar um sono que já está em andamento.');
+const duplicateWake = addRoutineRecord(awake, { type: 'acordou' }, 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS * 2, felipe);
+assert.equal(duplicateWake, awake, 'Não deve criar outro despertar enquanto o estado já é acordado.');
+const tinyManualSleep = addRoutineRecord(createEmptyDayState(), {
+  type: 'sono',
+  start: customWakeTime,
+  end: customWakeTime + 30_000,
+}, customWakeNow, felipe);
+assert.equal(tinyManualSleep.events.length, 0, 'Sono manual inferior ao limite mínimo deve ser descartado pelo domínio.');
+
+const blockedManualSleepStart = addRoutineRecord(awake, {
+  type: 'sono',
+  start: Number(awake.activeStartedAt) + 30_000,
+}, Number(awake.activeStartedAt) + 30_000, felipe);
+assert.equal(blockedManualSleepStart, awake, 'Um sono manual não pode começar poucos segundos depois do despertar atual.');
+
+const blockedManualWake = addRoutineRecord(sleeping, {
+  type: 'acordou',
+  start: Number(sleeping.activeStartedAt) + 30_000,
+}, Number(sleeping.activeStartedAt) + 30_000, mary);
+assert.equal(blockedManualWake, sleeping, 'Um despertar manual não pode encerrar um sono de poucos segundos.');
+
+const allowedManualWakeAt = Number(sleeping.activeStartedAt) + MIN_ROUTINE_STATE_DURATION_MS;
+const allowedManualWake = addRoutineRecord(sleeping, {
+  type: 'acordou',
+  start: allowedManualWakeAt,
+}, allowedManualWakeAt, mary);
+assert.equal(allowedManualWake.mode, 'awake');
+assert.equal(allowedManualWake.activeStartedAt, allowedManualWakeAt);
+
 assert.equal(mergeDayStates(awake, sleeping).mode, 'sleeping');
 assert.equal(mergeDayStates(sleeping, awake).mode, 'sleeping');
-assert.equal(mergeDayStates(awake, sleeping).activeStartedAt, 1_700_000_005_000);
+assert.equal(mergeDayStates(awake, sleeping).activeStartedAt, 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS);
 assert.equal(mergeDayStates(awake, sleeping).activeActor.label, 'Felipe · Pai');
 
-const wakeByMary = finishSleep(sleeping, 1_700_000_010_000, mary);
+const blockedRapidWake = finishSleep(sleeping, 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS + 30_000, mary);
+assert.equal(blockedRapidWake.mode, 'sleeping');
+const wakeByMary = finishSleep(sleeping, 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS * 2, mary);
 const sleepEvent = wakeByMary.events.find((event) => event.type === 'dormir');
 const wakeEvent = wakeByMary.events.find((event) => event.type === 'despertar-noturno');
 assert.equal(formatRoutineActorLabel(sleepEvent), 'Felipe · Pai');
 assert.equal(formatRoutineActorLabel(wakeEvent), 'Mary · Mãe');
 assert.equal(getRoutineEventOrbitTimestamp(sleepEvent), sleepEvent.end);
 assert.equal(getRoutineEventOrbitTimestamp(wakeEvent), wakeEvent.start);
+
+const groupingReference = new Date(2026, 6, 22, 12, 0, 0, 0).getTime();
+const rapidMarkers = [
+  { ...wakeEvent, id: 'wake-0007', type: 'despertar-noturno', start: new Date(2026, 6, 22, 0, 7, 0, 0).getTime(), end: new Date(2026, 6, 22, 0, 7, 0, 0).getTime() },
+  { ...sleepEvent, id: 'sleep-0008', type: 'dormir', start: new Date(2026, 6, 22, 0, 7, 30, 0).getTime(), end: new Date(2026, 6, 22, 0, 8, 0, 0).getTime() },
+  { ...wakeEvent, id: 'wake-0009', type: 'despertar-noturno', start: new Date(2026, 6, 22, 0, 9, 0, 0).getTime(), end: new Date(2026, 6, 22, 0, 9, 0, 0).getTime() },
+];
+const markerGroups = groupRoutineMarkerEvents(rapidMarkers, getRoutineMarkerCollisionWindowMinutes(140));
+assert.equal(markerGroups.length, 1);
+assert.equal(markerGroups[0].length, 3);
+const markerGroupDate = new Date(getRoutineMarkerGroupTimestamp(markerGroups[0], groupingReference));
+assert.equal(markerGroupDate.getHours(), 0);
+assert.ok(markerGroupDate.getMinutes() >= 7 && markerGroupDate.getMinutes() <= 9);
+
+const chainedMarkers = [0, 60, 120].map((minute, index) => ({
+  ...wakeEvent,
+  id: `chain-${index}`,
+  start: new Date(2026, 6, 22, 8, minute, 0, 0).getTime(),
+  end: new Date(2026, 6, 22, 8, minute, 0, 0).getTime(),
+}));
+const boundedGroups = groupRoutineMarkerEvents(chainedMarkers, 75);
+assert.equal(boundedGroups.length, 2, 'O agrupamento não pode encadear ações além da janela visual.');
+assert.deepEqual(boundedGroups.map((group) => group.length), [2, 1]);
+
+const midnightMarkers = [
+  { ...wakeEvent, id: 'late', start: new Date(2026, 6, 21, 23, 58, 0, 0).getTime(), end: new Date(2026, 6, 21, 23, 58, 0, 0).getTime() },
+  { ...wakeEvent, id: 'early', start: new Date(2026, 6, 22, 0, 2, 0, 0).getTime(), end: new Date(2026, 6, 22, 0, 2, 0, 0).getTime() },
+];
+assert.equal(groupRoutineMarkerEvents(midnightMarkers, 10).length, 1);
 
 const orbitToday = new Date(2026, 6, 19, 12, 0, 0, 0).getTime();
 const yesterdayMorningNap = {

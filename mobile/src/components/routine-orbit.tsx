@@ -5,7 +5,7 @@ import { Animated, ImageBackground, Modal, Pressable, ScrollView, StyleSheet, Te
 import Svg, { Circle, Defs, G, LinearGradient as SvgLinearGradient, Polygon, Rect, Stop, Text as SvgText } from 'react-native-svg';
 
 import { ActionArt } from '@/components/action-art';
-import { formatDuration, formatTime, getElapsedMs, getRoutineEventOrbitTimestamp, getRoutineEventsForLocalDay, getRoutineLocalDayBounds, getRoutineMarkerEventsForLocalDay, getRoutineSleepSegmentsForOrbit, recordConfig, type DayState, type RoutineEvent } from '@/domain/routine';
+import { formatDuration, formatRoutineActorLabel, formatTime, getElapsedMs, getRoutineCircularMinuteDistance, getRoutineClockMinutes, getRoutineEventOrbitTimestamp, getRoutineEventsForLocalDay, getRoutineLocalDayBounds, getRoutineMarkerCollisionWindowMinutes, getRoutineMarkerEventsForLocalDay, getRoutineMarkerGroupTimestamp, getRoutineSleepSegmentsForOrbit, groupRoutineMarkerEvents, recordConfig, type DayState, type RoutineEvent } from '@/domain/routine';
 import { useNinouTheme } from '@/theme/tokens';
 
 const darkStarPoints = [
@@ -38,6 +38,10 @@ function dayFraction(timestamp: number) {
   return (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) / 86400;
 }
 
+function formatClusterTimes(events: RoutineEvent[]) {
+  return events.map((event) => formatTime(getRoutineEventOrbitTimestamp(event))).join(' · ');
+}
+
 function svgPointForTime(timestamp: number, size: number, radius: number) {
   const date = new Date(timestamp);
   const minutes = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
@@ -66,17 +70,6 @@ function rayPoints(originX: number, originY: number, length: number, angle: numb
   const x2 = originX + Math.cos(b) * length;
   const y2 = originY + Math.sin(b) * length;
   return `${originX},${originY} ${x1},${y1} ${x2},${y2}`;
-}
-
-function groupNearbyEvents(events: RoutineEvent[]) {
-  return [...events]
-    .sort((a, b) => getRoutineEventOrbitTimestamp(a) - getRoutineEventOrbitTimestamp(b))
-    .reduce<RoutineEvent[][]>((groups, event) => {
-      const current = groups[groups.length - 1];
-      if (current && getRoutineEventOrbitTimestamp(event) - getRoutineEventOrbitTimestamp(current[current.length - 1]) <= 4 * 60 * 1000) current.push(event);
-      else groups.push([event]);
-      return groups;
-    }, []);
 }
 
 export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
@@ -129,14 +122,36 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
   const primaryJourneyId = activeArc?.id || completedSleep.reduce<(typeof completedSleep)[number] | null>((longest, segment) => !longest || segment.end - segment.start > longest.end - longest.start ? segment : longest, null)?.event.id;
   const nowPoint = pointForTime(now, size, orbitRadius, 10);
   const daySunPoint = { left: size * 0.067, top: size * 0.108 };
-  const eventGroups = groupNearbyEvents(todayMarkerEvents.filter((event) => event.type !== 'acordou'
-    && !(state.mode === 'sleeping'
+  const groupingWindowMinutes = getRoutineMarkerCollisionWindowMinutes(orbitRadius);
+  const activeMarkerEvent: RoutineEvent | null = state.mode === 'sleeping' && state.activeStartedAt
+    ? {
+        id: 'active',
+        type: state.activeType,
+        start: state.activeStartedAt,
+        end: now,
+        detail: state.activeDetail,
+        notes: state.activeNotes,
+        createdAtClient: state.activeStartedAt,
+        createdByUid: state.activeActor?.uid,
+        createdByEmail: state.activeActor?.email,
+        createdByName: state.activeActor?.name,
+        createdByRelationship: state.activeActor?.relationship,
+        createdByLabel: state.activeActor?.label,
+      }
+    : null;
+  const markerEvents = todayMarkerEvents.filter((event) => !(state.mode === 'sleeping'
       && state.activeStartedAt
       && (event.type === 'sono' || event.type === 'dormir')
-      && Math.abs(event.start - state.activeStartedAt) < 60000)).slice(-12));
-  const orbitMarkerTimestamps = eventGroups.map((group) => group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length);
-  if (state.mode !== 'idle' && state.activeType !== 'acordou' && state.activeStartedAt) orbitMarkerTimestamps.push(state.mode === 'sleeping' ? now : state.activeStartedAt);
+      && Math.abs(event.start - state.activeStartedAt) < 60000));
+  if (activeMarkerEvent) markerEvents.push(activeMarkerEvent);
+  const eventGroups = groupRoutineMarkerEvents(markerEvents, groupingWindowMinutes);
+  const orbitMarkerTimestamps = eventGroups.map((group) => getRoutineMarkerGroupTimestamp(group, now));
   const anchorIsOccupied = (anchorMinutes: number) => orbitMarkerTimestamps.some((timestamp) => distanceFromClockAnchor(timestamp, anchorMinutes) <= 60);
+  const isCurrentActiveMarker = (event: RoutineEvent) => event.id === 'active'
+    || Boolean(state.mode === 'awake'
+      && state.activeStartedAt
+      && event.type === state.activeType
+      && Math.abs(event.start - state.activeStartedAt) < 60000);
 
   useEffect(() => {
     const breatheLoop = Animated.loop(Animated.sequence([
@@ -244,32 +259,22 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
       {eventGroups.map((group) => {
         const event = group[group.length - 1];
         const markerTimestamp = getRoutineEventOrbitTimestamp(event);
-        const groupTimestamp = group.reduce((sum, item) => sum + getRoutineEventOrbitTimestamp(item), 0) / group.length;
-        const point = pointForTime(groupTimestamp, size, orbitRadius, group.length > 1 ? 44 : 34);
+        const groupTimestamp = getRoutineMarkerGroupTimestamp(group, now);
+        const containsActive = group.some(isCurrentActiveMarker);
+        const point = pointForTime(groupTimestamp, size, orbitRadius, group.length > 1 || containsActive ? 50 : 34);
         if (group.length > 1) return (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${group.length} registros próximos`} onPress={() => setSelectedCluster(group)} key={`cluster-${group[0].id}`} style={({ pressed }) => [styles.marker, styles.clusterMarker, point, { backgroundColor: isDark ? 'rgba(18,12,43,0.92)' : 'rgba(255,255,255,0.92)', borderColor: isDark ? 'rgba(181,131,255,0.72)' : 'rgba(117,88,232,0.48)' }, pressed && styles.markerPressed]}>
-            <ActionArt type={event.type} size={37} />
-            <View style={[styles.clusterBadge, { backgroundColor: colors.accent, borderColor: isDark ? '#17102E' : '#FFFFFF' }]}><Text style={styles.clusterCount}>{group.length}</Text></View>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${group.length} ações agrupadas: ${group.map((item) => recordConfig[item.type].title).join(', ')}`} onPress={() => setSelectedCluster(group)} key={`cluster-${group[0].id}`} style={({ pressed }) => [styles.marker, styles.clusterMarker, point, { backgroundColor: isDark ? 'rgba(18,12,43,0.98)' : 'rgba(255,255,255,0.98)', borderColor: isDark ? 'rgba(181,131,255,0.94)' : 'rgba(117,88,232,0.72)' }, pressed && styles.markerPressed]}>
+            <ActionArt type={event.type} size={39} />
+            <View style={[styles.clusterBadge, { backgroundColor: colors.accent, borderColor: isDark ? '#17102E' : '#FFFFFF' }]}><Text style={styles.clusterCount}>×{group.length}</Text></View>
           </Pressable>
         );
-        return (
-          <Pressable accessibilityRole="button" accessibilityLabel={`Abrir ${recordConfig[event.type].title} ${markerTimestamp > event.start ? `encerrado às ${formatTime(markerTimestamp)}` : `das ${formatTime(markerTimestamp)}`}`} onPress={() => setSelectedEvent(event)} key={event.id} style={({ pressed }) => [styles.marker, point, { backgroundColor: isDark ? 'rgba(21,18,54,0.76)' : 'rgba(255,255,255,0.72)', borderColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.96)' }, pressed && styles.markerPressed]}>
-            <ActionArt type={event.type} size={30} />
-            <Text style={[styles.markerTime, { color: colors.text }]}>{formatTime(markerTimestamp)}</Text>
-          </Pressable>
-        );
-      })}
-
-      {state.mode !== 'idle' && state.activeType !== 'acordou' && state.activeStartedAt ? (() => {
-        const activeMarkerTimestamp = state.mode === 'sleeping' ? now : state.activeStartedAt;
-        const activePoint = pointForTime(activeMarkerTimestamp, size, orbitRadius, 50);
-        const activeEvent: RoutineEvent = { id: 'active', type: state.activeType, start: state.activeStartedAt, end: now, detail: state.activeDetail, notes: state.activeNotes, createdAtClient: state.activeStartedAt };
-        return (
+        if (containsActive) return (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Abrir ${recordConfig[state.activeType].title} em andamento`}
-            onPress={() => setSelectedEvent(activeEvent)}
-            style={({ pressed }) => [styles.activeMarker, activePoint, pressed && styles.activeMarkerPressed]}>
+            accessibilityLabel={`Abrir ${recordConfig[event.type].title} em andamento`}
+            onPress={() => setSelectedEvent(event)}
+            key={`active-${event.id}`}
+            style={({ pressed }) => [styles.activeMarker, point, pressed && styles.activeMarkerPressed]}>
             <Animated.View
               pointerEvents="none"
               style={[
@@ -288,13 +293,19 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
               end={{ x: 0.92, y: 0.92 }}
               style={styles.activeMarkerRing}>
               <View style={[styles.activeMarkerInner, { backgroundColor: isDark ? '#17102E' : '#FFFDFC' }]}>
-                <ActionArt type={state.activeType} size={40} />
+                <ActionArt type={event.type} size={40} />
               </View>
             </LinearGradient>
             <Animated.View pointerEvents="none" style={[styles.activeMarkerGlint, { opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.45, 1] }) }]} />
           </Pressable>
         );
-      })() : null}
+        return (
+          <Pressable accessibilityRole="button" accessibilityLabel={`Abrir ${recordConfig[event.type].title} ${markerTimestamp > event.start ? `encerrado às ${formatTime(markerTimestamp)}` : `das ${formatTime(markerTimestamp)}`}`} onPress={() => setSelectedEvent(event)} key={event.id} style={({ pressed }) => [styles.marker, point, { backgroundColor: isDark ? 'rgba(21,18,54,0.76)' : 'rgba(255,255,255,0.72)', borderColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.96)' }, pressed && styles.markerPressed]}>
+            <ActionArt type={event.type} size={30} />
+            <Text style={[styles.markerTime, { color: colors.text }]}>{formatTime(markerTimestamp)}</Text>
+          </Pressable>
+        );
+      })}
 
       <Animated.View pointerEvents="none" style={[styles.coreHalo, { width: coreWidth + 24, height: coreHeight + 24, borderRadius: 999, left: center - (coreWidth + 24) / 2, top: center - (coreHeight + 24) / 2, backgroundColor: isDark ? 'rgba(113,66,210,0.1)' : 'rgba(255,255,255,0.24)', opacity: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.36, 0.72] }), transform: [{ scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [0.98, 1.035] }) }] }]} />
       <LinearGradient colors={isDark ? ['rgba(33,19,59,0.94)', 'rgba(7,10,28,0.86)'] : ['rgba(255,255,255,0.93)', 'rgba(255,255,255,0.72)']} start={{ x: 0.12, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.center, { width: coreWidth, height: coreHeight, borderRadius: 999, left: center - coreWidth / 2, top: center - coreHeight / 2, borderColor: isDark ? 'rgba(181,131,255,0.34)' : 'rgba(255,255,255,0.94)', shadowOpacity: isDark ? 0.43 : 0.19 }]}>
@@ -310,11 +321,12 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
             {selectedEvent ? (
               <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
                 <View style={[styles.sheetHero, { backgroundColor: colors.surfaceElevated }]}><ActionArt type={selectedEvent.type} size={72} /></View>
-                <Text style={[styles.sheetKicker, { color: colors.primary }]}>{selectedEvent.id === 'active' ? 'EM ANDAMENTO' : 'REGISTRO DA ÓRBITA'}</Text>
+                <Text style={[styles.sheetKicker, { color: colors.primary }]}>{isCurrentActiveMarker(selectedEvent) ? 'ESTADO ATUAL' : 'REGISTRO DA ÓRBITA'}</Text>
                 <Text style={[styles.sheetTitle, { color: colors.text }]}>{recordConfig[selectedEvent.type].title}</Text>
-                <Text style={[styles.sheetTime, { color: colors.textMuted }]}>{formatTime(selectedEvent.start)}{selectedEvent.end > selectedEvent.start ? ` — ${formatTime(selectedEvent.end)} · ${formatDuration(selectedEvent.end - selectedEvent.start)}` : ''}</Text>
+                <Text style={[styles.sheetTime, { color: colors.textMuted }]}>{isCurrentActiveMarker(selectedEvent) ? `${formatTime(selectedEvent.start)} — agora · em andamento` : `${formatTime(selectedEvent.start)}${selectedEvent.end > selectedEvent.start ? ` — ${formatTime(selectedEvent.end)} · ${formatDuration(selectedEvent.end - selectedEvent.start)}` : ''}`}</Text>
                 {selectedEvent.detail ? <View style={[styles.detailCard, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.detailLabel, { color: colors.textMuted }]}>DETALHE</Text><Text style={[styles.detailValue, { color: colors.text }]}>{selectedEvent.detail}</Text></View> : null}
                 {selectedEvent.notes ? <View style={[styles.detailCard, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.detailLabel, { color: colors.textMuted }]}>OBSERVAÇÕES</Text><Text style={[styles.detailValue, { color: colors.text }]}>{selectedEvent.notes}</Text></View> : null}
+                {formatRoutineActorLabel(selectedEvent) ? <View style={[styles.detailCard, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.detailLabel, { color: colors.textMuted }]}>REGISTRADO POR</Text><Text style={[styles.detailValue, { color: colors.text }]}>{formatRoutineActorLabel(selectedEvent)}</Text></View> : null}
                 <Pressable onPress={() => setSelectedEvent(null)} style={[styles.closeButton, { backgroundColor: colors.primary }]}><Text style={styles.closeText}>Fechar detalhes</Text></Pressable>
               </ScrollView>
             ) : null}
@@ -327,10 +339,10 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
           <Pressable style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={(event) => event.stopPropagation()}>
             <View style={[styles.sheetHandle, { backgroundColor: colors.border }]} />
             <Text style={[styles.sheetKicker, { color: colors.primary }]}>REGISTROS PRÓXIMOS</Text>
-            <Text style={[styles.sheetTitle, { color: colors.text }]}>Atividades no mesmo horário</Text>
-            <Text style={[styles.sheetTime, { color: colors.textMuted }]}>{selectedCluster.length ? `${formatTime(selectedCluster[0].start)} — ${formatTime(selectedCluster[selectedCluster.length - 1].start)}` : ''}</Text>
+            <View style={styles.clusterTitleRow}><Text style={[styles.sheetTitle, styles.clusterSheetTitle, { color: colors.text }]}>{selectedCluster.length} ações agrupadas</Text><View style={[styles.clusterTotalBadge, { backgroundColor: colors.accent }]}><Text style={styles.clusterTotalText}>×{selectedCluster.length}</Text></View></View>
+            <Text style={[styles.sheetTime, { color: colors.textMuted }]}>{selectedCluster.length ? `${formatClusterTimes(selectedCluster)} · toque em uma ação para ver todos os detalhes` : ''}</Text>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.clusterList}>
-              {selectedCluster.map((event) => <Pressable key={event.id} onPress={() => { setSelectedCluster([]); setSelectedEvent(event); }} style={({ pressed }) => [styles.clusterRow, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.markerPressed]}><ActionArt type={event.type} size={48} /><View style={styles.clusterCopy}><Text style={[styles.clusterTitle, { color: colors.text }]}>{recordConfig[event.type].title}</Text><Text style={[styles.clusterMeta, { color: colors.textMuted }]}>{formatTime(event.start)}{event.detail ? ` · ${event.detail}` : ''}</Text></View><Ionicons name="chevron-forward" size={17} color={colors.textMuted} /></Pressable>)}
+              {selectedCluster.map((event) => <Pressable key={event.id} onPress={() => { setSelectedCluster([]); setSelectedEvent(event); }} style={({ pressed }) => [styles.clusterRow, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.markerPressed]}><ActionArt type={event.type} size={48} /><View style={styles.clusterCopy}><Text style={[styles.clusterTitle, { color: colors.text }]}>{recordConfig[event.type].title}</Text><Text style={[styles.clusterMeta, { color: colors.textMuted }]}>{event.id === 'active' ? `${formatTime(event.start)} — agora · em andamento` : `${formatTime(event.start)}${event.end > event.start ? ` — ${formatTime(event.end)} · ${formatDuration(event.end - event.start)}` : ''}`}</Text>{event.detail ? <Text style={[styles.clusterDetail, { color: colors.text }]} numberOfLines={1}>{event.detail}</Text> : null}<Text style={[styles.clusterActor, { color: colors.textMuted }]} numberOfLines={1}>{formatRoutineActorLabel(event)}</Text></View><Ionicons name="chevron-forward" size={17} color={colors.textMuted} /></Pressable>)}
             </ScrollView>
             <Pressable onPress={() => setSelectedCluster([])} style={[styles.closeButton, { backgroundColor: colors.primary }]}><Text style={styles.closeText}>Fechar atividades</Text></Pressable>
           </Pressable>
@@ -358,7 +370,9 @@ const styles = StyleSheet.create({
   anchorTheme: { borderWidth: StyleSheet.hairlineWidth, shadowColor: '#2D174F', shadowOpacity: 0.22, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
   anchorText: { fontSize: 10.5, fontWeight: '900' },
   marker: { position: 'absolute', width: 34, height: 34, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', zIndex: 5 },
-  clusterMarker: { width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, shadowColor: '#8E5EFF', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, clusterBadge: { position: 'absolute', right: -5, top: -5, minWidth: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }, clusterCount: { color: '#10251F', fontSize: 10, fontWeight: '900' },
+  clusterMarker: { width: 50, height: 50, borderRadius: 25, borderWidth: 1.7, zIndex: 12, elevation: 12, shadowColor: '#8E5EFF', shadowOpacity: 0.52, shadowRadius: 14, shadowOffset: { width: 0, height: 5 } },
+  clusterBadge: { position: 'absolute', right: -9, top: -9, minWidth: 34, height: 27, borderRadius: 14, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6, zIndex: 18, elevation: 18 },
+  clusterCount: { color: '#10251F', fontSize: 12, lineHeight: 15, fontWeight: '900', fontVariant: ['tabular-nums'] },
   markerPressed: { opacity: 0.7, transform: [{ scale: 0.88 }] },
   markerTime: { position: 'absolute', top: 35, minWidth: 42, textAlign: 'center', fontSize: 8, fontWeight: '900', textShadowColor: 'rgba(255,255,255,0.3)', textShadowRadius: 3 },
   activeMarker: { position: 'absolute', width: 50, height: 50, zIndex: 8, alignItems: 'center', justifyContent: 'center', shadowColor: '#4B2D91', shadowOpacity: 0.44, shadowRadius: 13, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
@@ -383,7 +397,17 @@ const styles = StyleSheet.create({
   detailCard: { width: '100%', borderRadius: 18, padding: 14, marginTop: 13 },
   detailLabel: { fontSize: 9, fontWeight: '900', letterSpacing: 0.9 },
   detailValue: { marginTop: 5, fontSize: 14, lineHeight: 20, fontWeight: '700' },
-  clusterList: { gap: 9, paddingTop: 18 }, clusterRow: { minHeight: 70, borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 10 }, clusterCopy: { flex: 1 }, clusterTitle: { fontSize: 13.5, fontWeight: '900' }, clusterMeta: { marginTop: 3, fontSize: 10.5, lineHeight: 14, fontWeight: '600' },
+  clusterTitleRow: { marginTop: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  clusterSheetTitle: { flex: 1 },
+  clusterTotalBadge: { minWidth: 46, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 },
+  clusterTotalText: { color: '#10251F', fontSize: 13, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  clusterList: { gap: 9, paddingTop: 18 },
+  clusterRow: { minHeight: 82, borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  clusterCopy: { flex: 1 },
+  clusterTitle: { fontSize: 13.5, fontWeight: '900' },
+  clusterMeta: { marginTop: 3, fontSize: 10.5, lineHeight: 14, fontWeight: '700' },
+  clusterDetail: { marginTop: 4, fontSize: 10.5, lineHeight: 14, fontWeight: '700' },
+  clusterActor: { marginTop: 3, fontSize: 9.5, lineHeight: 13, fontWeight: '650' },
   closeButton: { width: '100%', minHeight: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
   closeText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
 });

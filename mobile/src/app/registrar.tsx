@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionArt } from '@/components/action-art';
 import { NinouBackground } from '@/components/ninou-background';
-import { formatDuration, formatTime, recordConfig, resolveRoutineIntervalEnd, type RecordType } from '@/domain/routine';
+import { formatDuration, formatTime, MIN_ROUTINE_STATE_DURATION_MS, recordConfig, resolveRoutineIntervalEnd, type RecordType } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
@@ -174,6 +174,10 @@ export default function RegisterScreen() {
         const resolvedEnd = resolveRoutineIntervalEnd(selectedType, start, timestampFor(recordDayId, endTime.trim()));
         if (resolvedEnd === null || (isSleep && resolvedEnd === start)) { setFormError('O término do sono precisa ser diferente do horário inicial.'); return; }
         end = resolvedEnd;
+        if (isSleep && end - start < MIN_ROUTINE_STATE_DURATION_MS) {
+          setFormError('Para evitar registros acidentais, o sono precisa durar pelo menos 2 minutos. Ajuste o início ou o término.');
+          return;
+        }
         if (end > Date.now() + 60 * 1000) { setFormError('O horário final não pode estar no futuro.'); return; }
       } else if (isSleep && recordDayId !== getLocalDateId()) {
         setFormError('Para um sono iniciado em outro dia, informe também o horário de término.');

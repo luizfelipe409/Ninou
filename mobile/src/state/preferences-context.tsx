@@ -11,7 +11,13 @@ type Preferences = {
   reportWhatsapp: string;
 };
 
-const initialPreferences: Preferences = { caregiverName: '', caregiverRelation: 'Responsável', legalAcceptedAt: 0, reportWhatsapp: '' };
+const initialPreferences: Preferences = { caregiverName: '', caregiverRelation: '', legalAcceptedAt: 0, reportWhatsapp: '' };
+
+function normalizeCaregiverRelation(value: unknown) {
+  const relation = typeof value === 'string' ? value.trim() : '';
+  return relation === 'Responsável' ? '' : relation;
+}
+
 const PreferencesContext = createContext<{ preferences: Preferences; updatePreferences: (patch: Partial<Preferences>) => void } | null>(null);
 
 export function PreferencesProvider({ children }: PropsWithChildren) {
@@ -23,7 +29,7 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
     void (async () => {
       const raw = await AsyncStorage.getItem(key);
       const local = raw ? { ...initialPreferences, ...JSON.parse(raw) } as Preferences : initialPreferences;
-      let next = local;
+      let next = { ...local, caregiverRelation: normalizeCaregiverRelation(local.caregiverRelation) };
       if (user) {
         const [legalResult, caregiverResult] = await Promise.allSettled([
           loadLegalConsent(user),
@@ -39,7 +45,7 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
           next = {
             ...next,
             caregiverName: cloudIdentity.caregiverName || next.caregiverName,
-            caregiverRelation: cloudIdentity.caregiverRelation || next.caregiverRelation,
+            caregiverRelation: normalizeCaregiverRelation(cloudIdentity.caregiverRelation) || next.caregiverRelation,
           };
         }
       }
@@ -50,7 +56,7 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
     return () => { active = false; };
   }, [access?.familyId, key, user]);
   const updatePreferences = useCallback((patch: Partial<Preferences>) => setPreferences((current) => {
-    const next = { ...current, ...patch };
+    const next = { ...current, ...patch, caregiverRelation: normalizeCaregiverRelation(patch.caregiverRelation ?? current.caregiverRelation) };
     void AsyncStorage.setItem(key, JSON.stringify(next));
     if (user && ('caregiverName' in patch || 'caregiverRelation' in patch)) {
       void saveAccountCaregiverProfile(user, access?.familyId, {

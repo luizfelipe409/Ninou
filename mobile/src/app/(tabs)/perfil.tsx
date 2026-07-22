@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
+import { NINOU_LEGAL_VERSION, NINOU_VERSION } from '@/config/release';
 import { DateField } from '@/components/date-field';
 import { RelationPicker } from '@/components/relation-picker';
 import { AvatarArt } from '@/components/avatar-art';
@@ -93,7 +94,11 @@ export default function ProfileScreen() {
       Alert.alert('Informe seu nome', 'O nome identifica quem realizou cada cuidado no Diário.');
       return;
     }
-    const caregiverRelation = caregiverRelationDraft.trim() || 'Responsável';
+    const caregiverRelation = caregiverRelationDraft.trim();
+    if (!caregiverRelation) {
+      Alert.alert('Escolha sua relação', 'Selecione como você se relaciona com o bebê para identificar os registros do Diário.');
+      return;
+    }
     updatePreferences({ caregiverName, caregiverRelation });
     setCaregiverDraft(null);
     setSavedIdentity({ name: caregiverName, relation: caregiverRelation });
@@ -113,7 +118,7 @@ export default function ProfileScreen() {
     const acceptedAt = Date.now();
     updatePreferences({ legalAcceptedAt: acceptedAt });
     setWorking('legal');
-    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: '82.1.12', privacyVersion: '82.1.12', medicalDisclaimerVersion: '82.1.12', acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
+    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: NINOU_LEGAL_VERSION, privacyVersion: NINOU_LEGAL_VERSION, medicalDisclaimerVersion: NINOU_LEGAL_VERSION, acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
     catch (legalError) { Alert.alert('Aceite salvo neste aparelho', `${getFirebaseErrorMessage(legalError)} A sincronização será tentada novamente.`); } finally { setWorking(''); }
   };
 
@@ -137,7 +142,7 @@ export default function ProfileScreen() {
   const sendSupport = async () => {
     if (!user || !supportMessage.trim()) return;
     setWorking('support');
-    const diagnostics = `Ninou Expo 82.1.12 | family=${access?.familyId || 'none'} | role=${access?.role || 'none'} | sync=${syncMessage}`;
+    const diagnostics = `Ninou Expo ${NINOU_VERSION} | family=${access?.familyId || 'none'} | role=${access?.role || 'none'} | sync=${syncMessage}`;
     try { await submitSupportRequest(user, access?.familyId, { category: supportCategory, message: supportMessage.trim(), diagnostics }); setSupportMessage(''); setSupportOpen(false); Alert.alert('Relato enviado', 'Recebemos o problema junto com as informações técnicas necessárias.'); }
     catch (supportError) { Alert.alert('Não foi possível enviar', getFirebaseErrorMessage(supportError)); } finally { setWorking(''); }
   };

@@ -1,51 +1,47 @@
-# Ninou Mobile
+# Ninou Mobile 83.0.2
 
-Aplicativo nativo Android e iOS do Ninou, criado com Expo SDK 57, React Native, TypeScript e Expo Router.
+Aplicativo nativo iOS e Android desenvolvido com Expo SDK 57, React Native, TypeScript e Expo Router.
 
-## Estado desta entrega
+## Configuração de lançamento
 
-- interface nativa fiel ao Ninou nas telas Hoje, Diário, Dados, Sons e Perfil, com a mesma largura, cabeçalho e hierarquia visual do webapp;
-- os 12 avatares originais do Ninou, seleção no Perfil e sincronização do avatar e de “Diário do/da” entre o aparelho e a família;
-- editor modal de avatar com prévia, nomes, seleção temporária e confirmação, equivalente ao webapp;
-- órbita cósmica responsiva de 24 horas, relógio central em tempo real, arcos de duração, lua, estrelas e transições acordado, soneca, noite e despertar;
-- menu inferior premium com as cinco áreas e o botão de novo registro integrados na mesma cápsula;
-- Dados com histórico familiar de sete dias, indicadores, peso e gráficos por categoria;
-- Sons com player principal, seleção dos três áudios, repetição e timer pausável de uma hora;
-- os oito tipos de registro do produto, com ícones, opções e histórico integrado;
-- persistência local da rotina e do perfil no aparelho;
-- biblioteca de sons com os áudios do produto;
-- entrada com a mesma conta Firebase e resolução do vínculo `users/{uid}/families`;
-- listener Firestore do dia e gravação transacional da rotina compartilhada;
-- tema claro/escuro, identificadores iniciais Android/iOS e perfis EAS;
-- Development Build configurado;
-- criação e aceite de convites, administração familiar, relatórios/exportações, suporte, consentimentos e solicitação de exclusão de conta integrados ao mobile;
-- preparação App Store v82.1.6 com ícone 1024 × 1024, Privacy Manifest, versões alinhadas e reprodução de áudio sem permissão de microfone.
+- versão: `83.0.2`;
+- build iOS: `90`;
+- versionCode Android: `90`;
+- bundle/package: `com.ninou.app`;
+- iOS mínimo: 16.4;
+- gravação de microfone desativada;
+- reprodução de áudio em segundo plano habilitada;
+- Privacy Manifest presente;
+- ícone 1024 × 1024.
 
-O app web continua independente na raiz do repositório. O mobile reutiliza a linguagem visual e as regras de domínio, sem incorporar a versão web por WebView.
+## Estrutura
 
-## Requisitos
-
-- Node.js 22.13 ou superior;
-- Xcode para simulador/build iOS local;
-- Android Studio para emulador/build Android local;
-- conta Expo para builds EAS.
+- `src/app`: telas e rotas;
+- `src/components`: componentes reutilizáveis;
+- `src/config/release.ts`: versão central do runtime;
+- `src/domain`: regras da rotina e acesso;
+- `src/services`: Firebase e administração;
+- `src/state`: autenticação, rotina, perfil e preferências;
+- `assets`: ícones, avatares, fundos e sons;
+- `ios`: projeto nativo usado pelo build iOS.
 
 ## Comandos
 
 ```bash
-cd mobile
-npm install
+npm ci
 npm run check
 npm run start:dev-client
 ```
 
-Para uma visualização rápida sem módulos nativos adicionais, `npm start` pode abrir o projeto. O fluxo oficial do produto deve usar Development Build:
+Testes puros que não exigem Expo instalado:
 
 ```bash
-npx eas-cli build --profile development --platform android
-npx eas-cli build --profile development --platform ios
+npm run test:source
 ```
 
-Antes do primeiro envio às lojas, confirme a disponibilidade de `com.ninou.app`, publique a política de privacidade em URL pública e valide o IPA no TestFlight. O ícone-fonte já está em 1024 × 1024.
+Builds:
 
-O roteiro completo está em [`docs/mobile-migration.md`](../docs/mobile-migration.md).
+```bash
+npx eas-cli build --profile production --platform ios
+npx eas-cli build --profile production --platform android
+```

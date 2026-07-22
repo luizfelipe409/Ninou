@@ -7,12 +7,13 @@ import {
   createEmptyDayState,
   clearRoutineDay,
   finishSleep,
+  getRoutineTransitionBlock,
   getPrimaryAction,
+  initializeRoutineDay,
   isNightPeriod,
   mergeDayStates,
   normalizeDayState,
   restoreRoutineSnapshot,
-  startRoutineAt,
   startSleep,
   deleteDayNoteEpisode,
   deleteRoutineEvent,
@@ -23,6 +24,7 @@ import {
   type RoutineEvent,
   type RecordType,
   type RoutineActor,
+  type RoutineDayStartInput,
 } from '@/domain/routine';
 import { getFirebaseErrorMessage, getLocalDateId, loadRoutineDays, observeRoutineDay, saveRoutineDay } from '@/services/firebase';
 import { canWriteFamilyRoutine } from '@/domain/family-access';
@@ -73,8 +75,8 @@ type RoutineContextValue = {
   syncMessage: string;
   canUndo: boolean;
   canWrite: boolean;
-  beginRoutine: (mode: 'awake' | 'sleeping', startedAt?: number) => void;
-  runPrimaryAction: () => void;
+  beginRoutine: (input: RoutineDayStartInput) => void;
+  runPrimaryAction: () => { ok: true } | { ok: false; message: string; remainingMs: number };
   addRecord: (input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => void;
   updateEvent: (dayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>) => void;
   deleteEvent: (dayId: string, eventId: string) => void;
@@ -298,16 +300,20 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     saveDay(targetDayId, buildNext(current, Date.now()));
   }, [canWrite, dayId, history, saveDay]);
 
-  const beginRoutine = useCallback((mode: 'awake' | 'sleeping', startedAt = Date.now()) => {
-    commit((current, at) => startRoutineAt(current, mode, startedAt, at, routineActor));
+  const beginRoutine = useCallback((input: RoutineDayStartInput) => {
+    commit((current, at) => initializeRoutineDay(current, input, at, routineActor));
   }, [commit, routineActor]);
 
   const runPrimaryAction = useCallback(() => {
+    const at = Date.now();
+    const block = getRoutineTransitionBlock(stateRef.current, at);
+    if (block) return { ok: false as const, ...block };
     commit((current, at) => {
       if (current.mode === 'sleeping') return finishSleep(current, at, routineActor);
       if (current.mode === 'awake') return startSleep(current, isNightPeriod(at) ? 'dormir' : 'sono', at, routineActor);
       return current;
     });
+    return { ok: true as const };
   }, [commit, routineActor]);
 
   const addRecord = useCallback((input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => {

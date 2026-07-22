@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "82.1.13";
+        const VERSION = "83.0.2";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
-        root.classList.add("ninou-booting", "ninou-v8200");
+        root.classList.add("ninou-booting", "ninou-launch-base");
         root.dataset.ninouVersion = VERSION;
         window.__NINOU_EARLY_VERSION__ = VERSION;
         window.__NINOU_EARLY_MIGRATION__ = (async () => {
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=82.1.13" />
+    <link rel="manifest" href="./manifest.webmanifest?v=83.0.2" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,14 +54,7 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.13" />
-    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.13" />
-    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.13" />
-    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=82.1.13" />
-    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=82.1.13" />
-    <link rel="stylesheet" href="./styles/web-interaction-stability-v82.1.10.css?v=82.1.13" />
-    <link rel="stylesheet" href="./styles/web-mobile-menu-parity-v82.1.11.css?v=82.1.13" />
-    <link rel="stylesheet" href="./styles/web-mobile-experience-v82.1.13.css?v=82.1.13" />
+    <link id="ninouAppStylesheet" data-ninou-style rel="stylesheet" href="./styles/app.css?v=83.0.2" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -1399,7 +1392,7 @@
             </div>
             <p>Consulte política, termos, aviso de uso responsável e opções de dados conforme sua permissão na família.</p>
             <div class="legal-status-grid" aria-label="Status legal do Ninou">
-              <article><span>Versão legal</span><strong id="legalVersionLabel">v82.1.7</strong><small>Privacidade + termos</small></article>
+              <article><span>Versão legal</span><strong id="legalVersionLabel">v83.0.2</strong><small>Privacidade + termos</small></article>
               <article><span>Consentimento</span><strong id="legalConsentStatus">Não confirmado</strong><small id="legalConsentDate">Aguardando aceite</small></article>
             </div>
             <div class="profile-actions-row legal-actions-row">
@@ -1425,7 +1418,7 @@
             </div>
             <p>Conte o que aconteceu. O Ninou inclui automaticamente as informações técnicas necessárias, sem expor a rotina da família na tela.</p>
             <div class="support-beta-grid" aria-label="Informações técnicas do suporte" hidden>
-              <article><span>Versão</span><strong id="supportVersionLabel">v82.1.7</strong><small>Atendimento Ninou</small></article>
+              <article><span>Versão</span><strong id="supportVersionLabel">v83.0.2</strong><small>Atendimento Ninou</small></article>
               <article><span>Último relatório</span><strong id="supportLastReportLabel">Nenhum</strong><small id="supportLastReportDetail">Nenhum relato enviado</small></article>
             </div>
             <div class="profile-actions-row support-actions-row">
@@ -1653,7 +1646,7 @@
                   <em>Roteiro recomendado para liberar o beta sem pular validações.</em>
                 </div>
                 <ol class="admin-commercial-sequence-list">
-                  <li><strong>1. Publicar versão e regras</strong><span>Subir a v82.1.7, publicar firestore.rules e limpar cache do PWA.</span></li>
+                  <li><strong>1. Publicar versão e regras</strong><span>Publicar a v83.0.2, aplicar firestore.rules e validar o PWA.</span></li>
                   <li><strong>2. Testar família Francisco</strong><span>Pai: luizfelipe.4092@hotmail.com. Mãe: marry@gmail.com. Ambos na mesma família.</span></li>
                   <li><strong>3. Criar família piloto</strong><span>Criar família nova com outro e-mail, gerar convite e aceitar em outro aparelho.</span></li>
                   <li><strong>4. Validar papéis</strong><span>Responsável/admin veem backup/exportação/exclusão; cuidador e visualização não veem ações sensíveis.</span></li>
@@ -1920,7 +1913,7 @@
           </article>
           <article id="adminDiagnosticsCard" class="admin-diagnostics-card" hidden>
             <span>Diagnóstico</span>
-            <strong id="diagnosticsVersionLabel">Ninou v82.1.7</strong>
+            <strong id="diagnosticsVersionLabel">Ninou v83.0.2</strong>
             <p id="diagnosticsSummary">Informações técnicas ficam recolhidas no modo simples para evitar poluição visual. Abra o modo avançado somente quando precisar investigar cache, PWA, sincronização ou permissões.</p>
             <div class="diagnostics-grid" aria-label="Diagnóstico técnico" data-advanced-only>
               <div><span>Usuário</span><strong id="diagnosticsUserLabel">—</strong></div>
@@ -2415,7 +2408,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v82.1.7.mjs?v=82.1.13").catch((error) => {
+      import("./js/bootstrap.mjs?v=83.0.2").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2428,11 +2421,5 @@
       });
     </script>
 
-    <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.13";
-      initActionLauncher();
-    </script>
-    <script type="module" src="./js/web-mobile-menu-parity-v82.1.11.mjs?v=82.1.13"></script>
-    <script type="module" src="./js/web-mobile-experience-v82.1.13.mjs?v=82.1.13"></script>
   </body>
 </html>

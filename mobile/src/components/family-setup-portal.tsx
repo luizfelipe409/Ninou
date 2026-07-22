@@ -68,7 +68,7 @@ export function FamilySetupPortal() {
   const [birthDate, setBirthDate] = useState('');
   const [article, setArticle] = useState<'do' | 'da'>('do');
   const [responsibleName, setResponsibleName] = useState('');
-  const [responsibleRelation, setResponsibleRelation] = useState('Responsável');
+  const [responsibleRelation, setResponsibleRelation] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -90,7 +90,7 @@ export function FamilySetupPortal() {
         birthDate,
         article,
         responsibleName: responsibleName.trim(),
-        responsibleRelation: responsibleRelation.trim() || 'Responsável',
+        responsibleRelation: responsibleRelation.trim(),
       });
       await refreshAccess();
     } catch (error) {

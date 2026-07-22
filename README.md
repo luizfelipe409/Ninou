@@ -1,58 +1,78 @@
-# Ninou v82.1.13 — paridade mobile e live wallpaper na web
+# Ninou 83.0.2 — base de lançamento com correções mobile
 
-Projeto completo do Ninou com:
+Repositório consolidado do Ninou para web/PWA, iOS e Android.
 
-- aplicação web/PWA com os fluxos e acabamentos principais do mobile, live wallpaper global e interações estáveis;
-- painel administrativo web;
-- aplicação mobile v82.1.12, com melhorias de usabilidade, fluxos de família e preparação para publicação;
-- Firebase/Firestore como camada de autenticação e sincronização.
+## Estrutura
 
-## Fluxo para uma nova família adquirente
+- `index.html`, `styles/` e `js/`: aplicação web/PWA.
+- `mobile/`: aplicação nativa Expo/React Native para iOS e Android.
+- `firestore.rules`: regras de acesso e sincronização do Firebase.
+- `dist/`: build web gerado por `npm run build`.
+- `docs/`: arquitetura, checklist e histórico técnico.
 
-1. No painel administrativo, abra **Nova família cliente**.
-2. Informe família, bebê e e-mail do responsável.
-3. Escolha o plano e a validade.
-4. Crie a família e envie ao cliente a mensagem de ativação copiada pelo painel.
-5. O cliente abre o Ninou, toca em **Ativar meu acesso** e usa o e-mail autorizado e o código recebido.
+## Base web consolidada
 
-O cliente não consegue criar uma família comercial sem convite. Cuidadores adicionais entram por convites da família.
+A aplicação web utiliza apenas:
 
-## Controle de acesso
+- `styles/app.css`: acabamento comum completo;
+- `styles/admin.css`: painel administrativo, carregado apenas para o admin;
+- `js/bootstrap.mjs`: inicialização;
+- `js/app-core.mjs`: regras e fluxos principais;
+- `js/ui/app-shell.mjs`: menu, live wallpaper e experiência compartilhada;
+- módulos de domínio, serviços e interface com nomes estáveis.
 
-- **Teste:** validade configurável, inicialmente 14 dias.
-- **Premium:** validade configurável, inicialmente 30 dias.
-- **Cortesia:** validade configurável.
-- **Suspenso:** bloqueia a entrada preservando os dados.
-- **Legado:** famílias antigas sem metadados comerciais continuam funcionando.
+Arquivos versionados de correção, cópias antigas de `boot`, `core`, painel e múltiplas folhas CSS empilhadas não fazem parte da base ativa. O núcleo legado foi preservado para reduzir risco funcional perto do lançamento, mas agora existe apenas uma cópia ativa com ponto de entrada estável.
 
-Não há checkout ou cobrança automática nesta versão. Pagamento, renovação e liberação são administrados pelo painel.
+## Mobile
 
-## Publicação na Vercel
+A pasta `mobile/` usa Expo SDK 57, React Native e TypeScript. A mesma base gera:
+
+- iOS: IPA/TestFlight/App Store;
+- Android: APK de teste e AAB para Google Play.
+
+Versão do pacote: `83.0.2`  
+Build iOS/Android: `90`  
+Identificador: `com.ninou.app`
+
+## Validação web
 
 ```bash
-npm test
-npm run build
+npm run release:check
 ```
 
-Configuração esperada:
+O comando executa regressões, build, validação estrutural e verificação de limpeza. Consulte também `VALIDACAO_BASE_LIMPA_v83.0.0.md`.
+
+## Validação mobile
+
+Consulte `VALIDACAO_MOBILE_v83.0.2.md` para os cenários corrigidos nesta versão.
+
+```bash
+cd mobile
+npm ci
+npm run check
+```
+
+Sem dependências instaladas, os testes puros ainda podem ser executados:
+
+```bash
+npm run test:source
+```
+
+## Publicação
+
+### Web/Vercel
 
 - Build Command: `npm run build`
 - Output Directory: `dist`
 
-Publique também as regras atualizadas do Firestore quando houver alteração nelas.
+### Lojas
 
-## Verificação após publicar
+Antes do envio, execute um build real de produção e valide em aparelhos físicos:
 
-Use uma família piloto para validar:
+```bash
+cd mobile
+npx eas-cli build --profile production --platform ios
+npx eas-cli build --profile production --platform android
+```
 
-1. criação no painel;
-2. recebimento/cópia do código;
-3. criação de conta com o e-mail autorizado;
-4. ativação da família;
-5. login em outro aparelho;
-6. recuperação de senha;
-7. expiração e renovação do plano;
-8. páginas de privacidade, termos e suporte;
-9. instalação como PWA.
-
-Consulte `VALIDACAO_WEB_CLIENTES_v82.1.7.md`, `VALIDACAO_ESTABILIDADE_WEB_v82.1.10.md`, `VALIDACAO_WEB_MOBILE_PARITY_v82.1.13.md` e as validações existentes em `mobile/`.
+O lançamento deve começar com uma família piloto criada pelo painel. Felipe e Maria seguem o mesmo fluxo comercial dos demais usuários; a conta administrativa apenas acrescenta acesso ao painel global.

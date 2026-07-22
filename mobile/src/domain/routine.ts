@@ -1,4 +1,16 @@
 export type RoutineMode = 'idle' | 'awake' | 'sleeping';
+export const MIN_ROUTINE_STATE_DURATION_MS = 2 * 60 * 1000;
+
+export type RoutineDayStartInput = {
+  wakeAt: number;
+  currentMode: Exclude<RoutineMode, 'idle'>;
+  currentStateStartedAt?: number;
+};
+
+export type RoutineTransitionBlock = {
+  remainingMs: number;
+  message: string;
+};
 export type RoutineActor = {
   uid: string;
   email: string;
@@ -305,11 +317,50 @@ export function startRoutineAt(state: DayState, mode: Exclude<RoutineMode, 'idle
   }, now, `start-${mode}`);
 }
 
+export function initializeRoutineDay(
+  state: DayState,
+  input: RoutineDayStartInput,
+  now = Date.now(),
+  actor?: RoutineActor | null,
+): DayState {
+  const dayStart = new Date(now);
+  dayStart.setHours(0, 0, 0, 0);
+  const safeWakeAt = Math.min(now, Math.max(dayStart.getTime(), Number(input.wakeAt) || now));
+  const requestedCurrentStart = Number(input.currentStateStartedAt);
+  const currentStateStartedAt = Math.min(
+    now,
+    Math.max(safeWakeAt, Number.isFinite(requestedCurrentStart) ? requestedCurrentStart : safeWakeAt),
+  );
+  const hasWakeMarker = state.events.some((event) => event.type === 'acordou' && Math.abs(event.start - safeWakeAt) < 60 * 1000);
+  const wakeEvent = hasWakeMarker
+    ? []
+    : [makeEvent('acordou', safeWakeAt, safeWakeAt, 'Primeiro despertar informado', '', undefined, actor)];
+
+  return stamp({
+    ...state,
+    mode: input.currentMode,
+    activeStartedAt: currentStateStartedAt,
+    activeType: input.currentMode === 'sleeping'
+      ? (isNightPeriod(currentStateStartedAt) ? 'dormir' : 'sono')
+      : 'acordou',
+    activeDetail: input.currentMode === 'sleeping'
+      ? (isNightPeriod(currentStateStartedAt) ? 'Sono noturno' : 'Timer')
+      : '',
+    activeNotes: '',
+    activeActor: normalizeRoutineActor(actor),
+    lastWakeWindowStartedAt: input.currentMode === 'sleeping' ? safeWakeAt : null,
+    lastWakeWindowMs: input.currentMode === 'sleeping' ? Math.max(0, currentStateStartedAt - safeWakeAt) : null,
+    events: [...state.events, ...wakeEvent].sort((left, right) => left.start - right.start),
+  }, now, `initialize-${input.currentMode}`);
+}
+
 export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>, now = Date.now(), actor?: RoutineActor | null): DayState {
   return startRoutineAt(state, mode, now, now, actor);
 }
 
 export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.now(), actor?: RoutineActor | null): DayState {
+  if (state.mode === 'sleeping') return state;
+  if (getRoutineTransitionBlock(state, now)) return state;
   const awakeStart = state.mode === 'awake' ? state.activeStartedAt : null;
   return stamp({
     ...state,
@@ -326,6 +377,7 @@ export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.
 
 export function finishSleep(state: DayState, now = Date.now(), actor?: RoutineActor | null): DayState {
   if (state.mode !== 'sleeping' || !state.activeStartedAt) return state;
+  if (getRoutineTransitionBlock(state, now)) return state;
   const isNight = state.activeType === 'dormir' || isNightPeriod(now);
   const wakeType: RecordType = isNight ? 'despertar-noturno' : 'acordou';
   return stamp({
@@ -344,6 +396,21 @@ export function finishSleep(state: DayState, now = Date.now(), actor?: RoutineAc
   }, now, `finish-${state.activeType}`);
 }
 
+export function getRoutineTransitionBlock(state: DayState, now = Date.now()): RoutineTransitionBlock | null {
+  if (state.mode === 'idle' || !state.activeStartedAt) return null;
+  const elapsed = Math.max(0, now - state.activeStartedAt);
+  if (elapsed >= MIN_ROUTINE_STATE_DURATION_MS) return null;
+  const remainingMs = MIN_ROUTINE_STATE_DURATION_MS - elapsed;
+  const remainingSeconds = Math.max(1, Math.ceil(remainingMs / 1000));
+  const remainingLabel = remainingSeconds >= 60
+    ? `${Math.ceil(remainingSeconds / 60)} min`
+    : `${remainingSeconds} s`;
+  return {
+    remainingMs,
+    message: `Para evitar registros acidentais, aguarde ${remainingLabel} antes de alternar entre sono e acordado. Se o horário estiver incorreto, ajuste o último registro no Diário.`,
+  };
+}
+
 export function addRoutineRecord(state: DayState, input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }, now = Date.now(), actor?: RoutineActor | null): DayState {
   const { type, detail = '', notes = '', amountMl } = input;
   const customStart = Number(input.start);
@@ -351,7 +418,9 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
   if (Number.isFinite(customStart)) {
     const resolvedEnd = resolveRoutineIntervalEnd(type, customStart, Number.isFinite(customEnd) ? customEnd : null);
     if ((type === 'sono' || type === 'dormir') && resolvedEnd === null) {
+      if (state.mode === 'sleeping') return state;
       const awakeStart = state.mode === 'awake' ? state.activeStartedAt : null;
+      if (awakeStart && (customStart < awakeStart || customStart - awakeStart < MIN_ROUTINE_STATE_DURATION_MS)) return state;
       return stamp({
         ...state,
         mode: 'sleeping',
@@ -365,11 +434,18 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
       }, now, `start-${type}-manual`);
     }
     const end = resolvedEnd ?? customStart;
+    if ((type === 'sono' || type === 'dormir') && end > customStart && end - customStart < MIN_ROUTINE_STATE_DURATION_MS) return state;
+    if ((type === 'acordou' || type === 'despertar-noturno') && state.mode === 'sleeping' && state.activeStartedAt) {
+      if (customStart < state.activeStartedAt || customStart - state.activeStartedAt < MIN_ROUTINE_STATE_DURATION_MS) return state;
+      return finishSleep(state, customStart, actor);
+    }
+    if ((type === 'acordou' || type === 'despertar-noturno') && state.mode === 'awake') return state;
     return stamp({ ...state, events: [...state.events, makeEvent(type, customStart, end, detail, notes, amountMl, actor)] }, now, `record-${type}`);
   }
   if (type === 'sono' || type === 'dormir') return startSleep(state, type, now, actor);
   if (type === 'acordou' || type === 'despertar-noturno') {
     if (state.mode === 'sleeping') return finishSleep(state, now, actor);
+    if (state.mode === 'awake') return state;
     const base = state;
     return stamp({
       ...base,
@@ -733,4 +809,78 @@ export function getRoutineEventsForLocalDay(events: RoutineEvent[], dayTimestamp
 export function getRoutineMarkerEventsForLocalDay(events: RoutineEvent[], dayTimestamp = Date.now()) {
   const { dayStart, dayEnd } = getRoutineLocalDayBounds(dayTimestamp);
   return getRoutineEventsForLocalDay(events, dayTimestamp).filter((event) => event.start >= dayStart && event.start < dayEnd);
+}
+
+export function getRoutineClockMinutes(timestamp: number) {
+  const date = new Date(timestamp);
+  return date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
+}
+
+export function getRoutineCircularMinuteDistance(left: number, right: number) {
+  const distance = Math.abs(left - right);
+  return Math.min(distance, 1440 - distance);
+}
+
+export function getRoutineMarkerCollisionWindowMinutes(orbitRadius: number) {
+  const circumference = Math.max(1, 2 * Math.PI * orbitRadius);
+  return Math.max(18, Math.min(82, (48 / circumference) * 1440));
+}
+
+function sortRoutineMarkerGroupCircularly(group: RoutineEvent[]) {
+  const sorted = [...group].sort((left, right) => getRoutineClockMinutes(getRoutineEventOrbitTimestamp(left)) - getRoutineClockMinutes(getRoutineEventOrbitTimestamp(right)));
+  if (sorted.length < 2) return sorted;
+  let largestGap = -1;
+  let rotateAt = 0;
+  sorted.forEach((event, index) => {
+    const current = getRoutineClockMinutes(getRoutineEventOrbitTimestamp(event));
+    const next = index === sorted.length - 1
+      ? getRoutineClockMinutes(getRoutineEventOrbitTimestamp(sorted[0])) + 1440
+      : getRoutineClockMinutes(getRoutineEventOrbitTimestamp(sorted[index + 1]));
+    const gap = next - current;
+    if (gap > largestGap) {
+      largestGap = gap;
+      rotateAt = (index + 1) % sorted.length;
+    }
+  });
+  return [...sorted.slice(rotateAt), ...sorted.slice(0, rotateAt)];
+}
+
+export function groupRoutineMarkerEvents(events: RoutineEvent[], thresholdMinutes: number) {
+  const threshold = Math.max(1, thresholdMinutes);
+  const sorted = [...events].sort((left, right) => getRoutineClockMinutes(getRoutineEventOrbitTimestamp(left)) - getRoutineClockMinutes(getRoutineEventOrbitTimestamp(right)));
+  const groups = sorted.reduce<RoutineEvent[][]>((result, event) => {
+    const current = result[result.length - 1];
+    const eventMinutes = getRoutineClockMinutes(getRoutineEventOrbitTimestamp(event));
+    const firstMinutes = current?.length ? getRoutineClockMinutes(getRoutineEventOrbitTimestamp(current[0])) : null;
+    // Evita agrupamento em cadeia: todos os itens do grupo precisam caber na mesma janela visual.
+    if (current && firstMinutes !== null && eventMinutes - firstMinutes <= threshold) current.push(event);
+    else result.push([event]);
+    return result;
+  }, []);
+  if (groups.length > 1) {
+    const first = groups[0];
+    const last = groups[groups.length - 1];
+    const firstEndMinutes = getRoutineClockMinutes(getRoutineEventOrbitTimestamp(first[first.length - 1]));
+    const lastStartMinutes = getRoutineClockMinutes(getRoutineEventOrbitTimestamp(last[0]));
+    const circularSpan = (1440 - lastStartMinutes) + firstEndMinutes;
+    if (circularSpan <= threshold) {
+      groups[0] = [...last, ...first];
+      groups.pop();
+    }
+  }
+  return groups.map(sortRoutineMarkerGroupCircularly);
+}
+
+export function getRoutineMarkerGroupTimestamp(group: RoutineEvent[], referenceTimestamp: number) {
+  if (!group.length) return referenceTimestamp;
+  const vectors = group.map((event) => {
+    const angle = (getRoutineClockMinutes(getRoutineEventOrbitTimestamp(event)) / 1440) * Math.PI * 2;
+    return { x: Math.cos(angle), y: Math.sin(angle) };
+  });
+  const angle = Math.atan2(vectors.reduce((sum, vector) => sum + vector.y, 0), vectors.reduce((sum, vector) => sum + vector.x, 0));
+  const normalized = angle < 0 ? angle + Math.PI * 2 : angle;
+  const minutes = (normalized / (Math.PI * 2)) * 1440;
+  const date = new Date(referenceTimestamp);
+  date.setHours(Math.floor(minutes / 60), Math.floor(minutes % 60), 0, 0);
+  return date.getTime();
 }
