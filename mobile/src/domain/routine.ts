@@ -289,19 +289,24 @@ function stamp(state: DayState, now: number, action: string): DayState {
   };
 }
 
-export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>, now = Date.now(), actor?: RoutineActor | null): DayState {
+export function startRoutineAt(state: DayState, mode: Exclude<RoutineMode, 'idle'>, startedAt: number, now = Date.now(), actor?: RoutineActor | null): DayState {
+  const safeStartedAt = Math.min(now, Math.max(0, Number(startedAt) || now));
   return stamp({
     ...state,
     mode,
-    activeStartedAt: now,
+    activeStartedAt: safeStartedAt,
     activeType: mode === 'sleeping' ? 'sono' : 'acordou',
     activeDetail: mode === 'sleeping' ? 'Timer' : '',
     activeNotes: '',
     activeActor: normalizeRoutineActor(actor),
     events: mode === 'awake'
-      ? [...state.events, makeEvent('acordou', now, now, 'Rotina iniciada agora', '', undefined, actor)]
+      ? [...state.events, makeEvent('acordou', safeStartedAt, safeStartedAt, safeStartedAt === now ? 'Rotina iniciada agora' : 'Horário inicial informado', '', undefined, actor)]
       : state.events,
   }, now, `start-${mode}`);
+}
+
+export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>, now = Date.now(), actor?: RoutineActor | null): DayState {
+  return startRoutineAt(state, mode, now, now, actor);
 }
 
 export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.now(), actor?: RoutineActor | null): DayState {

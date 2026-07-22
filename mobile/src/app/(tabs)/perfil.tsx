@@ -5,9 +5,11 @@ import { useEffect, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
+import { DateField } from '@/components/date-field';
+import { RelationPicker } from '@/components/relation-picker';
 import { AvatarArt } from '@/components/avatar-art';
 import { avatarIds, avatarLabels, type AvatarId } from '@/domain/avatar';
-import { canEditFamilyProfile, canExportFamilyReports, canManageFamily as roleCanManageFamily } from '@/domain/family-access';
+import { canEditFamilyProfile, canExportFamilyReports, canManageFamily as roleCanManageFamily, familyRoleLabel } from '@/domain/family-access';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
 import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
@@ -19,7 +21,7 @@ export default function ProfileScreen() {
   const { colors, isDark, mode, setMode } = useNinouTheme();
   const { profile, updateProfile } = useBabyProfile();
   const { user, access, status, error, login, signOut, refreshAccess } = useNinouAuth();
-  const { syncMessage, resetDay } = useRoutine();
+  const { syncMessage, canWrite, resetDay } = useRoutine();
   const { preferences, updatePreferences } = useFamilyPreferences();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,7 +113,7 @@ export default function ProfileScreen() {
     const acceptedAt = Date.now();
     updatePreferences({ legalAcceptedAt: acceptedAt });
     setWorking('legal');
-    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: '82.1.9', privacyVersion: '82.1.9', medicalDisclaimerVersion: '82.1.9', acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
+    try { const result = await saveLegalConsent(user, access?.familyId, { termsVersion: '82.1.12', privacyVersion: '82.1.12', medicalDisclaimerVersion: '82.1.12', acceptedAtClient: acceptedAt }); Alert.alert('Preferências salvas', result.familySynced || !access ? 'O aceite foi registrado nesta conta e família.' : 'O aceite foi salvo na sua conta. A família será sincronizada quando o acesso estiver disponível.'); }
     catch (legalError) { Alert.alert('Aceite salvo neste aparelho', `${getFirebaseErrorMessage(legalError)} A sincronização será tentada novamente.`); } finally { setWorking(''); }
   };
 
@@ -135,7 +137,7 @@ export default function ProfileScreen() {
   const sendSupport = async () => {
     if (!user || !supportMessage.trim()) return;
     setWorking('support');
-    const diagnostics = `Ninou Expo 82.1.9 | family=${access?.familyId || 'none'} | role=${access?.role || 'none'} | sync=${syncMessage}`;
+    const diagnostics = `Ninou Expo 82.1.12 | family=${access?.familyId || 'none'} | role=${access?.role || 'none'} | sync=${syncMessage}`;
     try { await submitSupportRequest(user, access?.familyId, { category: supportCategory, message: supportMessage.trim(), diagnostics }); setSupportMessage(''); setSupportOpen(false); Alert.alert('Relato enviado', 'Recebemos o problema junto com as informações técnicas necessárias.'); }
     catch (supportError) { Alert.alert('Não foi possível enviar', getFirebaseErrorMessage(supportError)); } finally { setWorking(''); }
   };
@@ -177,16 +179,13 @@ export default function ProfileScreen() {
               );
             })}
           </View>
-          <Text style={[styles.label, { color: colors.text }]}>Nascimento</Text>
-          <TextInput
+          <DateField
+            label="Data de nascimento"
             value={profile.birthDate}
-            onChangeText={(birthDate) => updateProfile({ birthDate })}
-            editable={canEditProfile}
-            placeholder="AAAA-MM-DD"
-            placeholderTextColor={colors.textMuted}
-            autoCapitalize="none"
-            keyboardType="numbers-and-punctuation"
-            style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
+            onChange={(birthDate) => updateProfile({ birthDate })}
+            placeholder="Escolher no calendário"
+            minimumDate={new Date(2000, 0, 1)}
+            disabled={!canEditProfile}
           />
           <Text style={[styles.label, { color: colors.text }]}>Avatar do diário</Text>
           <Pressable
@@ -219,8 +218,7 @@ export default function ProfileScreen() {
         <View style={styles.form}>
           <Text style={[styles.label, { color: colors.text }]}>Nome</Text>
           <TextInput value={caregiverNameDraft} onChangeText={(name) => setCaregiverDraft({ name, relation: caregiverRelationDraft })} placeholder="Ex.: Felipe" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} />
-          <Text style={[styles.label, { color: colors.text }]}>Relação com o bebê</Text>
-          <TextInput value={caregiverRelationDraft} onChangeText={(relation) => setCaregiverDraft({ name: caregiverNameDraft, relation })} placeholder="Pai, mãe, avó, babá…" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} />
+          <RelationPicker value={caregiverRelationDraft} onChange={(relation) => setCaregiverDraft({ name: caregiverNameDraft, relation })} />
         </View>
         <Pressable onPress={saveCaregiverIdentity} style={[styles.primaryButton, styles.cardAction, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Salvar identidade da conta</Text></Pressable>
       </NinouCard>
@@ -262,10 +260,14 @@ export default function ProfileScreen() {
       <NinouCard style={styles.profileCard}>
         <View style={styles.accessRow}><View style={[styles.accessIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={24} color={colors.primary} /></View><View style={styles.accessCopy}><Text style={[styles.sectionKicker, { color: colors.primary }]}>Família conectada</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Acesso e convites</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>{canManageFamily ? 'Convide cuidadores por e-mail. O código tem uso único e expira em 7 dias.' : 'Você pode acompanhar a família, mas apenas responsáveis podem gerar convites.'}</Text></View></View>
         {activeSubscription ? <View style={[styles.subscriptionCard, { backgroundColor: colors.primarySoft, borderColor: colors.border }]}><Text style={[styles.subscriptionKicker, { color: colors.primary }]}>{subscriptionLabel}</Text><Text style={[styles.subscriptionTitle, { color: colors.text }]}>{activeSubscription.plan === 'suspended' ? 'Temporariamente suspenso' : activeSubscription.validUntil ? `${activeSubscription.validUntil <= subscriptionClock ? 'Validade encerrada' : 'Válido até'} ${new Date(activeSubscription.validUntil).toLocaleDateString('pt-BR')}` : 'Validade ainda não definida'}</Text><Text style={[styles.subscriptionMeta, { color: colors.textMuted }]}>{activeSubscription.plan === 'suspended' ? 'Fale com o suporte para reativar o acesso.' : activeSubscription.validUntil ? (remainingDays ? `${remainingDays} dia(s) restante(s)` : 'O período terminou.') : 'O administrador ainda não definiu um período.'}</Text></View> : null}
-        {canManageFamily ? <View style={styles.inviteForm}><Text style={[styles.label, { color: colors.text }]}>E-mail do familiar</Text><TextInput value={inviteEmail} onChangeText={setInviteEmail} autoCapitalize="none" keyboardType="email-address" placeholder="familiar@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Papel</Text><View style={styles.articleRow}>{[['cuidador', 'Cuidador'], ['admin_familiar', 'Responsável']] .map(([value, label]) => <Pressable key={value} onPress={() => setInviteRole(value)} style={[styles.articleChoice, { borderColor: inviteRole === value ? colors.primary : colors.border, backgroundColor: inviteRole === value ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.articleChoiceText, { color: inviteRole === value ? '#FFF' : colors.text }]}>{label}</Text></Pressable>)}</View><Pressable disabled={working === 'invite' || !inviteEmail.trim()} onPress={() => void createInvite()} style={[styles.primaryButton, { backgroundColor: colors.primary }, (working === 'invite' || !inviteEmail.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>{working === 'invite' ? 'Gerando…' : 'Gerar convite'}</Text></Pressable></View> : null}
+        {canManageFamily ? <View style={styles.inviteForm}><Text style={[styles.label, { color: colors.text }]}>E-mail do familiar</Text><TextInput value={inviteEmail} onChangeText={setInviteEmail} autoCapitalize="none" keyboardType="email-address" placeholder="familiar@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Permissão do convite</Text><View style={styles.inviteRoles}>{[
+          ['admin_familiar', 'Responsável adicional', 'Registra cuidados, edita o perfil e pode convidar outras pessoas.', 'key-outline'],
+          ['cuidador', 'Cuidador', 'Registra e corrige a rotina, sem alterar família ou permissões.', 'heart-outline'],
+          ['visualizacao', 'Somente visualização', 'Acompanha registros e relatórios, sem criar, editar ou excluir.', 'eye-outline'],
+        ].map(([value, label, description, icon]) => { const selected = inviteRole === value; return <Pressable key={value} onPress={() => setInviteRole(value)} style={[styles.inviteRoleCard, { borderColor: selected ? colors.primary : colors.border, backgroundColor: selected ? colors.primarySoft : colors.surfaceElevated }]}><View style={[styles.inviteRoleIcon, { backgroundColor: selected ? colors.primary : colors.surface }]}><Ionicons name={icon as keyof typeof Ionicons.glyphMap} size={18} color={selected ? '#FFF' : colors.primary} /></View><View style={styles.inviteRoleCopy}><Text style={[styles.inviteRoleTitle, { color: colors.text }]}>{label}</Text><Text style={[styles.inviteRoleDescription, { color: colors.textMuted }]}>{description}</Text></View>{selected ? <Ionicons name="checkmark-circle" size={20} color={colors.primary} /> : null}</Pressable>; })}</View><View style={[styles.roleGuide, { backgroundColor: colors.primarySoft }]}><Ionicons name="information-circle-outline" size={18} color={colors.primary} /><Text style={[styles.roleGuideText, { color: colors.text }]}>Quem criou a família continua como responsável principal. O convite define apenas o que a nova pessoa poderá fazer.</Text></View><Pressable disabled={working === 'invite' || !inviteEmail.trim()} onPress={() => void createInvite()} style={[styles.primaryButton, { backgroundColor: colors.primary }, (working === 'invite' || !inviteEmail.trim()) && styles.disabled]}><Text style={styles.primaryButtonText}>{working === 'invite' ? 'Gerando…' : 'Gerar convite'}</Text></Pressable></View> : null}
         {inviteFeedback ? <Text style={[styles.inviteFeedback, { color: colors.warning }]}>{inviteFeedback}</Text> : null}
         {inviteCode ? <View style={[styles.inviteResult, { backgroundColor: colors.primarySoft, borderColor: colors.primary }]}><Text style={[styles.inviteResultLabel, { color: colors.primary }]}>CÓDIGO DO CONVITE</Text><Text style={[styles.inviteCode, { color: colors.text }]}>{inviteCode}</Text><Pressable onPress={() => void shareInvite()} style={[styles.shareInvite, { backgroundColor: colors.primary }]}><Ionicons name="share-social-outline" size={18} color="#FFF" /><Text style={styles.shareInviteText}>Compartilhar convite</Text></Pressable></View> : null}
-        <View style={styles.memberList}><Text style={[styles.label, { color: colors.text }]}>Pessoas com acesso</Text>{members.length ? members.map((member) => <View key={member.uid} style={[styles.member, { backgroundColor: colors.surfaceElevated }]}><View style={[styles.memberAvatar, { backgroundColor: colors.primarySoft }]}><Text style={[styles.memberInitial, { color: colors.primary }]}>{(member.name || member.email || 'F').charAt(0).toUpperCase()}</Text></View><View style={styles.memberCopy}><Text style={[styles.memberName, { color: colors.text }]}>{member.name || member.email}</Text><Text style={[styles.memberMeta, { color: colors.textMuted }]}>{member.role} · {member.status}</Text></View></View>) : <Text style={[styles.cardText, { color: colors.textMuted }]}>A lista aparecerá quando a família estiver sincronizada.</Text>}</View>
+        <View style={styles.memberList}><Text style={[styles.label, { color: colors.text }]}>Pessoas com acesso</Text>{members.length ? members.map((member) => <View key={member.uid} style={[styles.member, { backgroundColor: colors.surfaceElevated }]}><View style={[styles.memberAvatar, { backgroundColor: colors.primarySoft }]}><Text style={[styles.memberInitial, { color: colors.primary }]}>{(member.name || member.email || 'F').charAt(0).toUpperCase()}</Text></View><View style={styles.memberCopy}><Text style={[styles.memberName, { color: colors.text }]}>{member.name || member.email}</Text><Text style={[styles.memberMeta, { color: colors.textMuted }]}>{familyRoleLabel(member.role)} · {member.status === 'active' ? 'Ativo' : member.status}</Text></View></View>) : <Text style={[styles.cardText, { color: colors.textMuted }]}>A lista aparecerá quando a família estiver sincronizada.</Text>}</View>
       </NinouCard>
 
       <NinouCard style={styles.profileCard}>
@@ -274,7 +276,7 @@ export default function ProfileScreen() {
           <View style={styles.accessCopy}>
             <Text style={[styles.cardTitle, { color: colors.text }]}>Acesso familiar</Text>
             <Text style={[styles.cardText, { color: colors.textMuted }]}>
-              {access ? `${user?.email || ''} • ${access.role}` : user ? 'Conta conectada, aguardando vínculo familiar.' : 'Entre com a mesma conta usada no Ninou para sincronizar a rotina entre aparelhos.'}
+              {access ? `${user?.email || ''} • ${familyRoleLabel(access.role)}` : user ? 'Conta conectada, aguardando vínculo familiar.' : 'Entre com a mesma conta usada no Ninou para sincronizar a rotina entre aparelhos.'}
             </Text>
           </View>
         </View>
@@ -339,7 +341,7 @@ export default function ProfileScreen() {
       </NinouCard>
 
       <NinouCard style={styles.profileCard}>
-        <Text style={[styles.sectionKicker, { color: colors.danger }]}>Dados do dia</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Recomeçar os registros de hoje</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Remove o estado, os eventos e as notas de hoje para toda a família. Relatórios de dias anteriores permanecem intactos.</Text><Pressable onPress={() => Alert.alert('Zerar o dia?', 'Esta ação será sincronizada e não poderá ser desfeita.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Zerar hoje', style: 'destructive', onPress: () => resetDay(getLocalDateId()) }])} style={[styles.secondaryButton, styles.cardAction, { borderColor: colors.danger }]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>Zerar dia</Text></Pressable>
+        <Text style={[styles.sectionKicker, { color: colors.danger }]}>Dados do dia</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Recomeçar os registros de hoje</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Remove o estado, os eventos e as notas de hoje para toda a família. Relatórios de dias anteriores permanecem intactos.</Text><Pressable disabled={!canWrite} onPress={() => Alert.alert('Zerar o dia?', 'Esta ação será sincronizada e não poderá ser desfeita.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Zerar hoje', style: 'destructive', onPress: () => resetDay(getLocalDateId()) }])} style={[styles.secondaryButton, styles.cardAction, { borderColor: colors.danger }, !canWrite && styles.disabled]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>{canWrite ? 'Zerar dia' : 'Somente visualização'}</Text></Pressable>
       </NinouCard>
 
       <Modal visible={avatarModalOpen} transparent animationType="fade" onRequestClose={() => setAvatarModalOpen(false)}>
@@ -444,7 +446,7 @@ const styles = StyleSheet.create({
   accessIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   accessCopy: { flex: 1 },
   subscriptionCard: { marginTop: spacing.lg, padding: 14, borderWidth: StyleSheet.hairlineWidth, borderRadius: 18, gap: 4 }, subscriptionKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }, subscriptionTitle: { fontSize: 14, lineHeight: 19, fontWeight: '900' }, subscriptionMeta: { fontSize: 10.5, lineHeight: 15, fontWeight: '700' },
-  inviteForm: { marginTop: spacing.lg, gap: spacing.sm }, inviteFeedback: { marginTop: spacing.md, fontSize: 11.5, lineHeight: 17, fontWeight: '700' }, inviteResult: { marginTop: spacing.md, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, padding: 15, alignItems: 'center' }, inviteResultLabel: { fontSize: 9, fontWeight: '900', letterSpacing: 1.1 }, inviteCode: { marginVertical: 8, fontSize: 28, fontWeight: '900', letterSpacing: 4 }, shareInvite: { minHeight: 44, width: '100%', borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, shareInviteText: { color: '#FFF', fontSize: 12, fontWeight: '900' }, memberList: { marginTop: spacing.lg, gap: spacing.sm }, member: { minHeight: 58, borderRadius: 17, padding: 9, flexDirection: 'row', alignItems: 'center', gap: 10 }, memberAvatar: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, memberInitial: { fontSize: 16, fontWeight: '900' }, memberCopy: { flex: 1 }, memberName: { fontSize: 12.5, fontWeight: '900' }, memberMeta: { marginTop: 2, fontSize: 9.5, fontWeight: '700' },
+  inviteForm: { marginTop: spacing.lg, gap: spacing.sm }, inviteRoles: { gap: 8 }, inviteRoleCard: { minHeight: 76, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, padding: 11, flexDirection: 'row', alignItems: 'center', gap: 10 }, inviteRoleIcon: { width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, inviteRoleCopy: { flex: 1 }, inviteRoleTitle: { fontSize: 12.5, fontWeight: '900' }, inviteRoleDescription: { marginTop: 3, fontSize: 9.5, lineHeight: 14, fontWeight: '650' }, roleGuide: { minHeight: 54, borderRadius: 16, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }, roleGuideText: { flex: 1, fontSize: 10, lineHeight: 15, fontWeight: '750' }, inviteFeedback: { marginTop: spacing.md, fontSize: 11.5, lineHeight: 17, fontWeight: '700' }, inviteResult: { marginTop: spacing.md, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, padding: 15, alignItems: 'center' }, inviteResultLabel: { fontSize: 9, fontWeight: '900', letterSpacing: 1.1 }, inviteCode: { marginVertical: 8, fontSize: 28, fontWeight: '900', letterSpacing: 4 }, shareInvite: { minHeight: 44, width: '100%', borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, shareInviteText: { color: '#FFF', fontSize: 12, fontWeight: '900' }, memberList: { marginTop: spacing.lg, gap: spacing.sm }, member: { minHeight: 58, borderRadius: 17, padding: 9, flexDirection: 'row', alignItems: 'center', gap: 10 }, memberAvatar: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, memberInitial: { fontSize: 16, fontWeight: '900' }, memberCopy: { flex: 1 }, memberName: { fontSize: 12.5, fontWeight: '900' }, memberMeta: { marginTop: 2, fontSize: 9.5, fontWeight: '700' },
   authForm: { marginTop: spacing.lg, gap: spacing.md },
   primaryButton: { minHeight: 50, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg },
   cardAction: { marginTop: spacing.lg },

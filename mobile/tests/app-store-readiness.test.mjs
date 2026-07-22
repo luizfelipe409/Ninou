@@ -13,11 +13,11 @@ function pngSize(buffer) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
-assert.equal(appConfig.expo.version, '82.1.9');
-assert.equal(packageConfig.version, '82.1.9');
+assert.equal(appConfig.expo.version, '82.1.12');
+assert.equal(packageConfig.version, '82.1.12');
 assert.equal(appConfig.expo.ios.bundleIdentifier, 'com.ninou.app');
-assert.equal(appConfig.expo.ios.buildNumber, '86');
-assert.equal(appConfig.expo.android.versionCode, 86);
+assert.equal(appConfig.expo.ios.buildNumber, '87');
+assert.equal(appConfig.expo.android.versionCode, 87);
 assert.ok(appConfig.expo.android.blockedPermissions.includes('android.permission.RECORD_AUDIO'));
 assert.ok(!appConfig.expo.android.permissions.includes('android.permission.RECORD_AUDIO'));
 
@@ -32,8 +32,8 @@ assert.ok(!infoPlist.includes('NSMicrophoneUsageDescription'));
 assert.ok(infoPlist.includes('<string>$(MARKETING_VERSION)</string>'));
 assert.ok(infoPlist.includes('<string>$(CURRENT_PROJECT_VERSION)</string>'));
 assert.ok(infoPlist.includes('<key>LSMinimumSystemVersion</key>\n	<string>16.4</string>'));
-assert.match(project, /MARKETING_VERSION = 82\.1\.9;/);
-assert.match(project, /CURRENT_PROJECT_VERSION = 86;/);
+assert.match(project, /MARKETING_VERSION = 82\.1\.12;/);
+assert.match(project, /CURRENT_PROJECT_VERSION = 87;/);
 assert.deepEqual(pngSize(icon), { width: 1024, height: 1024 });
 
 const introspected = JSON.parse(execFileSync(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['expo', 'config', '--type', 'introspect', '--json'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' }));

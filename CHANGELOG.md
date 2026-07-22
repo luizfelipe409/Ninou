@@ -1,3 +1,17 @@
+
+## v82.1.13 — paridade mobile na web e live wallpaper
+
+- Fluxos e acabamentos da v82.1.12 mobile também aplicados à aplicação web.
+- Live wallpaper global adicionado à web, incluindo menus, telas e modais.
+- Pasta mobile v82.1.12 preservada integralmente.
+- Detalhes em `CHANGELOG_v82.1.13.md`.
+
+
+## v82.1.12 — revisão de usabilidade mobile
+
+- Correções no fluxo inicial, configuração da família, permissões, validade e exclusão de registros.
+- Detalhes em `CHANGELOG_v82.1.12.md`.
+
 # Ninou v82.1.11 — paridade dos menus web com o mobile
 
 - Barra inferior da web alinhada ao componente mobile.

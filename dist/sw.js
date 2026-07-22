@@ -1,6 +1,6 @@
-const CACHE_NAME = "ninou-v82-1-11-web-mobile-menu-parity";
-const APP_VERSION = "82.1.11";
-const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7", "web-interaction-stability-v82.1.10", "web-mobile-menu-parity-v82.1.11"];
+const CACHE_NAME = "ninou-v82-1-13-web-mobile-experience";
+const APP_VERSION = "82.1.13";
+const STYLE_MODULES = ["legacy", "premium-v82.0.0", "focused-flow-v82.0.0", "customer-ready-v82.1.7", "web-interaction-stability-v82.1.10", "web-mobile-menu-parity-v82.1.11", "web-mobile-experience-v82.1.13"];
 const APP_SHELL = [
   "/", "/index.html",
   ...STYLE_MODULES.map((name) => `/styles/${name}.css?v=${APP_VERSION}`),
@@ -13,6 +13,7 @@ const APP_SHELL = [
   `/js/ninou-consistency-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/ninou-stability-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/web-mobile-menu-parity-v82.1.11.mjs?v=${APP_VERSION}`,
+  `/js/web-mobile-experience-v82.1.13.mjs?v=${APP_VERSION}`,
   `/js/runtime/architecture-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/runtime/diagnostics-v82.0.0.mjs?v=${APP_VERSION}`,
   `/js/runtime/visual-guard-v82.0.0.mjs?v=${APP_VERSION}`,

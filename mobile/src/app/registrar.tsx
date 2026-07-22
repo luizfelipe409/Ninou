@@ -79,7 +79,7 @@ function CareMenu({ onClose, onSelect }: { onClose: () => void; onSelect: (type:
 
 export default function RegisterScreen() {
   const { colors, isDark } = useNinouTheme();
-  const { addRecord } = useRoutine();
+  const { addRecord, canWrite } = useRoutine();
   const { preferences } = useFamilyPreferences();
   const params = useLocalSearchParams<{ type?: string; dayId?: string }>();
   const scrollRef = useRef<ScrollView>(null);
@@ -129,6 +129,22 @@ export default function RegisterScreen() {
     const frame = requestAnimationFrame(() => scrollRef.current?.scrollTo({ y: 0, animated: false }));
     return () => cancelAnimationFrame(frame);
   }, [selectedType]);
+
+  if (!canWrite) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+        <NinouBackground />
+        <View style={styles.readOnlyWrap}>
+          <View style={[styles.readOnlyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.readOnlyIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="eye-outline" size={32} color={colors.primary} /></View>
+            <Text style={[styles.readOnlyTitle, { color: colors.text }]}>Acesso somente para visualização</Text>
+            <Text style={[styles.readOnlyText, { color: colors.textMuted }]}>Este perfil pode acompanhar a rotina, mas não criar ou alterar registros.</Text>
+            <Pressable onPress={() => router.back()} style={[styles.readOnlyButton, { backgroundColor: colors.primary }]}><Text style={styles.readOnlyButtonText}>Voltar</Text></Pressable>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const isSleepType = selectedType === 'sono' || selectedType === 'dormir';
   const manualSleepCrossesMidnight = Boolean(
@@ -356,4 +372,5 @@ const styles = StyleSheet.create({
   successKicker: { marginTop: 15, fontSize: 9.5, fontWeight: '900', letterSpacing: 1.35 }, successTitle: { marginTop: 7, fontSize: 28, lineHeight: 33, fontWeight: '900', letterSpacing: -0.7, textAlign: 'center' }, successText: { marginTop: 8, maxWidth: 320, fontSize: 12.5, lineHeight: 18, fontWeight: '600', textAlign: 'center' },
   successIdentity: { width: '100%', minHeight: 64, marginTop: 19, borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 10 }, successIdentityIcon: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, successIdentityCopy: { flex: 1 }, successIdentityLabel: { fontSize: 8, fontWeight: '900', letterSpacing: 0.9 }, successIdentityName: { marginTop: 3, fontSize: 12.5, fontWeight: '900' },
   successPrimary: { width: '100%', minHeight: 54, marginTop: 16, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, successPrimaryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' }, successSecondary: { width: '100%', minHeight: 49, marginTop: 8, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, successSecondaryText: { fontSize: 12.5, fontWeight: '900' },
-});
+
+  readOnlyWrap: { flex: 1, padding: 20, alignItems: 'center', justifyContent: 'center' }, readOnlyCard: { width: '100%', maxWidth: 390, minHeight: 310, borderRadius: 30, borderWidth: StyleSheet.hairlineWidth, padding: 24, alignItems: 'center', justifyContent: 'center' }, readOnlyIcon: { width: 72, height: 72, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }, readOnlyTitle: { marginTop: 18, fontSize: 24, lineHeight: 29, fontWeight: '900', textAlign: 'center' }, readOnlyText: { marginTop: 10, fontSize: 13, lineHeight: 20, fontWeight: '650', textAlign: 'center' }, readOnlyButton: { width: '100%', minHeight: 52, marginTop: 22, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, readOnlyButtonText: { color: '#FFF', fontSize: 13, fontWeight: '900' },});

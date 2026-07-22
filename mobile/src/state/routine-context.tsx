@@ -12,7 +12,7 @@ import {
   mergeDayStates,
   normalizeDayState,
   restoreRoutineSnapshot,
-  startRoutine,
+  startRoutineAt,
   startSleep,
   deleteDayNoteEpisode,
   deleteRoutineEvent,
@@ -25,6 +25,7 @@ import {
   type RoutineActor,
 } from '@/domain/routine';
 import { getFirebaseErrorMessage, getLocalDateId, loadRoutineDays, observeRoutineDay, saveRoutineDay } from '@/services/firebase';
+import { canWriteFamilyRoutine } from '@/domain/family-access';
 import { useNinouAuth } from '@/state/auth-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
 
@@ -71,7 +72,8 @@ type RoutineContextValue = {
   syncStatus: RoutineSyncStatus;
   syncMessage: string;
   canUndo: boolean;
-  beginRoutine: (mode: 'awake' | 'sleeping') => void;
+  canWrite: boolean;
+  beginRoutine: (mode: 'awake' | 'sleeping', startedAt?: number) => void;
   runPrimaryAction: () => void;
   addRecord: (input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => void;
   updateEvent: (dayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>) => void;
@@ -104,6 +106,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const storageKey = `${STORAGE_KEY_PREFIX}.${storageScope}.${dayId}`;
   const undoStorageKey = `${storageKey}.undo`;
   const liveStorageKey = `${LIVE_STATE_KEY_PREFIX}.${storageScope}`;
+  const canWrite = !access || canWriteFamilyRoutine(access.role);
   const routineActor = useMemo<RoutineActor>(() => {
     const email = user?.email || access?.email || '';
     const name = preferences.caregiverName.trim() || email.split('@')[0] || 'Responsável';
@@ -234,6 +237,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   }, [hydrated, liveStorageKey, state, storageKey]);
 
   const commit = useCallback((buildNext: (current: DayState, at: number) => DayState) => {
+    if (!canWrite) return;
     const at = Date.now();
     undoStateRef.current = stateRef.current;
     setCanUndo(true);
@@ -268,7 +272,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       setSyncStatus('local');
       setSyncMessage('Salvo neste aparelho');
     }
-  }, [access, dayId, liveStorageKey, storageKey, undoStorageKey, user]);
+  }, [access, canWrite, dayId, liveStorageKey, storageKey, undoStorageKey, user]);
 
   const saveDay = useCallback((targetDayId: string, next: DayState) => {
     setHistory((current) => ({ ...current, [targetDayId]: next }));
@@ -289,12 +293,13 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   }, [access, dayId, liveStorageKey, storageScope, user]);
 
   const commitDay = useCallback((targetDayId: string, buildNext: (current: DayState, at: number) => DayState) => {
+    if (!canWrite) return;
     const current = targetDayId === dayId ? stateRef.current : history[targetDayId] || createEmptyDayState();
     saveDay(targetDayId, buildNext(current, Date.now()));
-  }, [dayId, history, saveDay]);
+  }, [canWrite, dayId, history, saveDay]);
 
-  const beginRoutine = useCallback((mode: 'awake' | 'sleeping') => {
-    commit((current, at) => startRoutine(current, mode, at, routineActor));
+  const beginRoutine = useCallback((mode: 'awake' | 'sleeping', startedAt = Date.now()) => {
+    commit((current, at) => startRoutineAt(current, mode, startedAt, at, routineActor));
   }, [commit, routineActor]);
 
   const runPrimaryAction = useCallback(() => {
@@ -329,7 +334,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   }, [dayId, saveDay, undoStorageKey]);
   const resetDay = useCallback((targetDayId: string) => commitDay(targetDayId, (current, at) => clearRoutineDay(current, at)), [commitDay]);
 
-  const value = useMemo(() => ({ state, history, now, hydrated, syncStatus, syncMessage, canUndo, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisode: addNoteEpisodeToDay, deleteNoteEpisode: deleteNoteEpisodeFromDay, undoLastAction, resetDay }), [state, history, now, hydrated, syncStatus, syncMessage, canUndo, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisodeToDay, deleteNoteEpisodeFromDay, undoLastAction, resetDay]);
+  const value = useMemo(() => ({ state, history, now, hydrated, syncStatus, syncMessage, canUndo, canWrite, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisode: addNoteEpisodeToDay, deleteNoteEpisode: deleteNoteEpisodeFromDay, undoLastAction, resetDay }), [state, history, now, hydrated, syncStatus, syncMessage, canUndo, canWrite, beginRoutine, runPrimaryAction, addRecord, updateEvent, deleteEvent, updateDayNotes, addNoteEpisodeToDay, deleteNoteEpisodeFromDay, undoLastAction, resetDay]);
   return <RoutineContext.Provider value={value}>{children}</RoutineContext.Provider>;
 }
 

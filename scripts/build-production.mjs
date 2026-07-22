@@ -18,6 +18,7 @@ const publicFiles = [
   "styles/customer-ready-v82.1.7.css",
   "styles/web-interaction-stability-v82.1.10.css",
   "styles/web-mobile-menu-parity-v82.1.11.css",
+  "styles/web-mobile-experience-v82.1.13.css",
   "styles/premium-v82.0.0.css",
   "styles/focused-flow-v82.0.0.css",
 
@@ -31,6 +32,7 @@ const publicFiles = [
   "js/ninou-consistency-v82.0.0.mjs",
   "js/ninou-stability-v82.0.0.mjs",
   "js/web-mobile-menu-parity-v82.1.11.mjs",
+  "js/web-mobile-experience-v82.1.13.mjs",
   "js/config/constants.js",
   "js/core/app-state.js",
   "js/core/event-bus.js",
@@ -118,4 +120,4 @@ for (const file of publicFiles) {
   publicBytes += (await stat(source)).size;
 }
 
-console.log(`Build de produção v82.1.11 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);
+console.log(`Build de produção v82.1.13 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);

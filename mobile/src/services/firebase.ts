@@ -23,6 +23,7 @@ import {
   runTransaction,
   serverTimestamp,
   setDoc,
+  writeBatch,
   type Firestore,
   type Unsubscribe,
 } from 'firebase/firestore';
@@ -125,14 +126,16 @@ export async function createPersonalFamily(user: User, input: { familyName: stri
   const familyId = `family-${user.uid}`;
   const access: FamilyAccess = { familyId, role: 'owner', email, ownerUid: user.uid };
   const accessPayload = { ...access, status: 'active', roleVersion: 2, updatedAt: serverTimestamp() };
-  await setDoc(doc(db, 'users', user.uid, 'families', familyId), { ...accessPayload, joinedAt: serverTimestamp() }, { merge: true });
-  await setDoc(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
-  await setDoc(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload, name: input.responsibleName, relation: input.responsibleRelation, joinedAt: serverTimestamp() }, { merge: true });
-  await setDoc(doc(db, 'families', familyId), {
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'users', user.uid, 'families', familyId), { ...accessPayload, joinedAt: serverTimestamp() }, { merge: true });
+  batch.set(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
+  batch.set(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload, name: input.responsibleName, relation: input.responsibleRelation, joinedAt: serverTimestamp() }, { merge: true });
+  batch.set(doc(db, 'families', familyId), {
     familyId, title: input.familyName, name: input.familyName, babyName: input.babyName, babyArticle: input.article,
     ownerUid: user.uid, ownerEmail: email, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation,
-    familyType: 'client', status: 'active', appVersion: '82.1.9-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    familyType: 'client', status: 'active', appVersion: '82.1.12-mobile', createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   }, { merge: true });
+  await batch.commit();
   await setDoc(doc(db, 'families', familyId, 'profile', 'main'), {
     familyId, familyName: input.familyName, name: input.babyName, birthDate: input.birthDate, article: input.article,
     ownerUid: user.uid, responsibleName: input.responsibleName, responsibleRelation: input.responsibleRelation, updatedAt: serverTimestamp(),

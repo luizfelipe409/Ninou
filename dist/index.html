@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "82.1.11";
+        const VERSION = "82.1.13";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
         root.classList.add("ninou-booting", "ninou-v8200");
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=82.1.11" />
+    <link rel="manifest" href="./manifest.webmanifest?v=82.1.13" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,13 +54,14 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.11" />
-    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.11" />
-    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.11" />
-    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=82.1.11" />
-    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=82.1.11" />
-    <link rel="stylesheet" href="./styles/web-interaction-stability-v82.1.10.css?v=82.1.11" />
-    <link rel="stylesheet" href="./styles/web-mobile-menu-parity-v82.1.11.css?v=82.1.11" />
+    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=82.1.13" />
+    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=82.1.13" />
+    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=82.1.13" />
+    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=82.1.13" />
+    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=82.1.13" />
+    <link rel="stylesheet" href="./styles/web-interaction-stability-v82.1.10.css?v=82.1.13" />
+    <link rel="stylesheet" href="./styles/web-mobile-menu-parity-v82.1.11.css?v=82.1.13" />
+    <link rel="stylesheet" href="./styles/web-mobile-experience-v82.1.13.css?v=82.1.13" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -389,15 +390,11 @@
           <div id="startChoice" class="start-choice">
             <button type="button" data-start-mode="awake">
               <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Acordou / acordado desde...</span>
+              <span><strong>Está acordado</strong><small>Informe que horas acordou</small></span>
             </button>
             <button type="button" data-start-mode="sleeping">
               <span class="action-icon"><img class="icon-art icon-art-sono" src="./icons/actions/soneca.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Está dormindo desde...</span>
-            </button>
-            <button type="button" data-start-mode="now">
-              <span class="action-icon"><img class="icon-art icon-art-acordou" src="./icons/actions/acordou.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false" /></span>
-              <span>Começar agora</span>
+              <span><strong>Está dormindo</strong><small>Informe quando o sono começou</small></span>
             </button>
           </div>
         </section>
@@ -1049,9 +1046,9 @@
                   Permissão
                   <span class="select-control-wrap">
                     <select id="familyInviteRoleSelect">
-                      <option value="admin_familiar">Admin familiar — gerencia família</option>
-                      <option value="cuidador">Cuidador — registra rotina</option>
-                      <option value="visualizacao">Visualização — somente leitura</option>
+                      <option value="admin_familiar">Responsável adicional — administra e registra</option>
+                      <option value="cuidador">Cuidador — registra e corrige</option>
+                      <option value="visualizacao">Somente visualização — não altera dados</option>
                     </select>
                     <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                   </span>
@@ -1840,9 +1837,9 @@
                   Permissão
                   <span class="select-control-wrap">
                   <select id="adminInviteRole">
-                    <option value="admin_familiar">Admin familiar — gerencia família</option>
-                    <option value="cuidador">Cuidador — registra rotina</option>
-                    <option value="visualizacao">Visualização — somente leitura</option>
+                    <option value="admin_familiar">Responsável adicional — administra e registra</option>
+                    <option value="cuidador">Cuidador — registra e corrige</option>
+                    <option value="visualizacao">Somente visualização — não altera dados</option>
                   </select>
                   <svg class="select-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </span>
@@ -2418,7 +2415,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v82.1.7.mjs?v=82.1.11").catch((error) => {
+      import("./js/boot-v82.1.7.mjs?v=82.1.13").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2432,9 +2429,10 @@
     </script>
 
     <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.11";
+      import { initActionLauncher } from "./js/ui/action-launcher.js?v=82.1.13";
       initActionLauncher();
     </script>
-    <script type="module" src="./js/web-mobile-menu-parity-v82.1.11.mjs?v=82.1.11"></script>
+    <script type="module" src="./js/web-mobile-menu-parity-v82.1.11.mjs?v=82.1.13"></script>
+    <script type="module" src="./js/web-mobile-experience-v82.1.13.mjs?v=82.1.13"></script>
   </body>
 </html>

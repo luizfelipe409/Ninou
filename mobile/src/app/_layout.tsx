@@ -11,6 +11,7 @@ import { GuestEntryPortal, NinouLoadingScreen } from '@/components/guest-entry-p
 import { FamilySetupPortal } from '@/components/family-setup-portal';
 import { GlobalAdminPortal } from '@/components/global-admin-portal';
 import { BlockedAccountPortal } from '@/components/blocked-account-portal';
+import { SubscriptionGate } from '@/components/subscription-gate';
 import { PreferencesProvider } from '@/state/preferences-context';
 
 void SplashScreen.preventAutoHideAsync();
@@ -57,9 +58,10 @@ function AppGate() {
   if (status === 'blocked') return <BlockedAccountPortal />;
   if (status === 'no-family' || status === 'error') return <FamilySetupPortal />;
   return (
-    <ProfileProvider>
-      <PreferencesProvider>
-        <RoutineProvider>
+    <SubscriptionGate>
+      <ProfileProvider>
+        <PreferencesProvider>
+          <RoutineProvider>
           <Stack screenOptions={{ contentStyle: { backgroundColor: colors.background } }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
@@ -76,8 +78,9 @@ function AppGate() {
           />
           <Stack.Screen name="relatorios" options={{ presentation: 'modal', title: 'Relatórios', headerShadowVisible: false, headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text }} />
           </Stack>
-        </RoutineProvider>
-      </PreferencesProvider>
-    </ProfileProvider>
+          </RoutineProvider>
+        </PreferencesProvider>
+      </ProfileProvider>
+    </SubscriptionGate>
   );
 }

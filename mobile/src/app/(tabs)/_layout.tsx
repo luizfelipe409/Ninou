@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useNinouTheme } from '@/theme/tokens';
+import { useRoutine } from '@/state/routine-context';
 
 const tabMeta: Record<string, { label: string; icon: keyof typeof Ionicons.glyphMap; activeIcon: keyof typeof Ionicons.glyphMap }> = {
   index: { label: 'Hoje', icon: 'home-outline', activeIcon: 'home' },
@@ -32,6 +33,7 @@ type TabBarProps = { state: { index: number; routes: { key: string; name: string
 
 function PremiumTabBar({ state, navigation }: TabBarProps) {
   const { colors, isDark } = useNinouTheme();
+  const { canWrite } = useRoutine();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const barWidth = Math.min(500, width - 24);
@@ -46,8 +48,8 @@ function PremiumTabBar({ state, navigation }: TabBarProps) {
         if (!meta) return null;
         return <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: focused }} onPress={() => { const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true }); if (!focused && !event.defaultPrevented) { void Haptics.selectionAsync(); navigation.navigate(route.name); } }} style={({ pressed }) => [styles.item, focused && { backgroundColor: colors.primarySoft }, pressed && styles.itemPressed]}>{focused ? <LinearGradient colors={isDark ? ['rgba(168,146,255,0.2)', 'rgba(97,225,191,0.06)'] : ['rgba(117,88,232,0.14)', 'rgba(255,255,255,0.45)']} style={StyleSheet.absoluteFill} /> : null}<Ionicons name={focused ? meta.activeIcon : meta.icon} size={19} color={focused ? colors.primary : colors.textMuted} /><Text numberOfLines={1} style={[styles.label, { color: focused ? colors.text : colors.textMuted }]}>{meta.label}</Text>{focused ? <View style={[styles.activeDot, { backgroundColor: colors.accent }]} /> : null}</Pressable>;
       })}</View>
-      <View pointerEvents="none" style={[styles.addHalo, { backgroundColor: isDark ? 'rgba(111,242,203,0.15)' : 'rgba(117,88,232,0.12)' }]} />
-      <Pressable accessibilityRole="button" accessibilityLabel="Abrir menu de novos registros" onPress={() => { void Haptics.selectionAsync(); router.push('/registrar'); }} style={({ pressed }) => [styles.add, pressed && styles.pressed]}><LinearGradient colors={isDark ? ['#72F2C7', '#9FD5FF'] : ['#9C70FF', '#90B7FF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.addGradient}><Ionicons name="add" size={31} color={isDark ? '#10241E' : '#FFF'} /></LinearGradient></Pressable>
+      <View pointerEvents="none" style={[styles.addHalo, { backgroundColor: canWrite ? (isDark ? 'rgba(111,242,203,0.15)' : 'rgba(117,88,232,0.12)') : colors.primarySoft }]} />
+      <Pressable disabled={!canWrite} accessibilityRole="button" accessibilityLabel={canWrite ? 'Abrir menu de novos registros' : 'Acesso somente para visualização'} onPress={() => { void Haptics.selectionAsync(); router.push('/registrar'); }} style={({ pressed }) => [styles.add, pressed && canWrite && styles.pressed, !canWrite && styles.addDisabled]}><LinearGradient colors={canWrite ? (isDark ? ['#72F2C7', '#9FD5FF'] : ['#9C70FF', '#90B7FF']) : [colors.surfaceElevated, colors.surfaceElevated]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.addGradient}><Ionicons name={canWrite ? 'add' : 'eye-outline'} size={canWrite ? 31 : 24} color={canWrite ? (isDark ? '#10241E' : '#FFF') : colors.textMuted} /></LinearGradient></Pressable>
     </View>
   );
 }
@@ -58,5 +60,5 @@ const styles = StyleSheet.create({
   activeDot: { position: 'absolute', bottom: 4, width: 4, height: 4, borderRadius: 2 },
   itemPressed: { opacity: 0.74, transform: [{ scale: 0.97 }] },
   addHalo: { position: 'absolute', right: 4, top: 5, width: 60, height: 60, borderRadius: 23 },
-  add: { position: 'absolute', right: 9, top: 10, width: 50, height: 50, borderRadius: 18, overflow: 'hidden' }, addGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' }, pressed: { opacity: 0.8, transform: [{ scale: 0.95 }] },
+  add: { position: 'absolute', right: 9, top: 10, width: 50, height: 50, borderRadius: 18, overflow: 'hidden' }, addDisabled: { opacity: 0.72 }, addGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' }, pressed: { opacity: 0.8, transform: [{ scale: 0.95 }] },
 });

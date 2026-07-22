@@ -48,18 +48,25 @@ export function canEditFamilyProfile(role?: string | null) {
   return canManageFamily(role);
 }
 
-export function canExportFamilyReports(role?: string | null) {
+export function canWriteFamilyRoutine(role?: string | null) {
   return ['owner', 'admin', 'caregiver'].includes(normalizeFamilyRole(role));
+}
+
+export function canExportFamilyReports(role?: string | null) {
+  return ['owner', 'admin', 'caregiver', 'viewer'].includes(normalizeFamilyRole(role));
 }
 
 export function familyRoleLabel(role?: string | null) {
   const normalized = normalizeFamilyRole(role);
   if (normalized === 'owner') return 'Responsável principal';
-  if (normalized === 'admin') return 'Administrador familiar';
-  if (normalized === 'caregiver') return 'Cuidador familiar';
-  return 'Visualizador familiar';
+  if (normalized === 'admin') return 'Responsável adicional';
+  if (normalized === 'caregiver') return 'Cuidador';
+  return 'Somente visualização';
 }
 
 export function normalizeInviteRole(role?: string | null) {
-  return normalizeFamilyRole(role) === 'admin' ? 'admin_familiar' : 'cuidador';
+  const normalized = normalizeFamilyRole(role);
+  if (normalized === 'admin') return 'admin_familiar';
+  if (normalized === 'viewer') return 'visualizacao';
+  return 'cuidador';
 }

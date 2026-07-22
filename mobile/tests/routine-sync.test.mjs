@@ -19,14 +19,18 @@ const {
   restoreRoutineSnapshot,
   saveDayNotes,
   startRoutine,
+  startRoutineAt,
   startSleep,
   updateRoutineEvent,
 } = await import('../src/domain/routine.ts');
 const {
   canEditFamilyProfile,
   canExportFamilyReports,
+  canWriteFamilyRoutine,
+  familyRoleLabel,
   isGlobalAppAdminEmail,
   normalizeFamilyRole,
+  normalizeInviteRole,
 } = await import('../src/domain/family-access.ts');
 
 const initial = createEmptyDayState();
@@ -34,6 +38,15 @@ const felipe = { uid: 'felipe', email: 'felipe@example.com', name: 'Felipe', rel
 const mary = { uid: 'mary', email: 'mary@example.com', name: 'Mary', relationship: 'Mãe', label: 'Mary · Mãe' };
 const awake = startRoutine(initial, 'awake', 1_700_000_000_000, felipe);
 const sleeping = startSleep(awake, 'dormir', 1_700_000_005_000, felipe);
+
+
+const customWakeTime = new Date(2026, 6, 21, 6, 35, 0, 0).getTime();
+const customWakeNow = new Date(2026, 6, 21, 8, 0, 0, 0).getTime();
+const customWake = startRoutineAt(createEmptyDayState(), 'awake', customWakeTime, customWakeNow, felipe);
+assert.equal(customWake.mode, 'awake');
+assert.equal(customWake.activeStartedAt, customWakeTime);
+assert.equal(customWake.events.find((event) => event.type === 'acordou')?.start, customWakeTime);
+assert.equal(customWake.events.find((event) => event.type === 'acordou')?.detail, 'Horário inicial informado');
 
 assert.equal(mergeDayStates(awake, sleeping).mode, 'sleeping');
 assert.equal(mergeDayStates(sleeping, awake).mode, 'sleeping');
@@ -202,7 +215,13 @@ assert.equal(normalizeFamilyRole('visualizacao'), 'viewer');
 assert.equal(canEditFamilyProfile('responsavel'), true);
 assert.equal(canExportFamilyReports('admin_familiar'), true);
 assert.equal(canExportFamilyReports('cuidador'), true);
-assert.equal(canExportFamilyReports('visualizacao'), false);
+assert.equal(canExportFamilyReports('visualizacao'), true);
+assert.equal(canWriteFamilyRoutine('visualizacao'), false);
+assert.equal(canWriteFamilyRoutine('cuidador'), true);
+assert.equal(normalizeInviteRole('visualizacao'), 'visualizacao');
+assert.equal(normalizeInviteRole('responsavel'), 'admin_familiar');
+assert.equal(familyRoleLabel('admin_familiar'), 'Responsável adicional');
+assert.equal(familyRoleLabel('visualizacao'), 'Somente visualização');
 assert.equal(isGlobalAppAdminEmail(' LuizFelipe.DaSilva@gmail.com '), true);
 assert.equal(isGlobalAppAdminEmail('responsavel@example.com'), false);
 
