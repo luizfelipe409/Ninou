@@ -1,4 +1,4 @@
-# Ninou v82.1.13 — paridade mobile na web e live wallpaper
+# Ninou v83.0.3 — paridade mobile na web e live wallpaper
 
 ## Aplicação web
 

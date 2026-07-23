@@ -2,7 +2,7 @@ import { getFirebaseServices } from './firebase-service.js';
 
 export const GLOBAL_ADMIN_EMAIL = 'luizfelipe.dasilva@gmail.com';
 export const INTERNAL_ADMIN_FAMILY_ID = 'ninou-family-luizfelipe';
-export const ADMIN_WEB_VERSION = '82.1.4-web-admin-gate';
+export const ADMIN_WEB_VERSION = '82.1.5-web-dedicated-portal';
 
 const clean = (value) => String(value || '').trim();
 const lower = (value) => clean(value).toLowerCase();

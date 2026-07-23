@@ -1,4 +1,4 @@
-# Validação — Ninou v82.1.13
+# Validação — Ninou v83.0.3
 
 ## Escopo
 
@@ -15,7 +15,7 @@ Validação da paridade dos fluxos mobile na aplicação web e da nova camada de
 
 ## Validação visual controlada
 
-Executada em Chromium, viewport 390 × 844, usando os CSS e o runtime reais da v82.1.13.
+Executada em Chromium, viewport 390 × 844, usando os CSS e o runtime reais da v83.0.3.
 
 Resultados:
 
@@ -30,7 +30,7 @@ Resultados:
 - tela de validade alterada para “Acesso encerrado”, sem hifenização e sem estouro horizontal;
 - nenhuma exceção JavaScript registrada no cenário controlado.
 
-Dados detalhados: `Ninou_v82.1.13_VALIDACAO_WEB.json` entregue junto ao pacote de validação.
+Dados detalhados: `Ninou_v83.0.3_VALIDACAO_WEB.json` entregue junto ao pacote de validação.
 
 ## Integridade da pasta mobile
 

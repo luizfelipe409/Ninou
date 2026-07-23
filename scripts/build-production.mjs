@@ -1,31 +1,123 @@
-import { cp, mkdir, readFile, rm, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { cp, mkdir, rm, stat } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = join(root, "dist");
-const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
-const version = packageJson.version;
-const publicEntries = [
-  "index.html", "sw.js", "manifest.webmanifest", "privacidade.html", "termos.html", "suporte.html",
-  "styles", "js", "assets", "audio", "icons",
+const publicFiles = [
+  "index.html",
+  "sw.js",
+  "manifest.webmanifest",
+  "privacidade.html",
+  "termos.html",
+  "suporte.html",
+
+  "styles/legacy.css",
+  "styles/admin-mobile-parity-v82.1.1.css",
+  "styles/admin-web-v82.1.7.css",
+  "styles/customer-ready-v82.1.7.css",
+  "styles/web-interaction-stability-v82.1.10.css",
+  "styles/web-mobile-menu-parity-v82.1.11.css",
+  "styles/web-mobile-experience-v83.0.3.css",
+  "styles/premium-v82.0.0.css",
+  "styles/focused-flow-v82.0.0.css",
+
+  "js/boot-v82.0.0.mjs",
+  "js/boot-v82.1.7.mjs",
+  "js/ninou-core-v82.0.0.mjs",
+  "js/ninou-core-v82.1.7.mjs",
+  "js/ninou-admin-v82.0.0.mjs",
+  "js/ninou-admin-web-v82.1.7.mjs",
+  "js/ninou-ux-v82.0.0.mjs",
+  "js/ninou-consistency-v82.0.0.mjs",
+  "js/ninou-stability-v82.0.0.mjs",
+  "js/web-mobile-menu-parity-v82.1.11.mjs",
+  "js/web-mobile-experience-v83.0.3.mjs",
+  "js/config/constants.js",
+  "js/core/app-state.js",
+  "js/core/event-bus.js",
+  "js/core/logger.js",
+  "js/dom/dom.js",
+  "js/domain/baby-profile.js",
+  "js/domain/diaper.js",
+  "js/domain/event-editor.js",
+  "js/domain/feeding.js",
+  "js/domain/medication.js",
+  "js/domain/record-types.js",
+  "js/domain/records.js",
+  "js/domain/sleep.js",
+  "js/domain/sounds.js",
+  "js/domain/weights.js",
+  "js/repositories/json-repository.js",
+  "js/repositories/profile-repository.js",
+  "js/repositories/routine-repository.js",
+  "js/runtime/architecture-v82.0.0.mjs",
+  "js/runtime/diagnostics-v82.0.0.mjs",
+  "js/runtime/visual-guard-v82.0.0.mjs",
+  "js/services/account-service.js",
+  "js/services/export-service.js",
+  "js/services/firebase-service.js",
+  "js/services/commercial-access-service.js",
+  "js/services/admin-service.js",
+  "js/services/admin-service-v82.1.7.js",
+  "js/services/timer-service.js",
+  "js/storage/local-storage.js",
+  "js/ui/account.js",
+  "js/ui/action-launcher.js",
+  "js/ui/app-navigation.js",
+  "js/ui/charts.js",
+  "js/ui/empty-states.js",
+  "js/ui/event-formatters.js",
+  "js/ui/home.js",
+  "js/ui/intelligence.js",
+  "js/ui/navigation.js",
+  "js/ui/profile.js",
+  "js/ui/record-sheet.js",
+  "js/ui/render-utils.js",
+  "js/ui/sounds.js",
+  "js/ui/theme.js",
+  "js/utils/security.js",
+  "js/utils/text.js",
+  "js/utils/time.js",
+
+  "assets/clock-themes/day-sky.svg",
+  "assets/clock-themes/night-sky.svg",
+  "audio/ritmo-suave-bebe.mp3",
+  "audio/som-relaxar.mp3",
+  "audio/som-utero.mp3",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/apple-touch-icon.png",
+  "icons/actions/acordou.png",
+  "icons/actions/amamentacao.png",
+  "icons/actions/despertar-noturno.png",
+  "icons/actions/dormir.png",
+  "icons/actions/fralda.png",
+  "icons/actions/mamadeira.png",
+  "icons/actions/soneca.png",
+  "icons/baby-avatars/avatar-01.webp",
+  "icons/baby-avatars/avatar-02.webp",
+  "icons/baby-avatars/avatar-03.webp",
+  "icons/baby-avatars/avatar-04.webp",
+  "icons/baby-avatars/avatar-05.webp",
+  "icons/baby-avatars/avatar-06.webp",
+  "icons/baby-avatars/avatar-07.webp",
+  "icons/baby-avatars/avatar-08.webp",
+  "icons/baby-avatars/avatar-09.webp",
+  "icons/baby-avatars/avatar-10.webp",
+  "icons/baby-avatars/avatar-11.webp",
+  "icons/baby-avatars/avatar-12.webp",
 ];
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
-for (const entry of publicEntries) {
-  await cp(join(root, entry), join(output, entry), { recursive: true });
+let publicBytes = 0;
+for (const file of publicFiles) {
+  const source = join(root, file);
+  const target = join(output, file);
+  await mkdir(dirname(target), { recursive: true });
+  await cp(source, target);
+  publicBytes += (await stat(source)).size;
 }
 
-async function directorySize(path) {
-  const info = await stat(path);
-  if (info.isFile()) return info.size;
-  const { readdir } = await import("node:fs/promises");
-  const entries = await readdir(path);
-  let total = 0;
-  for (const entry of entries) total += await directorySize(join(path, entry));
-  return total;
-}
-
-const bytes = await directorySize(output);
-console.log(`Build de produção v${version} concluído em dist/ (${(bytes / 1024 / 1024).toFixed(1)} MB).`);
+console.log(`Build de produção v83.0.3 concluído em dist/ (${publicFiles.length} arquivos públicos, ${(publicBytes / 1024 / 1024).toFixed(1)} MB).`);
