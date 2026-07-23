@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Animated, ImageBackground, Modal, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Svg, { Circle, Defs, G, LinearGradient as SvgLinearGradient, Polygon, Rect, Stop, Text as SvgText } from 'react-native-svg';
 
@@ -76,6 +76,7 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
   const { colors, isDark } = useNinouTheme();
   const [selectedEvent, setSelectedEvent] = useState<RoutineEvent | null>(null);
   const [selectedCluster, setSelectedCluster] = useState<RoutineEvent[]>([]);
+  const [expandedClusterKey, setExpandedClusterKey] = useState<string | null>(null);
   const [breathe] = useState(() => new Animated.Value(0));
   const [twinkle] = useState(() => new Animated.Value(0));
   const { width } = useWindowDimensions();
@@ -262,12 +263,70 @@ export function RoutineOrbit({ state, now }: { state: DayState; now: number }) {
         const groupTimestamp = getRoutineMarkerGroupTimestamp(group, now);
         const containsActive = group.some(isCurrentActiveMarker);
         const point = pointForTime(groupTimestamp, size, orbitRadius, group.length > 1 || containsActive ? 50 : 34);
-        if (group.length > 1) return (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${group.length} ações agrupadas: ${group.map((item) => recordConfig[item.type].title).join(', ')}`} onPress={() => setSelectedCluster(group)} key={`cluster-${group[0].id}`} style={({ pressed }) => [styles.marker, styles.clusterMarker, point, { backgroundColor: isDark ? 'rgba(18,12,43,0.98)' : 'rgba(255,255,255,0.98)', borderColor: isDark ? 'rgba(181,131,255,0.94)' : 'rgba(117,88,232,0.72)' }, pressed && styles.markerPressed]}>
-            <ActionArt type={event.type} size={39} />
-            <View style={[styles.clusterBadge, { backgroundColor: colors.accent, borderColor: isDark ? '#17102E' : '#FFFFFF' }]}><Text style={styles.clusterCount}>×{group.length}</Text></View>
-          </Pressable>
-        );
+        if (group.length > 1) {
+          const clusterKey = `cluster-${group.map((item) => item.id).join('-')}`;
+          const expanded = expandedClusterKey === clusterKey;
+          const previewEvents = [...group].slice(-2);
+          const satelliteEvents = [...group].slice(0, 5);
+          const clusterCenter = { left: point.left + 28, top: point.top + 28 };
+          return (
+            <Fragment key={clusterKey}>
+              {expanded ? satelliteEvents.map((clusterEvent, index) => {
+                const spread = satelliteEvents.length === 1 ? 0 : (index / (satelliteEvents.length - 1) - 0.5) * 1.5;
+                const radialAngle = -Math.PI / 2 + spread;
+                const distance = 62;
+                return (
+                  <Pressable
+                    key={`${clusterKey}-satellite-${clusterEvent.id}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Abrir ${recordConfig[clusterEvent.type].title} às ${formatTime(clusterEvent.start)}`}
+                    onPress={() => { setExpandedClusterKey(null); setSelectedEvent(clusterEvent); }}
+                    style={({ pressed }) => [
+                      styles.clusterSatellite,
+                      {
+                        left: clusterCenter.left + Math.cos(radialAngle) * distance - 20,
+                        top: clusterCenter.top + Math.sin(radialAngle) * distance - 20,
+                        backgroundColor: isDark ? 'rgba(23,16,46,0.98)' : 'rgba(255,255,255,0.98)',
+                        borderColor: isDark ? 'rgba(181,131,255,0.82)' : 'rgba(117,88,232,0.42)',
+                      },
+                      pressed && styles.markerPressed,
+                    ]}>
+                    <ActionArt type={clusterEvent.type} size={30} />
+                    <Text style={[styles.clusterSatelliteTime, { color: colors.text }]}>{formatTime(clusterEvent.start)}</Text>
+                  </Pressable>
+                );
+              }) : null}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${group.length} ações agrupadas: ${group.map((item) => recordConfig[item.type].title).join(', ')}`}
+                onPress={() => {
+                  if (expanded) {
+                    setExpandedClusterKey(null);
+                    setSelectedCluster(group);
+                  } else {
+                    setExpandedClusterKey(clusterKey);
+                  }
+                }}
+                style={({ pressed }) => [
+                  styles.marker,
+                  styles.clusterMarker,
+                  point,
+                  { backgroundColor: isDark ? 'rgba(52,31,107,0.98)' : 'rgba(118,86,231,0.98)', borderColor: isDark ? 'rgba(203,176,255,0.98)' : 'rgba(255,255,255,0.96)' },
+                  expanded && styles.clusterMarkerExpanded,
+                  pressed && styles.markerPressed,
+                ]}>
+                <View style={styles.clusterPreviewStack}>
+                  {previewEvents.map((previewEvent, index) => (
+                    <View key={`${clusterKey}-preview-${previewEvent.id}`} style={[styles.clusterPreviewIcon, index === 1 && styles.clusterPreviewIconSecond]}>
+                      <ActionArt type={previewEvent.type} size={24} />
+                    </View>
+                  ))}
+                </View>
+                <View style={[styles.clusterBadge, { backgroundColor: '#7BE1C7', borderColor: isDark ? '#17102E' : '#FFFFFF' }]}><Text style={styles.clusterCount}>{group.length}</Text></View>
+              </Pressable>
+            </Fragment>
+          );
+        }
         if (containsActive) return (
           <Pressable
             accessibilityRole="button"
@@ -370,9 +429,15 @@ const styles = StyleSheet.create({
   anchorTheme: { borderWidth: StyleSheet.hairlineWidth, shadowColor: '#2D174F', shadowOpacity: 0.22, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
   anchorText: { fontSize: 10.5, fontWeight: '900' },
   marker: { position: 'absolute', width: 34, height: 34, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', zIndex: 5 },
-  clusterMarker: { width: 50, height: 50, borderRadius: 25, borderWidth: 1.7, zIndex: 12, elevation: 12, shadowColor: '#8E5EFF', shadowOpacity: 0.52, shadowRadius: 14, shadowOffset: { width: 0, height: 5 } },
-  clusterBadge: { position: 'absolute', right: -9, top: -9, minWidth: 34, height: 27, borderRadius: 14, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6, zIndex: 18, elevation: 18 },
-  clusterCount: { color: '#10251F', fontSize: 12, lineHeight: 15, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  clusterMarker: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, zIndex: 18, elevation: 18, shadowColor: '#8E5EFF', shadowOpacity: 0.62, shadowRadius: 16, shadowOffset: { width: 0, height: 7 }, alignItems: 'center', justifyContent: 'center' },
+  clusterMarkerExpanded: { transform: [{ scale: 1.06 }], shadowOpacity: 0.82 },
+  clusterPreviewStack: { width: 38, height: 30, position: 'relative', alignItems: 'center', justifyContent: 'center' },
+  clusterPreviewIcon: { position: 'absolute', left: 0, width: 28, height: 28, borderRadius: 14, overflow: 'hidden', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.9)' },
+  clusterPreviewIconSecond: { left: 12, top: 2 },
+  clusterBadge: { position: 'absolute', right: -8, top: -10, minWidth: 30, height: 30, borderRadius: 15, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 7, zIndex: 22, elevation: 22 },
+  clusterCount: { color: '#173C35', fontSize: 14, lineHeight: 17, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  clusterSatellite: { position: 'absolute', width: 40, height: 40, borderRadius: 20, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', zIndex: 17, elevation: 17, shadowColor: '#120A2B', shadowOpacity: 0.38, shadowRadius: 9, shadowOffset: { width: 0, height: 4 } },
+  clusterSatelliteTime: { position: 'absolute', top: 39, fontSize: 9, lineHeight: 11, fontWeight: '900', backgroundColor: 'rgba(20,13,45,0.82)', color: '#FFFFFF', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 8, overflow: 'hidden' },
   markerPressed: { opacity: 0.7, transform: [{ scale: 0.88 }] },
   markerTime: { position: 'absolute', top: 35, minWidth: 42, textAlign: 'center', fontSize: 8, fontWeight: '900', textShadowColor: 'rgba(255,255,255,0.3)', textShadowRadius: 3 },
   activeMarker: { position: 'absolute', width: 50, height: 50, zIndex: 8, alignItems: 'center', justifyContent: 'center', shadowColor: '#4B2D91', shadowOpacity: 0.44, shadowRadius: 13, shadowOffset: { width: 0, height: 6 }, elevation: 8 },

@@ -14,8 +14,8 @@ function pngSize(buffer) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
-assert.equal(appConfig.expo.version, '83.0.2');
-assert.equal(packageConfig.version, '83.0.2');
+assert.equal(appConfig.expo.version, '84.0.0');
+assert.equal(packageConfig.version, '84.0.0');
 assert.equal(appConfig.expo.ios.bundleIdentifier, 'com.ninou.app');
 assert.equal(appConfig.expo.ios.buildNumber, '90');
 assert.equal(appConfig.expo.android.versionCode, 90);

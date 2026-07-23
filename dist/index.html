@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <script>
       (() => {
-        const VERSION = "83.0.3";
+        const VERSION = "84.0.0";
         const MIGRATION_KEY = `ninou:runtime-migrated:${VERSION}`;
         const root = document.documentElement;
         root.classList.add("ninou-booting", "ninou-v8200");
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ninou" />
-    <link rel="manifest" href="./manifest.webmanifest?v=83.0.3" />
+    <link rel="manifest" href="./manifest.webmanifest?v=84.0.0" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="preload" as="image" href="./icons/actions/acordou.png" />
@@ -54,14 +54,14 @@
     <link rel="preload" as="image" href="./icons/actions/amamentacao.png" />
     <link rel="preload" as="image" href="./icons/actions/mamadeira.png" />
     <link rel="preload" as="image" href="./icons/actions/fralda.png" />
-    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=83.0.3" />
-    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=83.0.3" />
-    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=83.0.3" />
-    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=83.0.3" />
-    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=83.0.3" />
-    <link rel="stylesheet" href="./styles/web-interaction-stability-v82.1.10.css?v=83.0.3" />
-    <link rel="stylesheet" href="./styles/web-mobile-menu-parity-v82.1.11.css?v=83.0.3" />
-    <link rel="stylesheet" href="./styles/web-mobile-experience-v83.0.3.css?v=83.0.3" />
+    <link id="ninouLegacyStylesheet" rel="stylesheet" href="./styles/legacy.css?v=84.0.0" />
+    <link rel="stylesheet" href="./styles/premium-v82.0.0.css?v=84.0.0" />
+    <link rel="stylesheet" href="./styles/focused-flow-v82.0.0.css?v=84.0.0" />
+    <link id="ninouAdminStylesheet" rel="stylesheet" href="./styles/admin-web-v82.1.7.css?v=84.0.0" />
+    <link rel="stylesheet" href="./styles/customer-ready-v82.1.7.css?v=84.0.0" />
+    <link rel="stylesheet" href="./styles/web-interaction-stability-v82.1.10.css?v=84.0.0" />
+    <link rel="stylesheet" href="./styles/web-mobile-menu-parity-v82.1.11.css?v=84.0.0" />
+    <link rel="stylesheet" href="./styles/web-mobile-experience-v84.0.0.css?v=84.0.0" />
     <style id="ninouBootCriticalStyle">
       html { min-height:100%; background:linear-gradient(155deg,#fbf8ff 0%,#f5f1ff 54%,#eefaf7 100%); }
       html.ninou-booting, html.ninou-booting body, html.ninou-loading-overlay, html.ninou-loading-overlay body { min-height: 100%; overflow: hidden; }
@@ -2415,7 +2415,7 @@
       <strong>Solicitar acesso</strong>
     </a>
     <script type="module">
-      import("./js/boot-v82.1.7.mjs?v=83.0.3").catch((error) => {
+      import("./js/boot-v82.1.7.mjs?v=84.0.0").catch((error) => {
         console.error("Não foi possível carregar o reparador do Ninou:", error);
         window.clearTimeout(window.__NINOU_BOOT_WATCHDOG__ || 0);
         const card = document.querySelector("#ninouBootScreen .ninou-boot-card");
@@ -2429,10 +2429,10 @@
     </script>
 
     <script type="module">
-      import { initActionLauncher } from "./js/ui/action-launcher.js?v=83.0.3";
+      import { initActionLauncher } from "./js/ui/action-launcher.js?v=84.0.0";
       initActionLauncher();
     </script>
-    <script type="module" src="./js/web-mobile-menu-parity-v82.1.11.mjs?v=83.0.3"></script>
-    <script type="module" src="./js/web-mobile-experience-v83.0.3.mjs?v=83.0.3"></script>
+    <script type="module" src="./js/web-mobile-menu-parity-v82.1.11.mjs?v=84.0.0"></script>
+    <script type="module" src="./js/web-mobile-experience-v84.0.0.mjs?v=84.0.0"></script>
   </body>
 </html>

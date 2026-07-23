@@ -20,8 +20,8 @@ const [html, boot, core, adminRuntime, adminService, firebaseService, ux, stabil
   readFile(new URL("styles/web-interaction-stability-v82.1.10.css", root), "utf8"),
   readFile(new URL("styles/web-mobile-menu-parity-v82.1.11.css", root), "utf8"),
   readFile(new URL("js/web-mobile-menu-parity-v82.1.11.mjs", root), "utf8"),
-  readFile(new URL("styles/web-mobile-experience-v83.0.3.css", root), "utf8"),
-  readFile(new URL("js/web-mobile-experience-v83.0.3.mjs", root), "utf8"),
+  readFile(new URL("styles/web-mobile-experience-v84.0.0.css", root), "utf8"),
+  readFile(new URL("js/web-mobile-experience-v84.0.0.mjs", root), "utf8"),
   readFile(new URL("js/ui/action-launcher.js", root), "utf8"),
   readFile(new URL("js/ui/record-sheet.js", root), "utf8"),
   readFile(new URL("js/runtime/visual-guard-v82.0.0.mjs", root), "utf8"),
@@ -42,23 +42,23 @@ assert.match(adminRuntime, /const panelRoot = \$\('#adminWebPortal'\)/);
 assert.match(adminCss, /body\.global-admin-mode > main\.phone-shell[\s\S]*display: none !important/);
 assert.match(html, /id="quickActions" class="quick-actions"/);
 assert.match(html, /class="bottom-bar"/);
-assert.match(html, /styles\/legacy\.css\?v=83\.0\.3/);
+assert.match(html, /styles\/legacy\.css\?v=84\.0\.0/);
 assert.doesNotMatch(html, /styles\/admin-v82\.0\.0\.css/);
 assert.doesNotMatch(html, /<script[^>]+ninou-admin-web-v82\.1\.7\.mjs/);
-assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=83\.0\.3/);
-assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=83\.0\.3/);
+assert.match(html, /styles\/premium-v82\.0\.0\.css\?v=84\.0\.0/);
+assert.match(html, /styles\/focused-flow-v82\.0\.0\.css\?v=84\.0\.0/);
 assert.doesNotMatch(html, /styles\/(tokens|foundation|home|components|motion|responsive|v78\.4-critical)\.css/);
-assert.match(html, /boot-v82\.1\.7\.mjs\?v=83\.0\.3/);
+assert.match(html, /boot-v82\.1\.7\.mjs\?v=84\.0\.0/);
 assert.match(html, /__NINOU_BOOT_WATCHDOG__/);
 assert.match(html, /history\.replaceState/);
 
-assert.match(boot, /const NINOU_VERSION = "83\.0\.3"/);
+assert.match(boot, /const NINOU_VERSION = "84\.0\.0"/);
 assert.match(boot, /const MIN_SPLASH_MS = 1500;/);
 assert.match(boot, /visual-guard-v82\.0\.0/);
-assert.match(core, /const NINOU_RUNTIME_VERSION = "83\.0\.3"/);
-assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "83\.0\.3-web-mobile-experience"/);
-assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-web-v82\.1\.7\.css\?v=83\.0\.3"/);
-assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-web-v82\.1\.7\.mjs\?v=83\.0\.3"/);
+assert.match(core, /const NINOU_RUNTIME_VERSION = "84\.0\.0"/);
+assert.match(core, /const NINOU_FAMILY_SCOPE_VERSION = "84\.0\.0-web-mobile-experience"/);
+assert.match(core, /const ADMIN_STYLESHEET_HREF = "\.\/styles\/admin-web-v82\.1\.7\.css\?v=84\.0\.0"/);
+assert.match(core, /const ADMIN_RUNTIME_HREF = "\.\/ninou-admin-web-v82\.1\.7\.mjs\?v=84\.0\.0"/);
 assert.match(core, /void ensureAdminRuntime\(\)/);
 assert.doesNotMatch(core, /createInviteButton\.addEventListener/);
 assert.doesNotMatch(core, /adminInvitePanel\.addEventListener/);
@@ -111,7 +111,7 @@ assert.match(premiumCss, /\.action-launcher-grid > button:is\(:active,:hover\)/)
 assert.match(focusedFlowCss, /\.breast-side-play::before/);
 assert.match(focusedFlowCss, /\.select-control-wrap > select[\s\S]*width: 100%/);
 assert.match(focusedFlowCss, /\.select-control-wrap > \.select-control-icon[\s\S]*translate3d\(0, -50%, 0\)/);
-assert.match(html, /styles\/web-interaction-stability-v82\.1\.10\.css\?v=83\.0\.3/);
+assert.match(html, /styles\/web-interaction-stability-v82\.1\.10\.css\?v=84\.0\.0/);
 assert.match(webInteractionCss, /\.primary-action:active \.action-icon[\s\S]*transform: none !important/);
 assert.match(webInteractionCss, /\.bottom-nav button:active[\s\S]*transform: none !important/);
 assert.match(webInteractionCss, /\.sound-option > i::after[\s\S]*content: "▶"/);
@@ -126,8 +126,8 @@ assert.match(menuParityCss, /\.bottom-nav > button\.active::after/);
 assert.match(menuParityJs, /const navIconByTarget = \{ today: 'home', diary: 'reader', trends: 'stats', sounds: 'music', profile: 'person' \}/);
 assert.match(menuParityJs, /function openAvatarMenu\(\)/);
 assert.match(menuParityJs, /function openReports\(\)/);
-assert.match(html, /styles\/web-mobile-experience-v83\.0\.3\.css\?v=83\.0\.3/);
-assert.match(html, /js\/web-mobile-experience-v83\.0\.3\.mjs\?v=83\.0\.3/);
+assert.match(html, /styles\/web-mobile-experience-v84\.0\.0\.css\?v=84\.0\.0/);
+assert.match(html, /js\/web-mobile-experience-v84\.0\.0\.mjs\?v=84\.0\.0/);
 assert.match(mobileExperienceCss, /\.ninou-live-wallpaper/);
 assert.match(mobileExperienceCss, /@keyframes ninouLiveDrift/);
 assert.match(mobileExperienceCss, /\.premium-delete-record/);
@@ -171,10 +171,10 @@ assert.match(core, /\$\{isActive \? "Pausar" : "Iniciar"\} timer do peito/);
 assert.match(visualGuard, /function verifyOrbit/);
 assert.doesNotMatch(visualGuard, /style\.setProperty/);
 
-assert.match(sw, /ninou-v83-0-3-web-mobile-parity/);
+assert.match(sw, /ninou-v84-0-0-smart-orbit-clusters/);
 assert.match(sw, /ninou-admin-web-v82\.1\.7\.mjs\?v=\$\{APP_VERSION\}/);
-assert.match(sw, /const APP_VERSION = "83\.0\.3"/);
-assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0", "customer-ready-v82\.1\.7", "web-interaction-stability-v82\.1\.10", "web-mobile-menu-parity-v82\.1\.11", "web-mobile-experience-v83\.0\.3"\]/);
+assert.match(sw, /const APP_VERSION = "84\.0\.0"/);
+assert.match(sw, /const STYLE_MODULES = \["legacy", "premium-v82\.0\.0", "focused-flow-v82\.0\.0", "customer-ready-v82\.1\.7", "web-interaction-stability-v82\.1\.10", "web-mobile-menu-parity-v82\.1\.11", "web-mobile-experience-v84\.0\.0"\]/);
 assert.match(sw, /day-sky\.svg/);
 assert.match(sw, /night-sky\.svg/);
 assert.match(build, /"assets\/clock-themes\/day-sky\.svg"/);
@@ -186,8 +186,8 @@ assert.match(build, /"styles\/admin-web-v82\.1\.7\.css"/);
 assert.match(build, /"styles\/web-interaction-stability-v82\.1\.10\.css"/);
 assert.match(build, /"styles\/web-mobile-menu-parity-v82\.1\.11\.css"/);
 assert.match(build, /"js\/web-mobile-menu-parity-v82\.1\.11\.mjs"/);
-assert.match(build, /"styles\/web-mobile-experience-v83\.0\.3\.css"/);
-assert.match(build, /"js\/web-mobile-experience-v83\.0\.3\.mjs"/);
+assert.match(build, /"styles\/web-mobile-experience-v84\.0\.0\.css"/);
+assert.match(build, /"js\/web-mobile-experience-v84\.0\.0\.mjs"/);
 assert.doesNotMatch(build, /"styles\/admin-v82\.0\.0\.css"/);
 assert.doesNotMatch(build, /^\s*"(?:styles|js|icons|audio|assets|app\.js|styles\.css|firestore\.rules|vercel\.json)",?$/m);
 assert.match(vercel, /"buildCommand": "npm run build"/);
@@ -289,7 +289,9 @@ assert.match(focusedFlowCss, /:is\(\.orbit-event > i, \.live-orbit-marker > i, \
 assert.doesNotMatch(core, /ORBIT_MARKER_RADIUS/);
 assert.doesNotMatch(core, /setOrbitConstellationGeometry/);
 assert.match(core, /class="orbit-cluster-compact"/);
-assert.doesNotMatch(core, /class="orbit-cluster-preview/);
+assert.match(core, /class="orbit-cluster-preview-icon/);
+assert.match(core, /class="orbit-cluster-satellite/);
+assert.match(core, /button\.classList\.contains\("is-expanded"\)/);
 assert.match(core, /containsActiveEvent \? " contains-active" : ""/);
 assert.match(core, /function setOrbitClusterCountGeometry/);
 assert.match(core, /const badgeAngle = radialAngle \+ \.52/);

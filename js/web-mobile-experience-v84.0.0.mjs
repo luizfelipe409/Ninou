@@ -1,4 +1,4 @@
-const VERSION = "83.0.3";
+const VERSION = "84.0.0";
 
 const qs = (selector, root = document) => root.querySelector(selector);
 const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];

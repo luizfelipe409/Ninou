@@ -1,4 +1,4 @@
-/* Ninou v83.0.3 — paridade de experiência mobile na web e live wallpaper global. */
+/* Ninou v84.0.0 — paridade de experiência mobile na web e live wallpaper global. */
 :root {
   --n8213-wall-base-a: #0d091c;
   --n8213-wall-base-b: #17102e;
@@ -223,4 +223,155 @@ body.ninou-live-wallpaper-enabled .avatar-quick-menu-backdrop { background: rgba
 }
 @media (prefers-reduced-motion: reduce) {
   .ninou-live-glow, .ninou-live-star { animation: none !important; }
+}
+
+/* Ninou v84 — Cluster Inteligente da órbita */
+html.ninou-v8200 .orbit-cluster {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  border: 2px solid rgba(221,205,255,.96) !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg,#704de0,#4d2fa8) !important;
+  box-shadow: 0 0 0 4px rgba(126,91,230,.12),0 10px 22px rgba(37,19,86,.42) !important;
+  overflow: visible !important;
+  z-index: 18 !important;
+}
+html.ninou-v8200 .orbit-cluster-compact {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+html.ninou-v8200 .orbit-cluster-preview-stack {
+  position: relative !important;
+  display: block !important;
+  width: 40px !important;
+  height: 30px !important;
+}
+html.ninou-v8200 .orbit-cluster-preview-icon {
+  position: absolute !important;
+  top: 1px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid rgba(255,255,255,.94) !important;
+  background: rgba(25,15,57,.92) !important;
+  overflow: hidden !important;
+  display: grid !important;
+  place-items: center !important;
+  box-shadow: 0 3px 8px rgba(12,6,30,.28) !important;
+}
+html.ninou-v8200 .orbit-cluster-preview-icon.preview-1 { left: 0 !important; z-index: 2 !important; }
+html.ninou-v8200 .orbit-cluster-preview-icon.preview-2 { left: 12px !important; top: 3px !important; z-index: 3 !important; }
+html.ninou-v8200 .orbit-cluster-preview-icon > :is(img,svg) { width: 100% !important; height: 100% !important; }
+html.ninou-v8200 .orbit-cluster .orbit-cluster-count {
+  position: absolute !important;
+  right: -9px !important;
+  top: -10px !important;
+  left: auto !important;
+  width: auto !important;
+  min-width: 31px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 0 7px !important;
+  border: 2.5px solid var(--n79-surface,#17102e) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(145deg,#8bf0d5,#61d4b7) !important;
+  color: #173c35 !important;
+  -webkit-text-fill-color: #173c35 !important;
+  font-size: .82rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  display: grid !important;
+  place-items: center !important;
+  transform: none !important;
+  box-shadow: 0 5px 13px rgba(23,60,53,.3) !important;
+  z-index: 30 !important;
+}
+html.ninou-v8200 .orbit-cluster-satellite {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid rgba(205,183,255,.88) !important;
+  background: rgba(25,16,55,.98) !important;
+  box-shadow: 0 8px 18px rgba(11,6,28,.42) !important;
+  display: grid !important;
+  place-items: center !important;
+  opacity: 0 !important;
+  transform: translate(-50%,-50%) scale(.35) !important;
+  transition: transform 250ms cubic-bezier(.22,1,.36,1), opacity 170ms ease !important;
+  z-index: -1 !important;
+}
+html.ninou-v8200 .orbit-cluster-satellite i {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  display: grid !important;
+  place-items: center !important;
+}
+html.ninou-v8200 .orbit-cluster-satellite i > :is(img,svg) { width: 100% !important; height: 100% !important; }
+html.ninou-v8200 .orbit-cluster-satellite small {
+  position: absolute !important;
+  top: 42px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  padding: 2px 5px !important;
+  border-radius: 8px !important;
+  background: rgba(18,10,42,.9) !important;
+  color: #fff !important;
+  font-size: .52rem !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+html.ninou-v8200 .orbit-cluster.is-expanded {
+  transform: translate(var(--orbit-x),var(--orbit-y)) scale(1.06) !important;
+  box-shadow: 0 0 0 6px rgba(126,91,230,.16),0 14px 30px rgba(37,19,86,.5) !important;
+}
+html.ninou-v8200 .orbit-cluster.is-expanded .orbit-cluster-satellite {
+  opacity: 1 !important;
+  z-index: 25 !important;
+  transform: translate(calc(-50% + var(--satellite-x)),calc(-50% + var(--satellite-y))) scale(1) !important;
+}
+html.ninou-v8200 body.day-theme .orbit-cluster-satellite {
+  border-color: rgba(117,88,232,.3) !important;
+  background: rgba(255,255,255,.98) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.ninou-v8200 .orbit-cluster-satellite { transition: none !important; }
+}
+html.ninou-v8200 body.family-daily-surface button.orbit-cluster {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  border: 2px solid rgba(221,205,255,.96) !important;
+  background: linear-gradient(145deg,#704de0,#4d2fa8) !important;
+  box-shadow: 0 0 0 4px rgba(126,91,230,.12),0 10px 22px rgba(37,19,86,.42) !important;
+  transform: translate(-50%,-50%) !important;
+  transition: box-shadow 180ms ease !important;
+}
+html.ninou-v8200 body.family-daily-surface button.orbit-cluster:is(:hover,:active,:focus,:focus-visible) {
+  border: 2px solid rgba(235,225,255,.98) !important;
+  background: linear-gradient(145deg,#7653e6,#5334af) !important;
+  box-shadow: 0 0 0 5px rgba(126,91,230,.16),0 12px 26px rgba(37,19,86,.48) !important;
+  transform: translate(-50%,-50%) !important;
+}
+html.ninou-v8200 body.family-daily-surface button.orbit-cluster.is-expanded,
+html.ninou-v8200 body.family-daily-surface button.orbit-cluster.is-expanded:is(:hover,:active,:focus,:focus-visible) {
+  transform: translate(-50%,-50%) scale(1.06) !important;
+  box-shadow: 0 0 0 6px rgba(126,91,230,.18),0 14px 30px rgba(37,19,86,.52) !important;
 }

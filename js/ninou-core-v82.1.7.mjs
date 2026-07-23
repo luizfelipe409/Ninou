@@ -29,8 +29,8 @@ import { readThemeModeInput, updateThemeBody } from "./ui/theme.js";
 import { initSleepSounds as initSleepSoundsPanel } from "./ui/sounds.js";
 
 const ADMIN_STYLESHEET_ID = "ninouAdminStylesheet";
-const ADMIN_STYLESHEET_HREF = "./styles/admin-web-v82.1.7.css?v=83.0.3";
-const ADMIN_RUNTIME_HREF = "./ninou-admin-web-v82.1.7.mjs?v=83.0.3";
+const ADMIN_STYLESHEET_HREF = "./styles/admin-web-v82.1.7.css?v=84.0.0";
+const ADMIN_RUNTIME_HREF = "./ninou-admin-web-v82.1.7.mjs?v=84.0.0";
 let adminRuntimePromise = null;
 let adminRuntimeAttempt = 0;
 
@@ -574,7 +574,7 @@ const lastWeightValue = document.querySelector("#lastWeightValue");
 const lastWeightHint = document.querySelector("#lastWeightHint");
 const weightHistoryList = document.querySelector("#weightHistoryList");
 
-const NINOU_RUNTIME_VERSION = "83.0.3";
+const NINOU_RUNTIME_VERSION = "84.0.0";
 const DAY_NOTE_ENTRY_PATTERN = /^(\d{1,2}:\d{2})\s+[—-]\s+(.+?)(?:\s+\(([^()]+)\))?$/;
 let dayNotesAutosaveTimer = null;
 let exportRoutineInProgress = false;
@@ -599,7 +599,7 @@ const NINOU_FRANCISCO_BABY_ARTICLE = "do";
 // As próximas versões passam a tratar a família técnica/admin e famílias clientes
 // pelo mesmo resolvedor de escopo familiar.
 const APP_ADMIN_FAMILY_ID = NINOU_INTERNAL_ADMIN_FAMILY_ID;
-const NINOU_FAMILY_SCOPE_VERSION = "83.0.3-web-mobile-experience";
+const NINOU_FAMILY_SCOPE_VERSION = "84.0.0-web-mobile-experience";
 const NINOU_CLIENT_FAMILY_PREFIX = "family-";
 const ADMIN_WHATSAPP_NUMBER = "5521981904591";
 const ADMIN_WHATSAPP_MESSAGE = "Olá! Tenho interesse em acessar o Ninou. Pode me enviar um convite?";
@@ -10987,8 +10987,19 @@ function createOrbitEvent(event, active = false, position = eventPosition(event.
 
 function getOrbitClusterMarkup(eventList) {
   const newestFirst = [...eventList].sort((a, b) => b.start - a.start);
-  const primaryConfig = getEventConfig(newestFirst[0].type);
-  return `<span class="orbit-cluster-compact" aria-hidden="true"><i class="orbit-cluster-icon">${primaryConfig.icon}</i><span class="orbit-cluster-count">${eventList.length}</span></span>`;
+  const previewEvents = newestFirst.slice(0, 2);
+  const previews = previewEvents.map((event, index) => {
+    const config = getEventConfig(event.type);
+    return `<i class="orbit-cluster-preview-icon preview-${index + 1}">${config.icon}</i>`;
+  }).join("");
+  const satellites = newestFirst.slice(0, 5).map((event, index, items) => {
+    const config = getEventConfig(event.type);
+    const spread = items.length === 1 ? 0 : (index / (items.length - 1) - .5) * 1.5;
+    const angle = -Math.PI / 2 + spread;
+    const distance = 64;
+    return `<span class="orbit-cluster-satellite" style="--satellite-x:${(Math.cos(angle) * distance).toFixed(1)}px;--satellite-y:${(Math.sin(angle) * distance).toFixed(1)}px" data-event-id="${escapeHtml(String(event.id || ""))}" title="${escapeHtml(`${config.title} às ${formatTime(event.start)}`)}"><i>${config.icon}</i><small>${formatTime(event.start)}</small></span>`;
+  }).join("");
+  return `<span class="orbit-cluster-compact" aria-hidden="true"><span class="orbit-cluster-preview-stack">${previews}</span><span class="orbit-cluster-count">${eventList.length}</span>${satellites}</span>`;
 }
 
 function setOrbitClusterCountGeometry(button, position) {
@@ -11017,7 +11028,21 @@ function createOrbitCluster(group) {
   button.setAttribute("aria-label", `${eventList.length} registros próximos, no período ${timeRange}`);
   setOrbitClusterCountGeometry(button, group.position);
   button.innerHTML = getOrbitClusterMarkup(eventList);
-  button.addEventListener("click", () => openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` }));
+  button.addEventListener("click", () => {
+    const wasExpanded = button.classList.contains("is-expanded");
+    orbitEvents?.querySelectorAll?.(".orbit-cluster.is-expanded").forEach((cluster) => {
+      if (cluster !== button) cluster.classList.remove("is-expanded");
+    });
+    if (!wasExpanded) {
+      button.classList.add("is-expanded");
+      button.setAttribute("aria-expanded", "true");
+      return;
+    }
+    button.classList.remove("is-expanded");
+    button.setAttribute("aria-expanded", "false");
+    openOrbitEventsFromMarker(button, eventList, { title: `${eventList.length} registros · ${timeRange}` });
+  });
+  button.setAttribute("aria-expanded", "false");
   return button;
 }
 
@@ -15271,7 +15296,7 @@ if ("serviceWorker" in navigator) {
   });
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js?v=83.0.3", { updateViaCache: "none" }).then((registration) => {
+    navigator.serviceWorker.register("/sw.js?v=84.0.0", { updateViaCache: "none" }).then((registration) => {
       registration.update().catch(() => {});
 
       if (registration.waiting) showAppUpdateNotice(registration);
@@ -15299,7 +15324,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — base multi-família + polimento seguro consolidado no app.legacy.js */
 (() => {
-  const VERSION = "83.0.3";
+  const VERSION = "84.0.0";
   const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
   const TEXT_TAGS = "strong,small,span,p,em,li,b";
   const SKIP_SELECTOR = "script,style,textarea,input,select,option,button,.ninou-email-token";
@@ -15356,7 +15381,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — guarda de estabilidade + preparação multi-família. */
 (() => {
-  const VERSION = "83.0.3";
+  const VERSION = "84.0.0";
   const RESET_LABELS = new Map([
     ["familyHealthRefreshButton", "Verificar família"],
     ["familyHealthRepairButton", "Corrigir vínculos"],
@@ -15420,7 +15445,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — centro de privacidade, termos e solicitações de dados. */
 (() => {
-  const LEGAL_VERSION = "83.0.3";
+  const LEGAL_VERSION = "84.0.0";
   const CONSENT_KEY = `ninou_legal_consent_${LEGAL_VERSION}`;
   const REQUEST_KEY = `ninou_legal_last_request_${LEGAL_VERSION}`;
   const modal = document.querySelector("#legalInfoModal");
@@ -15679,7 +15704,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — suporte e monitoramento simples para beta comercial. */
 (() => {
-  const SUPPORT_VERSION = "83.0.3";
+  const SUPPORT_VERSION = "84.0.0";
   const REPORTS_KEY = `ninou_support_reports_${SUPPORT_VERSION}`;
   const ERRORS_KEY = `ninou_runtime_errors_${SUPPORT_VERSION}`;
 
@@ -16008,7 +16033,7 @@ sheetDetail?.addEventListener("change", updateSleepDurationPreview);
 
 /* Ninou v75.75.67 — revisão comercial final: restrição visual por permissão. */
 (() => {
-  const REVIEW_VERSION = "83.0.3";
+  const REVIEW_VERSION = "84.0.0";
 
   function currentEffectiveRole() {
     try {
