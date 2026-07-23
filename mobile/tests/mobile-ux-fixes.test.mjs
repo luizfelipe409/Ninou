@@ -52,7 +52,10 @@ assert.ok(today.includes('AÇÃO MUITO PRÓXIMA'));
 
 assert.ok(register.includes('o sono precisa durar pelo menos 2 minutos'));
 assert.ok(orbit.includes('groupRoutineMarkerEvents'));
-assert.ok(orbit.includes('×{group.length}'));
+assert.ok(orbit.includes('<Text style={styles.clusterCount}>{group.length}</Text>'));
+assert.ok(orbit.includes('×{selectedCluster.length}'));
+assert.ok(orbit.includes('setExpandedClusterKey(clusterKey)'));
+assert.ok(orbit.includes('clusterSatelliteTime'));
 assert.ok(orbit.includes('if (activeMarkerEvent) markerEvents.push(activeMarkerEvent);'));
 assert.ok(orbit.includes('const containsActive = group.some(isCurrentActiveMarker);'));
 assert.ok(!orbit.includes('activeCollides'), 'O marcador ativo não deve mais cobrir um agrupamento separado.');

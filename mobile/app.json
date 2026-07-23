@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ninou",
     "slug": "ninou",
-    "version": "84.0.0",
+    "version": "84.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/ninou-icon.png",
     "scheme": "ninou",
@@ -10,7 +10,7 @@
     "ios": {
       "icon": "./assets/images/ninou-icon.png",
       "bundleIdentifier": "com.ninou.app",
-      "buildNumber": "90",
+      "buildNumber": "92",
       "supportsTablet": false,
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
@@ -39,7 +39,7 @@
     },
     "android": {
       "package": "com.ninou.app",
-      "versionCode": 90,
+      "versionCode": 92,
       "adaptiveIcon": {
         "backgroundColor": "#1D1435",
         "foregroundImage": "./assets/images/ninou-icon.png"
@@ -56,7 +56,11 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/ninou-favicon.png"
+      "favicon": "./assets/images/ninou-favicon.png",
+      "bundler": "metro",
+      "name": "Ninou",
+      "shortName": "Ninou",
+      "lang": "pt-BR"
     },
     "plugins": [
       "expo-router",

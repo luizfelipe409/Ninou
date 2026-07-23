@@ -29,7 +29,7 @@ function normalizeWeights(value: unknown): WeightEntry[] {
   }).sort((left, right) => right.date.localeCompare(left.date));
 }
 
-const STORAGE_KEY_PREFIX = 'ninou.mobile.profile.v2';
+const STORAGE_KEY_PREFIX = 'ninou.universal.profile.v3';
 const initialProfile: BabyProfile = { name: '', birthDate: '', wakeWindowMinutes: 90, avatarId: 'avatar-01', article: 'do', weights: [] };
 
 const ProfileContext = createContext<{
@@ -50,6 +50,9 @@ export function ProfileProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (authStatus === 'loading' || authStatus === 'resolving-family') return;
     let mounted = true;
+    setHydrated(false);
+    profileRef.current = initialProfile;
+    setProfile(initialProfile);
     let unsubscribe: () => void = () => undefined;
     AsyncStorage.getItem(storageKey)
       .then((raw) => {
@@ -62,14 +65,14 @@ export function ProfileProvider({ children }: PropsWithChildren) {
           unsubscribe = observeBabyProfile(access.familyId, (cloudProfile) => {
             if (!mounted) return;
             const wakeWindow = Number(cloudProfile.wakeWindowMinutes ?? cloudProfile.wakeWindow);
+            // O documento families/{familyId}/profile/main é a fonte canônica em todas as plataformas.
             const next = {
-              ...profileRef.current,
-              name: typeof cloudProfile.name === 'string' ? cloudProfile.name : profileRef.current.name,
-              birthDate: typeof cloudProfile.birthDate === 'string' ? cloudProfile.birthDate : profileRef.current.birthDate,
-              wakeWindowMinutes: Number.isFinite(wakeWindow) && wakeWindow > 0 ? wakeWindow : profileRef.current.wakeWindowMinutes,
-              avatarId: normalizeAvatarId(cloudProfile.avatar?.hair || cloudProfile.avatar?.icon || cloudProfile.avatarId || profileRef.current.avatarId),
-              article: cloudProfile.article === 'da' ? 'da' : cloudProfile.article === 'do' ? 'do' : profileRef.current.article,
-              weights: Array.isArray(cloudProfile.weights) ? normalizeWeights(cloudProfile.weights) : profileRef.current.weights,
+              name: typeof cloudProfile.name === 'string' ? cloudProfile.name.trim() : '',
+              birthDate: typeof cloudProfile.birthDate === 'string' ? cloudProfile.birthDate : '',
+              wakeWindowMinutes: Number.isFinite(wakeWindow) && wakeWindow > 0 ? wakeWindow : 90,
+              avatarId: normalizeAvatarId(cloudProfile.avatar?.hair || cloudProfile.avatar?.icon || cloudProfile.avatarId || 'avatar-01'),
+              article: cloudProfile.article === 'da' ? 'da' as const : 'do' as const,
+              weights: Array.isArray(cloudProfile.weights) ? normalizeWeights(cloudProfile.weights) : [],
             };
             profileRef.current = next;
             setProfile(next);

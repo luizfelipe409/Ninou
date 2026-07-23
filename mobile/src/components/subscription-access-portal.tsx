@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   secondary: { width: '100%', minHeight: 53, marginTop: 10, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   secondaryText: { fontSize: 13, fontWeight: '900' },
   signOut: { minHeight: 48, paddingHorizontal: 18, alignItems: 'center', justifyContent: 'center' },
-  signOutText: { fontSize: 12, fontWeight: '850' },
+  signOutText: { fontSize: 12, fontWeight: '800' },
   preserve: { width: '100%', minHeight: 56, borderRadius: 17, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 9 },
   preserveText: { flex: 1, fontSize: 10.5, lineHeight: 16, fontWeight: '800' },
   disabled: { opacity: 0.55 },

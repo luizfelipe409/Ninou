@@ -1,5 +1,6 @@
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { User } from 'firebase/auth';
+import { AppState } from 'react-native';
 
 import { isGlobalAppAdminEmail } from '@/domain/family-access';
 import {
@@ -78,6 +79,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
     void loadAccess(nextUser);
   }), [loadAccess]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active' && user) void loadAccess(user);
+    });
+    return () => subscription.remove();
+  }, [loadAccess, user]);
 
   const login = useCallback(async (email: string, password: string) => {
     setError('');

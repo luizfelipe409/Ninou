@@ -111,22 +111,79 @@ function toFamilyAccess(data: Record<string, unknown>, fallbackId: string, user:
   };
 }
 
-export async function resolveFamilyAccess(user: User): Promise<FamilyAccess | null> {
-  const familySnapshots = await getDocs(collection(db, 'users', user.uid, 'families'));
-  const accesses = familySnapshots.docs
-    .map((snapshot) => toFamilyAccess(snapshot.data(), snapshot.id, user))
-    .filter((access): access is FamilyAccess => Boolean(access));
-  if (accesses.length) return accesses[0];
+type FamilyAccessCandidate = FamilyAccess & {
+  primary: boolean;
+  updatedAt: number;
+  sourceId: string;
+};
 
-  const legacySnapshot = await getDoc(doc(db, 'users', user.uid, 'access', 'ninou'));
-  return legacySnapshot.exists() ? toFamilyAccess(legacySnapshot.data(), '', user) : null;
+function toFamilyAccessCandidate(data: Record<string, unknown>, fallbackId: string, user: User): FamilyAccessCandidate | null {
+  const access = toFamilyAccess(data, fallbackId, user);
+  if (!access) return null;
+  return {
+    ...access,
+    primary: Boolean(data.isPrimary || data.primary || data.selected),
+    updatedAt: Math.max(
+      timestampMillis(data.selectedAt),
+      timestampMillis(data.lastSeenAt),
+      timestampMillis(data.updatedAt),
+      timestampMillis(data.joinedAt),
+      Number(data.selectedAtClient || 0),
+    ),
+    sourceId: fallbackId,
+  };
+}
+
+function compareFamilyAccess(left: FamilyAccessCandidate, right: FamilyAccessCandidate) {
+  if (left.primary !== right.primary) return left.primary ? -1 : 1;
+  const leftOwner = ['owner', 'responsavel_principal'].includes(left.role.toLowerCase());
+  const rightOwner = ['owner', 'responsavel_principal'].includes(right.role.toLowerCase());
+  if (leftOwner !== rightOwner) return leftOwner ? -1 : 1;
+  if (left.updatedAt !== right.updatedAt) return right.updatedAt - left.updatedAt;
+  return left.familyId.localeCompare(right.familyId);
+}
+
+async function persistCanonicalFamilyPointer(user: User, access: FamilyAccess, currentPointer: Record<string, unknown> | null) {
+  const currentFamilyId = String(currentPointer?.familyId || '').trim();
+  const currentRole = String(currentPointer?.role || '').trim();
+  if (currentFamilyId === access.familyId && currentRole === access.role && isActiveAccess(currentPointer || {})) return;
+  await setDoc(doc(db, 'users', user.uid, 'access', 'ninou'), {
+    ...access,
+    status: 'active',
+    roleVersion: 3,
+    selectedAtClient: Date.now(),
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export async function resolveFamilyAccess(user: User): Promise<FamilyAccess | null> {
+  const [pointerSnapshot, familySnapshots] = await Promise.all([
+    getDoc(doc(db, 'users', user.uid, 'access', 'ninou')),
+    getDocs(collection(db, 'users', user.uid, 'families')),
+  ]);
+  const pointerData = pointerSnapshot.exists() ? pointerSnapshot.data() : null;
+  const pointer = pointerData ? toFamilyAccess(pointerData, '', user) : null;
+  const candidates = familySnapshots.docs
+    .map((snapshot) => toFamilyAccessCandidate(snapshot.data(), snapshot.id, user))
+    .filter((access): access is FamilyAccessCandidate => Boolean(access));
+
+  // O ponteiro canônico tem prioridade quando também existe como vínculo ativo.
+  const pointedCandidate = pointer
+    ? candidates.find((candidate) => candidate.familyId === pointer.familyId)
+    : null;
+  const selected = pointedCandidate || [...candidates].sort(compareFamilyAccess)[0] || (pointer ? { ...pointer, primary: true, updatedAt: 0, sourceId: pointer.familyId } : null);
+  if (!selected) return null;
+
+  // Repara silenciosamente o ponteiro antigo para que web, iOS e Android escolham a mesma família.
+  try { await persistCanonicalFamilyPointer(user, selected, pointerData); } catch { /* leitura continua mesmo se a autorreparação estiver temporariamente indisponível */ }
+  return { familyId: selected.familyId, role: selected.role, email: selected.email, ownerUid: selected.ownerUid };
 }
 
 export async function createPersonalFamily(user: User, input: { familyName: string; babyName: string; birthDate: string; article: 'do' | 'da'; responsibleName: string; responsibleRelation: string }) {
   const email = (user.email || '').trim().toLowerCase();
   const familyId = `family-${user.uid}`;
   const access: FamilyAccess = { familyId, role: 'owner', email, ownerUid: user.uid };
-  const accessPayload = { ...access, status: 'active', roleVersion: 2, updatedAt: serverTimestamp() };
+  const accessPayload = { ...access, status: 'active', roleVersion: 3, isPrimary: true, selectedAtClient: Date.now(), updatedAt: serverTimestamp() };
   const batch = writeBatch(db);
   batch.set(doc(db, 'users', user.uid, 'families', familyId), { ...accessPayload, joinedAt: serverTimestamp() }, { merge: true });
   batch.set(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
@@ -183,7 +240,7 @@ export async function acceptCaregiverInvite(user: User, codeValue: string) {
   if (Number(invite.expiresAtClient || 0) && Number(invite.expiresAtClient) < Date.now()) throw new Error('Este convite expirou. Peça um novo código.');
   const role = String(invite.role || 'caregiver');
   const access: FamilyAccess = { familyId, role, email, ownerUid: String(invite.ownerUid || invite.createdByUid || '') };
-  const accessPayload = { ...access, inviteCode: code, status: 'active', roleVersion: 2, joinedAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const accessPayload = { ...access, inviteCode: code, status: 'active', roleVersion: 3, isPrimary: true, selectedAtClient: Date.now(), joinedAt: serverTimestamp(), updatedAt: serverTimestamp() };
   await setDoc(doc(db, 'users', user.uid, 'families', familyId), accessPayload, { merge: true });
   await setDoc(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
   await setDoc(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload }, { merge: true });
@@ -311,8 +368,8 @@ export async function loadAccountCaregiverProfile(user: User, familyId?: string)
     }
   }
   return {
-    caregiverName: String(account.caregiverName || account.name || account.displayName || member.name || member.displayName || '').trim(),
-    caregiverRelation: String(account.caregiverRelation || account.relation || account.relationship || member.relation || member.relationship || '').trim(),
+    caregiverName: String(member.name || member.displayName || account.caregiverName || account.name || account.displayName || '').trim(),
+    caregiverRelation: String(member.relation || member.relationship || account.caregiverRelation || account.relation || account.relationship || '').trim(),
   };
 }
 

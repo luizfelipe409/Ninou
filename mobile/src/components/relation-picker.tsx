@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   option: { minHeight: 50, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 11 },
   radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 10, height: 10, borderRadius: 5 },
-  optionText: { flex: 1, fontSize: 13.5, fontWeight: '850' },
+  optionText: { flex: 1, fontSize: 13.5, fontWeight: '800' },
   customCard: { borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, padding: 12, gap: 9, marginTop: 4 },
   customLabel: { fontSize: 12, fontWeight: '900' },
   customInput: { minHeight: 49, borderRadius: 15, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, fontSize: 13.5, fontWeight: '700' },

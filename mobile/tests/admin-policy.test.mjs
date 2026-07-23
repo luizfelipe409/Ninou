@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { isInternalAdminFamily } from '../src/domain/admin-policy.ts';
+import { isInternalAdminFamily } from '../src/domain/admin-policy-core.mjs';
 
 assert.equal(isInternalAdminFamily('ninou-family-luizfelipe', { title: 'Área técnica do admin' }), true);
 assert.equal(isInternalAdminFamily('qualquer-id', { internalAdminFamily: true }), true);

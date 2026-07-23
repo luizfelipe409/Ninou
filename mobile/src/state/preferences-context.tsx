@@ -22,7 +22,7 @@ const PreferencesContext = createContext<{ preferences: Preferences; updatePrefe
 
 export function PreferencesProvider({ children }: PropsWithChildren) {
   const { user, access } = useNinouAuth();
-  const key = `ninou.mobile.preferences.v2.${user?.uid || 'guest'}`;
+  const key = `ninou.universal.preferences.v3.${user?.uid || 'guest'}.${access?.familyId || 'no-family'}`;
   const [preferences, setPreferences] = useState(initialPreferences);
   useEffect(() => {
     let active = true;
@@ -42,10 +42,12 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
         }
         if (caregiverResult.status === 'fulfilled') {
           const cloudIdentity = caregiverResult.value;
+          const cloudName = cloudIdentity.caregiverName.trim();
+          const cloudRelation = normalizeCaregiverRelation(cloudIdentity.caregiverRelation);
           next = {
             ...next,
-            caregiverName: cloudIdentity.caregiverName || next.caregiverName,
-            caregiverRelation: normalizeCaregiverRelation(cloudIdentity.caregiverRelation) || next.caregiverRelation,
+            caregiverName: cloudName || next.caregiverName,
+            caregiverRelation: cloudRelation || next.caregiverRelation,
           };
         }
       }

@@ -1,58 +1,75 @@
-# Ninou v83.0.3 — paridade mobile e live wallpaper na web
+# Ninou v84.1.1 — aplicativo universal integrado
 
-Projeto completo do Ninou com:
+A partir desta versão, web, iPhone e Android executam a mesma aplicação Expo/React Native Web.
+Não existe mais uma interface web paralela em HTML/CSS/JavaScript legado.
 
-- aplicação web/PWA com os fluxos e acabamentos principais do mobile, live wallpaper global e interações estáveis;
-- painel administrativo web;
-- aplicação mobile v82.1.12, com melhorias de usabilidade, fluxos de família e preparação para publicação;
-- Firebase/Firestore como camada de autenticação e sincronização.
+## Paridade garantida
 
-## Fluxo para uma nova família adquirente
+As três plataformas compartilham diretamente:
 
-1. No painel administrativo, abra **Nova família cliente**.
-2. Informe família, bebê e e-mail do responsável.
-3. Escolha o plano e a validade.
-4. Crie a família e envie ao cliente a mensagem de ativação copiada pelo painel.
-5. O cliente abre o Ninou, toca em **Ativar meu acesso** e usa o e-mail autorizado e o código recebido.
+- autenticação e resolução da família ativa;
+- perfil do bebê e identidade do cuidador;
+- menus, opções e permissões;
+- wallpapers, efeitos e temas;
+- órbita, agrupamentos e registros da rotina;
+- telas Hoje, Diário, Dados, Sons e Perfil;
+- Firebase Authentication, Firestore e regras de segurança.
 
-O cliente não consegue criar uma família comercial sem convite. Cuidadores adicionais entram por convites da família.
+## Contrato canônico de dados
 
-## Controle de acesso
+- Família ativa: `users/{uid}/access/ninou`
+- Vínculos: `users/{uid}/families/{familyId}` e `families/{familyId}/members/{uid}`
+- Perfil: `families/{familyId}/profile/main`
+- Rotina: `families/{familyId}/days/{dayId}`
 
-- **Teste:** validade configurável, inicialmente 14 dias.
-- **Premium:** validade configurável, inicialmente 30 dias.
-- **Cortesia:** validade configurável.
-- **Suspenso:** bloqueia a entrada preservando os dados.
-- **Legado:** famílias antigas sem metadados comerciais continuam funcionando.
+O aplicativo repara silenciosamente ponteiros antigos quando encontra mais de um vínculo, garantindo que web, iOS e Android escolham a mesma família.
+Caches locais de perfil e preferências são isolados por família e nunca substituem a fonte canônica do Firestore.
 
-Não há checkout ou cobrança automática nesta versão. Pagamento, renovação e liberação são administrados pelo painel.
+## Instalação
 
-## Publicação na Vercel
+```bash
+cd mobile
+npm ci
+npm run typecheck
+```
+
+## Desenvolvimento
+
+Mobile Development Build:
+
+```bash
+npm run start:dev-client -- --clear
+```
+
+Web local:
+
+```bash
+npm run web
+```
+
+## Validação completa
+
+Na raiz:
 
 ```bash
 npm test
 npm run build
 ```
 
-Configuração esperada:
+## Publicação na Vercel
 
 - Build Command: `npm run build`
-- Output Directory: `dist`
+- Output Directory: `mobile/dist`
+- Install Command: `npm --prefix mobile ci`
 
-Publique também as regras atualizadas do Firestore quando houver alteração nelas.
+A Vercel passa a publicar o export web gerado da mesma base usada pelos aplicativos nativos.
 
-## Verificação após publicar
+## Firebase
 
-Use uma família piloto para validar:
+Antes da publicação comercial, publique as regras desta versão:
 
-1. criação no painel;
-2. recebimento/cópia do código;
-3. criação de conta com o e-mail autorizado;
-4. ativação da família;
-5. login em outro aparelho;
-6. recuperação de senha;
-7. expiração e renovação do plano;
-8. páginas de privacidade, termos e suporte;
-9. instalação como PWA.
+```bash
+firebase deploy --only firestore:rules
+```
 
-Consulte `VALIDACAO_WEB_CLIENTES_v82.1.7.md`, `VALIDACAO_ESTABILIDADE_WEB_v82.1.10.md`, `VALIDACAO_WEB_MOBILE_PARITY_v83.0.3.md` e as validações existentes em `mobile/`.
+Use o mesmo projeto Firebase (`ninou-3c936`) em web, iOS e Android.

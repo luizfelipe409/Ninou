@@ -4,7 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /*
-      Ninou v75.75.57 — regras multi-família seguras + legal/privacidade
+      Ninou v84.1.1 — contrato universal web/iOS/Android
       Objetivo: cada usuário acessa apenas famílias onde é membro ativo.
       Admin global: luizfelipe.dasilva@gmail.com
     */
@@ -496,17 +496,22 @@ service cloud.firestore {
         allow read, write: if isSelf(userId) || isGlobalAdmin();
       }
 
-      // Compatibilidade legado: dados pessoais só pelo próprio usuário ou admin global.
+      // Caminhos antigos permanecem somente para leitura/migração.
+      // A rotina canônica está em families/{familyId}/days/{dayId} e o perfil em
+      // families/{familyId}/profile/main para impedir divergência entre plataformas.
       match /days/{dayId} {
-        allow read, write: if isSelf(userId) || isGlobalAdmin();
+        allow read: if isSelf(userId) || isGlobalAdmin();
+        allow write: if isGlobalAdmin();
       }
 
       match /profile/{docId} {
-        allow read, write: if isSelf(userId) || isGlobalAdmin();
+        allow read: if isSelf(userId) || isGlobalAdmin();
+        allow write: if isGlobalAdmin();
       }
 
       match /{document=**} {
-        allow read, write: if isSelf(userId) || isGlobalAdmin();
+        allow read: if isSelf(userId) || isGlobalAdmin();
+        allow write: if isGlobalAdmin();
       }
     }
 

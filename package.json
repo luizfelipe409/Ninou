@@ -1,15 +1,18 @@
 {
   "name": "ninou-app",
   "private": true,
-  "version": "84.0.0",
+  "version": "84.1.1",
   "type": "module",
   "scripts": {
-    "check": "node tests/validate-project.mjs",
-    "test:architecture": "node tests/architecture.test.mjs",
-    "test": "npm run test:architecture && npm run test:regressions && npm run check",
-    "build": "node scripts/build-production.mjs",
-    "test:regressions": "node tests/v82.0.0-regressions.test.mjs",
+    "check": "node tests/validate-universal-project.mjs",
+    "test:architecture": "node tests/universal-platform-parity.test.mjs",
+    "test": "npm run test:architecture && npm run check && npm run mobile:test",
+    "build": "npm --prefix mobile run export:web",
+    "web:install": "npm --prefix mobile ci",
+    "web:start": "npm --prefix mobile run web",
+    "web:export": "npm --prefix mobile run export:web",
     "mobile:start": "npm --prefix mobile run start",
-    "mobile:check": "npm --prefix mobile run check"
+    "mobile:check": "npm --prefix mobile run check",
+    "mobile:test": "npm --prefix mobile run test:source"
   }
 }

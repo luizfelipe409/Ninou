@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   options: { marginTop: 24, gap: 12 }, option: { minHeight: 88, borderRadius: 21, borderWidth: StyleSheet.hairlineWidth, padding: 13, flexDirection: 'row', alignItems: 'center', gap: 12 }, optionIcon: { width: 50, height: 50, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, optionCopy: { flex: 1 }, optionTitle: { fontSize: 15, fontWeight: '900' }, optionText: { marginTop: 3, fontSize: 11.5, lineHeight: 16 },
   form: { marginTop: 22, gap: 14 }, field: { gap: 7 }, label: { fontSize: 12, fontWeight: '900' }, input: { minHeight: 56, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 14, fontSize: 14, fontWeight: '700' },
   segment: { flexDirection: 'row', gap: 8 }, segmentItem: { flex: 1, minHeight: 48, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' },
-  roleHint: { minHeight: 54, borderRadius: 16, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 9 }, roleHintText: { flex: 1, fontSize: 10.5, lineHeight: 15, fontWeight: '750' },
+  roleHint: { minHeight: 54, borderRadius: 16, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 9 }, roleHintText: { flex: 1, fontSize: 10.5, lineHeight: 15, fontWeight: '700' },
   help: { fontSize: 11.5, lineHeight: 17 }, primary: { minHeight: 55, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginTop: 2 }, primaryText: { color: '#FFF', fontSize: 13.5, fontWeight: '900' },
   feedback: { marginTop: 14, fontSize: 11.5, lineHeight: 17, fontWeight: '800' }, signOut: { alignSelf: 'center', padding: 16, marginTop: 8 }, signOutText: { fontSize: 12, fontWeight: '900' }, pressed: { opacity: 0.82 }, disabled: { opacity: 0.48 },
 });

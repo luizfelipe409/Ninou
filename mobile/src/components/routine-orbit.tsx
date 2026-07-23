@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   clusterTitle: { fontSize: 13.5, fontWeight: '900' },
   clusterMeta: { marginTop: 3, fontSize: 10.5, lineHeight: 14, fontWeight: '700' },
   clusterDetail: { marginTop: 4, fontSize: 10.5, lineHeight: 14, fontWeight: '700' },
-  clusterActor: { marginTop: 3, fontSize: 9.5, lineHeight: 13, fontWeight: '650' },
+  clusterActor: { marginTop: 3, fontSize: 9.5, lineHeight: 13, fontWeight: '600' },
   closeButton: { width: '100%', minHeight: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
   closeText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
 });
