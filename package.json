@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "check": "node tests/validate-universal-project.mjs",
+    "test:rules": "npx --yes firebase-tools@15.2.1 emulators:exec --project demo-ninou-rules-v84-1-2 --only firestore \"node tests/firestore-rules.test.mjs\"",
     "test:architecture": "node tests/universal-platform-parity.test.mjs",
-    "test": "npm run test:architecture && npm run check && npm run mobile:test",
+    "test": "npm run test:architecture && npm run check && npm run mobile:test && npm run test:rules",
     "build": "npm --prefix mobile run export:web",
     "web:install": "npm --prefix mobile ci",
     "web:start": "npm --prefix mobile run web",
@@ -14,5 +15,9 @@
     "mobile:start": "npm --prefix mobile run start",
     "mobile:check": "npm --prefix mobile run check",
     "mobile:test": "npm --prefix mobile run test:source"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.16.0"
   }
 }

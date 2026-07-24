@@ -9,6 +9,7 @@ const {
   finishSleep,
   formatRoutineActorLabel,
   getRoutineMarkerCollisionWindowMinutes,
+  getRoutineRecordConflict,
   getBreastfeedingDurations,
   getRoutineMarkerGroupTimestamp,
   getRoutineEventOrbitTimestamp,
@@ -49,7 +50,8 @@ const felipe = { uid: 'felipe', email: 'felipe@example.com', name: 'Felipe', rel
 const mary = { uid: 'mary', email: 'mary@example.com', name: 'Mary', relationship: 'Mãe', label: 'Mary · Mãe' };
 
 const feedingStartedAt = new Date(2026, 6, 23, 14, 0, 0, 0).getTime();
-const feedingLeft = startBreastfeedingTimer(initial, 'left', feedingStartedAt);
+const feedingBase = startRoutine(initial, 'awake', feedingStartedAt - 30 * 60_000, felipe);
+const feedingLeft = startBreastfeedingTimer(feedingBase, 'left', feedingStartedAt);
 assert.equal(feedingLeft.breastfeedingTimer.activeSide, 'left');
 assert.equal(getBreastfeedingDurations(feedingLeft.breastfeedingTimer, feedingStartedAt + 5 * 60_000).leftDurationMs, 5 * 60_000);
 const feedingRight = switchBreastfeedingSide(feedingLeft, 'right', feedingStartedAt + 5 * 60_000);
@@ -79,13 +81,18 @@ const correctedFeeding = updateRoutineEvent(feedingFinished, feedingEvent.id, {
   rightDurationMs: 4 * 60_000,
   detail: 'Esquerdo 00:07:00 • Direito 00:04:00',
 }, feedingStartedAt + 23 * 60_000, felipe);
-assert.equal(correctedFeeding.events[0].leftDurationMs, 7 * 60_000);
-assert.equal(correctedFeeding.events[0].rightDurationMs, 4 * 60_000);
+assert.equal(correctedFeeding.events.find((event) => event.id === feedingEvent.id).leftDurationMs, 7 * 60_000);
+assert.equal(correctedFeeding.events.find((event) => event.id === feedingEvent.id).rightDurationMs, 4 * 60_000);
 const awake = startRoutine(initial, 'awake', 1_700_000_000_000, felipe);
 const blockedRapidSleep = startSleep(awake, 'dormir', 1_700_000_030_000, felipe);
 assert.equal(blockedRapidSleep.mode, 'awake');
 assert.equal(blockedRapidSleep.events.length, awake.events.length);
 const sleeping = startSleep(awake, 'dormir', 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS, felipe);
+const feedingWhileSleeping = addRoutineRecord(sleeping, { type: 'mamadeira', amountMl: 90 }, 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS * 2, felipe);
+assert.equal(feedingWhileSleeping, sleeping, 'Não deve registrar alimentação durante um sono ativo.');
+assert.equal(getRoutineRecordConflict(sleeping, { type: 'amamentacao' }).code, 'feeding-during-sleep');
+const timerBeforeSleep = startBreastfeedingTimer(awake, 'left', 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS);
+assert.equal(startSleep(timerBeforeSleep, 'sono', 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS * 2, felipe), timerBeforeSleep, 'Não deve iniciar sono com mamada em andamento.');
 
 
 const customWakeTime = new Date(2026, 6, 21, 6, 35, 0, 0).getTime();
@@ -102,10 +109,9 @@ const initializedSleeping = initializeRoutineDay(createEmptyDayState(), {
   currentStateStartedAt: new Date(2026, 6, 21, 7, 20, 0, 0).getTime(),
 }, customWakeNow, felipe);
 assert.equal(initializedSleeping.mode, 'sleeping');
-assert.equal(initializedSleeping.events.filter((event) => event.type === 'acordou').length, 1);
-assert.equal(initializedSleeping.events[0].start, customWakeTime);
+assert.equal(initializedSleeping.events.filter((event) => event.type === 'acordou').length, 0);
 assert.equal(initializedSleeping.activeStartedAt, new Date(2026, 6, 21, 7, 20, 0, 0).getTime());
-assert.equal(initializedSleeping.lastWakeWindowMs, 45 * 60 * 1000);
+assert.equal(initializedSleeping.lastWakeWindowMs, null);
 
 const initializedAwakeStart = new Date(2026, 6, 21, 7, 42, 0, 0).getTime();
 const initializedAwake = initializeRoutineDay(createEmptyDayState(), {
@@ -115,7 +121,8 @@ const initializedAwake = initializeRoutineDay(createEmptyDayState(), {
 }, customWakeNow, felipe);
 assert.equal(initializedAwake.mode, 'awake');
 assert.equal(initializedAwake.events.filter((event) => event.type === 'acordou').length, 1);
-assert.equal(initializedAwake.events[0].start, customWakeTime);
+assert.equal(initializedAwake.events[0].start, initializedAwakeStart);
+assert.equal(initializedAwake.events[0].detail, 'Configuração inicial');
 assert.equal(initializedAwake.activeStartedAt, initializedAwakeStart);
 
 const duplicateSleepStart = startSleep(sleeping, 'dormir', 1_700_000_000_000 + MIN_ROUTINE_STATE_DURATION_MS * 2, felipe);
@@ -232,6 +239,16 @@ assert.ok(completedOvernightEvent);
 assert.equal(completedOvernightEvent.end, exactOvernightEnd);
 assert.equal(completedOvernightEvent.end - completedOvernightEvent.start, 6 * 60 * 60 * 1000);
 assert.equal(completedOvernightState.mode, 'idle');
+const feedingInsideCompletedSleep = addRoutineRecord(completedOvernightState, {
+  type: 'mamadeira',
+  start: exactOvernightStart + 30 * 60_000,
+  amountMl: 90,
+}, new Date(2026, 6, 19, 15, 1, 0, 0).getTime(), felipe);
+assert.equal(feedingInsideCompletedSleep.events.length, completedOvernightState.events.length, 'Alimentação retroativa não pode entrar dentro de um sono concluído.');
+const diaperDuringSleep = addRoutineRecord(sleeping, { type: 'fralda', detail: 'Xixi' }, Number(sleeping.activeStartedAt) + 10 * 60_000, felipe);
+const medicineDuringSleep = addRoutineRecord(sleeping, { type: 'medicamento', detail: 'Dose' }, Number(sleeping.activeStartedAt) + 11 * 60_000, felipe);
+assert.ok(diaperDuringSleep.events.some((event) => event.type === 'fralda'), 'Fralda pode ser registrada sem encerrar o sono.');
+assert.ok(medicineDuringSleep.events.some((event) => event.type === 'medicamento'), 'Medicamento pode ser registrado sem encerrar o sono.');
 
 const openManualSleep = addRoutineRecord(createEmptyDayState(), {
   type: 'sono',

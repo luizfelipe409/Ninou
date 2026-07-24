@@ -4,36 +4,49 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /*
-      Ninou v84.1.1 — contrato universal web/iOS/Android
-      Objetivo: cada usuário acessa apenas famílias onde é membro ativo.
-      Admin global: luizfelipe.dasilva@gmail.com
+      Ninou v84.1.2 — contrato universal seguro para web, iOS e Android.
+
+      Princípios:
+      - families/{familyId}/members/{uid} é a única fonte de autorização familiar.
+      - users/{uid}/families e users/{uid}/access/ninou são apenas índices.
+      - uma conta pode criar sua família pessoal somente em um lote atômico coerente.
+      - convites são individuais, expiram e não elevam o papel definido pelo gestor.
+      - owner, admin_familiar e cuidador escrevem rotina; visualizacao apenas lê.
+      - monetização ainda não bloqueia o uso. Somente o admin global altera assinatura.
     */
+
+    // ---------------------------------------------------------------------
+    // Identidade, caminhos e valores canônicos
+    // ---------------------------------------------------------------------
 
     function isSignedIn() {
       return request.auth != null;
     }
 
-    function userEmail() {
-      return isSignedIn() && request.auth.token.email != null
-        ? request.auth.token.email.lower()
+    function authUid() {
+      return isSignedIn() ? request.auth.uid : "";
+    }
+
+    function authEmail() {
+      return isSignedIn()
+        ? request.auth.token.get("email", "").lower()
         : "";
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && authUid() == uid;
     }
 
     function isGlobalAdmin() {
       return isSignedIn()
-        && userEmail() == "luizfelipe.dasilva@gmail.com";
+        && (
+          request.auth.token.get("ninouAdmin", false) == true
+          || authEmail() == "luizfelipe.dasilva@gmail.com"
+        );
     }
 
-    function isSelf(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    function inactiveStatuses() {
-      return ["removed", "revoked", "inactive", "cancelled", "blocked"];
-    }
-
-    function isActiveData(data) {
-      return !("status" in data) || !(data.status in inactiveStatuses());
+    function familyPath(familyId) {
+      return /databases/$(database)/documents/families/$(familyId);
     }
 
     function memberPath(familyId, uid) {
@@ -41,206 +54,638 @@ service cloud.firestore {
     }
 
     function currentMemberPath(familyId) {
-      return memberPath(familyId, request.auth.uid);
+      return memberPath(familyId, authUid());
     }
 
-    function currentUserFamilyPath(familyId) {
-      return userFamilyPath(request.auth.uid, familyId);
-    }
-
-    function userFamilyPath(userId, familyId) {
-      return /databases/$(database)/documents/users/$(userId)/families/$(familyId);
-    }
-
-    function invitePath(code) {
+    function globalInvitePath(code) {
       return /databases/$(database)/documents/invites/$(code);
     }
 
-    function isFamilyMember(familyId) {
-      return isSignedIn()
-        && (
-          (exists(currentMemberPath(familyId))
-            && isActiveData(get(currentMemberPath(familyId)).data))
-          || (exists(currentUserFamilyPath(familyId))
-            && isActiveData(get(currentUserFamilyPath(familyId)).data))
-        );
+    function isStoredRole(role) {
+      return role in ["owner", "admin_familiar", "cuidador", "visualizacao"];
     }
 
-    function memberRole(familyId) {
-      return exists(currentMemberPath(familyId))
-        ? get(currentMemberPath(familyId)).data.role
-        : (exists(currentUserFamilyPath(familyId))
-          ? get(currentUserFamilyPath(familyId)).data.role
-          : "");
-    }
-
-    function canReadFamily(familyId) {
-      return isGlobalAdmin() || isFamilyMember(familyId);
+    function isManagedRole(role) {
+      return role in ["admin_familiar", "cuidador", "visualizacao"];
     }
 
     function roleCanManage(role) {
-      return role in [
-        "owner",
-        "admin_familiar",
-        "responsavel",
-        "pai",
-        "mae",
-        "global_admin",
-        "admin"
-      ];
+      return role in ["owner", "admin_familiar"];
     }
 
     function roleCanWriteRoutine(role) {
-      return role in [
-        "owner",
-        "admin_familiar",
-        "responsavel",
-        "pai",
-        "mae",
-        "cuidador",
-        "caregiver",
-        "admin"
-      ];
+      return role in ["owner", "admin_familiar", "cuidador"];
     }
 
-    function isFamilyAdmin(familyId) {
-      return isGlobalAdmin()
-        || (isFamilyMember(familyId) && roleCanManage(memberRole(familyId)));
+    function isActiveMemberData(data) {
+      return data.get("status", "") == "active"
+        && isStoredRole(data.get("role", ""));
     }
 
-    function canWriteFamilyRoutine(familyId) {
-      return isGlobalAdmin()
-        || (isFamilyMember(familyId) && roleCanWriteRoutine(memberRole(familyId)));
+    function currentMemberExists(familyId) {
+      return isSignedIn() && exists(currentMemberPath(familyId));
     }
 
-    function incomingFamilyIdMatches(familyId) {
-      return !("familyId" in request.resource.data)
-        || request.resource.data.familyId == familyId;
+    function currentMemberData(familyId) {
+      return get(currentMemberPath(familyId)).data;
     }
 
-    function existingFamilyIdStable(familyId) {
-      return !("familyId" in resource.data)
-        || !("familyId" in request.resource.data)
-        || request.resource.data.familyId == resource.data.familyId;
+    function isActiveFamilyMember(familyId) {
+      return currentMemberExists(familyId)
+        && isActiveMemberData(currentMemberData(familyId));
     }
 
-    function familyScopedWrite(familyId) {
-      return incomingFamilyIdMatches(familyId) && existingFamilyIdStable(familyId);
-    }
-
-    function inviteEmailMatchesData(data) {
-      return !("email" in data)
-        || data.email == ""
-        || data.email == userEmail();
-    }
-
-    function inviteIsPendingData(data) {
-      return (data.status in ["pending", "active"])
-        && (!("expiresAt" in data) || request.time < data.expiresAt)
-        && (!("maxUses" in data) || data.maxUses <= 0 || !("useCount" in data) || data.useCount < data.maxUses);
-    }
-
-    function inviteCanBeUsedByCurrentUser(familyId, code) {
-      return isSignedIn()
-        && code != ""
-        && exists(invitePath(code))
-        && get(invitePath(code)).data.familyId == familyId
-        && inviteEmailMatchesData(get(invitePath(code)).data)
-        && inviteIsPendingData(get(invitePath(code)).data);
-    }
-
-    function inviteCodeFromRequest() {
-      return ("inviteCode" in request.resource.data)
-        ? request.resource.data.inviteCode
+    function currentMemberRole(familyId) {
+      return currentMemberExists(familyId)
+        ? currentMemberData(familyId).get("role", "")
         : "";
     }
 
-    function selfOwnerBootstrapMember(familyId, memberId) {
-      return isSelf(memberId)
-        && !exists(/databases/$(database)/documents/families/$(familyId))
-        && incomingFamilyIdMatches(familyId)
-        && request.resource.data.role == "owner"
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.status == "active";
+    function canReadFamily(familyId) {
+      return isGlobalAdmin() || isActiveFamilyMember(familyId);
     }
 
-    function selfInviteMemberCreate(familyId, memberId) {
-      return isSelf(memberId)
-        && incomingFamilyIdMatches(familyId)
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.status == "active"
-        && inviteCanBeUsedByCurrentUser(familyId, inviteCodeFromRequest())
-        && request.resource.data.role in ["admin_familiar", "cuidador", "caregiver", "visualizacao", "visualizador", "viewer", "responsavel"];
+    function isFamilyManager(familyId) {
+      return isGlobalAdmin()
+        || (
+          isActiveFamilyMember(familyId)
+          && roleCanManage(currentMemberRole(familyId))
+        );
     }
 
-    function memberOwnerProtected() {
-      return !(resource.data.role == "owner") || isGlobalAdmin();
+    function canWriteRoutine(familyId) {
+      return isGlobalAdmin()
+        || (
+          isActiveFamilyMember(familyId)
+          && roleCanWriteRoutine(currentMemberRole(familyId))
+        );
     }
 
-
-    function memberAdminUpdateSafe(familyId) {
-      return isFamilyAdmin(familyId)
-        && memberOwnerProtected()
-        && familyScopedWrite(familyId)
-        && (!("role" in request.resource.data) || request.resource.data.role != "owner");
+    function incomingFamilyIdMatches(familyId) {
+      return !request.resource.data.keys().hasAny(["familyId"])
+        || request.resource.data.familyId == familyId;
     }
 
-    function selfMemberUpdateSafe(familyId, memberId) {
-      return isSelf(memberId)
-        && familyScopedWrite(familyId)
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.ownerUid == resource.data.ownerUid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "status",
-          "leftAt",
-          "updatedAt",
-          "displayName",
+    function familyIdIsStable(familyId) {
+      return (
+          !resource.data.keys().hasAny(["familyId"])
+          || resource.data.familyId == familyId
+        )
+        && incomingFamilyIdMatches(familyId);
+    }
+
+    function emailIsSelfOrAbsent(data) {
+      return !data.keys().hasAny(["email"])
+        || data.email == ""
+        || data.email.lower() == authEmail();
+    }
+
+    function uidIsSelfOrAbsent(data, uid) {
+      return !data.keys().hasAny(["uid"]) || data.uid == uid;
+    }
+
+    function serverTimestampOrAbsent(data, field) {
+      return !data.keys().hasAny([field]) || data[field] == request.time;
+    }
+
+    function personalFamilyIdIsValid(familyId, uid) {
+      return familyId == "family-" + uid;
+    }
+
+    // ---------------------------------------------------------------------
+    // Bootstrap atômico da primeira família
+    // ---------------------------------------------------------------------
+
+    function selfFamilyBootstrapIsSafe(familyId) {
+      return isSignedIn()
+        && personalFamilyIdIsValid(familyId, authUid())
+        && !exists(familyPath(familyId))
+        && request.resource.data.get("familyId", "") == familyId
+        && request.resource.data.get("ownerUid", "") == authUid()
+        && request.resource.data.get("ownerEmail", "").lower() == authEmail()
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
+          "familyId",
+          "title",
           "name",
-          "relationship",
+          "babyName",
+          "babyArticle",
+          "ownerUid",
+          "ownerEmail",
+          "responsibleName",
+          "responsibleRelation",
+          "familyType",
+          "status",
+          "appVersion",
+          "createdAt",
+          "updatedAt"
+        ])
+        && serverTimestampOrAbsent(request.resource.data, "createdAt")
+        && serverTimestampOrAbsent(request.resource.data, "updatedAt")
+        && getAfter(memberPath(familyId, authUid())).data.get("uid", "") == authUid()
+        && getAfter(memberPath(familyId, authUid())).data.get("role", "") == "owner"
+        && getAfter(memberPath(familyId, authUid())).data.get("status", "") == "active";
+    }
+
+    function selfOwnerMemberBootstrapIsSafe(familyId, memberId) {
+      return isSelf(memberId)
+        && personalFamilyIdIsValid(familyId, memberId)
+        && !exists(familyPath(familyId))
+        && incomingFamilyIdMatches(familyId)
+        && uidIsSelfOrAbsent(request.resource.data, memberId)
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.get("role", "") == "owner"
+        && request.resource.data.get("ownerUid", "") == memberId
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
+          "uid",
+          "familyId",
+          "role",
+          "email",
+          "ownerUid",
+          "status",
+          "roleVersion",
+          "isPrimary",
+          "selectedAtClient",
+          "name",
+          "displayName",
           "relation",
+          "relationship",
           "relationshipLabel",
           "deviceId",
-          "lastSeenAt"
+          "joinedAt",
+          "lastSeenAt",
+          "updatedAt"
         ])
-        && (!("status" in request.resource.data) || request.resource.data.status in ["active", "removed"]);
+        && serverTimestampOrAbsent(request.resource.data, "joinedAt")
+        && serverTimestampOrAbsent(request.resource.data, "updatedAt")
+        && getAfter(familyPath(familyId)).data.get("ownerUid", "") == memberId
+        && getAfter(familyPath(familyId)).data.get("status", "") == "active";
     }
 
-    function familyCreateByOwner(familyId) {
-      return isSignedIn()
+    function selfOwnerIndexBootstrapIsSafe(uid, familyId) {
+      return isSelf(uid)
+        && personalFamilyIdIsValid(familyId, uid)
+        && !exists(familyPath(familyId))
         && incomingFamilyIdMatches(familyId)
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.status == "active";
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.get("role", "") == "owner"
+        && request.resource.data.get("ownerUid", "") == uid
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
+          "familyId",
+          "role",
+          "email",
+          "ownerUid",
+          "status",
+          "roleVersion",
+          "isPrimary",
+          "selectedAtClient",
+          "joinedAt",
+          "linkedAt",
+          "lastSeenAt",
+          "updatedAt"
+        ])
+        && getAfter(memberPath(familyId, uid)).data.get("role", "") == "owner"
+        && getAfter(memberPath(familyId, uid)).data.get("status", "") == "active";
     }
 
-    function familyUpdateByFamilyAdmin(familyId) {
-      return isFamilyAdmin(familyId)
-        && familyScopedWrite(familyId)
-        && request.resource.data.ownerUid == resource.data.ownerUid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+    function selfOwnerAccessBootstrapIsSafe(uid) {
+      let familyId = request.resource.data.get("familyId", "");
+      return isSelf(uid)
+        && personalFamilyIdIsValid(familyId, uid)
+        && !exists(familyPath(familyId))
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.get("role", "") == "owner"
+        && request.resource.data.get("ownerUid", "") == uid
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
           "familyId",
+          "role",
+          "email",
+          "ownerUid",
+          "status",
+          "roleVersion",
+          "isPrimary",
+          "selectedAtClient",
+          "joinedAt",
+          "linkedAt",
+          "lastSeenAt",
+          "updatedAt"
+        ])
+        && getAfter(memberPath(familyId, uid)).data.get("role", "") == "owner"
+        && getAfter(memberPath(familyId, uid)).data.get("status", "") == "active";
+    }
+
+    // ---------------------------------------------------------------------
+    // Convites e entrada de membros
+    // ---------------------------------------------------------------------
+
+    function inviteExists(code) {
+      return code != "" && exists(globalInvitePath(code));
+    }
+
+    function inviteData(code) {
+      return get(globalInvitePath(code)).data;
+    }
+
+    function inviteEmailMatchesCurrentUser(data) {
+      return data.get("email", "") == ""
+        || data.get("email", "").lower() == authEmail();
+    }
+
+    function inviteHasTimeRemaining(data) {
+      return (
+          data.get("expiresAt", null) is timestamp
+          && request.time < data.expiresAt
+        )
+        || (
+          data.get("expiresAtClient", null) is number
+          && request.time.toMillis() < data.expiresAtClient
+        );
+    }
+
+    function inviteIsPending(data) {
+      return data.get("status", "") == "pending"
+        && data.get("maxUses", 0) == 1
+        && data.get("useCount", 0) < 1
+        && inviteHasTimeRemaining(data);
+    }
+
+    function validInviteForUser(familyId, code) {
+      return isSignedIn()
+        && inviteExists(code)
+        && inviteData(code).get("code", code) == code
+        && inviteData(code).get("familyId", "") == familyId
+        && inviteEmailMatchesCurrentUser(inviteData(code))
+        && inviteIsPending(inviteData(code))
+        && isManagedRole(inviteData(code).get("role", ""))
+        && exists(familyPath(familyId))
+        && get(familyPath(familyId)).data.get("status", "active") == "active";
+    }
+
+    function inviteCodeFromIncomingData() {
+      return request.resource.data.get("inviteCode", "");
+    }
+
+    function incomingRoleMatchesInvite(code) {
+      return request.resource.data.get("role", "")
+        == inviteData(code).get("role", "");
+    }
+
+    function inviteCreateFieldsAreValid(code, familyId) {
+      return request.resource.data.get("code", code) == code
+        && request.resource.data.get("familyId", "") == familyId
+        && request.resource.data.get("email", "") is string
+        && request.resource.data.email.matches("^[^@]+@[^@]+\\.[^@]+$")
+        && isManagedRole(request.resource.data.get("role", ""))
+        && request.resource.data.get("status", "") == "pending"
+        && request.resource.data.get("maxUses", 0) == 1
+        && request.resource.data.get("useCount", -1) == 0
+        && request.resource.data.get("expiresAtClient", null) is number
+        && request.resource.data.expiresAtClient > request.time.toMillis()
+        && request.resource.data.expiresAtClient
+          <= request.time.toMillis() + 2592000000
+        && request.resource.data.get("createdByUid", "") == authUid()
+        && request.resource.data.get("createdByEmail", "").lower() == authEmail()
+        && serverTimestampOrAbsent(request.resource.data, "createdAt")
+        && serverTimestampOrAbsent(request.resource.data, "updatedAt");
+    }
+
+    function inviteImmutableFieldsStayStable() {
+      return request.resource.data.get("code", "")
+          == resource.data.get("code", "")
+        && request.resource.data.get("familyId", "")
+          == resource.data.get("familyId", "")
+        && request.resource.data.get("email", "")
+          == resource.data.get("email", "")
+        && request.resource.data.get("role", "")
+          == resource.data.get("role", "")
+        && request.resource.data.get("createdByUid", "")
+          == resource.data.get("createdByUid", "");
+    }
+
+    function managerInviteUpdateIsSafe(familyId) {
+      return isFamilyManager(familyId)
+        && inviteImmutableFieldsStayStable()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "useCount",
+          "expiresAt",
+          "expiresAtClient",
+          "renewedAt",
+          "cancelledAt",
+          "updatedAt"
+        ])
+        && request.resource.data.get("status", "") in ["pending", "cancelled"]
+        && request.resource.data.get("useCount", 0) in [0, 1]
+        && (
+          request.resource.data.get("status", "") == "cancelled"
+          || (
+            request.resource.data.get("useCount", 0) == 0
+            && request.resource.data.get("expiresAtClient", null) is number
+            && request.resource.data.expiresAtClient > request.time.toMillis()
+            && request.resource.data.expiresAtClient
+              <= request.time.toMillis() + 2592000000
+          )
+        )
+        && serverTimestampOrAbsent(request.resource.data, "updatedAt");
+    }
+
+    function invitedUserAcceptIsSafe(code, familyId) {
+      return isSignedIn()
+        && resource.data.get("code", code) == code
+        && resource.data.get("familyId", "") == familyId
+        && inviteEmailMatchesCurrentUser(resource.data)
+        && inviteIsPending(resource.data)
+        && getAfter(memberPath(familyId, authUid())).data.get("status", "")
+          == "active"
+        && getAfter(memberPath(familyId, authUid())).data.get("role", "")
+          == resource.data.get("role", "")
+        && inviteImmutableFieldsStayStable()
+        && request.resource.data.get("status", "") == "accepted"
+        && request.resource.data.get("useCount", 0)
+          == resource.data.get("useCount", 0) + 1
+        && request.resource.data.get("useCount", 0)
+          <= resource.data.get("maxUses", 1)
+        && request.resource.data.get("acceptedByUid", "") == authUid()
+        && request.resource.data.get("acceptedByEmail", authEmail()).lower()
+          == authEmail()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "useCount",
+          "acceptedByUid",
+          "acceptedBy",
+          "acceptedByEmail",
+          "acceptedAt",
+          "updatedAt"
+        ])
+        && serverTimestampOrAbsent(request.resource.data, "acceptedAt")
+        && serverTimestampOrAbsent(request.resource.data, "updatedAt");
+    }
+
+    function selfMemberJoinIsSafe(familyId, memberId) {
+      let code = inviteCodeFromIncomingData();
+      return isSelf(memberId)
+        && validInviteForUser(familyId, code)
+        && incomingRoleMatchesInvite(code)
+        && incomingFamilyIdMatches(familyId)
+        && uidIsSelfOrAbsent(request.resource.data, memberId)
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
+          "uid",
+          "familyId",
+          "role",
+          "email",
+          "ownerUid",
+          "inviteCode",
+          "status",
+          "roleVersion",
+          "isPrimary",
+          "selectedAtClient",
+          "name",
+          "displayName",
+          "relation",
+          "relationship",
+          "relationshipLabel",
+          "deviceId",
+          "joinedAt",
+          "acceptedAt",
+          "lastSeenAt",
+          "updatedAt"
+        ])
+        && serverTimestampOrAbsent(request.resource.data, "joinedAt")
+        && serverTimestampOrAbsent(request.resource.data, "updatedAt");
+    }
+
+    function selfInviteIndexCreateIsSafe(uid, familyId) {
+      let code = inviteCodeFromIncomingData();
+      return isSelf(uid)
+        && validInviteForUser(familyId, code)
+        && incomingRoleMatchesInvite(code)
+        && incomingFamilyIdMatches(familyId)
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
+          "familyId",
+          "role",
+          "email",
+          "ownerUid",
+          "inviteCode",
+          "status",
+          "roleVersion",
+          "isPrimary",
+          "selectedAtClient",
+          "joinedAt",
+          "linkedAt",
+          "acceptedAt",
+          "lastSeenAt",
+          "updatedAt"
+        ]);
+    }
+
+    function selfInviteAccessCreateIsSafe(uid) {
+      let familyId = request.resource.data.get("familyId", "");
+      return selfInviteIndexCreateIsSafe(uid, familyId);
+    }
+
+    // ---------------------------------------------------------------------
+    // Atualizações de membros, índices, família e conta
+    // ---------------------------------------------------------------------
+
+    function selfMemberMetadataUpdateIsSafe(familyId, memberId) {
+      return isSelf(memberId)
+        && familyIdIsStable(familyId)
+        && request.resource.data.get("uid", memberId)
+          == resource.data.get("uid", memberId)
+        && request.resource.data.get("role", "")
+          == resource.data.get("role", "")
+        && request.resource.data.get("ownerUid", "")
+          == resource.data.get("ownerUid", "")
+        && request.resource.data.get("status", "")
+          in [resource.data.get("status", ""), "removed"]
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "name",
+          "displayName",
+          "relation",
+          "relationship",
+          "relationshipLabel",
+          "isPrimary",
+          "selectedAtClient",
+          "leftAt",
+          "lastSeenAt",
+          "deviceId",
+          "updatedAt"
+        ]);
+    }
+
+    function managerMemberUpdateIsSafe(familyId) {
+      return isFamilyManager(familyId)
+        && resource.data.get("role", "") != "owner"
+        && familyIdIsStable(familyId)
+        && request.resource.data.get("uid", "")
+          == resource.data.get("uid", "")
+        && request.resource.data.get("role", resource.data.get("role", ""))
+          in ["admin_familiar", "cuidador", "visualizacao"]
+        && request.resource.data.get("status", resource.data.get("status", ""))
+          in ["active", "removed", "blocked"]
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "role",
+          "status",
+          "name",
+          "displayName",
+          "relation",
+          "relationship",
+          "relationshipLabel",
+          "removedAt",
+          "removedBy",
+          "blockedAt",
+          "blockedBy",
+          "updatedAt",
+          "updatedBy",
+          "updatedByEmail"
+        ]);
+    }
+
+    function selfIndexMetadataUpdateIsSafe(uid, familyId) {
+      return isSelf(uid)
+        && request.resource.data.get("familyId", "") == familyId
+        && resource.data.get("familyId", "") == familyId
+        && request.resource.data.get("role", "")
+          == resource.data.get("role", "")
+        && request.resource.data.get("ownerUid", "")
+          == resource.data.get("ownerUid", "")
+        && request.resource.data.get("status", "")
+          in [resource.data.get("status", ""), "removed"]
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "email",
+          "isPrimary",
+          "selectedAtClient",
+          "linkedAt",
+          "joinedAt",
+          "acceptedAt",
+          "leftAt",
+          "lastSeenAt",
+          "deviceId",
+          "status",
+          "updatedAt"
+        ]);
+    }
+
+    function managerIndexUpdateMatchesCanonicalMember(uid, familyId) {
+      return isFamilyManager(familyId)
+        && exists(memberPath(familyId, uid))
+        && request.resource.data.get("familyId", familyId) == familyId
+        && request.resource.data.get("role", "")
+          == get(memberPath(familyId, uid)).data.get("role", "")
+        && request.resource.data.get("status", "")
+          == get(memberPath(familyId, uid)).data.get("status", "")
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "role",
+          "status",
+          "ownerUid",
+          "removedAt",
+          "removedBy",
+          "blockedAt",
+          "blockedBy",
+          "leftAt",
+          "updatedAt",
+          "updatedBy",
+          "updatedByEmail"
+        ]);
+    }
+
+    function selfAccessPointerWriteIsSafe(uid) {
+      let familyId = request.resource.data.get("familyId", "");
+      return isSelf(uid)
+        && familyId != ""
+        && exists(memberPath(familyId, uid))
+        && isActiveMemberData(get(memberPath(familyId, uid)).data)
+        && request.resource.data.get("role", "")
+          == get(memberPath(familyId, uid)).data.get("role", "")
+        && request.resource.data.get("ownerUid", "")
+          == get(memberPath(familyId, uid)).data.get("ownerUid", "")
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.get("status", "") == "active"
+        && request.resource.data.keys().hasOnly([
+          "familyId",
+          "role",
+          "email",
+          "ownerUid",
+          "inviteCode",
+          "status",
+          "roleVersion",
+          "isPrimary",
+          "selectedAtClient",
+          "joinedAt",
+          "linkedAt",
+          "acceptedAt",
+          "lastSeenAt",
+          "deviceId",
+          "updatedAt"
+        ]);
+    }
+
+    function managerAccessUpdateMatchesCanonicalMember(uid) {
+      let familyId = request.resource.data.get(
+        "familyId",
+        resource.data.get("familyId", "")
+      );
+      return familyId != ""
+        && isFamilyManager(familyId)
+        && exists(memberPath(familyId, uid))
+        && request.resource.data.get("familyId", "") == familyId
+        && request.resource.data.get("role", "")
+          == get(memberPath(familyId, uid)).data.get("role", "")
+        && request.resource.data.get("status", "")
+          == get(memberPath(familyId, uid)).data.get("status", "")
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "role",
+          "status",
+          "ownerUid",
+          "removedAt",
+          "removedBy",
+          "blockedAt",
+          "blockedBy",
+          "leftAt",
+          "updatedAt",
+          "updatedBy",
+          "updatedByEmail"
+        ]);
+    }
+
+    function familyManagerUpdateIsSafe(familyId) {
+      return isFamilyManager(familyId)
+        && familyIdIsStable(familyId)
+        && request.resource.data.get("ownerUid", "")
+          == resource.data.get("ownerUid", "")
+        && request.resource.data.get("ownerEmail", "")
+          == resource.data.get("ownerEmail", "")
+        && request.resource.data.get("status", "")
+          == resource.data.get("status", "")
+        && request.resource.data.get("subscriptionPlan", "")
+          == resource.data.get("subscriptionPlan", "")
+        && request.resource.data.get("subscriptionStatus", "")
+          == resource.data.get("subscriptionStatus", "")
+        && request.resource.data.get("trialEndsAtClient", 0)
+          == resource.data.get("trialEndsAtClient", 0)
+        && request.resource.data.get("premiumUntilClient", 0)
+          == resource.data.get("premiumUntilClient", 0)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "title",
           "name",
           "familyName",
           "babyName",
           "babyArticle",
-          "accountEmail",
-          "ownerEmail",
           "responsibleName",
           "responsibleRelation",
-          "customerLabel",
-          "familyType",
-          "status",
           "membersCount",
           "pendingInvitesCount",
           "lastActivityAt",
           "lastActivityAtClient",
-          "latestMigratedDayId",
-          "migratedDayIds",
-          "migrationVersion",
-          "lastMigrationAt",
-          "legacyMigrationTarget",
-          "franciscoMigrationReady",
           "appVersion",
           "updatedAt",
           "updatedBy",
@@ -248,281 +693,354 @@ service cloud.firestore {
         ]);
     }
 
-    function inviteFamilyIdFromRequest() {
-      return ("familyId" in request.resource.data) ? request.resource.data.familyId : "";
-    }
-
-    function inviteFamilyIdFromResource() {
-      return ("familyId" in resource.data) ? resource.data.familyId : "";
-    }
-
-    function inviteCreateByFamilyAdmin() {
-      return isSignedIn()
-        && inviteFamilyIdFromRequest() != ""
-        && isFamilyAdmin(inviteFamilyIdFromRequest())
-        && request.resource.data.status in ["pending", "active"]
-        && request.resource.data.useCount == 0
-        && request.resource.data.maxUses <= 1
-        && request.resource.data.role in ["admin_familiar", "cuidador", "caregiver", "visualizacao", "visualizador", "viewer", "responsavel"];
-    }
-
-    function inviteUpdateByFamilyAdmin() {
-      return (inviteFamilyIdFromResource() != "" && isFamilyAdmin(inviteFamilyIdFromResource()))
-        || (inviteFamilyIdFromRequest() != "" && isFamilyAdmin(inviteFamilyIdFromRequest()));
-    }
-
-    function inviteReadByInvitedUser() {
-      return isSignedIn()
-        && inviteEmailMatchesData(resource.data)
-        && inviteIsPendingData(resource.data);
-    }
-
-    function inviteAcceptByInvitedUser() {
-      return isSignedIn()
-        && inviteEmailMatchesData(resource.data)
-        && inviteIsPendingData(resource.data)
-        && request.resource.data.familyId == resource.data.familyId
-        && request.resource.data.status == "accepted"
-        && request.resource.data.acceptedByUid == request.auth.uid
-        && (!("acceptedByEmail" in request.resource.data) || request.resource.data.acceptedByEmail == userEmail())
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+    function selfUserCreateIsSafe(uid) {
+      return isSelf(uid)
+        && uidIsSelfOrAbsent(request.resource.data, uid)
+        && emailIsSelfOrAbsent(request.resource.data)
+        && request.resource.data.keys().hasOnly([
+          "uid",
+          "email",
+          "displayName",
+          "name",
+          "caregiverName",
+          "caregiverRelation",
+          "relationship",
+          "relation",
+          "relationshipLabel",
+          "familyId",
+          "accessLevel",
           "status",
-          "useCount",
-          "acceptedByUid",
-          "acceptedBy",
-          "acceptedByEmail",
-          "acceptedAt",
+          "deletionRequestStatus",
+          "deletionRequestedAtClient",
+          "deletionRequestedAt",
+          "deviceId",
+          "lastSeenAt",
+          "createdAt",
           "updatedAt"
-        ]);
+        ])
+        && request.resource.data.get("status", "active")
+          in ["active", "deletion_requested"];
     }
 
-    function nestedInviteAcceptByInvitedUser(familyId, inviteId) {
-      return isSignedIn()
-        && incomingFamilyIdMatches(familyId)
-        && inviteEmailMatchesData(resource.data)
-        && (isFamilyMember(familyId) || inviteCanBeUsedByCurrentUser(familyId, inviteId))
-        && request.resource.data.status == "accepted"
-        && request.resource.data.acceptedByUid == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "status",
-          "useCount",
-          "acceptedByUid",
-          "acceptedBy",
-          "acceptedByEmail",
-          "acceptedAt",
-          "updatedAt"
-        ]);
-    }
-
-    function userFamilyCreateBySelf(userId, familyId) {
-      return isSelf(userId)
-        && incomingFamilyIdMatches(familyId)
-        && request.resource.data.status == "active"
-        && (
-          (request.resource.data.role == "owner" && request.resource.data.ownerUid == request.auth.uid)
-          || inviteCanBeUsedByCurrentUser(familyId, inviteCodeFromRequest())
-        );
-    }
-
-    function userFamilyUpdateByFamilyAdmin(userId, familyId) {
-      return isFamilyAdmin(familyId)
-        && exists(memberPath(familyId, userId))
-        && request.resource.data.familyId == resource.data.familyId
-        && (!("role" in request.resource.data) || request.resource.data.role != "owner")
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "role",
-          "status",
-          "removedAt",
-          "removedBy",
-          "leftAt",
-          "updatedAt"
-        ]);
-    }
-
-    function userFamilyUpdateBySelfSafe(userId) {
-      return isSelf(userId)
-        && request.resource.data.familyId == resource.data.familyId
+    function selfUserUpdateIsSafe(uid) {
+      return isSelf(uid)
+        && uidIsSelfOrAbsent(request.resource.data, uid)
+        && emailIsSelfOrAbsent(request.resource.data)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "email",
-          "updatedAt",
-          "linkedAt",
-          "lastSeenAt",
+          "displayName",
+          "name",
+          "caregiverName",
+          "caregiverRelation",
+          "relationship",
+          "relation",
+          "relationshipLabel",
+          "familyId",
+          "accessLevel",
+          "status",
+          "deletionRequestStatus",
+          "deletionRequestedAtClient",
+          "deletionRequestedAt",
           "deviceId",
-          "acceptedAt"
-        ]);
+          "lastSeenAt",
+          "updatedAt"
+        ])
+        && request.resource.data.get(
+          "status",
+          resource.data.get("status", "active")
+        ) in [resource.data.get("status", "active"), "deletion_requested"];
     }
 
-    function userAccessUpdateByFamilyAdmin(userId) {
-      return ("familyId" in request.resource.data)
-        && isFamilyAdmin(request.resource.data.familyId)
-        && exists(memberPath(request.resource.data.familyId, userId))
-        && (!("role" in request.resource.data) || request.resource.data.role != "owner")
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "role",
-          "status",
-          "familyId",
-          "removedAt",
-          "removedBy",
-          "leftAt",
-          "updatedAt"
-        ]);
-    }
+    // ---------------------------------------------------------------------
+    // Famílias e dados compartilhados
+    // ---------------------------------------------------------------------
 
     match /families/{familyId} {
-      allow read: if canReadFamily(familyId);
-      allow create: if isGlobalAdmin() || familyCreateByOwner(familyId);
-      allow update: if isGlobalAdmin() || familyUpdateByFamilyAdmin(familyId);
+      allow get: if canReadFamily(familyId);
+      allow list: if isGlobalAdmin();
+      allow create: if isGlobalAdmin() || selfFamilyBootstrapIsSafe(familyId);
+      allow update: if isGlobalAdmin() || familyManagerUpdateIsSafe(familyId);
       allow delete: if isGlobalAdmin();
 
       match /profile/{profileId} {
-        allow read: if canReadFamily(familyId);
-        allow create, update: if isFamilyAdmin(familyId) && incomingFamilyIdMatches(familyId);
-        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+        allow get, list: if canReadFamily(familyId);
+        allow create, update: if isFamilyManager(familyId)
+          && incomingFamilyIdMatches(familyId)
+          && !request.resource.data.keys().hasAny([
+            "subscriptionPlan",
+            "subscriptionStatus",
+            "trialEndsAt",
+            "trialEndsAtClient",
+            "premiumUntil",
+            "premiumUntilClient"
+          ]);
+        allow delete: if isGlobalAdmin();
       }
 
       match /days/{dayId} {
-        allow read: if canReadFamily(familyId);
-        allow create, update: if canWriteFamilyRoutine(familyId) && incomingFamilyIdMatches(familyId);
-        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+        allow get, list: if canReadFamily(familyId);
+        allow create: if canWriteRoutine(familyId)
+          && dayId.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+          && request.resource.data.get("familyId", "") == familyId
+          && request.resource.data.get("dayId", "") == dayId
+          && request.resource.data.get("date", "") == dayId
+          && request.resource.data.get("updatedByUid", "") == authUid()
+          && request.resource.data.get("updatedByEmail", authEmail()).lower()
+            == authEmail()
+          && request.resource.data.get("createdAt", null) == request.time
+          && request.resource.data.get("updatedAt", null) == request.time;
+        allow update: if canWriteRoutine(familyId)
+          && dayId.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+          && resource.data.get("familyId", familyId) == familyId
+          && request.resource.data.get("familyId", "") == familyId
+          && request.resource.data.get("dayId", "") == dayId
+          && request.resource.data.get("date", "") == dayId
+          && request.resource.data.get("updatedByUid", "") == authUid()
+          && request.resource.data.get("updatedByEmail", authEmail()).lower()
+            == authEmail()
+          && request.resource.data.get("updatedAt", null) == request.time
+          && request.resource.data.get("createdAt", null)
+            == resource.data.get("createdAt", null);
+        allow delete: if isGlobalAdmin() || isFamilyManager(familyId);
       }
 
       match /members/{memberId} {
-        allow read: if canReadFamily(familyId) || isSelf(memberId);
+        allow get: if isGlobalAdmin() || isSelf(memberId) || canReadFamily(familyId);
+        allow list: if canReadFamily(familyId);
         allow create: if isGlobalAdmin()
-          || (isFamilyAdmin(familyId) && incomingFamilyIdMatches(familyId))
-          || selfOwnerBootstrapMember(familyId, memberId)
-          || selfInviteMemberCreate(familyId, memberId);
+          || selfOwnerMemberBootstrapIsSafe(familyId, memberId)
+          || selfMemberJoinIsSafe(familyId, memberId);
         allow update: if isGlobalAdmin()
-          || memberAdminUpdateSafe(familyId)
-          || selfMemberUpdateSafe(familyId, memberId);
-        allow delete: if isGlobalAdmin() || (isFamilyAdmin(familyId) && memberOwnerProtected());
+          || managerMemberUpdateIsSafe(familyId)
+          || selfMemberMetadataUpdateIsSafe(familyId, memberId);
+        allow delete: if isGlobalAdmin();
       }
 
-      match /invites/{inviteId} {
-        allow read: if isGlobalAdmin() || isFamilyAdmin(familyId) || inviteReadByInvitedUser();
-        allow create: if isGlobalAdmin() || (isFamilyAdmin(familyId) && incomingFamilyIdMatches(familyId) && inviteCreateByFamilyAdmin());
+      match /invites/{code} {
+        allow get, list: if isGlobalAdmin() || isFamilyManager(familyId);
+        allow create: if isGlobalAdmin()
+          || (
+            isFamilyManager(familyId)
+            && inviteCreateFieldsAreValid(code, familyId)
+          );
         allow update: if isGlobalAdmin()
-          || (isFamilyAdmin(familyId) && incomingFamilyIdMatches(familyId))
-          || nestedInviteAcceptByInvitedUser(familyId, inviteId);
-        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+          || managerInviteUpdateIsSafe(familyId)
+          || invitedUserAcceptIsSafe(code, familyId);
+        allow delete: if isGlobalAdmin() || isFamilyManager(familyId);
       }
 
-      match /invitations/{inviteId} {
-        allow read: if isGlobalAdmin() || isFamilyAdmin(familyId) || inviteReadByInvitedUser();
-        allow create: if isGlobalAdmin() || (isFamilyAdmin(familyId) && incomingFamilyIdMatches(familyId) && inviteCreateByFamilyAdmin());
+      // Espelho temporário do convite. A concessão de acesso usa /invites/{code}.
+      match /invitations/{code} {
+        allow get, list: if isGlobalAdmin() || isFamilyManager(familyId);
+        allow create: if isGlobalAdmin()
+          || (
+            isFamilyManager(familyId)
+            && inviteCreateFieldsAreValid(code, familyId)
+          );
         allow update: if isGlobalAdmin()
-          || (isFamilyAdmin(familyId) && incomingFamilyIdMatches(familyId))
-          || nestedInviteAcceptByInvitedUser(familyId, inviteId);
-        allow delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+          || managerInviteUpdateIsSafe(familyId)
+          || invitedUserAcceptIsSafe(code, familyId);
+        allow delete: if isGlobalAdmin() || isFamilyManager(familyId);
       }
 
       match /audit/{auditId} {
-        allow read: if canReadFamily(familyId);
+        allow get, list: if isGlobalAdmin() || canReadFamily(familyId);
         allow create: if isGlobalAdmin()
-          || isFamilyAdmin(familyId)
-          || (isFamilyMember(familyId) && request.resource.data.actorUid == request.auth.uid);
-        allow update, delete: if isGlobalAdmin() || isFamilyAdmin(familyId);
+          || (
+            isFamilyManager(familyId)
+            && request.resource.data.get("actorUid", "") == authUid()
+          )
+          || (
+            isActiveFamilyMember(familyId)
+            && request.resource.data.get("actorUid", "") == authUid()
+            && request.resource.data.get("action", "")
+              in ["invite_accepted", "member_left"]
+          );
+        allow update, delete: if isGlobalAdmin();
       }
 
       match /migrations/{migrationId} {
-        allow read, write: if isGlobalAdmin() || isFamilyAdmin(familyId);
+        allow read, write: if isGlobalAdmin();
       }
 
       match /legal/{legalId} {
-        allow read: if canReadFamily(familyId);
+        allow get: if isGlobalAdmin()
+          || isFamilyManager(familyId)
+          || (
+            isSignedIn()
+            && resource.data.get("actorUid", "") == authUid()
+          );
+        allow list: if isGlobalAdmin() || isFamilyManager(familyId);
         allow create: if isGlobalAdmin()
-          || (isFamilyMember(familyId)
+          || (
+            isActiveFamilyMember(familyId)
             && incomingFamilyIdMatches(familyId)
-            && request.resource.data.actorUid == request.auth.uid
-            && request.resource.data.type in ["terms_acceptance", "data_deletion_request", "privacy_request", "support_request"]);
+            && request.resource.data.get("actorUid", "") == authUid()
+            && request.resource.data.get("actorEmail", authEmail()).lower()
+              == authEmail()
+            && request.resource.data.get("type", "") in [
+              "terms_acceptance",
+              "support_request",
+              "data_deletion_request",
+              "privacy_request"
+            ]
+          );
         allow update: if isGlobalAdmin()
-          || isFamilyAdmin(familyId)
-          || (isFamilyMember(familyId)
-            && resource.data.actorUid == request.auth.uid
-            && request.resource.data.actorUid == resource.data.actorUid
-            && familyScopedWrite(familyId)
-            && request.resource.data.type == resource.data.type
+          || (
+            isSignedIn()
+            && resource.data.get("actorUid", "") == authUid()
+            && request.resource.data.get("actorUid", "")
+              == resource.data.get("actorUid", "")
+            && request.resource.data.get("type", "")
+              == resource.data.get("type", "")
+            && familyIdIsStable(familyId)
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
               "status",
-              "updatedAt",
+              "accepted",
               "acceptedAt",
               "acceptedAtClient",
-              "accepted",
               "legalVersion",
               "termsVersion",
               "privacyVersion",
               "privacyPolicyVersion",
               "medicalDisclaimerVersion",
               "medicalDisclaimerAccepted",
-              "email",
-              "actorEmail",
-              "resolvedAt",
+              "message",
+              "category",
+              "diagnostics",
+              "requestState",
+              "updatedAt",
               "cancelledAt",
-              "note",
-              "userNote",
               "lastViewedAt"
-            ]));
+            ])
+          );
         allow delete: if isGlobalAdmin();
       }
-
 
       match /{document=**} {
         allow read, write: if isGlobalAdmin();
       }
     }
 
-    match /users/{userId} {
-      allow read: if isSelf(userId) || isGlobalAdmin();
-      allow create, update: if isSelf(userId) || isGlobalAdmin();
+    // ---------------------------------------------------------------------
+    // Usuários e índices não autoritativos
+    // ---------------------------------------------------------------------
+
+    match /users/{uid} {
+      allow get: if isSelf(uid) || isGlobalAdmin();
+      allow list: if isGlobalAdmin();
+      allow create: if isGlobalAdmin() || selfUserCreateIsSafe(uid);
+      allow update: if isGlobalAdmin() || selfUserUpdateIsSafe(uid);
       allow delete: if isGlobalAdmin();
 
       match /families/{familyId} {
-        allow read: if isSelf(userId) || isGlobalAdmin() || isFamilyAdmin(familyId);
-        allow create: if isGlobalAdmin() || userFamilyCreateBySelf(userId, familyId) || (isFamilyAdmin(familyId) && exists(memberPath(familyId, userId)));
+        allow get, list: if isSelf(uid) || isGlobalAdmin();
+        allow create: if isGlobalAdmin()
+          || selfOwnerIndexBootstrapIsSafe(uid, familyId)
+          || selfInviteIndexCreateIsSafe(uid, familyId);
         allow update: if isGlobalAdmin()
-          || userFamilyUpdateBySelfSafe(userId)
-          || userFamilyUpdateByFamilyAdmin(userId, familyId);
+          || selfIndexMetadataUpdateIsSafe(uid, familyId)
+          || managerIndexUpdateMatchesCanonicalMember(uid, familyId);
         allow delete: if isGlobalAdmin();
       }
 
       match /access/{docId} {
-        allow read: if isSelf(userId) || isGlobalAdmin();
-        allow create: if isSelf(userId) || isGlobalAdmin();
-        allow update: if isSelf(userId) || isGlobalAdmin() || userAccessUpdateByFamilyAdmin(userId);
+        allow get, list: if isSelf(uid) || isGlobalAdmin();
+        allow create: if isGlobalAdmin()
+          || (
+            docId == "ninou"
+            && (
+              selfOwnerAccessBootstrapIsSafe(uid)
+              || selfInviteAccessCreateIsSafe(uid)
+              || selfAccessPointerWriteIsSafe(uid)
+            )
+          );
+        allow update: if isGlobalAdmin()
+          || (
+            docId == "ninou"
+            && (
+              selfAccessPointerWriteIsSafe(uid)
+              || managerAccessUpdateMatchesCanonicalMember(uid)
+            )
+          );
         allow delete: if isGlobalAdmin();
       }
 
       match /account/{docId} {
-        allow read, write: if isSelf(userId) || isGlobalAdmin();
+        allow get, list: if isSelf(uid) || isGlobalAdmin();
+        allow create, update: if isGlobalAdmin()
+          || (
+            isSelf(uid)
+            && docId in [
+              "profile",
+              "legal",
+              "supportLastRequest",
+              "dataDeletionRequest"
+            ]
+            && uidIsSelfOrAbsent(request.resource.data, uid)
+            && emailIsSelfOrAbsent(request.resource.data)
+          );
+        allow delete: if isGlobalAdmin();
       }
 
-      // Caminhos antigos permanecem somente para leitura/migração.
-      // A rotina canônica está em families/{familyId}/days/{dayId} e o perfil em
-      // families/{familyId}/profile/main para impedir divergência entre plataformas.
+      // Caminhos legados pessoais não são fontes ativas do app universal.
       match /days/{dayId} {
-        allow read: if isSelf(userId) || isGlobalAdmin();
+        allow read: if isGlobalAdmin();
         allow write: if isGlobalAdmin();
       }
 
       match /profile/{docId} {
-        allow read: if isSelf(userId) || isGlobalAdmin();
+        allow read: if isGlobalAdmin();
         allow write: if isGlobalAdmin();
       }
 
       match /{document=**} {
-        allow read: if isSelf(userId) || isGlobalAdmin();
-        allow write: if isGlobalAdmin();
+        allow read, write: if isGlobalAdmin();
       }
     }
 
-    match /invites/{inviteId} {
-      allow read: if isGlobalAdmin() || inviteReadByInvitedUser();
-      allow create: if isGlobalAdmin() || inviteCreateByFamilyAdmin();
-      allow update: if isGlobalAdmin() || inviteUpdateByFamilyAdmin() || inviteAcceptByInvitedUser();
-      allow delete: if isGlobalAdmin() || (inviteFamilyIdFromResource() != "" && isFamilyAdmin(inviteFamilyIdFromResource()));
+    // ---------------------------------------------------------------------
+    // Convites globais e auditoria administrativa
+    // ---------------------------------------------------------------------
+
+    match /invites/{code} {
+      allow get: if isGlobalAdmin()
+        || (
+          isSignedIn()
+          && inviteEmailMatchesCurrentUser(resource.data)
+          && inviteIsPending(resource.data)
+        );
+      allow list: if isGlobalAdmin();
+      allow create: if isGlobalAdmin()
+        || (
+          request.resource.data.get("familyId", "") != ""
+          && isFamilyManager(request.resource.data.familyId)
+          && inviteCreateFieldsAreValid(
+            code,
+            request.resource.data.familyId
+          )
+        );
+      allow update: if isGlobalAdmin()
+        || (
+          resource.data.get("familyId", "") != ""
+          && managerInviteUpdateIsSafe(resource.data.familyId)
+        )
+        || invitedUserAcceptIsSafe(
+          code,
+          resource.data.get("familyId", "")
+        );
+      allow delete: if isGlobalAdmin()
+        || (
+          resource.data.get("familyId", "") != ""
+          && isFamilyManager(resource.data.familyId)
+        );
     }
 
-    // Qualquer outra coleção fica restrita ao admin global.
+    match /adminAuditLogs/{auditId} {
+      allow read, write: if isGlobalAdmin();
+    }
+
+    // Negação padrão.
     match /{document=**} {
       allow read, write: if isGlobalAdmin();
     }

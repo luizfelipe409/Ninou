@@ -1,14 +1,27 @@
 export type RoutineMode = 'idle' | 'awake' | 'sleeping';
+export type RoutineInitialState = 'awake' | 'nap' | 'night';
 export const MIN_ROUTINE_STATE_DURATION_MS = 2 * 60 * 1000;
 
 export type RoutineDayStartInput = {
-  wakeAt: number;
-  currentMode: Exclude<RoutineMode, 'idle'>;
+  currentState?: RoutineInitialState;
+  wakeAt?: number;
+  currentMode?: Exclude<RoutineMode, 'idle'>;
   currentStateStartedAt?: number;
 };
 
 export type RoutineTransitionBlock = {
   remainingMs: number;
+  message: string;
+};
+export type RoutineConflictCode =
+  | 'state-required'
+  | 'feeding-during-sleep'
+  | 'feeding-active'
+  | 'sleep-overlaps-feeding'
+  | 'already-sleeping';
+export type RoutineConflict = {
+  code: RoutineConflictCode;
+  title: string;
   message: string;
 };
 export type RoutineActor = {
@@ -36,6 +49,15 @@ export type RecordType =
   | 'mamadeira'
   | 'fralda'
   | 'medicamento';
+
+export type RoutineRecordInput = {
+  type: RecordType;
+  detail?: string;
+  notes?: string;
+  amountMl?: number;
+  start?: number;
+  end?: number;
+};
 
 export type RoutineEvent = {
   id: string;
@@ -83,6 +105,7 @@ export type DayState = {
   lastWakeWindowMs: number | null;
   routineStateUpdatedAt: number;
   routineStateMutationId: string;
+  routineStartDeferredAt: number;
   breastfeedingTimer: BreastfeedingTimer | null;
   breastfeedingTimerUpdatedAt: number;
   breastfeedingTimerMutationId: string;
@@ -117,6 +140,7 @@ export function createEmptyDayState(): DayState {
     lastWakeWindowMs: null,
     routineStateUpdatedAt: 0,
     routineStateMutationId: '',
+    routineStartDeferredAt: 0,
     breastfeedingTimer: null,
     breastfeedingTimerUpdatedAt: 0,
     breastfeedingTimerMutationId: '',
@@ -217,6 +241,7 @@ export function normalizeDayState(value: Partial<DayState> | null | undefined): 
     ...value,
     mode,
     activeStartedAt: mode !== 'idle' && Number.isFinite(start) ? start : null,
+    routineStartDeferredAt: Number.isFinite(Number(value.routineStartDeferredAt)) ? Number(value.routineStartDeferredAt) : 0,
     activeType: value.activeType && recordConfig[value.activeType] ? value.activeType : 'sono',
     activeActor: normalizeRoutineActor(value.activeActor),
     breastfeedingTimer: normalizeBreastfeedingTimer(value.breastfeedingTimer),
@@ -334,6 +359,7 @@ export function mergeDayStates(localValue: Partial<DayState>, cloudValue: Partia
     lastWakeWindowMs: latestLive.lastWakeWindowMs,
     routineStateUpdatedAt: latestLive.routineStateUpdatedAt,
     routineStateMutationId: latestLive.routineStateMutationId,
+    routineStartDeferredAt: Math.max(local.routineStartDeferredAt || 0, cloud.routineStartDeferredAt || 0),
     breastfeedingTimer: latestBreastfeeding.breastfeedingTimer,
     breastfeedingTimerUpdatedAt: latestBreastfeeding.breastfeedingTimerUpdatedAt,
     breastfeedingTimerMutationId: latestBreastfeeding.breastfeedingTimerMutationId,
@@ -354,12 +380,105 @@ function stamp(state: DayState, now: number, action: string): DayState {
   };
 }
 
+function stampContent(state: DayState): DayState {
+  return state;
+}
+
 function stampBreastfeeding(state: DayState, now: number, action: string): DayState {
-  return stamp({
+  return {
     ...state,
     breastfeedingTimerUpdatedAt: Math.max(now, state.breastfeedingTimerUpdatedAt + 1),
     breastfeedingTimerMutationId: `${action}-${now}-${Math.random().toString(36).slice(2, 6)}`,
-  }, now, action);
+  };
+}
+
+function isFeedingType(type: RecordType) {
+  return type === 'amamentacao' || type === 'mamadeira';
+}
+
+function intervalsOverlap(leftStart: number, leftEnd: number, rightStart: number, rightEnd: number) {
+  return leftStart < rightEnd && rightStart < leftEnd;
+}
+
+function eventInterval(event: RoutineEvent) {
+  const end = event.end > event.start ? event.end : event.start + 1000;
+  return { start: event.start, end };
+}
+
+export function getRoutineRecordConflict(
+  state: DayState,
+  input: RoutineRecordInput,
+  now = Date.now(),
+  ignoredEventId = '',
+): RoutineConflict | null {
+  const start = Number.isFinite(Number(input.start)) ? Number(input.start) : now;
+  const resolvedInputEnd = Number.isFinite(Number(input.end))
+    ? resolveRoutineIntervalEnd(input.type, start, Number(input.end))
+    : null;
+  const end = resolvedInputEnd && resolvedInputEnd > start ? resolvedInputEnd : start + 1000;
+
+  if (isFeedingType(input.type)) {
+    if (!Number.isFinite(Number(input.start)) && state.mode === 'idle') {
+      return {
+        code: 'state-required',
+        title: 'Informe o estado atual',
+        message: 'Antes da primeira alimentação, informe se o bebê está acordado, em uma soneca ou no sono da noite.',
+      };
+    }
+    if (
+      state.mode === 'sleeping'
+      && state.activeStartedAt
+      && intervalsOverlap(start, end, state.activeStartedAt, now + 24 * 60 * 60 * 1000)
+    ) {
+      return {
+        code: 'feeding-during-sleep',
+        title: 'O bebê está dormindo',
+        message: 'Para registrar uma alimentação, encerre primeiro o período de sono e informe o horário em que o bebê acordou.',
+      };
+    }
+    const overlapsRecordedSleep = state.events.some((event) => {
+      if (event.id === ignoredEventId || (event.type !== 'sono' && event.type !== 'dormir')) return false;
+      const interval = eventInterval(event);
+      return intervalsOverlap(start, end, interval.start, interval.end);
+    });
+    if (overlapsRecordedSleep) {
+      return {
+        code: 'feeding-during-sleep',
+        title: 'Horário dentro de um sono',
+        message: 'Esse horário pertence a um período de sono. Corrija ou encerre o sono antes de registrar a alimentação.',
+      };
+    }
+  }
+
+  if (input.type === 'sono' || input.type === 'dormir') {
+    if (!Number.isFinite(Number(input.start)) && state.mode === 'sleeping') {
+      return {
+        code: 'already-sleeping',
+        title: 'Sono já em andamento',
+        message: 'Finalize ou corrija o sono atual antes de iniciar outro período.',
+      };
+    }
+    if (!Number.isFinite(Number(input.end)) && state.breastfeedingTimer) {
+      return {
+        code: 'feeding-active',
+        title: 'Mamada em andamento',
+        message: 'Finalize ou descarte o timer da amamentação antes de iniciar um período de sono.',
+      };
+    }
+    const overlapsFeeding = state.events.some((event) => {
+      if (event.id === ignoredEventId || !isFeedingType(event.type)) return false;
+      const interval = eventInterval(event);
+      return intervalsOverlap(start, end, interval.start, interval.end);
+    });
+    if (resolvedInputEnd && overlapsFeeding) {
+      return {
+        code: 'sleep-overlaps-feeding',
+        title: 'Sono sobreposto a uma alimentação',
+        message: 'Existe uma alimentação nesse intervalo. Ajuste os horários antes de salvar o sono.',
+      };
+    }
+  }
+  return null;
 }
 
 export function getBreastfeedingDurations(timer: BreastfeedingTimer | null, now = Date.now()) {
@@ -392,6 +511,7 @@ export function formatBreastfeedingDetail(leftDurationMs: number, rightDurationM
 }
 
 export function startBreastfeedingTimer(state: DayState, side: BreastfeedingSide, now = Date.now()): DayState {
+  if (getRoutineRecordConflict(state, { type: 'amamentacao' }, now)) return state;
   if (state.breastfeedingTimer) {
     return switchBreastfeedingSide(state, side, now);
   }
@@ -453,6 +573,7 @@ export function cancelBreastfeedingTimer(state: DayState, now = Date.now()): Day
 export function finishBreastfeedingTimer(state: DayState, now = Date.now(), actor?: RoutineActor | null, notes = ''): DayState {
   const timer = state.breastfeedingTimer;
   if (!timer) return state;
+  if (getRoutineRecordConflict(state, { type: 'amamentacao', start: timer.startedAt, end: now }, now)) return state;
   const { leftDurationMs, rightDurationMs, totalDurationMs } = getBreastfeedingDurations(timer, now);
   if (totalDurationMs < 1000) return cancelBreastfeedingTimer(state, now);
   const event = makeEvent('amamentacao', timer.startedAt, now, formatBreastfeedingDetail(leftDurationMs, rightDurationMs), cleanText(notes, 1200) || timer.notes, undefined, actor);
@@ -487,35 +608,29 @@ export function initializeRoutineDay(
   now = Date.now(),
   actor?: RoutineActor | null,
 ): DayState {
-  const dayStart = new Date(now);
-  dayStart.setHours(0, 0, 0, 0);
-  const safeWakeAt = Math.min(now, Math.max(dayStart.getTime(), Number(input.wakeAt) || now));
-  const requestedCurrentStart = Number(input.currentStateStartedAt);
-  const currentStateStartedAt = Math.min(
-    now,
-    Math.max(safeWakeAt, Number.isFinite(requestedCurrentStart) ? requestedCurrentStart : safeWakeAt),
-  );
-  const hasWakeMarker = state.events.some((event) => event.type === 'acordou' && Math.abs(event.start - safeWakeAt) < 60 * 1000);
-  const wakeEvent = hasWakeMarker
-    ? []
-    : [makeEvent('acordou', safeWakeAt, safeWakeAt, 'Primeiro despertar informado', '', undefined, actor)];
+  const requestedState = input.currentState
+    || (input.currentMode === 'sleeping' ? (isNightPeriod(Number(input.currentStateStartedAt) || now) ? 'night' : 'nap') : 'awake');
+  const requestedCurrentStart = Number(input.currentStateStartedAt ?? input.wakeAt);
+  const currentStateStartedAt = Math.min(now, Math.max(0, Number.isFinite(requestedCurrentStart) ? requestedCurrentStart : now));
+  const currentMode: Exclude<RoutineMode, 'idle'> = requestedState === 'awake' ? 'awake' : 'sleeping';
+  const activeType: RecordType = requestedState === 'night' ? 'dormir' : requestedState === 'nap' ? 'sono' : 'acordou';
+  const hasInitialMarker = state.events.some((event) => event.type === 'acordou' && Math.abs(event.start - currentStateStartedAt) < 60 * 1000);
+  const initialEvent = currentMode === 'awake' && !hasInitialMarker
+    ? [makeEvent('acordou', currentStateStartedAt, currentStateStartedAt, 'Configuração inicial', '', undefined, actor)]
+    : [];
 
   return stamp({
     ...state,
-    mode: input.currentMode,
+    mode: currentMode,
     activeStartedAt: currentStateStartedAt,
-    activeType: input.currentMode === 'sleeping'
-      ? (isNightPeriod(currentStateStartedAt) ? 'dormir' : 'sono')
-      : 'acordou',
-    activeDetail: input.currentMode === 'sleeping'
-      ? (isNightPeriod(currentStateStartedAt) ? 'Sono noturno' : 'Timer')
-      : '',
+    activeType,
+    activeDetail: requestedState === 'night' ? 'Sono noturno' : requestedState === 'nap' ? 'Configuração inicial' : '',
     activeNotes: '',
     activeActor: normalizeRoutineActor(actor),
-    lastWakeWindowStartedAt: input.currentMode === 'sleeping' ? safeWakeAt : null,
-    lastWakeWindowMs: input.currentMode === 'sleeping' ? Math.max(0, currentStateStartedAt - safeWakeAt) : null,
-    events: [...state.events, ...wakeEvent].sort((left, right) => left.start - right.start),
-  }, now, `initialize-${input.currentMode}`);
+    lastWakeWindowStartedAt: null,
+    lastWakeWindowMs: null,
+    events: [...state.events, ...initialEvent].sort((left, right) => left.start - right.start),
+  }, now, `initialize-${requestedState}`);
 }
 
 export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>, now = Date.now(), actor?: RoutineActor | null): DayState {
@@ -524,6 +639,7 @@ export function startRoutine(state: DayState, mode: Exclude<RoutineMode, 'idle'>
 
 export function startSleep(state: DayState, type: 'sono' | 'dormir', now = Date.now(), actor?: RoutineActor | null): DayState {
   if (state.mode === 'sleeping') return state;
+  if (state.breastfeedingTimer) return state;
   if (getRoutineTransitionBlock(state, now)) return state;
   const awakeStart = state.mode === 'awake' ? state.activeStartedAt : null;
   return stamp({
@@ -561,6 +677,12 @@ export function finishSleep(state: DayState, now = Date.now(), actor?: RoutineAc
 }
 
 export function getRoutineTransitionBlock(state: DayState, now = Date.now()): RoutineTransitionBlock | null {
+  if (state.mode === 'awake' && state.breastfeedingTimer) {
+    return {
+      remainingMs: 0,
+      message: 'Finalize ou descarte o timer da amamentação antes de iniciar um período de sono.',
+    };
+  }
   if (state.mode === 'idle' || !state.activeStartedAt) return null;
   const elapsed = Math.max(0, now - state.activeStartedAt);
   if (elapsed >= MIN_ROUTINE_STATE_DURATION_MS) return null;
@@ -575,8 +697,9 @@ export function getRoutineTransitionBlock(state: DayState, now = Date.now()): Ro
   };
 }
 
-export function addRoutineRecord(state: DayState, input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }, now = Date.now(), actor?: RoutineActor | null): DayState {
+export function addRoutineRecord(state: DayState, input: RoutineRecordInput, now = Date.now(), actor?: RoutineActor | null): DayState {
   const { type, detail = '', notes = '', amountMl } = input;
+  if (getRoutineRecordConflict(state, input, now)) return state;
   const customStart = Number(input.start);
   const customEnd = Number(input.end);
   if (Number.isFinite(customStart)) {
@@ -604,7 +727,7 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
       return finishSleep(state, customStart, actor);
     }
     if ((type === 'acordou' || type === 'despertar-noturno') && state.mode === 'awake') return state;
-    return stamp({ ...state, events: [...state.events, makeEvent(type, customStart, end, detail, notes, amountMl, actor)] }, now, `record-${type}`);
+    return stampContent({ ...state, events: [...state.events, makeEvent(type, customStart, end, detail, notes, amountMl, actor)] });
   }
   if (type === 'sono' || type === 'dormir') return startSleep(state, type, now, actor);
   if (type === 'acordou' || type === 'despertar-noturno') {
@@ -625,35 +748,43 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
   const durableDetail = type === 'mamadeira' && Number.isFinite(amountMl)
     ? [detail, `${amountMl} ml`].filter(Boolean).join(' • ')
     : detail;
-  return stamp({ ...state, events: [...state.events, makeEvent(type, now, now, durableDetail, notes, amountMl, actor)] }, now, `record-${type}`);
+  return stampContent({ ...state, events: [...state.events, makeEvent(type, now, now, durableDetail, notes, amountMl, actor)] });
 }
 
 export function updateRoutineEvent(state: DayState, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl' | 'leftDurationMs' | 'rightDurationMs'>>, now = Date.now(), actor?: RoutineActor | null) {
-  return stamp({
+  const current = state.events.find((event) => event.id === eventId);
+  if (!current) return state;
+  const candidate = { ...current, ...patch };
+  if (getRoutineRecordConflict(state, candidate, now, eventId)) return state;
+  return stampContent({
     ...state,
     events: state.events.map((event) => event.id === eventId ? normalizeRoutineEvent({ ...event, ...patch, ...updatedByFields(actor) }) || event : event),
-  }, now, 'edit-event');
+  });
 }
 
 export function deleteRoutineEvent(state: DayState, eventId: string, now = Date.now()) {
-  return stamp({
+  return stampContent({
     ...state,
     events: state.events.filter((event) => event.id !== eventId),
     deletedEventIds: [...new Set([...state.deletedEventIds, eventId])],
-  }, now, 'delete-event');
+  });
 }
 
 export function saveDayNotes(state: DayState, dayNotes: string, now = Date.now()) {
-  return stamp({ ...state, dayNotes: dayNotes.trim().slice(0, 6000), dayNotesUpdatedAt: now }, now, 'day-notes');
+  return stampContent({ ...state, dayNotes: dayNotes.trim().slice(0, 6000), dayNotesUpdatedAt: now });
+}
+
+export function deferRoutineStart(state: DayState, now = Date.now()) {
+  return stampContent({ ...state, routineStartDeferredAt: now });
 }
 
 export function addDayNoteEpisode(state: DayState, input: Omit<DayNoteEpisode, 'id'> & { id?: string }, now = Date.now()) {
   const episode: DayNoteEpisode = { ...input, id: input.id || `note-${now}-${Math.random().toString(36).slice(2, 6)}` };
-  return stamp({ ...state, noteEpisodes: [...state.noteEpisodes, episode].sort((a, b) => a.time - b.time), dayNotesUpdatedAt: now }, now, 'day-episode');
+  return stampContent({ ...state, noteEpisodes: [...state.noteEpisodes, episode].sort((a, b) => a.time - b.time), dayNotesUpdatedAt: now });
 }
 
 export function deleteDayNoteEpisode(state: DayState, episodeId: string, now = Date.now()) {
-  return stamp({ ...state, noteEpisodes: state.noteEpisodes.filter((episode) => episode.id !== episodeId), deletedNoteEpisodeIds: [...new Set([...state.deletedNoteEpisodeIds, episodeId])], dayNotesUpdatedAt: now }, now, 'delete-episode');
+  return stampContent({ ...state, noteEpisodes: state.noteEpisodes.filter((episode) => episode.id !== episodeId), deletedNoteEpisodeIds: [...new Set([...state.deletedNoteEpisodeIds, episodeId])], dayNotesUpdatedAt: now });
 }
 
 export function clearRoutineDay(state: DayState, now = Date.now()) {

@@ -35,17 +35,19 @@ assert.ok(relationPicker.includes('legacyGenericRelations'), 'Valores antigos de
 
 assert.ok(firebaseService.includes('const batch = writeBatch(db);'));
 assert.ok(firebaseService.includes('await batch.commit();'));
+assert.ok(firebaseService.includes('expectedRoutineStateMutationId'));
+assert.ok(firebaseService.includes("'routine/conflict'"));
 assert.ok(subscriptionPortal.includes("'Acesso encerrado'"));
 assert.ok(subscriptionPortal.includes("foreground = isDark ? '#FFF9FF'"));
 assert.ok(!subscriptionPortal.includes('Seu período de acesso terminou'));
 
-assert.ok(today.includes('Que horas {profile.name || \'o bebê\'} acordou hoje?'));
-assert.ok(today.includes('ETAPA 1 · PRIMEIRO DESPERTAR'));
-assert.ok(today.includes('ETAPA 2 · ESTADO ATUAL'));
-assert.ok(today.includes('Como está agora?'));
-assert.ok(today.includes('ETAPA 3 · INÍCIO DO ESTADO ATUAL'));
+assert.ok(today.includes('Como {profile.name || \'o bebê\'} está agora?'));
+assert.ok(today.includes('Nenhum histórico anterior será inventado.'));
+assert.ok(today.includes('Tirando uma soneca'));
+assert.ok(today.includes('No sono da noite'));
+assert.ok(today.includes('Começar depois'));
 assert.ok(today.includes('Desde que horas está acordado?'));
-assert.ok(today.includes('Quando esse sono começou?'));
+assert.ok(today.includes('Quando essa soneca começou?'));
 assert.ok(today.includes('currentStateStartedAt'));
 assert.ok(today.includes('onValueChange'));
 assert.ok(!today.includes('onChange={'));
@@ -53,6 +55,9 @@ assert.ok(!today.includes('Começar a partir de agora'));
 assert.ok(today.includes('AÇÃO MUITO PRÓXIMA'));
 
 assert.ok(register.includes('o sono precisa durar pelo menos 2 minutos'));
+assert.ok(register.includes('Acordou agora e continuar'));
+assert.ok(register.includes('Informar outro horário'));
+assert.ok(register.includes('LINHA DO TEMPO PROTEGIDA'));
 assert.ok(orbit.includes('groupRoutineMarkerEvents'));
 assert.ok(orbit.includes('<Text style={styles.clusterCount}>{group.length}</Text>'));
 assert.ok(orbit.includes('×{selectedCluster.length}'));
@@ -82,7 +87,7 @@ assert.ok(rolePolicy.includes("return ['owner', 'admin', 'caregiver'].includes")
 assert.ok(rolePolicy.includes("if (normalized === 'viewer') return 'visualizacao'"));
 assert.ok(firestoreRules.includes('"visualizacao"'));
 assert.ok(firestoreRules.includes('roleCanWriteRoutine'));
-const routineWriteRule = firestoreRules.split('function roleCanWriteRoutine')[1].split('function isFamilyAdmin')[0];
+const routineWriteRule = firestoreRules.match(/function roleCanWriteRoutine\(role\) \{([\s\S]*?)\n    \}/)?.[1] || '';
 assert.ok(!routineWriteRule.includes('visualizacao'), 'Visualização não pode gravar a rotina.');
 assert.ok(!routineWriteRule.includes('viewer'), 'Viewer não pode gravar a rotina.');
 

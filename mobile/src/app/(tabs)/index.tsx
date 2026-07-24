@@ -3,7 +3,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,7 +12,7 @@ import { NinouCard } from '@/components/ninou-screen';
 import { RoutineOrbit } from '@/components/routine-orbit';
 import { NinouAppHeader } from '@/components/ninou-app-header';
 import { NinouBackground } from '@/components/ninou-background';
-import { formatDuration, formatTime, getPrimaryAction, getTodayAwakeMs, getTodaySummary, recordConfig, type RecordType, type RoutineEvent } from '@/domain/routine';
+import { formatDuration, formatTime, getPrimaryAction, getTodayAwakeMs, getTodaySummary, recordConfig, type RecordType, type RoutineEvent, type RoutineInitialState } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
@@ -23,15 +23,17 @@ const quickTypes: RecordType[] = ['amamentacao', 'fralda', 'mamadeira', 'medicam
 
 export default function TodayScreen() {
   const { colors, isDark } = useNinouTheme();
-  const { isDesktop, contentOffset } = useNinouLayout();
-  const { state, history, now, canUndo, canWrite, beginRoutine, runPrimaryAction, undoLastAction } = useRoutine();
+  const { width, isDesktop, contentOffset } = useNinouLayout();
+  const isWideDesktop = isDesktop && width >= 1380;
+  const { state, history, now, hydrated, canUndo, canWrite, beginRoutine, deferRoutineSetup, runPrimaryAction, undoLastAction } = useRoutine();
   const { profile } = useBabyProfile();
-  const [startStep, setStartStep] = useState<'wake' | 'state' | 'current' | null>(null);
-  const [wakeTime, setWakeTime] = useState(() => new Date());
-  const [currentMode, setCurrentMode] = useState<'awake' | 'sleeping'>('awake');
+  const [startStep, setStartStep] = useState<'state' | 'current' | null>(null);
+  const [currentState, setCurrentState] = useState<RoutineInitialState>('awake');
   const [currentStateStartTime, setCurrentStateStartTime] = useState(() => new Date());
+  const [pendingRecordType, setPendingRecordType] = useState<RecordType | null>(null);
   const [startError, setStartError] = useState('');
   const [transitionNotice, setTransitionNotice] = useState('');
+  const autoOpenedSetupRef = useRef(false);
   const orbitState = useMemo(() => {
     const referenceTime = now || Date.now();
     const previousDate = new Date(referenceTime);
@@ -49,6 +51,11 @@ export default function TodayScreen() {
   const openRecord = (type?: RecordType) => {
     if (!canWrite) return;
     void Haptics.selectionAsync();
+    if (state.mode === 'idle') {
+      setPendingRecordType(type || null);
+      openStartFlow();
+      return;
+    }
     router.push(type ? { pathname: '/registrar', params: { type } } : '/registrar');
   };
 
@@ -68,32 +75,37 @@ export default function TodayScreen() {
 
   const openStartFlow = () => {
     const reference = new Date();
-    setWakeTime(reference);
-    setCurrentMode('awake');
+    setCurrentState('awake');
     setCurrentStateStartTime(reference);
     setStartError('');
-    setStartStep('wake');
+    setStartStep('state');
     void Haptics.selectionAsync();
   };
 
   const closeStartFlow = () => {
     setStartStep(null);
     setStartError('');
+    setPendingRecordType(null);
   };
 
-  const confirmWakeTime = () => {
-    const wakeAt = timeToday(wakeTime);
-    if (wakeAt > Date.now()) {
-      setStartError('O primeiro despertar não pode estar no futuro.');
-      return;
-    }
+  useEffect(() => {
+    if (
+      autoOpenedSetupRef.current
+      || !hydrated
+      || !canWrite
+      || state.mode !== 'idle'
+      || state.events.length
+      || state.routineStartDeferredAt
+    ) return;
+    autoOpenedSetupRef.current = true;
+    setCurrentState('awake');
+    setCurrentStateStartTime(new Date());
     setStartError('');
     setStartStep('state');
-    void Haptics.selectionAsync();
-  };
+  }, [canWrite, hydrated, state.events.length, state.mode, state.routineStartDeferredAt]);
 
-  const chooseCurrentState = (mode: 'awake' | 'sleeping') => {
-    setCurrentMode(mode);
+  const chooseCurrentState = (nextState: RoutineInitialState) => {
+    setCurrentState(nextState);
     setCurrentStateStartTime(new Date());
     setStartError('');
     setStartStep('current');
@@ -103,19 +115,17 @@ export default function TodayScreen() {
   const confirmCurrentStateStart = () => {
     if (!canWrite) return;
     const reference = Date.now();
-    const wakeAt = timeToday(wakeTime);
     const currentStartedAt = timeToday(currentStateStartTime);
     if (currentStartedAt > reference) {
-      setStartError(`O início do período ${currentMode === 'sleeping' ? 'de sono' : 'acordado'} não pode estar no futuro.`);
+      setStartError('O início do estado atual não pode estar no futuro.');
       return;
     }
-    if (currentStartedAt < wakeAt) {
-      setStartError(`O período atual precisa ter começado depois do primeiro despertar de hoje.`);
-      return;
-    }
-    beginRoutine({ wakeAt, currentMode, currentStateStartedAt: currentStartedAt });
+    beginRoutine({ currentState, currentStateStartedAt: currentStartedAt });
+    const nextRecord = pendingRecordType;
+    setPendingRecordType(null);
     closeStartFlow();
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if (nextRecord) router.push({ pathname: '/registrar', params: { type: nextRecord } });
   };
 
   const handlePrimaryAction = () => {
@@ -148,19 +158,19 @@ export default function TodayScreen() {
           {!isDesktop ? <Pressable onPress={() => router.push('/perfil')} style={[styles.profileButton, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.profileButtonText, { color: colors.text }]}>Perfil</Text></Pressable> : null}
         </View>
 
-        <View style={[styles.heroWorkspace, isDesktop && styles.heroWorkspaceDesktop]}>
-          <View style={[styles.orbitColumn, isDesktop && styles.orbitColumnDesktop]}>
+        <View style={[styles.heroWorkspace, isWideDesktop && styles.heroWorkspaceDesktop]}>
+          <View style={[styles.orbitColumn, isWideDesktop && styles.orbitColumnDesktop]}>
             <RoutineOrbit state={orbitState} now={now} />
           </View>
-          <View style={[styles.heroSide, isDesktop && styles.heroSideDesktop]}>
+          <View style={[styles.heroSide, isWideDesktop && styles.heroSideDesktop]}>
             {state.mode === 'idle' ? (
               canWrite ? <View style={[styles.startPanel, isDesktop && styles.startPanelDesktop, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Text style={[styles.startKicker, { color: colors.primary }]}>PRIMEIRO MARCO DO DIA</Text>
-                <Text style={[styles.startTitle, isDesktop && styles.startTitleDesktop, { color: colors.text }]}>Que horas {profile.name || 'o bebê'} acordou hoje?</Text>
-                <Text style={[styles.startSubtitle, isDesktop && styles.startSubtitleDesktop, { color: colors.textMuted }]}>Primeiro registre o despertar. Depois o Ninou pergunta como o bebê está neste momento.</Text>
+                <Text style={[styles.startKicker, { color: colors.primary }]}>COMEÇAR ACOMPANHAMENTO</Text>
+                <Text style={[styles.startTitle, isDesktop && styles.startTitleDesktop, { color: colors.text }]}>Como {profile.name || 'o bebê'} está agora?</Text>
+                <Text style={[styles.startSubtitle, isDesktop && styles.startSubtitleDesktop, { color: colors.textMuted }]}>Informe apenas o estado atual. O Ninou não criará acontecimentos anteriores automaticamente.</Text>
                 <Pressable onPress={openStartFlow} style={({ pressed }) => [styles.startButton, isDesktop && styles.startButtonDesktop, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
                   <ActionArt type="acordou" size={isDesktop ? 64 : 52} />
-                  <View style={styles.startCopy}><Text style={[styles.startText, isDesktop && styles.startTextDesktop, { color: colors.text }]}>Informar primeiro despertar</Text><Text style={[styles.startHint, isDesktop && styles.startHintDesktop, { color: colors.textMuted }]}>Escolha o horário real em que o dia começou.</Text></View>
+                  <View style={styles.startCopy}><Text style={[styles.startText, isDesktop && styles.startTextDesktop, { color: colors.text }]}>Informar estado atual</Text><Text style={[styles.startHint, isDesktop && styles.startHintDesktop, { color: colors.textMuted }]}>Acordado, soneca ou sono da noite.</Text></View>
                   <Ionicons name="chevron-forward" size={isDesktop ? 23 : 19} color={colors.textMuted} />
                 </Pressable>
               </View> : <View style={[styles.readOnlyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><Ionicons name="eye-outline" size={26} color={colors.primary} /><View style={styles.readOnlyCopy}><Text style={[styles.readOnlyTitle, { color: colors.text }]}>Acesso de visualização</Text><Text style={[styles.readOnlyText, { color: colors.textMuted }]}>Você pode acompanhar a rotina, mas não criar ou alterar registros.</Text></View></View>
@@ -170,8 +180,19 @@ export default function TodayScreen() {
                 onPress={handlePrimaryAction}
                 style={({ pressed }) => [styles.primaryAction, isDesktop && styles.primaryActionDesktop, { borderColor: `${colors.accent}88` }, pressed && styles.pressed]}>
                 <LinearGradient colors={isDark ? ['#B8F2D7', '#8CDEBF'] : ['#7558E8', '#9A67ED']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-                <ActionArt type={primaryAction.type} size={isDesktop ? 72 : 58} />
-                <Text style={[styles.primaryTitle, isDesktop && styles.primaryTitleDesktop, { color: isDark ? '#172A24' : '#FFFFFF' }]}>{primaryAction.label}</Text>
+                <ActionArt type={primaryAction.type} size={isDesktop ? 62 : 58} />
+                {isDesktop ? (
+                  <>
+                    <View style={styles.primaryActionCopyDesktop}>
+                      <Text style={[styles.primaryActionKickerDesktop, { color: isDark ? '#285D50' : 'rgba(255,255,255,0.76)' }]}>PRÓXIMA TRANSIÇÃO</Text>
+                      <Text style={[styles.primaryTitle, styles.primaryTitleDesktop, { color: isDark ? '#172A24' : '#FFFFFF' }]}>{primaryAction.label}</Text>
+                      <Text style={[styles.primaryActionHintDesktop, { color: isDark ? '#326D5E' : 'rgba(255,255,255,0.82)' }]}>Atualize a rotina e sincronize com toda a família.</Text>
+                    </View>
+                    <View style={[styles.primaryActionArrowDesktop, { backgroundColor: isDark ? 'rgba(23,42,36,0.11)' : 'rgba(255,255,255,0.16)' }]}>
+                      <Ionicons name="arrow-forward" size={20} color={isDark ? '#172A24' : '#FFFFFF'} />
+                    </View>
+                  </>
+                ) : <Text style={[styles.primaryTitle, { color: isDark ? '#172A24' : '#FFFFFF' }]}>{primaryAction.label}</Text>}
               </Pressable>
             ) : null}
 
@@ -250,56 +271,49 @@ export default function TodayScreen() {
           <View style={[styles.startModal, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.startModalHead}>
               <View style={[styles.startModalIcon, { backgroundColor: colors.primarySoft }]}>
-                <ActionArt type={startStep === 'current' && currentMode === 'sleeping' ? 'sono' : 'acordou'} size={58} />
+                <ActionArt type={currentState === 'night' ? 'dormir' : currentState === 'nap' ? 'sono' : 'acordou'} size={58} />
               </View>
               <Pressable accessibilityLabel="Fechar início da rotina" onPress={closeStartFlow} style={[styles.startModalClose, { backgroundColor: colors.surfaceElevated }]}>
                 <Ionicons name="close" size={21} color={colors.text} />
               </Pressable>
             </View>
 
-            {startStep === 'wake' ? (
-              <>
-                <Text style={[styles.startModalKicker, { color: colors.primary }]}>ETAPA 1 · PRIMEIRO DESPERTAR</Text>
-                <Text style={[styles.startModalTitle, { color: colors.text }]}>Que horas {profile.name || 'o bebê'} acordou hoje?</Text>
-                <Text style={[styles.startModalText, { color: colors.textMuted }]}>Esse horário será o primeiro marco da linha do tempo de hoje.</Text>
-                <View style={[styles.timeCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
-                  <DateTimePicker value={wakeTime} mode="time" display={Platform.OS === 'ios' ? 'spinner' : 'clock'} locale="pt-BR" onValueChange={(_, value) => { setWakeTime(value); setStartError(''); }} accentColor={colors.primary} themeVariant={isDark ? 'dark' : 'light'} />
-                </View>
-                {startError ? <Text style={[styles.startError, { color: colors.danger }]}>{startError}</Text> : null}
-                <Pressable onPress={confirmWakeTime} style={[styles.startConfirm, { backgroundColor: colors.primary }]}><Ionicons name="arrow-forward-circle" size={19} color="#FFF" /><Text style={styles.startConfirmText}>Continuar com despertar às {wakeTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Text></Pressable>
-              </>
-            ) : null}
-
             {startStep === 'state' ? (
               <>
-                <Text style={[styles.startModalKicker, { color: colors.primary }]}>ETAPA 2 · ESTADO ATUAL</Text>
-                <Text style={[styles.startModalTitle, { color: colors.text }]}>Como está agora?</Text>
-                <Text style={[styles.startModalText, { color: colors.textMuted }]}>O primeiro despertar foi informado às {wakeTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.</Text>
+                <Text style={[styles.startModalKicker, { color: colors.primary }]}>ESTADO ATUAL</Text>
+                <Text style={[styles.startModalTitle, { color: colors.text }]}>Como {profile.name || 'o bebê'} está agora?</Text>
+                <Text style={[styles.startModalText, { color: colors.textMuted }]}>Escolha o estado real deste momento. Nenhum histórico anterior será inventado.</Text>
                 <View style={styles.currentStateChoices}>
                   <Pressable onPress={() => chooseCurrentState('awake')} style={({ pressed }) => [styles.currentStateButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
                     <ActionArt type="acordou" size={50} />
-                    <View style={styles.currentStateCopy}><Text style={[styles.currentStateTitle, { color: colors.text }]}>Está acordado</Text><Text style={[styles.currentStateHint, { color: colors.textMuted }]}>Na próxima etapa, informe desde quando está acordado.</Text></View>
+                    <View style={styles.currentStateCopy}><Text style={[styles.currentStateTitle, { color: colors.text }]}>Acordado</Text><Text style={[styles.currentStateHint, { color: colors.textMuted }]}>Informe desde quando está acordado.</Text></View>
                     <Ionicons name="checkmark-circle-outline" size={22} color={colors.primary} />
                   </Pressable>
-                  <Pressable onPress={() => chooseCurrentState('sleeping')} style={({ pressed }) => [styles.currentStateButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
+                  <Pressable onPress={() => chooseCurrentState('nap')} style={({ pressed }) => [styles.currentStateButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
                     <ActionArt type="sono" size={50} />
-                    <View style={styles.currentStateCopy}><Text style={[styles.currentStateTitle, { color: colors.text }]}>Está dormindo</Text><Text style={[styles.currentStateHint, { color: colors.textMuted }]}>Na próxima etapa, informe quando o período atual começou.</Text></View>
+                    <View style={styles.currentStateCopy}><Text style={[styles.currentStateTitle, { color: colors.text }]}>Tirando uma soneca</Text><Text style={[styles.currentStateHint, { color: colors.textMuted }]}>Inicie o acompanhamento do sono atual.</Text></View>
                     <Ionicons name="arrow-forward-circle-outline" size={22} color={colors.primary} />
                   </Pressable>
+                  <Pressable onPress={() => chooseCurrentState('night')} style={({ pressed }) => [styles.currentStateButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
+                    <ActionArt type="dormir" size={50} />
+                    <View style={styles.currentStateCopy}><Text style={[styles.currentStateTitle, { color: colors.text }]}>No sono da noite</Text><Text style={[styles.currentStateHint, { color: colors.textMuted }]}>Registre o início do período noturno.</Text></View>
+                    <Ionicons name="arrow-forward-circle-outline" size={22} color={colors.primary} />
+                  </Pressable>
+                  <Pressable onPress={() => { deferRoutineSetup(); setPendingRecordType(null); closeStartFlow(); }} style={styles.startCancel}><Text style={[styles.startCancelText, { color: colors.textMuted }]}>Começar depois</Text></Pressable>
                 </View>
               </>
             ) : null}
 
             {startStep === 'current' ? (
               <>
-                <Text style={[styles.startModalKicker, { color: colors.primary }]}>ETAPA 3 · INÍCIO DO ESTADO ATUAL</Text>
-                <Text style={[styles.startModalTitle, { color: colors.text }]}>{currentMode === 'sleeping' ? 'Quando esse sono começou?' : 'Desde que horas está acordado?'}</Text>
-                <Text style={[styles.startModalText, { color: colors.textMuted }]}>O primeiro despertar foi às {wakeTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}. Informe quando começou o período atual.</Text>
+                <Text style={[styles.startModalKicker, { color: colors.primary }]}>INÍCIO DO ESTADO ATUAL</Text>
+                <Text style={[styles.startModalTitle, { color: colors.text }]}>{currentState === 'awake' ? 'Desde que horas está acordado?' : currentState === 'night' ? 'Quando começou o sono da noite?' : 'Quando essa soneca começou?'}</Text>
+                <Text style={[styles.startModalText, { color: colors.textMuted }]}>Use “agora” ou ajuste o horário aproximado. Ele poderá ser corrigido no Diário.</Text>
                 <View style={[styles.timeCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
                   <DateTimePicker value={currentStateStartTime} mode="time" display={Platform.OS === 'ios' ? 'spinner' : 'clock'} locale="pt-BR" onValueChange={(_, value) => { setCurrentStateStartTime(value); setStartError(''); }} accentColor={colors.primary} themeVariant={isDark ? 'dark' : 'light'} />
                 </View>
                 {startError ? <Text style={[styles.startError, { color: colors.danger }]}>{startError}</Text> : null}
-                <Pressable onPress={confirmCurrentStateStart} style={[styles.startConfirm, { backgroundColor: colors.primary }]}><Ionicons name="checkmark-circle" size={19} color="#FFF" /><Text style={styles.startConfirmText}>{currentMode === 'sleeping' ? 'Iniciar sono' : 'Começar acordado'} desde {currentStateStartTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Text></Pressable>
+                <Pressable onPress={confirmCurrentStateStart} style={[styles.startConfirm, { backgroundColor: colors.primary }]}><Ionicons name="checkmark-circle" size={19} color="#FFF" /><Text style={styles.startConfirmText}>Confirmar desde {currentStateStartTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Text></Pressable>
                 <Pressable onPress={() => { setStartError(''); setStartStep('state'); }} style={styles.startCancel}><Text style={[styles.startCancelText, { color: colors.textMuted }]}>Voltar</Text></Pressable>
               </>
             ) : null}
@@ -342,11 +356,11 @@ const styles = StyleSheet.create({
   profileButtonText: { fontSize: 13, fontWeight: '900' },
   link: { fontSize: 13, fontWeight: '800' },
   heroWorkspace: { gap: 14 },
-  heroWorkspaceDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 24 },
+  heroWorkspaceDesktop: { width: '100%', maxWidth: 990, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 36 },
   orbitColumn: { alignItems: 'center' },
-  orbitColumnDesktop: { width: 540, minHeight: 520, justifyContent: 'center' },
+  orbitColumnDesktop: { width: 540, minHeight: 520, justifyContent: 'center', flexShrink: 0 },
   heroSide: { gap: 14 },
-  heroSideDesktop: { flex: 1, justifyContent: 'center', gap: 20 },
+  heroSideDesktop: { width: 390, flexGrow: 0, flexShrink: 0, justifyContent: 'center', gap: 16 },
   startPanel: { borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 16 }, startKicker: { fontSize: 9.5, fontWeight: '900', letterSpacing: 1.1 }, startTitle: { marginTop: 5, fontSize: 20, lineHeight: 25, fontWeight: '900' }, startSubtitle: { marginTop: 5, marginBottom: 14, fontSize: 12, lineHeight: 18, fontWeight: '600' },
   startPanelDesktop: { minHeight: 320, borderRadius: 30, padding: 30, justifyContent: 'center' },
   startTitleDesktop: { marginTop: 10, fontSize: 32, lineHeight: 38 },
@@ -359,9 +373,13 @@ const styles = StyleSheet.create({
   startHintDesktop: { marginTop: 5, fontSize: 14, lineHeight: 20 },
   readOnlyCard: { minHeight: 82, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 15, flexDirection: 'row', alignItems: 'center', gap: 12 }, readOnlyCopy: { flex: 1 }, readOnlyTitle: { fontSize: 14, fontWeight: '900' }, readOnlyText: { marginTop: 4, fontSize: 11, lineHeight: 16, fontWeight: '600' }, readOnlyDisabled: { opacity: 0.48 },
   primaryAction: { minHeight: 76, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: spacing.xl, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.md, overflow: 'hidden' },
-  primaryActionDesktop: { minHeight: 148, borderRadius: 30, gap: 22 },
+  primaryActionDesktop: { width: '100%', maxWidth: 390, minHeight: 122, alignSelf: 'center', justifyContent: 'flex-start', borderRadius: 27, paddingHorizontal: 20, gap: 15, boxShadow: '0 20px 50px rgba(25, 13, 53, 0.24)' },
+  primaryActionCopyDesktop: { flex: 1, minWidth: 0 },
+  primaryActionKickerDesktop: { fontSize: 9, lineHeight: 12, fontWeight: '900', letterSpacing: 1.15 },
+  primaryActionHintDesktop: { marginTop: 5, maxWidth: 210, fontSize: 11.5, lineHeight: 16, fontWeight: '700' },
+  primaryActionArrowDesktop: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   primaryTitle: { fontSize: 16, fontWeight: '900' },
-  primaryTitleDesktop: { fontSize: 25 },
+  primaryTitleDesktop: { marginTop: 3, fontSize: 22, lineHeight: 27 },
   pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
   lastAction: { minHeight: 66, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 8 }, lastActionCopy: { flex: 1 }, lastKicker: { fontSize: 8, fontWeight: '900', letterSpacing: 1 }, lastTitle: { marginTop: 3, fontSize: 12, fontWeight: '900' }, lastButton: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 5 }, lastButtonDisabled: { opacity: 0.35 }, lastButtonText: { fontSize: 10.5, fontWeight: '900' },
   lastActionDesktop: { minHeight: 92, borderRadius: 24, paddingHorizontal: 22, gap: 14 },

@@ -5,3 +5,6 @@ teste-layout.html
 teste-layout.css
 teste-layout.js
 .env*
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

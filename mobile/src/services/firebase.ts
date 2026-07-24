@@ -245,13 +245,15 @@ export async function acceptCaregiverInvite(user: User, codeValue: string) {
   const role = String(invite.role || 'caregiver');
   const access: FamilyAccess = { familyId, role, email, ownerUid: String(invite.ownerUid || invite.createdByUid || '') };
   const accessPayload = { ...access, inviteCode: code, status: 'active', roleVersion: 3, isPrimary: true, selectedAtClient: Date.now(), joinedAt: serverTimestamp(), updatedAt: serverTimestamp() };
-  await setDoc(doc(db, 'users', user.uid, 'families', familyId), accessPayload, { merge: true });
-  await setDoc(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
-  await setDoc(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload }, { merge: true });
   const acceptedPayload = { status: 'accepted', useCount: Number(invite.useCount || 0) + 1, acceptedByUid: user.uid, acceptedByEmail: email, acceptedAt: serverTimestamp(), updatedAt: serverTimestamp() };
-  await setDoc(inviteRef, acceptedPayload, { merge: true });
-  await setDoc(doc(db, 'families', familyId, 'invites', code), acceptedPayload, { merge: true });
-  await setDoc(doc(db, 'families', familyId, 'invitations', code), acceptedPayload, { merge: true });
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'users', user.uid, 'families', familyId), accessPayload, { merge: true });
+  batch.set(doc(db, 'users', user.uid, 'access', 'ninou'), accessPayload, { merge: true });
+  batch.set(doc(db, 'families', familyId, 'members', user.uid), { uid: user.uid, ...accessPayload }, { merge: true });
+  batch.set(inviteRef, acceptedPayload, { merge: true });
+  batch.set(doc(db, 'families', familyId, 'invites', code), acceptedPayload, { merge: true });
+  batch.set(doc(db, 'families', familyId, 'invitations', code), acceptedPayload, { merge: true });
+  await batch.commit();
   return access;
 }
 
@@ -502,25 +504,37 @@ export async function saveRoutineDay(input: {
   dayId: string;
   state: DayState;
   user: User;
+  expectedRoutineStateMutationId?: string;
+  expectedBreastfeedingTimerMutationId?: string;
 }) {
   const dayRef = doc(db, 'families', input.familyId, 'days', input.dayId);
   await runTransaction(db, async (transaction) => {
     const snapshot = await transaction.get(dayRef);
     const cloudData = snapshot.exists() ? snapshot.data() : {};
     const cloudState = normalizeDayState((cloudData.state && typeof cloudData.state === 'object' ? cloudData.state : cloudData) as Partial<DayState>);
-    const mergedBase = mergeDayStates(input.state, cloudState);
-    const merged = normalizeDayState({
-      ...mergedBase,
-      mode: input.state.mode,
-      activeStartedAt: input.state.activeStartedAt,
-      activeType: input.state.activeType,
-      activeDetail: input.state.activeDetail,
-      activeNotes: input.state.activeNotes,
-      lastWakeWindowStartedAt: input.state.lastWakeWindowStartedAt,
-      lastWakeWindowMs: input.state.lastWakeWindowMs,
-      routineStateUpdatedAt: Math.max(Date.now(), input.state.routineStateUpdatedAt, cloudState.routineStateUpdatedAt + 1),
-      routineStateMutationId: input.state.routineStateMutationId,
-    });
+    const liveStateChanged = input.expectedRoutineStateMutationId !== undefined
+      && input.state.routineStateMutationId !== input.expectedRoutineStateMutationId;
+    const feedingTimerChanged = input.expectedBreastfeedingTimerMutationId !== undefined
+      && input.state.breastfeedingTimerMutationId !== input.expectedBreastfeedingTimerMutationId;
+    if (
+      snapshot.exists()
+      && liveStateChanged
+      && cloudState.routineStateMutationId !== input.expectedRoutineStateMutationId
+    ) {
+      const conflict = new Error('A rotina foi atualizada em outro aparelho. A tela será sincronizada antes de uma nova alteração.') as Error & { code?: string };
+      conflict.code = 'routine/conflict';
+      throw conflict;
+    }
+    if (
+      snapshot.exists()
+      && feedingTimerChanged
+      && cloudState.breastfeedingTimerMutationId !== input.expectedBreastfeedingTimerMutationId
+    ) {
+      const conflict = new Error('O timer foi atualizado em outro aparelho. Aguarde a sincronização antes de continuar.') as Error & { code?: string };
+      conflict.code = 'routine/conflict';
+      throw conflict;
+    }
+    const merged = mergeDayStates(input.state, cloudState);
     transaction.set(dayRef, {
       ...merged,
       dayId: input.dayId,
@@ -579,6 +593,7 @@ export function getFirebaseErrorMessage(error: unknown) {
     'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
     'auth/network-request-failed': 'Sem conexão com o Firebase. Confira a internet e tente novamente.',
     'permission-denied': 'Sua conta não tem permissão para esta família.',
+    'routine/conflict': 'A rotina mudou em outro aparelho. A tela foi atualizada; confira o estado antes de tentar novamente.',
   };
   return messages[code] || (error instanceof Error ? error.message : 'Não foi possível concluir esta ação agora.');
 }

@@ -11,6 +11,7 @@ import {
   finishSleep,
   getRoutineTransitionBlock,
   getPrimaryAction,
+  getRoutineRecordConflict,
   initializeRoutineDay,
   isNightPeriod,
   mergeDayStates,
@@ -23,6 +24,7 @@ import {
   pauseBreastfeedingTimer,
   deleteDayNoteEpisode,
   deleteRoutineEvent,
+  deferRoutineStart,
   saveDayNotes,
   updateRoutineEvent,
   type DayState,
@@ -32,6 +34,8 @@ import {
   type RoutineActor,
   type RoutineDayStartInput,
   type BreastfeedingSide,
+  type RoutineConflict,
+  type RoutineRecordInput,
 } from '@/domain/routine';
 import { getFirebaseErrorMessage, getLocalDateId, loadRoutineDays, observeRoutineDay, saveRoutineDay } from '@/services/firebase';
 import { canWriteFamilyRoutine } from '@/domain/family-access';
@@ -94,14 +98,16 @@ type RoutineContextValue = {
   canUndo: boolean;
   canWrite: boolean;
   beginRoutine: (input: RoutineDayStartInput) => void;
+  deferRoutineSetup: () => void;
   runPrimaryAction: () => { ok: true } | { ok: false; message: string; remainingMs: number };
-  addRecord: (input: { type: RecordType; detail?: string; notes?: string; amountMl?: number; start?: number; end?: number }) => void;
-  updateEvent: (dayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl' | 'leftDurationMs' | 'rightDurationMs'>>) => void;
-  startBreastfeeding: (side: BreastfeedingSide) => void;
+  addRecord: (input: RoutineRecordInput) => RoutineMutationResult;
+  updateEvent: (dayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl' | 'leftDurationMs' | 'rightDurationMs'>>) => RoutineMutationResult;
+  startBreastfeeding: (side: BreastfeedingSide) => RoutineMutationResult;
+  endSleepForCare: (wakeAt?: number) => RoutineMutationResult;
   pauseBreastfeeding: () => void;
   resumeBreastfeeding: (side?: BreastfeedingSide) => void;
   changeBreastfeedingSide: (side: BreastfeedingSide) => void;
-  finishBreastfeeding: (notes?: string) => void;
+  finishBreastfeeding: (notes?: string) => RoutineMutationResult;
   cancelBreastfeeding: () => void;
   deleteEvent: (dayId: string, eventId: string) => void;
   updateDayNotes: (dayId: string, notes: string) => void;
@@ -110,6 +116,10 @@ type RoutineContextValue = {
   undoLastAction: () => void;
   resetDay: (dayId: string) => void;
 };
+
+export type RoutineMutationResult =
+  | { ok: true }
+  | { ok: false; conflict: RoutineConflict };
 
 const RoutineContext = createContext<RoutineContextValue | null>(null);
 
@@ -265,10 +275,11 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const commit = useCallback((buildNext: (current: DayState, at: number) => DayState) => {
     if (!canWrite) return;
     const at = Date.now();
-    undoStateRef.current = stateRef.current;
+    const previous = stateRef.current;
+    undoStateRef.current = previous;
     setCanUndo(true);
-    void AsyncStorage.setItem(undoStorageKey, JSON.stringify(stateRef.current));
-    const next = buildNext(stateRef.current, at);
+    void AsyncStorage.setItem(undoStorageKey, JSON.stringify(previous));
+    const next = buildNext(previous, at);
     setNow(at);
     stateRef.current = next;
     setState(next);
@@ -279,7 +290,14 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       setSyncMessage('Enviando atualização…');
       const saveTask = saveQueueRef.current
         .catch(() => undefined)
-        .then(() => saveRoutineDay({ familyId: access.familyId, dayId, state: next, user }));
+        .then(() => saveRoutineDay({
+          familyId: access.familyId,
+          dayId,
+          state: next,
+          user,
+          expectedRoutineStateMutationId: previous.routineStateMutationId,
+          expectedBreastfeedingTimerMutationId: previous.breastfeedingTimerMutationId,
+        }));
       saveQueueRef.current = saveTask;
       void saveTask
         .then(() => {
@@ -300,7 +318,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     }
   }, [access, canWrite, dayId, liveStorageKey, storageKey, undoStorageKey, user]);
 
-  const saveDay = useCallback((targetDayId: string, next: DayState) => {
+  const saveDay = useCallback((targetDayId: string, next: DayState, expected?: DayState) => {
     setHistory((current) => ({ ...current, [targetDayId]: next }));
     const targetStorageKey = `${STORAGE_KEY_PREFIX}.${storageScope}.${targetDayId}`;
     void AsyncStorage.setItem(targetStorageKey, JSON.stringify(next));
@@ -312,7 +330,16 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     if (user && access) {
       setSyncStatus('saving');
       setSyncMessage('Enviando atualização…');
-      const saveTask = saveQueueRef.current.catch(() => undefined).then(() => saveRoutineDay({ familyId: access.familyId, dayId: targetDayId, state: next, user }));
+      const saveTask = saveQueueRef.current.catch(() => undefined).then(() => saveRoutineDay({
+        familyId: access.familyId,
+        dayId: targetDayId,
+        state: next,
+        user,
+        ...(expected ? {
+          expectedRoutineStateMutationId: expected.routineStateMutationId,
+          expectedBreastfeedingTimerMutationId: expected.breastfeedingTimerMutationId,
+        } : {}),
+      }));
       saveQueueRef.current = saveTask;
       void saveTask.then(() => { setSyncStatus('synced'); setSyncMessage('Sincronizado com a família'); }).catch((error) => { setSyncStatus('pending'); setSyncMessage(getFirebaseErrorMessage(error)); });
     }
@@ -321,12 +348,15 @@ export function RoutineProvider({ children }: PropsWithChildren) {
   const commitDay = useCallback((targetDayId: string, buildNext: (current: DayState, at: number) => DayState) => {
     if (!canWrite) return;
     const current = targetDayId === dayId ? stateRef.current : history[targetDayId] || createEmptyDayState();
-    saveDay(targetDayId, buildNext(current, Date.now()));
+    saveDay(targetDayId, buildNext(current, Date.now()), current);
   }, [canWrite, dayId, history, saveDay]);
 
   const beginRoutine = useCallback((input: RoutineDayStartInput) => {
     commit((current, at) => initializeRoutineDay(current, input, at, routineActor));
   }, [commit, routineActor]);
+  const deferRoutineSetup = useCallback(() => {
+    commit((current, at) => deferRoutineStart(current, at));
+  }, [commit]);
 
   const runPrimaryAction = useCallback(() => {
     const at = Date.now();
@@ -345,16 +375,78 @@ export function RoutineProvider({ children }: PropsWithChildren) {
       && Number.isFinite(Number(input.start))
       && !Number.isFinite(Number(input.end));
     const targetDayId = isOpenSleep ? dayId : Number.isFinite(Number(input.start)) ? getLocalDateId(Number(input.start)) : dayId;
+    const targetState = targetDayId === dayId ? stateRef.current : history[targetDayId] || createEmptyDayState();
+    const validationEvents = new Map<string, RoutineEvent>();
+    Object.values(history).forEach((knownDay) => knownDay.events.forEach((event) => validationEvents.set(event.id, event)));
+    stateRef.current.events.forEach((event) => validationEvents.set(event.id, event));
+    const validationState = normalizeDayState({ ...targetState, events: [...validationEvents.values()] });
+    const conflict = getRoutineRecordConflict(validationState, input);
+    if (conflict) return { ok: false as const, conflict };
     if (targetDayId === dayId) commit((current, at) => addRoutineRecord(current, input, at, routineActor));
     else commitDay(targetDayId, (current, at) => addRoutineRecord(current, input, at, routineActor));
-  }, [commit, commitDay, dayId, routineActor]);
+    return { ok: true as const };
+  }, [commit, commitDay, dayId, history, routineActor]);
 
-  const updateEvent = useCallback((targetDayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl' | 'leftDurationMs' | 'rightDurationMs'>>) => commitDay(targetDayId, (current, at) => updateRoutineEvent(current, eventId, patch, at, routineActor)), [commitDay, routineActor]);
-  const startBreastfeeding = useCallback((side: BreastfeedingSide) => commit((current, at) => startBreastfeedingTimer(current, side, at)), [commit]);
+  const updateEvent = useCallback((targetDayId: string, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl' | 'leftDurationMs' | 'rightDurationMs'>>) => {
+    const targetState = targetDayId === dayId ? stateRef.current : history[targetDayId] || createEmptyDayState();
+    const currentEvent = targetState.events.find((event) => event.id === eventId);
+    if (!currentEvent) {
+      return { ok: false as const, conflict: { code: 'state-required' as const, title: 'Registro não encontrado', message: 'Atualize o Diário e tente novamente.' } };
+    }
+    const validationEvents = new Map<string, RoutineEvent>();
+    Object.values(history).forEach((knownDay) => knownDay.events.forEach((event) => validationEvents.set(event.id, event)));
+    stateRef.current.events.forEach((event) => validationEvents.set(event.id, event));
+    const validationState = normalizeDayState({ ...targetState, events: [...validationEvents.values()] });
+    const conflict = getRoutineRecordConflict(validationState, { ...currentEvent, ...patch }, Date.now(), eventId);
+    if (conflict) return { ok: false as const, conflict };
+    commitDay(targetDayId, (current, at) => updateRoutineEvent(current, eventId, patch, at, routineActor));
+    return { ok: true as const };
+  }, [commitDay, dayId, history, routineActor]);
+  const startBreastfeeding = useCallback((side: BreastfeedingSide) => {
+    const conflict = getRoutineRecordConflict(stateRef.current, { type: 'amamentacao' });
+    if (conflict) return { ok: false as const, conflict };
+    commit((current, at) => startBreastfeedingTimer(current, side, at));
+    return { ok: true as const };
+  }, [commit]);
+  const endSleepForCare = useCallback((wakeAt = Date.now()) => {
+    const current = stateRef.current;
+    if (current.mode !== 'sleeping' || !current.activeStartedAt) return { ok: true as const };
+    if (wakeAt > Date.now() + 60_000 || wakeAt < current.activeStartedAt) {
+      return {
+        ok: false as const,
+        conflict: {
+          code: 'feeding-during-sleep' as const,
+          title: 'Confira o horário',
+          message: 'O despertar precisa estar entre o início do sono atual e o horário de agora.',
+        },
+      };
+    }
+    const block = getRoutineTransitionBlock(current, wakeAt);
+    if (block) {
+      return {
+        ok: false as const,
+        conflict: {
+          code: 'feeding-during-sleep' as const,
+          title: 'Sono muito curto',
+          message: block.message,
+        },
+      };
+    }
+    commit((latest, at) => finishSleep(latest, Math.min(wakeAt, at), routineActor));
+    return { ok: true as const };
+  }, [commit, routineActor]);
   const pauseBreastfeeding = useCallback(() => commit((current, at) => pauseBreastfeedingTimer(current, at)), [commit]);
   const resumeBreastfeeding = useCallback((side?: BreastfeedingSide) => commit((current, at) => resumeBreastfeedingTimer(current, side, at)), [commit]);
   const changeBreastfeedingSide = useCallback((side: BreastfeedingSide) => commit((current, at) => switchBreastfeedingSide(current, side, at)), [commit]);
-  const finishBreastfeeding = useCallback((notes = '') => commit((current, at) => finishBreastfeedingTimer(current, at, routineActor, notes)), [commit, routineActor]);
+  const finishBreastfeeding = useCallback((notes = '') => {
+    const timer = stateRef.current.breastfeedingTimer;
+    const conflict = timer
+      ? getRoutineRecordConflict(stateRef.current, { type: 'amamentacao', start: timer.startedAt, end: Date.now() })
+      : null;
+    if (conflict) return { ok: false as const, conflict };
+    commit((current, at) => finishBreastfeedingTimer(current, at, routineActor, notes));
+    return { ok: true as const };
+  }, [commit, routineActor]);
   const cancelBreastfeeding = useCallback(() => commit((current, at) => cancelBreastfeedingTimer(current, at)), [commit]);
   const deleteEvent = useCallback((targetDayId: string, eventId: string) => commitDay(targetDayId, (current, at) => deleteRoutineEvent(current, eventId, at)), [commitDay]);
   const updateDayNotes = useCallback((targetDayId: string, notes: string) => commitDay(targetDayId, (current, at) => saveDayNotes(current, notes, at)), [commitDay]);
@@ -366,7 +458,8 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     undoStateRef.current = null;
     setCanUndo(false);
     void AsyncStorage.removeItem(undoStorageKey);
-    saveDay(dayId, restoreRoutineSnapshot(stateRef.current, previous, Date.now()));
+    const current = stateRef.current;
+    saveDay(dayId, restoreRoutineSnapshot(current, previous, Date.now()), current);
   }, [dayId, saveDay, undoStorageKey]);
   const resetDay = useCallback((targetDayId: string) => commitDay(targetDayId, (current, at) => clearRoutineDay(current, at)), [commitDay]);
 
@@ -380,10 +473,12 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     canUndo,
     canWrite,
     beginRoutine,
+    deferRoutineSetup,
     runPrimaryAction,
     addRecord,
     updateEvent,
     startBreastfeeding,
+    endSleepForCare,
     pauseBreastfeeding,
     resumeBreastfeeding,
     changeBreastfeedingSide,
@@ -395,7 +490,7 @@ export function RoutineProvider({ children }: PropsWithChildren) {
     deleteNoteEpisode: deleteNoteEpisodeFromDay,
     undoLastAction,
     resetDay,
-  }), [state, history, now, hydrated, syncStatus, syncMessage, canUndo, canWrite, beginRoutine, runPrimaryAction, addRecord, updateEvent, startBreastfeeding, pauseBreastfeeding, resumeBreastfeeding, changeBreastfeedingSide, finishBreastfeeding, cancelBreastfeeding, deleteEvent, updateDayNotes, addNoteEpisodeToDay, deleteNoteEpisodeFromDay, undoLastAction, resetDay]);
+  }), [state, history, now, hydrated, syncStatus, syncMessage, canUndo, canWrite, beginRoutine, deferRoutineSetup, runPrimaryAction, addRecord, updateEvent, startBreastfeeding, endSleepForCare, pauseBreastfeeding, resumeBreastfeeding, changeBreastfeedingSide, finishBreastfeeding, cancelBreastfeeding, deleteEvent, updateDayNotes, addNoteEpisodeToDay, deleteNoteEpisodeFromDay, undoLastAction, resetDay]);
   return <RoutineContext.Provider value={value}>{children}</RoutineContext.Provider>;
 }
 

@@ -1,4 +1,6 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider, Stack } from 'expo-router';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -17,15 +19,20 @@ import { PreferencesProvider } from '@/state/preferences-context';
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [iconsLoaded, iconFontError] = useFonts(Ionicons.font);
+
+  useEffect(() => {
+    if (iconsLoaded || iconFontError) void SplashScreen.hideAsync();
+  }, [iconFontError, iconsLoaded]);
+
+  if (!iconsLoaded && !iconFontError) return null;
+  if (iconFontError) throw iconFontError;
+
   return <NinouThemeProvider><RootNavigation /></NinouThemeProvider>;
 }
 
 function RootNavigation() {
   const { colors, isDark } = useNinouTheme();
-
-  useEffect(() => {
-    void SplashScreen.hideAsync();
-  }, []);
 
   const navigationTheme = {
     ...(isDark ? DarkTheme : DefaultTheme),

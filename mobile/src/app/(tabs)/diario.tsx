@@ -162,7 +162,7 @@ export default function DiaryScreen() {
         Alert.alert('Confira os tempos', 'Informe pelo menos um segundo de mamada em um dos lados.');
         return;
       }
-      updateEvent(selectedDayId, editing.id, {
+      const result = updateEvent(selectedDayId, editing.id, {
         start,
         end,
         detail: formatBreastfeedingDetail(leftDurationMs, rightDurationMs),
@@ -170,8 +170,16 @@ export default function DiaryScreen() {
         leftDurationMs,
         rightDurationMs,
       });
+      if (!result.ok) {
+        Alert.alert(result.conflict.title, result.conflict.message);
+        return;
+      }
     } else {
-      updateEvent(selectedDayId, editing.id, { start, end, detail: editDetail.trim(), notes: editNotes.trim() });
+      const result = updateEvent(selectedDayId, editing.id, { start, end, detail: editDetail.trim(), notes: editNotes.trim() });
+      if (!result.ok) {
+        Alert.alert(result.conflict.title, result.conflict.message);
+        return;
+      }
     }
     setEditing(null);
   };

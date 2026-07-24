@@ -1,14 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionArt } from '@/components/action-art';
 import { NinouBackground } from '@/components/ninou-background';
-import { formatDuration, formatTime, getBreastfeedingDurations, MIN_ROUTINE_STATE_DURATION_MS, recordConfig, resolveRoutineIntervalEnd, type BreastfeedingSide, type RecordType } from '@/domain/routine';
+import { formatDuration, formatTime, getBreastfeedingDurations, getRoutineRecordConflict, MIN_ROUTINE_STATE_DURATION_MS, recordConfig, resolveRoutineIntervalEnd, type BreastfeedingSide, type RecordType, type RoutineConflict } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
@@ -85,6 +86,7 @@ export default function RegisterScreen() {
     addRecord,
     canWrite,
     startBreastfeeding,
+    endSleepForCare,
     pauseBreastfeeding,
     changeBreastfeedingSide,
     finishBreastfeeding,
@@ -105,10 +107,23 @@ export default function RegisterScreen() {
   const [medicineDose, setMedicineDose] = useState('');
   const [savedRecord, setSavedRecord] = useState<{ type: RecordType; timestamp: number; end?: number; caregiver: string; status: 'timer' | 'completed' | 'recorded' } | null>(null);
   const [formError, setFormError] = useState('');
+  const [routineConflict, setRoutineConflict] = useState<RoutineConflict | null>(null);
+  const [wakeTime, setWakeTime] = useState(() => new Date());
+  const [customWakeTime, setCustomWakeTime] = useState(false);
 
   useEffect(() => {
     if (validType(params.type)) setSelectedType(params.type);
   }, [params.type]);
+
+  useEffect(() => {
+    if (selectedType !== 'amamentacao' && selectedType !== 'mamadeira') return;
+    const conflict = getRoutineRecordConflict(state, { type: selectedType });
+    if (conflict) {
+      setWakeTime(new Date());
+      setCustomWakeTime(false);
+      setRoutineConflict(conflict);
+    }
+  }, [selectedType, state]);
 
   const breastfeedingTimer = state.breastfeedingTimer;
   const breastfeedingDurations = getBreastfeedingDurations(breastfeedingTimer, now || breastfeedingTimer?.activeSideStartedAt || breastfeedingTimer?.startedAt || 0);
@@ -121,7 +136,11 @@ export default function RegisterScreen() {
     setDetail('');
     setNotes('');
     setFormError('');
-  }, []);
+    if (type === 'amamentacao' || type === 'mamadeira') {
+      const conflict = getRoutineRecordConflict(state, { type });
+      if (conflict) setRoutineConflict(conflict);
+    }
+  }, [state]);
 
   const showCareMenu = useCallback(() => {
     setSelectedType(null);
@@ -196,7 +215,11 @@ export default function RegisterScreen() {
         return;
       }
       const finishedAt = Date.now();
-      finishBreastfeeding(notes.trim());
+      const result = finishBreastfeeding(notes.trim());
+      if (!result.ok) {
+        setRoutineConflict(result.conflict);
+        return;
+      }
       const caregiver = [preferences.caregiverName.trim(), preferences.caregiverRelation.trim()].filter(Boolean).join(' · ') || 'Responsável';
       setSavedRecord({ type: selectedType, timestamp: breastfeedingTimer.startedAt, end: finishedAt, caregiver, status: 'completed' });
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -204,13 +227,21 @@ export default function RegisterScreen() {
     }
     const breastDetail = selectedType === 'amamentacao' && breastTotal > 0 ? `Esquerdo ${formatTimer(leftBreastSeconds)} • Direito ${formatTimer(rightBreastSeconds)}` : '';
     const medicineDetail = selectedType === 'medicamento' ? [medicineName.trim(), medicineDose.trim(), detail].filter(Boolean).join(' • ') : '';
-    addRecord({
+    const result = addRecord({
       type: selectedType,
       detail: breastDetail || medicineDetail || detail || recordConfig[selectedType].options[0],
       notes: notes.trim(),
       ...(selectedType === 'mamadeira' ? { amountMl } : {}),
       ...(Number.isFinite(start) ? { start, ...(Number.isFinite(end) ? { end } : {}) } : {}),
     });
+    if (!result.ok) {
+      if (result.conflict.code === 'feeding-during-sleep' || result.conflict.code === 'state-required') {
+        setRoutineConflict(result.conflict);
+      } else {
+        setFormError(result.conflict.message);
+      }
+      return;
+    }
     const caregiver = [preferences.caregiverName.trim(), preferences.caregiverRelation.trim()].filter(Boolean).join(' · ') || 'Responsável';
     const completedSleep = isSleep && Number.isFinite(start) && Number.isFinite(end) && Number(end) > Number(start);
     const status = isSleep ? (completedSleep ? 'completed' : 'timer') : 'recorded';
@@ -226,6 +257,18 @@ export default function RegisterScreen() {
     setMedicineDose('');
     setFormError('');
     showCareMenu();
+  };
+
+  const confirmWakeForFeeding = () => {
+    const selectedWakeAt = customWakeTime ? wakeTime.getTime() : Date.now();
+    const result = endSleepForCare(selectedWakeAt);
+    if (!result.ok) {
+      setRoutineConflict(result.conflict);
+      return;
+    }
+    setRoutineConflict(null);
+    setCustomWakeTime(false);
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   return (
@@ -329,13 +372,38 @@ export default function RegisterScreen() {
           </View>
         </View>
       </Modal>
+      <Modal visible={Boolean(routineConflict)} transparent animationType="fade" onRequestClose={() => setRoutineConflict(null)}>
+        <View style={styles.successBackdrop}>
+          <View style={[styles.conflictCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.conflictIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name={routineConflict?.code === 'state-required' ? 'help-circle-outline' : 'moon-outline'} size={31} color={colors.primary} /></View>
+            <Text style={[styles.successKicker, { color: colors.primary }]}>LINHA DO TEMPO PROTEGIDA</Text>
+            <Text style={[styles.conflictTitle, { color: colors.text }]}>{routineConflict?.title}</Text>
+            <Text style={[styles.conflictText, { color: colors.textMuted }]}>{routineConflict?.message}</Text>
+            {routineConflict?.code === 'feeding-during-sleep' && state.mode === 'sleeping' ? (
+              <>
+                {customWakeTime ? <View style={[styles.timePickerCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><DateTimePicker value={wakeTime} mode="time" display={Platform.OS === 'ios' ? 'spinner' : 'clock'} locale="pt-BR" onValueChange={(_, value) => setWakeTime(value)} accentColor={colors.primary} themeVariant={isDark ? 'dark' : 'light'} /></View> : null}
+                <Pressable onPress={confirmWakeForFeeding} style={[styles.successPrimary, { backgroundColor: colors.primary }]}><Ionicons name="sunny-outline" size={18} color="#FFF" /><Text style={styles.successPrimaryText}>{customWakeTime ? `Acordou às ${formatTime(wakeTime.getTime())} e continuar` : 'Acordou agora e continuar'}</Text></Pressable>
+                <Pressable onPress={() => { setWakeTime(new Date()); setCustomWakeTime((value) => !value); }} style={[styles.successSecondary, { borderColor: colors.border }]}><Ionicons name="time-outline" size={18} color={colors.primary} /><Text style={[styles.successSecondaryText, { color: colors.primary }]}>{customWakeTime ? 'Usar horário de agora' : 'Informar outro horário'}</Text></Pressable>
+              </>
+            ) : routineConflict?.code === 'state-required' ? (
+              <Pressable onPress={() => { setRoutineConflict(null); router.replace('/'); }} style={[styles.successPrimary, { backgroundColor: colors.primary }]}><Text style={styles.successPrimaryText}>Informar estado na tela Hoje</Text><Ionicons name="arrow-forward" size={18} color="#FFF" /></Pressable>
+            ) : (
+              <Pressable onPress={() => { setRoutineConflict(null); router.replace('/diario'); }} style={[styles.successPrimary, { backgroundColor: colors.primary }]}><Text style={styles.successPrimaryText}>Corrigir no Diário</Text><Ionicons name="arrow-forward" size={18} color="#FFF" /></Pressable>
+            )}
+            <Pressable onPress={() => { setRoutineConflict(null); setCustomWakeTime(false); }} style={styles.startCancel}><Text style={[styles.startCancelText, { color: colors.textMuted }]}>Cancelar</Text></Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 
   function BreastSide({ side, label, seconds }: { side: BreastfeedingSide; label: string; seconds: number }) {
     const active = breastfeedingTimer?.activeSide === side;
     const onPress = () => {
-      if (!breastfeedingTimer) startBreastfeeding(side);
+      if (!breastfeedingTimer) {
+        const result = startBreastfeeding(side);
+        if (!result.ok) setRoutineConflict(result.conflict);
+      }
       else if (active) pauseBreastfeeding();
       else changeBreastfeedingSide(side);
     };
@@ -394,5 +462,12 @@ const styles = StyleSheet.create({
   successKicker: { marginTop: 15, fontSize: 9.5, fontWeight: '900', letterSpacing: 1.35 }, successTitle: { marginTop: 7, fontSize: 28, lineHeight: 33, fontWeight: '900', letterSpacing: -0.7, textAlign: 'center' }, successText: { marginTop: 8, maxWidth: 320, fontSize: 12.5, lineHeight: 18, fontWeight: '600', textAlign: 'center' },
   successIdentity: { width: '100%', minHeight: 64, marginTop: 19, borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 10 }, successIdentityIcon: { width: 39, height: 39, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, successIdentityCopy: { flex: 1 }, successIdentityLabel: { fontSize: 8, fontWeight: '900', letterSpacing: 0.9 }, successIdentityName: { marginTop: 3, fontSize: 12.5, fontWeight: '900' },
   successPrimary: { width: '100%', minHeight: 54, marginTop: 16, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, successPrimaryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' }, successSecondary: { width: '100%', minHeight: 49, marginTop: 8, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, successSecondaryText: { fontSize: 12.5, fontWeight: '900' },
+  conflictCard: { width: '100%', maxWidth: 390, borderRadius: 31, borderWidth: StyleSheet.hairlineWidth, padding: 22, alignItems: 'center' },
+  conflictIcon: { width: 72, height: 72, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  conflictTitle: { marginTop: 7, fontSize: 25, lineHeight: 30, fontWeight: '900', textAlign: 'center' },
+  conflictText: { marginTop: 9, maxWidth: 330, fontSize: 13, lineHeight: 19, fontWeight: '600', textAlign: 'center' },
+  timePickerCard: { width: '100%', marginTop: 15, borderRadius: 19, borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden', alignItems: 'center' },
+  startCancel: { minHeight: 44, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
+  startCancelText: { fontSize: 11.5, fontWeight: '800' },
 
   readOnlyWrap: { flex: 1, padding: 20, alignItems: 'center', justifyContent: 'center' }, readOnlyCard: { width: '100%', maxWidth: 390, minHeight: 310, borderRadius: 30, borderWidth: StyleSheet.hairlineWidth, padding: 24, alignItems: 'center', justifyContent: 'center' }, readOnlyIcon: { width: 72, height: 72, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }, readOnlyTitle: { marginTop: 18, fontSize: 24, lineHeight: 29, fontWeight: '900', textAlign: 'center' }, readOnlyText: { marginTop: 10, fontSize: 13, lineHeight: 20, fontWeight: '600', textAlign: 'center' }, readOnlyButton: { width: '100%', minHeight: 52, marginTop: 22, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, readOnlyButtonText: { color: '#FFF', fontSize: 13, fontWeight: '900' },});

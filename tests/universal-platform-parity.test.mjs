@@ -42,7 +42,7 @@ assert.match(profile, /fonte canônica em todas as plataformas/);
 assert.match(preferences, /ninou\.universal\.preferences\.v3/);
 assert.match(preferences, /access\?\.familyId \|\| 'no-family'/);
 assert.match(routine, /loadRoutineDays\(access\.familyId\)/);
-assert.match(routine, /saveRoutineDay\(\{ familyId: access\.familyId/);
+assert.match(routine, /saveRoutineDay\(\{\s*familyId: access\.familyId/);
 assert.match(tabs, /const tabMeta/);
 assert.match(tabs, /label: 'Hoje'/);
 assert.match(tabs, /label: 'Diário'/);
@@ -51,7 +51,7 @@ assert.match(tabs, /label: 'Sons'/);
 assert.match(tabs, /label: 'Perfil'/);
 assert.match(background, /Animated\.loop/);
 assert.match(background, /LinearGradient/);
-assert.match(rules, /Caminhos antigos permanecem somente para leitura\/migração/);
+assert.match(rules, /Caminhos legados pessoais não são fontes ativas/);
 assert.match(rules, /match \/days\/\{dayId\}[\s\S]*allow write: if isGlobalAdmin\(\);/);
 assert.match(rules, /match \/profile\/\{docId\}[\s\S]*allow write: if isGlobalAdmin\(\);/);
 

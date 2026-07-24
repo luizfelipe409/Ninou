@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ActionArt } from '@/components/action-art';
 import { formatDuration, getBreastfeedingDurations, type BreastfeedingSide } from '@/domain/routine';
@@ -84,7 +84,10 @@ export function BreastfeedingTimerBar({ bottom, width, left }: Props) {
         <TimerButton
           label="Finalizar"
           icon="checkmark"
-          onPress={() => run(finishBreastfeeding)}
+          onPress={() => run(() => {
+            const result = finishBreastfeeding();
+            if (!result.ok) Alert.alert(result.conflict.title, result.conflict.message);
+          })}
           color="#FFFFFF"
           background={colors.accent}
         />
