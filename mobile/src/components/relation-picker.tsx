@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useNinouTheme } from '@/theme/tokens';
@@ -13,10 +13,6 @@ export function RelationPicker({ label = 'Relação com o bebê', value, onChang
   const visibleValue = legacyGenericRelations.has(value) ? '' : value;
   const [custom, setCustom] = useState(options.includes(visibleValue) ? '' : visibleValue);
   const selectedKnown = options.includes(visibleValue);
-
-  useEffect(() => {
-    setCustom(selectedKnown ? '' : visibleValue);
-  }, [selectedKnown, visibleValue]);
 
   const choose = (next: string) => {
     onChange(next);
@@ -36,7 +32,10 @@ export function RelationPicker({ label = 'Relação com o bebê', value, onChang
       <Pressable
         disabled={disabled}
         accessibilityRole="button"
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          setCustom(selectedKnown ? '' : visibleValue);
+          setOpen(true);
+        }}
         style={({ pressed }) => [styles.input, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && !disabled && styles.pressed, disabled && styles.disabled]}>
         <View style={[styles.icon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={19} color={colors.primary} /></View>
         <Text style={[styles.value, { color: visibleValue ? colors.text : colors.textMuted }]}>{visibleValue || 'Escolher relação'}</Text>

@@ -4,10 +4,12 @@ const {
   addRoutineRecord,
   createEmptyDayState,
   clearRoutineDay,
+  finishBreastfeedingTimer,
   deleteRoutineEvent,
   finishSleep,
   formatRoutineActorLabel,
   getRoutineMarkerCollisionWindowMinutes,
+  getBreastfeedingDurations,
   getRoutineMarkerGroupTimestamp,
   getRoutineEventOrbitTimestamp,
   getRoutineEventsForLocalDay,
@@ -23,9 +25,13 @@ const {
   resolveRoutineIntervalEnd,
   restoreRoutineSnapshot,
   saveDayNotes,
+  startBreastfeedingTimer,
   startRoutine,
   startRoutineAt,
   startSleep,
+  switchBreastfeedingSide,
+  pauseBreastfeedingTimer,
+  resumeBreastfeedingTimer,
   updateRoutineEvent,
 } = await import('../src/domain/routine.ts');
 const {
@@ -41,6 +47,40 @@ const {
 const initial = createEmptyDayState();
 const felipe = { uid: 'felipe', email: 'felipe@example.com', name: 'Felipe', relationship: 'Pai', label: 'Felipe · Pai' };
 const mary = { uid: 'mary', email: 'mary@example.com', name: 'Mary', relationship: 'Mãe', label: 'Mary · Mãe' };
+
+const feedingStartedAt = new Date(2026, 6, 23, 14, 0, 0, 0).getTime();
+const feedingLeft = startBreastfeedingTimer(initial, 'left', feedingStartedAt);
+assert.equal(feedingLeft.breastfeedingTimer.activeSide, 'left');
+assert.equal(getBreastfeedingDurations(feedingLeft.breastfeedingTimer, feedingStartedAt + 5 * 60_000).leftDurationMs, 5 * 60_000);
+const feedingRight = switchBreastfeedingSide(feedingLeft, 'right', feedingStartedAt + 5 * 60_000);
+assert.equal(feedingRight.breastfeedingTimer.leftDurationMs, 5 * 60_000);
+const feedingPaused = pauseBreastfeedingTimer(feedingRight, feedingStartedAt + 8 * 60_000);
+assert.equal(feedingPaused.breastfeedingTimer.activeSide, null);
+assert.deepEqual(getBreastfeedingDurations(feedingPaused.breastfeedingTimer, feedingStartedAt + 20 * 60_000), {
+  leftDurationMs: 5 * 60_000,
+  rightDurationMs: 3 * 60_000,
+  totalDurationMs: 8 * 60_000,
+});
+const feedingResumed = resumeBreastfeedingTimer(feedingPaused, 'right', feedingStartedAt + 20 * 60_000);
+const feedingFinished = finishBreastfeedingTimer(feedingResumed, feedingStartedAt + 22 * 60_000, mary, 'Mamou bem');
+assert.equal(feedingFinished.breastfeedingTimer, null);
+const feedingEvent = feedingFinished.events.find((event) => event.type === 'amamentacao');
+assert.ok(feedingEvent);
+assert.equal(feedingEvent.leftDurationMs, 5 * 60_000);
+assert.equal(feedingEvent.rightDurationMs, 5 * 60_000);
+assert.match(feedingEvent.detail, /Esquerdo 00:05:00/);
+assert.match(feedingEvent.detail, /Direito 00:05:00/);
+assert.equal(feedingEvent.notes, 'Mamou bem');
+assert.equal(formatRoutineActorLabel(feedingEvent), 'Mary · Mãe');
+assert.equal(mergeDayStates(feedingLeft, feedingFinished).breastfeedingTimer, null, 'A finalização mais nova deve remover o timer também em outro aparelho.');
+
+const correctedFeeding = updateRoutineEvent(feedingFinished, feedingEvent.id, {
+  leftDurationMs: 7 * 60_000,
+  rightDurationMs: 4 * 60_000,
+  detail: 'Esquerdo 00:07:00 • Direito 00:04:00',
+}, feedingStartedAt + 23 * 60_000, felipe);
+assert.equal(correctedFeeding.events[0].leftDurationMs, 7 * 60_000);
+assert.equal(correctedFeeding.events[0].rightDurationMs, 4 * 60_000);
 const awake = startRoutine(initial, 'awake', 1_700_000_000_000, felipe);
 const blockedRapidSleep = startSleep(awake, 'dormir', 1_700_000_030_000, felipe);
 assert.equal(blockedRapidSleep.mode, 'awake');
@@ -307,7 +347,7 @@ assert.equal(normalizeFamilyRole('visualizacao'), 'viewer');
 assert.equal(canEditFamilyProfile('responsavel'), true);
 assert.equal(canExportFamilyReports('admin_familiar'), true);
 assert.equal(canExportFamilyReports('cuidador'), true);
-assert.equal(canExportFamilyReports('visualizacao'), true);
+assert.equal(canExportFamilyReports('visualizacao'), false);
 assert.equal(canWriteFamilyRoutine('visualizacao'), false);
 assert.equal(canWriteFamilyRoutine('cuidador'), true);
 assert.equal(normalizeInviteRole('visualizacao'), 'visualizacao');

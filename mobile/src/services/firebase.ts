@@ -174,8 +174,12 @@ export async function resolveFamilyAccess(user: User): Promise<FamilyAccess | nu
   const selected = pointedCandidate || [...candidates].sort(compareFamilyAccess)[0] || (pointer ? { ...pointer, primary: true, updatedAt: 0, sourceId: pointer.familyId } : null);
   if (!selected) return null;
 
-  // Repara silenciosamente o ponteiro antigo para que web, iOS e Android escolham a mesma família.
-  try { await persistCanonicalFamilyPointer(user, selected, pointerData); } catch { /* leitura continua mesmo se a autorreparação estiver temporariamente indisponível */ }
+  // A autorreparação não deve bloquear a entrada no app em redes móveis lentas.
+  // A seleção já é determinística, então as três plataformas podem continuar
+  // enquanto o ponteiro canônico é atualizado em segundo plano.
+  void persistCanonicalFamilyPointer(user, selected, pointerData).catch(() => {
+    // A leitura continua mesmo se a autorreparação estiver temporariamente indisponível.
+  });
   return { familyId: selected.familyId, role: selected.role, email: selected.email, ownerUid: selected.ownerUid };
 }
 

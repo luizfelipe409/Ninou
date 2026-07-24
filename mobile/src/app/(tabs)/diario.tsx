@@ -6,11 +6,12 @@ import { Alert, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } 
 
 import { ActionArt } from '@/components/action-art';
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
-import { createEmptyDayState, formatDuration, formatRoutineActorLabel, formatTime, recordConfig, resolveRoutineIntervalEnd, type RoutineEvent } from '@/domain/routine';
+import { createEmptyDayState, formatBreastfeedingDetail, formatDuration, formatRoutineActorLabel, formatTime, recordConfig, resolveRoutineIntervalEnd, type RoutineEvent } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useNinouAuth } from '@/state/auth-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
 import { useRoutine } from '@/state/routine-context';
+import { useNinouLayout } from '@/theme/layout';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
 type Filter = 'all' | 'sleep' | 'feeding' | 'diaper' | 'medicine';
@@ -57,9 +58,36 @@ function formatEventInterval(event: RoutineEvent) {
   return `${formatTime(event.start)} — ${formatTime(event.end)} · ${formatDuration(event.end - event.start)}`;
 }
 
+function formatEditableDuration(durationMs: number) {
+  const totalSeconds = Math.max(0, Math.round(durationMs / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function parseEditableDuration(value: string) {
+  const trimmed = value.trim();
+  if (/^\d{1,3}$/.test(trimmed)) return Number(trimmed) * 60 * 1000;
+  const match = trimmed.match(/^(\d{1,3}):([0-5]\d)$/);
+  if (!match) return null;
+  return (Number(match[1]) * 60 + Number(match[2])) * 1000;
+}
+
+function breastfeedingDurationFromEvent(event: RoutineEvent, side: 'left' | 'right') {
+  const stored = side === 'left' ? event.leftDurationMs : event.rightDurationMs;
+  if (Number.isFinite(Number(stored))) return Math.max(0, Number(stored));
+  const label = side === 'left' ? 'Esquerdo' : 'Direito';
+  const match = event.detail.match(new RegExp(`${label}\\s+(\\d{1,3}):(\\d{2})(?::(\\d{2}))?`, 'i'));
+  if (!match) return 0;
+  return match[3]
+    ? (Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3])) * 1000
+    : (Number(match[1]) * 60 + Number(match[2])) * 1000;
+}
+
 export default function DiaryScreen() {
   const routeParams = useLocalSearchParams<{ dayId?: string | string[]; editEventId?: string | string[]; editRequest?: string | string[] }>();
   const { colors, isDark } = useNinouTheme();
+  const { isDesktop } = useNinouLayout();
   const { user } = useNinouAuth();
   const { preferences } = useFamilyPreferences();
   const { state, history, canWrite, updateEvent, deleteEvent, updateDayNotes, addNoteEpisode, deleteNoteEpisode } = useRoutine();
@@ -71,6 +99,8 @@ export default function DiaryScreen() {
   const [editEnd, setEditEnd] = useState('');
   const [editDetail, setEditDetail] = useState('');
   const [editNotes, setEditNotes] = useState('');
+  const [editLeftDuration, setEditLeftDuration] = useState('00:00');
+  const [editRightDuration, setEditRightDuration] = useState('00:00');
   const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
   const [freeform, setFreeform] = useState('');
   const [newEpisodeOpen, setNewEpisodeOpen] = useState(false);
@@ -104,11 +134,13 @@ export default function DiaryScreen() {
     setEditEnd(event.end > event.start ? formatTime(event.end) : '');
     setEditDetail(event.detail);
     setEditNotes(event.notes);
+    setEditLeftDuration(formatEditableDuration(breastfeedingDurationFromEvent(event, 'left')));
+    setEditRightDuration(formatEditableDuration(breastfeedingDurationFromEvent(event, 'right')));
   }, [dayState.events, routeParams.dayId, routeParams.editEventId, routeParams.editRequest, selectedDayId]);
 
   const openEdit = (event: RoutineEvent) => {
     if (!canWrite) return;
-    setEditing(event); setEditStart(formatTime(event.start)); setEditEnd(event.end > event.start ? formatTime(event.end) : ''); setEditDetail(event.detail); setEditNotes(event.notes);
+    setEditing(event); setEditStart(formatTime(event.start)); setEditEnd(event.end > event.start ? formatTime(event.end) : ''); setEditDetail(event.detail); setEditNotes(event.notes); setEditLeftDuration(formatEditableDuration(breastfeedingDurationFromEvent(event, 'left'))); setEditRightDuration(formatEditableDuration(breastfeedingDurationFromEvent(event, 'right')));
   };
   const saveEdit = () => {
     if (!editing) return;
@@ -119,7 +151,28 @@ export default function DiaryScreen() {
       Alert.alert('Confira o término', 'O horário de término precisa ser diferente do início.');
       return;
     }
-    updateEvent(selectedDayId, editing.id, { start, end, detail: editDetail.trim(), notes: editNotes.trim() });
+    if (editing.type === 'amamentacao') {
+      const leftDurationMs = parseEditableDuration(editLeftDuration);
+      const rightDurationMs = parseEditableDuration(editRightDuration);
+      if (leftDurationMs === null || rightDurationMs === null) {
+        Alert.alert('Confira os tempos', 'Use minutos e segundos no formato 00:00 para cada lado.');
+        return;
+      }
+      if (leftDurationMs + rightDurationMs < 1000) {
+        Alert.alert('Confira os tempos', 'Informe pelo menos um segundo de mamada em um dos lados.');
+        return;
+      }
+      updateEvent(selectedDayId, editing.id, {
+        start,
+        end,
+        detail: formatBreastfeedingDetail(leftDurationMs, rightDurationMs),
+        notes: editNotes.trim(),
+        leftDurationMs,
+        rightDurationMs,
+      });
+    } else {
+      updateEvent(selectedDayId, editing.id, { start, end, detail: editDetail.trim(), notes: editNotes.trim() });
+    }
     setEditing(null);
   };
   const pickerValue = () => {
@@ -149,28 +202,32 @@ export default function DiaryScreen() {
 
       <View style={styles.filterRow}>{filters.map((item) => <Pressable key={item.key} onPress={() => setFilter(item.key)} style={[styles.chip, { backgroundColor: filter === item.key ? colors.primary : colors.surface, borderColor: filter === item.key ? colors.primary : colors.border }]}><Text style={[styles.chipText, { color: filter === item.key ? '#FFFFFF' : colors.textMuted }]}>{item.label}</Text></Pressable>)}</View>
 
-      {events.length ? <View style={styles.timeline}>{events.map((event, index) => (
-        <View key={event.id} style={styles.timelineRow}>
-          <View style={styles.rail}><View style={[styles.dot, { backgroundColor: colors.primary }]} />{index < events.length - 1 ? <View style={[styles.line, { backgroundColor: colors.border }]} /> : null}</View>
-          <Pressable onPress={() => openEdit(event)} style={styles.eventPressable}>
-            <NinouCard style={styles.eventCard}>
-              <View style={styles.eventHead}><ActionArt type={event.type} size={50} /><View style={styles.eventCopy}><Text style={[styles.eventTitle, { color: colors.text }]}>{recordConfig[event.type].title}</Text><Text style={[styles.eventTime, { color: colors.primary }]}>{formatEventInterval(event)}</Text><View style={styles.eventActor}><Ionicons name="person-circle-outline" size={14} color={colors.textMuted} /><Text numberOfLines={1} style={[styles.eventActorText, { color: colors.textMuted }]}>Registrado por {formatRoutineActorLabel(event)}</Text></View></View>{canWrite ? <Pressable accessibilityLabel="Excluir registro" onPress={() => confirmDelete(event)} hitSlop={8} style={[styles.deleteIconButton, { backgroundColor: `${colors.danger}10` }]}><Ionicons name="trash-outline" size={19} color={colors.danger} /></Pressable> : null}</View>
-              {event.detail ? <Text style={[styles.eventDetail, { color: colors.text }]}>{event.detail}{event.amountMl ? ` • ${event.amountMl} ml` : ''}</Text> : null}
-              {event.notes ? <Text style={[styles.eventNotes, { color: colors.textMuted }]}>{event.notes}</Text> : null}
-              {canWrite ? <Text style={[styles.editHint, { color: colors.textMuted }]}>Toque para corrigir horário ou detalhes</Text> : <Text style={[styles.editHint, { color: colors.textMuted }]}>Somente visualização</Text>}
-            </NinouCard>
-          </Pressable>
+      <View style={[styles.diaryWorkspace, isDesktop && styles.diaryWorkspaceDesktop]}>
+        <View style={styles.timelineColumn}>
+          {events.length ? <View style={styles.timeline}>{events.map((event, index) => (
+            <View key={event.id} style={styles.timelineRow}>
+              <View style={styles.rail}><View style={[styles.dot, { backgroundColor: colors.primary }]} />{index < events.length - 1 ? <View style={[styles.line, { backgroundColor: colors.border }]} /> : null}</View>
+              <Pressable onPress={() => openEdit(event)} style={styles.eventPressable}>
+                <NinouCard style={[styles.eventCard, isDesktop && styles.eventCardDesktop]}>
+                  <View style={styles.eventHead}><ActionArt type={event.type} size={isDesktop ? 62 : 50} /><View style={styles.eventCopy}><Text style={[styles.eventTitle, isDesktop && styles.eventTitleDesktop, { color: colors.text }]}>{recordConfig[event.type].title}</Text><Text style={[styles.eventTime, isDesktop && styles.eventTimeDesktop, { color: colors.primary }]}>{formatEventInterval(event)}</Text><View style={styles.eventActor}><Ionicons name="person-circle-outline" size={14} color={colors.textMuted} /><Text numberOfLines={1} style={[styles.eventActorText, { color: colors.textMuted }]}>Registrado por {formatRoutineActorLabel(event)}</Text></View></View>{canWrite ? <Pressable accessibilityLabel="Excluir registro" onPress={() => confirmDelete(event)} hitSlop={8} style={[styles.deleteIconButton, { backgroundColor: `${colors.danger}10` }]}><Ionicons name="trash-outline" size={19} color={colors.danger} /></Pressable> : null}</View>
+                  {event.detail ? <Text style={[styles.eventDetail, { color: colors.text }]}>{event.detail}{event.amountMl ? ` • ${event.amountMl} ml` : ''}</Text> : null}
+                  {event.notes ? <Text style={[styles.eventNotes, { color: colors.textMuted }]}>{event.notes}</Text> : null}
+                  {canWrite ? <Text style={[styles.editHint, { color: colors.textMuted }]}>Toque para corrigir horário ou detalhes</Text> : <Text style={[styles.editHint, { color: colors.textMuted }]}>Somente visualização</Text>}
+                </NinouCard>
+              </Pressable>
+            </View>
+          ))}</View> : <NinouCard><View style={styles.emptyState}><Ionicons name="book-outline" size={32} color={colors.primary} /><Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum registro nesta data</Text><Text style={[styles.emptyText, { color: colors.textMuted }]}>Limpe o filtro ou adicione um cuidado para este dia.</Text>{canWrite ? <Pressable onPress={() => router.push({ pathname: '/registrar', params: { dayId: selectedDayId } })} style={[styles.emptyButton, { backgroundColor: colors.primary }]}><Text style={styles.emptyButtonText}>Novo registro</Text></Pressable> : <Text style={[styles.emptyText, { color: colors.textMuted }]}>Seu acesso permite apenas acompanhar os registros.</Text>}</View></NinouCard>}
         </View>
-      ))}</View> : <NinouCard><View style={styles.emptyState}><Ionicons name="book-outline" size={32} color={colors.primary} /><Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum registro nesta data</Text><Text style={[styles.emptyText, { color: colors.textMuted }]}>Limpe o filtro ou adicione um cuidado para este dia.</Text>{canWrite ? <Pressable onPress={() => router.push({ pathname: '/registrar', params: { dayId: selectedDayId } })} style={[styles.emptyButton, { backgroundColor: colors.primary }]}><Text style={styles.emptyButtonText}>Novo registro</Text></Pressable> : <Text style={[styles.emptyText, { color: colors.textMuted }]}>Seu acesso permite apenas acompanhar os registros.</Text>}</View></NinouCard>}
 
-      <NinouCard>
-        <View style={styles.notesHead}><View><Text style={[styles.notesKicker, { color: colors.primary }]}>Observações do dia</Text><Text style={[styles.notesTitle, { color: colors.text }]}>Acontecimentos importantes</Text></View><View style={[styles.autosave, { backgroundColor: colors.primarySoft }]}><Ionicons name="cloud-done-outline" size={14} color={colors.primary} /><Text style={[styles.autosaveText, { color: colors.primary }]}>automático</Text></View></View>
-        <View style={styles.quickGrid}>{quickObservations.map(([icon, text]) => <Pressable key={text} disabled={!canWrite} onPress={() => saveEpisode(icon, text)} style={[styles.quickNote, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Text style={styles.quickIcon}>{icon}</Text><Text style={[styles.quickText, { color: colors.text }]}>{text.replace('Teve ', '').replace('Tomou ', '')}</Text></Pressable>)}</View>
-        <Pressable disabled={!canWrite} onPress={() => setNewEpisodeOpen(true)} style={[styles.newEpisode, { borderColor: colors.primary }]}><Ionicons name="add-circle-outline" size={20} color={colors.primary} /><Text style={[styles.newEpisodeText, { color: colors.primary }]}>Novo episódio</Text></Pressable>
-        {dayState.noteEpisodes.length ? <View style={styles.episodes}>{[...dayState.noteEpisodes].reverse().map((episode) => <View key={episode.id} style={[styles.episode, { backgroundColor: colors.surfaceElevated }]}><Text style={styles.episodeIcon}>{episode.icon}</Text><View style={styles.episodeCopy}><Text style={[styles.episodeText, { color: colors.text }]}>{episode.text}</Text><Text style={[styles.episodeMeta, { color: colors.textMuted }]}>{formatTime(episode.time)} · {episode.caregiver}</Text></View>{canWrite ? <Pressable onPress={() => deleteNoteEpisode(selectedDayId, episode.id)}><Ionicons name="close" size={18} color={colors.textMuted} /></Pressable> : null}</View>)}</View> : null}
-        <Text style={[styles.freeLabel, { color: colors.text }]}>Nota livre do dia (opcional)</Text>
-        <TextInput editable={canWrite} multiline value={freeform} onChangeText={setFreeform} placeholder="Ex.: dormiu melhor depois do banho, aceitou bem a mamadeira…" placeholderTextColor={colors.textMuted} style={[styles.textArea, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} />
-      </NinouCard>
+        <NinouCard style={[styles.notesCard, isDesktop && styles.notesCardDesktop]}>
+          <View style={styles.notesHead}><View><Text style={[styles.notesKicker, { color: colors.primary }]}>Observações do dia</Text><Text style={[styles.notesTitle, { color: colors.text }]}>Acontecimentos importantes</Text></View><View style={[styles.autosave, { backgroundColor: colors.primarySoft }]}><Ionicons name="cloud-done-outline" size={14} color={colors.primary} /><Text style={[styles.autosaveText, { color: colors.primary }]}>automático</Text></View></View>
+          <View style={styles.quickGrid}>{quickObservations.map(([icon, text]) => <Pressable key={text} disabled={!canWrite} onPress={() => saveEpisode(icon, text)} style={[styles.quickNote, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Text style={styles.quickIcon}>{icon}</Text><Text style={[styles.quickText, { color: colors.text }]}>{text.replace('Teve ', '').replace('Tomou ', '')}</Text></Pressable>)}</View>
+          <Pressable disabled={!canWrite} onPress={() => setNewEpisodeOpen(true)} style={[styles.newEpisode, { borderColor: colors.primary }]}><Ionicons name="add-circle-outline" size={20} color={colors.primary} /><Text style={[styles.newEpisodeText, { color: colors.primary }]}>Novo episódio</Text></Pressable>
+          {dayState.noteEpisodes.length ? <View style={styles.episodes}>{[...dayState.noteEpisodes].reverse().map((episode) => <View key={episode.id} style={[styles.episode, { backgroundColor: colors.surfaceElevated }]}><Text style={styles.episodeIcon}>{episode.icon}</Text><View style={styles.episodeCopy}><Text style={[styles.episodeText, { color: colors.text }]}>{episode.text}</Text><Text style={[styles.episodeMeta, { color: colors.textMuted }]}>{formatTime(episode.time)} · {episode.caregiver}</Text></View>{canWrite ? <Pressable onPress={() => deleteNoteEpisode(selectedDayId, episode.id)}><Ionicons name="close" size={18} color={colors.textMuted} /></Pressable> : null}</View>)}</View> : null}
+          <Text style={[styles.freeLabel, { color: colors.text }]}>Nota livre do dia (opcional)</Text>
+          <TextInput editable={canWrite} multiline value={freeform} onChangeText={setFreeform} placeholder="Ex.: dormiu melhor depois do banho, aceitou bem a mamadeira…" placeholderTextColor={colors.textMuted} style={[styles.textArea, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} />
+        </NinouCard>
+      </View>
 
       <Modal visible={Boolean(deleteTarget)} transparent animationType="slide" onRequestClose={() => setDeleteTarget(null)}>
         <View style={styles.deleteBackdrop}>
@@ -190,7 +247,7 @@ export default function DiaryScreen() {
         </View>
       </Modal>
 
-      <Modal visible={Boolean(editing && !pickerTarget)} transparent animationType="slide" onRequestClose={() => setEditing(null)}><View style={styles.backdrop}><View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.handle, { backgroundColor: colors.border }]} /><Text style={[styles.modalKicker, { color: colors.primary }]}>CORRIGIR REGISTRO</Text><Text style={[styles.modalTitle, { color: colors.text }]}>{editing ? recordConfig[editing.type].title : ''}</Text><View style={styles.timeRow}><TimeField label="Início" value={editStart} target="start" /><TimeField label="Fim" value={editEnd} target="end" optional /></View>{editCrossesMidnight ? <View style={[styles.overnightHint, { backgroundColor: colors.primarySoft, borderColor: `${colors.primary}33` }]}><Ionicons name="moon-outline" size={16} color={colors.primary} /><Text style={[styles.overnightHintText, { color: colors.primary }]}>O término será salvo no dia seguinte.</Text></View> : null}<EditField label="Detalhe" value={editDetail} onChangeText={setEditDetail} /><EditField label="Observações" value={editNotes} onChangeText={setEditNotes} multiline /><View style={styles.modalActions}><Pressable onPress={() => setEditing(null)} style={[styles.cancel, { borderColor: colors.border }]}><Text style={[styles.cancelText, { color: colors.text }]}>Cancelar</Text></Pressable><Pressable onPress={saveEdit} style={[styles.save, { backgroundColor: colors.primary }]}><Text style={styles.saveText}>Salvar correção</Text></Pressable></View></View></View></Modal>
+      <Modal visible={Boolean(editing && !pickerTarget)} transparent animationType="slide" onRequestClose={() => setEditing(null)}><View style={styles.backdrop}><View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.handle, { backgroundColor: colors.border }]} /><Text style={[styles.modalKicker, { color: colors.primary }]}>CORRIGIR REGISTRO</Text><Text style={[styles.modalTitle, { color: colors.text }]}>{editing ? recordConfig[editing.type].title : ''}</Text><View style={styles.timeRow}><TimeField label="Início" value={editStart} target="start" /><TimeField label="Fim" value={editEnd} target="end" optional /></View>{editCrossesMidnight ? <View style={[styles.overnightHint, { backgroundColor: colors.primarySoft, borderColor: `${colors.primary}33` }]}><Ionicons name="moon-outline" size={16} color={colors.primary} /><Text style={[styles.overnightHintText, { color: colors.primary }]}>O término será salvo no dia seguinte.</Text></View> : null}{editing?.type === 'amamentacao' ? <View style={[styles.sideDurationPanel, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><View style={styles.sideDurationHead}><Ionicons name="timer-outline" size={18} color={colors.primary} /><View style={styles.sideDurationCopy}><Text style={[styles.sideDurationTitle, { color: colors.text }]}>Tempo por lado</Text><Text style={[styles.sideDurationHint, { color: colors.textMuted }]}>Edite em minutos e segundos (MM:SS).</Text></View></View><View style={styles.sideDurationRow}><DurationField label="Lado esquerdo" letter="E" value={editLeftDuration} onChangeText={setEditLeftDuration} /><DurationField label="Lado direito" letter="D" value={editRightDuration} onChangeText={setEditRightDuration} /></View></View> : <EditField label="Detalhe" value={editDetail} onChangeText={setEditDetail} />}<EditField label="Observações" value={editNotes} onChangeText={setEditNotes} multiline /><View style={styles.modalActions}><Pressable onPress={() => setEditing(null)} style={[styles.cancel, { borderColor: colors.border }]}><Text style={[styles.cancelText, { color: colors.text }]}>Cancelar</Text></Pressable><Pressable onPress={saveEdit} style={[styles.save, { backgroundColor: colors.primary }]}><Text style={styles.saveText}>Salvar correção</Text></Pressable></View></View></View></Modal>
 
       <Modal visible={newEpisodeOpen} transparent animationType="fade" onRequestClose={() => setNewEpisodeOpen(false)}><View style={styles.backdrop}><View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><Text style={[styles.modalKicker, { color: colors.primary }]}>NOVO EPISÓDIO</Text><Text style={[styles.modalTitle, { color: colors.text }]}>O que aconteceu?</Text><TextInput multiline value={newEpisode} onChangeText={setNewEpisode} placeholder="Descreva de forma breve" placeholderTextColor={colors.textMuted} style={[styles.textArea, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><View style={styles.modalActions}><Pressable onPress={() => setNewEpisodeOpen(false)} style={[styles.cancel, { borderColor: colors.border }]}><Text style={[styles.cancelText, { color: colors.text }]}>Cancelar</Text></Pressable><Pressable disabled={!newEpisode.trim()} onPress={() => { saveEpisode('✦', newEpisode.trim()); setNewEpisode(''); setNewEpisodeOpen(false); }} style={[styles.save, { backgroundColor: colors.primary }, !newEpisode.trim() && styles.disabled]}><Text style={styles.saveText}>Registrar agora</Text></Pressable></View></View></View></Modal>
 
@@ -205,17 +262,29 @@ export default function DiaryScreen() {
   function TimeField({ label, value, target, optional = false }: { label: string; value: string; target: 'start' | 'end'; optional?: boolean }) {
     return <View style={[styles.editField, styles.editFieldCompact]}><Text style={[styles.freeLabel, { color: colors.text }]}>{label}</Text><Pressable accessibilityRole="button" accessibilityLabel={`Escolher horário de ${label.toLowerCase()}`} onPress={() => setPickerTarget(target)} style={[styles.timePickerButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="time-outline" size={18} color={colors.primary} /><Text style={[styles.timePickerValue, { color: value ? colors.text : colors.textMuted }]}>{value || (optional ? 'Opcional' : 'Escolher')}</Text><Ionicons name="chevron-down" size={15} color={colors.textMuted} /></Pressable></View>;
   }
+  function DurationField({ label, letter, value, onChangeText }: { label: string; letter: string; value: string; onChangeText: (value: string) => void }) {
+    return <View style={styles.durationField}><View style={[styles.durationLetter, { backgroundColor: colors.primarySoft }]}><Text style={[styles.durationLetterText, { color: colors.primary }]}>{letter}</Text></View><View style={styles.durationInputWrap}><Text style={[styles.durationLabel, { color: colors.textMuted }]}>{label}</Text><TextInput value={value} onChangeText={onChangeText} keyboardType="numbers-and-punctuation" selectTextOnFocus maxLength={6} placeholder="00:00" placeholderTextColor={colors.textMuted} style={[styles.durationInput, { color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }]} /></View></View>;
+  }
 }
 
 const styles = StyleSheet.create({
   dateCard: { minHeight: 86, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 }, dateArrow: { width: 44, height: 44, borderRadius: 16, alignItems: 'center', justifyContent: 'center' }, dateCopy: { flex: 1, minHeight: 54, alignItems: 'center', justifyContent: 'center' }, dateTitle: { fontSize: 17, fontWeight: '900', textTransform: 'capitalize' }, dateValue: { marginTop: 4, flexDirection: 'row', alignItems: 'center', gap: 5 }, dateInput: { fontSize: 11, fontWeight: '700', textAlign: 'center' },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }, chip: { minHeight: 38, paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' }, chipText: { fontSize: 12, fontWeight: '800' },
+  diaryWorkspace: { gap: 14 },
+  diaryWorkspaceDesktop: { flexDirection: 'row', alignItems: 'flex-start', gap: 24 },
+  timelineColumn: { flex: 1, minWidth: 0 },
   timeline: { gap: 0 }, timelineRow: { flexDirection: 'row', alignItems: 'stretch' }, rail: { width: 26, alignItems: 'center' }, dot: { width: 10, height: 10, borderRadius: 5, marginTop: 27, zIndex: 2 }, line: { width: 2, flex: 1 }, eventPressable: { flex: 1 }, eventCard: { marginBottom: spacing.md, padding: spacing.md }, eventHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.md }, eventCopy: { flex: 1 }, eventTitle: { fontSize: 15, fontWeight: '900' }, eventTime: { fontSize: 12, fontWeight: '800', marginTop: 2 }, eventActor: { marginTop: 5, flexDirection: 'row', alignItems: 'center', gap: 4 }, eventActorText: { flex: 1, fontSize: 10, lineHeight: 14, fontWeight: '700' }, eventDetail: { fontSize: 13, fontWeight: '700', marginTop: spacing.md }, deleteIconButton: { width: 38, height: 38, borderRadius: 13, alignItems: 'center', justifyContent: 'center' }, eventNotes: { fontSize: 12, lineHeight: 18, marginTop: spacing.xs }, editHint: { marginTop: 10, fontSize: 9.5, fontWeight: '700' },
+  eventCardDesktop: { minHeight: 132, borderRadius: 26, padding: 20 },
+  eventTitleDesktop: { fontSize: 19 },
+  eventTimeDesktop: { marginTop: 4, fontSize: 14 },
   emptyState: { minHeight: 230, alignItems: 'center', justifyContent: 'center', gap: spacing.md, paddingHorizontal: spacing.lg }, emptyTitle: { fontSize: 18, fontWeight: '900' }, emptyText: { fontSize: 13, lineHeight: 19, textAlign: 'center' }, emptyButton: { minHeight: 44, borderRadius: radius.md, paddingHorizontal: spacing.xl, alignItems: 'center', justifyContent: 'center' }, emptyButtonText: { color: '#FFF', fontWeight: '900' },
+  notesCard: { width: '100%' },
+  notesCardDesktop: { width: 410, padding: 22 },
   notesHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }, notesKicker: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }, notesTitle: { fontSize: 18, fontWeight: '900', marginTop: 3 }, autosave: { borderRadius: 99, paddingHorizontal: 8, paddingVertical: 6, flexDirection: 'row', alignItems: 'center', gap: 4 }, autosaveText: { fontSize: 8.5, fontWeight: '900' },
   quickGrid: { marginTop: 16, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, quickNote: { width: '31%', flexGrow: 1, minHeight: 64, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, padding: 8, alignItems: 'center', justifyContent: 'center', gap: 4 }, quickIcon: { fontSize: 19 }, quickText: { fontSize: 9.5, fontWeight: '800', textAlign: 'center' }, newEpisode: { minHeight: 48, marginTop: 12, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, newEpisodeText: { fontSize: 13, fontWeight: '900' },
   episodes: { marginTop: 14, gap: 8 }, episode: { minHeight: 62, borderRadius: 17, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 10 }, episodeIcon: { fontSize: 22 }, episodeCopy: { flex: 1 }, episodeText: { fontSize: 12.5, lineHeight: 17, fontWeight: '800' }, episodeMeta: { marginTop: 3, fontSize: 9.5, fontWeight: '700' }, freeLabel: { marginTop: 15, marginBottom: 7, fontSize: 11.5, fontWeight: '900' }, textArea: { minHeight: 104, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, padding: 13, fontSize: 13, lineHeight: 19, textAlignVertical: 'top' },
   overnightHint: { marginTop: 10, minHeight: 38, borderRadius: 13, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 7 }, overnightHintText: { flex: 1, fontSize: 11, lineHeight: 15, fontWeight: '800' },
+  sideDurationPanel: { marginTop: 14, borderRadius: 18, borderWidth: StyleSheet.hairlineWidth, padding: 12 }, sideDurationHead: { flexDirection: 'row', alignItems: 'center', gap: 8 }, sideDurationCopy: { flex: 1 }, sideDurationTitle: { fontSize: 12.5, fontWeight: '900' }, sideDurationHint: { marginTop: 2, fontSize: 9.5, lineHeight: 13, fontWeight: '600' }, sideDurationRow: { marginTop: 11, flexDirection: 'row', gap: 8 }, durationField: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 7 }, durationLetter: { width: 32, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }, durationLetterText: { fontSize: 13, fontWeight: '900' }, durationInputWrap: { flex: 1, minWidth: 0 }, durationLabel: { marginBottom: 4, fontSize: 8.5, fontWeight: '800' }, durationInput: { minHeight: 42, borderRadius: 12, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 9, fontSize: 14, fontWeight: '900', fontVariant: ['tabular-nums'] },
   deleteBackdrop: { flex: 1, backgroundColor: 'rgba(6,3,13,0.72)', justifyContent: 'flex-end' }, deleteDialog: { width: '100%', maxWidth: 540, alignSelf: 'center', borderTopLeftRadius: 31, borderTopRightRadius: 31, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 24, shadowOpacity: 0.32, shadowRadius: 28, shadowOffset: { width: 0, height: -10 }, elevation: 16 }, deleteHandle: { width: 46, height: 5, borderRadius: 3, alignSelf: 'center', marginBottom: 18 }, deleteHeader: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 11 }, deleteHeaderCopy: { flex: 1 }, deleteIcon: { width: 52, height: 52, borderRadius: 18, borderWidth: 1, alignItems: 'center', justifyContent: 'center' }, deleteClose: { width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, deleteKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1.25 }, deleteTitle: { marginTop: 4, fontSize: 22, lineHeight: 27, fontWeight: '900' }, deletePreview: { width: '100%', minHeight: 82, marginTop: 17, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, padding: 11, flexDirection: 'row', alignItems: 'center', gap: 11 }, deletePreviewCopy: { flex: 1 }, deletePreviewTitle: { fontSize: 14, fontWeight: '900' }, deletePreviewMeta: { marginTop: 3, fontSize: 11, fontWeight: '800' }, deletePreviewDetail: { marginTop: 4, fontSize: 10, lineHeight: 14, fontWeight: '600' }, deleteNotice: { width: '100%', minHeight: 58, marginTop: 12, borderRadius: 17, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 9 }, deleteWarning: { flex: 1, fontSize: 10.5, lineHeight: 16, fontWeight: '700' }, deleteConfirm: { width: '100%', minHeight: 54, marginTop: 15, borderRadius: 17, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, deleteConfirmText: { color: '#FFF', fontSize: 13, fontWeight: '900' }, deleteCancel: { minHeight: 47, alignItems: 'center', justifyContent: 'center' }, deleteCancelText: { fontSize: 12, fontWeight: '800' },
   backdrop: { flex: 1, backgroundColor: 'rgba(6,3,13,0.62)', justifyContent: 'flex-end' }, modalCard: { width: '100%', maxWidth: 540, alignSelf: 'center', maxHeight: '88%', borderTopLeftRadius: 30, borderTopRightRadius: 30, borderWidth: StyleSheet.hairlineWidth, padding: 20 }, handle: { width: 45, height: 5, borderRadius: 3, alignSelf: 'center', marginBottom: 18 }, modalKicker: { fontSize: 10, fontWeight: '900', letterSpacing: 1.2 }, modalTitle: { marginTop: 5, marginBottom: 8, fontSize: 25, fontWeight: '900' }, timeRow: { flexDirection: 'row', gap: 10 }, editField: { width: '100%' }, editFieldCompact: { flex: 1 }, editInput: { minHeight: 50, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, fontSize: 14, fontWeight: '700' }, timePickerButton: { minHeight: 50, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 7 }, timePickerValue: { flex: 1, fontSize: 14, fontWeight: '800' }, modalActions: { flexDirection: 'row', gap: 10, marginTop: 18 }, cancel: { flex: 1, minHeight: 52, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' }, cancelText: { fontSize: 13, fontWeight: '900' }, save: { flex: 1.35, minHeight: 52, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, saveText: { color: '#FFF', fontSize: 13, fontWeight: '900' }, disabled: { opacity: 0.45 },
   pickerBackdrop: { flex: 1, backgroundColor: 'rgba(6,3,13,0.62)', alignItems: 'center', justifyContent: 'center', padding: 16 }, pickerCard: { width: '100%', maxWidth: 390, borderRadius: 28, borderWidth: StyleSheet.hairlineWidth, padding: 16, overflow: 'hidden' }, pickerHead: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }, pickerTitle: { marginTop: 4, fontSize: 20, lineHeight: 25, fontWeight: '900' }, pickerClose: { width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }, pickerActions: { marginTop: 8, flexDirection: 'row', gap: 9 }, pickerSecondary: { flex: 1, minHeight: 48, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' }, pickerDone: { flex: 1.25, minHeight: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },

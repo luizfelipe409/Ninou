@@ -50,11 +50,15 @@ export function ProfileProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (authStatus === 'loading' || authStatus === 'resolving-family') return;
     let mounted = true;
-    setHydrated(false);
-    profileRef.current = initialProfile;
-    setProfile(initialProfile);
     let unsubscribe: () => void = () => undefined;
-    AsyncStorage.getItem(storageKey)
+    Promise.resolve()
+      .then(() => {
+        if (!mounted) return null;
+        setHydrated(false);
+        profileRef.current = initialProfile;
+        setProfile(initialProfile);
+        return AsyncStorage.getItem(storageKey);
+      })
       .then((raw) => {
         if (!mounted) return;
         const parsed = raw ? JSON.parse(raw) : null;

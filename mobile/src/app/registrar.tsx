@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionArt } from '@/components/action-art';
 import { NinouBackground } from '@/components/ninou-background';
-import { formatDuration, formatTime, MIN_ROUTINE_STATE_DURATION_MS, recordConfig, resolveRoutineIntervalEnd, type RecordType } from '@/domain/routine';
+import { formatDuration, formatTime, getBreastfeedingDurations, MIN_ROUTINE_STATE_DURATION_MS, recordConfig, resolveRoutineIntervalEnd, type BreastfeedingSide, type RecordType } from '@/domain/routine';
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { useFamilyPreferences } from '@/state/preferences-context';
@@ -79,7 +79,17 @@ function CareMenu({ onClose, onSelect }: { onClose: () => void; onSelect: (type:
 
 export default function RegisterScreen() {
   const { colors, isDark } = useNinouTheme();
-  const { addRecord, canWrite } = useRoutine();
+  const {
+    state,
+    now,
+    addRecord,
+    canWrite,
+    startBreastfeeding,
+    pauseBreastfeeding,
+    changeBreastfeedingSide,
+    finishBreastfeeding,
+    cancelBreastfeeding,
+  } = useRoutine();
   const { preferences } = useFamilyPreferences();
   const params = useLocalSearchParams<{ type?: string; dayId?: string }>();
   const scrollRef = useRef<ScrollView>(null);
@@ -91,9 +101,6 @@ export default function RegisterScreen() {
   const [recordDayId, setRecordDayId] = useState(params.dayId || getLocalDateId());
   const [startTime, setStartTime] = useState(formatTime(Date.now()));
   const [endTime, setEndTime] = useState('');
-  const [leftBreastSeconds, setLeftBreastSeconds] = useState(0);
-  const [rightBreastSeconds, setRightBreastSeconds] = useState(0);
-  const [activeBreastSide, setActiveBreastSide] = useState<'left' | 'right' | null>(null);
   const [medicineName, setMedicineName] = useState('');
   const [medicineDose, setMedicineDose] = useState('');
   const [savedRecord, setSavedRecord] = useState<{ type: RecordType; timestamp: number; end?: number; caregiver: string; status: 'timer' | 'completed' | 'recorded' } | null>(null);
@@ -103,11 +110,10 @@ export default function RegisterScreen() {
     if (validType(params.type)) setSelectedType(params.type);
   }, [params.type]);
 
-  useEffect(() => {
-    if (!activeBreastSide) return;
-    const timer = setInterval(() => activeBreastSide === 'left' ? setLeftBreastSeconds((value) => value + 1) : setRightBreastSeconds((value) => value + 1), 1000);
-    return () => clearInterval(timer);
-  }, [activeBreastSide]);
+  const breastfeedingTimer = state.breastfeedingTimer;
+  const breastfeedingDurations = getBreastfeedingDurations(breastfeedingTimer, now || breastfeedingTimer?.activeSideStartedAt || breastfeedingTimer?.startedAt || 0);
+  const leftBreastSeconds = Math.floor(breastfeedingDurations.leftDurationMs / 1000);
+  const rightBreastSeconds = Math.floor(breastfeedingDurations.rightDurationMs / 1000);
 
   const selectType = useCallback((type: RecordType) => {
     void Haptics.selectionAsync();
@@ -118,7 +124,6 @@ export default function RegisterScreen() {
   }, []);
 
   const showCareMenu = useCallback(() => {
-    setActiveBreastSide(null);
     setSelectedType(null);
     setFormError('');
     router.setParams({ type: '' });
@@ -185,7 +190,18 @@ export default function RegisterScreen() {
       }
     }
 
-    if (selectedType === 'amamentacao' && breastTotal > 0 && !manualTime) { end = Date.now(); start = end - breastTotal * 1000; }
+    if (selectedType === 'amamentacao' && !manualTime) {
+      if (!breastfeedingTimer || breastTotal < 1) {
+        setFormError('Inicie o timer no lado esquerdo ou direito antes de finalizar a mamada.');
+        return;
+      }
+      const finishedAt = Date.now();
+      finishBreastfeeding(notes.trim());
+      const caregiver = [preferences.caregiverName.trim(), preferences.caregiverRelation.trim()].filter(Boolean).join(' · ') || 'Responsável';
+      setSavedRecord({ type: selectedType, timestamp: breastfeedingTimer.startedAt, end: finishedAt, caregiver, status: 'completed' });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      return;
+    }
     const breastDetail = selectedType === 'amamentacao' && breastTotal > 0 ? `Esquerdo ${formatTimer(leftBreastSeconds)} • Direito ${formatTimer(rightBreastSeconds)}` : '';
     const medicineDetail = selectedType === 'medicamento' ? [medicineName.trim(), medicineDose.trim(), detail].filter(Boolean).join(' • ') : '';
     addRecord({
@@ -198,7 +214,6 @@ export default function RegisterScreen() {
     const caregiver = [preferences.caregiverName.trim(), preferences.caregiverRelation.trim()].filter(Boolean).join(' · ') || 'Responsável';
     const completedSleep = isSleep && Number.isFinite(start) && Number.isFinite(end) && Number(end) > Number(start);
     const status = isSleep ? (completedSleep ? 'completed' : 'timer') : 'recorded';
-    setActiveBreastSide(null);
     setSavedRecord({ type: selectedType, timestamp: Number.isFinite(start) ? Number(start) : Date.now(), ...(Number.isFinite(end) ? { end: Number(end) } : {}), caregiver, status });
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
@@ -209,8 +224,6 @@ export default function RegisterScreen() {
     setNotes('');
     setMedicineName('');
     setMedicineDose('');
-    setLeftBreastSeconds(0);
-    setRightBreastSeconds(0);
     setFormError('');
     showCareMenu();
   };
@@ -275,7 +288,7 @@ export default function RegisterScreen() {
                 </> : null}
               </View>
 
-              {selectedType === 'amamentacao' ? <View style={[styles.breastPanel, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><View style={styles.breastHead}><View><Text style={[styles.miniLabel, { color: colors.textMuted }]}>TIMER DA MAMADA</Text><Text style={[styles.breastTotal, { color: colors.text }]}>{formatTimer(leftBreastSeconds + rightBreastSeconds)}</Text></View><Pressable onPress={() => { setActiveBreastSide(null); setLeftBreastSeconds(0); setRightBreastSeconds(0); }} style={[styles.resetTimer, { backgroundColor: colors.surface }]}><Text style={[styles.resetTimerText, { color: colors.primary }]}>Zerar</Text></Pressable></View><View style={styles.breastSides}><BreastSide side="left" label="Esquerdo" seconds={leftBreastSeconds} /><BreastSide side="right" label="Direito" seconds={rightBreastSeconds} /></View><Text style={[styles.breastHelp, { color: colors.textMuted }]}>Toque para iniciar ou pausar. Ao trocar de lado, o outro timer é pausado automaticamente.</Text></View> : null}
+              {selectedType === 'amamentacao' ? <View style={[styles.breastPanel, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><View style={styles.breastHead}><View><Text style={[styles.miniLabel, { color: colors.textMuted }]}>TIMER PERSISTENTE DA MAMADA</Text><Text style={[styles.breastTotal, { color: colors.text }]}>{formatTimer(leftBreastSeconds + rightBreastSeconds)}</Text></View>{breastfeedingTimer ? <Pressable onPress={cancelBreastfeeding} style={[styles.resetTimer, { backgroundColor: colors.surface }]}><Text style={[styles.resetTimerText, { color: colors.danger }]}>Descartar</Text></Pressable> : null}</View><View style={styles.breastSides}><BreastSide side="left" label="Esquerdo" seconds={leftBreastSeconds} /><BreastSide side="right" label="Direito" seconds={rightBreastSeconds} /></View><Text style={[styles.breastHelp, { color: colors.textMuted }]}>O timer continua ativo ao mudar de tela. Toque no lado atual para pausar ou no outro lado para alternar.</Text></View> : null}
 
               {selectedType === 'medicamento' ? <View style={styles.medicineFields}><View style={styles.medicineField}><Text style={[styles.miniLabel, { color: colors.textMuted }]}>Medicamento</Text><TextInput value={medicineName} onChangeText={setMedicineName} placeholder="Nome informado pela família" placeholderTextColor={colors.textMuted} style={[styles.smallInput, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /></View><View style={styles.medicineField}><Text style={[styles.miniLabel, { color: colors.textMuted }]}>Dose</Text><TextInput value={medicineDose} onChangeText={setMedicineDose} placeholder="Ex.: 5 gotas" placeholderTextColor={colors.textMuted} style={[styles.smallInput, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /></View></View> : null}
 
@@ -293,7 +306,7 @@ export default function RegisterScreen() {
 
             {formError ? <View style={[styles.formError, { backgroundColor: `${colors.danger}14`, borderColor: `${colors.danger}55` }]}><Ionicons name="alert-circle-outline" size={18} color={colors.danger} /><Text style={[styles.formErrorText, { color: colors.danger }]}>{formError}</Text></View> : null}
             <Pressable onPress={save} style={({ pressed }) => [styles.saveButton, { backgroundColor: colors.primary }, pressed && styles.pressed]}>
-              <Text style={styles.saveText}>{selectedType === 'sono' || selectedType === 'dormir' ? (manualTime && endTime.trim() ? 'Registrar sono concluído' : 'Iniciar timer') : 'Registrar'}</Text>
+              <Text style={styles.saveText}>{selectedType === 'sono' || selectedType === 'dormir' ? (manualTime && endTime.trim() ? 'Registrar sono concluído' : 'Iniciar timer') : selectedType === 'amamentacao' && !manualTime ? 'Finalizar e registrar mamada' : 'Registrar'}</Text>
             </Pressable>
           </>
         )}
@@ -319,9 +332,14 @@ export default function RegisterScreen() {
     </SafeAreaView>
   );
 
-  function BreastSide({ side, label, seconds }: { side: 'left' | 'right'; label: string; seconds: number }) {
-    const active = activeBreastSide === side;
-    return <Pressable accessibilityRole="button" accessibilityState={{ selected: active }} onPress={() => setActiveBreastSide((current) => current === side ? null : side)} style={[styles.breastSide, { backgroundColor: active ? colors.primarySoft : colors.surface, borderColor: active ? colors.primary : colors.border }]}><View style={[styles.breastPlay, { backgroundColor: active ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.breastLetter, { color: active ? '#FFF' : colors.primary }]}>{side === 'left' ? 'E' : 'D'}</Text><Ionicons name={active ? 'pause' : 'play'} size={12} color={active ? '#FFF' : colors.primary} /></View><Text style={[styles.breastTime, { color: colors.text }]}>{formatTimer(seconds)}</Text><Text style={[styles.breastLabel, { color: colors.textMuted }]}>{label}</Text></Pressable>;
+  function BreastSide({ side, label, seconds }: { side: BreastfeedingSide; label: string; seconds: number }) {
+    const active = breastfeedingTimer?.activeSide === side;
+    const onPress = () => {
+      if (!breastfeedingTimer) startBreastfeeding(side);
+      else if (active) pauseBreastfeeding();
+      else changeBreastfeedingSide(side);
+    };
+    return <Pressable accessibilityRole="button" accessibilityState={{ selected: active }} onPress={onPress} style={[styles.breastSide, { backgroundColor: active ? colors.primarySoft : colors.surface, borderColor: active ? colors.primary : colors.border }]}><View style={[styles.breastPlay, { backgroundColor: active ? colors.primary : colors.surfaceElevated }]}><Text style={[styles.breastLetter, { color: active ? '#FFF' : colors.primary }]}>{side === 'left' ? 'E' : 'D'}</Text><Ionicons name={active ? 'pause' : 'play'} size={12} color={active ? '#FFF' : colors.primary} /></View><Text style={[styles.breastTime, { color: colors.text }]}>{formatTimer(seconds)}</Text><Text style={[styles.breastLabel, { color: colors.textMuted }]}>{active ? `${label} · ativo` : label}</Text></Pressable>;
   }
 }
 

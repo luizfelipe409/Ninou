@@ -1,4 +1,4 @@
-NINOU v84.1.1 — BASE UNIVERSAL INTEGRADA
+NINOU v84.1.2 — BASE UNIVERSAL INTEGRADA
 
 A web, o iPhone e o Android agora são gerados pelo mesmo aplicativo Expo/React Native.
 Não existe mais uma implementação web separada para perfil, rotina, órbita ou menus.

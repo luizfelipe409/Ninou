@@ -16,12 +16,14 @@ import { formatDuration, formatTime, getPrimaryAction, getTodayAwakeMs, getToday
 import { getLocalDateId } from '@/services/firebase';
 import { useRoutine } from '@/state/routine-context';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
+import { useNinouLayout } from '@/theme/layout';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
 const quickTypes: RecordType[] = ['amamentacao', 'fralda', 'mamadeira', 'medicamento'];
 
 export default function TodayScreen() {
   const { colors, isDark } = useNinouTheme();
+  const { isDesktop, contentOffset } = useNinouLayout();
   const { state, history, now, canUndo, canWrite, beginRoutine, runPrimaryAction, undoLastAction } = useRoutine();
   const { profile } = useBabyProfile();
   const [startStep, setStartStep] = useState<'wake' | 'state' | 'current' | null>(null);
@@ -136,41 +138,46 @@ export default function TodayScreen() {
   const wakeWindowApproaching = state.mode === 'awake' && awakeMs >= wakeWindowMs * 0.9;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }, isDesktop && { paddingLeft: contentOffset }]} edges={['top']}>
       <NinouBackground />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop, state.breastfeedingTimer && styles.contentWithTimer]} showsVerticalScrollIndicator={false}>
         <NinouAppHeader />
 
         <View style={styles.topline}>
           <Text style={[styles.toplineText, { color: colors.textMuted }]} numberOfLines={1}>{getBabyAgeText(profile.birthDate)}</Text>
-          <Pressable onPress={() => router.push('/perfil')} style={[styles.profileButton, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.profileButtonText, { color: colors.text }]}>Perfil</Text></Pressable>
+          {!isDesktop ? <Pressable onPress={() => router.push('/perfil')} style={[styles.profileButton, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.profileButtonText, { color: colors.text }]}>Perfil</Text></Pressable> : null}
         </View>
 
-        <RoutineOrbit state={orbitState} now={now} />
+        <View style={[styles.heroWorkspace, isDesktop && styles.heroWorkspaceDesktop]}>
+          <View style={[styles.orbitColumn, isDesktop && styles.orbitColumnDesktop]}>
+            <RoutineOrbit state={orbitState} now={now} />
+          </View>
+          <View style={[styles.heroSide, isDesktop && styles.heroSideDesktop]}>
+            {state.mode === 'idle' ? (
+              canWrite ? <View style={[styles.startPanel, isDesktop && styles.startPanelDesktop, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.startKicker, { color: colors.primary }]}>PRIMEIRO MARCO DO DIA</Text>
+                <Text style={[styles.startTitle, isDesktop && styles.startTitleDesktop, { color: colors.text }]}>Que horas {profile.name || 'o bebê'} acordou hoje?</Text>
+                <Text style={[styles.startSubtitle, isDesktop && styles.startSubtitleDesktop, { color: colors.textMuted }]}>Primeiro registre o despertar. Depois o Ninou pergunta como o bebê está neste momento.</Text>
+                <Pressable onPress={openStartFlow} style={({ pressed }) => [styles.startButton, isDesktop && styles.startButtonDesktop, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
+                  <ActionArt type="acordou" size={isDesktop ? 64 : 52} />
+                  <View style={styles.startCopy}><Text style={[styles.startText, isDesktop && styles.startTextDesktop, { color: colors.text }]}>Informar primeiro despertar</Text><Text style={[styles.startHint, isDesktop && styles.startHintDesktop, { color: colors.textMuted }]}>Escolha o horário real em que o dia começou.</Text></View>
+                  <Ionicons name="chevron-forward" size={isDesktop ? 23 : 19} color={colors.textMuted} />
+                </Pressable>
+              </View> : <View style={[styles.readOnlyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><Ionicons name="eye-outline" size={26} color={colors.primary} /><View style={styles.readOnlyCopy}><Text style={[styles.readOnlyTitle, { color: colors.text }]}>Acesso de visualização</Text><Text style={[styles.readOnlyText, { color: colors.textMuted }]}>Você pode acompanhar a rotina, mas não criar ou alterar registros.</Text></View></View>
+            ) : primaryAction && canWrite ? (
+              <Pressable
+                accessibilityRole="button"
+                onPress={handlePrimaryAction}
+                style={({ pressed }) => [styles.primaryAction, isDesktop && styles.primaryActionDesktop, { borderColor: `${colors.accent}88` }, pressed && styles.pressed]}>
+                <LinearGradient colors={isDark ? ['#B8F2D7', '#8CDEBF'] : ['#7558E8', '#9A67ED']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                <ActionArt type={primaryAction.type} size={isDesktop ? 72 : 58} />
+                <Text style={[styles.primaryTitle, isDesktop && styles.primaryTitleDesktop, { color: isDark ? '#172A24' : '#FFFFFF' }]}>{primaryAction.label}</Text>
+              </Pressable>
+            ) : null}
 
-        {state.mode === 'idle' ? (
-          canWrite ? <View style={[styles.startPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.startKicker, { color: colors.primary }]}>PRIMEIRO MARCO DO DIA</Text>
-            <Text style={[styles.startTitle, { color: colors.text }]}>Que horas {profile.name || 'o bebê'} acordou hoje?</Text>
-            <Text style={[styles.startSubtitle, { color: colors.textMuted }]}>Primeiro registre o despertar. Depois o Ninou pergunta como o bebê está neste momento.</Text>
-            <Pressable onPress={openStartFlow} style={({ pressed }) => [styles.startButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }, pressed && styles.pressed]}>
-              <ActionArt type="acordou" size={52} />
-              <View style={styles.startCopy}><Text style={[styles.startText, { color: colors.text }]}>Informar primeiro despertar</Text><Text style={[styles.startHint, { color: colors.textMuted }]}>Escolha o horário real em que o dia começou.</Text></View>
-              <Ionicons name="chevron-forward" size={19} color={colors.textMuted} />
-            </Pressable>
-          </View> : <View style={[styles.readOnlyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><Ionicons name="eye-outline" size={26} color={colors.primary} /><View style={styles.readOnlyCopy}><Text style={[styles.readOnlyTitle, { color: colors.text }]}>Acesso de visualização</Text><Text style={[styles.readOnlyText, { color: colors.textMuted }]}>Você pode acompanhar a rotina, mas não criar ou alterar registros.</Text></View></View>
-        ) : primaryAction && canWrite ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={handlePrimaryAction}
-            style={({ pressed }) => [styles.primaryAction, { borderColor: `${colors.accent}88` }, pressed && styles.pressed]}>
-            <LinearGradient colors={isDark ? ['#B8F2D7', '#8CDEBF'] : ['#7558E8', '#9A67ED']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-            <ActionArt type={primaryAction.type} size={58} />
-            <Text style={[styles.primaryTitle, { color: isDark ? '#172A24' : '#FFFFFF' }]}>{primaryAction.label}</Text>
-          </Pressable>
-        ) : null}
-
-        {latest ? <View style={[styles.lastAction, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.lastActionCopy}><Text style={[styles.lastKicker, { color: colors.textMuted }]}>ÚLTIMA AÇÃO</Text><Text style={[styles.lastTitle, { color: colors.text }]}>{recordConfig[latest.type].title} · {formatTime(latest.start)}</Text></View>{canWrite ? <><Pressable onPress={editLatest} style={styles.lastButton}><Text style={[styles.lastButtonText, { color: colors.primary }]}>Editar</Text></Pressable><Pressable disabled={!canUndo} onPress={() => { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); undoLastAction(); }} style={[styles.lastButton, !canUndo && styles.lastButtonDisabled]}><Text style={[styles.lastButtonText, { color: colors.danger }]}>Desfazer</Text></Pressable></> : null}</View> : null}
+            {latest ? <View style={[styles.lastAction, isDesktop && styles.lastActionDesktop, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.lastActionCopy}><Text style={[styles.lastKicker, { color: colors.textMuted }]}>ÚLTIMA AÇÃO</Text><Text style={[styles.lastTitle, isDesktop && styles.lastTitleDesktop, { color: colors.text }]}>{recordConfig[latest.type].title} · {formatTime(latest.start)}</Text></View>{canWrite ? <><Pressable onPress={editLatest} style={styles.lastButton}><Text style={[styles.lastButtonText, isDesktop && styles.lastButtonTextDesktop, { color: colors.primary }]}>Editar</Text></Pressable><Pressable disabled={!canUndo} onPress={() => { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); undoLastAction(); }} style={[styles.lastButton, !canUndo && styles.lastButtonDisabled]}><Text style={[styles.lastButtonText, isDesktop && styles.lastButtonTextDesktop, { color: colors.danger }]}>Desfazer</Text></Pressable></> : null}</View> : null}
+          </View>
+        </View>
 
         <NinouCard>
           <View style={styles.cardHead}>
@@ -327,20 +334,39 @@ export default function TodayScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { width: '100%', maxWidth: 540, alignSelf: 'center', paddingHorizontal: 14, paddingTop: Platform.OS === 'web' ? 38 : spacing.sm, paddingBottom: 140, gap: 14 },
+  contentDesktop: { maxWidth: 1280, paddingHorizontal: 30, paddingTop: 28, paddingBottom: 64, gap: 20 },
+  contentWithTimer: { paddingBottom: 232 },
   topline: { minHeight: 46, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md, paddingHorizontal: 3 },
   toplineText: { flex: 1, fontSize: 12, fontWeight: '800', letterSpacing: 0.45, textTransform: 'uppercase' },
   profileButton: { minHeight: 42, borderRadius: 15, paddingHorizontal: spacing.lg, alignItems: 'center', justifyContent: 'center' },
   profileButtonText: { fontSize: 13, fontWeight: '900' },
   link: { fontSize: 13, fontWeight: '800' },
+  heroWorkspace: { gap: 14 },
+  heroWorkspaceDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 24 },
+  orbitColumn: { alignItems: 'center' },
+  orbitColumnDesktop: { width: 540, minHeight: 520, justifyContent: 'center' },
+  heroSide: { gap: 14 },
+  heroSideDesktop: { flex: 1, justifyContent: 'center', gap: 20 },
   startPanel: { borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 16 }, startKicker: { fontSize: 9.5, fontWeight: '900', letterSpacing: 1.1 }, startTitle: { marginTop: 5, fontSize: 20, lineHeight: 25, fontWeight: '900' }, startSubtitle: { marginTop: 5, marginBottom: 14, fontSize: 12, lineHeight: 18, fontWeight: '600' },
+  startPanelDesktop: { minHeight: 320, borderRadius: 30, padding: 30, justifyContent: 'center' },
+  startTitleDesktop: { marginTop: 10, fontSize: 32, lineHeight: 38 },
+  startSubtitleDesktop: { marginTop: 12, marginBottom: 24, fontSize: 16, lineHeight: 24 },
   startChoice: { gap: spacing.md },
   startButton: { minHeight: 78, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row', alignItems: 'center', padding: spacing.md, gap: spacing.md },
+  startButtonDesktop: { minHeight: 106, borderRadius: 24, paddingHorizontal: 22, gap: 18 },
   startCopy: { flex: 1 }, startText: { fontSize: 15, lineHeight: 20, fontWeight: '900' }, startHint: { marginTop: 3, fontSize: 10.5, lineHeight: 15, fontWeight: '600' },
+  startTextDesktop: { fontSize: 19, lineHeight: 25 },
+  startHintDesktop: { marginTop: 5, fontSize: 14, lineHeight: 20 },
   readOnlyCard: { minHeight: 82, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 15, flexDirection: 'row', alignItems: 'center', gap: 12 }, readOnlyCopy: { flex: 1 }, readOnlyTitle: { fontSize: 14, fontWeight: '900' }, readOnlyText: { marginTop: 4, fontSize: 11, lineHeight: 16, fontWeight: '600' }, readOnlyDisabled: { opacity: 0.48 },
   primaryAction: { minHeight: 76, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: spacing.xl, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.md, overflow: 'hidden' },
+  primaryActionDesktop: { minHeight: 148, borderRadius: 30, gap: 22 },
   primaryTitle: { fontSize: 16, fontWeight: '900' },
+  primaryTitleDesktop: { fontSize: 25 },
   pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
   lastAction: { minHeight: 66, borderRadius: 20, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 8 }, lastActionCopy: { flex: 1 }, lastKicker: { fontSize: 8, fontWeight: '900', letterSpacing: 1 }, lastTitle: { marginTop: 3, fontSize: 12, fontWeight: '900' }, lastButton: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 5 }, lastButtonDisabled: { opacity: 0.35 }, lastButtonText: { fontSize: 10.5, fontWeight: '900' },
+  lastActionDesktop: { minHeight: 92, borderRadius: 24, paddingHorizontal: 22, gap: 14 },
+  lastTitleDesktop: { marginTop: 6, fontSize: 17 },
+  lastButtonTextDesktop: { fontSize: 14 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md },
   cardKicker: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.6 },
   cardTitle: { fontSize: 18, fontWeight: '900', marginTop: 2 },

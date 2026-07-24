@@ -18,6 +18,15 @@ export type RoutineActor = {
   relationship: string;
   label: string;
 };
+export type BreastfeedingSide = 'left' | 'right';
+export type BreastfeedingTimer = {
+  startedAt: number;
+  activeSide: BreastfeedingSide | null;
+  activeSideStartedAt: number | null;
+  leftDurationMs: number;
+  rightDurationMs: number;
+  notes: string;
+};
 export type RecordType =
   | 'acordou'
   | 'sono'
@@ -36,6 +45,8 @@ export type RoutineEvent = {
   detail: string;
   notes: string;
   amountMl?: number;
+  leftDurationMs?: number;
+  rightDurationMs?: number;
   createdAtClient: number;
   createdByUid?: string;
   createdByEmail?: string;
@@ -72,6 +83,9 @@ export type DayState = {
   lastWakeWindowMs: number | null;
   routineStateUpdatedAt: number;
   routineStateMutationId: string;
+  breastfeedingTimer: BreastfeedingTimer | null;
+  breastfeedingTimerUpdatedAt: number;
+  breastfeedingTimerMutationId: string;
   events: RoutineEvent[];
   dayNotes: string;
   dayNotesUpdatedAt: number;
@@ -103,6 +117,9 @@ export function createEmptyDayState(): DayState {
     lastWakeWindowMs: null,
     routineStateUpdatedAt: 0,
     routineStateMutationId: '',
+    breastfeedingTimer: null,
+    breastfeedingTimerUpdatedAt: 0,
+    breastfeedingTimerMutationId: '',
     events: [],
     dayNotes: '',
     dayNotesUpdatedAt: 0,
@@ -125,6 +142,24 @@ function normalizeRoutineActor(value: unknown): RoutineActor | null {
   const label = cleanText(actor.label, 160) || [name, relationship].filter(Boolean).join(' · ') || email;
   if (!label) return null;
   return { uid: cleanText(actor.uid, 128), email, name, relationship, label };
+}
+
+function normalizeBreastfeedingTimer(value: unknown): BreastfeedingTimer | null {
+  if (!value || typeof value !== 'object') return null;
+  const timer = value as Partial<BreastfeedingTimer>;
+  const startedAt = Number(timer.startedAt);
+  if (!Number.isFinite(startedAt) || startedAt <= 0) return null;
+  const requestedActiveSide = timer.activeSide === 'left' || timer.activeSide === 'right' ? timer.activeSide : null;
+  const activeSideStartedAt = Number(timer.activeSideStartedAt);
+  const activeSide = requestedActiveSide && Number.isFinite(activeSideStartedAt) && activeSideStartedAt > 0 ? requestedActiveSide : null;
+  return {
+    startedAt,
+    activeSide,
+    activeSideStartedAt: activeSide ? activeSideStartedAt : null,
+    leftDurationMs: Math.max(0, Number(timer.leftDurationMs) || 0),
+    rightDurationMs: Math.max(0, Number(timer.rightDurationMs) || 0),
+    notes: cleanText(timer.notes, 1200),
+  };
 }
 
 function createdByFields(actor?: RoutineActor | null) {
@@ -184,6 +219,9 @@ export function normalizeDayState(value: Partial<DayState> | null | undefined): 
     activeStartedAt: mode !== 'idle' && Number.isFinite(start) ? start : null,
     activeType: value.activeType && recordConfig[value.activeType] ? value.activeType : 'sono',
     activeActor: normalizeRoutineActor(value.activeActor),
+    breastfeedingTimer: normalizeBreastfeedingTimer(value.breastfeedingTimer),
+    breastfeedingTimerUpdatedAt: Number.isFinite(Number(value.breastfeedingTimerUpdatedAt)) ? Number(value.breastfeedingTimerUpdatedAt) : 0,
+    breastfeedingTimerMutationId: cleanText(value.breastfeedingTimerMutationId, 160),
     events: Array.isArray(value.events)
       ? value.events.map(normalizeRoutineEvent).filter((event): event is RoutineEvent => Boolean(event))
       : [],
@@ -228,6 +266,8 @@ function normalizeRoutineEvent(event: Partial<RoutineEvent> | null | undefined):
   const detail = typeof event.detail === 'string' ? event.detail : '';
   const amountFromDetail = Number(detail.match(/(\d+(?:[.,]\d+)?)\s*ml/i)?.[1]?.replace(',', '.'));
   const amountMl = Number.isFinite(Number(event.amountMl)) ? Number(event.amountMl) : amountFromDetail;
+  const leftDurationMs = Number(event.leftDurationMs);
+  const rightDurationMs = Number(event.rightDurationMs);
   return {
     id: typeof event.id === 'string' && event.id ? event.id : `${event.type}-${start}`,
     type: event.type,
@@ -236,6 +276,8 @@ function normalizeRoutineEvent(event: Partial<RoutineEvent> | null | undefined):
     detail,
     notes: typeof event.notes === 'string' ? event.notes : '',
     ...(Number.isFinite(amountMl) ? { amountMl } : {}),
+    ...(Number.isFinite(leftDurationMs) ? { leftDurationMs: Math.max(0, leftDurationMs) } : {}),
+    ...(Number.isFinite(rightDurationMs) ? { rightDurationMs: Math.max(0, rightDurationMs) } : {}),
     ...Object.fromEntries([
       'createdByUid', 'createdByEmail', 'createdByName', 'createdByRelationship', 'createdByLabel',
       'updatedByUid', 'updatedByEmail', 'updatedByName', 'updatedByRelationship', 'updatedByLabel',
@@ -256,10 +298,18 @@ function compareLiveState(left: DayState, right: DayState) {
   return left.routineStateMutationId.localeCompare(right.routineStateMutationId);
 }
 
+function compareBreastfeedingState(left: DayState, right: DayState) {
+  if (left.breastfeedingTimerUpdatedAt !== right.breastfeedingTimerUpdatedAt) {
+    return left.breastfeedingTimerUpdatedAt - right.breastfeedingTimerUpdatedAt;
+  }
+  return left.breastfeedingTimerMutationId.localeCompare(right.breastfeedingTimerMutationId);
+}
+
 export function mergeDayStates(localValue: Partial<DayState>, cloudValue: Partial<DayState>) {
   const local = normalizeDayState(localValue);
   const cloud = normalizeDayState(cloudValue);
   const latestLive = compareLiveState(local, cloud) >= 0 ? local : cloud;
+  const latestBreastfeeding = compareBreastfeedingState(local, cloud) >= 0 ? local : cloud;
   const events = new Map<string, RoutineEvent>();
   cloud.events.forEach((event) => events.set(event.id, event));
   local.events.forEach((event) => events.set(event.id, event));
@@ -284,6 +334,9 @@ export function mergeDayStates(localValue: Partial<DayState>, cloudValue: Partia
     lastWakeWindowMs: latestLive.lastWakeWindowMs,
     routineStateUpdatedAt: latestLive.routineStateUpdatedAt,
     routineStateMutationId: latestLive.routineStateMutationId,
+    breastfeedingTimer: latestBreastfeeding.breastfeedingTimer,
+    breastfeedingTimerUpdatedAt: latestBreastfeeding.breastfeedingTimerUpdatedAt,
+    breastfeedingTimerMutationId: latestBreastfeeding.breastfeedingTimerMutationId,
     events: [...events.values()].sort((a, b) => a.start - b.start),
     dayNotes: notesSource.dayNotes,
     dayNotesUpdatedAt: notesSource.dayNotesUpdatedAt,
@@ -299,6 +352,117 @@ function stamp(state: DayState, now: number, action: string): DayState {
     routineStateUpdatedAt: Math.max(now, state.routineStateUpdatedAt + 1),
     routineStateMutationId: `${action}-${now}-${Math.random().toString(36).slice(2, 6)}`,
   };
+}
+
+function stampBreastfeeding(state: DayState, now: number, action: string): DayState {
+  return stamp({
+    ...state,
+    breastfeedingTimerUpdatedAt: Math.max(now, state.breastfeedingTimerUpdatedAt + 1),
+    breastfeedingTimerMutationId: `${action}-${now}-${Math.random().toString(36).slice(2, 6)}`,
+  }, now, action);
+}
+
+export function getBreastfeedingDurations(timer: BreastfeedingTimer | null, now = Date.now()) {
+  if (!timer) return { leftDurationMs: 0, rightDurationMs: 0, totalDurationMs: 0 };
+  const liveDuration = timer.activeSide && timer.activeSideStartedAt
+    ? Math.max(0, now - timer.activeSideStartedAt)
+    : 0;
+  const leftDurationMs = timer.leftDurationMs + (timer.activeSide === 'left' ? liveDuration : 0);
+  const rightDurationMs = timer.rightDurationMs + (timer.activeSide === 'right' ? liveDuration : 0);
+  return { leftDurationMs, rightDurationMs, totalDurationMs: leftDurationMs + rightDurationMs };
+}
+
+function settleBreastfeedingTimer(timer: BreastfeedingTimer, now: number): BreastfeedingTimer {
+  const durations = getBreastfeedingDurations(timer, now);
+  return {
+    ...timer,
+    activeSide: null,
+    activeSideStartedAt: null,
+    leftDurationMs: durations.leftDurationMs,
+    rightDurationMs: durations.rightDurationMs,
+  };
+}
+
+export function formatBreastfeedingDetail(leftDurationMs: number, rightDurationMs: number) {
+  const entries = [
+    leftDurationMs > 0 ? `Esquerdo ${formatDuration(leftDurationMs, true)}` : '',
+    rightDurationMs > 0 ? `Direito ${formatDuration(rightDurationMs, true)}` : '',
+  ].filter(Boolean);
+  return entries.join(' • ') || 'Mamada registrada';
+}
+
+export function startBreastfeedingTimer(state: DayState, side: BreastfeedingSide, now = Date.now()): DayState {
+  if (state.breastfeedingTimer) {
+    return switchBreastfeedingSide(state, side, now);
+  }
+  return stampBreastfeeding({
+    ...state,
+    breastfeedingTimer: {
+      startedAt: now,
+      activeSide: side,
+      activeSideStartedAt: now,
+      leftDurationMs: 0,
+      rightDurationMs: 0,
+      notes: '',
+    },
+  }, now, `breastfeeding-start-${side}`);
+}
+
+export function pauseBreastfeedingTimer(state: DayState, now = Date.now()): DayState {
+  if (!state.breastfeedingTimer?.activeSide) return state;
+  return stampBreastfeeding({
+    ...state,
+    breastfeedingTimer: settleBreastfeedingTimer(state.breastfeedingTimer, now),
+  }, now, 'breastfeeding-pause');
+}
+
+export function switchBreastfeedingSide(state: DayState, side: BreastfeedingSide, now = Date.now()): DayState {
+  const timer = state.breastfeedingTimer;
+  if (!timer) return startBreastfeedingTimer(state, side, now);
+  if (timer.activeSide === side) return pauseBreastfeedingTimer(state, now);
+  const settled = settleBreastfeedingTimer(timer, now);
+  return stampBreastfeeding({
+    ...state,
+    breastfeedingTimer: {
+      ...settled,
+      activeSide: side,
+      activeSideStartedAt: now,
+    },
+  }, now, `breastfeeding-side-${side}`);
+}
+
+export function resumeBreastfeedingTimer(state: DayState, side?: BreastfeedingSide, now = Date.now()): DayState {
+  const timer = state.breastfeedingTimer;
+  if (!timer || timer.activeSide) return state;
+  const resumeSide = side || (timer.rightDurationMs > timer.leftDurationMs ? 'right' : 'left');
+  return stampBreastfeeding({
+    ...state,
+    breastfeedingTimer: {
+      ...timer,
+      activeSide: resumeSide,
+      activeSideStartedAt: now,
+    },
+  }, now, `breastfeeding-resume-${resumeSide}`);
+}
+
+export function cancelBreastfeedingTimer(state: DayState, now = Date.now()): DayState {
+  if (!state.breastfeedingTimer) return state;
+  return stampBreastfeeding({ ...state, breastfeedingTimer: null }, now, 'breastfeeding-cancel');
+}
+
+export function finishBreastfeedingTimer(state: DayState, now = Date.now(), actor?: RoutineActor | null, notes = ''): DayState {
+  const timer = state.breastfeedingTimer;
+  if (!timer) return state;
+  const { leftDurationMs, rightDurationMs, totalDurationMs } = getBreastfeedingDurations(timer, now);
+  if (totalDurationMs < 1000) return cancelBreastfeedingTimer(state, now);
+  const event = makeEvent('amamentacao', timer.startedAt, now, formatBreastfeedingDetail(leftDurationMs, rightDurationMs), cleanText(notes, 1200) || timer.notes, undefined, actor);
+  event.leftDurationMs = leftDurationMs;
+  event.rightDurationMs = rightDurationMs;
+  return stampBreastfeeding({
+    ...state,
+    breastfeedingTimer: null,
+    events: [...state.events, event],
+  }, now, 'breastfeeding-finish');
 }
 
 export function startRoutineAt(state: DayState, mode: Exclude<RoutineMode, 'idle'>, startedAt: number, now = Date.now(), actor?: RoutineActor | null): DayState {
@@ -464,7 +628,7 @@ export function addRoutineRecord(state: DayState, input: { type: RecordType; det
   return stamp({ ...state, events: [...state.events, makeEvent(type, now, now, durableDetail, notes, amountMl, actor)] }, now, `record-${type}`);
 }
 
-export function updateRoutineEvent(state: DayState, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl'>>, now = Date.now(), actor?: RoutineActor | null) {
+export function updateRoutineEvent(state: DayState, eventId: string, patch: Partial<Pick<RoutineEvent, 'type' | 'start' | 'end' | 'detail' | 'notes' | 'amountMl' | 'leftDurationMs' | 'rightDurationMs'>>, now = Date.now(), actor?: RoutineActor | null) {
   return stamp({
     ...state,
     events: state.events.map((event) => event.id === eventId ? normalizeRoutineEvent({ ...event, ...patch, ...updatedByFields(actor) }) || event : event),
@@ -495,6 +659,8 @@ export function deleteDayNoteEpisode(state: DayState, episodeId: string, now = D
 export function clearRoutineDay(state: DayState, now = Date.now()) {
   return stamp({
     ...createEmptyDayState(),
+    breastfeedingTimerUpdatedAt: Math.max(now, state.breastfeedingTimerUpdatedAt + 1),
+    breastfeedingTimerMutationId: `breastfeeding-clear-${now}`,
     deletedEventIds: [...new Set([...state.deletedEventIds, ...state.events.map((event) => event.id)])],
     deletedNoteEpisodeIds: [...new Set([...state.deletedNoteEpisodeIds, ...state.noteEpisodes.map((episode) => episode.id)])],
     dayNotesUpdatedAt: now,

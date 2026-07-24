@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -144,6 +145,8 @@ export function NinouLoadingScreen() {
 
 function LoginPanel({ onBack, mode, onMode }: { onBack: () => void; mode: Exclude<EntryView, 'landing'>; onMode: (mode: Exclude<EntryView, 'landing'>) => void }) {
   const { login, register, error, submitting, status } = useNinouAuth();
+  const { colors, isDark } = useNinouTheme();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
@@ -151,8 +154,10 @@ function LoginPanel({ onBack, mode, onMode }: { onBack: () => void; mode: Exclud
   const submit = async () => {
     if (!email.trim() || !password) return;
     if (mode === 'invite') await AsyncStorage.setItem('ninou.mobile.pending-invite.v1', inviteCode.trim().toUpperCase());
-    if (mode === 'register') await register(email, password);
-    else await login(email, password);
+    const success = mode === 'register'
+      ? await register(email, password)
+      : await login(email, password);
+    if (success) router.replace('/');
   };
 
   const copy = mode === 'register'
@@ -162,35 +167,39 @@ function LoginPanel({ onBack, mode, onMode }: { onBack: () => void; mode: Exclud
       : { kicker: 'CONTA NINOU', title: 'Bem-vindo de volta', subtitle: 'Entre para acompanhar a rotina do bebê com toda a família.', button: 'Entrar no Ninou' };
 
   return (
-    <SafeAreaView style={styles.loginSafe}>
+    <SafeAreaView style={[styles.loginSafe, { backgroundColor: colors.background }]}>
+      <NinouBackground intense />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.loginSafe}>
-        <ScrollView contentContainerStyle={styles.loginContent} keyboardShouldPersistTaps="handled">
-          <View style={styles.loginTop}>
-            <Pressable accessibilityLabel="Voltar" onPress={onBack} style={styles.backButton}><Ionicons name="arrow-back" size={21} color="#39284D" /></Pressable>
-            <Brand lightPanel />
-            <View style={{ width: 44 }} />
-          </View>
-          <View style={styles.loginCopy}>
-            <Text style={styles.loginKicker}>{copy.kicker}</Text>
-            <Text style={styles.loginTitle}>{copy.title}</Text>
-            <Text style={styles.loginSubtitle}>{copy.subtitle}</Text>
-          </View>
-          <View style={styles.form}>
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput accessibilityLabel="E-mail" autoCapitalize="none" autoComplete="email" keyboardType="email-address" value={email} onChangeText={setEmail} placeholder="voce@exemplo.com" placeholderTextColor="#A89CAE" style={styles.input} />
-            <Text style={styles.label}>Senha</Text>
-            <TextInput accessibilityLabel="Senha" autoCapitalize="none" autoComplete="password" secureTextEntry value={password} onChangeText={setPassword} placeholder="Sua senha" placeholderTextColor="#A89CAE" style={styles.input} />
-            {mode === 'invite' ? <><Text style={styles.label}>Código do convite</Text><TextInput accessibilityLabel="Código do convite" autoCapitalize="characters" value={inviteCode} onChangeText={setInviteCode} placeholder="Ex.: ABCD2345" placeholderTextColor="#A89CAE" style={styles.input} /></> : null}
-            <Text style={styles.formHint}>{mode === 'register' ? 'Use uma senha com pelo menos 6 caracteres.' : 'Use a mesma conta do Ninou webapp.'}</Text>
-            {error ? <View accessibilityLiveRegion="polite" style={styles.loginErrorCard}><View style={styles.loginErrorIcon}><Ionicons name="alert-circle" size={19} color="#BE4F61" /></View><View style={styles.loginErrorCopy}><Text style={styles.loginErrorTitle}>Não foi possível entrar</Text><Text style={styles.loginError}>{error}</Text></View></View> : null}
-            <Pressable disabled={busy || !email.trim() || password.length < 6 || (mode === 'invite' && !inviteCode.trim())} onPress={() => void submit()} style={({ pressed }) => [styles.loginButton, (busy || !email.trim() || password.length < 6 || (mode === 'invite' && !inviteCode.trim())) && styles.disabled, pressed && styles.pressed]}>
-              {busy ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.loginButtonText}>{copy.button}</Text>}
-            </Pressable>
-          </View>
-          <View style={styles.loginFooter}>
-            <Text style={styles.footerText}>{mode === 'register' ? 'Já tem uma conta?' : mode === 'invite' ? 'O e-mail convidado ainda não tem conta?' : 'Ainda não tem uma conta?'}</Text>
-            <Pressable onPress={() => { if (mode === 'invite') void AsyncStorage.setItem('ninou.mobile.pending-invite.v1', inviteCode.trim().toUpperCase()); onMode(mode === 'register' ? 'login' : 'register'); }}><Text style={styles.footerLink}>{mode === 'register' ? 'Entrar na minha conta' : mode === 'invite' ? 'Criar conta e continuar com o convite' : 'Criar minha família no Ninou'}</Text></Pressable>
-            <Text style={styles.legal}>Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade.</Text>
+        <ScrollView contentContainerStyle={styles.loginContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={[styles.loginCard, { backgroundColor: isDark ? 'rgba(22,16,43,0.94)' : 'rgba(255,252,250,0.94)', borderColor: isDark ? 'rgba(188,164,255,0.22)' : 'rgba(91,62,133,0.13)' }]}>
+            <View style={styles.loginTop}>
+              <Pressable accessibilityLabel="Voltar" onPress={onBack} style={[styles.backButton, { backgroundColor: colors.surfaceElevated }]}><Ionicons name="arrow-back" size={21} color={colors.text} /></Pressable>
+              <Brand />
+              <ThemeToggle />
+            </View>
+            <View style={styles.loginCopy}>
+              <Text style={[styles.loginKicker, { color: colors.primary }]}>{copy.kicker}</Text>
+              <Text style={[styles.loginTitle, { color: colors.text }]}>{copy.title}</Text>
+              <Text style={[styles.loginSubtitle, { color: colors.textMuted }]}>{copy.subtitle}</Text>
+            </View>
+            <View style={styles.form}>
+              <Text style={[styles.label, { color: colors.text }]}>E-mail</Text>
+              <TextInput accessibilityLabel="E-mail" autoCapitalize="none" autoComplete="email" keyboardType="email-address" value={email} onChangeText={setEmail} placeholder="voce@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, color: colors.text }]} />
+              <Text style={[styles.label, { color: colors.text }]}>Senha</Text>
+              <TextInput accessibilityLabel="Senha" autoCapitalize="none" autoComplete="password" secureTextEntry value={password} onChangeText={setPassword} placeholder="Sua senha" placeholderTextColor={colors.textMuted} style={[styles.input, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, color: colors.text }]} />
+              {mode === 'invite' ? <><Text style={[styles.label, { color: colors.text }]}>Código do convite</Text><TextInput accessibilityLabel="Código do convite" autoCapitalize="characters" value={inviteCode} onChangeText={setInviteCode} placeholder="Ex.: ABCD2345" placeholderTextColor={colors.textMuted} style={[styles.input, { backgroundColor: colors.surfaceElevated, borderColor: colors.border, color: colors.text }]} /></> : null}
+              <Text style={[styles.formHint, { color: colors.textMuted }]}>{mode === 'register' ? 'Use uma senha com pelo menos 6 caracteres.' : 'Use a mesma conta do Ninou webapp.'}</Text>
+              {error ? <View accessibilityLiveRegion="polite" style={styles.loginErrorCard}><View style={styles.loginErrorIcon}><Ionicons name="alert-circle" size={19} color="#BE4F61" /></View><View style={styles.loginErrorCopy}><Text style={styles.loginErrorTitle}>Não foi possível entrar</Text><Text style={styles.loginError}>{error}</Text></View></View> : null}
+              <Pressable disabled={busy || !email.trim() || password.length < 6 || (mode === 'invite' && !inviteCode.trim())} onPress={() => void submit()} style={({ pressed }) => [styles.loginButton, { backgroundColor: colors.primary }, (busy || !email.trim() || password.length < 6 || (mode === 'invite' && !inviteCode.trim())) && styles.disabled, pressed && styles.pressed]}>
+                {busy ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.loginButtonText}>{copy.button}</Text>}
+              </Pressable>
+            </View>
+            <View style={styles.loginFooter}>
+              <Text style={[styles.footerText, { color: colors.textMuted }]}>{mode === 'register' ? 'Já tem uma conta?' : mode === 'invite' ? 'O e-mail convidado ainda não tem conta?' : 'Ainda não tem uma conta?'}</Text>
+              <Pressable onPress={() => { if (mode === 'invite') void AsyncStorage.setItem('ninou.mobile.pending-invite.v1', inviteCode.trim().toUpperCase()); onMode(mode === 'register' ? 'login' : 'register'); }}><Text style={[styles.footerLink, { color: colors.primary }]}>{mode === 'register' ? 'Entrar na minha conta' : mode === 'invite' ? 'Criar conta e continuar com o convite' : 'Criar minha família no Ninou'}</Text></Pressable>
+              <View style={styles.loginTrust}><Ionicons name="shield-checkmark" size={15} color={colors.accent} /><Text style={[styles.loginTrustText, { color: colors.textMuted }]}>Acesso protegido e sincronizado com a família</Text></View>
+              <Text style={[styles.legal, { color: colors.textMuted }]}>Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade.</Text>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -272,30 +281,33 @@ const styles = StyleSheet.create({
   demoStats: { flexDirection: 'row', justifyContent: 'space-between', gap: 18, paddingHorizontal: 4, paddingTop: 14 },
   statLabel: { fontSize: 8, fontWeight: '900', letterSpacing: 0.8 },
   statValue: { marginTop: 3, fontSize: 11, fontWeight: '800' },
-  loginSafe: { flex: 1, backgroundColor: '#FBFAFC' },
-  loginContent: { width: '100%', maxWidth: 500, minHeight: '100%', alignSelf: 'center', paddingHorizontal: 23, paddingBottom: 40 },
-  loginTop: { height: 72, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F0EAF5', alignItems: 'center', justifyContent: 'center' },
-  loginCopy: { marginTop: 48 },
-  loginKicker: { color: '#7558E8', fontSize: 11, fontWeight: '900', letterSpacing: 1.3 },
-  loginTitle: { color: '#302142', marginTop: 12, fontSize: 36, lineHeight: 40, fontWeight: '900', letterSpacing: -1.3 },
-  loginSubtitle: { color: '#756985', marginTop: 12, fontSize: 15, lineHeight: 22, fontWeight: '600' },
-  form: { marginTop: 35 },
-  label: { color: '#42344F', fontSize: 13, fontWeight: '800', marginBottom: 8, marginTop: 14 },
-  input: { height: 56, borderRadius: 17, borderWidth: 1, borderColor: '#DED5E6', backgroundColor: '#FFFFFF', paddingHorizontal: 16, color: '#302142', fontSize: 15, fontWeight: '600' },
-  formHint: { color: '#86798E', marginTop: 10, fontSize: 11.5, lineHeight: 17 },
+  loginSafe: { flex: 1 },
+  loginContent: { width: '100%', maxWidth: 540, flexGrow: 1, alignSelf: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 26 },
+  loginCard: { width: '100%', maxWidth: 500, alignSelf: 'center', borderRadius: 32, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 24, shadowColor: '#090418', shadowOpacity: 0.28, shadowRadius: 30, shadowOffset: { width: 0, height: 18 }, elevation: 10 },
+  loginTop: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  backButton: { width: 42, height: 42, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  loginCopy: { marginTop: 30 },
+  loginKicker: { fontSize: 10.5, fontWeight: '900', letterSpacing: 1.3 },
+  loginTitle: { marginTop: 10, fontSize: 34, lineHeight: 38, fontWeight: '900', letterSpacing: -1.3 },
+  loginSubtitle: { marginTop: 10, fontSize: 14.5, lineHeight: 21, fontWeight: '600' },
+  form: { marginTop: 26 },
+  label: { fontSize: 12.5, fontWeight: '800', marginBottom: 7, marginTop: 12 },
+  input: { height: 54, borderRadius: 17, borderWidth: 1, paddingHorizontal: 16, fontSize: 15, fontWeight: '600' },
+  formHint: { marginTop: 9, fontSize: 11.5, lineHeight: 17 },
   loginErrorCard: { marginTop: 14, borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(190,79,97,0.28)', backgroundColor: 'rgba(190,79,97,0.07)', padding: 11, flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
   loginErrorIcon: { width: 32, height: 32, borderRadius: 11, backgroundColor: 'rgba(190,79,97,0.1)', alignItems: 'center', justifyContent: 'center' },
   loginErrorCopy: { flex: 1 },
   loginErrorTitle: { color: '#8E3343', fontSize: 12, lineHeight: 16, fontWeight: '900' },
   loginError: { color: '#A74758', marginTop: 1, fontSize: 11.5, lineHeight: 16, fontWeight: '700' },
-  loginButton: { minHeight: 58, marginTop: 24, borderRadius: 18, backgroundColor: '#7558E8', alignItems: 'center', justifyContent: 'center' },
+  loginButton: { minHeight: 56, marginTop: 22, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   loginButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900' },
   disabled: { opacity: 0.5 },
-  loginFooter: { marginTop: 34, alignItems: 'center', gap: 5 },
-  footerText: { color: '#756985', fontSize: 13 },
-  footerLink: { color: '#7558E8', fontSize: 13, fontWeight: '800' },
-  legal: { color: '#94899A', maxWidth: 340, marginTop: 18, fontSize: 10.5, lineHeight: 16, textAlign: 'center' },
+  loginFooter: { marginTop: 28, alignItems: 'center', gap: 5 },
+  footerText: { fontSize: 12.5 },
+  footerLink: { fontSize: 12.5, fontWeight: '800' },
+  loginTrust: { marginTop: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  loginTrustText: { fontSize: 10.5, fontWeight: '700' },
+  legal: { maxWidth: 340, marginTop: 9, fontSize: 10, lineHeight: 15, textAlign: 'center' },
   loading: { flex: 1 },
   loadingContent: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
   launchStage: { width: 170, height: 170, alignItems: 'center', justifyContent: 'center' }, launchGlow: { position: 'absolute', width: 140, height: 140, borderRadius: 70 }, launchRing: { position: 'absolute', width: 156, height: 156, borderRadius: 78, borderWidth: 1 }, launchDot: { position: 'absolute', width: 10, height: 10, borderRadius: 5, top: -5, left: 72, shadowColor: '#61E1BF', shadowOpacity: 0.8, shadowRadius: 8 }, launchStar: { position: 'absolute', color: '#FFF4D4' }, launchStarA: { left: 7, top: 47, fontSize: 19 }, launchStarB: { right: 10, bottom: 43, fontSize: 15 },

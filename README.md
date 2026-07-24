@@ -1,4 +1,4 @@
-# Ninou v84.1.1 — aplicativo universal integrado
+# Ninou v84.1.2 — aplicativo universal integrado
 
 A partir desta versão, web, iPhone e Android executam a mesma aplicação Expo/React Native Web.
 Não existe mais uma interface web paralela em HTML/CSS/JavaScript legado.

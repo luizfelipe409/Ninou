@@ -2,11 +2,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, Tabs } from 'expo-router';
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useNinouTheme } from '@/theme/tokens';
 import { useRoutine } from '@/state/routine-context';
+import { BreastfeedingTimerBar } from '@/components/breastfeeding-timer-bar';
+import { DesktopNavigation } from '@/components/desktop-navigation';
+import { NINOU_DESKTOP_BREAKPOINT } from '@/theme/layout';
 
 const tabMeta: Record<string, { label: string; icon: keyof typeof Ionicons.glyphMap; activeIcon: keyof typeof Ionicons.glyphMap }> = {
   index: { label: 'Hoje', icon: 'home-outline', activeIcon: 'home' },
@@ -37,9 +40,17 @@ function PremiumTabBar({ state, navigation }: TabBarProps) {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const barWidth = Math.min(500, width - 24);
+  const barLeft = (width - barWidth) / 2;
+  const barBottom = Math.max(8, insets.bottom - 2);
   const routes = state.routes.filter((route) => route.name !== 'adicionar');
+  if (Platform.OS === 'web' && width >= NINOU_DESKTOP_BREAKPOINT) {
+    const timerWidth = Math.min(620, width - 340);
+    return <><DesktopNavigation state={state} navigation={navigation} /><BreastfeedingTimerBar width={timerWidth} left={width - timerWidth - 30} bottom={28} /></>;
+  }
   return (
-    <View style={[styles.bar, { width: barWidth, left: (width - barWidth) / 2, bottom: Math.max(8, insets.bottom - 2), backgroundColor: isDark ? 'rgba(22,14,43,0.97)' : 'rgba(255,251,247,0.97)', borderColor: isDark ? 'rgba(218,205,255,0.14)' : 'rgba(92,69,126,0.13)' }]}>
+    <>
+    <BreastfeedingTimerBar width={barWidth} left={barLeft} bottom={barBottom + 78} />
+    <View style={[styles.bar, { width: barWidth, left: barLeft, bottom: barBottom, backgroundColor: isDark ? 'rgba(22,14,43,0.97)' : 'rgba(255,251,247,0.97)', borderColor: isDark ? 'rgba(218,205,255,0.14)' : 'rgba(92,69,126,0.13)' }]}>
       <LinearGradient pointerEvents="none" colors={isDark ? ['rgba(255,255,255,0.055)', 'rgba(255,255,255,0.01)'] : ['rgba(255,255,255,0.95)', 'rgba(247,237,248,0.76)']} style={StyleSheet.absoluteFill} />
       <View style={styles.nav}>{routes.map((route) => {
         const originalIndex = state.routes.findIndex((item) => item.key === route.key);
@@ -51,6 +62,7 @@ function PremiumTabBar({ state, navigation }: TabBarProps) {
       <View pointerEvents="none" style={[styles.addHalo, { backgroundColor: canWrite ? (isDark ? 'rgba(111,242,203,0.15)' : 'rgba(117,88,232,0.12)') : colors.primarySoft }]} />
       <Pressable disabled={!canWrite} accessibilityRole="button" accessibilityLabel={canWrite ? 'Abrir menu de novos registros' : 'Acesso somente para visualização'} onPress={() => { void Haptics.selectionAsync(); router.push('/registrar'); }} style={({ pressed }) => [styles.add, pressed && canWrite && styles.pressed, !canWrite && styles.addDisabled]}><LinearGradient colors={canWrite ? (isDark ? ['#72F2C7', '#9FD5FF'] : ['#9C70FF', '#90B7FF']) : [colors.surfaceElevated, colors.surfaceElevated]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.addGradient}><Ionicons name={canWrite ? 'add' : 'eye-outline'} size={canWrite ? 31 : 24} color={canWrite ? (isDark ? '#10241E' : '#FFF') : colors.textMuted} /></LinearGradient></Pressable>
     </View>
+    </>
   );
 }
 

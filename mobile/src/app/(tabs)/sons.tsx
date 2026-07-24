@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { NinouCard, NinouScreen } from '@/components/ninou-screen';
+import { useNinouLayout } from '@/theme/layout';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -26,6 +27,7 @@ function formatTimer(milliseconds: number) {
 
 export default function SoundsScreen() {
   const { colors } = useNinouTheme();
+  const { isDesktop } = useNinouLayout();
   const womb = useAudioPlayer(require('@/assets/audio/som-utero.mp3'));
   const relax = useAudioPlayer(require('@/assets/audio/som-relaxar.mp3'));
   const rhythm = useAudioPlayer(require('@/assets/audio/ritmo-suave-bebe.mp3'));
@@ -108,67 +110,69 @@ export default function SoundsScreen() {
 
   return (
     <NinouScreen title="Sons" hidePageHeader>
-      <NinouCard style={styles.hero}>
-        <View style={[styles.heroIcon, { backgroundColor: colors.primarySoft, borderColor: colors.border }]}><Text style={[styles.heroIconText, { color: colors.text }]}>♪</Text></View>
+      <NinouCard style={[styles.hero, isDesktop && styles.heroDesktop]}>
+        <View style={[styles.heroIcon, isDesktop && styles.heroIconDesktop, { backgroundColor: colors.primarySoft, borderColor: colors.border }]}><Text style={[styles.heroIconText, isDesktop && styles.heroIconTextDesktop, { color: colors.text }]}>♪</Text></View>
         <View style={styles.heroCopy}>
           <Text style={[styles.kicker, { color: colors.textMuted }]}>Sons para dormir</Text>
-          <Text style={[styles.heroTitle, { color: colors.text }]}>Escolha um som relaxante</Text>
-          <Text style={[styles.heroText, { color: colors.textMuted }]}>Toque por 1 hora, com repetição automática até o timer terminar.</Text>
+          <Text style={[styles.heroTitle, isDesktop && styles.heroTitleDesktop, { color: colors.text }]}>Escolha um som relaxante</Text>
+          <Text style={[styles.heroText, isDesktop && styles.heroTextDesktop, { color: colors.textMuted }]}>Toque por 1 hora, com repetição automática até o timer terminar.</Text>
         </View>
       </NinouCard>
 
-      <NinouCard style={styles.playerCard}>
-        <View style={styles.playerTopline}>
-          <Text style={[styles.kicker, { color: colors.textMuted }]}>{playing ? 'Tocando agora' : paused ? 'Pausado' : 'Pronto para tocar'}</Text>
-          <Text style={[styles.timer, { color: colors.text }]}>{formatTimer(remainingMs)}</Text>
-        </View>
-        <View style={styles.currentSound}>
-          <View style={[styles.currentIcon, { backgroundColor: colors.surfaceElevated }]}><Text style={styles.emoji}>{current.icon}</Text></View>
-          <View style={styles.currentCopy}>
-            <Text style={[styles.currentTitle, { color: colors.text }]}>{current.title}</Text>
-            <Text style={[styles.currentDescription, { color: colors.textMuted }]}>{current.description}</Text>
+      <View style={[styles.soundWorkspace, isDesktop && styles.soundWorkspaceDesktop]}>
+        <NinouCard style={[styles.playerCard, isDesktop && styles.playerCardDesktop]}>
+          <View style={styles.playerTopline}>
+            <Text style={[styles.kicker, { color: colors.textMuted }]}>{playing ? 'Tocando agora' : paused ? 'Pausado' : 'Pronto para tocar'}</Text>
+            <Text style={[styles.timer, isDesktop && styles.timerDesktop, { color: colors.text }]}>{formatTimer(remainingMs)}</Text>
           </View>
-        </View>
-        <View style={[styles.progressTrack, { backgroundColor: colors.surfaceElevated }]}>
-          <LinearGradient colors={['#8F75FF', '#78E2C7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.progressFill, { width: `${progress}%` }]} />
-        </View>
-        <View style={styles.playerMeta}>
-          <Text style={[styles.metaText, { color: colors.textMuted }]}>{formatTimer(elapsedMs).replace(/^00:/, '')}</Text>
-          <Text style={[styles.metaText, styles.metaCenter, { color: colors.textMuted }]}>Repetir ativo • para em 1h</Text>
-          <Text style={[styles.metaText, styles.metaRight, { color: colors.textMuted }]}>{formatTimer(remainingMs)}</Text>
-        </View>
-        <View style={styles.controls}>
-          <Pressable onPress={playing ? pause : play} style={styles.mainControlWrap}>
-            <LinearGradient colors={['#FF9675', '#FFD0AD']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.mainControl}>
-              <Text style={styles.mainControlText}>{playing ? 'Ⅱ  Pausar' : paused ? '▶  Continuar' : '▶  Tocar por 1h'}</Text>
-            </LinearGradient>
-          </Pressable>
-          <Pressable onPress={stop} style={[styles.stopControl, { borderColor: `${colors.warning}88`, backgroundColor: `${colors.warning}12` }]}>
-            <Text style={[styles.stopText, { color: colors.warning }]}>■ Parar</Text>
-          </Pressable>
-        </View>
-      </NinouCard>
-
-      <View style={styles.soundList}>
-        {tracks.map((track, index) => {
-          const selected = selectedIndex === index;
-          return (
-            <Pressable
-              key={track.key}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              accessibilityLabel={`Selecionar ${track.title}`}
-              onPress={() => selectTrack(index)}
-              style={[styles.soundOption, { backgroundColor: selected ? colors.primarySoft : colors.surface, borderColor: selected ? colors.primary : colors.border }]}>
-              <View style={[styles.optionIcon, { backgroundColor: colors.surfaceElevated }]}><Text style={styles.emoji}>{track.icon}</Text></View>
-              <View style={styles.optionCopy}>
-                <Text style={[styles.optionTitle, { color: colors.text }]}>{track.title}</Text>
-                <Text style={[styles.optionDescription, { color: colors.textMuted }]}>{track.listDescription}</Text>
-              </View>
-              <Text style={[styles.playMark, { color: selected ? colors.accent : colors.primary }]}>{selected ? '● ▶' : '▶'}</Text>
+          <View style={styles.currentSound}>
+            <View style={[styles.currentIcon, isDesktop && styles.currentIconDesktop, { backgroundColor: colors.surfaceElevated }]}><Text style={[styles.emoji, isDesktop && styles.emojiDesktop]}>{current.icon}</Text></View>
+            <View style={styles.currentCopy}>
+              <Text style={[styles.currentTitle, isDesktop && styles.currentTitleDesktop, { color: colors.text }]}>{current.title}</Text>
+              <Text style={[styles.currentDescription, isDesktop && styles.currentDescriptionDesktop, { color: colors.textMuted }]}>{current.description}</Text>
+            </View>
+          </View>
+          <View style={[styles.progressTrack, { backgroundColor: colors.surfaceElevated }]}>
+            <LinearGradient colors={['#8F75FF', '#78E2C7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.progressFill, { width: `${progress}%` }]} />
+          </View>
+          <View style={styles.playerMeta}>
+            <Text style={[styles.metaText, { color: colors.textMuted }]}>{formatTimer(elapsedMs).replace(/^00:/, '')}</Text>
+            <Text style={[styles.metaText, styles.metaCenter, { color: colors.textMuted }]}>Repetir ativo • para em 1h</Text>
+            <Text style={[styles.metaText, styles.metaRight, { color: colors.textMuted }]}>{formatTimer(remainingMs)}</Text>
+          </View>
+          <View style={styles.controls}>
+            <Pressable onPress={playing ? pause : play} style={styles.mainControlWrap}>
+              <LinearGradient colors={['#FF9675', '#FFD0AD']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.mainControl, isDesktop && styles.mainControlDesktop]}>
+                <Text style={[styles.mainControlText, isDesktop && styles.mainControlTextDesktop]}>{playing ? 'Ⅱ  Pausar' : paused ? '▶  Continuar' : '▶  Tocar por 1h'}</Text>
+              </LinearGradient>
             </Pressable>
-          );
-        })}
+            <Pressable onPress={stop} style={[styles.stopControl, isDesktop && styles.stopControlDesktop, { borderColor: `${colors.warning}88`, backgroundColor: `${colors.warning}12` }]}>
+              <Text style={[styles.stopText, { color: colors.warning }]}>■ Parar</Text>
+            </Pressable>
+          </View>
+        </NinouCard>
+
+        <View style={[styles.soundList, isDesktop && styles.soundListDesktop]}>
+          {tracks.map((track, index) => {
+            const selected = selectedIndex === index;
+            return (
+              <Pressable
+                key={track.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                accessibilityLabel={`Selecionar ${track.title}`}
+                onPress={() => selectTrack(index)}
+                style={[styles.soundOption, isDesktop && styles.soundOptionDesktop, { backgroundColor: selected ? colors.primarySoft : colors.surface, borderColor: selected ? colors.primary : colors.border }]}>
+                <View style={[styles.optionIcon, { backgroundColor: colors.surfaceElevated }]}><Text style={styles.emoji}>{track.icon}</Text></View>
+                <View style={styles.optionCopy}>
+                  <Text style={[styles.optionTitle, { color: colors.text }]}>{track.title}</Text>
+                  <Text style={[styles.optionDescription, { color: colors.textMuted }]}>{track.listDescription}</Text>
+                </View>
+                <Text style={[styles.playMark, { color: selected ? colors.accent : colors.primary }]}>{selected ? '● ▶' : '▶'}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <NinouCard>
@@ -181,21 +185,34 @@ export default function SoundsScreen() {
 
 const styles = StyleSheet.create({
   hero: { minHeight: 122, flexDirection: 'row', alignItems: 'center', gap: spacing.lg, padding: 18 },
+  heroDesktop: { minHeight: 178, borderRadius: 30, paddingHorizontal: 32, gap: 24 },
   heroIcon: { width: 58, height: 58, borderRadius: 29, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' },
+  heroIconDesktop: { width: 82, height: 82, borderRadius: 28 },
   heroIconText: { fontSize: 28 },
+  heroIconTextDesktop: { fontSize: 40 },
   heroCopy: { flex: 1, gap: 4 },
   kicker: { fontSize: 11, lineHeight: 14, fontWeight: '900', letterSpacing: 1.05, textTransform: 'uppercase' },
   heroTitle: { fontSize: 20, lineHeight: 24, fontWeight: '900' },
+  heroTitleDesktop: { fontSize: 31, lineHeight: 37 },
   heroText: { fontSize: 14, lineHeight: 20 },
+  heroTextDesktop: { maxWidth: 720, fontSize: 16, lineHeight: 24 },
+  soundWorkspace: { gap: 14 },
+  soundWorkspaceDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 24 },
   playerCard: { gap: spacing.lg, padding: 20 },
+  playerCardDesktop: { flex: 1.35, minHeight: 430, borderRadius: 30, padding: 30, justifyContent: 'space-between' },
   playerTopline: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
   timer: { fontSize: 26, lineHeight: 30, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  timerDesktop: { fontSize: 38, lineHeight: 44 },
   currentSound: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   currentIcon: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
+  currentIconDesktop: { width: 76, height: 76, borderRadius: 26 },
   emoji: { fontSize: 24 },
+  emojiDesktop: { fontSize: 36 },
   currentCopy: { flex: 1, gap: 3 },
   currentTitle: { fontSize: 17, fontWeight: '900' },
+  currentTitleDesktop: { fontSize: 24 },
   currentDescription: { fontSize: 14, lineHeight: 20 },
+  currentDescriptionDesktop: { marginTop: 5, fontSize: 16, lineHeight: 24 },
   progressTrack: { height: 10, borderRadius: radius.pill, overflow: 'hidden' },
   progressFill: { height: '100%', minWidth: 0, borderRadius: radius.pill },
   playerMeta: { flexDirection: 'row', alignItems: 'center' },
@@ -205,11 +222,16 @@ const styles = StyleSheet.create({
   controls: { flexDirection: 'row', gap: 10 },
   mainControlWrap: { flex: 1 },
   mainControl: { minHeight: 50, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md },
+  mainControlDesktop: { minHeight: 62, borderRadius: 20 },
   mainControlText: { color: '#211F38', fontSize: 15, fontWeight: '800' },
+  mainControlTextDesktop: { fontSize: 17 },
   stopControl: { width: 96, minHeight: 50, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center' },
+  stopControlDesktop: { width: 122, minHeight: 62, borderRadius: 20 },
   stopText: { fontSize: 14, fontWeight: '800' },
   soundList: { gap: 10 },
+  soundListDesktop: { width: 390, justifyContent: 'space-between', gap: 14 },
   soundOption: { minHeight: 82, borderRadius: 22, borderWidth: StyleSheet.hairlineWidth, padding: 12, flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  soundOptionDesktop: { flex: 1, minHeight: 126, borderRadius: 26, padding: 18 },
   optionIcon: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
   optionCopy: { flex: 1, gap: 3 },
   optionTitle: { fontSize: 16, fontWeight: '900' },

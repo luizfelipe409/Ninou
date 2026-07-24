@@ -3,7 +3,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { NinouBackground } from '@/components/ninou-background';
@@ -19,6 +19,20 @@ import { useNinouTheme } from '@/theme/tokens';
 type Period = 'day' | '3d' | '7d' | '30d' | 'custom';
 
 function escapeHtml(value: string) { return value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character] || character); }
+
+function downloadWebFile(content: string, mimeType: string, fileName: string) {
+  if (Platform.OS !== 'web' || typeof document === 'undefined' || typeof URL === 'undefined') return false;
+  const uri = URL.createObjectURL(new Blob([content], { type: `${mimeType};charset=utf-8` }));
+  const link = document.createElement('a');
+  link.href = uri;
+  link.download = fileName;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(uri), 1000);
+  return true;
+}
 
 export default function ReportsScreen() {
   const { colors, isDark } = useNinouTheme();
@@ -60,8 +74,14 @@ export default function ReportsScreen() {
     try {
       const rows = report.events.map((event) => `<tr><td>${new Date(event.start).toLocaleDateString('pt-BR')}</td><td>${formatTime(event.start)}</td><td>${escapeHtml(recordConfig[event.type].title)}</td><td>${escapeHtml(event.detail || '—')}</td><td>${event.end > event.start ? formatDuration(event.end - event.start) : '—'}</td></tr>`).join('');
       const html = `<!doctype html><html><head><meta charset="utf-8"><style>@page{margin:28px}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#302142;background:#fff}header{padding:28px;border-radius:24px;background:linear-gradient(135deg,#17102e,#6548c9);color:#fff}h1{font-size:32px;margin:8px 0}.brand{letter-spacing:4px;font-size:11px;font-weight:800}.meta{color:#ded5f3}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}.kpi{padding:15px;border-radius:16px;background:#f4effb}.kpi b{display:block;font-size:20px;margin-top:5px}table{width:100%;border-collapse:collapse;font-size:11px}th{text-align:left;color:#7558e8;padding:9px;border-bottom:2px solid #e8e0f0}td{padding:9px;border-bottom:1px solid #eee8f3}.note{margin-top:18px;padding:16px;border-radius:16px;background:#eef8f5;white-space:pre-wrap}footer{margin-top:24px;color:#82768d;font-size:9px}</style></head><body><header><div class="brand">NINOU · RELATÓRIO DE ROTINA</div><h1>${escapeHtml(profile.name || 'Diário do bebê')}</h1><div class="meta">${new Date(report.start).toLocaleDateString('pt-BR')} — ${new Date(report.end).toLocaleDateString('pt-BR')} · preparado para a família</div></header><section class="grid"><div class="kpi">Sono<b>${formatDuration(report.summary.sleepMs)}</b></div><div class="kpi">Alimentações<b>${report.summary.feeding}</b></div><div class="kpi">Fraldas<b>${report.summary.diapers}</b></div><div class="kpi">Medicamentos<b>${report.summary.medicine}</b></div></section><h2>Linha do tempo</h2><table><thead><tr><th>Data</th><th>Hora</th><th>Cuidado</th><th>Detalhe</th><th>Duração</th></tr></thead><tbody>${rows || '<tr><td colspan="5">Sem registros no período.</td></tr>'}</tbody></table>${report.notes.length ? `<div class="note"><strong>Observações da família</strong><br><br>${escapeHtml(report.notes.join('\n'))}</div>` : ''}<footer>Documento informativo. O Ninou não realiza diagnóstico e não substitui orientação pediátrica.</footer></body></html>`;
-      const result = await Print.printToFileAsync({ html });
-      await shareFile(result.uri, 'application/pdf', 'Relatório premium do Ninou');
+      if (Platform.OS === 'web') {
+        // No navegador, o diálogo nativo permite imprimir ou salvar o material
+        // premium como PDF sem depender de uma URI local incompatível com Web Share.
+        await Print.printAsync({ html });
+      } else {
+        const result = await Print.printToFileAsync({ html });
+        await shareFile(result.uri, 'application/pdf', 'Relatório premium do Ninou');
+      }
     } catch (error) { Alert.alert('Não foi possível gerar o PDF', String((error as Error).message || error)); } finally { setBusy(''); }
   }
 
@@ -70,9 +90,11 @@ export default function ReportsScreen() {
     setBusy(format);
     try {
       const content = format === 'json' ? JSON.stringify({ generatedAt: new Date().toISOString(), baby: profile, report }, null, 2) : ['data,hora,tipo,detalhe,observacoes,duracao_minutos', ...report.events.map((event) => [new Date(event.start).toLocaleDateString('pt-BR'), formatTime(event.start), recordConfig[event.type].title, event.detail, event.notes, Math.round((event.end - event.start) / 60000)].map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','))].join('\n');
+      const mimeType = format === 'json' ? 'application/json' : 'text/csv';
+      if (downloadWebFile(content, mimeType, `${filename}.${format}`)) return;
       const uri = `${FileSystem.cacheDirectory}${filename}.${format}`;
       await FileSystem.writeAsStringAsync(uri, content, { encoding: FileSystem.EncodingType.UTF8 });
-      await shareFile(uri, format === 'json' ? 'application/json' : 'text/csv', `Relatório Ninou em ${format.toUpperCase()}`);
+      await shareFile(uri, mimeType, `Relatório Ninou em ${format.toUpperCase()}`);
     } catch (error) { Alert.alert('Exportação indisponível', String((error as Error).message || error)); } finally { setBusy(''); }
   }
 

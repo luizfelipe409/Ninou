@@ -14,12 +14,14 @@ import { canEditFamilyProfile, canExportFamilyReports, canManageFamily as roleCa
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
 import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
+import { useNinouLayout } from '@/theme/layout';
 import { radius, spacing, useNinouTheme, type ThemeMode } from '@/theme/tokens';
 import { useFamilyPreferences } from '@/state/preferences-context';
 import { createCaregiverInvite, getFirebaseErrorMessage, getLocalDateId, observeFamilyMembers, observeFamilySubscription, requestAccountDeletion, saveLegalConsent, submitSupportRequest, type FamilyMember, type FamilySubscription } from '@/services/firebase';
 
 export default function ProfileScreen() {
   const { colors, isDark, mode, setMode } = useNinouTheme();
+  const { isDesktop } = useNinouLayout();
   const { profile, updateProfile } = useBabyProfile();
   const { user, access, status, error, login, signOut, refreshAccess } = useNinouAuth();
   const { syncMessage, canWrite, resetDay } = useRoutine();
@@ -149,7 +151,7 @@ export default function ProfileScreen() {
 
   return (
     <NinouScreen title="Perfil" hidePageHeader>
-      <LinearGradient colors={isDark ? ['#2A1D4B', '#171029', '#100C20'] : ['#FFFDFC', '#F8F0FB', '#EEF5FF']} style={[styles.profileHero, { borderColor: colors.border }]}>
+      <LinearGradient colors={isDark ? ['#2A1D4B', '#171029', '#100C20'] : ['#FFFDFC', '#F8F0FB', '#EEF5FF']} style={[styles.profileHero, isDesktop && styles.profileHeroDesktop, { borderColor: colors.border }]}>
         <View style={[styles.avatarHaloOuter, { borderColor: `${colors.accent}66`, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.78)' }]}>
           <View style={[styles.avatarHaloInner, { borderColor: `${colors.primary}AA` }]}>
             <AvatarArt avatarId={profile.avatarId} size={88} />
@@ -159,7 +161,8 @@ export default function ProfileScreen() {
         <Text style={[styles.heroAge, { color: colors.text }]}>{getBabyAgeText(profile.birthDate)}</Text>
       </LinearGradient>
 
-      <NinouCard style={styles.profileCard}>
+      <View style={[styles.profileGrid, isDesktop && styles.profileGridDesktop]}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Perfil do diário</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Diário de cuidados</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Ajustes usados no diário de {profile.name || 'seu bebê'}.</Text>
@@ -206,7 +209,7 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Peso e crescimento</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Atualizar peso</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Guarde o histórico informado pela família. O Ninou não interpreta curvas nem oferece diagnóstico.</Text>
@@ -215,7 +218,7 @@ export default function ProfileScreen() {
         {profile.weights.slice(0, 4).map((weight) => <View key={weight.id} style={[styles.weightHistory, { borderTopColor: colors.border }]}><Text style={[styles.weightHistoryDate, { color: colors.textMuted }]}>{new Date(`${weight.date}T12:00:00`).toLocaleDateString('pt-BR')}</Text><Text style={[styles.weightHistoryValue, { color: colors.text }]}>{weight.value.toLocaleString('pt-BR', { minimumFractionDigits: 3 })} kg</Text></View>)}
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Identidade da conta</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Quem registra os cuidados?</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Cada conta mantém seu próprio nome. Ele acompanha os novos registros e aparece no Diário em todos os aparelhos.</Text>
@@ -228,7 +231,7 @@ export default function ProfileScreen() {
         <Pressable onPress={saveCaregiverIdentity} style={[styles.primaryButton, styles.cardAction, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Salvar identidade da conta</Text></Pressable>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Janela acordado</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Referência gentil</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>Escolha o tempo usado nos indicadores da rotina. Não é uma recomendação médica.</Text>
@@ -241,7 +244,7 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Preferências</Text>
         <Text style={[styles.cardTitle, { color: colors.text }]}>Tema do app</Text>
         <Text style={[styles.cardText, { color: colors.textMuted }]}>A escolha fica salva neste aparelho e também muda a órbita entre o céu claro e o cenário cósmico.</Text>
@@ -262,7 +265,7 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <View style={styles.accessRow}><View style={[styles.accessIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={24} color={colors.primary} /></View><View style={styles.accessCopy}><Text style={[styles.sectionKicker, { color: colors.primary }]}>Família conectada</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Acesso e convites</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>{canManageFamily ? 'Convide cuidadores por e-mail. O código tem uso único e expira em 7 dias.' : 'Você pode acompanhar a família, mas apenas responsáveis podem gerar convites.'}</Text></View></View>
         {activeSubscription ? <View style={[styles.subscriptionCard, { backgroundColor: colors.primarySoft, borderColor: colors.border }]}><Text style={[styles.subscriptionKicker, { color: colors.primary }]}>{subscriptionLabel}</Text><Text style={[styles.subscriptionTitle, { color: colors.text }]}>{activeSubscription.plan === 'suspended' ? 'Temporariamente suspenso' : activeSubscription.validUntil ? `${activeSubscription.validUntil <= subscriptionClock ? 'Validade encerrada' : 'Válido até'} ${new Date(activeSubscription.validUntil).toLocaleDateString('pt-BR')}` : 'Validade ainda não definida'}</Text><Text style={[styles.subscriptionMeta, { color: colors.textMuted }]}>{activeSubscription.plan === 'suspended' ? 'Fale com o suporte para reativar o acesso.' : activeSubscription.validUntil ? (remainingDays ? `${remainingDays} dia(s) restante(s)` : 'O período terminou.') : 'O administrador ainda não definiu um período.'}</Text></View> : null}
         {canManageFamily ? <View style={styles.inviteForm}><Text style={[styles.label, { color: colors.text }]}>E-mail do familiar</Text><TextInput value={inviteEmail} onChangeText={setInviteEmail} autoCapitalize="none" keyboardType="email-address" placeholder="familiar@exemplo.com" placeholderTextColor={colors.textMuted} style={[styles.input, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><Text style={[styles.label, { color: colors.text }]}>Permissão do convite</Text><View style={styles.inviteRoles}>{[
@@ -275,7 +278,7 @@ export default function ProfileScreen() {
         <View style={styles.memberList}><Text style={[styles.label, { color: colors.text }]}>Pessoas com acesso</Text>{members.length ? members.map((member) => <View key={member.uid} style={[styles.member, { backgroundColor: colors.surfaceElevated }]}><View style={[styles.memberAvatar, { backgroundColor: colors.primarySoft }]}><Text style={[styles.memberInitial, { color: colors.primary }]}>{(member.name || member.email || 'F').charAt(0).toUpperCase()}</Text></View><View style={styles.memberCopy}><Text style={[styles.memberName, { color: colors.text }]}>{member.name || member.email}</Text><Text style={[styles.memberMeta, { color: colors.textMuted }]}>{familyRoleLabel(member.role)} · {member.status === 'active' ? 'Ativo' : member.status}</Text></View></View>) : <Text style={[styles.cardText, { color: colors.textMuted }]}>A lista aparecerá quando a família estiver sincronizada.</Text>}</View>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <View style={styles.accessRow}>
           <View style={[styles.accessIcon, { backgroundColor: colors.primarySoft }]}><Ionicons name="people-outline" size={24} color={colors.primary} /></View>
           <View style={styles.accessCopy}>
@@ -330,9 +333,9 @@ export default function ProfileScreen() {
         {error ? <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text> : null}
       </NinouCard>
 
-      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={[styles.reportCard, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.disabled]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={27} color="#FFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF profissional e exportações' : 'Exportação restrita'}</Text><Text style={styles.reportText}>{canExportReports ? 'WhatsApp, CSV, JSON e períodos personalizados.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFF" /></Pressable>
+      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={[styles.reportCard, isDesktop && styles.reportCardDesktop, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.disabled]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={27} color="#FFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF profissional e exportações' : 'Exportação restrita'}</Text><Text style={styles.reportText}>{canExportReports ? 'WhatsApp, CSV, JSON e períodos personalizados.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFF" /></Pressable>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Privacidade e segurança</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Seus dados, suas escolhas</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Consulte os documentos e registre o aceite. A preferência fica salva na conta e na família.</Text>
         <View style={styles.legalActions}><Pressable onPress={() => setLegalDocument('privacy')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="shield-checkmark-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Política</Text></Pressable><Pressable onPress={() => setLegalDocument('terms')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="document-text-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Termos</Text></Pressable><Pressable onPress={() => setLegalDocument('medical')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="medical-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Aviso médico</Text></Pressable></View>
         <View style={styles.legalButtonStack}>
@@ -341,13 +344,15 @@ export default function ProfileScreen() {
         </View>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Ajuda e suporte</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Encontrou algum problema?</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Envie uma descrição. O diagnóstico técnico inclui apenas versão, família, papel e estado de sincronização — nunca senha ou conteúdo privado.</Text><Pressable onPress={() => setSupportOpen(true)} style={[styles.primaryButton, styles.cardAction, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Relatar um problema</Text></Pressable>
       </NinouCard>
 
-      <NinouCard style={styles.profileCard}>
+      <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.danger }]}>Dados do dia</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Recomeçar os registros de hoje</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Remove o estado, os eventos e as notas de hoje para toda a família. Relatórios de dias anteriores permanecem intactos.</Text><Pressable disabled={!canWrite} onPress={() => Alert.alert('Zerar o dia?', 'Esta ação será sincronizada e não poderá ser desfeita.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Zerar hoje', style: 'destructive', onPress: () => resetDay(getLocalDateId()) }])} style={[styles.secondaryButton, styles.cardAction, { borderColor: colors.danger }, !canWrite && styles.disabled]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>{canWrite ? 'Zerar dia' : 'Somente visualização'}</Text></Pressable>
       </NinouCard>
+
+      </View>
 
       <Modal visible={avatarModalOpen} transparent animationType="fade" onRequestClose={() => setAvatarModalOpen(false)}>
         <View style={styles.avatarModalBackdrop}>
@@ -420,7 +425,11 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   profileHero: { minHeight: 308, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, gap: spacing.lg, overflow: 'hidden' },
+  profileHeroDesktop: { minHeight: 270, borderRadius: 32, padding: 34 },
+  profileGrid: { gap: 14 },
+  profileGridDesktop: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: 20 },
   profileCard: { padding: 20 },
+  profileCardDesktop: { width: '48%', minWidth: 430, flexGrow: 1, borderRadius: 28, padding: 26 },
   avatarHaloOuter: { width: 122, height: 122, borderRadius: 61, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   avatarHaloInner: { width: 106, height: 106, borderRadius: 53, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   heroName: { marginTop: spacing.sm, fontSize: 42, lineHeight: 46, fontWeight: '900', letterSpacing: -1.8, textAlign: 'center' },
@@ -466,6 +475,7 @@ const styles = StyleSheet.create({
   buttonRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   errorText: { marginTop: spacing.md, fontSize: 12, lineHeight: 17, fontWeight: '700' },
   reportCard: { minHeight: 104, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 15, flexDirection: 'row', alignItems: 'center', gap: 12 }, reportIcon: { width: 54, height: 54, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }, reportCopy: { flex: 1 }, reportKicker: { color: 'rgba(255,255,255,0.72)', fontSize: 8.5, fontWeight: '900', letterSpacing: 1 }, reportTitle: { color: '#FFF', marginTop: 3, fontSize: 15, fontWeight: '900' }, reportText: { color: 'rgba(255,255,255,0.76)', marginTop: 3, fontSize: 10.5, lineHeight: 15 },
+  reportCardDesktop: { width: '48%', minWidth: 430, flexGrow: 1, minHeight: 132, borderRadius: 28, padding: 22 },
   legalActions: { marginTop: spacing.lg, marginBottom: spacing.md, flexDirection: 'row', gap: 9 }, legalButton: { flex: 1, minHeight: 72, borderRadius: 17, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', gap: 6 }, legalText: { fontSize: 10.5, fontWeight: '900' },
   legalButtonStack: { gap: 12 },
   disabled: { opacity: 0.48 },

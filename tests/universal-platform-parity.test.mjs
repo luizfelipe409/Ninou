@@ -16,9 +16,9 @@ const tabs = await read('mobile/src/app/(tabs)/_layout.tsx');
 const background = await read('mobile/src/components/ninou-background.tsx');
 const rules = await read('firestore.rules');
 
-assert.equal(rootPackage.version, '84.1.1');
-assert.equal(mobilePackage.version, '84.1.1');
-assert.equal(appConfig.expo.version, '84.1.1');
+assert.equal(rootPackage.version, '84.1.2');
+assert.equal(mobilePackage.version, '84.1.2');
+assert.equal(appConfig.expo.version, '84.1.2');
 assert.equal(rootPackage.scripts.build, 'npm --prefix mobile run export:web');
 assert.equal(mobilePackage.scripts['export:web'], 'expo export --platform web --output-dir dist --clear');
 assert.equal(appConfig.expo.web.output, 'static');

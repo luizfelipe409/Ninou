@@ -53,7 +53,7 @@ export function canWriteFamilyRoutine(role?: string | null) {
 }
 
 export function canExportFamilyReports(role?: string | null) {
-  return ['owner', 'admin', 'caregiver', 'viewer'].includes(normalizeFamilyRole(role));
+  return ['owner', 'admin', 'caregiver'].includes(normalizeFamilyRole(role));
 }
 
 export function familyRoleLabel(role?: string | null) {

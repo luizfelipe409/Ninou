@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useNinouTheme } from '@/theme/tokens';
@@ -126,10 +126,6 @@ export function DateField({
   const months = useMemo(() => Array.from({ length: 12 }, (_, index) => index), []);
   const days = useMemo(() => Array.from({ length: daysInMonth(draftDate.getFullYear(), draftDate.getMonth()) }, (_, index) => index + 1), [draftDate]);
 
-  useEffect(() => {
-    if (open) setDraftDate(selectedDate);
-  }, [open, selectedDate]);
-
   const confirm = () => {
     onChange(toDateId(draftDate));
     setOpen(false);
@@ -142,7 +138,10 @@ export function DateField({
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${formatted || placeholder}`}
-        onPress={() => setOpen(true)}
+        onPress={() => {
+          setDraftDate(selectedDate);
+          setOpen(true);
+        }}
         style={({ pressed }) => [
           styles.input,
           { backgroundColor: colors.surfaceElevated, borderColor: colors.border },

@@ -50,14 +50,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus('resolving-family');
     setError('');
     try {
-      const nextAccountStatus = await loadUserAccountStatus(nextUser);
+      // As duas leituras são independentes. Executá-las em paralelo reduz
+      // sensivelmente a tela de preparação em redes móveis e no PWA do iOS.
+      const [nextAccountStatus, nextAccess] = await Promise.all([
+        loadUserAccountStatus(nextUser),
+        resolveFamilyAccess(nextUser),
+      ]);
       setAccountStatus(nextAccountStatus);
       if (['blocked', 'suspended', 'disabled', 'deletion_requested', 'deletion-pending', 'pending_deletion'].includes(nextAccountStatus)) {
         setAccess(null);
         setStatus('blocked');
         return;
       }
-      const nextAccess = await resolveFamilyAccess(nextUser);
       setAccess(nextAccess);
       setStatus(nextAccess ? 'ready' : 'no-family');
     } catch (loadError) {

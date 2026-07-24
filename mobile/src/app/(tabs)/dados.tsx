@@ -11,6 +11,7 @@ import { getLocalDateId } from '@/services/firebase';
 import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
 import { useBabyProfile, type WeightEntry } from '@/state/profile-context';
+import { useNinouLayout } from '@/theme/layout';
 import { radius, spacing, useNinouTheme } from '@/theme/tokens';
 
 type DayMetric = {
@@ -77,6 +78,7 @@ function metricForDay(id: string, state: DayState, now: number, isToday: boolean
 
 export default function DataScreen() {
   const { colors, isDark } = useNinouTheme();
+  const { isDesktop } = useNinouLayout();
   const { width } = useWindowDimensions();
   const { state, history, now } = useRoutine();
   const { access } = useNinouAuth();
@@ -98,11 +100,11 @@ export default function DataScreen() {
 
   return (
     <NinouScreen title="Dados" hidePageHeader>
-      <LinearGradient colors={isDark ? ['#2B2048', '#201632'] : ['#FFFDFC', '#F7EFFB', '#EEF5FF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.hero, { borderColor: colors.border }]}>
+      <LinearGradient colors={isDark ? ['#2B2048', '#201632'] : ['#FFFDFC', '#F7EFFB', '#EEF5FF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.hero, isDesktop && styles.heroDesktop, { borderColor: colors.border }]}>
         <View style={styles.heroCopy}>
           <Text style={[styles.kicker, { color: colors.textMuted }]}>Últimos 7 dias</Text>
-          <Text style={[styles.heroTitle, { color: colors.text }]}>Dados inteligentes</Text>
-          <Text style={[styles.heroText, { color: colors.textMuted }]}>Um painel mais limpo para acompanhar sono, alimentação, fraldas, medicamentos e crescimento sem poluição visual.</Text>
+          <Text style={[styles.heroTitle, isDesktop && styles.heroTitleDesktop, { color: colors.text }]}>Dados inteligentes</Text>
+          <Text style={[styles.heroText, isDesktop && styles.heroTextDesktop, { color: colors.textMuted }]}>Um painel mais limpo para acompanhar sono, alimentação, fraldas, medicamentos e crescimento sem poluição visual.</Text>
         </View>
         <View style={[styles.heroBadge, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}>
           <Text style={[styles.badgeKicker, { color: colors.textMuted }]}>Resumo</Text>
@@ -110,7 +112,7 @@ export default function DataScreen() {
         </View>
       </LinearGradient>
 
-      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={({ pressed }) => [styles.reportButton, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.reportDisabled, pressed && canExportReports && styles.pressed]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={24} color="#FFFFFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF, WhatsApp, CSV e JSON' : 'Exportação restrita'}</Text><Text style={styles.reportHint}>{canExportReports ? 'Escolha o período e compartilhe dados reais da família.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFFFFF" /></Pressable>
+      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={({ pressed }) => [styles.reportButton, isDesktop && styles.reportButtonDesktop, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.reportDisabled, pressed && canExportReports && styles.pressed]}><View style={[styles.reportIcon, isDesktop && styles.reportIconDesktop]}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={isDesktop ? 31 : 24} color="#FFFFFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={[styles.reportTitle, isDesktop && styles.reportTitleDesktop]}>{canExportReports ? 'PDF, WhatsApp, CSV e JSON' : 'Exportação restrita'}</Text><Text style={[styles.reportHint, isDesktop && styles.reportHintDesktop]}>{canExportReports ? 'Escolha o período e compartilhe dados reais da família.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={isDesktop ? 27 : 22} color="#FFFFFF" /></Pressable>
 
       <View style={styles.overviewRow}>
         <NinouCard style={styles.overviewCard}>
@@ -322,12 +324,19 @@ function ChartCard({ title, days, values, formatValue, wide = false, compact = f
 
 const styles = StyleSheet.create({
   hero: { minHeight: 188, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: spacing.xl, flexDirection: 'row', alignItems: 'center', gap: spacing.lg, overflow: 'hidden' },
+  heroDesktop: { minHeight: 244, borderRadius: 32, paddingHorizontal: 34, gap: 30 },
   heroCopy: { flex: 1, gap: spacing.sm },
   kicker: { fontSize: 11, lineHeight: 14, fontWeight: '900', letterSpacing: 1.05, textTransform: 'uppercase' },
   heroTitle: { fontSize: 39, lineHeight: 40, fontWeight: '900', letterSpacing: -2 },
+  heroTitleDesktop: { fontSize: 52, lineHeight: 56, letterSpacing: -2.6 },
   heroText: { fontSize: 14, lineHeight: 20 },
+  heroTextDesktop: { maxWidth: 760, fontSize: 17, lineHeight: 25 },
   heroBadge: { width: 86, minHeight: 86, borderRadius: 25, borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center', gap: 2 },
   reportButton: { minHeight: 92, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }, reportDisabled: { opacity: 0.56 }, reportIcon: { width: 50, height: 50, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }, reportCopy: { flex: 1 }, reportKicker: { color: 'rgba(255,255,255,0.72)', fontSize: 8.5, fontWeight: '900', letterSpacing: 1 }, reportTitle: { color: '#FFF', marginTop: 3, fontSize: 15, fontWeight: '900' }, reportHint: { color: 'rgba(255,255,255,0.76)', marginTop: 3, fontSize: 10.5, lineHeight: 15 }, pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
+  reportButtonDesktop: { minHeight: 126, borderRadius: 28, paddingHorizontal: 24, gap: 18 },
+  reportIconDesktop: { width: 68, height: 68, borderRadius: 22 },
+  reportTitleDesktop: { marginTop: 5, fontSize: 22 },
+  reportHintDesktop: { marginTop: 5, fontSize: 14, lineHeight: 20 },
   badgeKicker: { fontSize: 9, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' },
   badgeValue: { fontSize: 18, fontWeight: '900' },
   overviewRow: { flexDirection: 'row', gap: 12 },

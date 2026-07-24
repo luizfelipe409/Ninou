@@ -20,7 +20,7 @@ const firebase = await read('mobile/src/services/firebase.ts');
 const release = await read('mobile/src/config/release.ts');
 const vercel = await read('vercel.json');
 const app = await read('mobile/app.json');
-assert.match(release, /NINOU_VERSION = '84\.1\.1'/);
+assert.match(release, /NINOU_VERSION = '84\.1\.2'/);
 assert.match(release, /NINOU_DATA_CONTRACT_VERSION = 3/);
 assert.match(firebase, /projectId: process\.env\.EXPO_PUBLIC_FIREBASE_PROJECT_ID \|\| 'ninou-3c936'/);
 assert.match(firebase, /browserLocalPersistence/);

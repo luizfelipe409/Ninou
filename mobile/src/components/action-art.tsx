@@ -25,7 +25,12 @@ export function ActionArt({ type, size = 64 }: { type: RecordType; size?: number
   }
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, overflow: 'hidden' }}>
-      <Image source={images[type]} resizeMode="cover" style={{ width: size, height: size, transform: [{ scale: 1.1 }] }} />
+      <Image
+        source={images[type]}
+        resizeMode="contain"
+        fadeDuration={0}
+        style={{ width: size, height: size }}
+      />
     </View>
   );
 }
