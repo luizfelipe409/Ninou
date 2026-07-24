@@ -101,14 +101,24 @@ service cloud.firestore {
         : "";
     }
 
+    function familyIsActive(familyId) {
+      return exists(familyPath(familyId))
+        && get(familyPath(familyId)).data.get("status", "") == "active";
+    }
+
     function canReadFamily(familyId) {
-      return isGlobalAdmin() || isActiveFamilyMember(familyId);
+      return isGlobalAdmin()
+        || (
+          familyIsActive(familyId)
+          && isActiveFamilyMember(familyId)
+        );
     }
 
     function isFamilyManager(familyId) {
       return isGlobalAdmin()
         || (
-          isActiveFamilyMember(familyId)
+          familyIsActive(familyId)
+          && isActiveFamilyMember(familyId)
           && roleCanManage(currentMemberRole(familyId))
         );
     }
@@ -116,7 +126,8 @@ service cloud.firestore {
     function canWriteRoutine(familyId) {
       return isGlobalAdmin()
         || (
-          isActiveFamilyMember(familyId)
+          familyIsActive(familyId)
+          && isActiveFamilyMember(familyId)
           && roleCanWriteRoutine(currentMemberRole(familyId))
         );
     }
@@ -710,16 +721,12 @@ service cloud.firestore {
           "familyId",
           "accessLevel",
           "status",
-          "deletionRequestStatus",
-          "deletionRequestedAtClient",
-          "deletionRequestedAt",
           "deviceId",
           "lastSeenAt",
           "createdAt",
           "updatedAt"
         ])
-        && request.resource.data.get("status", "active")
-          in ["active", "deletion_requested"];
+        && request.resource.data.get("status", "active") == "active";
     }
 
     function selfUserUpdateIsSafe(uid) {
@@ -738,9 +745,6 @@ service cloud.firestore {
           "familyId",
           "accessLevel",
           "status",
-          "deletionRequestStatus",
-          "deletionRequestedAtClient",
-          "deletionRequestedAt",
           "deviceId",
           "lastSeenAt",
           "updatedAt"
@@ -748,7 +752,7 @@ service cloud.firestore {
         && request.resource.data.get(
           "status",
           resource.data.get("status", "active")
-        ) in [resource.data.get("status", "active"), "deletion_requested"];
+        ) == resource.data.get("status", "active");
     }
 
     // ---------------------------------------------------------------------
@@ -881,7 +885,6 @@ service cloud.firestore {
             && request.resource.data.get("type", "") in [
               "terms_acceptance",
               "support_request",
-              "data_deletion_request",
               "privacy_request"
             ]
           );
@@ -974,8 +977,7 @@ service cloud.firestore {
             && docId in [
               "profile",
               "legal",
-              "supportLastRequest",
-              "dataDeletionRequest"
+              "supportLastRequest"
             ]
             && uidIsSelfOrAbsent(request.resource.data, uid)
             && emailIsSelfOrAbsent(request.resource.data)

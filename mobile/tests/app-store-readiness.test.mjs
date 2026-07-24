@@ -52,8 +52,11 @@ if (existsSync(expoBinary)) {
 const firebaseService = await readFile(new URL('../src/services/firebase.ts', import.meta.url), 'utf8');
 const authContext = await readFile(new URL('../src/state/auth-context.tsx', import.meta.url), 'utf8');
 const profileScreen = await readFile(new URL('../src/app/(tabs)/perfil.tsx', import.meta.url), 'utf8');
-assert.ok(firebaseService.includes("status: 'deletion_requested'"));
+assert.ok(firebaseService.includes("httpsCallable<"));
+assert.ok(firebaseService.includes("'deleteMyAccount'"));
+assert.ok(firebaseService.includes("confirmation: 'DELETE_NINOU_ACCOUNT'"));
 assert.ok(authContext.includes("'deletion_requested'"));
-assert.ok(profileScreen.includes('Excluir minha conta'));
+assert.ok(profileScreen.includes('Excluir conta e família'));
+assert.ok(profileScreen.includes('Confirmação final'));
 
 console.log('App Store readiness: configuração, permissões, versões e ícone aprovados.');

@@ -263,6 +263,34 @@ test('aplica corretamente owner, cuidador e visualização na rotina', async () 
   ));
 });
 
+test('bloqueia novos acessos assim que a família entra em exclusão', async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), 'families', FAMILY_A), {
+      status: 'deleting',
+    }, { merge: true });
+  });
+
+  const owner = authenticated('owner-a', 'owner-a@example.com');
+  await assertFails(getDoc(doc(owner, 'families', FAMILY_A)));
+  await assertFails(setDoc(
+    doc(owner, 'families', FAMILY_A, 'days', '2026-07-24'),
+    routineDay(FAMILY_A, '2026-07-24', 'owner-a', 'owner-a@example.com'),
+  ));
+});
+
+test('reserva a exclusão definitiva para o backend administrativo', async () => {
+  const owner = authenticated('owner-a', 'owner-a@example.com');
+
+  await assertFails(setDoc(
+    doc(owner, 'users', 'owner-a', 'account', 'dataDeletionRequest'),
+    { status: 'open', type: 'data_deletion_request' },
+  ));
+  await assertFails(setDoc(
+    doc(owner, 'accountDeletionJobs', 'owner-a'),
+    { uid: 'owner-a', status: 'processing' },
+  ));
+});
+
 test('valida escopo, data e autoria de uma gravação da rotina', async () => {
   const caregiver = authenticated('care-a', 'care-a@example.com');
 

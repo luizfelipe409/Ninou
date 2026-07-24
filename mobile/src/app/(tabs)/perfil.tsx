@@ -10,7 +10,7 @@ import { DateField } from '@/components/date-field';
 import { RelationPicker } from '@/components/relation-picker';
 import { AvatarArt } from '@/components/avatar-art';
 import { avatarIds, avatarLabels, type AvatarId } from '@/domain/avatar';
-import { canEditFamilyProfile, canExportFamilyReports, canManageFamily as roleCanManageFamily, familyRoleLabel } from '@/domain/family-access';
+import { canEditFamilyProfile, canExportFamilyReports, canManageFamily as roleCanManageFamily, familyRoleLabel, normalizeFamilyRole } from '@/domain/family-access';
 import { getBabyAgeText, useBabyProfile } from '@/state/profile-context';
 import { useNinouAuth } from '@/state/auth-context';
 import { useRoutine } from '@/state/routine-context';
@@ -50,6 +50,7 @@ export default function ProfileScreen() {
   const canEditProfile = !access || canEditFamilyProfile(access.role);
   const canManageFamily = Boolean(access && roleCanManageFamily(access.role));
   const canExportReports = Boolean(access && canExportFamilyReports(access.role));
+  const isPrimaryOwner = Boolean(access && normalizeFamilyRole(access.role) === 'owner');
   const caregiverNameDraft = caregiverDraft?.name ?? preferences.caregiverName;
   const caregiverRelationDraft = caregiverDraft?.relation ?? preferences.caregiverRelation;
 
@@ -130,8 +131,10 @@ export default function ProfileScreen() {
     try {
       await requestAccountDeletion(user, access?.familyId);
       Alert.alert(
-        'Exclusão iniciada',
-        'Sua conta foi desativada e a solicitação de exclusão foi enviada. Você será desconectado agora.',
+        'Exclusão concluída',
+        isPrimaryOwner
+          ? 'Sua conta, a família e todos os dados compartilhados foram excluídos permanentemente.'
+          : 'Sua conta e seu vínculo foram excluídos permanentemente. Os dados compartilhados da família foram preservados.',
         [{ text: 'Entendi', onPress: () => void signOut() }],
       );
     } catch (deletionError) {
@@ -333,14 +336,40 @@ export default function ProfileScreen() {
         {error ? <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text> : null}
       </NinouCard>
 
-      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={[styles.reportCard, isDesktop && styles.reportCardDesktop, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.disabled]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={27} color="#FFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF profissional e exportações' : 'Exportação restrita'}</Text><Text style={styles.reportText}>{canExportReports ? 'WhatsApp, CSV, JSON e períodos personalizados.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFF" /></Pressable>
+      <Pressable disabled={!canExportReports} onPress={() => router.push('/relatorios' as never)} style={[styles.reportCard, isDesktop && styles.reportCardDesktop, { backgroundColor: colors.primary, borderColor: colors.primary }, !canExportReports && styles.disabled]}><View style={styles.reportIcon}><Ionicons name={canExportReports ? 'document-text-outline' : 'lock-closed-outline'} size={27} color="#FFF" /></View><View style={styles.reportCopy}><Text style={styles.reportKicker}>RELATÓRIO DE ROTINA</Text><Text style={styles.reportTitle}>{canExportReports ? 'PDF profissional e exportações' : 'Exportação restrita'}</Text><Text style={styles.reportText}>{canExportReports ? 'Resumo no WhatsApp, CSV para Excel e períodos personalizados.' : 'Disponível para responsáveis e cuidadores.'}</Text></View><Ionicons name={canExportReports ? 'chevron-forward' : 'lock-closed-outline'} size={22} color="#FFF" /></Pressable>
 
       <NinouCard style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
         <Text style={[styles.sectionKicker, { color: colors.primary }]}>Privacidade e segurança</Text><Text style={[styles.cardTitle, { color: colors.text }]}>Seus dados, suas escolhas</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Consulte os documentos e registre o aceite. A preferência fica salva na conta e na família.</Text>
         <View style={styles.legalActions}><Pressable onPress={() => setLegalDocument('privacy')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="shield-checkmark-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Política</Text></Pressable><Pressable onPress={() => setLegalDocument('terms')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="document-text-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Termos</Text></Pressable><Pressable onPress={() => setLegalDocument('medical')} style={[styles.legalButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}><Ionicons name="medical-outline" size={19} color={colors.primary} /><Text style={[styles.legalText, { color: colors.text }]}>Aviso médico</Text></Pressable></View>
         <View style={styles.legalButtonStack}>
           <Pressable disabled={working === 'legal'} onPress={() => void acceptLegal()} style={[styles.primaryButton, { backgroundColor: preferences.legalAcceptedAt ? colors.accent : colors.primary }]}><Text style={styles.primaryButtonText}>{working === 'legal' ? 'Salvando…' : preferences.legalAcceptedAt ? `Termos aceitos em ${new Date(preferences.legalAcceptedAt).toLocaleDateString('pt-BR')}` : 'Aceitar termos'}</Text></Pressable>
-          <Pressable disabled={!user || working === 'delete-account'} onPress={() => Alert.alert('Excluir sua conta?', 'O acesso será desativado imediatamente e uma solicitação de exclusão da conta e dos dados pessoais será enviada. Dados compartilhados com a família podem ser preservados para os demais responsáveis até a conclusão.', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Excluir conta', style: 'destructive', onPress: () => void startAccountDeletion() }])} style={[styles.secondaryButton, { borderColor: colors.danger }, (!user || working === 'delete-account') && styles.disabled]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>{working === 'delete-account' ? 'Iniciando exclusão…' : 'Excluir minha conta'}</Text></Pressable>
+          <Pressable disabled={!user || working === 'delete-account'} onPress={() => Alert.alert(
+            isPrimaryOwner ? 'Excluir toda a família?' : 'Excluir sua conta?',
+            isPrimaryOwner
+              ? 'Você é o responsável principal. Esta ação apagará permanentemente sua conta, o perfil do bebê, todos os registros, relatórios, convites e vínculos da família. Não será possível recuperar os dados.'
+              : 'Esta ação apagará permanentemente sua conta e removerá seu acesso. Os registros compartilhados continuarão disponíveis para o responsável principal.',
+            [
+              { text: 'Cancelar', style: 'cancel' },
+              {
+                text: 'Continuar',
+                style: 'destructive',
+                onPress: () => Alert.alert(
+                  'Confirmação final',
+                  isPrimaryOwner
+                    ? 'Confirma a exclusão definitiva de toda a família e de todo o histórico do Ninou?'
+                    : 'Confirma a exclusão definitiva da sua conta Ninou?',
+                  [
+                    { text: 'Voltar', style: 'cancel' },
+                    {
+                      text: isPrimaryOwner ? 'Excluir tudo' : 'Excluir conta',
+                      style: 'destructive',
+                      onPress: () => void startAccountDeletion(),
+                    },
+                  ],
+                ),
+              },
+            ],
+          )} style={[styles.secondaryButton, { borderColor: colors.danger }, (!user || working === 'delete-account') && styles.disabled]}><Text style={[styles.secondaryButtonText, { color: colors.danger }]}>{working === 'delete-account' ? 'Excluindo definitivamente…' : isPrimaryOwner ? 'Excluir conta e família' : 'Excluir minha conta'}</Text></Pressable>
         </View>
       </NinouCard>
 
@@ -416,7 +445,7 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      <Modal visible={Boolean(legalDocument)} transparent animationType="slide" onRequestClose={() => setLegalDocument(null)}><View style={styles.avatarModalBackdrop}><View style={[styles.legalModal, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.modalHandle, { backgroundColor: colors.border }]} /><Text style={[styles.avatarModalKicker, { color: colors.primary }]}>{legalDocument === 'privacy' ? 'POLÍTICA DE PRIVACIDADE' : legalDocument === 'medical' ? 'AVISO MÉDICO' : 'TERMOS DE USO'}</Text><Text style={[styles.avatarModalTitle, { color: colors.text }]}>{legalDocument === 'privacy' ? 'Como o Ninou cuida dos dados' : legalDocument === 'medical' ? 'Apoio à rotina, sem diagnóstico' : 'Uso responsável do Ninou'}</Text><ScrollView style={styles.legalScroll} showsVerticalScrollIndicator={false}><Text style={[styles.legalBody, { color: colors.textMuted }]}>{legalDocument === 'privacy' ? 'O Ninou trata os dados fornecidos pelos responsáveis para autenticar a conta, sincronizar a rotina entre pessoas autorizadas, gerar relatórios e prestar suporte. Isso pode incluir e-mail, identificação dos cuidadores, nome e data de nascimento do bebê, registros de sono, alimentação, fraldas, medicamentos e peso. Os dados são armazenados no Firebase e não são vendidos, usados para publicidade comportamental ou compartilhados para rastreamento. A família controla convites e acessos. Você pode solicitar exportação ou iniciar a exclusão da conta nesta tela. Dados compartilhados podem ser preservados para os demais membros autorizados quando necessário. O Ninou não realiza diagnóstico médico.' : legalDocument === 'medical' ? 'O Ninou é um diário de organização familiar. Indicadores, janelas e resumos são informativos e dependem dos dados registrados. O aplicativo não diagnostica, não prescreve tratamento e não substitui pediatra ou serviço de emergência. Em caso de preocupação com a saúde do bebê, procure atendimento profissional.' : 'Ao usar o Ninou, a família se compromete a informar dados verdadeiros, proteger o acesso à conta e usar os recursos apenas para organização da rotina. Convites são pessoais, de uso único e não devem ser publicados. O uso do aplicativo pressupõe concordância com a política de privacidade e com o aviso médico.'}</Text></ScrollView><Pressable onPress={() => setLegalDocument(null)} style={[styles.primaryButton, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Entendi</Text></Pressable></View></View></Modal>
+      <Modal visible={Boolean(legalDocument)} transparent animationType="slide" onRequestClose={() => setLegalDocument(null)}><View style={styles.avatarModalBackdrop}><View style={[styles.legalModal, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.modalHandle, { backgroundColor: colors.border }]} /><Text style={[styles.avatarModalKicker, { color: colors.primary }]}>{legalDocument === 'privacy' ? 'POLÍTICA DE PRIVACIDADE' : legalDocument === 'medical' ? 'AVISO MÉDICO' : 'TERMOS DE USO'}</Text><Text style={[styles.avatarModalTitle, { color: colors.text }]}>{legalDocument === 'privacy' ? 'Como o Ninou cuida dos dados' : legalDocument === 'medical' ? 'Apoio à rotina, sem diagnóstico' : 'Uso responsável do Ninou'}</Text><ScrollView style={styles.legalScroll} showsVerticalScrollIndicator={false}><Text style={[styles.legalBody, { color: colors.textMuted }]}>{legalDocument === 'privacy' ? 'O Ninou trata os dados fornecidos pelos responsáveis para autenticar a conta, sincronizar a rotina entre pessoas autorizadas, gerar relatórios e prestar suporte. Isso pode incluir e-mail, identificação dos cuidadores, nome e data de nascimento do bebê, registros de sono, alimentação, fraldas, medicamentos e peso. Os dados são armazenados no Firebase e não são vendidos, usados para publicidade comportamental ou compartilhados para rastreamento. A família controla convites e acessos. Quando o responsável principal exclui a conta, a família e todo o histórico compartilhado são removidos permanentemente. Quando outro membro exclui a própria conta, apenas seu acesso e seus dados pessoais são removidos, preservando o histórico da família. O Ninou não realiza diagnóstico médico.' : legalDocument === 'medical' ? 'O Ninou é um diário de organização familiar. Indicadores, janelas e resumos são informativos e dependem dos dados registrados. O aplicativo não diagnostica, não prescreve tratamento e não substitui pediatra ou serviço de emergência. Em caso de preocupação com a saúde do bebê, procure atendimento profissional.' : 'Ao usar o Ninou, a família se compromete a informar dados verdadeiros, proteger o acesso à conta e usar os recursos apenas para organização da rotina. Convites são pessoais, de uso único e não devem ser publicados. O uso do aplicativo pressupõe concordância com a política de privacidade e com o aviso médico.'}</Text></ScrollView><Pressable onPress={() => setLegalDocument(null)} style={[styles.primaryButton, { backgroundColor: colors.primary }]}><Text style={styles.primaryButtonText}>Entendi</Text></Pressable></View></View></Modal>
 
       <Modal visible={supportOpen} transparent animationType="slide" onRequestClose={() => setSupportOpen(false)}><View style={styles.avatarModalBackdrop}><View style={[styles.legalModal, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.modalHandle, { backgroundColor: colors.border }]} /><Text style={[styles.avatarModalKicker, { color: colors.primary }]}>SUPORTE NINOU</Text><Text style={[styles.avatarModalTitle, { color: colors.text }]}>Relatar um problema</Text><Text style={[styles.cardText, { color: colors.textMuted }]}>Conte o que aconteceu e o que você esperava que acontecesse.</Text><Text style={[styles.label, { color: colors.text }]}>Categoria</Text><View style={styles.supportCategories}>{['Problema no aplicativo', 'Sugestão', 'Sincronização', 'Conta e família'].map((category) => <Pressable key={category} onPress={() => setSupportCategory(category)} style={[styles.supportChip, { backgroundColor: supportCategory === category ? colors.primary : colors.surfaceElevated, borderColor: colors.border }]}><Text style={[styles.supportChipText, { color: supportCategory === category ? '#FFF' : colors.text }]}>{category}</Text></Pressable>)}</View><Text style={[styles.label, { color: colors.text }]}>Descrição</Text><TextInput multiline value={supportMessage} onChangeText={setSupportMessage} placeholder="Descreva as etapas, a tela e o resultado observado" placeholderTextColor={colors.textMuted} style={[styles.supportArea, { color: colors.text, backgroundColor: colors.surfaceElevated, borderColor: colors.border }]} /><View style={styles.avatarModalActions}><Pressable onPress={() => setSupportOpen(false)} style={[styles.avatarCloseButton, { borderColor: colors.border, backgroundColor: colors.surfaceElevated }]}><Text style={[styles.avatarCloseText, { color: colors.text }]}>Cancelar</Text></Pressable><Pressable disabled={!supportMessage.trim() || working === 'support'} onPress={() => void sendSupport()} style={[styles.avatarSaveButton, { flex: 1, backgroundColor: colors.primary }, (!supportMessage.trim() || working === 'support') && styles.disabled]}><Text style={styles.primaryButtonText}>{working === 'support' ? 'Enviando…' : 'Enviar relato'}</Text></Pressable></View></View></View></Modal>
     </NinouScreen>

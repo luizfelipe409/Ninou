@@ -55,7 +55,7 @@ export function NinouAppHeader() {
                 <MenuItem icon="book-outline" label="Diário" hint="Histórico completo" onPress={() => open('/diario')} />
                 <MenuItem icon="stats-chart-outline" label="Dados" hint="Tendências" onPress={() => open('/dados')} />
                 <MenuItem icon="musical-notes-outline" label="Sons" hint="Relaxamento" onPress={() => open('/sons')} />
-                {canExportReports ? <MenuItem icon="document-text-outline" label="Relatórios" hint="PDF e exportações" onPress={() => open('/relatorios')} /> : null}
+                {canExportReports ? <MenuItem icon="document-text-outline" label="Relatórios" hint="PDF, WhatsApp e Excel" onPress={() => open('/relatorios')} /> : null}
                 <MenuItem icon="add-circle-outline" label="Novo registro" hint="Registrar cuidado" onPress={() => open('/registrar')} />
               </View>
               <Text style={[styles.menuSectionLabel, { color: colors.textMuted }]}>APARÊNCIA</Text>

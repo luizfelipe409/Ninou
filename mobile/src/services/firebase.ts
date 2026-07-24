@@ -27,6 +27,7 @@ import {
   type Firestore,
   type Unsubscribe,
 } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { Platform } from 'react-native';
 
 import { NINOU_CLIENT_VERSION } from '@/config/release';
@@ -63,6 +64,7 @@ function initializeNinouAuth(): Auth {
 
 export const auth = initializeNinouAuth();
 export const db: Firestore = getFirestore(app);
+const cloudFunctions = getFunctions(app, 'southamerica-east1');
 
 export type FamilyAccess = {
   familyId: string;
@@ -444,37 +446,23 @@ export async function submitSupportRequest(user: User, familyId: string | undefi
 }
 
 export async function requestAccountDeletion(user: User, familyId?: string) {
-  const stamp = Date.now();
-  const payload = {
-    uid: user.uid,
-    email: user.email || '',
-    familyId: familyId || '',
-    type: 'data_deletion_request',
-    category: 'Exclusão da conta',
-    message: 'Excluir a conta Ninou e os dados pessoais associados. Dados compartilhados da família devem ser avaliados antes da remoção definitiva.',
-    scope: 'account_and_personal_data',
-    status: 'open',
-    requestState: 'requested',
-    requestedAtClient: stamp,
-    requestedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
-  await setDoc(doc(db, 'users', user.uid, 'account', 'dataDeletionRequest'), payload, { merge: true });
-  if (familyId) {
-    await setDoc(doc(db, 'families', familyId, 'legal', `data_request_${user.uid}_${stamp}`), {
-      ...payload,
-      actorUid: user.uid,
-      actorEmail: user.email || '',
-    }, { merge: true });
+  if (auth.currentUser?.uid !== user.uid) {
+    throw new Error('Entre novamente antes de excluir sua conta.');
   }
-  await setDoc(doc(db, 'users', user.uid), {
-    status: 'deletion_requested',
-    deletionRequestStatus: 'open',
-    deletionRequestedAtClient: stamp,
-    deletionRequestedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  }, { merge: true });
-  return payload;
+  const deleteMyAccount = httpsCallable<
+    { familyId: string; confirmation: string },
+    {
+      deleted: boolean;
+      deletedFamilyIds: string[];
+      removedMembershipIds: string[];
+      familyCascade: boolean;
+    }
+  >(cloudFunctions, 'deleteMyAccount');
+  const result = await deleteMyAccount({
+    familyId: familyId || '',
+    confirmation: 'DELETE_NINOU_ACCOUNT',
+  });
+  return result.data;
 }
 
 export function getLocalDateId(now = Date.now()) {
@@ -593,6 +581,10 @@ export function getFirebaseErrorMessage(error: unknown) {
     'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
     'auth/network-request-failed': 'Sem conexão com o Firebase. Confira a internet e tente novamente.',
     'permission-denied': 'Sua conta não tem permissão para esta família.',
+    'functions/unauthenticated': 'Entre novamente antes de excluir sua conta.',
+    'functions/invalid-argument': 'A confirmação da exclusão não foi reconhecida.',
+    'functions/internal': 'Não foi possível concluir a exclusão definitiva. Tente novamente em alguns instantes.',
+    'functions/unavailable': 'O serviço de exclusão está temporariamente indisponível. Confira a internet e tente novamente.',
     'routine/conflict': 'A rotina mudou em outro aparelho. A tela foi atualizada; confira o estado antes de tentar novamente.',
   };
   return messages[code] || (error instanceof Error ? error.message : 'Não foi possível concluir esta ação agora.');
